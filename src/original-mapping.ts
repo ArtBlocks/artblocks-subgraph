@@ -1,26 +1,24 @@
-import { BigInt } from "@graphprotocol/graph-ts";
+import { BigInt, ByteArray, log } from "@graphprotocol/graph-ts";
 import {
-  ArtBlocks,
+  ArtBlocksOriginal as ArtBlocks,
   Mint,
   Transfer,
   AddProjectCall,
   AddProjectScriptCall,
   ClearTokenIpfsImageUriCall,
   OverrideTokenDynamicImageWithIpfsLinkCall,
-  RemoveProjectLastScriptCall,
   ToggleProjectIsActiveCall,
   ToggleProjectIsDynamicCall,
   ToggleProjectIsLockedCall,
   ToggleProjectIsPausedCall,
-  ToggleProjectUseHashStringCall,
   ToggleProjectUseIpfsForStaticCall,
   UpdateProjectAdditionalPayeeInfoCall,
   UpdateProjectArtistAddressCall,
   UpdateProjectArtistNameCall,
   UpdateProjectBaseIpfsURICall,
   UpdateProjectBaseURICall,
-  UpdateProjectCurrencyInfoCall,
   UpdateProjectDescriptionCall,
+  UpdateProjectHashesGeneratedCall,
   UpdateProjectIpfsHashCall,
   UpdateProjectLicenseCall,
   UpdateProjectMaxInvocationsCall,
@@ -31,13 +29,11 @@ import {
   UpdateProjectSecondaryMarketRoyaltyPercentageCall,
   UpdateProjectWebsiteCall,
   AddWhitelistedCall,
-  AddMintWhitelistedCall,
-  UpdateRandomizerAddressCall,
   UpdateArtblocksAddressCall,
   UpdateArtblocksPercentageCall,
   RemoveWhitelistedCall,
-  RemoveMintWhitelistedCall
-} from "../generated/ArtBlocks/ArtBlocks";
+  RemoveProjectLastScriptCall
+} from "../generated/ArtBlocksOriginal/ArtBlocksOriginal";
 import {
   Project,
   Token,
@@ -55,12 +51,12 @@ export function handleMint(event: Mint): void {
 
   token.project = projectId.toString();
   token.owner = event.params._to;
-  token.hash = event.params._hashString;
+  // None used more than 1
+  token.hash = contract.showTokenHashes(event.params._tokenId)[0];
 
-  // Entities can be written to the store with `.save()`
   token.save();
 
-  let project = Project.load(token.project);
+  let project = new Project(token.project);
   project.invocations = contract.projectTokenInfo(projectId).value2;
   project.save();
 }
@@ -75,7 +71,7 @@ export function handleTransfer(event: Transfer): void {
   let token = new Token(event.params.tokenId.toString());
 
   if (transfer.from.toHexString() == ZERO_ADDRESS) {
-    token.hash = contract.tokenIdToHash(event.params.tokenId);
+    token.hash = contract.showTokenHashes(event.params.tokenId)[0];
     token.project = contract
       .tokenIdToProjectId(event.params.tokenId)
       .toString();
@@ -94,8 +90,7 @@ export function handleAddProject(call: AddProjectCall): void {
 
   // TODO: This might get the wrong id if there's a bunch of projects
   // being uploaded together. We need Events!
-  let nextProjectId = contract.nextProjectId();
-  let id = nextProjectId.minus(BigInt.fromI32(1));
+  let id = contract.nextProjectId().minus(BigInt.fromI32(1));
 
   let projectDetails = contract.projectDetails(id);
   let projectTokenInfo = contract.projectTokenInfo(id);
@@ -108,10 +103,9 @@ export function handleAddProject(call: AddProjectCall): void {
   let pricePerTokenInWei = projectTokenInfo.value1;
   let invocations = projectTokenInfo.value2;
   let maxInvocations = projectTokenInfo.value3;
-  let currencySymbol = projectTokenInfo.value7;
 
   let scriptCount = projectScriptInfo.value1;
-  let useHashString = projectScriptInfo.value2;
+  let hashesPerToken = projectScriptInfo.value2;
   let paused = projectScriptInfo.value5;
 
   let project = new Project(id.toString());
@@ -122,18 +116,13 @@ export function handleAddProject(call: AddProjectCall): void {
   project.pricePerTokenInWei = pricePerTokenInWei;
   project.invocations = invocations;
   project.maxInvocations = maxInvocations;
-  project.currencySymbol = currencySymbol;
   project.scriptCount = scriptCount;
+  project.useHashString = hashesPerToken.toI32() > 0;
   project.paused = paused;
   project.active = false;
   project.locked = false;
 
   project.save();
-
-  let platform = new Platform(ARTBLOCKS_PLATFORM_ID);
-  platform.nextProjectId = nextProjectId;
-
-  platform.save();
 }
 
 /*** END EVENT HANDLERS ***/
@@ -157,37 +146,6 @@ export function handleRemoveWhitelisted(call: RemoveWhitelistedCall): void {
     ? platform.whitelisted.filter(address => address !== call.inputs._address)
     : [];
   platform.save();
-}
-
-export function handleAddMintWhitelisted(call: AddMintWhitelistedCall): void {
-  let contract = ArtBlocks.bind(call.to);
-
-  let platform = refreshPlatform(contract);
-  platform.mintWhitelisted = platform.mintWhitelisted
-    ? platform.mintWhitelisted.concat([call.inputs._address])
-    : [call.inputs._address];
-  platform.save();
-}
-
-export function handleRemoveMintWhitelisted(
-  call: RemoveMintWhitelistedCall
-): void {
-  let contract = ArtBlocks.bind(call.to);
-
-  let platform = refreshPlatform(contract);
-  platform.mintWhitelisted = platform.mintWhitelisted
-    ? platform.mintWhitelisted.filter(
-        address => address !== call.inputs._address
-      )
-    : [];
-  platform.save();
-}
-
-export function handleUpdateRandomizerAddress(
-  call: UpdateRandomizerAddressCall
-): void {
-  let contract = ArtBlocks.bind(call.to);
-  refreshPlatform(contract);
 }
 
 export function handleUpdateArtblocksAddress(
@@ -267,8 +225,8 @@ export function handleToggleProjectIsPaused(
   project.save();
 }
 
-export function handleToggleProjectUseHashString(
-  call: ToggleProjectUseHashStringCall
+export function handleUpdateProjectHashesGenerated(
+  call: UpdateProjectHashesGeneratedCall
 ): void {
   let project = Project.load(call.inputs._projectId.toString());
 
@@ -328,17 +286,6 @@ export function handleUpdateProjectBaseURI(
   let project = Project.load(call.inputs._projectId.toString());
 
   project.baseUri = call.inputs._newBaseURI;
-  project.save();
-}
-
-export function handleUpdateProjectCurrencyInfo(
-  call: UpdateProjectCurrencyInfoCall
-): void {
-  let project = Project.load(call.inputs._projectId.toString());
-
-  project.currencySymbol = call.inputs._currencySymbol;
-  project.currencyAddress = call.inputs._currencyAddress;
-
   project.save();
 }
 
@@ -434,14 +381,12 @@ function refreshPlatform(contract: ArtBlocks): Platform {
   let artblocksAddress = contract.artblocksAddress();
   let artblocksPercentage = contract.artblocksPercentage();
   let nextProjectId = contract.nextProjectId();
-  let randomizerContract = contract.randomizerContract();
 
   let platform = new Platform(ARTBLOCKS_PLATFORM_ID);
   platform.admin = admin;
   platform.artblocksAddress = artblocksAddress;
   platform.artblocksPercentage = artblocksPercentage;
   platform.nextProjectId = nextProjectId;
-  platform.randomizerContract = randomizerContract;
 
   platform.save();
 

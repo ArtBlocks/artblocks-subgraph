@@ -1,6 +1,56 @@
-type ExampleEntity @entity {
+type Platform @entity {
   id: ID!
-  count: BigInt!
-  owner: Bytes! # address
-  approved: Bytes! # address
+  admin: Bytes!
+  artblocksAddress: Bytes!
+  artblocksPercentage: BigInt!
+  mintWhitelisted: [Bytes!]
+  randomizerContract: Bytes
+  whitelisted: [Bytes!]
+  nextProjectId: BigInt!
+}
+
+type Project @entity {
+  id: ID!
+  active: Boolean!
+  additionalPayee: Bytes
+  additionalPayeePercentage: BigInt
+  artistAddress: Bytes!
+  artistName: String
+  baseIpfsUri: String
+  baseUri: String
+  currencyAddress: Bytes
+  currencySymbol: String
+  description: String
+  dynamic: Boolean!
+  invocations: BigInt!
+  ipfsHash: String
+  license: String
+  locked: Boolean!
+  maxInvocations: BigInt!
+  name: String
+  paused: Boolean!
+  pricePerTokenInWei: BigInt!
+  royaltyPercentage: BigInt
+  script: String
+  scriptCount: BigInt!
+  scriptJSON: String
+  useHashString: Boolean!
+  useIpfs: Boolean
+  website: String
+}
+
+type Token @entity {
+  id: ID!
+  hash: Bytes!
+  owner: Bytes!
+  project: Project!
+  uri: String
+}
+
+type Transfer @entity {
+  id: ID!
+  to: Bytes!
+  token: Token!
+  from: Bytes
+  timestamp: BigInt!
 }
