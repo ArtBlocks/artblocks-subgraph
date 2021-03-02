@@ -1,4 +1,4 @@
-import { BigInt } from "@graphprotocol/graph-ts";
+import { BigInt, log } from "@graphprotocol/graph-ts";
 import {
   ArtBlocks,
   Mint,
@@ -60,7 +60,7 @@ export function handleMint(event: Mint): void {
   // Entities can be written to the store with `.save()`
   token.save();
 
-  let project = Project.load(token.project);
+  let project = new Project(token.project);
   project.invocations = contract.projectTokenInfo(projectId).value2;
   project.save();
 }
@@ -91,11 +91,10 @@ export function handleTransfer(event: Transfer): void {
 
 export function handleAddProject(call: AddProjectCall): void {
   let contract = ArtBlocks.bind(call.to);
+  let platform = Platform.load(ARTBLOCKS_PLATFORM_ID);
 
-  // TODO: This might get the wrong id if there's a bunch of projects
-  // being uploaded together. We need Events!
-  let nextProjectId = contract.nextProjectId();
-  let id = nextProjectId.minus(BigInt.fromI32(1));
+  let nextProjectId = platform.nextProjectId;
+  let id = nextProjectId;
 
   let projectDetails = contract.projectDetails(id);
   let projectTokenInfo = contract.projectTokenInfo(id);
@@ -124,15 +123,14 @@ export function handleAddProject(call: AddProjectCall): void {
   project.maxInvocations = maxInvocations;
   project.currencySymbol = currencySymbol;
   project.scriptCount = scriptCount;
+  project.useHashString = useHashString;
   project.paused = paused;
   project.active = false;
   project.locked = false;
 
   project.save();
 
-  let platform = new Platform(ARTBLOCKS_PLATFORM_ID);
-  platform.nextProjectId = nextProjectId;
-
+  platform.nextProjectId = platform.nextProjectId.plus(BigInt.fromI32(1));
   platform.save();
 }
 
@@ -307,7 +305,13 @@ export function handleUpdateProjectArtistAddress(
 export function handleUpdateProjectArtistName(
   call: UpdateProjectArtistNameCall
 ): void {
+  log.debug("PROJECT ARTIST NAME UPDATE {}", [
+    call.inputs._projectId.toString()
+  ]);
+
   let project = Project.load(call.inputs._projectId.toString());
+
+  log.debug("PROJECT {}", [project.name]);
 
   project.artistName = call.inputs._projectArtistName;
   project.save();

@@ -479,6 +479,23 @@ export class Project extends Entity {
     }
   }
 
+  get tokens(): Array<string> | null {
+    let value = this.get("tokens");
+    if (value === null || value.kind == ValueKind.NULL) {
+      return null;
+    } else {
+      return value.toStringArray();
+    }
+  }
+
+  set tokens(value: Array<string> | null) {
+    if (value === null) {
+      this.unset("tokens");
+    } else {
+      this.set("tokens", Value.fromStringArray(value as Array<string>));
+    }
+  }
+
   get useHashString(): boolean {
     let value = this.get("useHashString");
     return value.toBoolean();
@@ -570,6 +587,23 @@ export class Token extends Entity {
 
   set project(value: string) {
     this.set("project", Value.fromString(value));
+  }
+
+  get transfers(): Array<string> | null {
+    let value = this.get("transfers");
+    if (value === null || value.kind == ValueKind.NULL) {
+      return null;
+    } else {
+      return value.toStringArray();
+    }
+  }
+
+  set transfers(value: Array<string> | null) {
+    if (value === null) {
+      this.unset("transfers");
+    } else {
+      this.set("transfers", Value.fromStringArray(value as Array<string>));
+    }
   }
 
   get uri(): string | null {

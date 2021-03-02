@@ -30,7 +30,7 @@ dataSources:
         - function: removeWhitelisted(address)
           handler: handleRemoveWhitelisted
         - function: addMintWhitelisted(address)
-          handler: addMintWhitelisted
+          handler: handleAddMintWhitelisted
         - function: removeMintWhitelisted(address)
           handler: handleRemoveMintWhitelisted
         - function: updateRandomizerAddress(address)
@@ -45,8 +45,6 @@ dataSources:
           handler: handleAddProjectScript
         - function: clearTokenIpfsImageUri(uint256)
           handler: handleClearTokenIpfsImageUri
-        - function: mint(address,uint256,address)
-          handler: handleMint
         - function: overrideTokenDynamicImageWithIpfsLink(uint256,string)
           handler: handleOverrideTokenDynamicImageWithIpfsLink
         - function: removeProjectLastScript(uint256)
