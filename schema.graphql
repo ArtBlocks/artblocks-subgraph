@@ -45,14 +45,5 @@ type Token @entity {
   hash: Bytes!
   owner: Bytes!
   project: Project!
-  transfers: [Transfer!] @derivedFrom(field: "token")
   uri: String
-}
-
-type Transfer @entity {
-  id: ID!
-  to: Bytes!
-  token: Token!
-  from: Bytes
-  timestamp: BigInt!
 }

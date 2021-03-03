@@ -1,4 +1,13 @@
-import { BigInt, ByteArray, log } from "@graphprotocol/graph-ts";
+// We're duplicating a lot of the code from mapping.ts here so
+// that we can use the auto-generated types graph-cli codegen
+// provides. There are no union types in AssemblyScript so
+// we can't use that and then check the address and cast to a
+// specific type. Some call signatures are the same so the type
+// wouldn't ultimately matter/would be the same but I'd prefer
+// to consistently use the generated types for the specific
+// contract we're indexing from.
+
+import { BigInt, log } from "@graphprotocol/graph-ts";
 import {
   ArtBlocksOriginal as ArtBlocks,
   Mint,
@@ -34,12 +43,7 @@ import {
   RemoveWhitelistedCall,
   RemoveProjectLastScriptCall
 } from "../generated/ArtBlocksOriginal/ArtBlocksOriginal";
-import {
-  Project,
-  Token,
-  Transfer as TransferEntity,
-  Platform
-} from "../generated/schema";
+import { Project, Token, Platform } from "../generated/schema";
 import { ARTBLOCKS_PLATFORM_ID, ZERO_ADDRESS } from "./constants";
 
 /*** EVENT HANDLERS ***/
@@ -61,16 +65,16 @@ export function handleMint(event: Mint): void {
   project.save();
 }
 
+// Update token owner on transfer
 export function handleTransfer(event: Transfer): void {
   let contract = ArtBlocks.bind(event.address);
-  let transfer = new TransferEntity(event.transaction.from.toHex());
 
-  transfer.to = event.params.to;
-  transfer.from = event.params.from;
-
+  // This will only create a new token if a token with the
+  // same id does not already exist
   let token = new Token(event.params.tokenId.toString());
 
-  if (transfer.from.toHexString() == ZERO_ADDRESS) {
+  // Set required fields if this is a mint
+  if (event.params.from.toHexString() == ZERO_ADDRESS) {
     token.hash = contract.showTokenHashes(event.params.tokenId)[0];
     token.project = contract
       .tokenIdToProjectId(event.params.tokenId)
@@ -78,19 +82,18 @@ export function handleTransfer(event: Transfer): void {
   }
 
   token.owner = event.params.to;
-  transfer.token = token.id;
-  transfer.timestamp = event.block.timestamp;
-
-  transfer.save();
   token.save();
 }
 
 export function handleAddProject(call: AddProjectCall): void {
   let contract = ArtBlocks.bind(call.to);
+  let platform = Platform.load(ARTBLOCKS_PLATFORM_ID);
 
-  // TODO: This might get the wrong id if there's a bunch of projects
-  // being uploaded together. We need Events!
-  let id = contract.nextProjectId().minus(BigInt.fromI32(1));
+  if (platform == null) {
+    platform = refreshPlatform(contract);
+  }
+
+  let id = platform.nextProjectId;
 
   let projectDetails = contract.projectDetails(id);
   let projectTokenInfo = contract.projectTokenInfo(id);
@@ -123,6 +126,9 @@ export function handleAddProject(call: AddProjectCall): void {
   project.locked = false;
 
   project.save();
+
+  platform.nextProjectId = platform.nextProjectId.plus(BigInt.fromI32(1));
+  platform.save();
 }
 
 /*** END EVENT HANDLERS ***/
@@ -420,4 +426,4 @@ function refreshProjectScript(contract: ArtBlocks, projectId: BigInt): void {
 
   project.save();
 }
-/** HELPERS ***/
+/** END HELPERS ***/

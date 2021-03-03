@@ -1,4 +1,4 @@
-import { BigInt, log } from "@graphprotocol/graph-ts";
+import { BigInt } from "@graphprotocol/graph-ts";
 import {
   ArtBlocks,
   Mint,
@@ -38,12 +38,8 @@ import {
   RemoveWhitelistedCall,
   RemoveMintWhitelistedCall
 } from "../generated/ArtBlocks/ArtBlocks";
-import {
-  Project,
-  Token,
-  Transfer as TransferEntity,
-  Platform
-} from "../generated/schema";
+
+import { Project, Token, Platform } from "../generated/schema";
 import { ARTBLOCKS_PLATFORM_ID, ZERO_ADDRESS } from "./constants";
 
 /*** EVENT HANDLERS ***/
@@ -55,9 +51,8 @@ export function handleMint(event: Mint): void {
 
   token.project = projectId.toString();
   token.owner = event.params._to;
-  token.hash = event.params._hashString;
 
-  // Entities can be written to the store with `.save()`
+  token.hash = (event as Mint).params._hashString;
   token.save();
 
   let project = new Project(token.project);
@@ -65,36 +60,38 @@ export function handleMint(event: Mint): void {
   project.save();
 }
 
+// Update token owner on transfer
 export function handleTransfer(event: Transfer): void {
-  let contract = ArtBlocks.bind(event.address);
-  let transfer = new TransferEntity(event.transaction.from.toHex());
+  let contract: ArtBlocks = ArtBlocks.bind(event.address);
 
-  transfer.to = event.params.to;
-  transfer.from = event.params.from;
-
+  // This will only create a new token if a token with the
+  // same id does not already exist
   let token = new Token(event.params.tokenId.toString());
 
-  if (transfer.from.toHexString() == ZERO_ADDRESS) {
-    token.hash = contract.tokenIdToHash(event.params.tokenId);
+  if (event.params.from.toHexString() == ZERO_ADDRESS) {
+    token.hash = (contract as ArtBlocks).tokenIdToHash(event.params.tokenId);
     token.project = contract
       .tokenIdToProjectId(event.params.tokenId)
       .toString();
   }
 
   token.owner = event.params.to;
-  transfer.token = token.id;
-  transfer.timestamp = event.block.timestamp;
-
-  transfer.save();
   token.save();
 }
+/*** END EVENT HANDLERS ***/
 
+/*** CALL HANDLERS  ***/
 export function handleAddProject(call: AddProjectCall): void {
   let contract = ArtBlocks.bind(call.to);
+
   let platform = Platform.load(ARTBLOCKS_PLATFORM_ID);
 
-  let nextProjectId = platform.nextProjectId;
-  let id = nextProjectId;
+  if (platform === null) {
+    platform = refreshPlatform(contract);
+  }
+
+  // If two transactions with
+  let id = platform.nextProjectId;
 
   let projectDetails = contract.projectDetails(id);
   let projectTokenInfo = contract.projectTokenInfo(id);
@@ -134,9 +131,6 @@ export function handleAddProject(call: AddProjectCall): void {
   platform.save();
 }
 
-/*** END EVENT HANDLERS ***/
-
-/*** CALL HANDLERS  ***/
 export function handleAddWhitelisted(call: AddWhitelistedCall): void {
   let contract = ArtBlocks.bind(call.to);
 
@@ -305,13 +299,7 @@ export function handleUpdateProjectArtistAddress(
 export function handleUpdateProjectArtistName(
   call: UpdateProjectArtistNameCall
 ): void {
-  log.debug("PROJECT ARTIST NAME UPDATE {}", [
-    call.inputs._projectId.toString()
-  ]);
-
   let project = Project.load(call.inputs._projectId.toString());
-
-  log.debug("PROJECT {}", [project.name]);
 
   project.artistName = call.inputs._projectArtistName;
   project.save();
@@ -438,14 +426,13 @@ function refreshPlatform(contract: ArtBlocks): Platform {
   let artblocksAddress = contract.artblocksAddress();
   let artblocksPercentage = contract.artblocksPercentage();
   let nextProjectId = contract.nextProjectId();
-  let randomizerContract = contract.randomizerContract();
 
   let platform = new Platform(ARTBLOCKS_PLATFORM_ID);
   platform.admin = admin;
   platform.artblocksAddress = artblocksAddress;
   platform.artblocksPercentage = artblocksPercentage;
   platform.nextProjectId = nextProjectId;
-  platform.randomizerContract = randomizerContract;
+  platform.randomizerContract = (contract as ArtBlocks).randomizerContract();
 
   platform.save();
 
@@ -479,4 +466,4 @@ function refreshProjectScript(contract: ArtBlocks, projectId: BigInt): void {
 
   project.save();
 }
-/** HELPERS ***/
+/** END HELPERS ***/

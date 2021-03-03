@@ -14,8 +14,9 @@ dataSources:
       apiVersion: 0.0.4
       language: wasm/assemblyscript
       entities:
-        - Mint
-        - Transfer
+        - Project
+        - Token
+        - Platform
       abis:
         - name: ArtBlocks
           file: ./abis/ArtBlocks.json
@@ -106,8 +107,9 @@ dataSources:
       apiVersion: 0.0.4
       language: wasm/assemblyscript
       entities:
-        - Mint
-        - Transfer
+        - Project
+        - Token
+        - Platform
       abis:
         - name: ArtBlocksOriginal
           file: ./abis/ArtBlocksOriginal.json

@@ -589,23 +589,6 @@ export class Token extends Entity {
     this.set("project", Value.fromString(value));
   }
 
-  get transfers(): Array<string> | null {
-    let value = this.get("transfers");
-    if (value === null || value.kind == ValueKind.NULL) {
-      return null;
-    } else {
-      return value.toStringArray();
-    }
-  }
-
-  set transfers(value: Array<string> | null) {
-    if (value === null) {
-      this.unset("transfers");
-    } else {
-      this.set("transfers", Value.fromStringArray(value as Array<string>));
-    }
-  }
-
   get uri(): string | null {
     let value = this.get("uri");
     if (value === null || value.kind == ValueKind.NULL) {
@@ -621,80 +604,5 @@ export class Token extends Entity {
     } else {
       this.set("uri", Value.fromString(value as string));
     }
-  }
-}
-
-export class Transfer extends Entity {
-  constructor(id: string) {
-    super();
-    this.set("id", Value.fromString(id));
-  }
-
-  save(): void {
-    let id = this.get("id");
-    assert(id !== null, "Cannot save Transfer entity without an ID");
-    assert(
-      id.kind == ValueKind.STRING,
-      "Cannot save Transfer entity with non-string ID. " +
-        'Considering using .toHex() to convert the "id" to a string.'
-    );
-    store.set("Transfer", id.toString(), this);
-  }
-
-  static load(id: string): Transfer | null {
-    return store.get("Transfer", id) as Transfer | null;
-  }
-
-  get id(): string {
-    let value = this.get("id");
-    return value.toString();
-  }
-
-  set id(value: string) {
-    this.set("id", Value.fromString(value));
-  }
-
-  get to(): Bytes {
-    let value = this.get("to");
-    return value.toBytes();
-  }
-
-  set to(value: Bytes) {
-    this.set("to", Value.fromBytes(value));
-  }
-
-  get token(): string {
-    let value = this.get("token");
-    return value.toString();
-  }
-
-  set token(value: string) {
-    this.set("token", Value.fromString(value));
-  }
-
-  get from(): Bytes | null {
-    let value = this.get("from");
-    if (value === null || value.kind == ValueKind.NULL) {
-      return null;
-    } else {
-      return value.toBytes();
-    }
-  }
-
-  set from(value: Bytes | null) {
-    if (value === null) {
-      this.unset("from");
-    } else {
-      this.set("from", Value.fromBytes(value as Bytes));
-    }
-  }
-
-  get timestamp(): BigInt {
-    let value = this.get("timestamp");
-    return value.toBigInt();
-  }
-
-  set timestamp(value: BigInt) {
-    this.set("timestamp", Value.fromBigInt(value));
   }
 }
