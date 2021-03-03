@@ -46,4 +46,22 @@ type Token @entity {
   owner: Bytes!
   project: Project!
   uri: String
+  osSalesHistory: [OSSaleEntry!]! @derivedFrom(field: "token")
+}
+
+type OSSaleWrapper @entity {
+  id: ID!
+
+  timestamp: BigInt!
+  from: Bytes!
+  to: Bytes!
+  priceInWei: BigInt
+  isBundle: Boolean!
+  osSaleEntries: [OSSaleEntry!]! @derivedFrom(field: "osSaleWrapper")
+}
+
+type OSSaleEntry @entity {
+  id: ID!
+  token: Token!
+  osSaleWrapper: OSSaleWrapper!
 }
