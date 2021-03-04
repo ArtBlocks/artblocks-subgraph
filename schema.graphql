@@ -38,6 +38,7 @@ type Project @entity {
   useHashString: Boolean!
   useIpfs: Boolean
   website: String
+  osTotalVolumeInWei: BigInt!
 }
 
 type Token @entity {
@@ -57,6 +58,8 @@ type OSSaleWrapper @entity {
   to: Bytes!
   priceInWei: BigInt
   isBundle: Boolean!
+
+  associatedProjectsIds: [ID!] # Field used to keep track of all projects involved in the sale (in case of bundle)
   osSaleEntries: [OSSaleEntry!]! @derivedFrom(field: "osSaleWrapper")
 }
 

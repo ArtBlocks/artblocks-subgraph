@@ -132,6 +132,7 @@ export function handleAddProject(call: AddProjectCall): void {
   project.paused = paused;
   project.active = false;
   project.locked = false;
+  project.osTotalVolumeInWei = BigInt.fromI32(0);
 
   project.save();
 

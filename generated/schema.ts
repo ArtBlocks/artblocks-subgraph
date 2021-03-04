@@ -530,6 +530,15 @@ export class Project extends Entity {
       this.set("website", Value.fromString(value as string));
     }
   }
+
+  get osTotalVolumeInWei(): BigInt {
+    let value = this.get("osTotalVolumeInWei");
+    return value.toBigInt();
+  }
+
+  set osTotalVolumeInWei(value: BigInt) {
+    this.set("osTotalVolumeInWei", Value.fromBigInt(value));
+  }
 }
 
 export class Token extends Entity {
@@ -697,6 +706,26 @@ export class OSSaleWrapper extends Entity {
 
   set isBundle(value: boolean) {
     this.set("isBundle", Value.fromBoolean(value));
+  }
+
+  get associatedProjectsIds(): Array<string> | null {
+    let value = this.get("associatedProjectsIds");
+    if (value === null || value.kind == ValueKind.NULL) {
+      return null;
+    } else {
+      return value.toStringArray();
+    }
+  }
+
+  set associatedProjectsIds(value: Array<string> | null) {
+    if (value === null) {
+      this.unset("associatedProjectsIds");
+    } else {
+      this.set(
+        "associatedProjectsIds",
+        Value.fromStringArray(value as Array<string>)
+      );
+    }
   }
 
   get osSaleEntries(): Array<string> {

@@ -131,6 +131,7 @@ export function handleAddProject(call: AddProjectCall): void {
   project.paused = paused;
   project.active = false;
   project.locked = false;
+  project.osTotalVolumeInWei = BigInt.fromI32(0);
 
   project.save();
 
@@ -458,7 +459,24 @@ function handleOpenSeaSale(event: Transfer): void {
   }
 
   saleEntry.osSaleWrapper = saleWrapper.id;
-  saleEntry.token = event.params.tokenId.toString();
+
+  let tokenId = event.params.tokenId.toString();
+  saleEntry.token = tokenId;
+
+  // Here we fill the associatedProjectsIds of the OSSaleWrapper
+  // This is needed to then slipt the ETH price of the sale
+  // accross the different projects in case of bundle sale
+  let token = Token.load(tokenId);
+  // Should always be the case
+  if (token != null) {
+    if (saleWrapper.associatedProjectsIds == null) {
+      saleWrapper.associatedProjectsIds = [token.project];
+    } else {
+      let associatedProjectsIds = saleWrapper.associatedProjectsIds;
+      associatedProjectsIds.push(token.project);
+      saleWrapper.associatedProjectsIds = associatedProjectsIds;
+    }
+  }
 
   saleEntry.save();
   saleWrapper.save();
