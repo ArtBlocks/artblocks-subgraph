@@ -182,3 +182,25 @@ dataSources:
         - function: updateProjectWebsite(uint256,string)
           handler: handleUpdateProjectWebsite
       file: ./src/original-mapping.ts
+  - kind: ethereum/contract
+    name: WyvernExchange
+    network: mainnet
+    source:
+      address: "0x7Be8076f4EA4A4AD08075C2508e481d6C946D12b"
+      abi: WyvernExchange
+      startBlock: 11338811
+    mapping:
+      kind: ethereum/events
+      apiVersion: 0.0.4
+      language: wasm/assemblyscript
+      entities:
+        - Project
+        - Token
+        - Platform
+      abis:
+        - name: WyvernExchange
+          file: ./abis/WyvernExchange.json
+      eventHandlers:
+        - event: OrdersMatched(bytes32,bytes32,indexed address,indexed address,uint256,indexed bytes32)
+          handler: handleOrdersMatched
+      file: ./src/os-mapping.ts

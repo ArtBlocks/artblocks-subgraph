@@ -530,6 +530,15 @@ export class Project extends Entity {
       this.set("website", Value.fromString(value as string));
     }
   }
+
+  get osTotalVolumeInWei(): BigInt {
+    let value = this.get("osTotalVolumeInWei");
+    return value.toBigInt();
+  }
+
+  set osTotalVolumeInWei(value: BigInt) {
+    this.set("osTotalVolumeInWei", Value.fromBigInt(value));
+  }
 }
 
 export class Token extends Entity {
@@ -604,5 +613,176 @@ export class Token extends Entity {
     } else {
       this.set("uri", Value.fromString(value as string));
     }
+  }
+
+  get osSalesHistory(): Array<string> {
+    let value = this.get("osSalesHistory");
+    return value.toStringArray();
+  }
+
+  set osSalesHistory(value: Array<string>) {
+    this.set("osSalesHistory", Value.fromStringArray(value));
+  }
+}
+
+export class OSSaleWrapper extends Entity {
+  constructor(id: string) {
+    super();
+    this.set("id", Value.fromString(id));
+  }
+
+  save(): void {
+    let id = this.get("id");
+    assert(id !== null, "Cannot save OSSaleWrapper entity without an ID");
+    assert(
+      id.kind == ValueKind.STRING,
+      "Cannot save OSSaleWrapper entity with non-string ID. " +
+        'Considering using .toHex() to convert the "id" to a string.'
+    );
+    store.set("OSSaleWrapper", id.toString(), this);
+  }
+
+  static load(id: string): OSSaleWrapper | null {
+    return store.get("OSSaleWrapper", id) as OSSaleWrapper | null;
+  }
+
+  get id(): string {
+    let value = this.get("id");
+    return value.toString();
+  }
+
+  set id(value: string) {
+    this.set("id", Value.fromString(value));
+  }
+
+  get timestamp(): BigInt {
+    let value = this.get("timestamp");
+    return value.toBigInt();
+  }
+
+  set timestamp(value: BigInt) {
+    this.set("timestamp", Value.fromBigInt(value));
+  }
+
+  get from(): Bytes {
+    let value = this.get("from");
+    return value.toBytes();
+  }
+
+  set from(value: Bytes) {
+    this.set("from", Value.fromBytes(value));
+  }
+
+  get to(): Bytes {
+    let value = this.get("to");
+    return value.toBytes();
+  }
+
+  set to(value: Bytes) {
+    this.set("to", Value.fromBytes(value));
+  }
+
+  get priceInWei(): BigInt | null {
+    let value = this.get("priceInWei");
+    if (value === null || value.kind == ValueKind.NULL) {
+      return null;
+    } else {
+      return value.toBigInt();
+    }
+  }
+
+  set priceInWei(value: BigInt | null) {
+    if (value === null) {
+      this.unset("priceInWei");
+    } else {
+      this.set("priceInWei", Value.fromBigInt(value as BigInt));
+    }
+  }
+
+  get isBundle(): boolean {
+    let value = this.get("isBundle");
+    return value.toBoolean();
+  }
+
+  set isBundle(value: boolean) {
+    this.set("isBundle", Value.fromBoolean(value));
+  }
+
+  get associatedProjectsIds(): Array<string> | null {
+    let value = this.get("associatedProjectsIds");
+    if (value === null || value.kind == ValueKind.NULL) {
+      return null;
+    } else {
+      return value.toStringArray();
+    }
+  }
+
+  set associatedProjectsIds(value: Array<string> | null) {
+    if (value === null) {
+      this.unset("associatedProjectsIds");
+    } else {
+      this.set(
+        "associatedProjectsIds",
+        Value.fromStringArray(value as Array<string>)
+      );
+    }
+  }
+
+  get osSaleEntries(): Array<string> {
+    let value = this.get("osSaleEntries");
+    return value.toStringArray();
+  }
+
+  set osSaleEntries(value: Array<string>) {
+    this.set("osSaleEntries", Value.fromStringArray(value));
+  }
+}
+
+export class OSSaleEntry extends Entity {
+  constructor(id: string) {
+    super();
+    this.set("id", Value.fromString(id));
+  }
+
+  save(): void {
+    let id = this.get("id");
+    assert(id !== null, "Cannot save OSSaleEntry entity without an ID");
+    assert(
+      id.kind == ValueKind.STRING,
+      "Cannot save OSSaleEntry entity with non-string ID. " +
+        'Considering using .toHex() to convert the "id" to a string.'
+    );
+    store.set("OSSaleEntry", id.toString(), this);
+  }
+
+  static load(id: string): OSSaleEntry | null {
+    return store.get("OSSaleEntry", id) as OSSaleEntry | null;
+  }
+
+  get id(): string {
+    let value = this.get("id");
+    return value.toString();
+  }
+
+  set id(value: string) {
+    this.set("id", Value.fromString(value));
+  }
+
+  get token(): string {
+    let value = this.get("token");
+    return value.toString();
+  }
+
+  set token(value: string) {
+    this.set("token", Value.fromString(value));
+  }
+
+  get osSaleWrapper(): string {
+    let value = this.get("osSaleWrapper");
+    return value.toString();
+  }
+
+  set osSaleWrapper(value: string) {
+    this.set("osSaleWrapper", Value.fromString(value));
   }
 }

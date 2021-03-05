@@ -39,8 +39,8 @@ import {
   RemoveMintWhitelistedCall
 } from "../generated/ArtBlocks/ArtBlocks";
 
-import { Project, Token, Platform } from "../generated/schema";
-import { ARTBLOCKS_PLATFORM_ID, ZERO_ADDRESS } from "./constants";
+import { Project, Token, Platform, OSSaleEntry, OSSaleWrapper } from "../generated/schema";
+import { ARTBLOCKS_PLATFORM_ID, WYVERN_ATOMICIZER_ADDRESS, WYVERN_EXCHANGE_ADDRESS, ZERO_ADDRESS } from "./constants";
 
 /*** EVENT HANDLERS ***/
 export function handleMint(event: Mint): void {
@@ -74,6 +74,14 @@ export function handleTransfer(event: Transfer): void {
       .tokenIdToProjectId(event.params.tokenId)
       .toString();
   }
+
+  // If the transfer event is raised because of a transaction sent to Open Sea 
+  // create a new OSSaleEntry and update/create its associated OSSaleWrapper
+  let txSentTo = event.transaction.to.toHexString();
+  if (txSentTo == WYVERN_EXCHANGE_ADDRESS || txSentTo == WYVERN_ATOMICIZER_ADDRESS) {
+    handleOpenSeaSale(event);
+  }
+
 
   token.owner = event.params.to;
   token.save();
@@ -124,6 +132,7 @@ export function handleAddProject(call: AddProjectCall): void {
   project.paused = paused;
   project.active = false;
   project.locked = false;
+  project.osTotalVolumeInWei = BigInt.fromI32(0);
 
   project.save();
 
@@ -169,8 +178,8 @@ export function handleRemoveMintWhitelisted(
   let platform = refreshPlatform(contract);
   platform.mintWhitelisted = platform.mintWhitelisted
     ? platform.mintWhitelisted.filter(
-        address => address !== call.inputs._address
-      )
+      address => address !== call.inputs._address
+    )
     : [];
   platform.save();
 }
@@ -465,5 +474,35 @@ function refreshProjectScript(contract: ArtBlocks, projectId: BigInt): void {
   project.scriptCount = scriptInfo.value1;
 
   project.save();
+}
+
+function handleOpenSeaSale(event: Transfer): void {
+  // Create a new SaleEntry
+  let saleEntry = new OSSaleEntry(event.transaction.hash.toHexString() + event.logIndex.toString())
+
+  // Fetch the associated sale wrapper
+  let saleWrapper = OSSaleWrapper.load(event.transaction.hash.toHexString());
+  if (saleWrapper != null) {
+
+    // Several Transfer events for the same tx
+    // This is a bundle sale
+    saleWrapper.isBundle = true;
+
+  } else {
+
+    // If none create it
+    saleWrapper = new OSSaleWrapper(event.transaction.hash.toHexString());
+
+    saleWrapper.timestamp = event.block.timestamp;
+    saleWrapper.from = event.params.from;
+    saleWrapper.to = event.params.to;
+    saleWrapper.isBundle = false;
+  }
+
+  saleEntry.osSaleWrapper = saleWrapper.id;
+  saleEntry.token = event.params.tokenId.toString();
+
+  saleEntry.save();
+  saleWrapper.save();
 }
 /** END HELPERS ***/
