@@ -3,14 +3,15 @@ type Platform @entity {
   admin: Bytes!
   artblocksAddress: Bytes!
   artblocksPercentage: BigInt!
-  mintWhitelisted: [Bytes!]
+  mintWhitelisted: [Bytes!]!
   randomizerContract: Bytes
-  whitelisted: [Bytes!]
+  whitelisted: [Bytes!]!
   nextProjectId: BigInt!
 }
 
 type Project @entity {
   id: ID!
+  index: BigInt! # BigInt equivalent of ID for sorting
   active: Boolean!
   additionalPayee: Bytes
   additionalPayeePercentage: BigInt
@@ -39,15 +40,35 @@ type Project @entity {
   useIpfs: Boolean
   website: String
   osTotalVolumeInWei: BigInt!
+  "Accounts that own tokens from the project"
+  accounts: [AccountProject!] @derivedFrom(field: "project")
+  createdAt: BigInt!
+  updatedAt: BigInt!
+}
+
+type Account @entity {
+  id: ID!
+  tokens: [Token!] @derivedFrom(field: "owner")
+  "Projects the account owns tokens from"
+  projects: [AccountProject!] @derivedFrom(field: "account")
+}
+
+type AccountProject @entity {
+  id: ID!
+  account: Account!
+  project: Project!
+  count: Int!
 }
 
 type Token @entity {
   id: ID!
+  invocation: BigInt!
   hash: Bytes!
-  owner: Bytes!
+  owner: Account!
   project: Project!
   uri: String
   osSalesHistory: [OSSaleEntry!]! @derivedFrom(field: "token")
+  createdAt: BigInt!
 }
 
 type OSSaleWrapper @entity {

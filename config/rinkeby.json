@@ -1,0 +1,9 @@
+{
+  "network": "rinkeby",
+  "address": "0x152eeE3DCc5526efd646E9b45c9a9672BfFcc097",
+  "startBlock": 8000902,
+  "originalAddress": "0x7b404C05733344eA9a618b95B21Ad27090B53456",
+  "originalStartBlock": 7601960,
+  "openSeaAddress": "0x5206e78b21Ce315ce284FB24cf05e0585A93B1d9",
+  "openSeaStartBlock": 7601960
+}

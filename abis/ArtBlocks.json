@@ -81,8 +81,8 @@
       {
         "indexed": true,
         "internalType": "bytes32",
-        "name": "_hashString",
-        "type": "bytes32"
+        "name": "_projectId",
+        "type": "uint256"
       }
     ],
     "name": "Mint",

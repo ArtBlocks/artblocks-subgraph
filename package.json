@@ -4,13 +4,19 @@
   "scripts": {
     "codegen": "graph codegen",
     "build": "graph build",
-    "deploy": "graph deploy --node https://api.thegraph.com/deploy/ --ipfs https://api.thegraph.com/ipfs/ ArtBlocks/artblocks-subgraph",
-    "create-local": "graph create --node http://localhost:8020/ ArtBlocks/artblocks-subgraph",
-    "remove-local": "graph remove --node http://localhost:8020/ ArtBlocks/artblocks-subgraph",
-    "deploy-local": "graph deploy --node http://localhost:8020/ --ipfs http://localhost:5001 ArtBlocks/artblocks-subgraph"
+    "deploy": "graph deploy --node https://api.thegraph.com/deploy/ --ipfs https://api.thegraph.com/ipfs/ ArtBlocks/art-blocks",
+    "create-local": "graph create --node http://localhost:8020/ ArtBlocks/art-blocks",
+    "remove-local": "graph remove --node http://localhost:8020/ ArtBlocks/art-blocks",
+    "deploy-local": "graph deploy --node http://localhost:8020/ --ipfs http://localhost:5001 ArtBlocks/art-blocks",
+    "prepare:mainnet": "mustache config/mainnet.json subgraph.template.yaml > subgraph.yaml",
+    "prepare:rinkeby": "mustache config/rinkeby.json subgraph.template.yaml > subgraph.yaml",
+    "prepare:local": "mustache config/local.json subgraph.template.yaml > subgraph.yaml"
   },
   "dependencies": {
     "@graphprotocol/graph-cli": "0.20.0",
     "@graphprotocol/graph-ts": "0.20.0"
+  },
+  "devDependencies": {
+    "mustache": "^4.1.0"
   }
 }
