@@ -507,7 +507,7 @@ export function handleToggleProjectIsPaused(
   let project = Project.load(call.inputs._projectId.toString());
 
   if (project != null) {
-    project.paused = !project.locked;
+    project.paused = !project.paused;
     project.save();
   }
 }
