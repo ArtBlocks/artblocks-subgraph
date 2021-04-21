@@ -12,108 +12,6 @@ import {
   BigDecimal
 } from "@graphprotocol/graph-ts";
 
-export class Platform extends Entity {
-  constructor(id: string) {
-    super();
-    this.set("id", Value.fromString(id));
-  }
-
-  save(): void {
-    let id = this.get("id");
-    assert(id !== null, "Cannot save Platform entity without an ID");
-    assert(
-      id.kind == ValueKind.STRING,
-      "Cannot save Platform entity with non-string ID. " +
-        'Considering using .toHex() to convert the "id" to a string.'
-    );
-    store.set("Platform", id.toString(), this);
-  }
-
-  static load(id: string): Platform | null {
-    return store.get("Platform", id) as Platform | null;
-  }
-
-  get id(): string {
-    let value = this.get("id");
-    return value.toString();
-  }
-
-  set id(value: string) {
-    this.set("id", Value.fromString(value));
-  }
-
-  get admin(): Bytes {
-    let value = this.get("admin");
-    return value.toBytes();
-  }
-
-  set admin(value: Bytes) {
-    this.set("admin", Value.fromBytes(value));
-  }
-
-  get artblocksAddress(): Bytes {
-    let value = this.get("artblocksAddress");
-    return value.toBytes();
-  }
-
-  set artblocksAddress(value: Bytes) {
-    this.set("artblocksAddress", Value.fromBytes(value));
-  }
-
-  get artblocksPercentage(): BigInt {
-    let value = this.get("artblocksPercentage");
-    return value.toBigInt();
-  }
-
-  set artblocksPercentage(value: BigInt) {
-    this.set("artblocksPercentage", Value.fromBigInt(value));
-  }
-
-  get mintWhitelisted(): Array<Bytes> {
-    let value = this.get("mintWhitelisted");
-    return value.toBytesArray();
-  }
-
-  set mintWhitelisted(value: Array<Bytes>) {
-    this.set("mintWhitelisted", Value.fromBytesArray(value));
-  }
-
-  get randomizerContract(): Bytes | null {
-    let value = this.get("randomizerContract");
-    if (value === null || value.kind == ValueKind.NULL) {
-      return null;
-    } else {
-      return value.toBytes();
-    }
-  }
-
-  set randomizerContract(value: Bytes | null) {
-    if (value === null) {
-      this.unset("randomizerContract");
-    } else {
-      this.set("randomizerContract", Value.fromBytes(value as Bytes));
-    }
-  }
-
-  get whitelisted(): Array<Bytes> {
-    let value = this.get("whitelisted");
-    return value.toBytesArray();
-  }
-
-  set whitelisted(value: Array<Bytes>) {
-    this.set("whitelisted", Value.fromBytesArray(value));
-  }
-
-  get nextProjectId(): BigInt {
-    let value = this.get("nextProjectId");
-    return value.toBigInt();
-  }
-
-  set nextProjectId(value: BigInt) {
-    this.set("nextProjectId", Value.fromBigInt(value));
-  }
-}
-
 export class Project extends Entity {
   constructor(id: string) {
     super();
@@ -194,6 +92,15 @@ export class Project extends Entity {
     } else {
       this.set("additionalPayeePercentage", Value.fromBigInt(value as BigInt));
     }
+  }
+
+  get artist(): string {
+    let value = this.get("artist");
+    return value.toString();
+  }
+
+  set artist(value: string) {
+    this.set("artist", Value.fromString(value));
   }
 
   get artistAddress(): Bytes {
@@ -533,8 +440,8 @@ export class Project extends Entity {
     this.set("osTotalVolumeInWei", Value.fromBigInt(value));
   }
 
-  get accounts(): Array<string> | null {
-    let value = this.get("accounts");
+  get owners(): Array<string> | null {
+    let value = this.get("owners");
     if (value === null || value.kind == ValueKind.NULL) {
       return null;
     } else {
@@ -542,11 +449,11 @@ export class Project extends Entity {
     }
   }
 
-  set accounts(value: Array<string> | null) {
+  set owners(value: Array<string> | null) {
     if (value === null) {
-      this.unset("accounts");
+      this.unset("owners");
     } else {
-      this.set("accounts", Value.fromStringArray(value as Array<string>));
+      this.set("owners", Value.fromStringArray(value as Array<string>));
     }
   }
 
@@ -566,6 +473,191 @@ export class Project extends Entity {
 
   set updatedAt(value: BigInt) {
     this.set("updatedAt", Value.fromBigInt(value));
+  }
+
+  get contract(): string {
+    let value = this.get("contract");
+    return value.toString();
+  }
+
+  set contract(value: string) {
+    this.set("contract", Value.fromString(value));
+  }
+}
+
+export class Contract extends Entity {
+  constructor(id: string) {
+    super();
+    this.set("id", Value.fromString(id));
+  }
+
+  save(): void {
+    let id = this.get("id");
+    assert(id !== null, "Cannot save Contract entity without an ID");
+    assert(
+      id.kind == ValueKind.STRING,
+      "Cannot save Contract entity with non-string ID. " +
+        'Considering using .toHex() to convert the "id" to a string.'
+    );
+    store.set("Contract", id.toString(), this);
+  }
+
+  static load(id: string): Contract | null {
+    return store.get("Contract", id) as Contract | null;
+  }
+
+  get id(): string {
+    let value = this.get("id");
+    return value.toString();
+  }
+
+  set id(value: string) {
+    this.set("id", Value.fromString(value));
+  }
+
+  get admin(): Bytes {
+    let value = this.get("admin");
+    return value.toBytes();
+  }
+
+  set admin(value: Bytes) {
+    this.set("admin", Value.fromBytes(value));
+  }
+
+  get artblocksAddress(): Bytes {
+    let value = this.get("artblocksAddress");
+    return value.toBytes();
+  }
+
+  set artblocksAddress(value: Bytes) {
+    this.set("artblocksAddress", Value.fromBytes(value));
+  }
+
+  get artblocksPercentage(): BigInt {
+    let value = this.get("artblocksPercentage");
+    return value.toBigInt();
+  }
+
+  set artblocksPercentage(value: BigInt) {
+    this.set("artblocksPercentage", Value.fromBigInt(value));
+  }
+
+  get mintWhitelisted(): Array<Bytes> {
+    let value = this.get("mintWhitelisted");
+    return value.toBytesArray();
+  }
+
+  set mintWhitelisted(value: Array<Bytes>) {
+    this.set("mintWhitelisted", Value.fromBytesArray(value));
+  }
+
+  get randomizerContract(): Bytes | null {
+    let value = this.get("randomizerContract");
+    if (value === null || value.kind == ValueKind.NULL) {
+      return null;
+    } else {
+      return value.toBytes();
+    }
+  }
+
+  set randomizerContract(value: Bytes | null) {
+    if (value === null) {
+      this.unset("randomizerContract");
+    } else {
+      this.set("randomizerContract", Value.fromBytes(value as Bytes));
+    }
+  }
+
+  get nextProjectId(): BigInt {
+    let value = this.get("nextProjectId");
+    return value.toBigInt();
+  }
+
+  set nextProjectId(value: BigInt) {
+    this.set("nextProjectId", Value.fromBigInt(value));
+  }
+
+  get projects(): Array<string> | null {
+    let value = this.get("projects");
+    if (value === null || value.kind == ValueKind.NULL) {
+      return null;
+    } else {
+      return value.toStringArray();
+    }
+  }
+
+  set projects(value: Array<string> | null) {
+    if (value === null) {
+      this.unset("projects");
+    } else {
+      this.set("projects", Value.fromStringArray(value as Array<string>));
+    }
+  }
+
+  get whitelisted(): Array<string> | null {
+    let value = this.get("whitelisted");
+    if (value === null || value.kind == ValueKind.NULL) {
+      return null;
+    } else {
+      return value.toStringArray();
+    }
+  }
+
+  set whitelisted(value: Array<string> | null) {
+    if (value === null) {
+      this.unset("whitelisted");
+    } else {
+      this.set("whitelisted", Value.fromStringArray(value as Array<string>));
+    }
+  }
+}
+
+export class Whitelisting extends Entity {
+  constructor(id: string) {
+    super();
+    this.set("id", Value.fromString(id));
+  }
+
+  save(): void {
+    let id = this.get("id");
+    assert(id !== null, "Cannot save Whitelisting entity without an ID");
+    assert(
+      id.kind == ValueKind.STRING,
+      "Cannot save Whitelisting entity with non-string ID. " +
+        'Considering using .toHex() to convert the "id" to a string.'
+    );
+    store.set("Whitelisting", id.toString(), this);
+  }
+
+  static load(id: string): Whitelisting | null {
+    return store.get("Whitelisting", id) as Whitelisting | null;
+  }
+
+  get id(): string {
+    let value = this.get("id");
+    return value.toString();
+  }
+
+  set id(value: string) {
+    this.set("id", Value.fromString(value));
+  }
+
+  get account(): string {
+    let value = this.get("account");
+    return value.toString();
+  }
+
+  set account(value: string) {
+    this.set("account", Value.fromString(value));
+  }
+
+  get contract(): string {
+    let value = this.get("contract");
+    return value.toString();
+  }
+
+  set contract(value: string) {
+    this.set("contract", Value.fromString(value));
   }
 }
 
@@ -616,8 +708,8 @@ export class Account extends Entity {
     }
   }
 
-  get projects(): Array<string> | null {
-    let value = this.get("projects");
+  get projectsOwned(): Array<string> | null {
+    let value = this.get("projectsOwned");
     if (value === null || value.kind == ValueKind.NULL) {
       return null;
     } else {
@@ -625,11 +717,48 @@ export class Account extends Entity {
     }
   }
 
-  set projects(value: Array<string> | null) {
+  set projectsOwned(value: Array<string> | null) {
     if (value === null) {
-      this.unset("projects");
+      this.unset("projectsOwned");
     } else {
-      this.set("projects", Value.fromStringArray(value as Array<string>));
+      this.set("projectsOwned", Value.fromStringArray(value as Array<string>));
+    }
+  }
+
+  get projectsCreated(): Array<string> | null {
+    let value = this.get("projectsCreated");
+    if (value === null || value.kind == ValueKind.NULL) {
+      return null;
+    } else {
+      return value.toStringArray();
+    }
+  }
+
+  set projectsCreated(value: Array<string> | null) {
+    if (value === null) {
+      this.unset("projectsCreated");
+    } else {
+      this.set(
+        "projectsCreated",
+        Value.fromStringArray(value as Array<string>)
+      );
+    }
+  }
+
+  get whitelistedOn(): Array<string> | null {
+    let value = this.get("whitelistedOn");
+    if (value === null || value.kind == ValueKind.NULL) {
+      return null;
+    } else {
+      return value.toStringArray();
+    }
+  }
+
+  set whitelistedOn(value: Array<string> | null) {
+    if (value === null) {
+      this.unset("whitelistedOn");
+    } else {
+      this.set("whitelistedOn", Value.fromStringArray(value as Array<string>));
     }
   }
 }
@@ -791,6 +920,15 @@ export class Token extends Entity {
 
   set createdAt(value: BigInt) {
     this.set("createdAt", Value.fromBigInt(value));
+  }
+
+  get transactionHash(): Bytes {
+    let value = this.get("transactionHash");
+    return value.toBytes();
+  }
+
+  set transactionHash(value: Bytes) {
+    this.set("transactionHash", Value.fromBytes(value));
   }
 }
 

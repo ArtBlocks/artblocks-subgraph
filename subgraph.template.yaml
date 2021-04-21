@@ -19,9 +19,10 @@ dataSources:
       entities:
         - Project
         - Token
-        - Platform
+        - Contract
         - Account
         - AccountProject
+        - Whitelisting
         - OSSaleWrapper
         - OSSaleEntry
       abis:
@@ -122,9 +123,10 @@ dataSources:
       entities:
         - Project
         - Token
-        - Platform
+        - Contract
         - Account
         - AccountProject
+        - Whitelisting
         - OSSaleWrapper
         - OSSaleEntry
       abis:
@@ -162,9 +164,10 @@ dataSources:
       entities:
         - Project
         - Token
-        - Platform
+        - Contract
         - Account
         - AccountProject
+        - Whitelisting
         - OSSaleWrapper
         - OSSaleEntry
       abis:
@@ -257,9 +260,10 @@ dataSources:
       entities:
         - Project
         - Token
-        - Platform
+        - Contract
         - Account
         - AccountProject
+        - Whitelisting
         - OSSaleWrapper
         - OSSaleEntry
       abis:

@@ -1,20 +1,10 @@
-type Platform @entity {
-  id: ID!
-  admin: Bytes!
-  artblocksAddress: Bytes!
-  artblocksPercentage: BigInt!
-  mintWhitelisted: [Bytes!]!
-  randomizerContract: Bytes
-  whitelisted: [Bytes!]!
-  nextProjectId: BigInt!
-}
-
 type Project @entity {
   id: ID!
   index: BigInt! # BigInt equivalent of ID for sorting
   active: Boolean!
   additionalPayee: Bytes
   additionalPayeePercentage: BigInt
+  artist: Account!
   artistAddress: Bytes!
   artistName: String
   baseIpfsUri: String
@@ -41,16 +31,37 @@ type Project @entity {
   website: String
   osTotalVolumeInWei: BigInt!
   "Accounts that own tokens from the project"
-  accounts: [AccountProject!] @derivedFrom(field: "project")
+  owners: [AccountProject!] @derivedFrom(field: "project")
   createdAt: BigInt!
   updatedAt: BigInt!
+  contract: Contract!
+}
+
+type Contract @entity {
+  id: ID!
+  admin: Bytes!
+  artblocksAddress: Bytes!
+  artblocksPercentage: BigInt!
+  mintWhitelisted: [Bytes!]!
+  randomizerContract: Bytes
+  nextProjectId: BigInt!
+  projects: [Project!] @derivedFrom(field: "contract")
+  whitelisted: [Whitelisting!] @derivedFrom(field: "contract")
+}
+
+type Whitelisting @entity {
+  id: ID!
+  account: Account!
+  contract: Contract!
 }
 
 type Account @entity {
   id: ID!
   tokens: [Token!] @derivedFrom(field: "owner")
   "Projects the account owns tokens from"
-  projects: [AccountProject!] @derivedFrom(field: "account")
+  projectsOwned: [AccountProject!] @derivedFrom(field: "account")
+  projectsCreated: [Project!] @derivedFrom(field: "artist")
+  whitelistedOn: [Whitelisting!] @derivedFrom(field: "account")
 }
 
 type AccountProject @entity {
@@ -69,6 +80,8 @@ type Token @entity {
   uri: String
   osSalesHistory: [OSSaleEntry!]! @derivedFrom(field: "token")
   createdAt: BigInt!
+  "We'll use this to check block confirmations"
+  transactionHash: Bytes!
 }
 
 type OSSaleWrapper @entity {

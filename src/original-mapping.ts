@@ -46,18 +46,22 @@ import {
 import {
   Project,
   Token,
-  Platform,
+  Contract,
   OSSaleEntry,
   OSSaleWrapper,
   Account,
-  AccountProject
+  AccountProject,
+  Whitelisting
 } from "../generated/schema";
 import {
   ARTBLOCKS_PLATFORM_ID,
   WYVERN_ATOMICIZER_ADDRESS,
   WYVERN_EXCHANGE_ADDRESS
 } from "./constants";
-import { generateAccountProjectId } from "./global-helpers";
+import {
+  generateAccountProjectId,
+  generateWhitelistingId
+} from "./global-helpers";
 
 /*** EVENT HANDLERS ***/
 export function handleMint(event: Mint): void {
@@ -66,7 +70,7 @@ export function handleMint(event: Mint): void {
   let token = new Token(event.params._tokenId.toString());
   let projectId = contract.tokenIdToProjectId(event.params._tokenId);
   let project = Project.load(projectId.toString());
-  let invocation = project.invocations.plus(BigInt.fromI32(1));
+  let invocation = project.invocations;
 
   token.project = projectId.toString();
   token.owner = event.params._to.toHexString();
@@ -74,9 +78,10 @@ export function handleMint(event: Mint): void {
   token.hash = contract.showTokenHashes(event.params._tokenId)[0];
   token.invocation = invocation;
   token.createdAt = event.block.timestamp;
+  token.transactionHash = event.transaction.hash;
   token.save();
 
-  project.invocations = invocation;
+  project.invocations = invocation.plus(BigInt.fromI32(1));
   project.save();
 
   let account = new Account(token.owner);
@@ -103,7 +108,10 @@ export function handleTransfer(event: Transfer): void {
     // Update Account <-> Project many-to-many relation
     // table to reflect new account project token balance
     let prevAccountProject = AccountProject.load(
-      generateAccountProjectId(event.params.from.toHexString(), token.project)
+      generateAccountProjectId(
+        event.transaction.from.toHexString(),
+        token.project
+      )
     );
 
     if (
@@ -152,13 +160,13 @@ export function handleTransfer(event: Transfer): void {
 
 export function handleAddProject(call: AddProjectCall): void {
   let contract = ArtBlocks.bind(call.to);
-  let platform = Platform.load(ARTBLOCKS_PLATFORM_ID);
+  let contractEntity = Contract.load(call.to.toHexString());
 
-  if (platform == null) {
-    platform = refreshPlatform(contract);
+  if (contractEntity == null) {
+    contractEntity = refreshContract(contract);
   }
 
-  let id = platform.nextProjectId;
+  let id = contractEntity.nextProjectId;
 
   let projectDetails = contract.projectDetails(id);
   let projectTokenInfo = contract.projectTokenInfo(id);
@@ -168,6 +176,9 @@ export function handleAddProject(call: AddProjectCall): void {
   let dynamic = projectDetails.value5;
 
   let artistAddress = projectTokenInfo.value0;
+  let artist = new Account(artistAddress.toHexString());
+  artist.save();
+
   let pricePerTokenInWei = projectTokenInfo.value1;
   let invocations = projectTokenInfo.value2;
   let maxInvocations = projectTokenInfo.value3;
@@ -178,6 +189,8 @@ export function handleAddProject(call: AddProjectCall): void {
 
   let project = new Project(id.toString());
 
+  project.contract = contractEntity.id;
+  project.artist = artist.id;
   project.index = id;
   project.name = name;
   project.dynamic = dynamic;
@@ -196,8 +209,10 @@ export function handleAddProject(call: AddProjectCall): void {
 
   project.save();
 
-  platform.nextProjectId = platform.nextProjectId.plus(BigInt.fromI32(1));
-  platform.save();
+  contractEntity.nextProjectId = contractEntity.nextProjectId.plus(
+    BigInt.fromI32(1)
+  );
+  contractEntity.save();
 }
 
 /*** END EVENT HANDLERS ***/
@@ -205,36 +220,46 @@ export function handleAddProject(call: AddProjectCall): void {
 /*** CALL HANDLERS  ***/
 export function handleAddWhitelisted(call: AddWhitelistedCall): void {
   let contract = ArtBlocks.bind(call.to);
+  let contractEntity = refreshContract(contract);
 
-  let platform = refreshPlatform(contract);
-  platform.whitelisted = platform.whitelisted
-    ? platform.whitelisted.concat([call.inputs._address])
-    : [call.inputs._address];
-  platform.save();
+  let account = new Account(call.inputs._address.toHexString());
+  account.save();
+
+  let whitelisting = new Whitelisting(
+    generateWhitelistingId(contractEntity.id, account.id)
+  );
+  whitelisting.account = account.id;
+  whitelisting.contract = contractEntity.id;
+
+  whitelisting.save();
 }
 
 export function handleRemoveWhitelisted(call: RemoveWhitelistedCall): void {
   let contract = ArtBlocks.bind(call.to);
 
-  let platform = refreshPlatform(contract);
-  platform.whitelisted = platform.whitelisted
-    ? platform.whitelisted.filter(address => address !== call.inputs._address)
-    : [];
-  platform.save();
+  let contractEntity = refreshContract(contract);
+  let account = new Account(call.inputs._address.toHexString());
+
+  let whitelistingId = generateWhitelistingId(contractEntity.id, account.id);
+  let whitelisting = Whitelisting.load(whitelistingId);
+
+  if (whitelisting != null) {
+    store.remove("Whitelisting", whitelistingId);
+  }
 }
 
 export function handleUpdateArtblocksAddress(
   call: UpdateArtblocksAddressCall
 ): void {
   let contract = ArtBlocks.bind(call.to);
-  refreshPlatform(contract);
+  refreshContract(contract);
 }
 
 export function handleUpdateArtblocksPercentage(
   call: UpdateArtblocksPercentageCall
 ): void {
   let contract = ArtBlocks.bind(call.to);
-  refreshPlatform(contract);
+  refreshContract(contract);
 }
 
 export function handleAddProjectScript(call: AddProjectScriptCall): void {
@@ -268,7 +293,7 @@ export function handleToggleProjectIsActive(
 ): void {
   let project = Project.load(call.inputs._projectId.toString());
 
-  if (project != null) {
+  if (project != null && project.contract == call.to.toHexString()) {
     project.active = !project.active;
     project.save();
   }
@@ -279,7 +304,7 @@ export function handleToggleProjectIsDynamic(
 ): void {
   let project = Project.load(call.inputs._projectId.toString());
 
-  if (project != null) {
+  if (project != null && project.contract == call.to.toHexString()) {
     project.dynamic = !project.dynamic;
     project.useHashString = !project.dynamic;
     project.save();
@@ -291,7 +316,7 @@ export function handleToggleProjectIsLocked(
 ): void {
   let project = Project.load(call.inputs._projectId.toString());
 
-  if (project != null) {
+  if (project != null && project.contract == call.to.toHexString()) {
     project.locked = !project.locked;
     project.save();
   }
@@ -302,7 +327,7 @@ export function handleToggleProjectIsPaused(
 ): void {
   let project = Project.load(call.inputs._projectId.toString());
 
-  if (project != null) {
+  if (project != null && project.contract == call.to.toHexString()) {
     project.paused = !project.paused;
     project.save();
   }
@@ -313,8 +338,8 @@ export function handleUpdateProjectHashesGenerated(
 ): void {
   let project = Project.load(call.inputs._projectId.toString());
 
-  if (project != null) {
-    project.useHashString = !project.useHashString;
+  if (project.contract == call.to.toHexString()) {
+    project.useHashString = call.inputs._hashes.gt(BigInt.fromI32(0));
     project.save();
   }
 }
@@ -324,7 +349,7 @@ export function handleToggleProjectUseIpfsForStatic(
 ): void {
   let project = Project.load(call.inputs._projectId.toString());
 
-  if (project != null) {
+  if (project != null && project.contract == call.to.toHexString()) {
     project.useIpfs = !project.useIpfs;
     project.save();
   }
@@ -346,6 +371,10 @@ export function handleUpdateProjectArtistAddress(
   let project = new Project(call.inputs._projectId.toString());
 
   project.artistAddress = call.inputs._artistAddress;
+  let artist = new Account(project.artistAddress.toHexString());
+  artist.save();
+  project.artist = artist.id;
+
   project.save();
 }
 
@@ -463,23 +492,26 @@ export function handleUpdateProjectWebsite(
 /*** END CALL HANDLERS  ***/
 
 /** HELPERS ***/
-function refreshPlatform(contract: ArtBlocks): Platform {
+function refreshContract(contract: ArtBlocks): Contract {
   let admin = contract.admin();
   let artblocksAddress = contract.artblocksAddress();
   let artblocksPercentage = contract.artblocksPercentage();
   let nextProjectId = contract.nextProjectId();
 
-  let platform = new Platform(ARTBLOCKS_PLATFORM_ID);
-  platform.admin = admin;
-  platform.artblocksAddress = artblocksAddress;
-  platform.artblocksPercentage = artblocksPercentage;
-  platform.nextProjectId = nextProjectId;
-  platform.whitelisted = [];
-  platform.mintWhitelisted = [];
+  let contractEntity = Contract.load(contract._address.toHexString());
 
-  platform.save();
+  if (contractEntity == null) {
+    contractEntity = new Contract(contract._address.toHexString());
+  }
+  contractEntity.admin = admin;
+  contractEntity.artblocksAddress = artblocksAddress;
+  contractEntity.artblocksPercentage = artblocksPercentage;
+  contractEntity.nextProjectId = nextProjectId;
+  contractEntity.mintWhitelisted = [];
 
-  return platform;
+  contractEntity.save();
+
+  return contractEntity as Contract;
 }
 
 function refreshTokenUri(contract: ArtBlocks, tokenId: BigInt): void {
