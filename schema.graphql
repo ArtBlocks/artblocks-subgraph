@@ -9,6 +9,7 @@ type Project @entity {
   artistName: String
   baseIpfsUri: String
   baseUri: String
+  curationStatus: String
   currencyAddress: Bytes
   currencySymbol: String
   description: String
@@ -80,7 +81,6 @@ type Token @entity {
   uri: String
   osSalesHistory: [OSSaleEntry!]! @derivedFrom(field: "token")
   createdAt: BigInt!
-  "We'll use this to check block confirmations"
   transactionHash: Bytes!
 }
 

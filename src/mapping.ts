@@ -1,4 +1,10 @@
-import { BigInt, Bytes, store } from "@graphprotocol/graph-ts";
+import {
+  BigInt,
+  Bytes,
+  store,
+  json,
+  JSONValueKind
+} from "@graphprotocol/graph-ts";
 import {
   ArtBlocks,
   Mint,
@@ -691,6 +697,18 @@ export function handleUpdateProjectScriptJSON(
   call: UpdateProjectScriptJSONCall
 ): void {
   let project = new Project(call.inputs._projectId.toString());
+
+  let scriptJSONRaw = json.fromBytes(
+    Bytes.fromUTF8(call.inputs._projectScriptJSON) as Bytes
+  );
+  if (scriptJSONRaw.kind == JSONValueKind.OBJECT) {
+    let scriptJSON = scriptJSONRaw.toObject();
+    let curationStatusJSONValue = scriptJSON.get("curation_status");
+    if (curationStatusJSONValue.kind == JSONValueKind.STRING) {
+      let curationStatus = curationStatusJSONValue.toString();
+      project.curationStatus = curationStatus;
+    }
+  }
 
   project.scriptJSON = call.inputs._projectScriptJSON;
   project.save();
