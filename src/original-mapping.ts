@@ -301,6 +301,7 @@ export function handleToggleProjectIsActive(
 
   if (project != null && project.contract == call.to.toHexString()) {
     project.active = !project.active;
+    project.updatedAt = call.block.timestamp;
     project.save();
   }
 }
@@ -335,6 +336,7 @@ export function handleToggleProjectIsPaused(
 
   if (project != null && project.contract == call.to.toHexString()) {
     project.paused = !project.paused;
+    project.updatedAt = call.block.timestamp;
     project.save();
   }
 }
@@ -390,6 +392,7 @@ export function handleUpdateProjectArtistName(
   let project = new Project(call.inputs._projectId.toString());
 
   project.artistName = call.inputs._projectArtistName;
+  project.updatedAt = call.block.timestamp;
   project.save();
 }
 
@@ -451,6 +454,7 @@ export function handleUpdateProjectName(call: UpdateProjectNameCall): void {
   let project = new Project(call.inputs._projectId.toString());
 
   project.name = call.inputs._projectName;
+  project.updatedAt = call.block.timestamp;
   project.save();
 }
 

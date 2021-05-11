@@ -5,10 +5,12 @@
     "codegen": "graph codegen",
     "build": "graph build",
     "deploy": "graph deploy --node https://api.thegraph.com/deploy/ --ipfs https://api.thegraph.com/ipfs/ ArtBlocks/art-blocks",
+    "deploy-ropsten-dev": "yarn prepare:ropsten && graph deploy --node https://api.thegraph.com/deploy/ --ipfs https://api.thegraph.com/ipfs/ ArtBlocks/art-blocks-dev",
     "create-local": "graph create --node http://localhost:8020/ ArtBlocks/art-blocks",
     "remove-local": "graph remove --node http://localhost:8020/ ArtBlocks/art-blocks",
     "deploy-local": "graph deploy --node http://localhost:8020/ --ipfs http://localhost:5001 ArtBlocks/art-blocks",
     "prepare:mainnet": "mustache config/mainnet.json subgraph.template.yaml > subgraph.yaml",
+    "prepare:ropsten": "mustache config/ropsten.json subgraph.template.yaml > subgraph.yaml",
     "prepare:rinkeby": "mustache config/rinkeby.json subgraph.template.yaml > subgraph.yaml",
     "prepare:local": "mustache config/local.json subgraph.template.yaml > subgraph.yaml"
   },
