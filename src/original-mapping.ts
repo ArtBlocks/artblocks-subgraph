@@ -12,6 +12,7 @@ import {
   Bytes,
   json,
   JSONValueKind,
+  log,
   store
 } from "@graphprotocol/graph-ts";
 import {
@@ -84,10 +85,15 @@ export function handleMint(event: Mint): void {
   token.hash = contract.showTokenHashes(event.params._tokenId)[0];
   token.invocation = invocation;
   token.createdAt = event.block.timestamp;
+  token.updatedAt = event.block.timestamp;
   token.transactionHash = event.transaction.hash;
   token.save();
 
   project.invocations = invocation.plus(BigInt.fromI32(1));
+  if (project.invocations == project.maxInvocations) {
+    project.complete = true;
+    project.updatedAt = event.block.timestamp;
+  }
   project.save();
 
   let account = new Account(token.owner);
@@ -150,6 +156,7 @@ export function handleTransfer(event: Transfer): void {
 
     // Update token owner
     token.owner = event.params.to.toHexString();
+    token.updatedAt = event.block.timestamp;
     token.save();
   }
 
@@ -168,11 +175,14 @@ export function handleAddProject(call: AddProjectCall): void {
   let contract = ArtBlocks.bind(call.to);
   let contractEntity = Contract.load(call.to.toHexString());
 
+  let id: BigInt;
   if (contractEntity == null) {
     contractEntity = refreshContract(contract);
+    // In this case nextProjectId has already been incremented
+    id = contractEntity.nextProjectId.minus(BigInt.fromI32(1));
+  } else {
+    id = contractEntity.nextProjectId;
   }
-
-  let id = contractEntity.nextProjectId;
 
   let projectDetails = contract.projectDetails(id);
   let projectTokenInfo = contract.projectTokenInfo(id);
@@ -209,6 +219,7 @@ export function handleAddProject(call: AddProjectCall): void {
   project.paused = paused;
   project.active = false;
   project.locked = false;
+  project.complete = false;
   project.osTotalVolumeInWei = BigInt.fromI32(0);
   project.createdAt = call.block.timestamp;
   project.updatedAt = call.block.timestamp;
@@ -376,12 +387,13 @@ export function handleUpdateProjectAdditionalPayeeInfo(
 export function handleUpdateProjectArtistAddress(
   call: UpdateProjectArtistAddressCall
 ): void {
-  let project = new Project(call.inputs._projectId.toString());
-
-  project.artistAddress = call.inputs._artistAddress;
-  let artist = new Account(project.artistAddress.toHexString());
+  let artist = new Account(call.inputs._artistAddress.toHexString());
   artist.save();
+
+  let project = new Project(call.inputs._projectId.toString());
+  project.artistAddress = call.inputs._artistAddress;
   project.artist = artist.id;
+  project.updatedAt = call.block.timestamp;
 
   project.save();
 }
@@ -438,16 +450,26 @@ export function handleUpdateProjectLicense(
   let project = new Project(call.inputs._projectId.toString());
 
   project.license = call.inputs._projectLicense;
+  project.updatedAt = call.block.timestamp;
   project.save();
 }
 
 export function handleUpdateProjectMaxInvocations(
   call: UpdateProjectMaxInvocationsCall
 ): void {
-  let project = new Project(call.inputs._projectId.toString());
+  let project = Project.load(call.inputs._projectId.toString());
 
-  project.maxInvocations = call.inputs._maxInvocations;
-  project.save();
+  if (project != null) {
+    project.maxInvocations = call.inputs._maxInvocations;
+    project.complete = project.invocations.ge(project.maxInvocations);
+    project.updatedAt = call.block.timestamp;
+    project.save();
+  } else {
+    log.warning(
+      "handleUpdateProjectMaxInvocations received unexpected project id",
+      []
+    );
+  }
 }
 
 export function handleUpdateProjectName(call: UpdateProjectNameCall): void {
@@ -464,6 +486,7 @@ export function handleUpdateProjectPricePerTokenInWei(
   let project = new Project(call.inputs._projectId.toString());
 
   project.pricePerTokenInWei = call.inputs._pricePerTokenInWei;
+  project.updatedAt = call.block.timestamp;
   project.save();
 }
 
@@ -491,6 +514,7 @@ export function handleUpdateProjectScriptJSON(
   }
 
   project.scriptJSON = call.inputs._projectScriptJSON;
+  project.updatedAt = call.block.timestamp;
   project.save();
 }
 
@@ -565,6 +589,7 @@ function refreshProjectScript(
   project.script = script;
   project.scriptCount = scriptInfo.value1;
   project.updatedAt = timestamp;
+  project.scriptUpdatedAt = timestamp;
 
   project.save();
 }

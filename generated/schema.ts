@@ -163,6 +163,15 @@ export class Project extends Entity {
     }
   }
 
+  get complete(): boolean {
+    let value = this.get("complete");
+    return value.toBoolean();
+  }
+
+  set complete(value: boolean) {
+    this.set("complete", Value.fromBoolean(value));
+  }
+
   get curationStatus(): string | null {
     let value = this.get("curationStatus");
     if (value === null || value.kind == ValueKind.NULL) {
@@ -490,6 +499,23 @@ export class Project extends Entity {
 
   set updatedAt(value: BigInt) {
     this.set("updatedAt", Value.fromBigInt(value));
+  }
+
+  get scriptUpdatedAt(): BigInt | null {
+    let value = this.get("scriptUpdatedAt");
+    if (value === null || value.kind == ValueKind.NULL) {
+      return null;
+    } else {
+      return value.toBigInt();
+    }
+  }
+
+  set scriptUpdatedAt(value: BigInt | null) {
+    if (value === null) {
+      this.unset("scriptUpdatedAt");
+    } else {
+      this.set("scriptUpdatedAt", Value.fromBigInt(value as BigInt));
+    }
   }
 
   get contract(): string {
@@ -937,6 +963,15 @@ export class Token extends Entity {
 
   set createdAt(value: BigInt) {
     this.set("createdAt", Value.fromBigInt(value));
+  }
+
+  get updatedAt(): BigInt {
+    let value = this.get("updatedAt");
+    return value.toBigInt();
+  }
+
+  set updatedAt(value: BigInt) {
+    this.set("updatedAt", Value.fromBigInt(value));
   }
 
   get transactionHash(): Bytes {
