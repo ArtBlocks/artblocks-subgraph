@@ -54,17 +54,10 @@ import {
   Project,
   Token,
   Contract,
-  OSSaleEntry,
-  OSSaleWrapper,
   Account,
   AccountProject,
   Whitelisting
 } from "../generated/schema";
-import {
-  ARTBLOCKS_PLATFORM_ID,
-  WYVERN_ATOMICIZER_ADDRESS,
-  WYVERN_EXCHANGE_ADDRESS
-} from "./constants";
 import {
   generateAccountProjectId,
   generateWhitelistingId
@@ -158,16 +151,6 @@ export function handleTransfer(event: Transfer): void {
     token.owner = event.params.to.toHexString();
     token.updatedAt = event.block.timestamp;
     token.save();
-  }
-
-  // If the transfer event is raised because of a transaction sent to Open Sea
-  // create a new OSSaleEntry and update/create its associated OSSaleWrapper
-  let txSentTo = event.transaction.to.toHexString();
-  if (
-    txSentTo == WYVERN_EXCHANGE_ADDRESS ||
-    txSentTo == WYVERN_ATOMICIZER_ADDRESS
-  ) {
-    handleOpenSeaSale(event);
   }
 }
 
@@ -594,49 +577,4 @@ function refreshProjectScript(
   project.save();
 }
 
-function handleOpenSeaSale(event: Transfer): void {
-  // Create a new SaleEntry
-  let saleEntry = new OSSaleEntry(
-    event.transaction.hash.toHexString() + event.logIndex.toString()
-  );
-
-  // Fetch the associated sale wrapper
-  let saleWrapper = OSSaleWrapper.load(event.transaction.hash.toHexString());
-  if (saleWrapper != null) {
-    // Several Transfer events for the same tx
-    // This is a bundle sale
-    saleWrapper.isBundle = true;
-  } else {
-    // If none create it
-    saleWrapper = new OSSaleWrapper(event.transaction.hash.toHexString());
-
-    saleWrapper.timestamp = event.block.timestamp;
-    saleWrapper.from = event.params.from;
-    saleWrapper.to = event.params.to;
-    saleWrapper.isBundle = false;
-  }
-
-  saleEntry.osSaleWrapper = saleWrapper.id;
-
-  let tokenId = event.params.tokenId.toString();
-  saleEntry.token = tokenId;
-
-  // Here we fill the associatedProjectsIds of the OSSaleWrapper
-  // This is needed to then slipt the ETH price of the sale
-  // accross the different projects in case of bundle sale
-  let token = Token.load(tokenId);
-  // Should always be the case
-  if (token != null) {
-    if (saleWrapper.associatedProjectsIds == null) {
-      saleWrapper.associatedProjectsIds = [token.project];
-    } else {
-      let associatedProjectsIds = saleWrapper.associatedProjectsIds;
-      associatedProjectsIds.push(token.project);
-      saleWrapper.associatedProjectsIds = associatedProjectsIds;
-    }
-  }
-
-  saleEntry.save();
-  saleWrapper.save();
-}
 /** END HELPERS ***/

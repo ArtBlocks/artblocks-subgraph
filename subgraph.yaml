@@ -20,8 +20,8 @@ dataSources:
         - Account
         - AccountProject
         - Whitelisting
-        - OSSaleWrapper
-        - OSSaleEntry
+        - OpenSeaSale
+        - TokenOpenSeaSaleLookupTable
       abis:
         - name: ArtBlocks
           file: ./abis/ArtBlocks.json
@@ -118,8 +118,8 @@ dataSources:
         - Account
         - AccountProject
         - Whitelisting
-        - OSSaleWrapper
-        - OSSaleEntry
+        - OpenSeaSale
+        - TokenOpenSeaSaleLookupTable
       abis:
         - name: ArtBlocksOriginal
           file: ./abis/ArtBlocksOriginal.json
@@ -210,12 +210,12 @@ dataSources:
         - Account
         - AccountProject
         - Whitelisting
-        - OSSaleWrapper
-        - OSSaleEntry
+        - OpenSeaSale
+        - TokenOpenSeaSaleLookupTable
       abis:
         - name: WyvernExchange
           file: ./abis/WyvernExchange.json
-      eventHandlers:
-        - event: OrdersMatched(bytes32,bytes32,indexed address,indexed address,uint256,indexed bytes32)
-          handler: handleOrdersMatched
+      callHandlers: 
+        - function: atomicMatch_(address[14],uint256[18],uint8[8],bytes,bytes,bytes,bytes,bytes,bytes,uint8[2],bytes32[5])
+          handler: handleAtomicMatch_
       file: ./src/os-mapping.ts

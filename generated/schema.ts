@@ -947,15 +947,6 @@ export class Token extends Entity {
     }
   }
 
-  get osSalesHistory(): Array<string> {
-    let value = this.get("osSalesHistory");
-    return value.toStringArray();
-  }
-
-  set osSalesHistory(value: Array<string>) {
-    this.set("osSalesHistory", Value.fromStringArray(value));
-  }
-
   get createdAt(): BigInt {
     let value = this.get("createdAt");
     return value.toBigInt();
@@ -982,9 +973,18 @@ export class Token extends Entity {
   set transactionHash(value: Bytes) {
     this.set("transactionHash", Value.fromBytes(value));
   }
+
+  get tokenOpenSeaSaleLookupTable(): Array<string> {
+    let value = this.get("tokenOpenSeaSaleLookupTable");
+    return value.toStringArray();
+  }
+
+  set tokenOpenSeaSaleLookupTable(value: Array<string>) {
+    this.set("tokenOpenSeaSaleLookupTable", Value.fromStringArray(value));
+  }
 }
 
-export class OSSaleWrapper extends Entity {
+export class OpenSeaSale extends Entity {
   constructor(id: string) {
     super();
     this.set("id", Value.fromString(id));
@@ -992,17 +992,17 @@ export class OSSaleWrapper extends Entity {
 
   save(): void {
     let id = this.get("id");
-    assert(id !== null, "Cannot save OSSaleWrapper entity without an ID");
+    assert(id !== null, "Cannot save OpenSeaSale entity without an ID");
     assert(
       id.kind == ValueKind.STRING,
-      "Cannot save OSSaleWrapper entity with non-string ID. " +
+      "Cannot save OpenSeaSale entity with non-string ID. " +
         'Considering using .toHex() to convert the "id" to a string.'
     );
-    store.set("OSSaleWrapper", id.toString(), this);
+    store.set("OpenSeaSale", id.toString(), this);
   }
 
-  static load(id: string): OSSaleWrapper | null {
-    return store.get("OSSaleWrapper", id) as OSSaleWrapper | null;
+  static load(id: string): OpenSeaSale | null {
+    return store.get("OpenSeaSale", id) as OpenSeaSale | null;
   }
 
   get id(): string {
@@ -1014,90 +1014,97 @@ export class OSSaleWrapper extends Entity {
     this.set("id", Value.fromString(value));
   }
 
-  get timestamp(): BigInt {
-    let value = this.get("timestamp");
+  get saleType(): string | null {
+    let value = this.get("saleType");
+    if (value === null || value.kind == ValueKind.NULL) {
+      return null;
+    } else {
+      return value.toString();
+    }
+  }
+
+  set saleType(value: string | null) {
+    if (value === null) {
+      this.unset("saleType");
+    } else {
+      this.set("saleType", Value.fromString(value as string));
+    }
+  }
+
+  get blockNumber(): BigInt {
+    let value = this.get("blockNumber");
     return value.toBigInt();
   }
 
-  set timestamp(value: BigInt) {
-    this.set("timestamp", Value.fromBigInt(value));
+  set blockNumber(value: BigInt) {
+    this.set("blockNumber", Value.fromBigInt(value));
   }
 
-  get from(): Bytes {
-    let value = this.get("from");
-    return value.toBytes();
+  get blockTimestamp(): BigInt {
+    let value = this.get("blockTimestamp");
+    return value.toBigInt();
   }
 
-  set from(value: Bytes) {
-    this.set("from", Value.fromBytes(value));
+  set blockTimestamp(value: BigInt) {
+    this.set("blockTimestamp", Value.fromBigInt(value));
   }
 
-  get to(): Bytes {
-    let value = this.get("to");
-    return value.toBytes();
+  get summaryTokensSold(): string {
+    let value = this.get("summaryTokensSold");
+    return value.toString();
   }
 
-  set to(value: Bytes) {
-    this.set("to", Value.fromBytes(value));
+  set summaryTokensSold(value: string) {
+    this.set("summaryTokensSold", Value.fromString(value));
   }
 
-  get priceInWei(): BigInt | null {
-    let value = this.get("priceInWei");
-    if (value === null || value.kind == ValueKind.NULL) {
-      return null;
-    } else {
-      return value.toBigInt();
-    }
-  }
-
-  set priceInWei(value: BigInt | null) {
-    if (value === null) {
-      this.unset("priceInWei");
-    } else {
-      this.set("priceInWei", Value.fromBigInt(value as BigInt));
-    }
-  }
-
-  get isBundle(): boolean {
-    let value = this.get("isBundle");
-    return value.toBoolean();
-  }
-
-  set isBundle(value: boolean) {
-    this.set("isBundle", Value.fromBoolean(value));
-  }
-
-  get associatedProjectsIds(): Array<string> | null {
-    let value = this.get("associatedProjectsIds");
-    if (value === null || value.kind == ValueKind.NULL) {
-      return null;
-    } else {
-      return value.toStringArray();
-    }
-  }
-
-  set associatedProjectsIds(value: Array<string> | null) {
-    if (value === null) {
-      this.unset("associatedProjectsIds");
-    } else {
-      this.set(
-        "associatedProjectsIds",
-        Value.fromStringArray(value as Array<string>)
-      );
-    }
-  }
-
-  get osSaleEntries(): Array<string> {
-    let value = this.get("osSaleEntries");
+  get tokenOpenSeaSaleLookupTable(): Array<string> {
+    let value = this.get("tokenOpenSeaSaleLookupTable");
     return value.toStringArray();
   }
 
-  set osSaleEntries(value: Array<string>) {
-    this.set("osSaleEntries", Value.fromStringArray(value));
+  set tokenOpenSeaSaleLookupTable(value: Array<string>) {
+    this.set("tokenOpenSeaSaleLookupTable", Value.fromStringArray(value));
+  }
+
+  get seller(): Bytes {
+    let value = this.get("seller");
+    return value.toBytes();
+  }
+
+  set seller(value: Bytes) {
+    this.set("seller", Value.fromBytes(value));
+  }
+
+  get buyer(): Bytes {
+    let value = this.get("buyer");
+    return value.toBytes();
+  }
+
+  set buyer(value: Bytes) {
+    this.set("buyer", Value.fromBytes(value));
+  }
+
+  get paymentToken(): Bytes {
+    let value = this.get("paymentToken");
+    return value.toBytes();
+  }
+
+  set paymentToken(value: Bytes) {
+    this.set("paymentToken", Value.fromBytes(value));
+  }
+
+  get price(): BigInt {
+    let value = this.get("price");
+    return value.toBigInt();
+  }
+
+  set price(value: BigInt) {
+    this.set("price", Value.fromBigInt(value));
   }
 }
 
-export class OSSaleEntry extends Entity {
+export class TokenOpenSeaSaleLookupTable extends Entity {
   constructor(id: string) {
     super();
     this.set("id", Value.fromString(id));
@@ -1105,17 +1112,23 @@ export class OSSaleEntry extends Entity {
 
   save(): void {
     let id = this.get("id");
-    assert(id !== null, "Cannot save OSSaleEntry entity without an ID");
+    assert(
+      id !== null,
+      "Cannot save TokenOpenSeaSaleLookupTable entity without an ID"
+    );
     assert(
       id.kind == ValueKind.STRING,
-      "Cannot save OSSaleEntry entity with non-string ID. " +
+      "Cannot save TokenOpenSeaSaleLookupTable entity with non-string ID. " +
         'Considering using .toHex() to convert the "id" to a string.'
     );
-    store.set("OSSaleEntry", id.toString(), this);
+    store.set("TokenOpenSeaSaleLookupTable", id.toString(), this);
   }
 
-  static load(id: string): OSSaleEntry | null {
-    return store.get("OSSaleEntry", id) as OSSaleEntry | null;
+  static load(id: string): TokenOpenSeaSaleLookupTable | null {
+    return store.get(
+      "TokenOpenSeaSaleLookupTable",
+      id
+    ) as TokenOpenSeaSaleLookupTable | null;
   }
 
   get id(): string {
@@ -1136,12 +1149,12 @@ export class OSSaleEntry extends Entity {
     this.set("token", Value.fromString(value));
   }
 
-  get osSaleWrapper(): string {
-    let value = this.get("osSaleWrapper");
+  get openSeaSale(): string {
+    let value = this.get("openSeaSale");
     return value.toString();
   }
 
-  set osSaleWrapper(value: string) {
-    this.set("osSaleWrapper", Value.fromString(value));
+  set openSeaSale(value: string) {
+    this.set("openSeaSale", Value.fromString(value));
   }
 }
