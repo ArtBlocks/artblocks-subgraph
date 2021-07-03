@@ -527,6 +527,7 @@ export function handleToggleProjectIsActive(
 
   if (project != null && project.contract == call.to.toHexString()) {
     project.active = !project.active;
+    project.activatedAt = project.active ? call.block.timestamp : null;
     project.updatedAt = call.block.timestamp;
     project.save();
   }

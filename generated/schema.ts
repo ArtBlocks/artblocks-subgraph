@@ -501,6 +501,23 @@ export class Project extends Entity {
     this.set("updatedAt", Value.fromBigInt(value));
   }
 
+  get activatedAt(): BigInt | null {
+    let value = this.get("activatedAt");
+    if (value === null || value.kind == ValueKind.NULL) {
+      return null;
+    } else {
+      return value.toBigInt();
+    }
+  }
+
+  set activatedAt(value: BigInt | null) {
+    if (value === null) {
+      this.unset("activatedAt");
+    } else {
+      this.set("activatedAt", Value.fromBigInt(value as BigInt));
+    }
+  }
+
   get scriptUpdatedAt(): BigInt | null {
     let value = this.get("scriptUpdatedAt");
     if (value === null || value.kind == ValueKind.NULL) {

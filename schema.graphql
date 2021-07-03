@@ -36,6 +36,7 @@ type Project @entity {
   owners: [AccountProject!] @derivedFrom(field: "project")
   createdAt: BigInt!
   updatedAt: BigInt!
+  activatedAt: BigInt
   scriptUpdatedAt: BigInt
   contract: Contract!
 }
