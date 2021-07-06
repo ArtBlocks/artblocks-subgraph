@@ -991,13 +991,13 @@ export class Token extends Entity {
     this.set("transactionHash", Value.fromBytes(value));
   }
 
-  get tokenOpenSeaSaleLookupTable(): Array<string> {
-    let value = this.get("tokenOpenSeaSaleLookupTable");
+  get tokenOpenSeaSaleLookupTables(): Array<string> {
+    let value = this.get("tokenOpenSeaSaleLookupTables");
     return value.toStringArray();
   }
 
-  set tokenOpenSeaSaleLookupTable(value: Array<string>) {
-    this.set("tokenOpenSeaSaleLookupTable", Value.fromStringArray(value));
+  set tokenOpenSeaSaleLookupTables(value: Array<string>) {
+    this.set("tokenOpenSeaSaleLookupTables", Value.fromStringArray(value));
   }
 }
 
@@ -1075,13 +1075,13 @@ export class OpenSeaSale extends Entity {
     this.set("summaryTokensSold", Value.fromString(value));
   }
 
-  get tokenOpenSeaSaleLookupTable(): Array<string> {
-    let value = this.get("tokenOpenSeaSaleLookupTable");
+  get tokenOpenSeaSaleLookupTables(): Array<string> {
+    let value = this.get("tokenOpenSeaSaleLookupTables");
     return value.toStringArray();
   }
 
-  set tokenOpenSeaSaleLookupTable(value: Array<string>) {
-    this.set("tokenOpenSeaSaleLookupTable", Value.fromStringArray(value));
+  set tokenOpenSeaSaleLookupTables(value: Array<string>) {
+    this.set("tokenOpenSeaSaleLookupTables", Value.fromStringArray(value));
   }
 
   get seller(): Bytes {

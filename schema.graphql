@@ -87,7 +87,7 @@ type Token @entity {
   transactionHash: Bytes!
 
   "Token <=> OpenSeaSale lookup table to get the OpenSea Sale history"
-  tokenOpenSeaSaleLookupTable: [TokenOpenSeaSaleLookupTable!]! @derivedFrom(field: "token")
+  tokenOpenSeaSaleLookupTables: [TokenOpenSeaSaleLookupTable!]! @derivedFrom(field: "token")
 }
 
 enum SaleType {
@@ -112,7 +112,7 @@ type OpenSeaSale @entity {
   summaryTokensSold: String!
 
   "Token to OpenSeaSale lookup table to get the list of Nfts sold in this sale"
-  tokenOpenSeaSaleLookupTable: [TokenOpenSeaSaleLookupTable!]! @derivedFrom(field: "openSeaSale")
+  tokenOpenSeaSaleLookupTables: [TokenOpenSeaSaleLookupTable!]! @derivedFrom(field: "openSeaSale")
 
   "The seller address"
   seller: Bytes!
