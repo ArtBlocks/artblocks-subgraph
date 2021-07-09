@@ -42,13 +42,13 @@ export class Project extends Entity {
     this.set("id", Value.fromString(value));
   }
 
-  get index(): BigInt {
-    let value = this.get("index");
+  get projectId(): BigInt {
+    let value = this.get("projectId");
     return value.toBigInt();
   }
 
-  set index(value: BigInt) {
-    this.set("index", Value.fromBigInt(value));
+  set projectId(value: BigInt) {
+    this.set("projectId", Value.fromBigInt(value));
   }
 
   get active(): boolean {
@@ -457,15 +457,6 @@ export class Project extends Entity {
     }
   }
 
-  get osTotalVolumeInWei(): BigInt {
-    let value = this.get("osTotalVolumeInWei");
-    return value.toBigInt();
-  }
-
-  set osTotalVolumeInWei(value: BigInt) {
-    this.set("osTotalVolumeInWei", Value.fromBigInt(value));
-  }
-
   get owners(): Array<string> | null {
     let value = this.get("owners");
     if (value === null || value.kind == ValueKind.NULL) {
@@ -651,6 +642,23 @@ export class Contract extends Entity {
       this.unset("projects");
     } else {
       this.set("projects", Value.fromStringArray(value as Array<string>));
+    }
+  }
+
+  get tokens(): Array<string> | null {
+    let value = this.get("tokens");
+    if (value === null || value.kind == ValueKind.NULL) {
+      return null;
+    } else {
+      return value.toStringArray();
+    }
+  }
+
+  set tokens(value: Array<string> | null) {
+    if (value === null) {
+      this.unset("tokens");
+    } else {
+      this.set("tokens", Value.fromStringArray(value as Array<string>));
     }
   }
 
@@ -909,6 +917,24 @@ export class Token extends Entity {
 
   set id(value: string) {
     this.set("id", Value.fromString(value));
+  }
+
+  get tokenId(): BigInt {
+    let value = this.get("tokenId");
+    return value.toBigInt();
+  }
+
+  set tokenId(value: BigInt) {
+    this.set("tokenId", Value.fromBigInt(value));
+  }
+
+  get contract(): string {
+    let value = this.get("contract");
+    return value.toString();
+  }
+
+  set contract(value: string) {
+    this.set("contract", Value.fromString(value));
   }
 
   get invocation(): BigInt {

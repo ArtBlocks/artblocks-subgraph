@@ -4,10 +4,10 @@ schema:
 dataSources:
   {{#address}}
   - kind: ethereum/contract
-    name: ArtBlocks
+    name: 'ArtBlocks-{{.}}'
     network: {{network}}
     source:
-      address: '{{address}}'
+      address: '{{.}}'
       abi: ArtBlocks
       {{#startBlock}}
       startBlock: {{startBlock}}
