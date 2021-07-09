@@ -4,7 +4,7 @@ import {
   store,
   json,
   JSONValueKind,
-  log,
+  log
 } from "@graphprotocol/graph-ts";
 import {
   ArtBlocks,
@@ -76,6 +76,7 @@ export function handleMint(event: Mint): void {
   let invocation = project.invocations;
 
   token.project = projectId.toString();
+  token.tokenId = event.params._tokenId;
   token.owner = event.params._to.toHexString();
   token.hash = contract.tokenIdToHash(event.params._tokenId);
   token.invocation = invocation;
@@ -371,6 +372,7 @@ export function handleAddProject(call: AddProjectCall): void {
 
   project.contract = contractEntity.id;
   project.artist = artist.id;
+  project.projectId = id;
   project.index = id;
   project.name = name;
   project.dynamic = dynamic;

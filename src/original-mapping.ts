@@ -72,6 +72,7 @@ export function handleMint(event: Mint): void {
   let project = Project.load(projectId.toString());
   let invocation = project.invocations;
 
+  token.tokenId = event.params._tokenId;
   token.project = projectId.toString();
   token.owner = event.params._to.toHexString();
   // None used more than 1
@@ -190,6 +191,7 @@ export function handleAddProject(call: AddProjectCall): void {
 
   project.contract = contractEntity.id;
   project.artist = artist.id;
+  project.projectId = id;
   project.index = id;
   project.name = name;
   project.dynamic = dynamic;

@@ -1,5 +1,6 @@
 type Project @entity {
   id: ID!
+  projectId: BigInt!
   index: BigInt! # BigInt equivalent of ID for sorting
   active: Boolean!
   additionalPayee: Bytes
@@ -77,6 +78,7 @@ type AccountProject @entity {
 
 type Token @entity {
   id: ID!
+  tokenId: BigInt!
   invocation: BigInt!
   hash: Bytes!
   owner: Account!
