@@ -81,6 +81,7 @@ export function handleMint(event: Mint): void {
   token.createdAt = event.block.timestamp;
   token.updatedAt = event.block.timestamp;
   token.transactionHash = event.transaction.hash;
+  token.contract = event.address.toHexString();
   token.save();
 
   project.invocations = invocation.plus(BigInt.fromI32(1));

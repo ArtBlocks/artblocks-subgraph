@@ -663,6 +663,23 @@ export class Contract extends Entity {
     }
   }
 
+  get tokens(): Array<string> | null {
+    let value = this.get("tokens");
+    if (value === null || value.kind == ValueKind.NULL) {
+      return null;
+    } else {
+      return value.toStringArray();
+    }
+  }
+
+  set tokens(value: Array<string> | null) {
+    if (value === null) {
+      this.unset("tokens");
+    } else {
+      this.set("tokens", Value.fromStringArray(value as Array<string>));
+    }
+  }
+
   get whitelisted(): Array<string> | null {
     let value = this.get("whitelisted");
     if (value === null || value.kind == ValueKind.NULL) {
@@ -1007,6 +1024,15 @@ export class Token extends Entity {
 
   set transactionHash(value: Bytes) {
     this.set("transactionHash", Value.fromBytes(value));
+  }
+
+  get contract(): string {
+    let value = this.get("contract");
+    return value.toString();
+  }
+
+  set contract(value: string) {
+    this.set("contract", Value.fromString(value));
   }
 
   get tokenOpenSeaSaleLookupTables(): Array<string> {

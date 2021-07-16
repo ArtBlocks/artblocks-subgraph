@@ -51,6 +51,7 @@ type Contract @entity {
   randomizerContract: Bytes
   nextProjectId: BigInt!
   projects: [Project!] @derivedFrom(field: "contract")
+  tokens: [Token!] @derivedFrom(field: "contract")
   whitelisted: [Whitelisting!] @derivedFrom(field: "contract")
 }
 
@@ -87,6 +88,7 @@ type Token @entity {
   createdAt: BigInt!
   updatedAt: BigInt!
   transactionHash: Bytes!
+  contract: Contract!
 
   "Token <=> OpenSeaSale lookup table to get the OpenSea Sale history"
   tokenOpenSeaSaleLookupTables: [TokenOpenSeaSaleLookupTable!]! @derivedFrom(field: "token")
