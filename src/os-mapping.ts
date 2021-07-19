@@ -153,7 +153,6 @@ function _handleBundleSale(call: AtomicMatch_Call): void {
 
   // If the bundle does not contain any artblocks sales we don't care
   if (bundleIncludesArtBlocks) {
-    log.info("OS ARTBLOCKS BUNDLE SALE", []);
     // Create the sale
     let openSeaSaleId = call.transaction.hash.toHexString();
     let openSeaSale = new OpenSeaSale(openSeaSaleId);
