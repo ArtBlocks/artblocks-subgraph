@@ -51,15 +51,6 @@ export class Project extends Entity {
     this.set("projectId", Value.fromBigInt(value));
   }
 
-  get index(): BigInt {
-    let value = this.get("index");
-    return value.toBigInt();
-  }
-
-  set index(value: BigInt) {
-    this.set("index", Value.fromBigInt(value));
-  }
-
   get active(): boolean {
     let value = this.get("active");
     return value.toBoolean();
@@ -464,15 +455,6 @@ export class Project extends Entity {
     } else {
       this.set("website", Value.fromString(value as string));
     }
-  }
-
-  get osTotalVolumeInWei(): BigInt {
-    let value = this.get("osTotalVolumeInWei");
-    return value.toBigInt();
-  }
-
-  set osTotalVolumeInWei(value: BigInt) {
-    this.set("osTotalVolumeInWei", Value.fromBigInt(value));
   }
 
   get owners(): Array<string> | null {
@@ -946,6 +928,15 @@ export class Token extends Entity {
     this.set("tokenId", Value.fromBigInt(value));
   }
 
+  get contract(): string {
+    let value = this.get("contract");
+    return value.toString();
+  }
+
+  set contract(value: string) {
+    this.set("contract", Value.fromString(value));
+  }
+
   get invocation(): BigInt {
     let value = this.get("invocation");
     return value.toBigInt();
@@ -1024,15 +1015,6 @@ export class Token extends Entity {
 
   set transactionHash(value: Bytes) {
     this.set("transactionHash", Value.fromBytes(value));
-  }
-
-  get contract(): string {
-    let value = this.get("contract");
-    return value.toString();
-  }
-
-  set contract(value: string) {
-    this.set("contract", Value.fromString(value));
   }
 
   get tokenOpenSeaSaleLookupTables(): Array<string> {

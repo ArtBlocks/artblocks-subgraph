@@ -1,40 +1,98 @@
 type Project @entity {
+  "Unique identifier made up of contract address and project id"
   id: ID!
+
+  "ID of the project on the contract"
   projectId: BigInt!
-  index: BigInt! # BigInt equivalent of ID for sorting
+
+  "Determines if the project should be visible to the public"
   active: Boolean!
+
+  "Address to split sales with the artist"
   additionalPayee: Bytes
+
+  "Percentage of sales that goes to additional payee"
   additionalPayeePercentage: BigInt
+
+  "Artist that created the project"
   artist: Account!
+
+  "Wallet address of the artist"
   artistAddress: Bytes!
+
+  "Artist name"
   artistName: String
+
   baseIpfsUri: String
   baseUri: String
+
+  "A project is complete when it has reached its maximum invocations"
   complete: Boolean!
+
+  "Curated, playground, factory. A project with no curation status is considered factory"
   curationStatus: String
+
+  "ERC-20 contract address if the project is purchasable via ERC-20"
   currencyAddress: Bytes
+
+  "Currency symbol for ERC-20"
   currencySymbol: String
+
+  "Artist description of the project"
   description: String
+
+  "Is the project dynamic or a static image"
   dynamic: Boolean!
+
+  "Number of times the project has been invoked - number of tokens of the project"
   invocations: BigInt!
+
   ipfsHash: String
+
+  "License for the project"
   license: String
+
+  "Once the project is locked its script may never be updated again"
   locked: Boolean!
+
+  "Maximum number of invocations allowed for the project"
   maxInvocations: BigInt!
+
+  "Project name"
   name: String
+
+  "Purchases paused"
   paused: Boolean!
+
   pricePerTokenInWei: BigInt!
+
+  "Artist/additional payee royalty percentage"
   royaltyPercentage: BigInt
+
+  "The actual script for the project"
   script: String
+
+  "The number of scripts stored on-chain"
   scriptCount: BigInt!
+
+  "Extra information about the script and rendering options"
   scriptJSON: String
+
+  "Tokens of the project"
   tokens: [Token!] @derivedFrom(field: "project")
+
+  "Does the project actually use the hash string"
   useHashString: Boolean!
+
+  "Does the project use media from ipfs"
   useIpfs: Boolean
+
+  "Artist or project website"
   website: String
-  osTotalVolumeInWei: BigInt!
-  "Accounts that own tokens from the project"
+
+  "Accounts that own tokens of the project"
   owners: [AccountProject!] @derivedFrom(field: "project")
+
   createdAt: BigInt!
   updatedAt: BigInt!
   activatedAt: BigInt
@@ -45,13 +103,28 @@ type Project @entity {
 type Contract @entity {
   id: ID!
   admin: Bytes!
+
+  "Address that receives platform fees"
   artblocksAddress: Bytes!
+
+  "Percentage of sales the platform takes"
   artblocksPercentage: BigInt!
+
+  "List of contracts that are allowed to mint"
   mintWhitelisted: [Bytes!]!
+
+  "Randomizer contract used to generate token hashes"
   randomizerContract: Bytes
+
   nextProjectId: BigInt!
+
+  "List of projects on the contract"
   projects: [Project!] @derivedFrom(field: "contract")
+
+  "List of tokens on the contract"
   tokens: [Token!] @derivedFrom(field: "contract")
+
+  "Accounts whitelisted on the contract"
   whitelisted: [Whitelisting!] @derivedFrom(field: "contract")
 }
 
@@ -64,9 +137,14 @@ type Whitelisting @entity {
 type Account @entity {
   id: ID!
   tokens: [Token!] @derivedFrom(field: "owner")
+
   "Projects the account owns tokens from"
   projectsOwned: [AccountProject!] @derivedFrom(field: "account")
+  
+  "Projects the account is listed as artist for"
   projectsCreated: [Project!] @derivedFrom(field: "artist")
+  
+  "Contracts the account is whitelisted on"
   whitelistedOn: [Whitelisting!] @derivedFrom(field: "account")
 }
 
@@ -78,17 +156,33 @@ type AccountProject @entity {
 }
 
 type Token @entity {
+  "Unique identifier made up of contract address and token id"
   id: ID!
+  
+  "ID of the token on the contract"
   tokenId: BigInt!
+
+  "Contract the token is on"
+  contract: Contract!
+  
+  "Invocation number of the project"
   invocation: BigInt!
+  
+  "Unique string used as input to the tokens project script"
   hash: Bytes!
+  
+  "Current owner of the token"
   owner: Account!
+  
+  "Project of the token"
   project: Project!
+  
   uri: String
   createdAt: BigInt!
   updatedAt: BigInt!
+  
+  "Transaction hash of token mint"
   transactionHash: Bytes!
-  contract: Contract!
 
   "Token <=> OpenSeaSale lookup table to get the OpenSea Sale history"
   tokenOpenSeaSaleLookupTables: [TokenOpenSeaSaleLookupTable!]! @derivedFrom(field: "token")

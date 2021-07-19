@@ -3,7 +3,7 @@ schema:
   file: ./schema.graphql
 dataSources:
   - kind: ethereum/contract
-    name: ArtBlocks
+    name: 'ArtBlocks-0xa7d8d9ef8D8Ce8992Df33D8b8CF4Aebabd5bD270'
     network: mainnet
     source:
       address: '0xa7d8d9ef8D8Ce8992Df33D8b8CF4Aebabd5bD270'
