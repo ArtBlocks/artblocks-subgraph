@@ -518,7 +518,7 @@ export function handleRemoveProjectLastScript(
 export function handleToggleProjectIsActive(
   call: ToggleProjectIsActiveCall
 ): void {
-  let project = new Project(
+  let project = Project.load(
     generateContractSpecificId(call.to, call.inputs._projectId)
   );
 
@@ -533,7 +533,7 @@ export function handleToggleProjectIsActive(
 export function handleToggleProjectIsDynamic(
   call: ToggleProjectIsDynamicCall
 ): void {
-  let project = new Project(
+  let project = Project.load(
     generateContractSpecificId(call.to, call.inputs._projectId)
   );
 
@@ -547,7 +547,7 @@ export function handleToggleProjectIsDynamic(
 export function handleToggleProjectIsLocked(
   call: ToggleProjectIsLockedCall
 ): void {
-  let project = new Project(
+  let project = Project.load(
     generateContractSpecificId(call.to, call.inputs._projectId)
   );
 
@@ -560,7 +560,7 @@ export function handleToggleProjectIsLocked(
 export function handleToggleProjectIsPaused(
   call: ToggleProjectIsPausedCall
 ): void {
-  let project = new Project(
+  let project = Project.load(
     generateContractSpecificId(call.to, call.inputs._projectId)
   );
 
@@ -574,7 +574,7 @@ export function handleToggleProjectIsPaused(
 export function handleToggleProjectUseHashString(
   call: ToggleProjectUseHashStringCall
 ): void {
-  let project = new Project(
+  let project = Project.load(
     generateContractSpecificId(call.to, call.inputs._projectId)
   );
 
@@ -587,7 +587,7 @@ export function handleToggleProjectUseHashString(
 export function handleToggleProjectUseIpfsForStatic(
   call: ToggleProjectUseIpfsForStaticCall
 ): void {
-  let project = new Project(
+  let project = Project.load(
     generateContractSpecificId(call.to, call.inputs._projectId)
   );
 
@@ -710,7 +710,7 @@ export function handleUpdateProjectLicense(
 export function handleUpdateProjectMaxInvocations(
   call: UpdateProjectMaxInvocationsCall
 ): void {
-  let project = new Project(
+  let project = Project.load(
     generateContractSpecificId(call.to, call.inputs._projectId)
   );
 

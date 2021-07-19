@@ -1,4 +1,4 @@
-import { Address, BigInt, Bytes } from "@graphprotocol/graph-ts";
+import { Address, BigInt, Bytes, log } from "@graphprotocol/graph-ts";
 
 import { AtomicMatch_Call } from "../generated/WyvernExchange/WyvernExchange";
 
@@ -153,6 +153,7 @@ function _handleBundleSale(call: AtomicMatch_Call): void {
 
   // If the bundle does not contain any artblocks sales we don't care
   if (bundleIncludesArtBlocks) {
+    log.info("OS ARTBLOCKS BUNDLE SALE", []);
     // Create the sale
     let openSeaSaleId = call.transaction.hash.toHexString();
     let openSeaSale = new OpenSeaSale(openSeaSaleId);
@@ -176,7 +177,12 @@ function _handleBundleSale(call: AtomicMatch_Call): void {
       }
 
       // Get the asosciated Art Blocks token if any (might not be an AB token)
-      let token = Token.load(generateContractSpecificId(Address.fromString(nftContractList[i]), BigInt.fromString(tokenId));
+      let token = Token.load(
+        generateContractSpecificId(
+          Address.fromString(nftContractList[i]),
+          BigInt.fromString(tokenId)
+        )
+      );
       if (token != null) {
         // Link both of them (NFT with OpenSeaSale)
         let tableEntryId = _buildTokenSaleLookupTableId(
