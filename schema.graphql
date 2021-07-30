@@ -72,6 +72,8 @@ type Project @entity {
   "The actual script for the project"
   script: String
 
+  scripts: [ProjectScript!] @derivedFrom(field: "project")
+
   "The number of scripts stored on-chain"
   scriptCount: BigInt!
 
@@ -98,6 +100,13 @@ type Project @entity {
   activatedAt: BigInt
   scriptUpdatedAt: BigInt
   contract: Contract!
+}
+
+type ProjectScript @entity {
+  id: ID!
+  index: BigInt!
+  project: Project!
+  script: String!
 }
 
 type Contract @entity {

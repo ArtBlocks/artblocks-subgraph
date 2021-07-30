@@ -88,118 +88,6 @@ export class Mint__Params {
   }
 }
 
-export class PlatformUpdated extends ethereum.Event {
-  get params(): PlatformUpdated__Params {
-    return new PlatformUpdated__Params(this);
-  }
-}
-
-export class PlatformUpdated__Params {
-  _event: PlatformUpdated;
-
-  constructor(event: PlatformUpdated) {
-    this._event = event;
-  }
-
-  get field(): string {
-    return this._event.parameters[0].value.toString();
-  }
-}
-
-export class PlatformWhitelistUpdated extends ethereum.Event {
-  get params(): PlatformWhitelistUpdated__Params {
-    return new PlatformWhitelistUpdated__Params(this);
-  }
-}
-
-export class PlatformWhitelistUpdated__Params {
-  _event: PlatformWhitelistUpdated;
-
-  constructor(event: PlatformWhitelistUpdated) {
-    this._event = event;
-  }
-
-  get update(): string {
-    return this._event.parameters[0].value.toString();
-  }
-
-  get addr(): Address {
-    return this._event.parameters[1].value.toAddress();
-  }
-}
-
-export class ProjectAdded extends ethereum.Event {
-  get params(): ProjectAdded__Params {
-    return new ProjectAdded__Params(this);
-  }
-}
-
-export class ProjectAdded__Params {
-  _event: ProjectAdded;
-
-  constructor(event: ProjectAdded) {
-    this._event = event;
-  }
-
-  get _id(): BigInt {
-    return this._event.parameters[0].value.toBigInt();
-  }
-
-  get artistAddress(): Address {
-    return this._event.parameters[1].value.toAddress();
-  }
-
-  get name(): string {
-    return this._event.parameters[2].value.toString();
-  }
-
-  get currencySymbol(): string {
-    return this._event.parameters[3].value.toString();
-  }
-
-  get pricePerTokenInWei(): BigInt {
-    return this._event.parameters[4].value.toBigInt();
-  }
-
-  get paused(): boolean {
-    return this._event.parameters[5].value.toBoolean();
-  }
-
-  get dynamic(): boolean {
-    return this._event.parameters[6].value.toBoolean();
-  }
-
-  get useHashString(): boolean {
-    return this._event.parameters[7].value.toBoolean();
-  }
-
-  get maxInvocations(): BigInt {
-    return this._event.parameters[8].value.toBigInt();
-  }
-}
-
-export class ProjectUpdated extends ethereum.Event {
-  get params(): ProjectUpdated__Params {
-    return new ProjectUpdated__Params(this);
-  }
-}
-
-export class ProjectUpdated__Params {
-  _event: ProjectUpdated;
-
-  constructor(event: ProjectUpdated) {
-    this._event = event;
-  }
-
-  get _id(): BigInt {
-    return this._event.parameters[0].value.toBigInt();
-  }
-
-  get updates(): string {
-    return this._event.parameters[1].value.toString();
-  }
-}
-
 export class Transfer extends ethereum.Event {
   get params(): Transfer__Params {
     return new Transfer__Params(this);
@@ -226,7 +114,7 @@ export class Transfer__Params {
   }
 }
 
-export class ArtBlocksPlus__getRoyaltyDataResult {
+export class GenArt721Core__getRoyaltyDataResult {
   value0: Address;
   value1: Address;
   value2: BigInt;
@@ -254,7 +142,7 @@ export class ArtBlocksPlus__getRoyaltyDataResult {
   }
 }
 
-export class ArtBlocksPlus__projectDetailsResult {
+export class GenArt721Core__projectDetailsResult {
   value0: string;
   value1: string;
   value2: string;
@@ -290,7 +178,7 @@ export class ArtBlocksPlus__projectDetailsResult {
   }
 }
 
-export class ArtBlocksPlus__projectScriptInfoResult {
+export class GenArt721Core__projectScriptInfoResult {
   value0: string;
   value1: BigInt;
   value2: boolean;
@@ -326,7 +214,7 @@ export class ArtBlocksPlus__projectScriptInfoResult {
   }
 }
 
-export class ArtBlocksPlus__projectTokenInfoResult {
+export class GenArt721Core__projectTokenInfoResult {
   value0: Address;
   value1: BigInt;
   value2: BigInt;
@@ -374,7 +262,7 @@ export class ArtBlocksPlus__projectTokenInfoResult {
   }
 }
 
-export class ArtBlocksPlus__projectURIInfoResult {
+export class GenArt721Core__projectURIInfoResult {
   value0: string;
   value1: string;
   value2: boolean;
@@ -394,9 +282,9 @@ export class ArtBlocksPlus__projectURIInfoResult {
   }
 }
 
-export class ArtBlocksPlus extends ethereum.SmartContract {
-  static bind(address: Address): ArtBlocksPlus {
-    return new ArtBlocksPlus("ArtBlocksPlus", address);
+export class GenArt721Core extends ethereum.SmartContract {
+  static bind(address: Address): GenArt721Core {
+    return new GenArt721Core("GenArt721Core", address);
   }
 
   admin(): Address {
@@ -500,14 +388,14 @@ export class ArtBlocksPlus extends ethereum.SmartContract {
     return ethereum.CallResult.fromValue(value[0].toAddress());
   }
 
-  getRoyaltyData(_tokenId: BigInt): ArtBlocksPlus__getRoyaltyDataResult {
+  getRoyaltyData(_tokenId: BigInt): GenArt721Core__getRoyaltyDataResult {
     let result = super.call(
       "getRoyaltyData",
       "getRoyaltyData(uint256):(address,address,uint256,uint256)",
       [ethereum.Value.fromUnsignedBigInt(_tokenId)]
     );
 
-    return new ArtBlocksPlus__getRoyaltyDataResult(
+    return new GenArt721Core__getRoyaltyDataResult(
       result[0].toAddress(),
       result[1].toAddress(),
       result[2].toBigInt(),
@@ -517,7 +405,7 @@ export class ArtBlocksPlus extends ethereum.SmartContract {
 
   try_getRoyaltyData(
     _tokenId: BigInt
-  ): ethereum.CallResult<ArtBlocksPlus__getRoyaltyDataResult> {
+  ): ethereum.CallResult<GenArt721Core__getRoyaltyDataResult> {
     let result = super.tryCall(
       "getRoyaltyData",
       "getRoyaltyData(uint256):(address,address,uint256,uint256)",
@@ -528,7 +416,7 @@ export class ArtBlocksPlus extends ethereum.SmartContract {
     }
     let value = result.value;
     return ethereum.CallResult.fromValue(
-      new ArtBlocksPlus__getRoyaltyDataResult(
+      new GenArt721Core__getRoyaltyDataResult(
         value[0].toAddress(),
         value[1].toAddress(),
         value[2].toBigInt(),
@@ -714,14 +602,14 @@ export class ArtBlocksPlus extends ethereum.SmartContract {
     return ethereum.CallResult.fromValue(value[0].toAddress());
   }
 
-  projectDetails(_projectId: BigInt): ArtBlocksPlus__projectDetailsResult {
+  projectDetails(_projectId: BigInt): GenArt721Core__projectDetailsResult {
     let result = super.call(
       "projectDetails",
       "projectDetails(uint256):(string,string,string,string,string,bool)",
       [ethereum.Value.fromUnsignedBigInt(_projectId)]
     );
 
-    return new ArtBlocksPlus__projectDetailsResult(
+    return new GenArt721Core__projectDetailsResult(
       result[0].toString(),
       result[1].toString(),
       result[2].toString(),
@@ -733,7 +621,7 @@ export class ArtBlocksPlus extends ethereum.SmartContract {
 
   try_projectDetails(
     _projectId: BigInt
-  ): ethereum.CallResult<ArtBlocksPlus__projectDetailsResult> {
+  ): ethereum.CallResult<GenArt721Core__projectDetailsResult> {
     let result = super.tryCall(
       "projectDetails",
       "projectDetails(uint256):(string,string,string,string,string,bool)",
@@ -744,7 +632,7 @@ export class ArtBlocksPlus extends ethereum.SmartContract {
     }
     let value = result.value;
     return ethereum.CallResult.fromValue(
-      new ArtBlocksPlus__projectDetailsResult(
+      new GenArt721Core__projectDetailsResult(
         value[0].toString(),
         value[1].toString(),
         value[2].toString(),
@@ -956,14 +844,14 @@ export class ArtBlocksPlus extends ethereum.SmartContract {
 
   projectScriptInfo(
     _projectId: BigInt
-  ): ArtBlocksPlus__projectScriptInfoResult {
+  ): GenArt721Core__projectScriptInfoResult {
     let result = super.call(
       "projectScriptInfo",
       "projectScriptInfo(uint256):(string,uint256,bool,string,bool,bool)",
       [ethereum.Value.fromUnsignedBigInt(_projectId)]
     );
 
-    return new ArtBlocksPlus__projectScriptInfoResult(
+    return new GenArt721Core__projectScriptInfoResult(
       result[0].toString(),
       result[1].toBigInt(),
       result[2].toBoolean(),
@@ -975,7 +863,7 @@ export class ArtBlocksPlus extends ethereum.SmartContract {
 
   try_projectScriptInfo(
     _projectId: BigInt
-  ): ethereum.CallResult<ArtBlocksPlus__projectScriptInfoResult> {
+  ): ethereum.CallResult<GenArt721Core__projectScriptInfoResult> {
     let result = super.tryCall(
       "projectScriptInfo",
       "projectScriptInfo(uint256):(string,uint256,bool,string,bool,bool)",
@@ -986,7 +874,7 @@ export class ArtBlocksPlus extends ethereum.SmartContract {
     }
     let value = result.value;
     return ethereum.CallResult.fromValue(
-      new ArtBlocksPlus__projectScriptInfoResult(
+      new GenArt721Core__projectScriptInfoResult(
         value[0].toString(),
         value[1].toBigInt(),
         value[2].toBoolean(),
@@ -1022,14 +910,14 @@ export class ArtBlocksPlus extends ethereum.SmartContract {
     return ethereum.CallResult.fromValue(value[0].toBigIntArray());
   }
 
-  projectTokenInfo(_projectId: BigInt): ArtBlocksPlus__projectTokenInfoResult {
+  projectTokenInfo(_projectId: BigInt): GenArt721Core__projectTokenInfoResult {
     let result = super.call(
       "projectTokenInfo",
       "projectTokenInfo(uint256):(address,uint256,uint256,uint256,bool,address,uint256,string,address)",
       [ethereum.Value.fromUnsignedBigInt(_projectId)]
     );
 
-    return new ArtBlocksPlus__projectTokenInfoResult(
+    return new GenArt721Core__projectTokenInfoResult(
       result[0].toAddress(),
       result[1].toBigInt(),
       result[2].toBigInt(),
@@ -1044,7 +932,7 @@ export class ArtBlocksPlus extends ethereum.SmartContract {
 
   try_projectTokenInfo(
     _projectId: BigInt
-  ): ethereum.CallResult<ArtBlocksPlus__projectTokenInfoResult> {
+  ): ethereum.CallResult<GenArt721Core__projectTokenInfoResult> {
     let result = super.tryCall(
       "projectTokenInfo",
       "projectTokenInfo(uint256):(address,uint256,uint256,uint256,bool,address,uint256,string,address)",
@@ -1055,7 +943,7 @@ export class ArtBlocksPlus extends ethereum.SmartContract {
     }
     let value = result.value;
     return ethereum.CallResult.fromValue(
-      new ArtBlocksPlus__projectTokenInfoResult(
+      new GenArt721Core__projectTokenInfoResult(
         value[0].toAddress(),
         value[1].toBigInt(),
         value[2].toBigInt(),
@@ -1069,14 +957,14 @@ export class ArtBlocksPlus extends ethereum.SmartContract {
     );
   }
 
-  projectURIInfo(_projectId: BigInt): ArtBlocksPlus__projectURIInfoResult {
+  projectURIInfo(_projectId: BigInt): GenArt721Core__projectURIInfoResult {
     let result = super.call(
       "projectURIInfo",
       "projectURIInfo(uint256):(string,string,bool)",
       [ethereum.Value.fromUnsignedBigInt(_projectId)]
     );
 
-    return new ArtBlocksPlus__projectURIInfoResult(
+    return new GenArt721Core__projectURIInfoResult(
       result[0].toString(),
       result[1].toString(),
       result[2].toBoolean()
@@ -1085,7 +973,7 @@ export class ArtBlocksPlus extends ethereum.SmartContract {
 
   try_projectURIInfo(
     _projectId: BigInt
-  ): ethereum.CallResult<ArtBlocksPlus__projectURIInfoResult> {
+  ): ethereum.CallResult<GenArt721Core__projectURIInfoResult> {
     let result = super.tryCall(
       "projectURIInfo",
       "projectURIInfo(uint256):(string,string,bool)",
@@ -1096,7 +984,7 @@ export class ArtBlocksPlus extends ethereum.SmartContract {
     }
     let value = result.value;
     return ethereum.CallResult.fromValue(
-      new ArtBlocksPlus__projectURIInfoResult(
+      new GenArt721Core__projectURIInfoResult(
         value[0].toString(),
         value[1].toString(),
         value[2].toBoolean()

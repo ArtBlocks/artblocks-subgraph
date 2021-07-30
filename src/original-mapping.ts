@@ -56,13 +56,15 @@ import {
   Contract,
   Account,
   AccountProject,
-  Whitelisting
+  Whitelisting,
+  ProjectScript
 } from "../generated/schema";
 import {
   generateAccountProjectId,
   generateWhitelistingId,
   generateContractSpecificId
-} from "./global-helpers";
+} from "./helpers";
+import { generateProjectScriptId } from "./helpers";
 
 /*** EVENT HANDLERS ***/
 export function handleMint(event: Mint): void {
@@ -294,7 +296,23 @@ export function handleRemoveProjectLastScript(
   call: RemoveProjectLastScriptCall
 ): void {
   let contract = ArtBlocks.bind(call.to);
-  refreshProjectScript(contract, call.inputs._projectId, call.block.timestamp);
+  let project = Project.load(
+    generateContractSpecificId(call.to, call.inputs._projectId)
+  );
+  if (project != null) {
+    store.remove(
+      "ProjectScript",
+      generateProjectScriptId(
+        project.id,
+        project.scriptCount.minus(BigInt.fromI32(1))
+      )
+    );
+    refreshProjectScript(
+      contract,
+      call.inputs._projectId,
+      call.block.timestamp
+    );
+  }
 }
 
 export function handleToggleProjectIsActive(
@@ -606,20 +624,31 @@ function refreshProjectScript(
   projectId: BigInt,
   timestamp: BigInt
 ): void {
+  let project = new Project(
+    generateContractSpecificId(contract._address, projectId)
+  );
+
   let scriptInfo = contract.projectScriptInfo(projectId);
 
   let scriptCount = scriptInfo.value1.toI32();
   let scripts: string[] = [];
   for (let i = 0; i < scriptCount; i++) {
     let script = contract.projectScriptByIndex(projectId, BigInt.fromI32(i));
+
+    let projectScriptIndex = BigInt.fromI32(i);
+    let projectScript = new ProjectScript(
+      generateProjectScriptId(project.id, projectScriptIndex)
+    );
+    projectScript.script = script;
+    projectScript.index = projectScriptIndex;
+    projectScript.project = project.id;
+    projectScript.save();
+
     scripts.push(script);
   }
 
   let script = scripts.join("");
 
-  let project = new Project(
-    generateContractSpecificId(contract._address, projectId)
-  );
   project.script = script;
   project.scriptCount = scriptInfo.value1;
   project.updatedAt = timestamp;

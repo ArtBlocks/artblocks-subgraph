@@ -13,7 +13,7 @@ import {
   ARTBLOCKS_ORIGINAL_ADDRESS,
   WYVERN_ATOMICIZER_ADDRESS
 } from "./constants";
-import { generateContractSpecificId } from "./global-helpers";
+import { generateContractSpecificId } from "./helpers";
 
 /** Call handlers */
 /**

@@ -20,3 +20,10 @@ export function generateContractSpecificId(
 ): string {
   return contractAddress.toHexString() + "-" + entityId.toString();
 }
+
+export function generateProjectScriptId(
+  projectId: string,
+  scriptIndex: BigInt
+): string {
+  return projectId + "-" + scriptIndex.toString();
+}

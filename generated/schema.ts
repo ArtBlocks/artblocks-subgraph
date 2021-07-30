@@ -379,6 +379,23 @@ export class Project extends Entity {
     }
   }
 
+  get scripts(): Array<string> | null {
+    let value = this.get("scripts");
+    if (value === null || value.kind == ValueKind.NULL) {
+      return null;
+    } else {
+      return value.toStringArray();
+    }
+  }
+
+  set scripts(value: Array<string> | null) {
+    if (value === null) {
+      this.unset("scripts");
+    } else {
+      this.set("scripts", Value.fromStringArray(value as Array<string>));
+    }
+  }
+
   get scriptCount(): BigInt {
     let value = this.get("scriptCount");
     return value.toBigInt();
@@ -533,6 +550,64 @@ export class Project extends Entity {
 
   set contract(value: string) {
     this.set("contract", Value.fromString(value));
+  }
+}
+
+export class ProjectScript extends Entity {
+  constructor(id: string) {
+    super();
+    this.set("id", Value.fromString(id));
+  }
+
+  save(): void {
+    let id = this.get("id");
+    assert(id !== null, "Cannot save ProjectScript entity without an ID");
+    assert(
+      id.kind == ValueKind.STRING,
+      "Cannot save ProjectScript entity with non-string ID. " +
+        'Considering using .toHex() to convert the "id" to a string.'
+    );
+    store.set("ProjectScript", id.toString(), this);
+  }
+
+  static load(id: string): ProjectScript | null {
+    return store.get("ProjectScript", id) as ProjectScript | null;
+  }
+
+  get id(): string {
+    let value = this.get("id");
+    return value.toString();
+  }
+
+  set id(value: string) {
+    this.set("id", Value.fromString(value));
+  }
+
+  get index(): BigInt {
+    let value = this.get("index");
+    return value.toBigInt();
+  }
+
+  set index(value: BigInt) {
+    this.set("index", Value.fromBigInt(value));
+  }
+
+  get project(): string {
+    let value = this.get("project");
+    return value.toString();
+  }
+
+  set project(value: string) {
+    this.set("project", Value.fromString(value));
+  }
+
+  get script(): string {
+    let value = this.get("script");
+    return value.toString();
+  }
+
+  set script(value: string) {
+    this.set("script", Value.fromString(value));
   }
 }
 

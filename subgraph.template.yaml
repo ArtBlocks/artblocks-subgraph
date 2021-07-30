@@ -4,11 +4,11 @@ schema:
 dataSources:
   {{#address}}
   - kind: ethereum/contract
-    name: 'ArtBlocks-{{.}}'
+    name: 'GenArt721Core-{{.}}'
     network: {{network}}
     source:
       address: '{{.}}'
-      abi: ArtBlocks
+      abi: GenArt721Core
       {{#startBlock}}
       startBlock: {{startBlock}}
       {{/startBlock}}
@@ -26,8 +26,8 @@ dataSources:
         - OpenSeaSale
         - TokenOpenSeaSaleLookupTable
       abis:
-        - name: ArtBlocks
-          file: ./abis/ArtBlocks.json
+        - name: GenArt721Core
+          file: ./abis/GenArt721Core.json
       eventHandlers:
         - event: Mint(indexed address,indexed uint256,indexed uint256)
           handler: handleMint
@@ -104,15 +104,119 @@ dataSources:
           handler: handleUpdateProjectWebsite
       file: ./src/mapping.ts
   {{/address}}
+  {{#core2Address}}
+  - kind: ethereum/contract
+    name: 'GenArt721Core2-{{.}}'
+    network: {{network}}
+    source:
+      address: '{{.}}'
+      abi: GenArt721Core2
+      {{#startBlock}}
+      startBlock: {{startBlock}}
+      {{/startBlock}}
+    mapping:
+      kind: ethereum/events
+      apiVersion: 0.0.4
+      language: wasm/assemblyscript
+      entities:
+        - Project
+        - Token
+        - Contract
+        - Account
+        - AccountProject
+        - Whitelisting
+        - OpenSeaSale
+        - TokenOpenSeaSaleLookupTable
+      abis:
+        - name: GenArt721Core2
+          file: ./abis/GenArt721Core2.json
+      eventHandlers:
+        - event: Mint(indexed address,indexed uint256,indexed uint256)
+          handler: handleMint
+        - event: Transfer(indexed address,indexed address,indexed uint256)
+          handler: handleTransfer
+      callHandlers:
+        - function: updateAdmin(address)
+          handler: handleUpdateAdmin 
+        - function: addWhitelisted(address)
+          handler: handleAddWhitelisted
+        - function: removeWhitelisted(address)
+          handler: handleRemoveWhitelisted
+        - function: addMintWhitelisted(address)
+          handler: handleAddMintWhitelisted
+        - function: removeMintWhitelisted(address)
+          handler: handleRemoveMintWhitelisted
+        - function: updateRandomizerAddress(address)
+          handler: handleUpdateRandomizerAddress
+        - function: updateArtblocksAddress(address)
+          handler: handleUpdateArtblocksAddress
+        - function: updateArtblocksPercentage(uint256)
+          handler: handleUpdateArtblocksPercentage
+        - function: addProject(string,address,uint256,bool)
+          handler: handleAddProject
+        - function: addProjectScript(uint256,string)
+          handler: handleAddProjectScript
+        - function: clearTokenIpfsImageUri(uint256)
+          handler: handleClearTokenIpfsImageUri
+        - function: overrideTokenDynamicImageWithIpfsLink(uint256,string)
+          handler: handleOverrideTokenDynamicImageWithIpfsLink
+        - function: removeProjectLastScript(uint256)
+          handler: handleRemoveProjectLastScript
+        - function: toggleProjectIsActive(uint256)
+          handler: handleToggleProjectIsActive
+        - function: toggleProjectIsDynamic(uint256)
+          handler: handleToggleProjectIsDynamic
+        - function: toggleProjectIsLocked(uint256)
+          handler: handleToggleProjectIsLocked
+        - function: toggleProjectIsPaused(uint256)
+          handler: handleToggleProjectIsPaused
+        - function: toggleProjectUseHashString(uint256)
+          handler: handleToggleProjectUseHashString
+        - function: toggleProjectUseIpfsForStatic(uint256)
+          handler: handleToggleProjectUseIpfsForStatic
+        - function: updateProjectAdditionalPayeeInfo(uint256,address,uint256)
+          handler: handleUpdateProjectAdditionalPayeeInfo
+        - function: updateProjectArtistAddress(uint256,address)
+          handler: handleUpdateProjectArtistAddress
+        - function: updateProjectArtistName(uint256,string)
+          handler: handleUpdateProjectArtistName
+        - function: updateProjectBaseIpfsURI(uint256,string)
+          handler: handleUpdateProjectBaseIpfsURI
+        - function: updateProjectBaseURI(uint256,string)
+          handler: handleUpdateProjectBaseURI
+        - function: updateProjectCurrencyInfo(uint256,string,address)
+          handler: handleUpdateProjectCurrencyInfo
+        - function: updateProjectDescription(uint256,string)
+          handler: handleUpdateProjectDescription
+        - function: updateProjectIpfsHash(uint256,string)
+          handler: handleUpdateProjectIpfsHash
+        - function: updateProjectLicense(uint256,string)
+          handler: handleUpdateProjectLicense
+        - function: updateProjectMaxInvocations(uint256,uint256)
+          handler: handleUpdateProjectMaxInvocations
+        - function: updateProjectName(uint256,string)
+          handler: handleUpdateProjectName
+        - function: updateProjectPricePerTokenInWei(uint256,uint256)
+          handler: handleUpdateProjectPricePerTokenInWei
+        - function: updateProjectScript(uint256,uint256,string)
+          handler: handleUpdateProjectScript
+        - function: updateProjectScriptJSON(uint256,string)
+          handler: handleUpdateProjectScriptJSON
+        - function: updateProjectSecondaryMarketRoyaltyPercentage(uint256,uint256)
+          handler: handleUpdateProjectSecondaryMarketRoyaltyPercentage
+        - function: updateProjectWebsite(uint256,string)
+          handler: handleUpdateProjectWebsite
+      file: ./src/mapping.ts
+  {{/core2Address}}
   {{#plusAddress}}
   # We need a contract with events for project/platform updates for testing
   # because Ganache and Rinkeby don't support the trace_filter method
   - kind: ethereum/contract
-    name: ArtBlocksPlus
+    name: GenArt721CorePlus
     network: {{network}}
     source:
       address: '{{plusAddress}}'
-      abi: ArtBlocksPlus
+      abi: GenArt721CorePlus
       {{#plusStartBlock}}
       startBlock: {{plusStartBlock}}
       {{/plusStartBlock}}
@@ -130,8 +234,8 @@ dataSources:
         - OpenSeaSale
         - TokenOpenSeaSaleLookupTable
       abis:
-        - name: ArtBlocksPlus
-          file: ./abis/ArtBlocksPlus.json
+        - name: GenArt721CorePlus
+          file: ./abis/GenArt721CorePlus.json
       eventHandlers:
         - event: Mint(indexed address,indexed uint256,indexed uint256)
           handler: handleMint
@@ -149,11 +253,11 @@ dataSources:
   {{/plusAddress}}
   {{#originalAddress}}
   - kind: ethereum/contract
-    name: ArtBlocksOriginal
+    name: GenArt721
     network: {{network}}
     source:
       address: '{{originalAddress}}'
-      abi: ArtBlocksOriginal
+      abi: GenArt721
       {{#originalStartBlock}}
       startBlock: {{originalStartBlock}}
       {{/originalStartBlock}}
@@ -171,8 +275,8 @@ dataSources:
         - OpenSeaSale
         - TokenOpenSeaSaleLookupTable
       abis:
-        - name: ArtBlocksOriginal
-          file: ./abis/ArtBlocksOriginal.json
+        - name: GenArt721
+          file: ./abis/GenArt721.json
       eventHandlers:
         - event: Mint(indexed address,indexed uint256,indexed uint256,uint256,uint256)
           handler: handleMint
