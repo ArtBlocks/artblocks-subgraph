@@ -130,6 +130,8 @@ dataSources:
       abis:
         - name: GenArt721Core2
           file: ./abis/GenArt721Core2.json
+        - name: GenArt721Core
+          file: ./abis/GenArt721Core.json
       eventHandlers:
         - event: Mint(indexed address,indexed uint256,indexed uint256)
           handler: handleMint

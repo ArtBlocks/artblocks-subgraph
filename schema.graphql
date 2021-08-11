@@ -69,9 +69,10 @@ type Project @entity {
   "Artist/additional payee royalty percentage"
   royaltyPercentage: BigInt
 
-  "The actual script for the project"
+  "The full script composed of scripts"
   script: String
 
+  "Parts of the project script"
   scripts: [ProjectScript!] @derivedFrom(field: "project")
 
   "The number of scripts stored on-chain"
@@ -240,6 +241,9 @@ type TokenOpenSeaSaleLookupTable @entity {
 
   "The token sold"
   token: Token!
+
+  "Timestamp of the sale"
+  timestamp: BigInt!
 
   "The associated OpenSea sale"
   openSeaSale: OpenSeaSale!

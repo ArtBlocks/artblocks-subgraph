@@ -1267,6 +1267,15 @@ export class TokenOpenSeaSaleLookupTable extends Entity {
     this.set("token", Value.fromString(value));
   }
 
+  get timestamp(): BigInt {
+    let value = this.get("timestamp");
+    return value.toBigInt();
+  }
+
+  set timestamp(value: BigInt) {
+    this.set("timestamp", Value.fromBigInt(value));
+  }
+
   get openSeaSale(): string {
     let value = this.get("openSeaSale");
     return value.toString();

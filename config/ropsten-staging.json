@@ -1,5 +1,5 @@
 {
   "network": "ropsten",
-  "core2Address": ["0x37DA8A225A33BDe184C1E63e4328faeb194dA11D"],
-  "startBlock": 10719469
+  "core2Address": ["0x1CD623a86751d4C4f20c96000FEC763941f098A2"],
+  "startBlock": 10760915
 }

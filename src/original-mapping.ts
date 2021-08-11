@@ -16,7 +16,7 @@ import {
   store
 } from "@graphprotocol/graph-ts";
 import {
-  ArtBlocksOriginal as ArtBlocks,
+  GenArt721,
   Mint,
   Transfer,
   AddProjectCall,
@@ -49,7 +49,7 @@ import {
   UpdateArtblocksPercentageCall,
   RemoveWhitelistedCall,
   RemoveProjectLastScriptCall
-} from "../generated/ArtBlocksOriginal/ArtBlocksOriginal";
+} from "../generated/GenArt721/GenArt721";
 import {
   Project,
   Token,
@@ -68,7 +68,7 @@ import { generateProjectScriptId } from "./helpers";
 
 /*** EVENT HANDLERS ***/
 export function handleMint(event: Mint): void {
-  let contract = ArtBlocks.bind(event.address);
+  let contract = GenArt721.bind(event.address);
 
   let token = new Token(
     generateContractSpecificId(event.address, event.params._tokenId)
@@ -170,7 +170,7 @@ export function handleTransfer(event: Transfer): void {
 
 /*** CALL HANDLERS  ***/
 export function handleAddProject(call: AddProjectCall): void {
-  let contract = ArtBlocks.bind(call.to);
+  let contract = GenArt721.bind(call.to);
   let contractEntity = Contract.load(call.to.toHexString());
 
   let projectId: BigInt;
@@ -230,7 +230,7 @@ export function handleAddProject(call: AddProjectCall): void {
 }
 
 export function handleAddWhitelisted(call: AddWhitelistedCall): void {
-  let contract = ArtBlocks.bind(call.to);
+  let contract = GenArt721.bind(call.to);
   let contractEntity = refreshContract(contract);
 
   let account = new Account(call.inputs._address.toHexString());
@@ -246,7 +246,7 @@ export function handleAddWhitelisted(call: AddWhitelistedCall): void {
 }
 
 export function handleRemoveWhitelisted(call: RemoveWhitelistedCall): void {
-  let contract = ArtBlocks.bind(call.to);
+  let contract = GenArt721.bind(call.to);
 
   let contractEntity = refreshContract(contract);
   let account = new Account(call.inputs._address.toHexString());
@@ -262,40 +262,40 @@ export function handleRemoveWhitelisted(call: RemoveWhitelistedCall): void {
 export function handleUpdateArtblocksAddress(
   call: UpdateArtblocksAddressCall
 ): void {
-  let contract = ArtBlocks.bind(call.to);
+  let contract = GenArt721.bind(call.to);
   refreshContract(contract);
 }
 
 export function handleUpdateArtblocksPercentage(
   call: UpdateArtblocksPercentageCall
 ): void {
-  let contract = ArtBlocks.bind(call.to);
+  let contract = GenArt721.bind(call.to);
   refreshContract(contract);
 }
 
 export function handleAddProjectScript(call: AddProjectScriptCall): void {
-  let contract = ArtBlocks.bind(call.to);
+  let contract = GenArt721.bind(call.to);
   refreshProjectScript(contract, call.inputs._projectId, call.block.timestamp);
 }
 
 export function handleClearTokenIpfsImageUri(
   call: ClearTokenIpfsImageUriCall
 ): void {
-  let contract = ArtBlocks.bind(call.to);
+  let contract = GenArt721.bind(call.to);
   refreshTokenUri(contract, call.inputs._tokenId);
 }
 
 export function handleOverrideTokenDynamicImageWithIpfsLink(
   call: OverrideTokenDynamicImageWithIpfsLinkCall
 ): void {
-  let contract = ArtBlocks.bind(call.to);
+  let contract = GenArt721.bind(call.to);
   refreshTokenUri(contract, call.inputs._tokenId);
 }
 
 export function handleRemoveProjectLastScript(
   call: RemoveProjectLastScriptCall
 ): void {
-  let contract = ArtBlocks.bind(call.to);
+  let contract = GenArt721.bind(call.to);
   let project = Project.load(
     generateContractSpecificId(call.to, call.inputs._projectId)
   );
@@ -535,7 +535,7 @@ export function handleUpdateProjectPricePerTokenInWei(
 }
 
 export function handleUpdateProjectScript(call: UpdateProjectScriptCall): void {
-  let contract = ArtBlocks.bind(call.to);
+  let contract = GenArt721.bind(call.to);
 
   refreshProjectScript(contract, call.inputs._projectId, call.block.timestamp);
 }
@@ -588,7 +588,7 @@ export function handleUpdateProjectWebsite(
 /*** END CALL HANDLERS  ***/
 
 /** HELPERS ***/
-function refreshContract(contract: ArtBlocks): Contract {
+function refreshContract(contract: GenArt721): Contract {
   let admin = contract.admin();
   let artblocksAddress = contract.artblocksAddress();
   let artblocksPercentage = contract.artblocksPercentage();
@@ -610,7 +610,7 @@ function refreshContract(contract: ArtBlocks): Contract {
   return contractEntity as Contract;
 }
 
-function refreshTokenUri(contract: ArtBlocks, tokenId: BigInt): void {
+function refreshTokenUri(contract: GenArt721, tokenId: BigInt): void {
   let tokenURI = contract.tokenURI(tokenId);
 
   let token = new Token(generateContractSpecificId(contract._address, tokenId));
@@ -620,7 +620,7 @@ function refreshTokenUri(contract: ArtBlocks, tokenId: BigInt): void {
 }
 
 function refreshProjectScript(
-  contract: ArtBlocks,
+  contract: GenArt721,
   projectId: BigInt,
   timestamp: BigInt
 ): void {
@@ -644,7 +644,9 @@ function refreshProjectScript(
     projectScript.project = project.id;
     projectScript.save();
 
-    scripts.push(script);
+    if (script != null && script != "") {
+      scripts.push(script);
+    }
   }
 
   let script = scripts.join("");

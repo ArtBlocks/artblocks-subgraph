@@ -897,7 +897,9 @@ function refreshProjectScript(
     projectScript.project = project.id;
     projectScript.save();
 
-    scripts.push(script);
+    if (script != null && script != "") {
+      scripts.push(script);
+    }
   }
 
   let script = scripts.join("");

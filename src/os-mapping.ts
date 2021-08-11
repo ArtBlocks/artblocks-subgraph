@@ -107,6 +107,7 @@ function _handleSingleAssetSale(call: AtomicMatch_Call): void {
       );
       tokenOpenSeaSaleLookupTable.token = token.id;
       tokenOpenSeaSaleLookupTable.openSeaSale = openSeaSale.id;
+      tokenOpenSeaSaleLookupTable.timestamp = openSeaSale.blockTimestamp;
       tokenOpenSeaSaleLookupTable.save();
     }
   }
@@ -193,6 +194,7 @@ function _handleBundleSale(call: AtomicMatch_Call): void {
         );
         tokenOpenSeaSaleLookupTable.token = token.id;
         tokenOpenSeaSaleLookupTable.openSeaSale = openSeaSale.id;
+        tokenOpenSeaSaleLookupTable.timestamp = openSeaSale.blockTimestamp;
         tokenOpenSeaSaleLookupTable.save();
       }
     }
