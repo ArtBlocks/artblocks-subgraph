@@ -8,11 +8,7 @@ import {
   Token,
   TokenOpenSeaSaleLookupTable
 } from "../generated/schema";
-import {
-  ARTBLOCKS_ADDRESS,
-  ARTBLOCKS_ORIGINAL_ADDRESS,
-  WYVERN_ATOMICIZER_ADDRESS
-} from "./constants";
+import { WYVERN_ATOMICIZER_ADDRESS, NULL_ADDRESS } from "./constants";
 import { generateContractSpecificId } from "./helpers";
 
 /** Call handlers */
@@ -98,6 +94,7 @@ function _handleSingleAssetSale(call: AtomicMatch_Call): void {
       openSeaSale.paymentToken = paymentTokenErc20Address;
       openSeaSale.price = price;
       openSeaSale.summaryTokensSold = token.id;
+      openSeaSale.isPrivate = _isPrivateSale(call);
       openSeaSale.save();
 
       // Create the associated entry in the Nft <=> OpenSeaSale lookup table
@@ -164,6 +161,7 @@ function _handleBundleSale(call: AtomicMatch_Call): void {
     openSeaSale.seller = sellerAdress;
     openSeaSale.paymentToken = paymentTokenErc20Address;
     openSeaSale.price = price;
+    openSeaSale.isPrivate = _isPrivateSale(call);
 
     // Build the token sold summary and create all the associated entries in the Nft <=> OpenSeaSale lookup table
     let summaryTokensSold = "";
@@ -202,6 +200,24 @@ function _handleBundleSale(call: AtomicMatch_Call): void {
     openSeaSale.summaryTokensSold = summaryTokensSold;
     openSeaSale.save();
   }
+}
+
+/**
+ * Return true if the associated sale was private.
+ *
+ * @param call The original call data
+ * @returns true if the sale was private else false 
+ */
+function _isPrivateSale(call: AtomicMatch_Call): boolean {
+  /**
+   * If the sale was private it means the seller hardcoded the address
+   * of the buyer in the order. This is translated in code with the "taker"
+   * side of the "sell" order NOT being the NULL address
+   */
+  let addrs: Address[] = call.inputs.addrs;
+  let takerOfSellOrder = addrs[9];
+
+  return takerOfSellOrder.toHexString() !== NULL_ADDRESS;
 }
 
 /**

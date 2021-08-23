@@ -233,6 +233,9 @@ type OpenSeaSale @entity {
 
   "The price of the OpenSea sale"
   price: BigInt!
+
+  "Private sales are flagged by this boolean"
+  isPrivate: Boolean!
 }
 
 type TokenOpenSeaSaleLookupTable @entity {
