@@ -1220,6 +1220,15 @@ export class OpenSeaSale extends Entity {
   set price(value: BigInt) {
     this.set("price", Value.fromBigInt(value));
   }
+
+  get isPrivate(): boolean {
+    let value = this.get("isPrivate");
+    return value.toBoolean();
+  }
+
+  set isPrivate(value: boolean) {
+    this.set("isPrivate", Value.fromBoolean(value));
+  }
 }
 
 export class TokenOpenSeaSaleLookupTable extends Entity {
