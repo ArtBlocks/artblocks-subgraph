@@ -217,7 +217,7 @@ function _isPrivateSale(call: AtomicMatch_Call): boolean {
   let addrs: Address[] = call.inputs.addrs;
   let takerOfSellOrder = addrs[9];
 
-  return takerOfSellOrder.toHexString() !== NULL_ADDRESS;
+  return takerOfSellOrder.toHexString() != NULL_ADDRESS;
 }
 
 /**
