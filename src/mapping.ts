@@ -4,7 +4,8 @@ import {
   store,
   json,
   JSONValueKind,
-  log
+  log,
+  Address
 } from "@graphprotocol/graph-ts";
 import {
   GenArt721Core,
@@ -43,7 +44,10 @@ import {
   UpdateArtblocksAddressCall,
   UpdateArtblocksPercentageCall,
   RemoveWhitelistedCall,
-  RemoveMintWhitelistedCall
+  RemoveMintWhitelistedCall,
+  GenArt721Core__projectDetailsResult,
+  GenArt721Core__projectTokenInfoResult,
+  GenArt721Core__projectScriptInfoResult
 } from "../generated/GenArt721Core/GenArt721Core";
 import {
   GenArt721CorePlus,
@@ -56,6 +60,11 @@ import {
   UpdateAdminCall,
   GenArt721Core2
 } from "../generated/GenArt721Core2/GenArt721Core2";
+import {
+  UpdateRenderProviderAddressCall,
+  UpdateRenderProviderPercentageCall,
+  GenArt721Core2PBAB
+} from "../generated/GenArt721Core2PBAB/GenArt721Core2PBAB";
 
 import {
   Project,
@@ -307,9 +316,9 @@ export function handlePlatformUpdated(event: PlatformUpdated): void {
   let field = event.params.field;
 
   if (field == "artblocksAddress") {
-    contractEntity.artblocksAddress = contract.artblocksAddress();
+    contractEntity.renderProviderAddress = contract.artblocksAddress();
   } else if (field == "artblocksPercentage") {
-    contractEntity.artblocksPercentage = contract.artblocksPercentage();
+    contractEntity.renderProviderPercentage = contract.artblocksPercentage();
   } else if (field == "randomizerContract") {
     contractEntity.randomizerContract = contract.randomizerContract();
   }
@@ -321,7 +330,7 @@ export function handlePlatformWhitelistUpdated(
   event: PlatformWhitelistUpdated
 ): void {
   let contract = GenArt721CorePlus.bind(event.address);
-  let contractEntity = refreshContract(contract as GenArt721Core);
+  let contractEntity = refreshContractArtBlocks(contract as GenArt721Core);
   let update = event.params.update;
 
   if (update == "addWhitelisted") {
@@ -363,7 +372,7 @@ export function handleAddProject(call: AddProjectCall): void {
 
   let projectId: BigInt;
   if (contractEntity == null) {
-    contractEntity = refreshContract(contract);
+    contractEntity = refreshContractArtBlocks(contract);
     // In this case nextProjectId has already been incremented
     projectId = contractEntity.nextProjectId.minus(BigInt.fromI32(1));
   } else {
@@ -374,6 +383,61 @@ export function handleAddProject(call: AddProjectCall): void {
   let projectTokenInfo = contract.projectTokenInfo(projectId);
   let projectScriptInfo = contract.projectScriptInfo(projectId);
 
+  initializeProjectEntity(
+    call.to,
+    projectId,
+    projectDetails,
+    projectTokenInfo,
+    projectScriptInfo,
+    call.block.timestamp
+  );
+
+  contractEntity.nextProjectId = contractEntity.nextProjectId.plus(
+    BigInt.fromI32(1)
+  );
+  contractEntity.save();
+}
+
+export function handleAddProjectPBAB(call: AddProjectCall): void {
+  let contract = GenArt721Core2PBAB.bind(call.to);
+  let contractEntity = Contract.load(call.to.toHexString());
+
+  let projectId: BigInt;
+  if (contractEntity == null) {
+    contractEntity = refreshContractPBAB(contract);
+    // In this case nextProjectId has already been incremented
+    projectId = contractEntity.nextProjectId.minus(BigInt.fromI32(1));
+  } else {
+    projectId = contractEntity.nextProjectId;
+  }
+
+  let projectDetails = contract.projectDetails(projectId);
+  let projectTokenInfo = contract.projectTokenInfo(projectId);
+  let projectScriptInfo = contract.projectScriptInfo(projectId);
+
+  initializeProjectEntity(
+    call.to,
+    projectId,
+    projectDetails as GenArt721Core__projectDetailsResult,
+    projectTokenInfo as GenArt721Core__projectTokenInfoResult,
+    projectScriptInfo as GenArt721Core__projectScriptInfoResult,
+    call.block.timestamp
+  );
+
+  contractEntity.nextProjectId = contractEntity.nextProjectId.plus(
+    BigInt.fromI32(1)
+  );
+  contractEntity.save();
+}
+
+function initializeProjectEntity(
+  contractAddress: Address,
+  projectId: BigInt,
+  projectDetails: GenArt721Core__projectDetailsResult,
+  projectTokenInfo: GenArt721Core__projectTokenInfoResult,
+  projectScriptInfo: GenArt721Core__projectScriptInfoResult,
+  timestamp: BigInt
+): void {
   let name = projectDetails.value0;
   let dynamic = projectDetails.value5;
 
@@ -390,9 +454,11 @@ export function handleAddProject(call: AddProjectCall): void {
   let useHashString = projectScriptInfo.value2;
   let paused = projectScriptInfo.value5;
 
-  let project = new Project(generateContractSpecificId(call.to, projectId));
+  let project = new Project(
+    generateContractSpecificId(contractAddress, projectId)
+  );
 
-  project.contract = contractEntity.id;
+  project.contract = contractAddress.toHexString();
   project.artist = artist.id;
   project.projectId = projectId;
   project.name = name;
@@ -408,45 +474,69 @@ export function handleAddProject(call: AddProjectCall): void {
   project.active = false;
   project.locked = false;
   project.complete = false;
-  project.createdAt = call.block.timestamp;
-  project.updatedAt = call.block.timestamp;
+  project.createdAt = timestamp;
+  project.updatedAt = timestamp;
 
   project.save();
-
-  contractEntity.nextProjectId = contractEntity.nextProjectId.plus(
-    BigInt.fromI32(1)
-  );
-  contractEntity.save();
 }
 
 export function handleUpdateAdmin(call: UpdateAdminCall): void {
   let contract = GenArt721Core2.bind(call.to);
-  refreshContract(contract as GenArt721Core);
+  refreshContractArtBlocks(contract as GenArt721Core);
+}
+
+export function handleUpdateAdminPBAB(call: UpdateAdminCall): void {
+  let contract = GenArt721Core2PBAB.bind(call.to);
+  refreshContractPBAB(contract as GenArt721Core2PBAB);
 }
 
 export function handleAddWhitelisted(call: AddWhitelistedCall): void {
   let contract = GenArt721Core.bind(call.to);
-  let contractEntity = refreshContract(contract);
+  let contractEntity = refreshContractArtBlocks(contract);
 
-  let account = new Account(call.inputs._address.toHexString());
+  addWhitelisting(contractEntity.id, call.inputs._address.toHexString());
+}
+
+export function handleAddWhitelistedPBAB(call: AddWhitelistedCall): void {
+  let contract = GenArt721Core2PBAB.bind(call.to);
+  let contractEntity = refreshContractPBAB(contract);
+
+  addWhitelisting(contractEntity.id, call.inputs._address.toHexString());
+}
+
+function addWhitelisting(contractId: string, accountId: string): void {
+  let account = new Account(accountId);
   account.save();
 
   let whitelisting = new Whitelisting(
-    generateWhitelistingId(contractEntity.id, account.id)
+    generateWhitelistingId(contractId, account.id)
   );
   whitelisting.account = account.id;
-  whitelisting.contract = contractEntity.id;
+  whitelisting.contract = contractId;
 
   whitelisting.save();
 }
 
 export function handleRemoveWhitelisted(call: RemoveWhitelistedCall): void {
   let contract = GenArt721Core.bind(call.to);
+  let contractEntity = refreshContractArtBlocks(contract);
 
-  let contractEntity = refreshContract(contract);
-  let account = new Account(call.inputs._address.toHexString());
+  removeWhitelisting(contractEntity.id, call.inputs._address.toHexString());
+}
 
-  let whitelistingId = generateWhitelistingId(contractEntity.id, account.id);
+export function handleRemoveWhitelistedPBAB(
+  call: RemoveMintWhitelistedCall
+): void {
+  let contract = GenArt721Core2PBAB.bind(call.to);
+  let contractEntity = refreshContractPBAB(contract);
+
+  removeWhitelisting(contractEntity.id, call.inputs._address.toHexString());
+}
+
+function removeWhitelisting(contractId: string, accountId: string): void {
+  let account = new Account(accountId);
+
+  let whitelistingId = generateWhitelistingId(contractId, account.id);
   let whitelisting = Whitelisting.load(whitelistingId);
 
   if (whitelisting != null) {
@@ -456,8 +546,20 @@ export function handleRemoveWhitelisted(call: RemoveWhitelistedCall): void {
 
 export function handleAddMintWhitelisted(call: AddMintWhitelistedCall): void {
   let contract = GenArt721Core.bind(call.to);
+  let contractEntity = refreshContractArtBlocks(contract);
 
-  let contractEntity = refreshContract(contract);
+  contractEntity.mintWhitelisted = contractEntity.mintWhitelisted
+    ? contractEntity.mintWhitelisted.concat([call.inputs._address])
+    : [call.inputs._address];
+  contractEntity.save();
+}
+
+export function handleAddMintWhitelistedPBAB(
+  call: AddMintWhitelistedCall
+): void {
+  let contract = GenArt721Core2PBAB.bind(call.to);
+  let contractEntity = refreshContractPBAB(contract);
+
   contractEntity.mintWhitelisted = contractEntity.mintWhitelisted
     ? contractEntity.mintWhitelisted.concat([call.inputs._address])
     : [call.inputs._address];
@@ -468,17 +570,34 @@ export function handleRemoveMintWhitelisted(
   call: RemoveMintWhitelistedCall
 ): void {
   let contract = GenArt721Core.bind(call.to);
+  let contractEntity = refreshContractArtBlocks(contract);
 
-  let contractEntity = refreshContract(contract);
+  removeMintWhitelisting(contractEntity, call.inputs._address);
+}
+
+export function handleRemoveMintWhitelistedPBAB(
+  call: RemoveMintWhitelistedCall
+): void {
+  let contract = GenArt721Core.bind(call.to);
+  let contractEntity = refreshContractArtBlocks(contract);
+
+  removeMintWhitelisting(contractEntity, call.inputs._address);
+}
+
+function removeMintWhitelisting(
+  contractEntity: Contract,
+  minterAddress: Address
+): void {
   let mintWhitelisted = contractEntity.mintWhitelisted;
+
   let newMintWhitelisted: Bytes[] = [];
   for (let i = 0; i < mintWhitelisted.length; i++) {
-    if ((mintWhitelisted[i] as Bytes) != call.inputs._address) {
+    if ((mintWhitelisted[i] as Bytes) != minterAddress) {
       newMintWhitelisted.push(mintWhitelisted[i]);
     }
   }
-  contractEntity.mintWhitelisted = newMintWhitelisted;
 
+  contractEntity.mintWhitelisted = newMintWhitelisted;
   contractEntity.save();
 }
 
@@ -486,21 +605,42 @@ export function handleUpdateRandomizerAddress(
   call: UpdateRandomizerAddressCall
 ): void {
   let contract = GenArt721Core.bind(call.to);
-  refreshContract(contract);
+  refreshContractArtBlocks(contract);
+}
+
+export function handleUpdateRandomizerAddressPBAB(
+  call: UpdateRandomizerAddressCall
+): void {
+  let contract = GenArt721Core2PBAB.bind(call.to);
+  refreshContractPBAB(contract);
 }
 
 export function handleUpdateArtblocksAddress(
   call: UpdateArtblocksAddressCall
 ): void {
   let contract = GenArt721Core.bind(call.to);
-  refreshContract(contract);
+  refreshContractArtBlocks(contract);
 }
 
 export function handleUpdateArtblocksPercentage(
   call: UpdateArtblocksPercentageCall
 ): void {
   let contract = GenArt721Core.bind(call.to);
-  refreshContract(contract);
+  refreshContractArtBlocks(contract);
+}
+
+export function handleUpdateRenderProviderAddress(
+  call: UpdateRenderProviderAddressCall
+): void {
+  let contract = GenArt721Core2PBAB.bind(call.to);
+  refreshContractPBAB(contract);
+}
+
+export function handleUpdateRenderProviderPercentage(
+  call: UpdateRenderProviderPercentageCall
+): void {
+  let contract = GenArt721Core2PBAB.bind(call.to);
+  refreshContractPBAB(contract);
 }
 
 export function handleAddProjectScript(call: AddProjectScriptCall): void {
@@ -839,7 +979,7 @@ export function handleUpdateProjectWebsite(
 /*** END CALL HANDLERS  ***/
 
 /** HELPERS ***/
-function refreshContract(contract: GenArt721Core): Contract {
+function refreshContractArtBlocks(contract: GenArt721Core): Contract {
   let admin = contract.admin();
   let artblocksAddress = contract.artblocksAddress();
   let artblocksPercentage = contract.artblocksPercentage();
@@ -853,8 +993,32 @@ function refreshContract(contract: GenArt721Core): Contract {
   }
 
   contractEntity.admin = admin;
-  contractEntity.artblocksAddress = artblocksAddress;
-  contractEntity.artblocksPercentage = artblocksPercentage;
+  contractEntity.renderProviderAddress = artblocksAddress;
+  contractEntity.renderProviderPercentage = artblocksPercentage;
+  contractEntity.nextProjectId = nextProjectId;
+  contractEntity.randomizerContract = contract.randomizerContract();
+
+  contractEntity.save();
+
+  return contractEntity as Contract;
+}
+
+function refreshContractPBAB(contract: GenArt721Core2PBAB): Contract {
+  let admin = contract.admin();
+  let renderProviderAddress = contract.renderProviderAddress();
+  let renderProviderPercentage = contract.renderProviderPercentage();
+  let nextProjectId = contract.nextProjectId();
+
+  let contractEntity = Contract.load(contract._address.toHexString());
+
+  if (contractEntity == null) {
+    contractEntity = new Contract(contract._address.toHexString());
+    contractEntity.mintWhitelisted = [];
+  }
+
+  contractEntity.admin = admin;
+  contractEntity.renderProviderAddress = renderProviderAddress;
+  contractEntity.renderProviderPercentage = renderProviderPercentage;
   contractEntity.nextProjectId = nextProjectId;
   contractEntity.randomizerContract = contract.randomizerContract();
 

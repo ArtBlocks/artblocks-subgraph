@@ -650,22 +650,22 @@ export class Contract extends Entity {
     this.set("admin", Value.fromBytes(value));
   }
 
-  get artblocksAddress(): Bytes {
-    let value = this.get("artblocksAddress");
+  get renderProviderAddress(): Bytes {
+    let value = this.get("renderProviderAddress");
     return value.toBytes();
   }
 
-  set artblocksAddress(value: Bytes) {
-    this.set("artblocksAddress", Value.fromBytes(value));
+  set renderProviderAddress(value: Bytes) {
+    this.set("renderProviderAddress", Value.fromBytes(value));
   }
 
-  get artblocksPercentage(): BigInt {
-    let value = this.get("artblocksPercentage");
+  get renderProviderPercentage(): BigInt {
+    let value = this.get("renderProviderPercentage");
     return value.toBigInt();
   }
 
-  set artblocksPercentage(value: BigInt) {
-    this.set("artblocksPercentage", Value.fromBigInt(value));
+  set renderProviderPercentage(value: BigInt) {
+    this.set("renderProviderPercentage", Value.fromBigInt(value));
   }
 
   get mintWhitelisted(): Array<Bytes> {

@@ -3,12 +3,12 @@ schema:
   file: ./schema.graphql
 dataSources:
   - kind: ethereum/contract
-    name: 'GenArt721Core-0xa7d8d9ef8D8Ce8992Df33D8b8CF4Aebabd5bD270'
-    network: mainnet
+    name: 'GenArt721Core2-0x1CD623a86751d4C4f20c96000FEC763941f098A2'
+    network: ropsten
     source:
-      address: '0xa7d8d9ef8D8Ce8992Df33D8b8CF4Aebabd5bD270'
-      abi: GenArt721Core
-      startBlock: 11437151
+      address: '0x1CD623a86751d4C4f20c96000FEC763941f098A2'
+      abi: GenArt721Core2
+      startBlock: 10760915
     mapping:
       kind: ethereum/events
       apiVersion: 0.0.4
@@ -23,6 +23,8 @@ dataSources:
         - OpenSeaSale
         - TokenOpenSeaSaleLookupTable
       abis:
+        - name: GenArt721Core2
+          file: ./abis/GenArt721Core2.json
         - name: GenArt721Core
           file: ./abis/GenArt721Core.json
       eventHandlers:
@@ -31,6 +33,8 @@ dataSources:
         - event: Transfer(indexed address,indexed address,indexed uint256)
           handler: handleTransfer
       callHandlers:
+        - function: updateAdmin(address)
+          handler: handleUpdateAdmin 
         - function: addWhitelisted(address)
           handler: handleAddWhitelisted
         - function: removeWhitelisted(address)
@@ -101,12 +105,12 @@ dataSources:
           handler: handleUpdateProjectWebsite
       file: ./src/mapping.ts
   - kind: ethereum/contract
-    name: GenArt721
-    network: mainnet
+    name: 'GenArt721Core2PBAB-0x7EF730aA9a011fe94e4419Cd921C556EA5A22b38'
+    network: ropsten
     source:
-      address: '0x059EDD72Cd353dF5106D2B9cC5ab83a52287aC3a'
-      abi: GenArt721
-      startBlock: 11338811
+      address: '0x7EF730aA9a011fe94e4419Cd921C556EA5A22b38'
+      abi: GenArt721Core2PBAB
+      startBlock: 10760915
     mapping:
       kind: ethereum/events
       apiVersion: 0.0.4
@@ -121,24 +125,34 @@ dataSources:
         - OpenSeaSale
         - TokenOpenSeaSaleLookupTable
       abis:
-        - name: GenArt721
-          file: ./abis/GenArt721.json
+        - name: GenArt721Core2PBAB
+          file: ./abis/GenArt721Core2PBAB.json
+        - name: GenArt721Core
+          file: ./abis/GenArt721Core.json
       eventHandlers:
-        - event: Mint(indexed address,indexed uint256,indexed uint256,uint256,uint256)
+        - event: Mint(indexed address,indexed uint256,indexed uint256)
           handler: handleMint
         - event: Transfer(indexed address,indexed address,indexed uint256)
           handler: handleTransfer
       callHandlers:
+        - function: updateAdmin(address)
+          handler: handleUpdateAdminPBAB
         - function: addWhitelisted(address)
-          handler: handleAddWhitelisted
+          handler: handleAddWhitelistedPBAB
         - function: removeWhitelisted(address)
-          handler: handleRemoveWhitelisted
-        - function: updateArtblocksAddress(address)
-          handler: handleUpdateArtblocksAddress
-        - function: updateArtblocksPercentage(uint256)
-          handler: handleUpdateArtblocksPercentage
-        - function: addProject(uint256,bool)
-          handler: handleAddProject
+          handler: handleRemoveWhitelistedPBAB
+        - function: addMintWhitelisted(address)
+          handler: handleAddMintWhitelistedPBAB
+        - function: removeMintWhitelisted(address)
+          handler: handleRemoveMintWhitelistedPBAB
+        - function: updateRandomizerAddress(address)
+          handler: handleUpdateRandomizerAddressPBAB
+        - function: updateRenderProviderAddress(address)
+          handler: handleUpdateRenderProviderAddress
+        - function: updateRenderProviderPercentage(uint256)
+          handler: handleUpdateRenderProviderPercentage
+        - function: addProject(string,address,uint256,bool)
+          handler: handleAddProjectPBAB
         - function: addProjectScript(uint256,string)
           handler: handleAddProjectScript
         - function: clearTokenIpfsImageUri(uint256)
@@ -147,8 +161,6 @@ dataSources:
           handler: handleOverrideTokenDynamicImageWithIpfsLink
         - function: removeProjectLastScript(uint256)
           handler: handleRemoveProjectLastScript
-        - function: removeWhitelisted(address)
-          handler: handleRemoveWhitelisted
         - function: toggleProjectIsActive(uint256)
           handler: handleToggleProjectIsActive
         - function: toggleProjectIsDynamic(uint256)
@@ -157,6 +169,8 @@ dataSources:
           handler: handleToggleProjectIsLocked
         - function: toggleProjectIsPaused(uint256)
           handler: handleToggleProjectIsPaused
+        - function: toggleProjectUseHashString(uint256)
+          handler: handleToggleProjectUseHashString
         - function: toggleProjectUseIpfsForStatic(uint256)
           handler: handleToggleProjectUseIpfsForStatic
         - function: updateProjectAdditionalPayeeInfo(uint256,address,uint256)
@@ -169,10 +183,10 @@ dataSources:
           handler: handleUpdateProjectBaseIpfsURI
         - function: updateProjectBaseURI(uint256,string)
           handler: handleUpdateProjectBaseURI
+        - function: updateProjectCurrencyInfo(uint256,string,address)
+          handler: handleUpdateProjectCurrencyInfo
         - function: updateProjectDescription(uint256,string)
           handler: handleUpdateProjectDescription
-        - function: updateProjectHashesGenerated(uint256,uint256)
-          handler: handleUpdateProjectHashesGenerated
         - function: updateProjectIpfsHash(uint256,string)
           handler: handleUpdateProjectIpfsHash
         - function: updateProjectLicense(uint256,string)
@@ -191,31 +205,4 @@ dataSources:
           handler: handleUpdateProjectSecondaryMarketRoyaltyPercentage
         - function: updateProjectWebsite(uint256,string)
           handler: handleUpdateProjectWebsite
-      file: ./src/original-mapping.ts
-  - kind: ethereum/contract
-    name: WyvernExchange
-    network: mainnet
-    source:
-      address: '0x7Be8076f4EA4A4AD08075C2508e481d6C946D12b'
-      abi: WyvernExchange
-      startBlock: 11338811
-    mapping:
-      kind: ethereum/events
-      apiVersion: 0.0.4
-      language: wasm/assemblyscript
-      entities:
-        - Project
-        - Token
-        - Contract
-        - Account
-        - AccountProject
-        - Whitelisting
-        - OpenSeaSale
-        - TokenOpenSeaSaleLookupTable
-      abis:
-        - name: WyvernExchange
-          file: ./abis/WyvernExchange.json
-      callHandlers: 
-        - function: atomicMatch_(address[14],uint256[18],uint8[8],bytes,bytes,bytes,bytes,bytes,bytes,uint8[2],bytes32[5])
-          handler: handleAtomicMatch_
-      file: ./src/os-mapping.ts
+      file: ./src/mapping.ts

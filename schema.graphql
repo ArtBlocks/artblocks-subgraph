@@ -115,10 +115,10 @@ type Contract @entity {
   admin: Bytes!
 
   "Address that receives platform fees"
-  artblocksAddress: Bytes!
+  renderProviderAddress: Bytes!
 
   "Percentage of sales the platform takes"
-  artblocksPercentage: BigInt!
+  renderProviderPercentage: BigInt!
 
   "List of contracts that are allowed to mint"
   mintWhitelisted: [Bytes!]!
