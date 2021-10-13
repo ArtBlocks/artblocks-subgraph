@@ -753,6 +753,15 @@ export class Contract extends Entity {
       this.set("whitelisted", Value.fromStringArray(value as Array<string>));
     }
   }
+
+  get updatedAt(): BigInt {
+    let value = this.get("updatedAt");
+    return value.toBigInt();
+  }
+
+  set updatedAt(value: BigInt) {
+    this.set("updatedAt", Value.fromBigInt(value));
+  }
 }
 
 export class Whitelisting extends Entity {

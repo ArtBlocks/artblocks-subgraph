@@ -114,7 +114,7 @@ export class Transfer__Params {
   }
 }
 
-export class GenArt721Core2PBAB__getRoyaltyDataResult {
+export class GenArt721Core2__getRoyaltyDataResult {
   value0: Address;
   value1: Address;
   value2: BigInt;
@@ -142,25 +142,28 @@ export class GenArt721Core2PBAB__getRoyaltyDataResult {
   }
 }
 
-export class GenArt721Core2PBAB__projectDetailsResult {
+export class GenArt721Core2__projectDetailsResult {
   value0: string;
   value1: string;
   value2: string;
   value3: string;
   value4: string;
+  value5: boolean;
 
   constructor(
     value0: string,
     value1: string,
     value2: string,
     value3: string,
-    value4: string
+    value4: string,
+    value5: boolean
   ) {
     this.value0 = value0;
     this.value1 = value1;
     this.value2 = value2;
     this.value3 = value3;
     this.value4 = value4;
+    this.value5 = value5;
   }
 
   toMap(): TypedMap<string, ethereum.Value> {
@@ -170,43 +173,48 @@ export class GenArt721Core2PBAB__projectDetailsResult {
     map.set("value2", ethereum.Value.fromString(this.value2));
     map.set("value3", ethereum.Value.fromString(this.value3));
     map.set("value4", ethereum.Value.fromString(this.value4));
+    map.set("value5", ethereum.Value.fromBoolean(this.value5));
     return map;
   }
 }
 
-export class GenArt721Core2PBAB__projectScriptInfoResult {
+export class GenArt721Core2__projectScriptInfoResult {
   value0: string;
   value1: BigInt;
-  value2: string;
-  value3: boolean;
+  value2: boolean;
+  value3: string;
   value4: boolean;
+  value5: boolean;
 
   constructor(
     value0: string,
     value1: BigInt,
-    value2: string,
-    value3: boolean,
-    value4: boolean
+    value2: boolean,
+    value3: string,
+    value4: boolean,
+    value5: boolean
   ) {
     this.value0 = value0;
     this.value1 = value1;
     this.value2 = value2;
     this.value3 = value3;
     this.value4 = value4;
+    this.value5 = value5;
   }
 
   toMap(): TypedMap<string, ethereum.Value> {
     let map = new TypedMap<string, ethereum.Value>();
     map.set("value0", ethereum.Value.fromString(this.value0));
     map.set("value1", ethereum.Value.fromUnsignedBigInt(this.value1));
-    map.set("value2", ethereum.Value.fromString(this.value2));
-    map.set("value3", ethereum.Value.fromBoolean(this.value3));
+    map.set("value2", ethereum.Value.fromBoolean(this.value2));
+    map.set("value3", ethereum.Value.fromString(this.value3));
     map.set("value4", ethereum.Value.fromBoolean(this.value4));
+    map.set("value5", ethereum.Value.fromBoolean(this.value5));
     return map;
   }
 }
 
-export class GenArt721Core2PBAB__projectTokenInfoResult {
+export class GenArt721Core2__projectTokenInfoResult {
   value0: Address;
   value1: BigInt;
   value2: BigInt;
@@ -254,9 +262,29 @@ export class GenArt721Core2PBAB__projectTokenInfoResult {
   }
 }
 
-export class GenArt721Core2PBAB extends ethereum.SmartContract {
-  static bind(address: Address): GenArt721Core2PBAB {
-    return new GenArt721Core2PBAB("GenArt721Core2PBAB", address);
+export class GenArt721Core2__projectURIInfoResult {
+  value0: string;
+  value1: string;
+  value2: boolean;
+
+  constructor(value0: string, value1: string, value2: boolean) {
+    this.value0 = value0;
+    this.value1 = value1;
+    this.value2 = value2;
+  }
+
+  toMap(): TypedMap<string, ethereum.Value> {
+    let map = new TypedMap<string, ethereum.Value>();
+    map.set("value0", ethereum.Value.fromString(this.value0));
+    map.set("value1", ethereum.Value.fromString(this.value1));
+    map.set("value2", ethereum.Value.fromBoolean(this.value2));
+    return map;
+  }
+}
+
+export class GenArt721Core2 extends ethereum.SmartContract {
+  static bind(address: Address): GenArt721Core2 {
+    return new GenArt721Core2("GenArt721Core2", address);
   }
 
   admin(): Address {
@@ -272,6 +300,52 @@ export class GenArt721Core2PBAB extends ethereum.SmartContract {
     }
     let value = result.value;
     return ethereum.CallResult.fromValue(value[0].toAddress());
+  }
+
+  artblocksAddress(): Address {
+    let result = super.call(
+      "artblocksAddress",
+      "artblocksAddress():(address)",
+      []
+    );
+
+    return result[0].toAddress();
+  }
+
+  try_artblocksAddress(): ethereum.CallResult<Address> {
+    let result = super.tryCall(
+      "artblocksAddress",
+      "artblocksAddress():(address)",
+      []
+    );
+    if (result.reverted) {
+      return new ethereum.CallResult();
+    }
+    let value = result.value;
+    return ethereum.CallResult.fromValue(value[0].toAddress());
+  }
+
+  artblocksPercentage(): BigInt {
+    let result = super.call(
+      "artblocksPercentage",
+      "artblocksPercentage():(uint256)",
+      []
+    );
+
+    return result[0].toBigInt();
+  }
+
+  try_artblocksPercentage(): ethereum.CallResult<BigInt> {
+    let result = super.tryCall(
+      "artblocksPercentage",
+      "artblocksPercentage():(uint256)",
+      []
+    );
+    if (result.reverted) {
+      return new ethereum.CallResult();
+    }
+    let value = result.value;
+    return ethereum.CallResult.fromValue(value[0].toBigInt());
   }
 
   balanceOf(owner: Address): BigInt {
@@ -314,14 +388,14 @@ export class GenArt721Core2PBAB extends ethereum.SmartContract {
     return ethereum.CallResult.fromValue(value[0].toAddress());
   }
 
-  getRoyaltyData(_tokenId: BigInt): GenArt721Core2PBAB__getRoyaltyDataResult {
+  getRoyaltyData(_tokenId: BigInt): GenArt721Core2__getRoyaltyDataResult {
     let result = super.call(
       "getRoyaltyData",
       "getRoyaltyData(uint256):(address,address,uint256,uint256)",
       [ethereum.Value.fromUnsignedBigInt(_tokenId)]
     );
 
-    return new GenArt721Core2PBAB__getRoyaltyDataResult(
+    return new GenArt721Core2__getRoyaltyDataResult(
       result[0].toAddress(),
       result[1].toAddress(),
       result[2].toBigInt(),
@@ -331,7 +405,7 @@ export class GenArt721Core2PBAB extends ethereum.SmartContract {
 
   try_getRoyaltyData(
     _tokenId: BigInt
-  ): ethereum.CallResult<GenArt721Core2PBAB__getRoyaltyDataResult> {
+  ): ethereum.CallResult<GenArt721Core2__getRoyaltyDataResult> {
     let result = super.tryCall(
       "getRoyaltyData",
       "getRoyaltyData(uint256):(address,address,uint256,uint256)",
@@ -342,7 +416,7 @@ export class GenArt721Core2PBAB extends ethereum.SmartContract {
     }
     let value = result.value;
     return ethereum.CallResult.fromValue(
-      new GenArt721Core2PBAB__getRoyaltyDataResult(
+      new GenArt721Core2__getRoyaltyDataResult(
         value[0].toAddress(),
         value[1].toAddress(),
         value[2].toBigInt(),
@@ -528,28 +602,29 @@ export class GenArt721Core2PBAB extends ethereum.SmartContract {
     return ethereum.CallResult.fromValue(value[0].toAddress());
   }
 
-  projectDetails(_projectId: BigInt): GenArt721Core2PBAB__projectDetailsResult {
+  projectDetails(_projectId: BigInt): GenArt721Core2__projectDetailsResult {
     let result = super.call(
       "projectDetails",
-      "projectDetails(uint256):(string,string,string,string,string)",
+      "projectDetails(uint256):(string,string,string,string,string,bool)",
       [ethereum.Value.fromUnsignedBigInt(_projectId)]
     );
 
-    return new GenArt721Core2PBAB__projectDetailsResult(
+    return new GenArt721Core2__projectDetailsResult(
       result[0].toString(),
       result[1].toString(),
       result[2].toString(),
       result[3].toString(),
-      result[4].toString()
+      result[4].toString(),
+      result[5].toBoolean()
     );
   }
 
   try_projectDetails(
     _projectId: BigInt
-  ): ethereum.CallResult<GenArt721Core2PBAB__projectDetailsResult> {
+  ): ethereum.CallResult<GenArt721Core2__projectDetailsResult> {
     let result = super.tryCall(
       "projectDetails",
-      "projectDetails(uint256):(string,string,string,string,string)",
+      "projectDetails(uint256):(string,string,string,string,string,bool)",
       [ethereum.Value.fromUnsignedBigInt(_projectId)]
     );
     if (result.reverted) {
@@ -557,12 +632,13 @@ export class GenArt721Core2PBAB extends ethereum.SmartContract {
     }
     let value = result.value;
     return ethereum.CallResult.fromValue(
-      new GenArt721Core2PBAB__projectDetailsResult(
+      new GenArt721Core2__projectDetailsResult(
         value[0].toString(),
         value[1].toString(),
         value[2].toString(),
         value[3].toString(),
-        value[4].toString()
+        value[4].toString(),
+        value[5].toBoolean()
       )
     );
   }
@@ -768,28 +844,29 @@ export class GenArt721Core2PBAB extends ethereum.SmartContract {
 
   projectScriptInfo(
     _projectId: BigInt
-  ): GenArt721Core2PBAB__projectScriptInfoResult {
+  ): GenArt721Core2__projectScriptInfoResult {
     let result = super.call(
       "projectScriptInfo",
-      "projectScriptInfo(uint256):(string,uint256,string,bool,bool)",
+      "projectScriptInfo(uint256):(string,uint256,bool,string,bool,bool)",
       [ethereum.Value.fromUnsignedBigInt(_projectId)]
     );
 
-    return new GenArt721Core2PBAB__projectScriptInfoResult(
+    return new GenArt721Core2__projectScriptInfoResult(
       result[0].toString(),
       result[1].toBigInt(),
-      result[2].toString(),
-      result[3].toBoolean(),
-      result[4].toBoolean()
+      result[2].toBoolean(),
+      result[3].toString(),
+      result[4].toBoolean(),
+      result[5].toBoolean()
     );
   }
 
   try_projectScriptInfo(
     _projectId: BigInt
-  ): ethereum.CallResult<GenArt721Core2PBAB__projectScriptInfoResult> {
+  ): ethereum.CallResult<GenArt721Core2__projectScriptInfoResult> {
     let result = super.tryCall(
       "projectScriptInfo",
-      "projectScriptInfo(uint256):(string,uint256,string,bool,bool)",
+      "projectScriptInfo(uint256):(string,uint256,bool,string,bool,bool)",
       [ethereum.Value.fromUnsignedBigInt(_projectId)]
     );
     if (result.reverted) {
@@ -797,26 +874,25 @@ export class GenArt721Core2PBAB extends ethereum.SmartContract {
     }
     let value = result.value;
     return ethereum.CallResult.fromValue(
-      new GenArt721Core2PBAB__projectScriptInfoResult(
+      new GenArt721Core2__projectScriptInfoResult(
         value[0].toString(),
         value[1].toBigInt(),
-        value[2].toString(),
-        value[3].toBoolean(),
-        value[4].toBoolean()
+        value[2].toBoolean(),
+        value[3].toString(),
+        value[4].toBoolean(),
+        value[5].toBoolean()
       )
     );
   }
 
-  projectTokenInfo(
-    _projectId: BigInt
-  ): GenArt721Core2PBAB__projectTokenInfoResult {
+  projectTokenInfo(_projectId: BigInt): GenArt721Core2__projectTokenInfoResult {
     let result = super.call(
       "projectTokenInfo",
       "projectTokenInfo(uint256):(address,uint256,uint256,uint256,bool,address,uint256,string,address)",
       [ethereum.Value.fromUnsignedBigInt(_projectId)]
     );
 
-    return new GenArt721Core2PBAB__projectTokenInfoResult(
+    return new GenArt721Core2__projectTokenInfoResult(
       result[0].toAddress(),
       result[1].toBigInt(),
       result[2].toBigInt(),
@@ -831,7 +907,7 @@ export class GenArt721Core2PBAB extends ethereum.SmartContract {
 
   try_projectTokenInfo(
     _projectId: BigInt
-  ): ethereum.CallResult<GenArt721Core2PBAB__projectTokenInfoResult> {
+  ): ethereum.CallResult<GenArt721Core2__projectTokenInfoResult> {
     let result = super.tryCall(
       "projectTokenInfo",
       "projectTokenInfo(uint256):(address,uint256,uint256,uint256,bool,address,uint256,string,address)",
@@ -842,7 +918,7 @@ export class GenArt721Core2PBAB extends ethereum.SmartContract {
     }
     let value = result.value;
     return ethereum.CallResult.fromValue(
-      new GenArt721Core2PBAB__projectTokenInfoResult(
+      new GenArt721Core2__projectTokenInfoResult(
         value[0].toAddress(),
         value[1].toBigInt(),
         value[2].toBigInt(),
@@ -856,27 +932,39 @@ export class GenArt721Core2PBAB extends ethereum.SmartContract {
     );
   }
 
-  projectURIInfo(_projectId: BigInt): string {
+  projectURIInfo(_projectId: BigInt): GenArt721Core2__projectURIInfoResult {
     let result = super.call(
       "projectURIInfo",
-      "projectURIInfo(uint256):(string)",
+      "projectURIInfo(uint256):(string,string,bool)",
       [ethereum.Value.fromUnsignedBigInt(_projectId)]
     );
 
-    return result[0].toString();
+    return new GenArt721Core2__projectURIInfoResult(
+      result[0].toString(),
+      result[1].toString(),
+      result[2].toBoolean()
+    );
   }
 
-  try_projectURIInfo(_projectId: BigInt): ethereum.CallResult<string> {
+  try_projectURIInfo(
+    _projectId: BigInt
+  ): ethereum.CallResult<GenArt721Core2__projectURIInfoResult> {
     let result = super.tryCall(
       "projectURIInfo",
-      "projectURIInfo(uint256):(string)",
+      "projectURIInfo(uint256):(string,string,bool)",
       [ethereum.Value.fromUnsignedBigInt(_projectId)]
     );
     if (result.reverted) {
       return new ethereum.CallResult();
     }
     let value = result.value;
-    return ethereum.CallResult.fromValue(value[0].toString());
+    return ethereum.CallResult.fromValue(
+      new GenArt721Core2__projectURIInfoResult(
+        value[0].toString(),
+        value[1].toString(),
+        value[2].toBoolean()
+      )
+    );
   }
 
   randomizerContract(): Address {
@@ -902,50 +990,27 @@ export class GenArt721Core2PBAB extends ethereum.SmartContract {
     return ethereum.CallResult.fromValue(value[0].toAddress());
   }
 
-  renderProviderAddress(): Address {
+  staticIpfsImageLink(param0: BigInt): string {
     let result = super.call(
-      "renderProviderAddress",
-      "renderProviderAddress():(address)",
-      []
+      "staticIpfsImageLink",
+      "staticIpfsImageLink(uint256):(string)",
+      [ethereum.Value.fromUnsignedBigInt(param0)]
     );
 
-    return result[0].toAddress();
+    return result[0].toString();
   }
 
-  try_renderProviderAddress(): ethereum.CallResult<Address> {
+  try_staticIpfsImageLink(param0: BigInt): ethereum.CallResult<string> {
     let result = super.tryCall(
-      "renderProviderAddress",
-      "renderProviderAddress():(address)",
-      []
+      "staticIpfsImageLink",
+      "staticIpfsImageLink(uint256):(string)",
+      [ethereum.Value.fromUnsignedBigInt(param0)]
     );
     if (result.reverted) {
       return new ethereum.CallResult();
     }
     let value = result.value;
-    return ethereum.CallResult.fromValue(value[0].toAddress());
-  }
-
-  renderProviderPercentage(): BigInt {
-    let result = super.call(
-      "renderProviderPercentage",
-      "renderProviderPercentage():(uint256)",
-      []
-    );
-
-    return result[0].toBigInt();
-  }
-
-  try_renderProviderPercentage(): ethereum.CallResult<BigInt> {
-    let result = super.tryCall(
-      "renderProviderPercentage",
-      "renderProviderPercentage():(uint256)",
-      []
-    );
-    if (result.reverted) {
-      return new ethereum.CallResult();
-    }
-    let value = result.value;
-    return ethereum.CallResult.fromValue(value[0].toBigInt());
+    return ethereum.CallResult.fromValue(value[0].toString());
   }
 
   supportsInterface(interfaceId: Bytes): boolean {
@@ -1239,6 +1304,10 @@ export class AddProjectCall__Inputs {
   get _pricePerTokenInWei(): BigInt {
     return this._call.inputValues[2].value.toBigInt();
   }
+
+  get _dynamic(): boolean {
+    return this._call.inputValues[3].value.toBoolean();
+  }
 }
 
 export class AddProjectCall__Outputs {
@@ -1347,6 +1416,36 @@ export class ApproveCall__Outputs {
   }
 }
 
+export class ClearTokenIpfsImageUriCall extends ethereum.Call {
+  get inputs(): ClearTokenIpfsImageUriCall__Inputs {
+    return new ClearTokenIpfsImageUriCall__Inputs(this);
+  }
+
+  get outputs(): ClearTokenIpfsImageUriCall__Outputs {
+    return new ClearTokenIpfsImageUriCall__Outputs(this);
+  }
+}
+
+export class ClearTokenIpfsImageUriCall__Inputs {
+  _call: ClearTokenIpfsImageUriCall;
+
+  constructor(call: ClearTokenIpfsImageUriCall) {
+    this._call = call;
+  }
+
+  get _tokenId(): BigInt {
+    return this._call.inputValues[0].value.toBigInt();
+  }
+}
+
+export class ClearTokenIpfsImageUriCall__Outputs {
+  _call: ClearTokenIpfsImageUriCall;
+
+  constructor(call: ClearTokenIpfsImageUriCall) {
+    this._call = call;
+  }
+}
+
 export class MintCall extends ethereum.Call {
   get inputs(): MintCall__Inputs {
     return new MintCall__Inputs(this);
@@ -1386,6 +1485,40 @@ export class MintCall__Outputs {
 
   get _tokenId(): BigInt {
     return this._call.outputValues[0].value.toBigInt();
+  }
+}
+
+export class OverrideTokenDynamicImageWithIpfsLinkCall extends ethereum.Call {
+  get inputs(): OverrideTokenDynamicImageWithIpfsLinkCall__Inputs {
+    return new OverrideTokenDynamicImageWithIpfsLinkCall__Inputs(this);
+  }
+
+  get outputs(): OverrideTokenDynamicImageWithIpfsLinkCall__Outputs {
+    return new OverrideTokenDynamicImageWithIpfsLinkCall__Outputs(this);
+  }
+}
+
+export class OverrideTokenDynamicImageWithIpfsLinkCall__Inputs {
+  _call: OverrideTokenDynamicImageWithIpfsLinkCall;
+
+  constructor(call: OverrideTokenDynamicImageWithIpfsLinkCall) {
+    this._call = call;
+  }
+
+  get _tokenId(): BigInt {
+    return this._call.inputValues[0].value.toBigInt();
+  }
+
+  get _ipfsHash(): string {
+    return this._call.inputValues[1].value.toString();
+  }
+}
+
+export class OverrideTokenDynamicImageWithIpfsLinkCall__Outputs {
+  _call: OverrideTokenDynamicImageWithIpfsLinkCall;
+
+  constructor(call: OverrideTokenDynamicImageWithIpfsLinkCall) {
+    this._call = call;
   }
 }
 
@@ -1623,6 +1756,36 @@ export class ToggleProjectIsActiveCall__Outputs {
   }
 }
 
+export class ToggleProjectIsDynamicCall extends ethereum.Call {
+  get inputs(): ToggleProjectIsDynamicCall__Inputs {
+    return new ToggleProjectIsDynamicCall__Inputs(this);
+  }
+
+  get outputs(): ToggleProjectIsDynamicCall__Outputs {
+    return new ToggleProjectIsDynamicCall__Outputs(this);
+  }
+}
+
+export class ToggleProjectIsDynamicCall__Inputs {
+  _call: ToggleProjectIsDynamicCall;
+
+  constructor(call: ToggleProjectIsDynamicCall) {
+    this._call = call;
+  }
+
+  get _projectId(): BigInt {
+    return this._call.inputValues[0].value.toBigInt();
+  }
+}
+
+export class ToggleProjectIsDynamicCall__Outputs {
+  _call: ToggleProjectIsDynamicCall;
+
+  constructor(call: ToggleProjectIsDynamicCall) {
+    this._call = call;
+  }
+}
+
 export class ToggleProjectIsLockedCall extends ethereum.Call {
   get inputs(): ToggleProjectIsLockedCall__Inputs {
     return new ToggleProjectIsLockedCall__Inputs(this);
@@ -1679,6 +1842,66 @@ export class ToggleProjectIsPausedCall__Outputs {
   _call: ToggleProjectIsPausedCall;
 
   constructor(call: ToggleProjectIsPausedCall) {
+    this._call = call;
+  }
+}
+
+export class ToggleProjectUseHashStringCall extends ethereum.Call {
+  get inputs(): ToggleProjectUseHashStringCall__Inputs {
+    return new ToggleProjectUseHashStringCall__Inputs(this);
+  }
+
+  get outputs(): ToggleProjectUseHashStringCall__Outputs {
+    return new ToggleProjectUseHashStringCall__Outputs(this);
+  }
+}
+
+export class ToggleProjectUseHashStringCall__Inputs {
+  _call: ToggleProjectUseHashStringCall;
+
+  constructor(call: ToggleProjectUseHashStringCall) {
+    this._call = call;
+  }
+
+  get _projectId(): BigInt {
+    return this._call.inputValues[0].value.toBigInt();
+  }
+}
+
+export class ToggleProjectUseHashStringCall__Outputs {
+  _call: ToggleProjectUseHashStringCall;
+
+  constructor(call: ToggleProjectUseHashStringCall) {
+    this._call = call;
+  }
+}
+
+export class ToggleProjectUseIpfsForStaticCall extends ethereum.Call {
+  get inputs(): ToggleProjectUseIpfsForStaticCall__Inputs {
+    return new ToggleProjectUseIpfsForStaticCall__Inputs(this);
+  }
+
+  get outputs(): ToggleProjectUseIpfsForStaticCall__Outputs {
+    return new ToggleProjectUseIpfsForStaticCall__Outputs(this);
+  }
+}
+
+export class ToggleProjectUseIpfsForStaticCall__Inputs {
+  _call: ToggleProjectUseIpfsForStaticCall;
+
+  constructor(call: ToggleProjectUseIpfsForStaticCall) {
+    this._call = call;
+  }
+
+  get _projectId(): BigInt {
+    return this._call.inputValues[0].value.toBigInt();
+  }
+}
+
+export class ToggleProjectUseIpfsForStaticCall__Outputs {
+  _call: ToggleProjectUseIpfsForStaticCall;
+
+  constructor(call: ToggleProjectUseIpfsForStaticCall) {
     this._call = call;
   }
 }
@@ -1747,6 +1970,66 @@ export class UpdateAdminCall__Outputs {
   _call: UpdateAdminCall;
 
   constructor(call: UpdateAdminCall) {
+    this._call = call;
+  }
+}
+
+export class UpdateArtblocksAddressCall extends ethereum.Call {
+  get inputs(): UpdateArtblocksAddressCall__Inputs {
+    return new UpdateArtblocksAddressCall__Inputs(this);
+  }
+
+  get outputs(): UpdateArtblocksAddressCall__Outputs {
+    return new UpdateArtblocksAddressCall__Outputs(this);
+  }
+}
+
+export class UpdateArtblocksAddressCall__Inputs {
+  _call: UpdateArtblocksAddressCall;
+
+  constructor(call: UpdateArtblocksAddressCall) {
+    this._call = call;
+  }
+
+  get _artblocksAddress(): Address {
+    return this._call.inputValues[0].value.toAddress();
+  }
+}
+
+export class UpdateArtblocksAddressCall__Outputs {
+  _call: UpdateArtblocksAddressCall;
+
+  constructor(call: UpdateArtblocksAddressCall) {
+    this._call = call;
+  }
+}
+
+export class UpdateArtblocksPercentageCall extends ethereum.Call {
+  get inputs(): UpdateArtblocksPercentageCall__Inputs {
+    return new UpdateArtblocksPercentageCall__Inputs(this);
+  }
+
+  get outputs(): UpdateArtblocksPercentageCall__Outputs {
+    return new UpdateArtblocksPercentageCall__Outputs(this);
+  }
+}
+
+export class UpdateArtblocksPercentageCall__Inputs {
+  _call: UpdateArtblocksPercentageCall;
+
+  constructor(call: UpdateArtblocksPercentageCall) {
+    this._call = call;
+  }
+
+  get _artblocksPercentage(): BigInt {
+    return this._call.inputValues[0].value.toBigInt();
+  }
+}
+
+export class UpdateArtblocksPercentageCall__Outputs {
+  _call: UpdateArtblocksPercentageCall;
+
+  constructor(call: UpdateArtblocksPercentageCall) {
     this._call = call;
   }
 }
@@ -1853,6 +2136,40 @@ export class UpdateProjectArtistNameCall__Outputs {
   _call: UpdateProjectArtistNameCall;
 
   constructor(call: UpdateProjectArtistNameCall) {
+    this._call = call;
+  }
+}
+
+export class UpdateProjectBaseIpfsURICall extends ethereum.Call {
+  get inputs(): UpdateProjectBaseIpfsURICall__Inputs {
+    return new UpdateProjectBaseIpfsURICall__Inputs(this);
+  }
+
+  get outputs(): UpdateProjectBaseIpfsURICall__Outputs {
+    return new UpdateProjectBaseIpfsURICall__Outputs(this);
+  }
+}
+
+export class UpdateProjectBaseIpfsURICall__Inputs {
+  _call: UpdateProjectBaseIpfsURICall;
+
+  constructor(call: UpdateProjectBaseIpfsURICall) {
+    this._call = call;
+  }
+
+  get _projectId(): BigInt {
+    return this._call.inputValues[0].value.toBigInt();
+  }
+
+  get _projectBaseIpfsURI(): string {
+    return this._call.inputValues[1].value.toString();
+  }
+}
+
+export class UpdateProjectBaseIpfsURICall__Outputs {
+  _call: UpdateProjectBaseIpfsURICall;
+
+  constructor(call: UpdateProjectBaseIpfsURICall) {
     this._call = call;
   }
 }
@@ -2299,66 +2616,6 @@ export class UpdateRandomizerAddressCall__Outputs {
   _call: UpdateRandomizerAddressCall;
 
   constructor(call: UpdateRandomizerAddressCall) {
-    this._call = call;
-  }
-}
-
-export class UpdateRenderProviderAddressCall extends ethereum.Call {
-  get inputs(): UpdateRenderProviderAddressCall__Inputs {
-    return new UpdateRenderProviderAddressCall__Inputs(this);
-  }
-
-  get outputs(): UpdateRenderProviderAddressCall__Outputs {
-    return new UpdateRenderProviderAddressCall__Outputs(this);
-  }
-}
-
-export class UpdateRenderProviderAddressCall__Inputs {
-  _call: UpdateRenderProviderAddressCall;
-
-  constructor(call: UpdateRenderProviderAddressCall) {
-    this._call = call;
-  }
-
-  get _renderProviderAddress(): Address {
-    return this._call.inputValues[0].value.toAddress();
-  }
-}
-
-export class UpdateRenderProviderAddressCall__Outputs {
-  _call: UpdateRenderProviderAddressCall;
-
-  constructor(call: UpdateRenderProviderAddressCall) {
-    this._call = call;
-  }
-}
-
-export class UpdateRenderProviderPercentageCall extends ethereum.Call {
-  get inputs(): UpdateRenderProviderPercentageCall__Inputs {
-    return new UpdateRenderProviderPercentageCall__Inputs(this);
-  }
-
-  get outputs(): UpdateRenderProviderPercentageCall__Outputs {
-    return new UpdateRenderProviderPercentageCall__Outputs(this);
-  }
-}
-
-export class UpdateRenderProviderPercentageCall__Inputs {
-  _call: UpdateRenderProviderPercentageCall;
-
-  constructor(call: UpdateRenderProviderPercentageCall) {
-    this._call = call;
-  }
-
-  get _renderProviderPercentage(): BigInt {
-    return this._call.inputValues[0].value.toBigInt();
-  }
-}
-
-export class UpdateRenderProviderPercentageCall__Outputs {
-  _call: UpdateRenderProviderPercentageCall;
-
-  constructor(call: UpdateRenderProviderPercentageCall) {
     this._call = call;
   }
 }

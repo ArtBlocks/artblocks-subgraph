@@ -175,7 +175,7 @@ export function handleAddProject(call: AddProjectCall): void {
 
   let projectId: BigInt;
   if (contractEntity == null) {
-    contractEntity = refreshContract(contract);
+    contractEntity = refreshContract(contract, call.block.timestamp);
     // In this case nextProjectId has already been incremented
     projectId = contractEntity.nextProjectId.minus(BigInt.fromI32(1));
   } else {
@@ -226,12 +226,13 @@ export function handleAddProject(call: AddProjectCall): void {
   contractEntity.nextProjectId = contractEntity.nextProjectId.plus(
     BigInt.fromI32(1)
   );
+  contractEntity.updatedAt = call.block.timestamp;
   contractEntity.save();
 }
 
 export function handleAddWhitelisted(call: AddWhitelistedCall): void {
   let contract = GenArt721.bind(call.to);
-  let contractEntity = refreshContract(contract);
+  let contractEntity = refreshContract(contract, call.block.timestamp);
 
   let account = new Account(call.inputs._address.toHexString());
   account.save();
@@ -248,7 +249,7 @@ export function handleAddWhitelisted(call: AddWhitelistedCall): void {
 export function handleRemoveWhitelisted(call: RemoveWhitelistedCall): void {
   let contract = GenArt721.bind(call.to);
 
-  let contractEntity = refreshContract(contract);
+  let contractEntity = refreshContract(contract, call.block.timestamp);
   let account = new Account(call.inputs._address.toHexString());
 
   let whitelistingId = generateWhitelistingId(contractEntity.id, account.id);
@@ -263,14 +264,14 @@ export function handleUpdateArtblocksAddress(
   call: UpdateArtblocksAddressCall
 ): void {
   let contract = GenArt721.bind(call.to);
-  refreshContract(contract);
+  refreshContract(contract, call.block.timestamp);
 }
 
 export function handleUpdateArtblocksPercentage(
   call: UpdateArtblocksPercentageCall
 ): void {
   let contract = GenArt721.bind(call.to);
-  refreshContract(contract);
+  refreshContract(contract, call.block.timestamp);
 }
 
 export function handleAddProjectScript(call: AddProjectScriptCall): void {
@@ -340,6 +341,7 @@ export function handleToggleProjectIsDynamic(
   if (project != null && project.contract == call.to.toHexString()) {
     project.dynamic = !project.dynamic;
     project.useHashString = !project.dynamic;
+    project.updatedAt = call.block.timestamp;
     project.save();
   }
 }
@@ -353,6 +355,7 @@ export function handleToggleProjectIsLocked(
 
   if (project != null && project.contract == call.to.toHexString()) {
     project.locked = !project.locked;
+    project.updatedAt = call.block.timestamp;
     project.save();
   }
 }
@@ -406,6 +409,7 @@ export function handleUpdateProjectAdditionalPayeeInfo(
 
   project.additionalPayee = call.inputs._additionalPayee;
   project.additionalPayeePercentage = call.inputs._additionalPayeePercentage;
+  project.updatedAt = call.block.timestamp;
   project.save();
 }
 
@@ -456,6 +460,7 @@ export function handleUpdateProjectBaseURI(
   );
 
   project.baseUri = call.inputs._newBaseURI;
+  project.updatedAt = call.block.timestamp;
   project.save();
 }
 
@@ -467,6 +472,7 @@ export function handleUpdateProjectDescription(
   );
 
   project.description = call.inputs._projectDescription;
+  project.updatedAt = call.block.timestamp;
   project.save();
 }
 
@@ -478,6 +484,7 @@ export function handleUpdateProjectIpfsHash(
   );
 
   project.ipfsHash = call.inputs._ipfsHash;
+  project.updatedAt = call.block.timestamp;
   project.save();
 }
 
@@ -572,6 +579,7 @@ export function handleUpdateProjectSecondaryMarketRoyaltyPercentage(
   );
 
   project.royaltyPercentage = call.inputs._secondMarketRoyalty;
+  project.updatedAt = call.block.timestamp;
   project.save();
 }
 
@@ -583,12 +591,13 @@ export function handleUpdateProjectWebsite(
   );
 
   project.website = call.inputs._projectWebsite;
+  project.updatedAt = call.block.timestamp;
   project.save();
 }
 /*** END CALL HANDLERS  ***/
 
 /** HELPERS ***/
-function refreshContract(contract: GenArt721): Contract {
+function refreshContract(contract: GenArt721, timestamp: BigInt): Contract {
   let admin = contract.admin();
   let artblocksAddress = contract.artblocksAddress();
   let artblocksPercentage = contract.artblocksPercentage();
@@ -600,10 +609,11 @@ function refreshContract(contract: GenArt721): Contract {
     contractEntity = new Contract(contract._address.toHexString());
   }
   contractEntity.admin = admin;
-  contractEntity.artblocksAddress = artblocksAddress;
-  contractEntity.artblocksPercentage = artblocksPercentage;
+  contractEntity.renderProviderAddress = artblocksAddress;
+  contractEntity.renderProviderPercentage = artblocksPercentage;
   contractEntity.nextProjectId = nextProjectId;
   contractEntity.mintWhitelisted = [];
+  contractEntity.updatedAt = timestamp;
 
   contractEntity.save();
 
