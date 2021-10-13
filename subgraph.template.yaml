@@ -288,23 +288,23 @@ dataSources:
           handler: handleTransfer
       callHandlers:
         - function: updateAdmin(address)
-          handler: handleUpdateAdminPBAB
+          handler: handleUpdateAdmin
         - function: addWhitelisted(address)
-          handler: handleAddWhitelistedPBAB
+          handler: handleAddWhitelisted
         - function: removeWhitelisted(address)
-          handler: handleRemoveWhitelistedPBAB
+          handler: handleRemoveWhitelisted
         - function: addMintWhitelisted(address)
-          handler: handleAddMintWhitelistedPBAB
+          handler: handleAddMintWhitelisted
         - function: removeMintWhitelisted(address)
-          handler: handleRemoveMintWhitelistedPBAB
+          handler: handleRemoveMintWhitelisted
         - function: updateRandomizerAddress(address)
-          handler: handleUpdateRandomizerAddressPBAB
+          handler: handleUpdateRandomizerAddress
         - function: updateRenderProviderAddress(address)
           handler: handleUpdateRenderProviderAddress
         - function: updateRenderProviderPercentage(uint256)
           handler: handleUpdateRenderProviderPercentage
         - function: addProject(string,address,uint256)
-          handler: handleAddProjectPBAB
+          handler: handleAddProject
         - function: addProjectScript(uint256,string)
           handler: handleAddProjectScript
         - function: removeProjectLastScript(uint256)
@@ -345,7 +345,7 @@ dataSources:
           handler: handleUpdateProjectSecondaryMarketRoyaltyPercentage
         - function: updateProjectWebsite(uint256,string)
           handler: handleUpdateProjectWebsite
-      file: ./src/mapping.ts
+      file: ./src/pbab-mapping.ts
   {{/pbabAddress}}
   {{#originalAddress}}
   - kind: ethereum/contract

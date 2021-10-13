@@ -7,26 +7,19 @@ import {
   log,
   Address
 } from "@graphprotocol/graph-ts";
-
 import {
-  GenArt721Core,
+  GenArt721Core2PBAB,
   Mint,
   Transfer,
   AddProjectCall,
   AddProjectScriptCall,
-  ClearTokenIpfsImageUriCall,
-  OverrideTokenDynamicImageWithIpfsLinkCall,
   RemoveProjectLastScriptCall,
   ToggleProjectIsActiveCall,
-  ToggleProjectIsDynamicCall,
   ToggleProjectIsLockedCall,
   ToggleProjectIsPausedCall,
-  ToggleProjectUseHashStringCall,
-  ToggleProjectUseIpfsForStaticCall,
   UpdateProjectAdditionalPayeeInfoCall,
   UpdateProjectArtistAddressCall,
   UpdateProjectArtistNameCall,
-  UpdateProjectBaseIpfsURICall,
   UpdateProjectBaseURICall,
   UpdateProjectCurrencyInfoCall,
   UpdateProjectDescriptionCall,
@@ -42,17 +35,12 @@ import {
   AddWhitelistedCall,
   AddMintWhitelistedCall,
   UpdateRandomizerAddressCall,
-  UpdateArtblocksAddressCall,
-  UpdateArtblocksPercentageCall,
+  UpdateRenderProviderAddressCall,
+  UpdateRenderProviderPercentageCall,
   RemoveWhitelistedCall,
-  RemoveMintWhitelistedCall
-} from "../generated/GenArt721Core/GenArt721Core";
-
-import {
-  UpdateAdminCall,
-  GenArt721Core2
-} from "../generated/GenArt721Core2/GenArt721Core2";
-
+  RemoveMintWhitelistedCall,
+  UpdateAdminCall
+} from "../generated/GenArt721Core2PBAB/GenArt721Core2PBAB";
 import {
   GenArt721CorePlus,
   PlatformUpdated,
@@ -70,7 +58,6 @@ import {
   Whitelisting,
   ProjectScript
 } from "../generated/schema";
-
 import {
   generateAccountProjectId,
   generateWhitelistingId,
@@ -80,7 +67,7 @@ import {
 
 /*** EVENT HANDLERS ***/
 export function handleMint(event: Mint): void {
-  let contract = GenArt721Core.bind(event.address);
+  let contract = GenArt721Core2PBAB.bind(event.address);
 
   let token = new Token(
     generateContractSpecificId(event.address, event.params._tokenId)
@@ -177,199 +164,11 @@ export function handleTransfer(event: Transfer): void {
     token.save();
   }
 }
-
-export function handleProjectAdded(event: ProjectAdded): void {
-  let project = new Project(
-    generateContractSpecificId(event.address, event.params._id)
-  );
-
-  let contractEntity = new Contract(event.address.toHexString());
-  contractEntity.nextProjectId = event.params._id.plus(BigInt.fromI32(1));
-  contractEntity.updatedAt = event.block.timestamp;
-  contractEntity.save();
-  project.contract = contractEntity.id;
-
-  project.artistAddress = event.params.artistAddress;
-  let artist = new Account(event.params.artistAddress.toHexString());
-  artist.save();
-  project.artist = artist.id;
-
-  project.currencySymbol = event.params.currencySymbol;
-  project.dynamic = event.params.dynamic;
-  project.maxInvocations = event.params.maxInvocations;
-  project.name = event.params.name;
-  project.paused = event.params.paused;
-  project.pricePerTokenInWei = event.params.pricePerTokenInWei;
-  project.useHashString = event.params.useHashString;
-  project.active = false;
-  project.locked = false;
-  project.complete = false;
-  project.invocations = BigInt.fromI32(0);
-  project.scriptCount = BigInt.fromI32(0);
-  project.createdAt = event.block.timestamp;
-  project.updatedAt = event.block.timestamp;
-
-  project.save();
-}
-
-export function handleProjectUpdated(event: ProjectUpdated): void {
-  let contract: GenArt721CorePlus = GenArt721CorePlus.bind(event.address);
-  let project = new Project(
-    generateContractSpecificId(event.address, event.params._id)
-  );
-  let id = event.params._id;
-  let updates = event.params.updates.split(",");
-
-  let detailsFields: string[] = [
-    "name",
-    "artistName",
-    "description",
-    "website",
-    "license",
-    "dynamic"
-  ];
-
-  let tokenInfoFields: string[] = [
-    "artistAddress",
-    "pricePerTokenInWei",
-    "maxInvocations",
-    "active",
-    "additionalPayee",
-    "additionalPayeePercentage",
-    "currencySymbol",
-    "currencyAddress"
-  ];
-
-  let scriptJsonFields: string[] = [
-    "scriptJSON",
-    "scriptCount",
-    "useHashString",
-    "ipfsHash",
-    "locked",
-    "paused"
-  ];
-
-  let uriFields: string[] = ["baseUri", "baseIpfsUri", "useIpfs"];
-
-  for (let i = 0; i < updates.length; i++) {
-    let update = updates[i];
-
-    if (detailsFields.indexOf(update) > -1) {
-      let details = contract.projectDetails(id);
-      project.name = details.value0;
-      project.artistName = details.value1;
-      project.description = details.value2;
-      project.website = details.value3;
-      project.license = details.value4;
-      project.dynamic = details.value5;
-      project.useHashString = details.value5;
-    } else if (tokenInfoFields.indexOf(update) > -1) {
-      let tokenInfo = contract.projectTokenInfo(id);
-
-      project.artistAddress = tokenInfo.value0;
-      let artist = new Account(tokenInfo.value0.toHexString());
-      artist.save();
-      project.artist = artist.id;
-
-      project.pricePerTokenInWei = tokenInfo.value1;
-      project.maxInvocations = tokenInfo.value3;
-      project.active = tokenInfo.value4;
-      project.additionalPayee = tokenInfo.value5;
-      project.additionalPayeePercentage = tokenInfo.value6;
-      project.currencySymbol = tokenInfo.value7;
-      project.currencyAddress = tokenInfo.value8;
-    } else if (scriptJsonFields.indexOf(update) > -1) {
-      let scriptInfo = contract.projectScriptInfo(id);
-      project.scriptJSON = scriptInfo.value0;
-      project.scriptCount = scriptInfo.value1;
-      project.useHashString = scriptInfo.value2;
-      project.ipfsHash = scriptInfo.value3;
-      project.locked = scriptInfo.value4;
-      project.paused = scriptInfo.value5;
-    } else if (update == "script") {
-      refreshProjectScript(
-        contract as GenArt721Core,
-        id,
-        event.block.timestamp
-      );
-    } else if (update == "royaltyPercentage") {
-      project.royaltyPercentage = contract.projectIdToSecondaryMarketRoyaltyPercentage(
-        id
-      );
-    } else if (uriFields.indexOf(update) > -1) {
-      let uriInfo = contract.projectURIInfo(id);
-      project.baseUri = uriInfo.value0;
-      project.baseIpfsUri = uriInfo.value1;
-      project.useIpfs = uriInfo.value2;
-    }
-  }
-
-  project.updatedAt = event.block.timestamp;
-  project.save();
-}
-
-export function handlePlatformUpdated(event: PlatformUpdated): void {
-  let contractEntity = new Contract(event.address.toHexString());
-  let contract = GenArt721CorePlus.bind(event.address);
-  let field = event.params.field;
-
-  if (field == "artblocksAddress") {
-    contractEntity.renderProviderAddress = contract.artblocksAddress();
-  } else if (field == "artblocksPercentage") {
-    contractEntity.renderProviderPercentage = contract.artblocksPercentage();
-  } else if (field == "randomizerContract") {
-    contractEntity.randomizerContract = contract.randomizerContract();
-  }
-
-  contractEntity.updatedAt = event.block.timestamp;
-  contractEntity.save();
-}
-
-export function handlePlatformWhitelistUpdated(
-  event: PlatformWhitelistUpdated
-): void {
-  let contract = GenArt721CorePlus.bind(event.address);
-  let contractEntity = refreshContract(
-    contract as GenArt721Core,
-    event.block.timestamp
-  );
-  let update = event.params.update;
-
-  if (update == "addWhitelisted") {
-    let whitelisting = new Whitelisting(
-      generateWhitelistingId(contractEntity.id, event.params.addr.toString())
-    );
-    whitelisting.save();
-  } else if (update == "removeWhitelisted") {
-    let whitelisting = Whitelisting.load(
-      generateWhitelistingId(contractEntity.id, event.params.addr.toString())
-    );
-
-    if (whitelisting) {
-      store.remove("Whitelisting", whitelisting.id);
-    }
-  } else if (update == "addMintWhitelisted") {
-    contractEntity.mintWhitelisted = contractEntity.mintWhitelisted
-      ? contractEntity.mintWhitelisted.concat([event.params.addr])
-      : [event.params.addr];
-  } else if (update == "removeMintWhitelisted") {
-    let mintWhitelisted: Bytes[] = contractEntity.mintWhitelisted;
-    let newMintWhitelisted: Bytes[] = [];
-    for (let i = 0; i < mintWhitelisted.length; i++) {
-      if ((mintWhitelisted[i] as Bytes) != event.address) {
-        newMintWhitelisted.push(mintWhitelisted[i]);
-      }
-    }
-    contractEntity.mintWhitelisted = newMintWhitelisted;
-  }
-
-  contractEntity.save();
-}
 /*** END EVENT HANDLERS ***/
 
 /*** CALL HANDLERS  (Mainnet and Ropsten Only) ***/
 export function handleAddProject(call: AddProjectCall): void {
-  let contract = GenArt721Core.bind(call.to);
+  let contract = GenArt721Core2PBAB.bind(call.to);
   let contractEntity = Contract.load(call.to.toHexString());
 
   let projectId: BigInt;
@@ -389,7 +188,7 @@ export function handleAddProject(call: AddProjectCall): void {
   let contractAddress = call.to;
 
   let name = projectDetails.value0;
-  let dynamic = projectDetails.value5;
+  let dynamic = false;
 
   let artistAddress = projectTokenInfo.value0;
   let artist = new Account(artistAddress.toHexString());
@@ -401,7 +200,7 @@ export function handleAddProject(call: AddProjectCall): void {
   let currencySymbol = projectTokenInfo.value7;
 
   let scriptCount = projectScriptInfo.value1;
-  let useHashString = projectScriptInfo.value2;
+  let useHashString = true;
   let paused = projectScriptInfo.value4;
 
   let project = new Project(
@@ -437,12 +236,12 @@ export function handleAddProject(call: AddProjectCall): void {
 }
 
 export function handleUpdateAdmin(call: UpdateAdminCall): void {
-  let contract = GenArt721Core2.bind(call.to);
-  refreshContract(contract as GenArt721Core, call.block.timestamp);
+  let contract = GenArt721Core2PBAB.bind(call.to);
+  refreshContract(contract as GenArt721Core2PBAB, call.block.timestamp);
 }
 
 export function handleAddWhitelisted(call: AddWhitelistedCall): void {
-  let contract = GenArt721Core.bind(call.to);
+  let contract = GenArt721Core2PBAB.bind(call.to);
   let contractEntity = refreshContract(contract, call.block.timestamp);
 
   addWhitelisting(contractEntity.id, call.inputs._address.toHexString());
@@ -461,8 +260,8 @@ function addWhitelisting(contractId: string, accountId: string): void {
   whitelisting.save();
 }
 
-export function handleRemoveWhitelisted(call: RemoveWhitelistedCall): void {
-  let contract = GenArt721Core.bind(call.to);
+export function handleRemoveWhitelisted(call: RemoveMintWhitelistedCall): void {
+  let contract = GenArt721Core2PBAB.bind(call.to);
   let contractEntity = refreshContract(contract, call.block.timestamp);
 
   removeWhitelisting(contractEntity.id, call.inputs._address.toHexString());
@@ -480,7 +279,7 @@ function removeWhitelisting(contractId: string, accountId: string): void {
 }
 
 export function handleAddMintWhitelisted(call: AddMintWhitelistedCall): void {
-  let contract = GenArt721Core.bind(call.to);
+  let contract = GenArt721Core2PBAB.bind(call.to);
   let contractEntity = refreshContract(contract, call.block.timestamp);
 
   contractEntity.mintWhitelisted = contractEntity.mintWhitelisted
@@ -489,10 +288,10 @@ export function handleAddMintWhitelisted(call: AddMintWhitelistedCall): void {
   contractEntity.save();
 }
 
-export function handleRemoveMintWhitelisted(
+export function handleRemoveMintWhitelistedPBAB(
   call: RemoveMintWhitelistedCall
 ): void {
-  let contract = GenArt721Core.bind(call.to);
+  let contract = GenArt721Core2PBAB.bind(call.to);
   let contractEntity = refreshContract(contract, call.block.timestamp);
 
   removeMintWhitelisting(contractEntity, call.inputs._address);
@@ -518,47 +317,33 @@ function removeMintWhitelisting(
 export function handleUpdateRandomizerAddress(
   call: UpdateRandomizerAddressCall
 ): void {
-  let contract = GenArt721Core.bind(call.to);
+  let contract = GenArt721Core2PBAB.bind(call.to);
   refreshContract(contract, call.block.timestamp);
 }
 
-export function handleUpdateArtblocksAddress(
-  call: UpdateArtblocksAddressCall
+export function handleUpdateRenderProviderAddress(
+  call: UpdateRenderProviderAddressCall
 ): void {
-  let contract = GenArt721Core.bind(call.to);
+  let contract = GenArt721Core2PBAB.bind(call.to);
   refreshContract(contract, call.block.timestamp);
 }
 
-export function handleUpdateArtblocksPercentage(
-  call: UpdateArtblocksPercentageCall
+export function handleUpdateRenderProviderPercentage(
+  call: UpdateRenderProviderPercentageCall
 ): void {
-  let contract = GenArt721Core.bind(call.to);
+  let contract = GenArt721Core2PBAB.bind(call.to);
   refreshContract(contract, call.block.timestamp);
 }
 
 export function handleAddProjectScript(call: AddProjectScriptCall): void {
-  let contract = GenArt721Core.bind(call.to);
+  let contract = GenArt721Core2PBAB.bind(call.to);
   refreshProjectScript(contract, call.inputs._projectId, call.block.timestamp);
-}
-
-export function handleClearTokenIpfsImageUri(
-  call: ClearTokenIpfsImageUriCall
-): void {
-  let contract = GenArt721Core.bind(call.to);
-  refreshTokenUri(contract, call.inputs._tokenId);
-}
-
-export function handleOverrideTokenDynamicImageWithIpfsLink(
-  call: OverrideTokenDynamicImageWithIpfsLinkCall
-): void {
-  let contract = GenArt721Core.bind(call.to);
-  refreshTokenUri(contract, call.inputs._tokenId);
 }
 
 export function handleRemoveProjectLastScript(
   call: RemoveProjectLastScriptCall
 ): void {
-  let contract = GenArt721Core.bind(call.to);
+  let contract = GenArt721Core2PBAB.bind(call.to);
   let project = Project.load(
     generateContractSpecificId(call.to, call.inputs._projectId)
   );
@@ -593,20 +378,6 @@ export function handleToggleProjectIsActive(
   }
 }
 
-export function handleToggleProjectIsDynamic(
-  call: ToggleProjectIsDynamicCall
-): void {
-  let project = Project.load(
-    generateContractSpecificId(call.to, call.inputs._projectId)
-  );
-
-  if (project != null && project.contract == call.to.toHexString()) {
-    project.dynamic = !project.dynamic;
-    project.useHashString = !project.dynamic;
-    project.save();
-  }
-}
-
 export function handleToggleProjectIsLocked(
   call: ToggleProjectIsLockedCall
 ): void {
@@ -631,32 +402,6 @@ export function handleToggleProjectIsPaused(
   if (project != null && project.contract == call.to.toHexString()) {
     project.paused = !project.paused;
     project.updatedAt = call.block.timestamp;
-    project.save();
-  }
-}
-
-export function handleToggleProjectUseHashString(
-  call: ToggleProjectUseHashStringCall
-): void {
-  let project = Project.load(
-    generateContractSpecificId(call.to, call.inputs._projectId)
-  );
-
-  if (project != null && project.contract == call.to.toHexString()) {
-    project.useHashString = !project.useHashString;
-    project.save();
-  }
-}
-
-export function handleToggleProjectUseIpfsForStatic(
-  call: ToggleProjectUseIpfsForStaticCall
-): void {
-  let project = Project.load(
-    generateContractSpecificId(call.to, call.inputs._projectId)
-  );
-
-  if (project != null && project.contract == call.to.toHexString()) {
-    project.useIpfs = !project.useIpfs;
     project.save();
   }
 }
@@ -699,17 +444,6 @@ export function handleUpdateProjectArtistName(
 
   project.artistName = call.inputs._projectArtistName;
   project.updatedAt = call.block.timestamp;
-  project.save();
-}
-
-export function handleUpdateProjectBaseIpfsURI(
-  call: UpdateProjectBaseIpfsURICall
-): void {
-  let project = new Project(
-    generateContractSpecificId(call.to, call.inputs._projectId)
-  );
-
-  project.baseIpfsUri = call.inputs._projectBaseIpfsURI;
   project.save();
 }
 
@@ -818,7 +552,7 @@ export function handleUpdateProjectPricePerTokenInWei(
 }
 
 export function handleUpdateProjectScript(call: UpdateProjectScriptCall): void {
-  let contract = GenArt721Core.bind(call.to);
+  let contract = GenArt721Core2PBAB.bind(call.to);
 
   refreshProjectScript(contract, call.inputs._projectId, call.block.timestamp);
 }
@@ -879,10 +613,13 @@ export function handleUpdateProjectWebsite(
 /*** END CALL HANDLERS  ***/
 
 /** HELPERS ***/
-function refreshContract(contract: GenArt721Core, timestamp: BigInt): Contract {
+function refreshContract(
+  contract: GenArt721Core2PBAB,
+  timestamp: BigInt
+): Contract {
   let admin = contract.admin();
-  let artblocksAddress = contract.artblocksAddress();
-  let artblocksPercentage = contract.artblocksPercentage();
+  let renderProviderAddress = contract.renderProviderAddress();
+  let renderProviderPercentage = contract.renderProviderPercentage();
   let nextProjectId = contract.nextProjectId();
 
   let contractEntity = Contract.load(contract._address.toHexString());
@@ -894,8 +631,8 @@ function refreshContract(contract: GenArt721Core, timestamp: BigInt): Contract {
   }
 
   contractEntity.admin = admin;
-  contractEntity.renderProviderAddress = artblocksAddress;
-  contractEntity.renderProviderPercentage = artblocksPercentage;
+  contractEntity.renderProviderAddress = renderProviderAddress;
+  contractEntity.renderProviderPercentage = renderProviderPercentage;
   contractEntity.nextProjectId = nextProjectId;
   contractEntity.randomizerContract = contract.randomizerContract();
 
@@ -904,7 +641,7 @@ function refreshContract(contract: GenArt721Core, timestamp: BigInt): Contract {
   return contractEntity as Contract;
 }
 
-function refreshTokenUri(contract: GenArt721Core, tokenId: BigInt): void {
+function refreshTokenUri(contract: GenArt721Core2PBAB, tokenId: BigInt): void {
   let tokenURI = contract.tokenURI(tokenId);
 
   let token = new Token(generateContractSpecificId(contract._address, tokenId));
@@ -914,7 +651,7 @@ function refreshTokenUri(contract: GenArt721Core, tokenId: BigInt): void {
 }
 
 function refreshProjectScript(
-  contract: GenArt721Core,
+  contract: GenArt721Core2PBAB,
   projectId: BigInt,
   timestamp: BigInt
 ): void {
@@ -952,4 +689,5 @@ function refreshProjectScript(
 
   project.save();
 }
+
 /** END HELPERS ***/
