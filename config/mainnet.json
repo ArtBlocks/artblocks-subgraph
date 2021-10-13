@@ -1,9 +1,19 @@
 {
   "network": "mainnet",
-  "address": "0xa7d8d9ef8D8Ce8992Df33D8b8CF4Aebabd5bD270",
-  "startBlock": 11437151,
-  "originalAddress": "0x059EDD72Cd353dF5106D2B9cC5ab83a52287aC3a",
-  "originalStartBlock": 11338811,
-  "openSeaAddress": "0x7Be8076f4EA4A4AD08075C2508e481d6C946D12b",
-  "openSeaStartBlock": 11338811
+  "artblocksGenArt721CoreContracts": [
+    {
+      "address": "0xa7d8d9ef8D8Ce8992Df33D8b8CF4Aebabd5bD270",
+      "startBlock": 11437151
+    }
+  ],
+  "artblocksGenArt721Contracts": [
+    {
+      "address": "0x059EDD72Cd353dF5106D2B9cC5ab83a52287aC3a",
+      "startBlock": 11338811
+    }
+  ],
+  "openSeaContract": {
+    "address": "0x7Be8076f4EA4A4AD08075C2508e481d6C946D12b",
+    "startBlock": 11338811
+  }
 }

@@ -1,6 +1,18 @@
 {
   "network": "ropsten",
-  "address": ["0x87c6E93Fc0B149ec59AD595e2E187a4e1d7fDC25", "0x3f073062271F86711f851df57F31D2DEc026E3da"],
-  "pbabAddress": ["0x9Ee1F6E70F532D24459C0f10e2FB5D362DEaE58f"],
+  "artblocksGenArt721CoreContracts": [
+    {
+      "address": "0x87c6E93Fc0B149ec59AD595e2E187a4e1d7fDC25"
+    },
+    {
+      "address": "0x3f073062271F86711f851df57F31D2DEc026E3da"
+    }
+  ],
+  "pbabContracts": [
+    {
+      "address": "0x9Ee1F6E70F532D24459C0f10e2FB5D362DEaE58f",
+      "name": "pbab test"
+    }
+  ],
   "startBlock": 10216817
 }

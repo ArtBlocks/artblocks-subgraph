@@ -136,6 +136,8 @@ type Contract @entity {
 
   "Accounts whitelisted on the contract"
   whitelisted: [Whitelisting!] @derivedFrom(field: "contract")
+
+  updatedAt: BigInt!
 }
 
 type Whitelisting @entity {

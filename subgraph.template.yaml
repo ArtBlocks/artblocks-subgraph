@@ -2,16 +2,14 @@ specVersion: 0.0.2
 schema:
   file: ./schema.graphql
 dataSources:
-  {{#address}}
+  {{#artblocksGenArt721CoreContracts}}
   - kind: ethereum/contract
-    name: 'GenArt721Core-{{.}}'
+    name: 'GenArt721Core-{{address}}'
     network: {{network}}
     source:
-      address: '{{.}}'
+      address: '{{address}}'
       abi: GenArt721Core
-      {{#startBlock}}
       startBlock: {{startBlock}}
-      {{/startBlock}}
     mapping:
       kind: ethereum/events
       apiVersion: 0.0.4
@@ -103,17 +101,15 @@ dataSources:
         - function: updateProjectWebsite(uint256,string)
           handler: handleUpdateProjectWebsite
       file: ./src/mapping.ts
-  {{/address}}
-  {{#core2Address}}
+  {{/artblocksGenArt721CoreContracts}}
+  {{#artblocksGenArt721Core2Contracts}}
   - kind: ethereum/contract
-    name: 'GenArt721Core2-{{.}}'
+    name: 'GenArt721Core2-{{address}}'
     network: {{network}}
     source:
-      address: '{{.}}'
+      address: '{{address}}'
       abi: GenArt721Core2
-      {{#startBlock}}
       startBlock: {{startBlock}}
-      {{/startBlock}}
     mapping:
       kind: ethereum/events
       apiVersion: 0.0.4
@@ -209,19 +205,17 @@ dataSources:
         - function: updateProjectWebsite(uint256,string)
           handler: handleUpdateProjectWebsite
       file: ./src/mapping.ts
-  {{/core2Address}}
-  {{#plusAddress}}
+  {{/artblocksGenArt721Core2Contracts}}
+  {{#genArt721CorePlusContracts}}
   # We need a contract with events for project/platform updates for testing
   # because Ganache and Rinkeby don't support the trace_filter method
   - kind: ethereum/contract
     name: GenArt721CorePlus
     network: {{network}}
     source:
-      address: '{{plusAddress}}'
+      address: '{{address}}'
       abi: GenArt721CorePlus
-      {{#plusStartBlock}}
-      startBlock: {{plusStartBlock}}
-      {{/plusStartBlock}}
+      startBlock: {{startBlock}}
     mapping:
       kind: ethereum/events
       apiVersion: 0.0.4
@@ -252,17 +246,15 @@ dataSources:
         - event: ProjectUpdated(indexed uint256,string)
           handler: handleProjectUpdated
       file: ./src/mapping.ts
-  {{/plusAddress}}
-  {{#pbabAddress}}
+  {{/genArt721CorePlusContracts}}
+  {{#pbabContracts}}
   - kind: ethereum/contract
-    name: 'GenArt721Core2PBAB-{{.}}'
+    name: 'GenArt721Core2PBAB-{{address}}'
     network: {{network}}
     source:
-      address: '{{.}}'
+      address: '{{address}}'
       abi: GenArt721Core2PBAB
-      {{#startBlock}}
       startBlock: {{startBlock}}
-      {{/startBlock}}
     mapping:
       kind: ethereum/events
       apiVersion: 0.0.4
@@ -288,51 +280,39 @@ dataSources:
           handler: handleTransfer
       callHandlers:
         - function: updateAdmin(address)
-          handler: handleUpdateAdminPBAB
+          handler: handleUpdateAdmin
         - function: addWhitelisted(address)
-          handler: handleAddWhitelistedPBAB
+          handler: handleAddWhitelisted
         - function: removeWhitelisted(address)
-          handler: handleRemoveWhitelistedPBAB
+          handler: handleRemoveWhitelisted
         - function: addMintWhitelisted(address)
-          handler: handleAddMintWhitelistedPBAB
+          handler: handleAddMintWhitelisted
         - function: removeMintWhitelisted(address)
-          handler: handleRemoveMintWhitelistedPBAB
+          handler: handleRemoveMintWhitelisted
         - function: updateRandomizerAddress(address)
-          handler: handleUpdateRandomizerAddressPBAB
+          handler: handleUpdateRandomizerAddress
         - function: updateRenderProviderAddress(address)
           handler: handleUpdateRenderProviderAddress
         - function: updateRenderProviderPercentage(uint256)
           handler: handleUpdateRenderProviderPercentage
-        - function: addProject(string,address,uint256,bool)
-          handler: handleAddProjectPBAB
+        - function: addProject(string,address,uint256)
+          handler: handleAddProject
         - function: addProjectScript(uint256,string)
           handler: handleAddProjectScript
-        - function: clearTokenIpfsImageUri(uint256)
-          handler: handleClearTokenIpfsImageUri
-        - function: overrideTokenDynamicImageWithIpfsLink(uint256,string)
-          handler: handleOverrideTokenDynamicImageWithIpfsLink
         - function: removeProjectLastScript(uint256)
           handler: handleRemoveProjectLastScript
         - function: toggleProjectIsActive(uint256)
           handler: handleToggleProjectIsActive
-        - function: toggleProjectIsDynamic(uint256)
-          handler: handleToggleProjectIsDynamic
         - function: toggleProjectIsLocked(uint256)
           handler: handleToggleProjectIsLocked
         - function: toggleProjectIsPaused(uint256)
           handler: handleToggleProjectIsPaused
-        - function: toggleProjectUseHashString(uint256)
-          handler: handleToggleProjectUseHashString
-        - function: toggleProjectUseIpfsForStatic(uint256)
-          handler: handleToggleProjectUseIpfsForStatic
         - function: updateProjectAdditionalPayeeInfo(uint256,address,uint256)
           handler: handleUpdateProjectAdditionalPayeeInfo
         - function: updateProjectArtistAddress(uint256,address)
           handler: handleUpdateProjectArtistAddress
         - function: updateProjectArtistName(uint256,string)
           handler: handleUpdateProjectArtistName
-        - function: updateProjectBaseIpfsURI(uint256,string)
-          handler: handleUpdateProjectBaseIpfsURI
         - function: updateProjectBaseURI(uint256,string)
           handler: handleUpdateProjectBaseURI
         - function: updateProjectCurrencyInfo(uint256,string,address)
@@ -357,9 +337,9 @@ dataSources:
           handler: handleUpdateProjectSecondaryMarketRoyaltyPercentage
         - function: updateProjectWebsite(uint256,string)
           handler: handleUpdateProjectWebsite
-      file: ./src/mapping.ts
-  {{/pbabAddress}}
-  {{#originalAddress}}
+      file: ./src/pbab-mapping.ts
+  {{/pbabContracts}}
+  {{#genArt721Contracts}}
   - kind: ethereum/contract
     name: GenArt721
     network: {{network}}
@@ -454,17 +434,15 @@ dataSources:
         - function: updateProjectWebsite(uint256,string)
           handler: handleUpdateProjectWebsite
       file: ./src/original-mapping.ts
-  {{/originalAddress}}
-  {{#openSeaAddress}}
+  {{/genArt721Contracts}}
+  {{#openSeaContract}}
   - kind: ethereum/contract
     name: WyvernExchange
     network: mainnet
     source:
-      address: '{{openSeaAddress}}'
+      address: '{{address}}'
       abi: WyvernExchange
-      {{#openSeaStartBlock}}
-      startBlock: {{openSeaStartBlock}}
-      {{/openSeaStartBlock}}
+      startBlock: {{startBlock}}
     mapping:
       kind: ethereum/events
       apiVersion: 0.0.4
@@ -485,4 +463,4 @@ dataSources:
         - function: atomicMatch_(address[14],uint256[18],uint8[8],bytes,bytes,bytes,bytes,bytes,bytes,uint8[2],bytes32[5])
           handler: handleAtomicMatch_
       file: ./src/os-mapping.ts
-  {{/openSeaAddress}}
+  {{/openSeaContract}}
