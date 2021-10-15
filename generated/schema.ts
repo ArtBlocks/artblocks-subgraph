@@ -551,6 +551,15 @@ export class Project extends Entity {
   set contract(value: string) {
     this.set("contract", Value.fromString(value));
   }
+
+  get openSeaSaleLookupTables(): Array<string> {
+    let value = this.get("openSeaSaleLookupTables");
+    return value.toStringArray();
+  }
+
+  set openSeaSaleLookupTables(value: Array<string>) {
+    this.set("openSeaSaleLookupTables", Value.fromStringArray(value));
+  }
 }
 
 export class ProjectScript extends Entity {
@@ -1101,13 +1110,13 @@ export class Token extends Entity {
     this.set("transactionHash", Value.fromBytes(value));
   }
 
-  get tokenOpenSeaSaleLookupTables(): Array<string> {
-    let value = this.get("tokenOpenSeaSaleLookupTables");
+  get openSeaSaleLookupTables(): Array<string> {
+    let value = this.get("openSeaSaleLookupTables");
     return value.toStringArray();
   }
 
-  set tokenOpenSeaSaleLookupTables(value: Array<string>) {
-    this.set("tokenOpenSeaSaleLookupTables", Value.fromStringArray(value));
+  set openSeaSaleLookupTables(value: Array<string>) {
+    this.set("openSeaSaleLookupTables", Value.fromStringArray(value));
   }
 }
 
@@ -1185,13 +1194,13 @@ export class OpenSeaSale extends Entity {
     this.set("summaryTokensSold", Value.fromString(value));
   }
 
-  get tokenOpenSeaSaleLookupTables(): Array<string> {
-    let value = this.get("tokenOpenSeaSaleLookupTables");
+  get openSeaSaleLookupTables(): Array<string> {
+    let value = this.get("openSeaSaleLookupTables");
     return value.toStringArray();
   }
 
-  set tokenOpenSeaSaleLookupTables(value: Array<string>) {
-    this.set("tokenOpenSeaSaleLookupTables", Value.fromStringArray(value));
+  set openSeaSaleLookupTables(value: Array<string>) {
+    this.set("openSeaSaleLookupTables", Value.fromStringArray(value));
   }
 
   get seller(): Bytes {
@@ -1240,7 +1249,7 @@ export class OpenSeaSale extends Entity {
   }
 }
 
-export class TokenOpenSeaSaleLookupTable extends Entity {
+export class OpenSeaSaleLookupTable extends Entity {
   constructor(id: string) {
     super();
     this.set("id", Value.fromString(id));
@@ -1250,21 +1259,21 @@ export class TokenOpenSeaSaleLookupTable extends Entity {
     let id = this.get("id");
     assert(
       id !== null,
-      "Cannot save TokenOpenSeaSaleLookupTable entity without an ID"
+      "Cannot save OpenSeaSaleLookupTable entity without an ID"
     );
     assert(
       id.kind == ValueKind.STRING,
-      "Cannot save TokenOpenSeaSaleLookupTable entity with non-string ID. " +
+      "Cannot save OpenSeaSaleLookupTable entity with non-string ID. " +
         'Considering using .toHex() to convert the "id" to a string.'
     );
-    store.set("TokenOpenSeaSaleLookupTable", id.toString(), this);
+    store.set("OpenSeaSaleLookupTable", id.toString(), this);
   }
 
-  static load(id: string): TokenOpenSeaSaleLookupTable | null {
+  static load(id: string): OpenSeaSaleLookupTable | null {
     return store.get(
-      "TokenOpenSeaSaleLookupTable",
+      "OpenSeaSaleLookupTable",
       id
-    ) as TokenOpenSeaSaleLookupTable | null;
+    ) as OpenSeaSaleLookupTable | null;
   }
 
   get id(): string {
@@ -1276,13 +1285,13 @@ export class TokenOpenSeaSaleLookupTable extends Entity {
     this.set("id", Value.fromString(value));
   }
 
-  get token(): string {
-    let value = this.get("token");
-    return value.toString();
+  get blockNumber(): BigInt {
+    let value = this.get("blockNumber");
+    return value.toBigInt();
   }
 
-  set token(value: string) {
-    this.set("token", Value.fromString(value));
+  set blockNumber(value: BigInt) {
+    this.set("blockNumber", Value.fromBigInt(value));
   }
 
   get timestamp(): BigInt {
@@ -1292,6 +1301,24 @@ export class TokenOpenSeaSaleLookupTable extends Entity {
 
   set timestamp(value: BigInt) {
     this.set("timestamp", Value.fromBigInt(value));
+  }
+
+  get project(): string {
+    let value = this.get("project");
+    return value.toString();
+  }
+
+  set project(value: string) {
+    this.set("project", Value.fromString(value));
+  }
+
+  get token(): string {
+    let value = this.get("token");
+    return value.toString();
+  }
+
+  set token(value: string) {
+    this.set("token", Value.fromString(value));
   }
 
   get openSeaSale(): string {

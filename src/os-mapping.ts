@@ -6,7 +6,7 @@ import {
   Contract,
   OpenSeaSale,
   Token,
-  TokenOpenSeaSaleLookupTable
+  OpenSeaSaleLookupTable
 } from "../generated/schema";
 import { WYVERN_ATOMICIZER_ADDRESS, NULL_ADDRESS } from "./constants";
 import { generateContractSpecificId } from "./helpers";
@@ -98,14 +98,16 @@ function _handleSingleAssetSale(call: AtomicMatch_Call): void {
       openSeaSale.save();
 
       // Create the associated entry in the Nft <=> OpenSeaSale lookup table
-      let tableEntryId = _buildTokenSaleLookupTableId(token.id, openSeaSaleId);
-      let tokenOpenSeaSaleLookupTable = new TokenOpenSeaSaleLookupTable(
+      let tableEntryId = _buildTokenSaleLookupTableId(token.project, token.id, openSeaSaleId);
+      let openSeaSaleLookupTable = new OpenSeaSaleLookupTable(
         tableEntryId
       );
-      tokenOpenSeaSaleLookupTable.token = token.id;
-      tokenOpenSeaSaleLookupTable.openSeaSale = openSeaSale.id;
-      tokenOpenSeaSaleLookupTable.timestamp = openSeaSale.blockTimestamp;
-      tokenOpenSeaSaleLookupTable.save();
+      openSeaSaleLookupTable.token = token.id;
+      openSeaSaleLookupTable.project = token.project;
+      openSeaSaleLookupTable.openSeaSale = openSeaSale.id;
+      openSeaSaleLookupTable.timestamp = openSeaSale.blockTimestamp;
+      openSeaSaleLookupTable.blockNumber = openSeaSale.blockNumber;
+      openSeaSaleLookupTable.save();
     }
   }
 }
@@ -184,16 +186,21 @@ function _handleBundleSale(call: AtomicMatch_Call): void {
       if (token != null) {
         // Link both of them (NFT with OpenSeaSale)
         let tableEntryId = _buildTokenSaleLookupTableId(
+          token.project,
           token.id,
           openSeaSaleId
         );
-        let tokenOpenSeaSaleLookupTable = new TokenOpenSeaSaleLookupTable(
+
+        let openSeaSaleLookupTable = new OpenSeaSaleLookupTable(
           tableEntryId
         );
-        tokenOpenSeaSaleLookupTable.token = token.id;
-        tokenOpenSeaSaleLookupTable.openSeaSale = openSeaSale.id;
-        tokenOpenSeaSaleLookupTable.timestamp = openSeaSale.blockTimestamp;
-        tokenOpenSeaSaleLookupTable.save();
+        
+        openSeaSaleLookupTable.token = token.id;
+        openSeaSaleLookupTable.project = token.project;
+        openSeaSaleLookupTable.openSeaSale = openSeaSale.id;
+        openSeaSaleLookupTable.timestamp = openSeaSale.blockTimestamp;
+        openSeaSaleLookupTable.blockNumber = openSeaSale.blockNumber;
+        openSeaSaleLookupTable.save();
       }
     }
 
@@ -353,11 +360,12 @@ function _getSingleTokenIdFromTransferFromCallData(
 }
 
 /**
- *
+ * 
+ * @param projectId The projectId id
  * @param tokenId The token id
  * @param saleId The sale id (eth tx hash)
  * @returns The corresponding lookup table id
  */
-function _buildTokenSaleLookupTableId(tokenId: string, saleId: string): string {
-  return tokenId + "<=>" + saleId;
+function _buildTokenSaleLookupTableId(projectId: string, tokenId: string, saleId: string): string {
+  return projectId + "::" + tokenId + "::" + saleId;
 }
