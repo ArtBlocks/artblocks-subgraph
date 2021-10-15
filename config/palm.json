@@ -1,6 +1,6 @@
 {
   "network": "palm",
-  "artblocksGenArt721Core2Contracts": [
+  "genArt721Core2Contracts": [
     {
       "address": "0x8De4e517A6F0B84654625228D8293b70AB49cF6C",
       "startBlock": 700000

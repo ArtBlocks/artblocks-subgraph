@@ -1,6 +1,6 @@
 {
   "network": "ropsten",
-  "artblocksGenArt721Core2Contracts": [
+  "genArt721Core2Contracts": [
     { "address": "0x1CD623a86751d4C4f20c96000FEC763941f098A2" }
   ],
   "pbabContracts": [
