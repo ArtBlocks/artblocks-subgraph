@@ -7,6 +7,7 @@ import {
   log,
   Address
 } from "@graphprotocol/graph-ts";
+
 import {
   GenArt721Core2PBAB,
   Mint,
@@ -41,13 +42,6 @@ import {
   RemoveMintWhitelistedCall,
   UpdateAdminCall
 } from "../generated/GenArt721Core2PBAB/GenArt721Core2PBAB";
-import {
-  GenArt721CorePlus,
-  PlatformUpdated,
-  PlatformWhitelistUpdated,
-  ProjectAdded,
-  ProjectUpdated
-} from "../generated/GenArt721CorePlus/GenArt721CorePlus";
 
 import {
   Project,
@@ -58,6 +52,7 @@ import {
   Whitelisting,
   ProjectScript
 } from "../generated/schema";
+
 import {
   generateAccountProjectId,
   generateWhitelistingId,

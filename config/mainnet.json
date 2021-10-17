@@ -12,6 +12,13 @@
       "startBlock": 11338811
     }
   ],
+  "pbabContracts": [
+    {
+      "address": "0x28f2D3805652FB5d359486dFfb7D08320D403240",
+      "name": "Doodle Labs",
+      "startBlock": 13426126
+    }
+  ],
   "openSeaContract": {
     "address": "0x7Be8076f4EA4A4AD08075C2508e481d6C946D12b",
     "startBlock": 11338811
