@@ -402,7 +402,7 @@ export function handleAddProject(call: AddProjectCall): void {
 
   let scriptCount = projectScriptInfo.value1;
   let useHashString = projectScriptInfo.value2;
-  let paused = projectScriptInfo.value4;
+  let paused = projectScriptInfo.value5;
 
   let project = new Project(
     generateContractSpecificId(contractAddress, projectId)

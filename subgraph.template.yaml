@@ -16,6 +16,7 @@ dataSources:
       language: wasm/assemblyscript
       entities:
         - Project
+        - ProjectScript
         - Token
         - Contract
         - Account
@@ -116,6 +117,7 @@ dataSources:
       language: wasm/assemblyscript
       entities:
         - Project
+        - ProjectScript
         - Token
         - Contract
         - Account
@@ -222,6 +224,7 @@ dataSources:
       language: wasm/assemblyscript
       entities:
         - Project
+        - ProjectScript
         - Token
         - Contract
         - Account
@@ -261,6 +264,7 @@ dataSources:
       language: wasm/assemblyscript
       entities:
         - Project
+        - ProjectScript
         - Token
         - Contract
         - Account
@@ -271,8 +275,6 @@ dataSources:
       abis:
         - name: GenArt721Core2PBAB
           file: ./abis/GenArt721Core2PBAB.json
-        - name: GenArt721Core
-          file: ./abis/GenArt721Core.json
       eventHandlers:
         - event: Mint(indexed address,indexed uint256,indexed uint256)
           handler: handleMint
@@ -353,6 +355,7 @@ dataSources:
       language: wasm/assemblyscript
       entities:
         - Project
+        - ProjectScript
         - Token
         - Contract
         - Account
@@ -447,6 +450,7 @@ dataSources:
       language: wasm/assemblyscript
       entities:
         - Project
+        - ProjectScript
         - Token
         - Contract
         - Account
