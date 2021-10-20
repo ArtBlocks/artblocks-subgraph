@@ -1,14 +1,14 @@
-import { Address, BigInt, Bytes, log } from "@graphprotocol/graph-ts";
+import { Address, BigInt, ByteArray, Bytes, ethereum, log } from "@graphprotocol/graph-ts";
 
-import { AtomicMatch_Call } from "../generated/WyvernExchange/WyvernExchange";
+import { AtomicMatch_Call, WyvernExchange } from "../generated/WyvernExchange/WyvernExchange";
 
 import {
   Contract,
   OpenSeaSale,
   Token,
-  OpenSeaSaleLookupTable
+  OpenSeaSaleLookupTable,
 } from "../generated/schema";
-import { WYVERN_ATOMICIZER_ADDRESS, NULL_ADDRESS } from "./constants";
+import { WYVERN_ATOMICIZER_ADDRESS, NULL_ADDRESS, TRANSFER_FROM_SELECTOR } from "./constants";
 import { generateContractSpecificId } from "./helpers";
 
 /** Call handlers */
@@ -50,6 +50,8 @@ export function handleAtomicMatch_(call: AtomicMatch_Call): void {
  *              A "normal" sale is a sale that is not a bundle (only contains one asset).
  */
 function _handleSingleAssetSale(call: AtomicMatch_Call): void {
+  log.warning("_handleSingleAssetSale", []);
+
   let callInputs = call.inputs;
   let uints: BigInt[] = callInputs.uints;
   let addrs: Address[] = callInputs.addrs;
@@ -57,7 +59,7 @@ function _handleSingleAssetSale(call: AtomicMatch_Call): void {
   // Only interested in Art Blocks sells
   let nftContract: Address = addrs[11];
   let contract = Contract.load(nftContract.toHexString());
-  if (contract != null) {
+  if (contract) {
     // TODO: The price could be retrieved from the calculateMatchPrice_ method of OpenSea Smart Contract
     let price: BigInt = uints[4];
 
@@ -66,23 +68,21 @@ function _handleSingleAssetSale(call: AtomicMatch_Call): void {
     let paymentTokenErc20Address: Address = addrs[6];
 
     // Merge sell order data with buy order data (just like they are doing in their contract)
-    let mergedCallDataStr = _guardedArrayReplace(
+    let mergedCallData = _guardedArrayReplace(
       callInputs.calldataBuy,
       callInputs.calldataSell,
       callInputs.replacementPatternBuy
     );
 
     // Fetch the token ID that has been sold from the call data
-    let tokenIdStr = _getSingleTokenIdFromTransferFromCallData(
-      mergedCallDataStr,
-      true
-    );
+    let tokenIdStr = _getSingleTokenIdFromTransferFromCallData(mergedCallData);
 
     // The token must already exist (minted) to be sold on OpenSea
     let token = Token.load(
       generateContractSpecificId(nftContract, BigInt.fromString(tokenIdStr))
     );
-    if (token != null) {
+
+    if (token) {
       // Create the OpenSeaSale
       let openSeaSaleId = call.transaction.hash.toHexString();
       let openSeaSale = new OpenSeaSale(openSeaSaleId);
@@ -119,6 +119,8 @@ function _handleSingleAssetSale(call: AtomicMatch_Call): void {
  *              A "bundle" sale is a sale that contains several assets embeded in the same, atomic, transaction.
  */
 function _handleBundleSale(call: AtomicMatch_Call): void {
+  log.warning("_handleBundleSale", []);
+
   let callInputs = call.inputs;
   let addrs: Address[] = callInputs.addrs;
   let uints: BigInt[] = callInputs.uints;
@@ -143,7 +145,7 @@ function _handleBundleSale(call: AtomicMatch_Call): void {
   let bundleIncludesArtBlocks = false;
   for (let i = 0; i < nftContractList.length; i++) {
     let contract = Contract.load(nftContractList[i]);
-    if (contract != null) {
+    if (contract) {
       bundleIncludesArtBlocks = true;
       break;
     }
@@ -183,7 +185,7 @@ function _handleBundleSale(call: AtomicMatch_Call): void {
           BigInt.fromString(tokenId)
         )
       );
-      if (token != null) {
+      if (token) {
         // Link both of them (NFT with OpenSeaSale)
         let tableEntryId = _buildTokenSaleLookupTableId(
           token.project,
@@ -239,7 +241,7 @@ function _guardedArrayReplace(
   array: Bytes,
   replacement: Bytes,
   mask: Bytes
-): string {
+): Bytes {
   array.reverse();
   replacement.reverse();
   mask.reverse();
@@ -251,8 +253,8 @@ function _guardedArrayReplace(
   // array |= replacement & mask;
   bigIntReplacement = bigIntReplacement.bitAnd(bigIntMask);
   bigIntgArray = bigIntgArray.bitOr(bigIntReplacement);
-  let callDataHexString = bigIntgArray.toHexString();
-  return callDataHexString;
+  // let callDataHexString = bigIntgArray.toHexString();
+  return (changetype<Bytes>(ByteArray.fromBigInt(bigIntgArray).reverse()));
 }
 
 /**
@@ -262,70 +264,75 @@ function _guardedArrayReplace(
  * @returns An array of 2 cells: [listOfContractAddress][listOfTokenId]
  */
 function _getNftContractAddressAndTokenIdFromCallData(
-  atomicizeCallData: string
+  atomicizeCallData: Bytes
 ): string[][] {
-  const TRAILING_0x = 2;
-  const METHOD_ID_LENGTH = 8;
-  const UINT_256_LENGTH = 64;
-
-  let indexStartNbToken = TRAILING_0x + METHOD_ID_LENGTH + UINT_256_LENGTH * 4;
-  let indexStopNbToken = indexStartNbToken + UINT_256_LENGTH;
-  let nbTokenStr = atomicizeCallData.substring(
-    indexStartNbToken,
-    indexStopNbToken
-  );
+  let dataWithoutFunctionSelector: Bytes = changetype<Bytes>(atomicizeCallData.subarray(4));
   
-  let nbToken = BigInt.fromString(`0x${nbTokenStr}`).toI32();
-  // let nbToken = parseI32(nbTokenStr, 16);
+  // As function encoding is not handled yet by the lib, we first need to reach the offset of where the 
+  // actual params are located. As they are all dynamic we can just fetch the offset of the first param
+  // and then start decoding params from there as known sized types
+  let offset: i32 = ethereum.decode(
+    "uint256", 
+    changetype<Bytes>(dataWithoutFunctionSelector)
+  )!.toBigInt().toI32();
+  
+  // Get the length of the first array. All arrays must have same length so fetching only this one is enough
+  let arrayLength: i32 = ethereum.decode(
+    "uint256", 
+    changetype<Bytes>(dataWithoutFunctionSelector.subarray(offset))
+  )!.toBigInt().toI32();
+  offset += 1 * 32;
+  
+  // Now that we know the size of each params we can decode them one by one as know sized types
+  // function atomicize(address[] addrs,uint256[] values,uint256[] calldataLengths,bytes calldatas)
+  let decodedAddresses: Address[] = ethereum.decode(
+    `address[${arrayLength}]`, 
+    changetype<Bytes>(dataWithoutFunctionSelector.subarray(offset))
+  )!.toAddressArray();
+  offset += arrayLength * 32;
+  
+  offset += 1 * 32;
+  // We don't need those values, just move the offset forward
+  // let decodedValues: BigInt[] = ethereum.decode(
+  //   `uint256[${arrayLength}]`, 
+  //   changetype<Bytes>(dataWithoutFunctionSelector.subarray(offset))
+  // )!.toBigIntArray();
+  offset += arrayLength * 32;
+  
+  offset += 1 * 32;
+  let decodedCalldataIndividualLengths = ethereum.decode(
+    `uint256[${arrayLength}]`, 
+    changetype<Bytes>(dataWithoutFunctionSelector.subarray(offset))
+  )!.toBigIntArray().map<i32>(e => e.toI32());
+  offset += arrayLength * 32;
+  
+  let decodedCallDatasLength = ethereum.decode(
+    "uint256", 
+    changetype<Bytes>(dataWithoutFunctionSelector.subarray(offset))
+  )!.toBigInt().toI32();
+  offset += 1 * 32;
 
-  // Get the associated NFT contracts
+  let callDatas: Bytes = changetype<Bytes>(dataWithoutFunctionSelector.subarray(offset, offset + decodedCallDatasLength));
+
   let nftContractsAddrsList: string[] = [];
-  let offset = indexStopNbToken;
-  for (let i = 0; i < nbToken; i++) {
-    let addrs = atomicizeCallData.substring(offset, offset + UINT_256_LENGTH);
+  let tokenIds: string[] = [];
+  
+  let calldataOffset = 0;
+  for(let i = 0; i < decodedAddresses.length; i++) {
+    let callDataLength = decodedCalldataIndividualLengths[1];
+    let calldata: Bytes = changetype<Bytes>(callDatas.subarray(calldataOffset, calldataOffset + callDataLength));
 
-    // Remove the 24 leading zeros
-    addrs = addrs.substring(24);
-    nftContractsAddrsList.push("0x" + addrs);
-
-    // Move forward in the call data
-    offset += UINT_256_LENGTH;
+    // Sometime the call data is not a transferFrom (ie: https://etherscan.io/tx/0xe8629bfc57ab619a442f027c46d63e1f101bd934232405fa8e8eaf156bfca848) 
+    // Ignore if not transferFrom
+    let functionSelector: string =  changetype<Bytes>(calldata.subarray(0,4)).toHexString();
+    if(functionSelector === TRANSFER_FROM_SELECTOR) {
+      nftContractsAddrsList.push(decodedAddresses[i].toHexString());
+      tokenIds.push(_getSingleTokenIdFromTransferFromCallData(calldata));
+    }
+    calldataOffset += callDataLength;
   }
 
-  /**
-   * After reading the contract addresses involved in the bundle sale
-   * there are 2 chunks of params of length nbToken * UINT_256_LENGTH.
-   *
-   * Those chunks are each preceded by a "chunk metadata" of length UINT_256_LENGTH
-   * Finalluy a last "chunk metadata" is set of length UINT_256_LENGTH. (3 META_CHUNKS)
-   *
-   *
-   * After that we are reading the abiencoded data representing the transferFrom calls
-   */
-  const LEFT_CHUNKS = 2;
-  const NB_META_CHUNKS = 3;
-  offset +=
-    nbToken * UINT_256_LENGTH * LEFT_CHUNKS + NB_META_CHUNKS * UINT_256_LENGTH;
-
-  // Get the NFT token IDs
-  const TRANSFER_FROM_DATA_LENGTH = METHOD_ID_LENGTH + UINT_256_LENGTH * 3;
-  let tokenIdsList: string[] = [];
-  for (let i = 0; i < nbToken; i++) {
-    let transferFromData = atomicizeCallData.substring(
-      offset,
-      offset + TRANSFER_FROM_DATA_LENGTH
-    );
-    let tokenIdstr = _getSingleTokenIdFromTransferFromCallData(
-      transferFromData,
-      false
-    );
-    tokenIdsList.push(tokenIdstr);
-
-    // Move forward in the call data
-    offset += TRANSFER_FROM_DATA_LENGTH;
-  }
-
-  return [nftContractsAddrsList, tokenIdsList];
+  return [nftContractsAddrsList,tokenIds];
 }
 
 /**
@@ -335,31 +342,12 @@ function _getNftContractAddressAndTokenIdFromCallData(
  * @returns The tokenId (string) of the transfer
  */
 function _getSingleTokenIdFromTransferFromCallData(
-  transferFromData: string,
-  trailing0x: boolean
+  transferFromData: Bytes,
 ): string {
-  let TRAILING_0x = trailing0x ? 2 : 0;
-  const METHOD_ID_LENGTH = 8;
-  const UINT_256_LENGTH = 64;
 
-  /**
-   * The calldata input is formated as:
-   * Format => METHOD_ID (transferFrom) | FROM | TO | TOKEN_ID
-   * Size   =>            X             |   Y  |  Y |    Y
-   *      Where :
-   *          - X = 32 bits (8 hex chars)
-   *          - Y = 256 bits (64 hex chars)
-   *
-   * +2 | 0 chars for the "0x" leading part
-   */
-  let tokenIdHexStr: string = transferFromData.substring(
-    TRAILING_0x + METHOD_ID_LENGTH + UINT_256_LENGTH * 2
-  );
-  let tokenId = BigInt.fromString(tokenIdHexStr);
-  // let tokenId = parseI64(tokenIdHexStr, 16);
-  let tokenIdStr: string = tokenId.toString();
-  
-  return tokenIdStr;
+  let dataWithoutFunctionSelector = changetype<Bytes>(transferFromData.subarray(4));
+  let decoded = ethereum.decode("(address,address,uint256)", dataWithoutFunctionSelector)!.toTuple();
+  return decoded[2].toBigInt().toString();
 }
 
 /**
@@ -372,3 +360,4 @@ function _getSingleTokenIdFromTransferFromCallData(
 function _buildTokenSaleLookupTableId(projectId: string, tokenId: string, saleId: string): string {
   return projectId + "::" + tokenId + "::" + saleId;
 }
+

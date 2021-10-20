@@ -5,7 +5,8 @@ import {
   json,
   JSONValueKind,
   log,
-  Address
+  Address,
+  ByteArray
 } from "@graphprotocol/graph-ts";
 
 import {
@@ -137,7 +138,7 @@ export function handleTransfer(event: Transfer): void {
   );
 
   // Let mint handlers deal with new tokens
-  if (token != null) {
+  if (token) {
     // Update Account <-> Project many-to-many relation
     // table to reflect new account project token balance
     let prevAccountProject = AccountProject.load(
@@ -148,12 +149,12 @@ export function handleTransfer(event: Transfer): void {
     );
 
     if (
-      prevAccountProject != null &&
+      prevAccountProject &&
       (prevAccountProject as AccountProject).count > 1
     ) {
       prevAccountProject.count -= 1;
       prevAccountProject.save();
-    } else if (prevAccountProject != null) {
+    } else if (prevAccountProject) {
       store.remove("AccountProject", prevAccountProject.id);
     }
 
@@ -487,7 +488,7 @@ function removeWhitelisting(contractId: string, accountId: string): void {
   let whitelistingId = generateWhitelistingId(contractId, account.id);
   let whitelisting = Whitelisting.load(whitelistingId);
 
-  if (whitelisting != null) {
+  if (whitelisting) {
     store.remove("Whitelisting", whitelistingId);
   }
 }
@@ -579,7 +580,7 @@ export function handleRemoveProjectLastScript(
   let project = Project.load(
     generateContractSpecificId(call.to, call.inputs._projectId)
   );
-  if (project != null) {
+  if (project) {
     store.remove(
       "ProjectScript",
       generateProjectScriptId(
@@ -602,7 +603,7 @@ export function handleToggleProjectIsActive(
     generateContractSpecificId(call.to, call.inputs._projectId)
   );
 
-  if (project != null && project.contract == call.to.toHexString()) {
+  if (project && project.contract == call.to.toHexString()) {
     project.active = !project.active;
     project.activatedAt = project.active ? call.block.timestamp : null;
     project.updatedAt = call.block.timestamp;
@@ -617,7 +618,7 @@ export function handleToggleProjectIsDynamic(
     generateContractSpecificId(call.to, call.inputs._projectId)
   );
 
-  if (project != null && project.contract == call.to.toHexString()) {
+  if (project && project.contract == call.to.toHexString()) {
     project.dynamic = !project.dynamic;
     project.useHashString = !project.dynamic;
     project.save();
@@ -631,7 +632,7 @@ export function handleToggleProjectIsLocked(
     generateContractSpecificId(call.to, call.inputs._projectId)
   );
 
-  if (project != null && project.contract == call.to.toHexString()) {
+  if (project && project.contract == call.to.toHexString()) {
     project.locked = !project.locked;
     project.updatedAt = call.block.timestamp;
     project.save();
@@ -645,7 +646,7 @@ export function handleToggleProjectIsPaused(
     generateContractSpecificId(call.to, call.inputs._projectId)
   );
 
-  if (project != null && project.contract == call.to.toHexString()) {
+  if (project && project.contract == call.to.toHexString()) {
     project.paused = !project.paused;
     project.updatedAt = call.block.timestamp;
     project.save();
@@ -659,7 +660,7 @@ export function handleToggleProjectUseHashString(
     generateContractSpecificId(call.to, call.inputs._projectId)
   );
 
-  if (project != null && project.contract == call.to.toHexString()) {
+  if (project && project.contract == call.to.toHexString()) {
     project.useHashString = !project.useHashString;
     project.save();
   }
@@ -672,7 +673,7 @@ export function handleToggleProjectUseIpfsForStatic(
     generateContractSpecificId(call.to, call.inputs._projectId)
   );
 
-  if (project != null && project.contract == call.to.toHexString()) {
+  if (project && project.contract == call.to.toHexString()) {
     project.useIpfs = !project.useIpfs;
     project.save();
   }
@@ -799,7 +800,7 @@ export function handleUpdateProjectMaxInvocations(
     generateContractSpecificId(call.to, call.inputs._projectId)
   );
 
-  if (project != null) {
+  if (project) {
     project.maxInvocations = call.inputs._maxInvocations;
     project.complete = project.invocations.ge(project.maxInvocations);
     project.updatedAt = call.block.timestamp;
@@ -848,7 +849,7 @@ export function handleUpdateProjectScriptJSON(
   );
 
   let scriptJSONRaw = json.fromBytes(
-    Bytes.fromUTF8(call.inputs._projectScriptJSON) as Bytes
+    changetype<Bytes>(ByteArray.fromUTF8(call.inputs._projectScriptJSON))
   );
 
   if (scriptJSONRaw.kind == JSONValueKind.OBJECT) {
@@ -968,7 +969,7 @@ function refreshProjectScript<T>(
     projectScript.project = project.id;
     projectScript.save();
 
-    if (script != null && script != "") {
+    if (script && script != "") {
       scripts.push(script);
     }
   }
