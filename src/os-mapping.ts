@@ -274,7 +274,9 @@ function _getNftContractAddressAndTokenIdFromCallData(
     indexStartNbToken,
     indexStopNbToken
   );
-  let nbToken = parseI32(nbTokenStr, 16);
+  
+  let nbToken = BigInt.fromString(`0x${nbTokenStr}`).toI32();
+  // let nbToken = parseI32(nbTokenStr, 16);
 
   // Get the associated NFT contracts
   let nftContractsAddrsList: string[] = [];
@@ -353,9 +355,10 @@ function _getSingleTokenIdFromTransferFromCallData(
   let tokenIdHexStr: string = transferFromData.substring(
     TRAILING_0x + METHOD_ID_LENGTH + UINT_256_LENGTH * 2
   );
-  let tokenId = parseI64(tokenIdHexStr, 16);
+  let tokenId = BigInt.fromString(tokenIdHexStr);
+  // let tokenId = parseI64(tokenIdHexStr, 16);
   let tokenIdStr: string = tokenId.toString();
-
+  
   return tokenIdStr;
 }
 

@@ -72,39 +72,42 @@ export function handleMint(event: Mint): void {
     event.params._projectId
   );
   let project = Project.load(projectId);
-  let invocation = project.invocations;
 
-  token.tokenId = event.params._tokenId;
-  token.contract = event.address.toHexString();
-  token.project = projectId;
-  token.owner = event.params._to.toHexString();
-  token.hash = contract.tokenIdToHash(event.params._tokenId);
-  token.invocation = invocation;
-  token.createdAt = event.block.timestamp;
-  token.updatedAt = event.block.timestamp;
-  token.transactionHash = event.transaction.hash;
-  token.save();
+  if(project) {
+    let invocation = project.invocations;
 
-  project.invocations = invocation.plus(BigInt.fromI32(1));
-  if (project.invocations == project.maxInvocations) {
-    project.complete = true;
-    project.updatedAt = event.block.timestamp;
+    token.tokenId = event.params._tokenId;
+    token.contract = event.address.toHexString();
+    token.project = projectId;
+    token.owner = event.params._to.toHexString();
+    token.hash = contract.tokenIdToHash(event.params._tokenId);
+    token.invocation = invocation;
+    token.createdAt = event.block.timestamp;
+    token.updatedAt = event.block.timestamp;
+    token.transactionHash = event.transaction.hash;
+    token.save();
+
+    project.invocations = invocation.plus(BigInt.fromI32(1));
+    if (project.invocations == project.maxInvocations) {
+      project.complete = true;
+      project.updatedAt = event.block.timestamp;
+    }
+    project.save();
+
+    let account = new Account(token.owner);
+    account.save();
+
+    let accountProjectId = generateAccountProjectId(account.id, project.id);
+    let accountProject = AccountProject.load(accountProjectId);
+    if (accountProject == null) {
+      accountProject = new AccountProject(accountProjectId);
+      accountProject.account = account.id;
+      accountProject.project = project.id;
+      accountProject.count = 0;
+    }
+    accountProject.count += 1;
+    accountProject.save();
   }
-  project.save();
-
-  let account = new Account(token.owner);
-  account.save();
-
-  let accountProjectId = generateAccountProjectId(account.id, project.id);
-  let accountProject = AccountProject.load(accountProjectId);
-  if (accountProject == null) {
-    accountProject = new AccountProject(accountProjectId);
-    accountProject.account = account.id;
-    accountProject.project = project.id;
-    accountProject.count = 0;
-  }
-  accountProject.count += 1;
-  accountProject.save();
 }
 
 // Update token owner on transfer
@@ -567,13 +570,15 @@ export function handleUpdateProjectScriptJSON(
 
     // Old site used curation_status, new site uses curationStatus
     let curationStatusJSONValue = scriptJSON.get("curation_status");
-    if (curationStatusJSONValue.isNull()) {
-      curationStatusJSONValue = scriptJSON.get("curationStatus");
-    }
+    if(curationStatusJSONValue) {
+      if (curationStatusJSONValue.isNull()) {
+        curationStatusJSONValue = scriptJSON.get("curationStatus");
+      }
 
-    if (curationStatusJSONValue.kind == JSONValueKind.STRING) {
-      let curationStatus = curationStatusJSONValue.toString();
-      project.curationStatus = curationStatus;
+      if (curationStatusJSONValue && curationStatusJSONValue.kind == JSONValueKind.STRING) {
+        let curationStatus = curationStatusJSONValue.toString();
+        project.curationStatus = curationStatus;
+      }
     }
   }
 

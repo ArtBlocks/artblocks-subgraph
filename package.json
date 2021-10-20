@@ -4,7 +4,7 @@
   "scripts": {
     "codegen": "graph codegen",
     "build": "graph build",
-    "deploy": "graph deploy --product hosted-service --ac --node https://api.thegraph.com/deploy/ --ipfs https://api.thegraph.com/ipfs/ ArtBlocks/art-blocks",
+    "deploy": "graph deploy --product hosted-service --ac --node https://api.thegraph.com/deploy/ --ipfs https://api.thegraph.com/ipfs/ xenoliss/dev-subgraph",
     "deploy-studio": "graph deploy --studio art-blocks",
     "deploy-ropsten-dev": "yarn prepare:ropsten-dev && graph deploy --product hosted-service --node https://api.thegraph.com/deploy/ --ipfs https://api.thegraph.com/ipfs/ ArtBlocks/art-blocks-dev",
     "deploy-ropsten-staging": "yarn prepare:ropsten-staging && graph deploy --product hosted-service --node https://api.thegraph.com/deploy/ --ipfs https://api.thegraph.com/ipfs/ ArtBlocks/art-blocks-artist-staging",
@@ -18,8 +18,8 @@
     "prepare:local": "mustache config/local.json subgraph.template.yaml > subgraph.yaml"
   },
   "dependencies": {
-    "@graphprotocol/graph-cli": "^0.21.0",
-    "@graphprotocol/graph-ts": "^0.20.1"
+    "@graphprotocol/graph-cli": "^0.22.4",
+    "@graphprotocol/graph-ts": "^0.22.1"
   },
   "devDependencies": {
     "mustache": "^4.1.0"
