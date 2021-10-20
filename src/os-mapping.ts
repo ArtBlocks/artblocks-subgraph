@@ -172,19 +172,20 @@ function _handleBundleSale(call: AtomicMatch_Call): void {
     for (let i = 0; i < tokenIdsList.length; i++) {
       let tokenId = tokenIdsList[i];
 
+      let fullTokenId = generateContractSpecificId(
+          Address.fromString(nftContractList[i]),
+          BigInt.fromString(tokenId)
+        );
+
       if (summaryTokensSold.length == 0) {
-        summaryTokensSold += tokenId;
+          summaryTokensSold += fullTokenId;
       } else {
-        summaryTokensSold += "::" + tokenId;
+        summaryTokensSold += "::" + fullTokenId;
       }
 
       // Get the asosciated Art Blocks token if any (might not be an AB token)
-      let token = Token.load(
-        generateContractSpecificId(
-          Address.fromString(nftContractList[i]),
-          BigInt.fromString(tokenId)
-        )
-      );
+      let token = Token.load(fullTokenId);
+
       if (token) {
         // Link both of them (NFT with OpenSeaSale)
         let tableEntryId = _buildTokenSaleLookupTableId(
