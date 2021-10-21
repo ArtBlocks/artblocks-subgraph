@@ -8,7 +8,7 @@ import {
   Token,
   OpenSeaSaleLookupTable,
 } from "../generated/schema";
-import { WYVERN_ATOMICIZER_ADDRESS, NULL_ADDRESS, TRANSFER_FROM_SELECTOR } from "./constants";
+import { WYVERN_ATOMICIZER_ADDRESS, NULL_ADDRESS, TRANSFER_FROM_SELECTOR, WYVERN_EXCHANGE_ADDRESS } from "./constants";
 import { generateContractSpecificId } from "./helpers";
 
 /** Call handlers */
@@ -53,16 +53,21 @@ function _handleSingleAssetSale(call: AtomicMatch_Call): void {
   log.warning("_handleSingleAssetSale", []);
 
   let callInputs = call.inputs;
+  let addrs: Address[] = callInputs.addrs ;
   let uints: BigInt[] = callInputs.uints;
-  let addrs: Address[] = callInputs.addrs;
+  let feeMethodsSidesKindsHowToCalls = callInputs.feeMethodsSidesKindsHowToCalls;
 
   // Only interested in Art Blocks sells
   let nftContract: Address = addrs[11];
   let contract = Contract.load(nftContract.toHexString());
   if (contract) {
-    // TODO: The price could be retrieved from the calculateMatchPrice_ method of OpenSea Smart Contract
-    let price: BigInt = uints[4];
 
+    let price: BigInt = _calculateMatchPrice(
+      feeMethodsSidesKindsHowToCalls[1], feeMethodsSidesKindsHowToCalls[2], uints[4],uints[5],uints[6], uints[7],
+      feeMethodsSidesKindsHowToCalls[5], feeMethodsSidesKindsHowToCalls[6], uints[13],uints[14],uints[15], uints[16],
+      addrs[10]
+    );
+    
     let buyerAdress: Address = addrs[1]; // Buyer.maker
     let sellerAdress: Address = addrs[8]; // Saler.maker
     let paymentTokenErc20Address: Address = addrs[6];
@@ -124,9 +129,13 @@ function _handleBundleSale(call: AtomicMatch_Call): void {
   let callInputs = call.inputs;
   let addrs: Address[] = callInputs.addrs;
   let uints: BigInt[] = callInputs.uints;
+  let feeMethodsSidesKindsHowToCalls = callInputs.feeMethodsSidesKindsHowToCalls;
 
-  // TODO: The price should be retrieved from the calculateMatchPrice_ method of OpenSea Smart Contract
-  let price: BigInt = uints[4];
+  let price: BigInt = _calculateMatchPrice(
+    feeMethodsSidesKindsHowToCalls[1], feeMethodsSidesKindsHowToCalls[2], uints[4],uints[5],uints[6], uints[7],
+    feeMethodsSidesKindsHowToCalls[5], feeMethodsSidesKindsHowToCalls[6], uints[13],uints[14],uints[15], uints[16],
+    addrs[10]
+  );
 
   let buyerAdress: Address = addrs[1]; // Buyer.maker
   let sellerAdress: Address = addrs[8]; // Saler.maker
@@ -255,7 +264,7 @@ function _guardedArrayReplace(
   bigIntReplacement = bigIntReplacement.bitAnd(bigIntMask);
   bigIntgArray = bigIntgArray.bitOr(bigIntReplacement);
   // let callDataHexString = bigIntgArray.toHexString();
-  return (changetype<Bytes>(ByteArray.fromBigInt(bigIntgArray).reverse()));
+  return (changetype<Bytes>(Bytes.fromBigInt(bigIntgArray).reverse()));
 }
 
 /**
@@ -320,7 +329,7 @@ function _getNftContractAddressAndTokenIdFromCallData(
   
   let calldataOffset = 0;
   for(let i = 0; i < decodedAddresses.length; i++) {
-    let callDataLength = decodedCalldataIndividualLengths[1];
+    let callDataLength = decodedCalldataIndividualLengths[i];
     let calldata: Bytes = changetype<Bytes>(callDatas.subarray(calldataOffset, calldataOffset + callDataLength));
 
     // Sometime the call data is not a transferFrom (ie: https://etherscan.io/tx/0xe8629bfc57ab619a442f027c46d63e1f101bd934232405fa8e8eaf156bfca848) 
@@ -362,3 +371,44 @@ function _buildTokenSaleLookupTableId(projectId: string, tokenId: string, saleId
   return projectId + "::" + tokenId + "::" + saleId;
 }
 
+/**
+ * @param side See `calculateFinalPrice` of WyvernExchange
+ * @param saleKind See `calculateFinalPrice` of WyvernExchange
+ * @param basePrice See `calculateFinalPrice` of WyvernExchange
+ * @param extra See `calculateFinalPrice` of WyvernExchange
+ * @param linstingTime See `calculateFinalPrice` of WyvernExchange
+ * @param exprirationTime See `calculateFinalPrice` of WyvernExchange
+ * @returns The final price of the given order params. The price is computed from the contract method
+ */
+function _calculateFinalPrice(side: i32, saleKind: i32, basePrice: BigInt, extra: BigInt, linstingTime: BigInt, exprirationTime: BigInt): BigInt {
+  let wyvern = WyvernExchange.bind(changetype<Address>(Address.fromHexString(WYVERN_EXCHANGE_ADDRESS)));
+  return wyvern.calculateFinalPrice(side, saleKind, basePrice, extra, linstingTime, exprirationTime);
+}
+
+/**
+ * Necessary function because of graph bugs whe calling `calculateMatchPrice_` of WyvernExchange, see: https://github.com/graphprotocol/graph-ts/issues/211
+ * @param buySide See `calculateFinalPrice` of WyvernExchange
+ * @param buySaleKind See `calculateFinalPrice` of WyvernExchange
+ * @param buyBasePrice See `calculateFinalPrice` of WyvernExchange
+ * @param buyExtra See `calculateFinalPrice` of WyvernExchange
+ * @param buyLinstingTime See `calculateFinalPrice` of WyvernExchange
+ * @param buyExprirationTime See `calculateFinalPrice` of WyvernExchange
+ * @param sellSide See `calculateFinalPrice` of WyvernExchange
+ * @param sellSaleKind See `calculateFinalPrice` of WyvernExchange
+ * @param sellBasePrice See `calculateFinalPrice` of WyvernExchange
+ * @param sellExtra See `calculateFinalPrice` of WyvernExchange
+ * @param sellLinstingTime See `calculateFinalPrice` of WyvernExchange
+ * @param sellExprirationTime See `calculateFinalPrice` of WyvernExchange
+ * @param sellFeeRecipient See `calculateFinalPrice` of WyvernExchange
+ * @returns The match price of the given buy and sell orders
+ */
+function _calculateMatchPrice(
+  buySide: i32, buySaleKind: i32, buyBasePrice: BigInt, buyExtra: BigInt, buyLinstingTime: BigInt, buyExprirationTime: BigInt,
+  sellSide: i32, sellSaleKind: i32, sellBasePrice: BigInt, sellExtra: BigInt, sellLinstingTime: BigInt, sellExprirationTime: BigInt,
+  sellFeeRecipient: Address
+): BigInt {
+  let buyPrice = _calculateFinalPrice(buySide, buySaleKind, buyBasePrice, buyExtra, buyLinstingTime, buyExprirationTime);
+  let sellPrice = _calculateFinalPrice(sellSide, sellSaleKind, sellBasePrice, sellExtra, sellLinstingTime, sellExprirationTime);
+
+  return sellFeeRecipient.toHexString() === NULL_ADDRESS ? sellPrice : buyPrice;
+}
