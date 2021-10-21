@@ -50,8 +50,6 @@ export function handleAtomicMatch_(call: AtomicMatch_Call): void {
  *              A "normal" sale is a sale that is not a bundle (only contains one asset).
  */
 function _handleSingleAssetSale(call: AtomicMatch_Call): void {
-  log.warning("_handleSingleAssetSale", []);
-
   let callInputs = call.inputs;
   let addrs: Address[] = callInputs.addrs ;
   let uints: BigInt[] = callInputs.uints;
@@ -124,8 +122,6 @@ function _handleSingleAssetSale(call: AtomicMatch_Call): void {
  *              A "bundle" sale is a sale that contains several assets embeded in the same, atomic, transaction.
  */
 function _handleBundleSale(call: AtomicMatch_Call): void {
-  log.warning("_handleBundleSale", []);
-
   let callInputs = call.inputs;
   let addrs: Address[] = callInputs.addrs;
   let uints: BigInt[] = callInputs.uints;
@@ -147,6 +143,7 @@ function _handleBundleSale(call: AtomicMatch_Call): void {
     callInputs.calldataSell,
     callInputs.replacementPatternBuy
   );
+
 
   // Fetch the token IDs list that has been sold from the call data for this bundle sale
   let results = _getNftContractAddressAndTokenIdFromCallData(mergedCallDataStr);
@@ -214,8 +211,7 @@ function _handleBundleSale(call: AtomicMatch_Call): void {
         openSeaSaleLookupTable.blockNumber = openSeaSale.blockNumber;
         openSeaSaleLookupTable.save();
       }
-    }
-
+    }  
     openSeaSale.summaryTokensSold = summaryTokensSold;
     openSeaSale.save();
   }
@@ -273,9 +269,7 @@ function _guardedArrayReplace(
  *                          to trigger bundle sales (looping over NFT and calling transferFrom for each)
  * @returns An array of 2 cells: [listOfContractAddress][listOfTokenId]
  */
-function _getNftContractAddressAndTokenIdFromCallData(
-  atomicizeCallData: Bytes
-): string[][] {
+function _getNftContractAddressAndTokenIdFromCallData(atomicizeCallData: Bytes): string[][] {
   let dataWithoutFunctionSelector: Bytes = changetype<Bytes>(atomicizeCallData.subarray(4));
   
   // As function encoding is not handled yet by the lib, we first need to reach the offset of where the 
@@ -335,7 +329,7 @@ function _getNftContractAddressAndTokenIdFromCallData(
     // Sometime the call data is not a transferFrom (ie: https://etherscan.io/tx/0xe8629bfc57ab619a442f027c46d63e1f101bd934232405fa8e8eaf156bfca848) 
     // Ignore if not transferFrom
     let functionSelector: string =  changetype<Bytes>(calldata.subarray(0,4)).toHexString();
-    if(functionSelector === TRANSFER_FROM_SELECTOR) {
+    if(functionSelector == TRANSFER_FROM_SELECTOR) {
       nftContractsAddrsList.push(decodedAddresses[i].toHexString());
       tokenIds.push(_getSingleTokenIdFromTransferFromCallData(calldata));
     }
@@ -410,5 +404,5 @@ function _calculateMatchPrice(
   let buyPrice = _calculateFinalPrice(buySide, buySaleKind, buyBasePrice, buyExtra, buyLinstingTime, buyExprirationTime);
   let sellPrice = _calculateFinalPrice(sellSide, sellSaleKind, sellBasePrice, sellExtra, sellLinstingTime, sellExprirationTime);
 
-  return sellFeeRecipient.toHexString() === NULL_ADDRESS ? sellPrice : buyPrice;
+  return sellFeeRecipient.toHexString() == NULL_ADDRESS ? sellPrice : buyPrice;
 }
