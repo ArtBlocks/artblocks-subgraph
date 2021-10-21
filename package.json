@@ -4,8 +4,8 @@
   "scripts": {
     "codegen": "graph codegen",
     "build": "graph build",
-    "deploy": "graph deploy --product hosted-service --ac --node https://api.thegraph.com/deploy/ --ipfs https://api.thegraph.com/ipfs/ xenoliss/dev-subgraph",
-    "deploy-studio": "graph deploy --studio artblocks-dev",
+    "deploy": "graph deploy --product hosted-service --ac --node https://api.thegraph.com/deploy/ --ipfs https://api.thegraph.com/ipfs/ ArtBlocks/art-blocks",
+    "deploy-studio": "graph deploy --studio art-blocks",
     "deploy-ropsten-dev": "yarn prepare:ropsten-dev && graph deploy --product hosted-service --node https://api.thegraph.com/deploy/ --ipfs https://api.thegraph.com/ipfs/ ArtBlocks/art-blocks-dev",
     "deploy-ropsten-staging": "yarn prepare:ropsten-staging && graph deploy --product hosted-service --node https://api.thegraph.com/deploy/ --ipfs https://api.thegraph.com/ipfs/ ArtBlocks/art-blocks-artist-staging",
     "create-local": "graph create --node http://localhost:8020/ ArtBlocks/art-blocks",
