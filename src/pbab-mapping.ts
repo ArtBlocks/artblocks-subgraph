@@ -283,7 +283,7 @@ export function handleAddMintWhitelisted(call: AddMintWhitelistedCall): void {
   contractEntity.save();
 }
 
-export function handleRemoveMintWhitelistedPBAB(
+export function handleRemoveMintWhitelisted(
   call: RemoveMintWhitelistedCall
 ): void {
   let contract = GenArt721Core2PBAB.bind(call.to);
