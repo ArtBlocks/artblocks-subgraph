@@ -73,7 +73,7 @@ export function handleMint(event: Mint): void {
   );
   let project = Project.load(projectId);
 
-  if(project) {
+  if (project) {
     let invocation = project.invocations;
 
     token.tokenId = event.params._tokenId;
@@ -130,7 +130,7 @@ export function handleTransfer(event: Transfer): void {
     );
 
     if (
-      prevAccountProject&&
+      prevAccountProject &&
       (prevAccountProject as AccountProject).count > 1
     ) {
       prevAccountProject.count -= 1;
@@ -570,12 +570,15 @@ export function handleUpdateProjectScriptJSON(
 
     // Old site used curation_status, new site uses curationStatus
     let curationStatusJSONValue = scriptJSON.get("curation_status");
-    if(curationStatusJSONValue) {
+    if (curationStatusJSONValue) {
       if (curationStatusJSONValue.isNull()) {
         curationStatusJSONValue = scriptJSON.get("curationStatus");
       }
 
-      if (curationStatusJSONValue && curationStatusJSONValue.kind == JSONValueKind.STRING) {
+      if (
+        curationStatusJSONValue &&
+        curationStatusJSONValue.kind == JSONValueKind.STRING
+      ) {
         let curationStatus = curationStatusJSONValue.toString();
         project.curationStatus = curationStatus;
       }

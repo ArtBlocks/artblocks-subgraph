@@ -1,14 +1,29 @@
-import { Address, BigInt, ByteArray, Bytes, ethereum, log } from "@graphprotocol/graph-ts";
+import {
+  Address,
+  BigInt,
+  ByteArray,
+  Bytes,
+  ethereum,
+  log
+} from "@graphprotocol/graph-ts";
 
-import { AtomicMatch_Call, WyvernExchange } from "../generated/WyvernExchange/WyvernExchange";
+import {
+  AtomicMatch_Call,
+  WyvernExchange
+} from "../generated/WyvernExchange/WyvernExchange";
 
 import {
   Contract,
   OpenSeaSale,
   Token,
-  OpenSeaSaleLookupTable,
+  OpenSeaSaleLookupTable
 } from "../generated/schema";
-import { WYVERN_ATOMICIZER_ADDRESS, NULL_ADDRESS, TRANSFER_FROM_SELECTOR, WYVERN_EXCHANGE_ADDRESS } from "./constants";
+import {
+  WYVERN_ATOMICIZER_ADDRESS,
+  NULL_ADDRESS,
+  TRANSFER_FROM_SELECTOR,
+  WYVERN_EXCHANGE_ADDRESS
+} from "./constants";
 import { generateContractSpecificId } from "./helpers";
 
 /** Call handlers */
@@ -51,21 +66,31 @@ export function handleAtomicMatch_(call: AtomicMatch_Call): void {
  */
 function _handleSingleAssetSale(call: AtomicMatch_Call): void {
   let callInputs = call.inputs;
-  let addrs: Address[] = callInputs.addrs ;
+  let addrs: Address[] = callInputs.addrs;
   let uints: BigInt[] = callInputs.uints;
-  let feeMethodsSidesKindsHowToCalls = callInputs.feeMethodsSidesKindsHowToCalls;
+  let feeMethodsSidesKindsHowToCalls =
+    callInputs.feeMethodsSidesKindsHowToCalls;
 
   // Only interested in Art Blocks sells
   let nftContract: Address = addrs[11];
   let contract = Contract.load(nftContract.toHexString());
   if (contract) {
-
     let price: BigInt = _calculateMatchPrice(
-      feeMethodsSidesKindsHowToCalls[1], feeMethodsSidesKindsHowToCalls[2], uints[4],uints[5],uints[6], uints[7],
-      feeMethodsSidesKindsHowToCalls[5], feeMethodsSidesKindsHowToCalls[6], uints[13],uints[14],uints[15], uints[16],
+      feeMethodsSidesKindsHowToCalls[1],
+      feeMethodsSidesKindsHowToCalls[2],
+      uints[4],
+      uints[5],
+      uints[6],
+      uints[7],
+      feeMethodsSidesKindsHowToCalls[5],
+      feeMethodsSidesKindsHowToCalls[6],
+      uints[13],
+      uints[14],
+      uints[15],
+      uints[16],
       addrs[10]
     );
-    
+
     let buyerAdress: Address = addrs[1]; // Buyer.maker
     let sellerAdress: Address = addrs[8]; // Saler.maker
     let paymentTokenErc20Address: Address = addrs[6];
@@ -101,10 +126,12 @@ function _handleSingleAssetSale(call: AtomicMatch_Call): void {
       openSeaSale.save();
 
       // Create the associated entry in the Nft <=> OpenSeaSale lookup table
-      let tableEntryId = _buildTokenSaleLookupTableId(token.project, token.id, openSeaSaleId);
-      let openSeaSaleLookupTable = new OpenSeaSaleLookupTable(
-        tableEntryId
+      let tableEntryId = _buildTokenSaleLookupTableId(
+        token.project,
+        token.id,
+        openSeaSaleId
       );
+      let openSeaSaleLookupTable = new OpenSeaSaleLookupTable(tableEntryId);
       openSeaSaleLookupTable.token = token.id;
       openSeaSaleLookupTable.project = token.project;
       openSeaSaleLookupTable.openSeaSale = openSeaSale.id;
@@ -125,11 +152,22 @@ function _handleBundleSale(call: AtomicMatch_Call): void {
   let callInputs = call.inputs;
   let addrs: Address[] = callInputs.addrs;
   let uints: BigInt[] = callInputs.uints;
-  let feeMethodsSidesKindsHowToCalls = callInputs.feeMethodsSidesKindsHowToCalls;
+  let feeMethodsSidesKindsHowToCalls =
+    callInputs.feeMethodsSidesKindsHowToCalls;
 
   let price: BigInt = _calculateMatchPrice(
-    feeMethodsSidesKindsHowToCalls[1], feeMethodsSidesKindsHowToCalls[2], uints[4],uints[5],uints[6], uints[7],
-    feeMethodsSidesKindsHowToCalls[5], feeMethodsSidesKindsHowToCalls[6], uints[13],uints[14],uints[15], uints[16],
+    feeMethodsSidesKindsHowToCalls[1],
+    feeMethodsSidesKindsHowToCalls[2],
+    uints[4],
+    uints[5],
+    uints[6],
+    uints[7],
+    feeMethodsSidesKindsHowToCalls[5],
+    feeMethodsSidesKindsHowToCalls[6],
+    uints[13],
+    uints[14],
+    uints[15],
+    uints[16],
     addrs[10]
   );
 
@@ -143,7 +181,6 @@ function _handleBundleSale(call: AtomicMatch_Call): void {
     callInputs.calldataSell,
     callInputs.replacementPatternBuy
   );
-
 
   // Fetch the token IDs list that has been sold from the call data for this bundle sale
   let results = _getNftContractAddressAndTokenIdFromCallData(mergedCallDataStr);
@@ -179,12 +216,12 @@ function _handleBundleSale(call: AtomicMatch_Call): void {
       let tokenId = tokenIdsList[i];
 
       let fullTokenId = generateContractSpecificId(
-          Address.fromString(nftContractList[i]),
-          BigInt.fromString(tokenId)
-        );
+        Address.fromString(nftContractList[i]),
+        BigInt.fromString(tokenId)
+      );
 
       if (summaryTokensSold.length == 0) {
-          summaryTokensSold += fullTokenId;
+        summaryTokensSold += fullTokenId;
       } else {
         summaryTokensSold += "::" + fullTokenId;
       }
@@ -200,10 +237,8 @@ function _handleBundleSale(call: AtomicMatch_Call): void {
           openSeaSaleId
         );
 
-        let openSeaSaleLookupTable = new OpenSeaSaleLookupTable(
-          tableEntryId
-        );
-        
+        let openSeaSaleLookupTable = new OpenSeaSaleLookupTable(tableEntryId);
+
         openSeaSaleLookupTable.token = token.id;
         openSeaSaleLookupTable.project = token.project;
         openSeaSaleLookupTable.openSeaSale = openSeaSale.id;
@@ -211,7 +246,7 @@ function _handleBundleSale(call: AtomicMatch_Call): void {
         openSeaSaleLookupTable.blockNumber = openSeaSale.blockNumber;
         openSeaSaleLookupTable.save();
       }
-    }  
+    }
     openSeaSale.summaryTokensSold = summaryTokensSold;
     openSeaSale.save();
   }
@@ -221,7 +256,7 @@ function _handleBundleSale(call: AtomicMatch_Call): void {
  * Return true if the associated sale was private.
  *
  * @param call The original call data
- * @returns true if the sale was private else false 
+ * @returns true if the sale was private else false
  */
 function _isPrivateSale(call: AtomicMatch_Call): boolean {
   /**
@@ -260,7 +295,7 @@ function _guardedArrayReplace(
   bigIntReplacement = bigIntReplacement.bitAnd(bigIntMask);
   bigIntgArray = bigIntgArray.bitOr(bigIntReplacement);
   // let callDataHexString = bigIntgArray.toHexString();
-  return (changetype<Bytes>(Bytes.fromBigInt(bigIntgArray).reverse()));
+  return changetype<Bytes>(Bytes.fromBigInt(bigIntgArray).reverse());
 }
 
 /**
@@ -269,74 +304,98 @@ function _guardedArrayReplace(
  *                          to trigger bundle sales (looping over NFT and calling transferFrom for each)
  * @returns An array of 2 cells: [listOfContractAddress][listOfTokenId]
  */
-function _getNftContractAddressAndTokenIdFromCallData(atomicizeCallData: Bytes): string[][] {
-  let dataWithoutFunctionSelector: Bytes = changetype<Bytes>(atomicizeCallData.subarray(4));
-  
-  // As function encoding is not handled yet by the lib, we first need to reach the offset of where the 
+function _getNftContractAddressAndTokenIdFromCallData(
+  atomicizeCallData: Bytes
+): string[][] {
+  let dataWithoutFunctionSelector: Bytes = changetype<Bytes>(
+    atomicizeCallData.subarray(4)
+  );
+
+  // As function encoding is not handled yet by the lib, we first need to reach the offset of where the
   // actual params are located. As they are all dynamic we can just fetch the offset of the first param
   // and then start decoding params from there as known sized types
-  let offset: i32 = ethereum.decode(
-    "uint256", 
-    changetype<Bytes>(dataWithoutFunctionSelector)
-  )!.toBigInt().toI32();
-  
+  let offset: i32 = ethereum
+    .decode("uint256", changetype<Bytes>(dataWithoutFunctionSelector))!
+    .toBigInt()
+    .toI32();
+
   // Get the length of the first array. All arrays must have same length so fetching only this one is enough
-  let arrayLength: i32 = ethereum.decode(
-    "uint256", 
-    changetype<Bytes>(dataWithoutFunctionSelector.subarray(offset))
-  )!.toBigInt().toI32();
+  let arrayLength: i32 = ethereum
+    .decode(
+      "uint256",
+      changetype<Bytes>(dataWithoutFunctionSelector.subarray(offset))
+    )!
+    .toBigInt()
+    .toI32();
   offset += 1 * 32;
-  
+
   // Now that we know the size of each params we can decode them one by one as know sized types
   // function atomicize(address[] addrs,uint256[] values,uint256[] calldataLengths,bytes calldatas)
-  let decodedAddresses: Address[] = ethereum.decode(
-    `address[${arrayLength}]`, 
-    changetype<Bytes>(dataWithoutFunctionSelector.subarray(offset))
-  )!.toAddressArray();
+  let decodedAddresses: Address[] = ethereum
+    .decode(
+      `address[${arrayLength}]`,
+      changetype<Bytes>(dataWithoutFunctionSelector.subarray(offset))
+    )!
+    .toAddressArray();
   offset += arrayLength * 32;
-  
+
   offset += 1 * 32;
   // We don't need those values, just move the offset forward
   // let decodedValues: BigInt[] = ethereum.decode(
-  //   `uint256[${arrayLength}]`, 
+  //   `uint256[${arrayLength}]`,
   //   changetype<Bytes>(dataWithoutFunctionSelector.subarray(offset))
   // )!.toBigIntArray();
   offset += arrayLength * 32;
-  
+
   offset += 1 * 32;
-  let decodedCalldataIndividualLengths = ethereum.decode(
-    `uint256[${arrayLength}]`, 
-    changetype<Bytes>(dataWithoutFunctionSelector.subarray(offset))
-  )!.toBigIntArray().map<i32>(e => e.toI32());
+  let decodedCalldataIndividualLengths = ethereum
+    .decode(
+      `uint256[${arrayLength}]`,
+      changetype<Bytes>(dataWithoutFunctionSelector.subarray(offset))
+    )!
+    .toBigIntArray()
+    .map<i32>(e => e.toI32());
   offset += arrayLength * 32;
-  
-  let decodedCallDatasLength = ethereum.decode(
-    "uint256", 
-    changetype<Bytes>(dataWithoutFunctionSelector.subarray(offset))
-  )!.toBigInt().toI32();
+
+  let decodedCallDatasLength = ethereum
+    .decode(
+      "uint256",
+      changetype<Bytes>(dataWithoutFunctionSelector.subarray(offset))
+    )!
+    .toBigInt()
+    .toI32();
   offset += 1 * 32;
 
-  let callDatas: Bytes = changetype<Bytes>(dataWithoutFunctionSelector.subarray(offset, offset + decodedCallDatasLength));
+  let callDatas: Bytes = changetype<Bytes>(
+    dataWithoutFunctionSelector.subarray(
+      offset,
+      offset + decodedCallDatasLength
+    )
+  );
 
   let nftContractsAddrsList: string[] = [];
   let tokenIds: string[] = [];
-  
-  let calldataOffset = 0;
-  for(let i = 0; i < decodedAddresses.length; i++) {
-    let callDataLength = decodedCalldataIndividualLengths[i];
-    let calldata: Bytes = changetype<Bytes>(callDatas.subarray(calldataOffset, calldataOffset + callDataLength));
 
-    // Sometime the call data is not a transferFrom (ie: https://etherscan.io/tx/0xe8629bfc57ab619a442f027c46d63e1f101bd934232405fa8e8eaf156bfca848) 
+  let calldataOffset = 0;
+  for (let i = 0; i < decodedAddresses.length; i++) {
+    let callDataLength = decodedCalldataIndividualLengths[i];
+    let calldata: Bytes = changetype<Bytes>(
+      callDatas.subarray(calldataOffset, calldataOffset + callDataLength)
+    );
+
+    // Sometime the call data is not a transferFrom (ie: https://etherscan.io/tx/0xe8629bfc57ab619a442f027c46d63e1f101bd934232405fa8e8eaf156bfca848)
     // Ignore if not transferFrom
-    let functionSelector: string =  changetype<Bytes>(calldata.subarray(0,4)).toHexString();
-    if(functionSelector == TRANSFER_FROM_SELECTOR) {
+    let functionSelector: string = changetype<Bytes>(
+      calldata.subarray(0, 4)
+    ).toHexString();
+    if (functionSelector == TRANSFER_FROM_SELECTOR) {
       nftContractsAddrsList.push(decodedAddresses[i].toHexString());
       tokenIds.push(_getSingleTokenIdFromTransferFromCallData(calldata));
     }
     calldataOffset += callDataLength;
   }
 
-  return [nftContractsAddrsList,tokenIds];
+  return [nftContractsAddrsList, tokenIds];
 }
 
 /**
@@ -346,22 +405,29 @@ function _getNftContractAddressAndTokenIdFromCallData(atomicizeCallData: Bytes):
  * @returns The tokenId (string) of the transfer
  */
 function _getSingleTokenIdFromTransferFromCallData(
-  transferFromData: Bytes,
+  transferFromData: Bytes
 ): string {
-
-  let dataWithoutFunctionSelector = changetype<Bytes>(transferFromData.subarray(4));
-  let decoded = ethereum.decode("(address,address,uint256)", dataWithoutFunctionSelector)!.toTuple();
+  let dataWithoutFunctionSelector = changetype<Bytes>(
+    transferFromData.subarray(4)
+  );
+  let decoded = ethereum
+    .decode("(address,address,uint256)", dataWithoutFunctionSelector)!
+    .toTuple();
   return decoded[2].toBigInt().toString();
 }
 
 /**
- * 
+ *
  * @param projectId The projectId id
  * @param tokenId The token id
  * @param saleId The sale id (eth tx hash)
  * @returns The corresponding lookup table id
  */
-function _buildTokenSaleLookupTableId(projectId: string, tokenId: string, saleId: string): string {
+function _buildTokenSaleLookupTableId(
+  projectId: string,
+  tokenId: string,
+  saleId: string
+): string {
   return projectId + "::" + tokenId + "::" + saleId;
 }
 
@@ -374,9 +440,25 @@ function _buildTokenSaleLookupTableId(projectId: string, tokenId: string, saleId
  * @param exprirationTime See `calculateFinalPrice` of WyvernExchange
  * @returns The final price of the given order params. The price is computed from the contract method
  */
-function _calculateFinalPrice(side: i32, saleKind: i32, basePrice: BigInt, extra: BigInt, linstingTime: BigInt, exprirationTime: BigInt): BigInt {
-  let wyvern = WyvernExchange.bind(changetype<Address>(Address.fromHexString(WYVERN_EXCHANGE_ADDRESS)));
-  return wyvern.calculateFinalPrice(side, saleKind, basePrice, extra, linstingTime, exprirationTime);
+function _calculateFinalPrice(
+  side: i32,
+  saleKind: i32,
+  basePrice: BigInt,
+  extra: BigInt,
+  linstingTime: BigInt,
+  exprirationTime: BigInt
+): BigInt {
+  let wyvern = WyvernExchange.bind(
+    changetype<Address>(Address.fromHexString(WYVERN_EXCHANGE_ADDRESS))
+  );
+  return wyvern.calculateFinalPrice(
+    side,
+    saleKind,
+    basePrice,
+    extra,
+    linstingTime,
+    exprirationTime
+  );
 }
 
 /**
@@ -397,12 +479,36 @@ function _calculateFinalPrice(side: i32, saleKind: i32, basePrice: BigInt, extra
  * @returns The match price of the given buy and sell orders
  */
 function _calculateMatchPrice(
-  buySide: i32, buySaleKind: i32, buyBasePrice: BigInt, buyExtra: BigInt, buyLinstingTime: BigInt, buyExprirationTime: BigInt,
-  sellSide: i32, sellSaleKind: i32, sellBasePrice: BigInt, sellExtra: BigInt, sellLinstingTime: BigInt, sellExprirationTime: BigInt,
+  buySide: i32,
+  buySaleKind: i32,
+  buyBasePrice: BigInt,
+  buyExtra: BigInt,
+  buyLinstingTime: BigInt,
+  buyExprirationTime: BigInt,
+  sellSide: i32,
+  sellSaleKind: i32,
+  sellBasePrice: BigInt,
+  sellExtra: BigInt,
+  sellLinstingTime: BigInt,
+  sellExprirationTime: BigInt,
   sellFeeRecipient: Address
 ): BigInt {
-  let buyPrice = _calculateFinalPrice(buySide, buySaleKind, buyBasePrice, buyExtra, buyLinstingTime, buyExprirationTime);
-  let sellPrice = _calculateFinalPrice(sellSide, sellSaleKind, sellBasePrice, sellExtra, sellLinstingTime, sellExprirationTime);
+  let buyPrice = _calculateFinalPrice(
+    buySide,
+    buySaleKind,
+    buyBasePrice,
+    buyExtra,
+    buyLinstingTime,
+    buyExprirationTime
+  );
+  let sellPrice = _calculateFinalPrice(
+    sellSide,
+    sellSaleKind,
+    sellBasePrice,
+    sellExtra,
+    sellLinstingTime,
+    sellExprirationTime
+  );
 
   return sellFeeRecipient.toHexString() == NULL_ADDRESS ? sellPrice : buyPrice;
 }

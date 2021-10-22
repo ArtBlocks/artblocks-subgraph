@@ -92,7 +92,7 @@ export function handleMint(event: Mint): void {
   );
 
   let project = Project.load(projectId);
-  if(project) {
+  if (project) {
     let invocation = project.invocations;
 
     token.tokenId = event.params._tokenId;
@@ -291,11 +291,7 @@ export function handleProjectUpdated(event: ProjectUpdated): void {
       project.locked = scriptInfo.value4;
       project.paused = scriptInfo.value5;
     } else if (update == "script") {
-      refreshProjectScript(
-        contract,
-        id,
-        event.block.timestamp
-      );
+      refreshProjectScript(contract, id, event.block.timestamp);
     } else if (update == "royaltyPercentage") {
       project.royaltyPercentage = contract.projectIdToSecondaryMarketRoyaltyPercentage(
         id
@@ -333,12 +329,9 @@ export function handlePlatformWhitelistUpdated(
   event: PlatformWhitelistUpdated
 ): void {
   let contract = GenArt721CorePlus.bind(event.address);
-  let contractEntity = refreshContract(
-    contract,
-    event.block.timestamp
-  );
+  let contractEntity = refreshContract(contract, event.block.timestamp);
 
-  if(contractEntity) {
+  if (contractEntity) {
     let update = event.params.update;
     if (update == "addWhitelisted") {
       let whitelisting = new Whitelisting(
@@ -381,8 +374,8 @@ export function handleAddProject(call: AddProjectCall): void {
   let projectId: BigInt;
   if (!contractEntity) {
     contractEntity = refreshContract(contract, call.block.timestamp);
-    if(contractEntity) {
-       // In this case nextProjectId has already been incremented
+    if (contractEntity) {
+      // In this case nextProjectId has already been incremented
       projectId = contractEntity.nextProjectId.minus(BigInt.fromI32(1));
     }
   } else {
@@ -437,7 +430,7 @@ export function handleAddProject(call: AddProjectCall): void {
 
   project.save();
 
-  if(contractEntity) {
+  if (contractEntity) {
     contractEntity.nextProjectId = contractEntity.nextProjectId.plus(
       BigInt.fromI32(1)
     );
@@ -455,7 +448,7 @@ export function handleAddWhitelisted(call: AddWhitelistedCall): void {
   let contract = GenArt721Core.bind(call.to);
   let contractEntity = refreshContract(contract, call.block.timestamp);
 
-  if(contractEntity) {
+  if (contractEntity) {
     addWhitelisting(contractEntity.id, call.inputs._address.toHexString());
   }
 }
@@ -477,7 +470,7 @@ export function handleRemoveWhitelisted(call: RemoveWhitelistedCall): void {
   let contract = GenArt721Core.bind(call.to);
   let contractEntity = refreshContract(contract, call.block.timestamp);
 
-  if(contractEntity) {
+  if (contractEntity) {
     removeWhitelisting(contractEntity.id, call.inputs._address.toHexString());
   }
 }
@@ -497,7 +490,7 @@ export function handleAddMintWhitelisted(call: AddMintWhitelistedCall): void {
   let contract = GenArt721Core.bind(call.to);
   let contractEntity = refreshContract(contract, call.block.timestamp);
 
-  if(contractEntity) {
+  if (contractEntity) {
     contractEntity.mintWhitelisted = contractEntity.mintWhitelisted
       ? contractEntity.mintWhitelisted.concat([call.inputs._address])
       : [call.inputs._address];
@@ -511,7 +504,7 @@ export function handleRemoveMintWhitelisted(
   let contract = GenArt721Core.bind(call.to);
   let contractEntity = refreshContract(contract, call.block.timestamp);
 
-  if(contractEntity) {
+  if (contractEntity) {
     removeMintWhitelisting(contractEntity, call.inputs._address);
   }
 }
@@ -857,13 +850,15 @@ export function handleUpdateProjectScriptJSON(
 
     // Old site used curation_status, new site uses curationStatus
     let curationStatusJSONValue = scriptJSON.get("curation_status");
-    if(curationStatusJSONValue) {
-
+    if (curationStatusJSONValue) {
       if (curationStatusJSONValue.isNull()) {
         curationStatusJSONValue = scriptJSON.get("curationStatus");
       }
-      
-      if (curationStatusJSONValue && curationStatusJSONValue.kind == JSONValueKind.STRING) {
+
+      if (
+        curationStatusJSONValue &&
+        curationStatusJSONValue.kind == JSONValueKind.STRING
+      ) {
         let curationStatus = curationStatusJSONValue.toString();
         project.curationStatus = curationStatus;
       }
@@ -902,9 +897,12 @@ export function handleUpdateProjectWebsite(
 
 /** HELPERS ***/
 function refreshContract<T>(contract: T, timestamp: BigInt): Contract | null {
-  if(!(contract instanceof GenArt721Core) && !(contract instanceof GenArt721CorePlus) ) {
+  if (
+    !(contract instanceof GenArt721Core) &&
+    !(contract instanceof GenArt721CorePlus)
+  ) {
     return null;
-  } 
+  }
 
   let admin = contract.admin();
   let artblocksAddress = contract.artblocksAddress();
@@ -944,10 +942,12 @@ function refreshProjectScript<T>(
   projectId: BigInt,
   timestamp: BigInt
 ): void {
-
-  if(!(contract instanceof GenArt721Core) && !(contract instanceof GenArt721CorePlus) ) {
+  if (
+    !(contract instanceof GenArt721Core) &&
+    !(contract instanceof GenArt721CorePlus)
+  ) {
     return;
-  } 
+  }
 
   let project = new Project(
     generateContractSpecificId(contract._address, projectId)
