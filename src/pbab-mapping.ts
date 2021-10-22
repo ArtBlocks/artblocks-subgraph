@@ -72,39 +72,42 @@ export function handleMint(event: Mint): void {
     event.params._projectId
   );
   let project = Project.load(projectId);
-  let invocation = project.invocations;
 
-  token.tokenId = event.params._tokenId;
-  token.contract = event.address.toHexString();
-  token.project = projectId;
-  token.owner = event.params._to.toHexString();
-  token.hash = contract.tokenIdToHash(event.params._tokenId);
-  token.invocation = invocation;
-  token.createdAt = event.block.timestamp;
-  token.updatedAt = event.block.timestamp;
-  token.transactionHash = event.transaction.hash;
-  token.save();
+  if(project) {
+    let invocation = project.invocations;
 
-  project.invocations = invocation.plus(BigInt.fromI32(1));
-  if (project.invocations == project.maxInvocations) {
-    project.complete = true;
-    project.updatedAt = event.block.timestamp;
+    token.tokenId = event.params._tokenId;
+    token.contract = event.address.toHexString();
+    token.project = projectId;
+    token.owner = event.params._to.toHexString();
+    token.hash = contract.tokenIdToHash(event.params._tokenId);
+    token.invocation = invocation;
+    token.createdAt = event.block.timestamp;
+    token.updatedAt = event.block.timestamp;
+    token.transactionHash = event.transaction.hash;
+    token.save();
+
+    project.invocations = invocation.plus(BigInt.fromI32(1));
+    if (project.invocations == project.maxInvocations) {
+      project.complete = true;
+      project.updatedAt = event.block.timestamp;
+    }
+    project.save();
+
+    let account = new Account(token.owner);
+    account.save();
+
+    let accountProjectId = generateAccountProjectId(account.id, project.id);
+    let accountProject = AccountProject.load(accountProjectId);
+    if (!accountProject) {
+      accountProject = new AccountProject(accountProjectId);
+      accountProject.account = account.id;
+      accountProject.project = project.id;
+      accountProject.count = 0;
+    }
+    accountProject.count += 1;
+    accountProject.save();
   }
-  project.save();
-
-  let account = new Account(token.owner);
-  account.save();
-
-  let accountProjectId = generateAccountProjectId(account.id, project.id);
-  let accountProject = AccountProject.load(accountProjectId);
-  if (accountProject == null) {
-    accountProject = new AccountProject(accountProjectId);
-    accountProject.account = account.id;
-    accountProject.project = project.id;
-    accountProject.count = 0;
-  }
-  accountProject.count += 1;
-  accountProject.save();
 }
 
 // Update token owner on transfer
@@ -116,7 +119,7 @@ export function handleTransfer(event: Transfer): void {
   );
 
   // Let mint handlers deal with new tokens
-  if (token != null) {
+  if (token) {
     // Update Account <-> Project many-to-many relation
     // table to reflect new account project token balance
     let prevAccountProject = AccountProject.load(
@@ -127,12 +130,12 @@ export function handleTransfer(event: Transfer): void {
     );
 
     if (
-      prevAccountProject != null &&
+      prevAccountProject&&
       (prevAccountProject as AccountProject).count > 1
     ) {
       prevAccountProject.count -= 1;
       prevAccountProject.save();
-    } else if (prevAccountProject != null) {
+    } else if (prevAccountProject) {
       store.remove("AccountProject", prevAccountProject.id);
     }
 
@@ -141,7 +144,7 @@ export function handleTransfer(event: Transfer): void {
       token.project
     );
     let newAccountProject = AccountProject.load(newAccountProjectId);
-    if (newAccountProject == null) {
+    if (!newAccountProject) {
       newAccountProject = new AccountProject(newAccountProjectId);
       newAccountProject.project = token.project;
       newAccountProject.account = event.params.to.toHexString();
@@ -167,7 +170,7 @@ export function handleAddProject(call: AddProjectCall): void {
   let contractEntity = Contract.load(call.to.toHexString());
 
   let projectId: BigInt;
-  if (contractEntity == null) {
+  if (!contractEntity) {
     contractEntity = refreshContract(contract, call.block.timestamp);
     // In this case nextProjectId has already been incremented
     projectId = contractEntity.nextProjectId.minus(BigInt.fromI32(1));
@@ -268,7 +271,7 @@ function removeWhitelisting(contractId: string, accountId: string): void {
   let whitelistingId = generateWhitelistingId(contractId, account.id);
   let whitelisting = Whitelisting.load(whitelistingId);
 
-  if (whitelisting != null) {
+  if (whitelisting) {
     store.remove("Whitelisting", whitelistingId);
   }
 }
@@ -342,7 +345,7 @@ export function handleRemoveProjectLastScript(
   let project = Project.load(
     generateContractSpecificId(call.to, call.inputs._projectId)
   );
-  if (project != null) {
+  if (project) {
     store.remove(
       "ProjectScript",
       generateProjectScriptId(
@@ -365,7 +368,7 @@ export function handleToggleProjectIsActive(
     generateContractSpecificId(call.to, call.inputs._projectId)
   );
 
-  if (project != null && project.contract == call.to.toHexString()) {
+  if (project && project.contract == call.to.toHexString()) {
     project.active = !project.active;
     project.activatedAt = project.active ? call.block.timestamp : null;
     project.updatedAt = call.block.timestamp;
@@ -380,7 +383,7 @@ export function handleToggleProjectIsLocked(
     generateContractSpecificId(call.to, call.inputs._projectId)
   );
 
-  if (project != null && project.contract == call.to.toHexString()) {
+  if (project && project.contract == call.to.toHexString()) {
     project.locked = !project.locked;
     project.updatedAt = call.block.timestamp;
     project.save();
@@ -394,7 +397,7 @@ export function handleToggleProjectIsPaused(
     generateContractSpecificId(call.to, call.inputs._projectId)
   );
 
-  if (project != null && project.contract == call.to.toHexString()) {
+  if (project && project.contract == call.to.toHexString()) {
     project.paused = !project.paused;
     project.updatedAt = call.block.timestamp;
     project.save();
@@ -511,7 +514,7 @@ export function handleUpdateProjectMaxInvocations(
     generateContractSpecificId(call.to, call.inputs._projectId)
   );
 
-  if (project != null) {
+  if (project) {
     project.maxInvocations = call.inputs._maxInvocations;
     project.complete = project.invocations.ge(project.maxInvocations);
     project.updatedAt = call.block.timestamp;
@@ -567,13 +570,15 @@ export function handleUpdateProjectScriptJSON(
 
     // Old site used curation_status, new site uses curationStatus
     let curationStatusJSONValue = scriptJSON.get("curation_status");
-    if (curationStatusJSONValue.isNull()) {
-      curationStatusJSONValue = scriptJSON.get("curationStatus");
-    }
+    if(curationStatusJSONValue) {
+      if (curationStatusJSONValue.isNull()) {
+        curationStatusJSONValue = scriptJSON.get("curationStatus");
+      }
 
-    if (curationStatusJSONValue.kind == JSONValueKind.STRING) {
-      let curationStatus = curationStatusJSONValue.toString();
-      project.curationStatus = curationStatus;
+      if (curationStatusJSONValue && curationStatusJSONValue.kind == JSONValueKind.STRING) {
+        let curationStatus = curationStatusJSONValue.toString();
+        project.curationStatus = curationStatus;
+      }
     }
   }
 
@@ -619,7 +624,7 @@ function refreshContract(
 
   let contractEntity = Contract.load(contract._address.toHexString());
 
-  if (contractEntity == null) {
+  if (!contractEntity) {
     contractEntity = new Contract(contract._address.toHexString());
     contractEntity.mintWhitelisted = [];
     contractEntity.updatedAt = timestamp;
@@ -670,7 +675,7 @@ function refreshProjectScript(
     projectScript.project = project.id;
     projectScript.save();
 
-    if (script != null && script != "") {
+    if (script && script != "") {
       scripts.push(script);
     }
   }
