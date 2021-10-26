@@ -208,48 +208,6 @@ dataSources:
           handler: handleUpdateProjectWebsite
       file: ./src/mapping.ts
   {{/genArt721Core2Contracts}}
-  {{#genArt721CorePlusContracts}}
-  # We need a contract with events for project/platform updates for testing
-  # because Ganache and Rinkeby don't support the trace_filter method
-  - kind: ethereum/contract
-    name: GenArt721CorePlus
-    network: {{network}}
-    source:
-      address: '{{address}}'
-      abi: GenArt721CorePlus
-      startBlock: {{startBlock}}
-    mapping:
-      kind: ethereum/events
-      apiVersion: 0.0.5
-      language: wasm/assemblyscript
-      entities:
-        - Project
-        - ProjectScript
-        - Token
-        - Contract
-        - Account
-        - AccountProject
-        - Whitelisting
-        - OpenSeaSale
-        - TokenOpenSeaSaleLookupTable
-      abis:
-        - name: GenArt721CorePlus
-          file: ./abis/GenArt721CorePlus.json
-      eventHandlers:
-        - event: Mint(indexed address,indexed uint256,indexed uint256)
-          handler: handleMint
-        - event: Transfer(indexed address,indexed address,indexed uint256)
-          handler: handleTransfer
-        - event: PlatformUpdated(string)
-          handler: handlePlatformUpdated
-        - event: PlatformWhitelistUpdated(string,address)
-          handler: handlePlatformWhitelistUpdated
-        - event: ProjectAdded(indexed uint256,address,string,string,uint256,bool,bool,bool,uint256)
-          handler: handleProjectAdded
-        - event: ProjectUpdated(indexed uint256,string)
-          handler: handleProjectUpdated
-      file: ./src/mapping.ts
-  {{/genArt721CorePlusContracts}}
   {{#pbabContracts}}
   - kind: ethereum/contract
     name: 'GenArt721Core2PBAB-{{address}}'
