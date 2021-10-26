@@ -74,12 +74,12 @@ export function handleMint(event: Mint): void {
     event.address,
     event.params._projectId
   );
-  
+
   let project = Project.load(projectId);
-  if(project) {
+  if (project) {
     let invocation = project.invocations;
 
-    let token = new Token( 
+    let token = new Token(
       generateContractSpecificId(event.address, event.params._tokenId)
     );
 
@@ -115,7 +115,7 @@ export function handleMint(event: Mint): void {
     }
     accountProject.count += 1;
     accountProject.save();
-  } 
+  }
 }
 
 // Update token owner on transfer
@@ -136,7 +136,7 @@ export function handleTransfer(event: Transfer): void {
     );
 
     if (
-      prevAccountProject&&
+      prevAccountProject &&
       (prevAccountProject as AccountProject).count > 1
     ) {
       prevAccountProject.count -= 1;
@@ -213,7 +213,7 @@ export function handleAddProject(call: AddProjectCall): void {
   project.dynamic = dynamic;
   project.artistAddress = artistAddress;
   project.pricePerTokenInWei = pricePerTokenInWei;
-  project.invocations = invocations; 
+  project.invocations = invocations;
   project.maxInvocations = maxInvocations;
   project.scriptCount = scriptCount;
   project.useHashString = hashesPerToken.toI32() > 0;
@@ -223,7 +223,6 @@ export function handleAddProject(call: AddProjectCall): void {
   project.complete = false;
   project.createdAt = call.block.timestamp;
   project.updatedAt = call.block.timestamp;
-  log.warning("ORIGINAL MAPPING handleAddProject id: <{}> link to artist: <{}>", [project.projectId.toString(), artistAddress.toHexString()]);
   project.save();
 
   contractEntity.nextProjectId = contractEntity.nextProjectId.plus(
@@ -406,7 +405,6 @@ export function handleToggleProjectUseIpfsForStatic(
 export function handleUpdateProjectAdditionalPayeeInfo(
   call: UpdateProjectAdditionalPayeeInfoCall
 ): void {
-
   let project = Project.load(
     generateContractSpecificId(call.to, call.inputs._projectId)
   );
@@ -425,13 +423,13 @@ export function handleUpdateProjectArtistAddress(
   let artist = new Account(call.inputs._artistAddress.toHexString());
   artist.save();
 
-  let project = Project.load(generateContractSpecificId(call.to, call.inputs._projectId));
-  if(project) {
+  let project = Project.load(
+    generateContractSpecificId(call.to, call.inputs._projectId)
+  );
+  if (project) {
     project.artistAddress = call.inputs._artistAddress;
     project.artist = artist.id;
     project.updatedAt = call.block.timestamp;
-
-    log.warning("ORIGINAL MAPPING handleUpdateProjectArtistAddress id: <{}> link to artist: <{}>", [project.id, call.inputs._artistAddress.toHexString()]);
 
     project.save();
   }
@@ -440,9 +438,10 @@ export function handleUpdateProjectArtistAddress(
 export function handleUpdateProjectArtistName(
   call: UpdateProjectArtistNameCall
 ): void {
-
-  let project = Project.load(generateContractSpecificId(call.to, call.inputs._projectId))
-  if(project) {
+  let project = Project.load(
+    generateContractSpecificId(call.to, call.inputs._projectId)
+  );
+  if (project) {
     project.artistName = call.inputs._projectArtistName;
     project.updatedAt = call.block.timestamp;
     project.save();
@@ -452,8 +451,10 @@ export function handleUpdateProjectArtistName(
 export function handleUpdateProjectBaseIpfsURI(
   call: UpdateProjectBaseIpfsURICall
 ): void {
-  let project = Project.load(generateContractSpecificId(call.to, call.inputs._projectId))
-  if(project) {
+  let project = Project.load(
+    generateContractSpecificId(call.to, call.inputs._projectId)
+  );
+  if (project) {
     project.baseIpfsUri = call.inputs._projectBaseIpfsURI;
     project.save();
   }
@@ -462,9 +463,10 @@ export function handleUpdateProjectBaseIpfsURI(
 export function handleUpdateProjectBaseURI(
   call: UpdateProjectBaseURICall
 ): void {
-
-  let project = Project.load(generateContractSpecificId(call.to, call.inputs._projectId))
-  if(project) {
+  let project = Project.load(
+    generateContractSpecificId(call.to, call.inputs._projectId)
+  );
+  if (project) {
     project.baseUri = call.inputs._newBaseURI;
     project.updatedAt = call.block.timestamp;
     project.save();
@@ -474,8 +476,10 @@ export function handleUpdateProjectBaseURI(
 export function handleUpdateProjectDescription(
   call: UpdateProjectDescriptionCall
 ): void {
-  let project = Project.load(generateContractSpecificId(call.to, call.inputs._projectId))
-  if(project) {
+  let project = Project.load(
+    generateContractSpecificId(call.to, call.inputs._projectId)
+  );
+  if (project) {
     project.description = call.inputs._projectDescription;
     project.updatedAt = call.block.timestamp;
     project.save();
@@ -485,9 +489,10 @@ export function handleUpdateProjectDescription(
 export function handleUpdateProjectIpfsHash(
   call: UpdateProjectIpfsHashCall
 ): void {
-
-  let project = Project.load(generateContractSpecificId(call.to, call.inputs._projectId))
-  if(project) {
+  let project = Project.load(
+    generateContractSpecificId(call.to, call.inputs._projectId)
+  );
+  if (project) {
     project.ipfsHash = call.inputs._ipfsHash;
     project.updatedAt = call.block.timestamp;
     project.save();
@@ -497,8 +502,10 @@ export function handleUpdateProjectIpfsHash(
 export function handleUpdateProjectLicense(
   call: UpdateProjectLicenseCall
 ): void {
-  let project = Project.load(generateContractSpecificId(call.to, call.inputs._projectId))
-  if(project) {
+  let project = Project.load(
+    generateContractSpecificId(call.to, call.inputs._projectId)
+  );
+  if (project) {
     project.license = call.inputs._projectLicense;
     project.updatedAt = call.block.timestamp;
     project.save();
@@ -526,8 +533,10 @@ export function handleUpdateProjectMaxInvocations(
 }
 
 export function handleUpdateProjectName(call: UpdateProjectNameCall): void {
-  let project = Project.load(generateContractSpecificId(call.to, call.inputs._projectId))
-  if(project) {
+  let project = Project.load(
+    generateContractSpecificId(call.to, call.inputs._projectId)
+  );
+  if (project) {
     project.name = call.inputs._projectName;
     project.updatedAt = call.block.timestamp;
     project.save();
@@ -537,8 +546,10 @@ export function handleUpdateProjectName(call: UpdateProjectNameCall): void {
 export function handleUpdateProjectPricePerTokenInWei(
   call: UpdateProjectPricePerTokenInWeiCall
 ): void {
-  let project = Project.load(generateContractSpecificId(call.to, call.inputs._projectId))
-  if(project) {
+  let project = Project.load(
+    generateContractSpecificId(call.to, call.inputs._projectId)
+  );
+  if (project) {
     project.pricePerTokenInWei = call.inputs._pricePerTokenInWei;
     project.updatedAt = call.block.timestamp;
     project.save();
@@ -554,8 +565,10 @@ export function handleUpdateProjectScript(call: UpdateProjectScriptCall): void {
 export function handleUpdateProjectScriptJSON(
   call: UpdateProjectScriptJSONCall
 ): void {
-  let project = Project.load(generateContractSpecificId(call.to, call.inputs._projectId))
-  if(project) {
+  let project = Project.load(
+    generateContractSpecificId(call.to, call.inputs._projectId)
+  );
+  if (project) {
     let scriptJSONRaw = json.fromBytes(
       changetype<Bytes>(ByteArray.fromUTF8(call.inputs._projectScriptJSON))
     );
@@ -563,8 +576,11 @@ export function handleUpdateProjectScriptJSON(
     if (scriptJSONRaw.kind == JSONValueKind.OBJECT) {
       let scriptJSON = scriptJSONRaw.toObject();
       let curationStatusJSONValue = scriptJSON.get("curation_status");
-      
-      if (curationStatusJSONValue && curationStatusJSONValue.kind == JSONValueKind.STRING) {
+
+      if (
+        curationStatusJSONValue &&
+        curationStatusJSONValue.kind == JSONValueKind.STRING
+      ) {
         let curationStatus = curationStatusJSONValue.toString();
         project.curationStatus = curationStatus;
       }
@@ -579,8 +595,10 @@ export function handleUpdateProjectScriptJSON(
 export function handleUpdateProjectSecondaryMarketRoyaltyPercentage(
   call: UpdateProjectSecondaryMarketRoyaltyPercentageCall
 ): void {
-  let project = Project.load(generateContractSpecificId(call.to, call.inputs._projectId))
-  if(project) {
+  let project = Project.load(
+    generateContractSpecificId(call.to, call.inputs._projectId)
+  );
+  if (project) {
     project.royaltyPercentage = call.inputs._secondMarketRoyalty;
     project.updatedAt = call.block.timestamp;
     project.save();
@@ -590,9 +608,10 @@ export function handleUpdateProjectSecondaryMarketRoyaltyPercentage(
 export function handleUpdateProjectWebsite(
   call: UpdateProjectWebsiteCall
 ): void {
-
-  let project = Project.load(generateContractSpecificId(call.to, call.inputs._projectId))
-  if(project) {
+  let project = Project.load(
+    generateContractSpecificId(call.to, call.inputs._projectId)
+  );
+  if (project) {
     project.website = call.inputs._projectWebsite;
     project.updatedAt = call.block.timestamp;
     project.save();
@@ -626,8 +645,10 @@ function refreshContract(contract: GenArt721, timestamp: BigInt): Contract {
 function refreshTokenUri(contract: GenArt721, tokenId: BigInt): void {
   let tokenURI = contract.tokenURI(tokenId);
 
-  let token =  Token.load(generateContractSpecificId(contract._address, tokenId));
-  if(token) {
+  let token = Token.load(
+    generateContractSpecificId(contract._address, tokenId)
+  );
+  if (token) {
     token.uri = tokenURI;
     token.save();
   }
@@ -638,8 +659,10 @@ function refreshProjectScript(
   projectId: BigInt,
   timestamp: BigInt
 ): void {
-  let project = Project.load(generateContractSpecificId(contract._address, projectId));
-  if(project) {
+  let project = Project.load(
+    generateContractSpecificId(contract._address, projectId)
+  );
+  if (project) {
     let scriptInfo = contract.projectScriptInfo(projectId);
 
     let scriptCount = scriptInfo.value1.toI32();

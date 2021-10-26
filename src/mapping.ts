@@ -55,14 +55,6 @@ import {
 } from "../generated/GenArt721Core2/GenArt721Core2";
 
 import {
-  GenArt721CorePlus,
-  PlatformUpdated,
-  PlatformWhitelistUpdated,
-  ProjectAdded,
-  ProjectUpdated
-} from "../generated/GenArt721CorePlus/GenArt721CorePlus";
-
-import {
   Project,
   Token,
   Account,
@@ -179,48 +171,6 @@ export function handleTransfer(event: Transfer): void {
     token.owner = event.params.to.toHexString();
     token.updatedAt = event.block.timestamp;
     token.save();
-  }
-}
-
-// TODO: Legacy to remove ?
-export function handlePlatformWhitelistUpdated(
-  event: PlatformWhitelistUpdated
-): void {
-  let contract = GenArt721CorePlus.bind(event.address);
-  let contractEntity = refreshContract(contract, event.block.timestamp);
-
-  if (contractEntity) {
-    let update = event.params.update;
-    if (update == "addWhitelisted") {
-      // TODO: Patch me ?
-      let whitelisting = new Whitelisting(
-        generateWhitelistingId(contractEntity.id, event.params.addr.toString())
-      );
-      whitelisting.save();
-    } else if (update == "removeWhitelisted") {
-      let whitelisting = Whitelisting.load(
-        generateWhitelistingId(contractEntity.id, event.params.addr.toString())
-      );
-
-      if (whitelisting) {
-        store.remove("Whitelisting", whitelisting.id);
-      }
-    } else if (update == "addMintWhitelisted") {
-      contractEntity.mintWhitelisted = contractEntity.mintWhitelisted
-        ? contractEntity.mintWhitelisted.concat([event.params.addr])
-        : [event.params.addr];
-    } else if (update == "removeMintWhitelisted") {
-      let mintWhitelisted: Bytes[] = contractEntity.mintWhitelisted;
-      let newMintWhitelisted: Bytes[] = [];
-      for (let i = 0; i < mintWhitelisted.length; i++) {
-        if ((mintWhitelisted[i] as Bytes) != event.address) {
-          newMintWhitelisted.push(mintWhitelisted[i]);
-        }
-      }
-      contractEntity.mintWhitelisted = newMintWhitelisted;
-    }
-
-    contractEntity.save();
   }
 }
 /*** END EVENT HANDLERS ***/
@@ -538,7 +488,7 @@ export function handleUpdateProjectAdditionalPayeeInfo(
     generateContractSpecificId(call.to, call.inputs._projectId)
   );
 
-  if(project) {
+  if (project) {
     project.additionalPayee = call.inputs._additionalPayee;
     project.additionalPayeePercentage = call.inputs._additionalPayeePercentage;
     project.updatedAt = call.block.timestamp;
@@ -555,7 +505,7 @@ export function handleUpdateProjectArtistAddress(
   let project = Project.load(
     generateContractSpecificId(call.to, call.inputs._projectId)
   );
-  if(project) {
+  if (project) {
     project.artistAddress = call.inputs._artistAddress;
     project.artist = artist.id;
     project.updatedAt = call.block.timestamp;
@@ -571,7 +521,7 @@ export function handleUpdateProjectArtistName(
     generateContractSpecificId(call.to, call.inputs._projectId)
   );
 
-  if(project) {
+  if (project) {
     project.artistName = call.inputs._projectArtistName;
     project.updatedAt = call.block.timestamp;
     project.save();
@@ -585,7 +535,7 @@ export function handleUpdateProjectBaseIpfsURI(
     generateContractSpecificId(call.to, call.inputs._projectId)
   );
 
-  if(project) {
+  if (project) {
     project.baseIpfsUri = call.inputs._projectBaseIpfsURI;
     project.save();
   }
@@ -598,7 +548,7 @@ export function handleUpdateProjectBaseURI(
     generateContractSpecificId(call.to, call.inputs._projectId)
   );
 
-  if(project) {
+  if (project) {
     project.baseUri = call.inputs._newBaseURI;
     project.updatedAt = call.block.timestamp;
     project.save();
@@ -612,7 +562,7 @@ export function handleUpdateProjectCurrencyInfo(
     generateContractSpecificId(call.to, call.inputs._projectId)
   );
 
-  if(project) {
+  if (project) {
     project.currencySymbol = call.inputs._currencySymbol;
     project.currencyAddress = call.inputs._currencyAddress;
     project.updatedAt = call.block.timestamp;
@@ -627,7 +577,7 @@ export function handleUpdateProjectDescription(
     generateContractSpecificId(call.to, call.inputs._projectId)
   );
 
-  if(project) {
+  if (project) {
     project.description = call.inputs._projectDescription;
     project.updatedAt = call.block.timestamp;
     project.save();
@@ -641,7 +591,7 @@ export function handleUpdateProjectIpfsHash(
     generateContractSpecificId(call.to, call.inputs._projectId)
   );
 
-  if(project) {
+  if (project) {
     project.ipfsHash = call.inputs._ipfsHash;
     project.updatedAt = call.block.timestamp;
     project.save();
@@ -654,8 +604,8 @@ export function handleUpdateProjectLicense(
   let project = Project.load(
     generateContractSpecificId(call.to, call.inputs._projectId)
   );
-  
-  if(project) {
+
+  if (project) {
     project.license = call.inputs._projectLicense;
     project.updatedAt = call.block.timestamp;
     project.save();
@@ -687,7 +637,7 @@ export function handleUpdateProjectName(call: UpdateProjectNameCall): void {
     generateContractSpecificId(call.to, call.inputs._projectId)
   );
 
-  if(project) {
+  if (project) {
     project.name = call.inputs._projectName;
     project.updatedAt = call.block.timestamp;
     project.save();
@@ -701,11 +651,11 @@ export function handleUpdateProjectPricePerTokenInWei(
     generateContractSpecificId(call.to, call.inputs._projectId)
   );
 
-  if(project) {
+  if (project) {
     project.pricePerTokenInWei = call.inputs._pricePerTokenInWei;
     project.updatedAt = call.block.timestamp;
     project.save();
-  } 
+  }
 }
 
 export function handleUpdateProjectScript(call: UpdateProjectScriptCall): void {
@@ -721,9 +671,9 @@ export function handleUpdateProjectScriptJSON(
     generateContractSpecificId(call.to, call.inputs._projectId)
   );
 
-  if(project) {
+  if (project) {
     let scriptJSONRaw = json.fromBytes(
-    changetype<Bytes>(ByteArray.fromUTF8(call.inputs._projectScriptJSON))
+      changetype<Bytes>(ByteArray.fromUTF8(call.inputs._projectScriptJSON))
     );
 
     if (scriptJSONRaw.kind == JSONValueKind.OBJECT) {
@@ -759,7 +709,7 @@ export function handleUpdateProjectSecondaryMarketRoyaltyPercentage(
     generateContractSpecificId(call.to, call.inputs._projectId)
   );
 
-  if(project) {
+  if (project) {
     project.royaltyPercentage = call.inputs._secondMarketRoyalty;
     project.updatedAt = call.block.timestamp;
     project.save();
@@ -773,7 +723,7 @@ export function handleUpdateProjectWebsite(
     generateContractSpecificId(call.to, call.inputs._projectId)
   );
 
-  if(project) {
+  if (project) {
     project.website = call.inputs._projectWebsite;
     project.updatedAt = call.block.timestamp;
     project.save();
@@ -783,10 +733,7 @@ export function handleUpdateProjectWebsite(
 
 /** HELPERS ***/
 function refreshContract<T>(contract: T, timestamp: BigInt): Contract | null {
-  if (
-    !(contract instanceof GenArt721Core) &&
-    !(contract instanceof GenArt721CorePlus)
-  ) {
+  if (!(contract instanceof GenArt721Core)) {
     return null;
   }
 
@@ -816,8 +763,10 @@ function refreshContract<T>(contract: T, timestamp: BigInt): Contract | null {
 function refreshTokenUri(contract: GenArt721Core, tokenId: BigInt): void {
   let tokenURI = contract.tokenURI(tokenId);
 
-  let token = Token.load(generateContractSpecificId(contract._address, tokenId));
-  if(token) {
+  let token = Token.load(
+    generateContractSpecificId(contract._address, tokenId)
+  );
+  if (token) {
     token.uri = tokenURI;
     token.save();
   }
@@ -828,10 +777,7 @@ function refreshProjectScript<T>(
   projectId: BigInt,
   timestamp: BigInt
 ): void {
-  if (
-    !(contract instanceof GenArt721Core) &&
-    !(contract instanceof GenArt721CorePlus)
-  ) {
+  if (!(contract instanceof GenArt721Core)) {
     return;
   }
 
@@ -839,7 +785,7 @@ function refreshProjectScript<T>(
     generateContractSpecificId(contract._address, projectId)
   );
 
-  if(project) {
+  if (project) {
     let scriptInfo = contract.projectScriptInfo(projectId);
 
     let scriptCount = scriptInfo.value1.toI32();

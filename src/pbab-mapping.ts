@@ -210,7 +210,6 @@ export function handleAddProject(call: AddProjectCall): void {
   project.projectId = projectId;
   project.name = name;
   project.dynamic = dynamic;
-  log.warning("PBA MAPPING handleAddProject link to artist : {}", [artistAddress.toHexString()]);
   project.artistAddress = artistAddress;
   project.pricePerTokenInWei = pricePerTokenInWei;
   project.invocations = invocations;
@@ -259,7 +258,7 @@ function addWhitelisting(contractId: string, accountId: string): void {
   whitelisting.save();
 }
 
-export function handleRemoveWhitelisted(call: RemoveMintWhitelistedCall): void {
+export function handleRemoveWhitelisted(call: RemoveWhitelistedCall): void {
   let contract = GenArt721Core2PBAB.bind(call.to);
   let contractEntity = refreshContract(contract, call.block.timestamp);
 
@@ -412,7 +411,7 @@ export function handleUpdateProjectAdditionalPayeeInfo(
     generateContractSpecificId(call.to, call.inputs._projectId)
   );
 
-  if(project) {
+  if (project) {
     project.additionalPayee = call.inputs._additionalPayee;
     project.additionalPayeePercentage = call.inputs._additionalPayeePercentage;
     project.updatedAt = call.block.timestamp;
@@ -430,14 +429,13 @@ export function handleUpdateProjectArtistAddress(
     generateContractSpecificId(call.to, call.inputs._projectId)
   );
 
-  if(project) {
+  if (project) {
     project.artistAddress = call.inputs._artistAddress;
     project.artist = artist.id;
     project.updatedAt = call.block.timestamp;
 
     project.save();
   }
-  
 }
 
 export function handleUpdateProjectArtistName(
@@ -446,12 +444,12 @@ export function handleUpdateProjectArtistName(
   let project = Project.load(
     generateContractSpecificId(call.to, call.inputs._projectId)
   );
-  
-  if(project) {
+
+  if (project) {
     project.artistName = call.inputs._projectArtistName;
     project.updatedAt = call.block.timestamp;
     project.save();
-  } 
+  }
 }
 
 export function handleUpdateProjectBaseURI(
@@ -461,11 +459,11 @@ export function handleUpdateProjectBaseURI(
     generateContractSpecificId(call.to, call.inputs._projectId)
   );
 
-  if(project) {
+  if (project) {
     project.baseUri = call.inputs._newBaseURI;
     project.updatedAt = call.block.timestamp;
     project.save();
-  } 
+  }
 }
 
 export function handleUpdateProjectCurrencyInfo(
@@ -475,13 +473,13 @@ export function handleUpdateProjectCurrencyInfo(
     generateContractSpecificId(call.to, call.inputs._projectId)
   );
 
-  if(project) {
+  if (project) {
     project.currencySymbol = call.inputs._currencySymbol;
     project.currencyAddress = call.inputs._currencyAddress;
     project.updatedAt = call.block.timestamp;
 
     project.save();
-  } 
+  }
 }
 
 export function handleUpdateProjectDescription(
@@ -491,7 +489,7 @@ export function handleUpdateProjectDescription(
     generateContractSpecificId(call.to, call.inputs._projectId)
   );
 
-  if(project) {
+  if (project) {
     project.description = call.inputs._projectDescription;
     project.updatedAt = call.block.timestamp;
     project.save();
@@ -505,7 +503,7 @@ export function handleUpdateProjectIpfsHash(
     generateContractSpecificId(call.to, call.inputs._projectId)
   );
 
-  if(project) {
+  if (project) {
     project.ipfsHash = call.inputs._ipfsHash;
     project.updatedAt = call.block.timestamp;
     project.save();
@@ -519,11 +517,11 @@ export function handleUpdateProjectLicense(
     generateContractSpecificId(call.to, call.inputs._projectId)
   );
 
-  if(project) {
+  if (project) {
     project.license = call.inputs._projectLicense;
     project.updatedAt = call.block.timestamp;
     project.save();
-  } 
+  }
 }
 
 export function handleUpdateProjectMaxInvocations(
@@ -551,7 +549,7 @@ export function handleUpdateProjectName(call: UpdateProjectNameCall): void {
     generateContractSpecificId(call.to, call.inputs._projectId)
   );
 
-  if(project) {
+  if (project) {
     project.name = call.inputs._projectName;
     project.updatedAt = call.block.timestamp;
     project.save();
@@ -565,7 +563,7 @@ export function handleUpdateProjectPricePerTokenInWei(
     generateContractSpecificId(call.to, call.inputs._projectId)
   );
 
-  if(project) {
+  if (project) {
     project.pricePerTokenInWei = call.inputs._pricePerTokenInWei;
     project.updatedAt = call.block.timestamp;
     project.save();
@@ -585,7 +583,7 @@ export function handleUpdateProjectScriptJSON(
     generateContractSpecificId(call.to, call.inputs._projectId)
   );
 
-  if(project) {
+  if (project) {
     let scriptJSONRaw = json.fromBytes(
       Bytes.fromUTF8(call.inputs._projectScriptJSON) as Bytes
     );
@@ -622,7 +620,7 @@ export function handleUpdateProjectSecondaryMarketRoyaltyPercentage(
     generateContractSpecificId(call.to, call.inputs._projectId)
   );
 
-  if(project) {
+  if (project) {
     project.royaltyPercentage = call.inputs._secondMarketRoyalty;
     project.updatedAt = call.block.timestamp;
     project.save();
@@ -636,7 +634,7 @@ export function handleUpdateProjectWebsite(
     generateContractSpecificId(call.to, call.inputs._projectId)
   );
 
-  if(project) {
+  if (project) {
     project.website = call.inputs._projectWebsite;
     project.updatedAt = call.block.timestamp;
     project.save();
@@ -676,8 +674,10 @@ function refreshContract(
 function refreshTokenUri(contract: GenArt721Core2PBAB, tokenId: BigInt): void {
   let tokenURI = contract.tokenURI(tokenId);
 
-  let token = Token.load(generateContractSpecificId(contract._address, tokenId));
-  if(token) {
+  let token = Token.load(
+    generateContractSpecificId(contract._address, tokenId)
+  );
+  if (token) {
     token.uri = tokenURI;
     token.save();
   }
@@ -692,7 +692,7 @@ function refreshProjectScript(
     generateContractSpecificId(contract._address, projectId)
   );
 
-  if(project) {
+  if (project) {
     let scriptInfo = contract.projectScriptInfo(projectId);
 
     let scriptCount = scriptInfo.value1.toI32();
