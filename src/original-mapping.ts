@@ -70,17 +70,18 @@ import { generateProjectScriptId } from "./helpers";
 /*** EVENT HANDLERS ***/
 export function handleMint(event: Mint): void {
   let contract = GenArt721.bind(event.address);
-
-  let token = new Token(
-    generateContractSpecificId(event.address, event.params._tokenId)
-  );
   let projectId = generateContractSpecificId(
     event.address,
     event.params._projectId
   );
+  
   let project = Project.load(projectId);
   if(project) {
     let invocation = project.invocations;
+
+    let token = new Token( 
+      generateContractSpecificId(event.address, event.params._tokenId)
+    );
 
     token.project = projectId;
     token.tokenId = event.params._tokenId;
@@ -205,7 +206,6 @@ export function handleAddProject(call: AddProjectCall): void {
   let paused = projectScriptInfo.value5;
 
   let project = new Project(generateContractSpecificId(call.to, projectId));
-
   project.contract = contractEntity.id;
   project.artist = artist.id;
   project.projectId = projectId;
@@ -213,7 +213,7 @@ export function handleAddProject(call: AddProjectCall): void {
   project.dynamic = dynamic;
   project.artistAddress = artistAddress;
   project.pricePerTokenInWei = pricePerTokenInWei;
-  project.invocations = invocations;
+  project.invocations = invocations; 
   project.maxInvocations = maxInvocations;
   project.scriptCount = scriptCount;
   project.useHashString = hashesPerToken.toI32() > 0;
@@ -223,7 +223,7 @@ export function handleAddProject(call: AddProjectCall): void {
   project.complete = false;
   project.createdAt = call.block.timestamp;
   project.updatedAt = call.block.timestamp;
-
+  log.warning("ORIGINAL MAPPING handleAddProject id: <{}> link to artist: <{}>", [project.projectId.toString(), artistAddress.toHexString()]);
   project.save();
 
   contractEntity.nextProjectId = contractEntity.nextProjectId.plus(
@@ -406,14 +406,17 @@ export function handleToggleProjectUseIpfsForStatic(
 export function handleUpdateProjectAdditionalPayeeInfo(
   call: UpdateProjectAdditionalPayeeInfoCall
 ): void {
-  let project = new Project(
+
+  let project = Project.load(
     generateContractSpecificId(call.to, call.inputs._projectId)
   );
 
-  project.additionalPayee = call.inputs._additionalPayee;
-  project.additionalPayeePercentage = call.inputs._additionalPayeePercentage;
-  project.updatedAt = call.block.timestamp;
-  project.save();
+  if (project && project.contract == call.to.toHexString()) {
+    project.additionalPayee = call.inputs._additionalPayee;
+    project.additionalPayeePercentage = call.inputs._additionalPayeePercentage;
+    project.updatedAt = call.block.timestamp;
+    project.save();
+  }
 }
 
 export function handleUpdateProjectArtistAddress(
@@ -422,85 +425,84 @@ export function handleUpdateProjectArtistAddress(
   let artist = new Account(call.inputs._artistAddress.toHexString());
   artist.save();
 
-  let project = new Project(
-    generateContractSpecificId(call.to, call.inputs._projectId)
-  );
-  project.artistAddress = call.inputs._artistAddress;
-  project.artist = artist.id;
-  project.updatedAt = call.block.timestamp;
+  let project = Project.load(generateContractSpecificId(call.to, call.inputs._projectId));
+  if(project) {
+    project.artistAddress = call.inputs._artistAddress;
+    project.artist = artist.id;
+    project.updatedAt = call.block.timestamp;
 
-  project.save();
+    log.warning("ORIGINAL MAPPING handleUpdateProjectArtistAddress id: <{}> link to artist: <{}>", [project.id, call.inputs._artistAddress.toHexString()]);
+
+    project.save();
+  }
 }
 
 export function handleUpdateProjectArtistName(
   call: UpdateProjectArtistNameCall
 ): void {
-  let project = new Project(
-    generateContractSpecificId(call.to, call.inputs._projectId)
-  );
 
-  project.artistName = call.inputs._projectArtistName;
-  project.updatedAt = call.block.timestamp;
-  project.save();
+  let project = Project.load(generateContractSpecificId(call.to, call.inputs._projectId))
+  if(project) {
+    project.artistName = call.inputs._projectArtistName;
+    project.updatedAt = call.block.timestamp;
+    project.save();
+  }
 }
 
 export function handleUpdateProjectBaseIpfsURI(
   call: UpdateProjectBaseIpfsURICall
 ): void {
-  let project = new Project(
-    generateContractSpecificId(call.to, call.inputs._projectId)
-  );
-
-  project.baseIpfsUri = call.inputs._projectBaseIpfsURI;
-  project.save();
+  let project = Project.load(generateContractSpecificId(call.to, call.inputs._projectId))
+  if(project) {
+    project.baseIpfsUri = call.inputs._projectBaseIpfsURI;
+    project.save();
+  }
 }
 
 export function handleUpdateProjectBaseURI(
   call: UpdateProjectBaseURICall
 ): void {
-  let project = new Project(
-    generateContractSpecificId(call.to, call.inputs._projectId)
-  );
 
-  project.baseUri = call.inputs._newBaseURI;
-  project.updatedAt = call.block.timestamp;
-  project.save();
+  let project = Project.load(generateContractSpecificId(call.to, call.inputs._projectId))
+  if(project) {
+    project.baseUri = call.inputs._newBaseURI;
+    project.updatedAt = call.block.timestamp;
+    project.save();
+  }
 }
 
 export function handleUpdateProjectDescription(
   call: UpdateProjectDescriptionCall
 ): void {
-  let project = new Project(
-    generateContractSpecificId(call.to, call.inputs._projectId)
-  );
-
-  project.description = call.inputs._projectDescription;
-  project.updatedAt = call.block.timestamp;
-  project.save();
+  let project = Project.load(generateContractSpecificId(call.to, call.inputs._projectId))
+  if(project) {
+    project.description = call.inputs._projectDescription;
+    project.updatedAt = call.block.timestamp;
+    project.save();
+  }
 }
 
 export function handleUpdateProjectIpfsHash(
   call: UpdateProjectIpfsHashCall
 ): void {
-  let project = new Project(
-    generateContractSpecificId(call.to, call.inputs._projectId)
-  );
 
-  project.ipfsHash = call.inputs._ipfsHash;
-  project.updatedAt = call.block.timestamp;
-  project.save();
+  let project = Project.load(generateContractSpecificId(call.to, call.inputs._projectId))
+  if(project) {
+    project.ipfsHash = call.inputs._ipfsHash;
+    project.updatedAt = call.block.timestamp;
+    project.save();
+  }
 }
 
 export function handleUpdateProjectLicense(
   call: UpdateProjectLicenseCall
 ): void {
-  let project = new Project(
-    generateContractSpecificId(call.to, call.inputs._projectId)
-  );
-
-  project.license = call.inputs._projectLicense;
-  project.updatedAt = call.block.timestamp;
-  project.save();
+  let project = Project.load(generateContractSpecificId(call.to, call.inputs._projectId))
+  if(project) {
+    project.license = call.inputs._projectLicense;
+    project.updatedAt = call.block.timestamp;
+    project.save();
+  }
 }
 
 export function handleUpdateProjectMaxInvocations(
@@ -524,24 +526,23 @@ export function handleUpdateProjectMaxInvocations(
 }
 
 export function handleUpdateProjectName(call: UpdateProjectNameCall): void {
-  let project = new Project(
-    generateContractSpecificId(call.to, call.inputs._projectId)
-  );
-
-  project.name = call.inputs._projectName;
-  project.updatedAt = call.block.timestamp;
-  project.save();
+  let project = Project.load(generateContractSpecificId(call.to, call.inputs._projectId))
+  if(project) {
+    project.name = call.inputs._projectName;
+    project.updatedAt = call.block.timestamp;
+    project.save();
+  }
 }
 
 export function handleUpdateProjectPricePerTokenInWei(
   call: UpdateProjectPricePerTokenInWeiCall
 ): void {
-  let project = new Project(
-    generateContractSpecificId(call.to, call.inputs._projectId)
-  );
-  project.pricePerTokenInWei = call.inputs._pricePerTokenInWei;
-  project.updatedAt = call.block.timestamp;
-  project.save();
+  let project = Project.load(generateContractSpecificId(call.to, call.inputs._projectId))
+  if(project) {
+    project.pricePerTokenInWei = call.inputs._pricePerTokenInWei;
+    project.updatedAt = call.block.timestamp;
+    project.save();
+  }
 }
 
 export function handleUpdateProjectScript(call: UpdateProjectScriptCall): void {
@@ -553,51 +554,49 @@ export function handleUpdateProjectScript(call: UpdateProjectScriptCall): void {
 export function handleUpdateProjectScriptJSON(
   call: UpdateProjectScriptJSONCall
 ): void {
-  let project = new Project(
-    generateContractSpecificId(call.to, call.inputs._projectId)
-  );
+  let project = Project.load(generateContractSpecificId(call.to, call.inputs._projectId))
+  if(project) {
+    let scriptJSONRaw = json.fromBytes(
+      changetype<Bytes>(ByteArray.fromUTF8(call.inputs._projectScriptJSON))
+    );
 
-  let scriptJSONRaw = json.fromBytes(
-    changetype<Bytes>(ByteArray.fromUTF8(call.inputs._projectScriptJSON))
-  );
-
-  if (scriptJSONRaw.kind == JSONValueKind.OBJECT) {
-    let scriptJSON = scriptJSONRaw.toObject();
-    let curationStatusJSONValue = scriptJSON.get("curation_status");
-    
-    if (curationStatusJSONValue && curationStatusJSONValue.kind == JSONValueKind.STRING) {
-      let curationStatus = curationStatusJSONValue.toString();
-      project.curationStatus = curationStatus;
+    if (scriptJSONRaw.kind == JSONValueKind.OBJECT) {
+      let scriptJSON = scriptJSONRaw.toObject();
+      let curationStatusJSONValue = scriptJSON.get("curation_status");
+      
+      if (curationStatusJSONValue && curationStatusJSONValue.kind == JSONValueKind.STRING) {
+        let curationStatus = curationStatusJSONValue.toString();
+        project.curationStatus = curationStatus;
+      }
     }
-  }
 
-  project.scriptJSON = call.inputs._projectScriptJSON;
-  project.updatedAt = call.block.timestamp;
-  project.save();
+    project.scriptJSON = call.inputs._projectScriptJSON;
+    project.updatedAt = call.block.timestamp;
+    project.save();
+  }
 }
 
 export function handleUpdateProjectSecondaryMarketRoyaltyPercentage(
   call: UpdateProjectSecondaryMarketRoyaltyPercentageCall
 ): void {
-  let project = new Project(
-    generateContractSpecificId(call.to, call.inputs._projectId)
-  );
-
-  project.royaltyPercentage = call.inputs._secondMarketRoyalty;
-  project.updatedAt = call.block.timestamp;
-  project.save();
+  let project = Project.load(generateContractSpecificId(call.to, call.inputs._projectId))
+  if(project) {
+    project.royaltyPercentage = call.inputs._secondMarketRoyalty;
+    project.updatedAt = call.block.timestamp;
+    project.save();
+  }
 }
 
 export function handleUpdateProjectWebsite(
   call: UpdateProjectWebsiteCall
 ): void {
-  let project = new Project(
-    generateContractSpecificId(call.to, call.inputs._projectId)
-  );
 
-  project.website = call.inputs._projectWebsite;
-  project.updatedAt = call.block.timestamp;
-  project.save();
+  let project = Project.load(generateContractSpecificId(call.to, call.inputs._projectId))
+  if(project) {
+    project.website = call.inputs._projectWebsite;
+    project.updatedAt = call.block.timestamp;
+    project.save();
+  }
 }
 /*** END CALL HANDLERS  ***/
 
@@ -609,7 +608,6 @@ function refreshContract(contract: GenArt721, timestamp: BigInt): Contract {
   let nextProjectId = contract.nextProjectId();
 
   let contractEntity = Contract.load(contract._address.toHexString());
-
   if (!contractEntity) {
     contractEntity = new Contract(contract._address.toHexString());
   }
@@ -628,10 +626,11 @@ function refreshContract(contract: GenArt721, timestamp: BigInt): Contract {
 function refreshTokenUri(contract: GenArt721, tokenId: BigInt): void {
   let tokenURI = contract.tokenURI(tokenId);
 
-  let token = new Token(generateContractSpecificId(contract._address, tokenId));
-  token.uri = tokenURI;
-
-  token.save();
+  let token =  Token.load(generateContractSpecificId(contract._address, tokenId));
+  if(token) {
+    token.uri = tokenURI;
+    token.save();
+  }
 }
 
 function refreshProjectScript(
@@ -639,39 +638,38 @@ function refreshProjectScript(
   projectId: BigInt,
   timestamp: BigInt
 ): void {
-  let project = new Project(
-    generateContractSpecificId(contract._address, projectId)
-  );
+  let project = Project.load(generateContractSpecificId(contract._address, projectId));
+  if(project) {
+    let scriptInfo = contract.projectScriptInfo(projectId);
 
-  let scriptInfo = contract.projectScriptInfo(projectId);
+    let scriptCount = scriptInfo.value1.toI32();
+    let scripts: string[] = [];
+    for (let i = 0; i < scriptCount; i++) {
+      let script = contract.projectScriptByIndex(projectId, BigInt.fromI32(i));
 
-  let scriptCount = scriptInfo.value1.toI32();
-  let scripts: string[] = [];
-  for (let i = 0; i < scriptCount; i++) {
-    let script = contract.projectScriptByIndex(projectId, BigInt.fromI32(i));
+      let projectScriptIndex = BigInt.fromI32(i);
+      let projectScript = new ProjectScript(
+        generateProjectScriptId(project.id, projectScriptIndex)
+      );
+      projectScript.index = projectScriptIndex;
+      projectScript.project = project.id;
+      projectScript.script = script;
+      projectScript.save();
 
-    let projectScriptIndex = BigInt.fromI32(i);
-    let projectScript = new ProjectScript(
-      generateProjectScriptId(project.id, projectScriptIndex)
-    );
-    projectScript.script = script;
-    projectScript.index = projectScriptIndex;
-    projectScript.project = project.id;
-    projectScript.save();
-
-    if (script && script != "") {
-      scripts.push(script);
+      if (script && script != "") {
+        scripts.push(script);
+      }
     }
+
+    let script = scripts.join("");
+
+    project.script = script;
+    project.scriptCount = scriptInfo.value1;
+    project.updatedAt = timestamp;
+    project.scriptUpdatedAt = timestamp;
+
+    project.save();
   }
-
-  let script = scripts.join("");
-
-  project.script = script;
-  project.scriptCount = scriptInfo.value1;
-  project.updatedAt = timestamp;
-  project.scriptUpdatedAt = timestamp;
-
-  project.save();
 }
 
 /** END HELPERS ***/

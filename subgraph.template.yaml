@@ -244,10 +244,6 @@ dataSources:
           handler: handlePlatformUpdated
         - event: PlatformWhitelistUpdated(string,address)
           handler: handlePlatformWhitelistUpdated
-        - event: ProjectAdded(indexed uint256,address,string,string,uint256,bool,bool,bool,uint256)
-          handler: handleProjectAdded
-        - event: ProjectUpdated(indexed uint256,string)
-          handler: handleProjectUpdated
       file: ./src/mapping.ts
   {{/genArt721CorePlusContracts}}
   {{#pbabContracts}}
