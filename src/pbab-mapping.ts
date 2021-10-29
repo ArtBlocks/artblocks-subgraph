@@ -5,7 +5,8 @@ import {
   json,
   JSONValueKind,
   log,
-  Address
+  Address,
+  ByteArray
 } from "@graphprotocol/graph-ts";
 
 import {
@@ -585,7 +586,7 @@ export function handleUpdateProjectScriptJSON(
 
   if (project) {
     let scriptJSONRaw = json.fromBytes(
-      Bytes.fromUTF8(call.inputs._projectScriptJSON) as Bytes
+      changetype<Bytes>(ByteArray.fromUTF8(call.inputs._projectScriptJSON))
     );
     if (scriptJSONRaw.kind == JSONValueKind.OBJECT) {
       let scriptJSON = scriptJSONRaw.toObject();
