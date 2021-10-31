@@ -493,15 +493,8 @@ function _calculateMatchPrice(
   sellExprirationTime: BigInt,
   sellFeeRecipient: Address
 ): BigInt {
-  let buyPrice = _calculateFinalPrice(
-    buySide,
-    buySaleKind,
-    buyBasePrice,
-    buyExtra,
-    buyLinstingTime,
-    buyExprirationTime
-  );
-  let sellPrice = _calculateFinalPrice(
+
+   let sellPrice = _calculateFinalPrice(
     sellSide,
     sellSaleKind,
     sellBasePrice,
@@ -510,5 +503,14 @@ function _calculateMatchPrice(
     sellExprirationTime
   );
 
-  return sellFeeRecipient.toHexString() == NULL_ADDRESS ? sellPrice : buyPrice;
+  let buyPrice = _calculateFinalPrice(
+    buySide,
+    buySaleKind,
+    buyBasePrice,
+    buyExtra,
+    buyLinstingTime,
+    buyExprirationTime
+  );
+
+  return sellFeeRecipient.toHexString() != NULL_ADDRESS ? sellPrice : buyPrice;
 }
