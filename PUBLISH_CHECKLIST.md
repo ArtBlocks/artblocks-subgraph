@@ -1,8 +1,9 @@
 # Graph Network Subgraph Publish Checklist
 1. Deploy any contracts to be indexed
-2. Update mainnet.json to include contracts
-    - Verify that contract addresses added are for the correct contract by checking Etherscan at the contract address
-3. Run `yarn prepare:mainnet` to generate subgraph manifest (subgraph.yaml)
+    - Please see [ArtBlocks/artblocks-contracts](https://github.com/ArtBlocks/artblocks-contracts) for more info on contract deployment.
+2. Update the corresponding `config/` file for the desired network (e.g. `mainnet.json` for mainnet EVM) to include the newly deployed contracts
+    - Verify that contract addresses added are for the correct contracts by checking Etherscan at the contract address
+3. Run `yarn prepare:{NETWORK}`, (e.g. `yarn prepare:mainnet` for mainnet) to generate subgraph manifest (subgraph.yaml)
 4. Manually look over the generated subgraph manifest to make sure it is correct
 5. Run `yarn codegen` to generate contract mappings
 6. Deploy subgraph to subgraph studio `yarn deploy-studio`
