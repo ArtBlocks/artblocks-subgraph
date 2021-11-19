@@ -656,6 +656,7 @@ export class Contract extends Entity {
     this.set("renderProviderPercentage", Value.fromBigInt(BigInt.zero()));
     this.set("mintWhitelisted", Value.fromBytesArray(new Array(0)));
     this.set("nextProjectId", Value.fromBigInt(BigInt.zero()));
+    this.set("createdAt", Value.fromBigInt(BigInt.zero()));
     this.set("updatedAt", Value.fromBigInt(BigInt.zero()));
   }
 
@@ -796,6 +797,15 @@ export class Contract extends Entity {
     } else {
       this.set("whitelisted", Value.fromStringArray(<Array<string>>value));
     }
+  }
+
+  get createdAt(): BigInt {
+    let value = this.get("createdAt");
+    return value!.toBigInt();
+  }
+
+  set createdAt(value: BigInt) {
+    this.set("createdAt", Value.fromBigInt(value));
   }
 
   get updatedAt(): BigInt {

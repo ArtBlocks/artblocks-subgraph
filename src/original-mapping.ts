@@ -569,9 +569,16 @@ export function handleUpdateProjectScriptJSON(
     generateContractSpecificId(call.to, call.inputs._projectId)
   );
   if (project) {
-    let scriptJSONRaw = json.fromBytes(
+    let jsonResult = json.try_fromBytes(
       changetype<Bytes>(ByteArray.fromUTF8(call.inputs._projectScriptJSON))
     );
+
+    if (jsonResult.isError) {
+      log.warning("Invalid scriptJSON added for project {}", [project.id]);
+      return;
+    }
+
+    let scriptJSONRaw = jsonResult.value;
 
     if (scriptJSONRaw.kind == JSONValueKind.OBJECT) {
       let scriptJSON = scriptJSONRaw.toObject();
@@ -629,12 +636,13 @@ function refreshContract(contract: GenArt721, timestamp: BigInt): Contract {
   let contractEntity = Contract.load(contract._address.toHexString());
   if (!contractEntity) {
     contractEntity = new Contract(contract._address.toHexString());
+    contractEntity.createdAt = timestamp;
+    contractEntity.mintWhitelisted = [];
   }
   contractEntity.admin = admin;
   contractEntity.renderProviderAddress = artblocksAddress;
   contractEntity.renderProviderPercentage = artblocksPercentage;
   contractEntity.nextProjectId = nextProjectId;
-  contractEntity.mintWhitelisted = [];
   contractEntity.updatedAt = timestamp;
 
   contractEntity.save();

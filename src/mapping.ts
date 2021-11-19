@@ -672,27 +672,32 @@ export function handleUpdateProjectScriptJSON(
   );
 
   if (project) {
-    let scriptJSONRaw = json.fromBytes(
+    let jsonResult = json.try_fromBytes(
       changetype<Bytes>(ByteArray.fromUTF8(call.inputs._projectScriptJSON))
     );
+
+    if (jsonResult.isError) {
+      log.warning("Invalid scriptJSON added for project {}", [project.id]);
+      return;
+    }
+
+    let scriptJSONRaw = jsonResult.value;
 
     if (scriptJSONRaw.kind == JSONValueKind.OBJECT) {
       let scriptJSON = scriptJSONRaw.toObject();
 
       // Old site used curation_status, new site uses curationStatus
       let curationStatusJSONValue = scriptJSON.get("curation_status");
-      if (curationStatusJSONValue) {
-        if (curationStatusJSONValue.isNull()) {
-          curationStatusJSONValue = scriptJSON.get("curationStatus");
-        }
+      if (!curationStatusJSONValue || curationStatusJSONValue.isNull()) {
+        curationStatusJSONValue = scriptJSON.get("curationStatus");
+      }
 
-        if (
-          curationStatusJSONValue &&
-          curationStatusJSONValue.kind == JSONValueKind.STRING
-        ) {
-          let curationStatus = curationStatusJSONValue.toString();
-          project.curationStatus = curationStatus;
-        }
+      if (
+        curationStatusJSONValue &&
+        curationStatusJSONValue.kind == JSONValueKind.STRING
+      ) {
+        let curationStatus = curationStatusJSONValue.toString();
+        project.curationStatus = curationStatus;
       }
     }
 
@@ -745,8 +750,8 @@ function refreshContract<T>(contract: T, timestamp: BigInt): Contract | null {
   let contractEntity = Contract.load(contract._address.toHexString());
   if (!contractEntity) {
     contractEntity = new Contract(contract._address.toHexString());
+    contractEntity.createdAt = timestamp;
     contractEntity.mintWhitelisted = [];
-    contractEntity.updatedAt = timestamp;
   }
 
   contractEntity.admin = admin;
@@ -754,6 +759,7 @@ function refreshContract<T>(contract: T, timestamp: BigInt): Contract | null {
   contractEntity.renderProviderPercentage = artblocksPercentage;
   contractEntity.nextProjectId = nextProjectId;
   contractEntity.randomizerContract = contract.randomizerContract();
+  contractEntity.updatedAt = timestamp;
 
   contractEntity.save();
 
