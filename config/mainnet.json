@@ -17,6 +17,26 @@
       "address": "0x28f2D3805652FB5d359486dFfb7D08320D403240",
       "name": "Doodle Labs",
       "startBlock": 13426126
+    },
+    {
+      "address": "0xbdde08bd57e5c9fd563ee7ac61618cb2ecdc0ce0",
+      "name": "CryptoCitizens",
+      "startBlock": 13711854
+    },
+    {
+      "address": "0x13aAe6f9599880edbB7d144BB13F1212CeE99533",
+      "name": "Flutter Gen Art",
+      "startBlock": 13711972
+    },
+    {
+      "address": "0x62e37f664b5945629B6549a87F8e10Ed0B6D923b",
+      "name": "Tboa Club",
+      "startBlock": 13712223
+    },
+    {
+      "address": "0xa319C382a702682129fcbF55d514E61a16f97f9c",
+      "name": "Plottables",
+      "startBlock": 13712123
     }
   ],
   "openSeaContract": {
