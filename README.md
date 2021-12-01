@@ -14,7 +14,7 @@ For Ropsten subgraph deployments, we deploy directly to a hosted subgraph servic
 
 Mainnet subgraph deployments should **only** be done on Wednesdays, barring the need to push out a hotfix to resolve an outage or related breaking issue, in order to avoid adding to the risk of creating an outage on a drop-day.
 
-For mainnet subgraph deployments, we deploy first to the hosted subgraph service provided by The Graph, which takes ~24 hours to sync, and then proceed to deploying to the decentralized Graph network if all is confirmed to be working as intended, which takes an additional ~2 hours to sync.
+For mainnet subgraph deployments, we deploy first to the hosted subgraph service provided by The Graph, which takes ~36 hours to sync, and then proceed to deploying to the decentralized Graph network if all is confirmed to be working as intended, which takes an additional ~4 hours to sync.
 
 ## Graph Network Subgraph Publish Checklist
 1. Deploy any contracts to be indexed
