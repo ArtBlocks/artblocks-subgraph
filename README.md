@@ -1,4 +1,22 @@
-# Graph Network Subgraph Publish Checklist
+# Art Blocks Subgraph
+
+The Art Blocks subgraph definitions for The Graph.
+
+## Subgraph Deployments
+
+### Ropsten
+
+Ropsten subgraph deployments can be performed on any day of the working week, other than Friday, in order to avoid causing an outage on https://artist-staging.artblocks.io going into a weekend, when the team will not be readily available to look into it.
+
+For Ropsten subgraph deployments, we deploy directly to a hosted subgraph service provided by The Graph, which takes ~20 minutes to sync.
+
+### Mainnet
+
+Mainnet subgraph deployments should **only** be done on Wednesdays, barring the need to push out a hotfix to resolve an outage or related breaking issue, in order to avoid adding to the risk of creating an outage on a drop-day.
+
+For mainnet subgraph deployments, we deploy first to the hosted subgraph service provided by The Graph, which takes ~36 hours to sync, and then proceed to deploying to the decentralized Graph network if all is confirmed to be working as intended, which takes an additional ~4 hours to sync.
+
+## Graph Network Subgraph Publish Checklist
 1. Deploy any contracts to be indexed
     - Please see [ArtBlocks/artblocks-contracts](https://github.com/ArtBlocks/artblocks-contracts) for more info on contract deployment.
 2. Update the corresponding `config/` file for the desired network (e.g. `mainnet.json` for mainnet EVM) to include the newly deployed contracts
