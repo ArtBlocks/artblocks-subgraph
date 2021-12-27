@@ -1,0 +1,16 @@
+{
+  "data": {
+    "openSeaSale": {
+      "blockNumber": "11533331",
+      "blockTimestamp": "1609038637",
+      "buyer": "0xf3860788d1597cecf938424baabe976fac87dc26",
+      "id": "0x293da7134635d0d9d4e545712a04a56415bc4b13e7935928018414ff02946772",
+      "isPrivate": false,
+      "paymentToken": "0x0000000000000000000000000000000000000000",
+      "price": "1211450223222119263",
+      "saleType": "Single",
+      "seller": "0xcf0e9b4746cfb97bae329fe5f696969f6564566a",
+      "summaryTokensSold": "0x059edd72cd353df5106d2b9cc5ab83a52287ac3a-100"
+    }
+  }
+}

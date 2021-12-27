@@ -18,10 +18,13 @@
     "prepare:local": "mustache config/local.json subgraph.template.yaml > subgraph.yaml"
   },
   "dependencies": {
-    "@graphprotocol/graph-cli": "^0.22.4",
-    "@graphprotocol/graph-ts": "^0.23.1"
+    "@assemblyscript/loader": "^0.19.22",
+    "@graphprotocol/graph-cli": "^0.25.1",
+    "@graphprotocol/graph-ts": "^0.24.1",
+    "matchstick-as": "^0.2.2"
   },
   "devDependencies": {
+    "assemblyscript": "^0.19.22",
     "mustache": "^4.1.0"
   }
 }
