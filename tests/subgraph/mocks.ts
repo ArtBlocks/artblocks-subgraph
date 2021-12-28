@@ -3,6 +3,8 @@ import { Address, BigInt, ethereum } from "@graphprotocol/graph-ts"
 import { meridianScript } from '../meridianScript';
 import { AddProjectCall } from '../../generated/GenArt721Core/GenArt721Core';
 import { handleAddProject } from '../../src/mapping';
+import { Token } from "../../generated/schema";
+import { generateContractSpecificId } from '../../src/helpers';
 
 let coreContractAddress = Address.fromString("0xa7d8d9ef8D8Ce8992Df33D8b8CF4Aebabd5bD270");
 
@@ -85,4 +87,12 @@ export const createProjectToLoad = function(): void {
   ]
 
   handleAddProject(newProjectCall);
+}
+
+export const createTokenToLoad = function(address: Address, tokenId: BigInt): void {
+    let token = new Token(
+        generateContractSpecificId(address, tokenId)
+      );
+
+      token.save();
 }

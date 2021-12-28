@@ -1,4 +1,4 @@
-import { assert, clearStore, test,  newMockCall } from "matchstick-as/assembly/index"
+import { assert, clearStore, test,  newMockCall, createMockedFunction } from "matchstick-as/assembly/index"
 import { Address, BigInt, Bytes, ethereum, store, Value, log } from "@graphprotocol/graph-ts"
 import { GenArt721Core,
          AddProjectCall,
@@ -8,9 +8,17 @@ import { GenArt721Core,
          UpdateRandomizerAddressCall,
          UpdateArtblocksAddressCall,
          UpdateArtblocksPercentageCall,
-         AddProjectScriptCall
+         AddProjectScriptCall,
+         ClearTokenIpfsImageUriCall,
+         OverrideTokenDynamicImageWithIpfsLinkCall,
+         RemoveProjectLastScriptCall,
+         ToggleProjectIsActiveCall,
+         ToggleProjectIsDynamicCall,
+         ToggleProjectIsLockedCall,
+         ToggleProjectIsPausedCall
          } from '../../generated/GenArt721Core/GenArt721Core';
 import { Contract, Project, Token } from "../../generated/schema";
+import { generateContractSpecificId } from '../../src/helpers';
 import { logStore } from "matchstick-as";
 import { handleAddProject,
          handleAddWhitelisted, 
@@ -19,15 +27,23 @@ import { handleAddProject,
          handleUpdateRandomizerAddress,
          handleUpdateArtblocksAddress,
          handleUpdateArtblocksPercentage,
-         handleAddProjectScript } from '../../src/mapping';
+         handleAddProjectScript, 
+         handleClearTokenIpfsImageUri,
+         handleOverrideTokenDynamicImageWithIpfsLink,
+         handleRemoveProjectLastScript,
+         handleToggleProjectIsActive,
+         handleToggleProjectIsDynamic,
+         handleToggleProjectIsLocked,
+         handleToggleProjectIsPaused} from '../../src/mapping';
 import { meridianScript } from '../meridianScript';
-import { mockRefreshContractCalls, mockProjectContractCalls, mockRefreshProjectScript, createProjectToLoad } from './mocks';
+import { mockRefreshContractCalls, mockProjectContractCalls, mockRefreshProjectScript, createProjectToLoad, createTokenToLoad } from './mocks';
 
 let ACCOUNT_ENTITY_TYPE = "Account"
 let PROJECT_ENTITY_TYPE = "Project"
 let CONTRACT_ENTITY_TYPE = "Contract"
 let WHITELISTING_ENTITY_TYPE = "Whitelisting"
 let PROJECTSCRIPT_ENTITY_TYPE = "ProjectScript"
+let TOKEN_ENTITY_TYPE = "Token"
 
 test("Should throw an error", () => {
   throw new Error()
@@ -279,30 +295,204 @@ test("Can handle add project script", () => {
   clearStore();
 }, true)
 
-//all these tests are calling Project.load()...mock that Entity
-// test("Can clear a Token IPFS image uri", () => {
 
-//   }
+test("Can clear a Token IPFS image uri", () => {
+  let call = changetype<ClearTokenIpfsImageUriCall>(newMockCall())
+  
+  call.to = Address.fromString("0xa7d8d9ef8D8Ce8992Df33D8b8CF4Aebabd5bD270")  // must be 721Core?
+  call.block.timestamp = BigInt.fromString('1230')
+  call.inputValues = [
+    new ethereum.EventParam("_tokenId",
+    ethereum.Value.fromSignedBigInt(BigInt.fromString('123')))
+  ]
 
-// test("Can override token dynamic image with IPFS link", () => {
+  createMockedFunction(Address.fromString("0xa7d8d9ef8D8Ce8992Df33D8b8CF4Aebabd5bD270"), 'tokenURI', 'tokenURI(uint256):(string)')
+    .withArgs([ethereum.Value.fromSignedBigInt(BigInt.fromString('123'))])
+    .returns([ethereum.Value.fromString('mtwirsqawjuoloq2gvtyug2tc3jbf5htm2zeo4rsknfiv3fdp46a')])
 
-//   }
+  createTokenToLoad(call.to, call.inputs._tokenId);
+  let token = Token.load("0xa7d8d9ef8d8ce8992df33d8b8cf4aebabd5bd270-123");
+  
+  if (token) {
+    assert.assertNull(token.uri);
+  }
+    
+  handleClearTokenIpfsImageUri(call);
+  assert.fieldEquals(TOKEN_ENTITY_TYPE, "0xa7d8d9ef8d8ce8992df33d8b8cf4aebabd5bd270-123", "uri", "mtwirsqawjuoloq2gvtyug2tc3jbf5htm2zeo4rsknfiv3fdp46a")
 
-// test("Can remove a project's last script", () => {
+  clearStore();
+}, true);
 
-//   }
+test("Can override token dynamic image with IPFS link", () => {
+  let call = changetype<OverrideTokenDynamicImageWithIpfsLinkCall>(newMockCall())
+  
+  call.to = Address.fromString("0xa7d8d9ef8D8Ce8992Df33D8b8CF4Aebabd5bD270")
+  call.block.timestamp = BigInt.fromString('1230')
+  call.inputValues = [
+    new ethereum.EventParam("_tokenId",
+    ethereum.Value.fromSignedBigInt(BigInt.fromString('123'))),
+    new ethereum.EventParam("_ipfsHash",
+    ethereum.Value.fromString('mtwirsqawjuoloq2gvtyug2tc3jbf5htm2zeo4rsknfiv3fdp46a'))
+  ]
 
+createMockedFunction(Address.fromString("0xa7d8d9ef8D8Ce8992Df33D8b8CF4Aebabd5bD270"), 'tokenURI', 'tokenURI(uint256):(string)')
+  .withArgs([ethereum.Value.fromSignedBigInt(BigInt.fromString('123'))])
+  .returns([ethereum.Value.fromString('mtwirsqawjuoloq2gvtyug2tc3jbf5htm2zeo4rsknfiv3fdp46a')])
 
-// test("Can toggle projectIsActive", () => {
-//   let call = changetype<ToggleProjectIsActiveCall>(newMockCall())
+createTokenToLoad(call.to, call.inputs._tokenId);
+let token = Token.load("0xa7d8d9ef8d8ce8992df33d8b8cf4aebabd5bd270-123");
 
-//   call.inputValues = [
-//     new ethereum.EventParam("_projectId",
-//     ethereum.Value.fromString("12345"))
-//   ]
-//   handleToggleProjectIsActive(call)
+if (token) {
+  assert.assertNull(token.uri);
+}
 
-//   assert.fieldEquals(PROJECT_ENTITY_TYPE, "0x1233973F9aEa61250e98b697246cb10146903672", "active", "false")
+  handleOverrideTokenDynamicImageWithIpfsLink(call);
+  assert.fieldEquals(TOKEN_ENTITY_TYPE, "0xa7d8d9ef8d8ce8992df33d8b8cf4aebabd5bd270-123", "uri", "mtwirsqawjuoloq2gvtyug2tc3jbf5htm2zeo4rsknfiv3fdp46a")
 
-//   clearStore();
-// }, true)
+  clearStore();
+}, true);
+
+test("Can remove and update a project's last script", () => {
+  mockRefreshContractCalls();
+  mockProjectContractCalls();
+  mockRefreshProjectScript();
+
+  let call = changetype<RemoveProjectLastScriptCall>(newMockCall())
+  
+  call.to = Address.fromString("0xa7d8d9ef8D8Ce8992Df33D8b8CF4Aebabd5bD270")
+  call.block.timestamp = BigInt.fromString('1230')
+  call.inputValues = [
+    new ethereum.EventParam("_projectId",
+    ethereum.Value.fromSignedBigInt(BigInt.fromString('99')))
+  ]
+
+  let refreshScriptCall = changetype<AddProjectScriptCall>(newMockCall())
+  refreshScriptCall.to = call.to
+  refreshScriptCall.block.timestamp = call.block.timestamp
+  refreshScriptCall.inputValues = [
+    new ethereum.EventParam("_projectId",
+    ethereum.Value.fromSignedBigInt(BigInt.fromString('99'))),
+    new ethereum.EventParam("_script",
+    ethereum.Value.fromString(meridianScript))
+  ]
+
+  // mock a full Project entity before loading and removing a script
+  createProjectToLoad();
+  handleAddProjectScript(refreshScriptCall)
+
+  assert.fieldEquals(PROJECTSCRIPT_ENTITY_TYPE, "0xa7d8d9ef8d8ce8992df33d8b8cf4aebabd5bd270-99-0", "project", "0xa7d8d9ef8d8ce8992df33d8b8cf4aebabd5bd270-99")
+  assert.fieldEquals(PROJECTSCRIPT_ENTITY_TYPE, "0xa7d8d9ef8d8ce8992df33d8b8cf4aebabd5bd270-99-0", "script", meridianScript.toString())
+
+  handleRemoveProjectLastScript(call);
+  
+  assert.fieldEquals(PROJECTSCRIPT_ENTITY_TYPE, "0xa7d8d9ef8d8ce8992df33d8b8cf4aebabd5bd270-99-0", "project", "0xa7d8d9ef8d8ce8992df33d8b8cf4aebabd5bd270-99")
+  assert.fieldEquals(PROJECTSCRIPT_ENTITY_TYPE, "0xa7d8d9ef8d8ce8992df33d8b8cf4aebabd5bd270-99-0", "script", meridianScript.toString())
+
+  clearStore();
+  }, true);
+
+test("Can toggle if a project is active", () => {
+  mockRefreshContractCalls();
+  mockProjectContractCalls();
+
+  createProjectToLoad();
+
+  let call = changetype<ToggleProjectIsActiveCall>(newMockCall())
+  
+  call.to = Address.fromString("0xa7d8d9ef8D8Ce8992Df33D8b8CF4Aebabd5bD270")
+  call.block.timestamp = BigInt.fromString('230')
+  call.inputValues = [
+    new ethereum.EventParam("_projectId",
+    ethereum.Value.fromSignedBigInt(BigInt.fromString('99')))
+  ]
+
+  assert.fieldEquals(PROJECT_ENTITY_TYPE, "0xa7d8d9ef8d8ce8992df33d8b8cf4aebabd5bd270-99", "active", "false")
+  assert.fieldEquals(PROJECT_ENTITY_TYPE, "0xa7d8d9ef8d8ce8992df33d8b8cf4aebabd5bd270-99", "updatedAt", "1232")
+
+  handleToggleProjectIsActive(call);
+
+  assert.fieldEquals(PROJECT_ENTITY_TYPE, "0xa7d8d9ef8d8ce8992df33d8b8cf4aebabd5bd270-99", "active", "true")
+  assert.fieldEquals(PROJECT_ENTITY_TYPE, "0xa7d8d9ef8d8ce8992df33d8b8cf4aebabd5bd270-99", "updatedAt", "230")
+  assert.fieldEquals(PROJECT_ENTITY_TYPE, "0xa7d8d9ef8d8ce8992df33d8b8cf4aebabd5bd270-99", "activatedAt", "230")
+  clearStore();
+  }, true);
+
+test("Can toggle if a project is dynamic", () => {
+  mockRefreshContractCalls();
+  mockProjectContractCalls();
+
+  createProjectToLoad();
+
+  let call = changetype<ToggleProjectIsDynamicCall>(newMockCall())
+  
+  call.to = Address.fromString("0xa7d8d9ef8D8Ce8992Df33D8b8CF4Aebabd5bD270")
+  call.block.timestamp = BigInt.fromString('230')
+  call.inputValues = [
+    new ethereum.EventParam("_projectId",
+    ethereum.Value.fromSignedBigInt(BigInt.fromString('99')))
+  ]
+
+  assert.fieldEquals(PROJECT_ENTITY_TYPE, "0xa7d8d9ef8d8ce8992df33d8b8cf4aebabd5bd270-99", "dynamic", "true")
+  assert.fieldEquals(PROJECT_ENTITY_TYPE, "0xa7d8d9ef8d8ce8992df33d8b8cf4aebabd5bd270-99", "useHashString", "true")
+
+  handleToggleProjectIsDynamic(call);
+
+  assert.fieldEquals(PROJECT_ENTITY_TYPE, "0xa7d8d9ef8d8ce8992df33d8b8cf4aebabd5bd270-99", "dynamic", "false")
+  assert.fieldEquals(PROJECT_ENTITY_TYPE, "0xa7d8d9ef8d8ce8992df33d8b8cf4aebabd5bd270-99", "useHashString", "true")
+
+  clearStore();
+  }, true);
+
+test("Can toggle if a project is locked", () => {
+  mockRefreshContractCalls();
+  mockProjectContractCalls();
+
+  createProjectToLoad();
+
+  let call = changetype<ToggleProjectIsLockedCall>(newMockCall())
+  
+  call.to = Address.fromString("0xa7d8d9ef8D8Ce8992Df33D8b8CF4Aebabd5bD270")
+  call.block.timestamp = BigInt.fromString('230')
+  call.inputValues = [
+    new ethereum.EventParam("_projectId",
+    ethereum.Value.fromSignedBigInt(BigInt.fromString('99')))
+  ]
+
+  assert.fieldEquals(PROJECT_ENTITY_TYPE, "0xa7d8d9ef8d8ce8992df33d8b8cf4aebabd5bd270-99", "locked", "false")
+  assert.fieldEquals(PROJECT_ENTITY_TYPE, "0xa7d8d9ef8d8ce8992df33d8b8cf4aebabd5bd270-99", "updatedAt", "1232")
+
+  handleToggleProjectIsLocked(call);
+
+  assert.fieldEquals(PROJECT_ENTITY_TYPE, "0xa7d8d9ef8d8ce8992df33d8b8cf4aebabd5bd270-99", "locked", "true")
+  assert.fieldEquals(PROJECT_ENTITY_TYPE, "0xa7d8d9ef8d8ce8992df33d8b8cf4aebabd5bd270-99", "updatedAt", "230")
+
+  clearStore();
+  }, true);
+
+test("Can toggle if a project is paused", () => {
+  mockRefreshContractCalls();
+  mockProjectContractCalls();
+
+  createProjectToLoad();
+
+  let call = changetype<ToggleProjectIsPausedCall>(newMockCall())
+  
+  call.to = Address.fromString("0xa7d8d9ef8D8Ce8992Df33D8b8CF4Aebabd5bD270")
+  call.block.timestamp = BigInt.fromString('230')
+  call.inputValues = [
+    new ethereum.EventParam("_projectId",
+    ethereum.Value.fromSignedBigInt(BigInt.fromString('99')))
+  ]
+
+  assert.fieldEquals(PROJECT_ENTITY_TYPE, "0xa7d8d9ef8d8ce8992df33d8b8cf4aebabd5bd270-99", "paused", "true")
+  assert.fieldEquals(PROJECT_ENTITY_TYPE, "0xa7d8d9ef8d8ce8992df33d8b8cf4aebabd5bd270-99", "updatedAt", "1232")
+
+  handleToggleProjectIsPaused(call);
+
+  assert.fieldEquals(PROJECT_ENTITY_TYPE, "0xa7d8d9ef8d8ce8992df33d8b8cf4aebabd5bd270-99", "paused", "false")
+  assert.fieldEquals(PROJECT_ENTITY_TYPE, "0xa7d8d9ef8d8ce8992df33d8b8cf4aebabd5bd270-99", "updatedAt", "230")
+
+  clearStore();
+  }, true);
+
+  
