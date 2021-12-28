@@ -15,8 +15,23 @@ import { GenArt721Core,
          ToggleProjectIsActiveCall,
          ToggleProjectIsDynamicCall,
          ToggleProjectIsLockedCall,
-         ToggleProjectIsPausedCall
-         } from '../../generated/GenArt721Core/GenArt721Core';
+         ToggleProjectIsPausedCall,
+         ToggleProjectUseHashStringCall,
+         ToggleProjectUseIpfsForStaticCall,
+         UpdateProjectAdditionalPayeeInfoCall,
+         UpdateProjectArtistAddressCall,
+         UpdateProjectArtistNameCall,
+         UpdateProjectBaseIpfsURICall,
+         UpdateProjectBaseURICall,
+         UpdateProjectCurrencyInfoCall,
+         UpdateProjectDescriptionCall,
+         UpdateProjectIpfsHashCall,
+         UpdateProjectLicenseCall,
+         UpdateProjectMaxInvocationsCall,
+         UpdateProjectNameCall,
+         UpdateProjectPricePerTokenInWeiCall,
+         UpdateProjectWebsiteCall,
+         UpdateProjectSecondaryMarketRoyaltyPercentageCall } from '../../generated/GenArt721Core/GenArt721Core';
 import { Contract, Project, Token } from "../../generated/schema";
 import { generateContractSpecificId } from '../../src/helpers';
 import { logStore } from "matchstick-as";
@@ -34,7 +49,23 @@ import { handleAddProject,
          handleToggleProjectIsActive,
          handleToggleProjectIsDynamic,
          handleToggleProjectIsLocked,
-         handleToggleProjectIsPaused} from '../../src/mapping';
+         handleToggleProjectIsPaused,
+         handleToggleProjectUseHashString,
+         handleToggleProjectUseIpfsForStatic,
+         handleUpdateProjectAdditionalPayeeInfo,
+         handleUpdateProjectArtistAddress,
+         handleUpdateProjectArtistName,
+         handleUpdateProjectBaseIpfsURI,
+         handleUpdateProjectBaseURI,
+         handleUpdateProjectCurrencyInfo,
+         handleUpdateProjectDescription,
+         handleUpdateProjectIpfsHash,
+         handleUpdateProjectLicense,
+         handleUpdateProjectMaxInvocations,
+         handleUpdateProjectName,
+         handleUpdateProjectPricePerTokenInWei,
+         handleUpdateProjectWebsite,
+         handleUpdateProjectSecondaryMarketRoyaltyPercentage } from '../../src/mapping';
 import { meridianScript } from '../meridianScript';
 import { mockRefreshContractCalls, mockProjectContractCalls, mockRefreshProjectScript, createProjectToLoad, createTokenToLoad } from './mocks';
 
@@ -495,4 +526,416 @@ test("Can toggle if a project is paused", () => {
   clearStore();
   }, true);
 
+test("Can toggle a project's useHashString", () => {
+  mockRefreshContractCalls();
+  mockProjectContractCalls();
+
+  createProjectToLoad();
+
+  let call = changetype<ToggleProjectUseHashStringCall>(newMockCall())
   
+  call.to = Address.fromString("0xa7d8d9ef8D8Ce8992Df33D8b8CF4Aebabd5bD270")
+  call.block.timestamp = BigInt.fromString('230')
+  call.inputValues = [
+    new ethereum.EventParam("_projectId",
+    ethereum.Value.fromSignedBigInt(BigInt.fromString('99')))
+  ]
+
+  handleToggleProjectUseHashString(call);
+  assert.fieldEquals(PROJECT_ENTITY_TYPE, "0xa7d8d9ef8d8ce8992df33d8b8cf4aebabd5bd270-99", "useHashString", "false")
+
+  handleToggleProjectUseHashString(call);
+
+  assert.fieldEquals(PROJECT_ENTITY_TYPE, "0xa7d8d9ef8d8ce8992df33d8b8cf4aebabd5bd270-99", "useHashString", "true")
+
+  clearStore();
+  }, true);
+
+test("Can toggle if a project uses Ipfs", () => {
+  mockRefreshContractCalls();
+  mockProjectContractCalls();
+
+  createProjectToLoad();
+
+  let call = changetype<ToggleProjectUseIpfsForStaticCall>(newMockCall())
+  
+  call.to = Address.fromString("0xa7d8d9ef8D8Ce8992Df33D8b8CF4Aebabd5bD270")
+  call.block.timestamp = BigInt.fromString('230')
+  call.inputValues = [
+    new ethereum.EventParam("_projectId",
+    ethereum.Value.fromSignedBigInt(BigInt.fromString('99')))
+  ]
+
+  assert.fieldEquals(PROJECT_ENTITY_TYPE, "0xa7d8d9ef8d8ce8992df33d8b8cf4aebabd5bd270-99", "useIpfs", "false")
+
+  handleToggleProjectUseIpfsForStatic(call);
+
+  assert.fieldEquals(PROJECT_ENTITY_TYPE, "0xa7d8d9ef8d8ce8992df33d8b8cf4aebabd5bd270-99", "useIpfs", "true")
+
+  clearStore();
+  }, true);
+
+test("Can update a projects additional payee info", () => {
+  mockRefreshContractCalls();
+  mockProjectContractCalls();
+
+  createProjectToLoad();
+
+  let call = changetype<UpdateProjectAdditionalPayeeInfoCall>(newMockCall())
+  
+  call.to = Address.fromString("0xa7d8d9ef8D8Ce8992Df33D8b8CF4Aebabd5bD270")
+  call.block.timestamp = BigInt.fromString('230')
+  call.inputValues = [
+    new ethereum.EventParam("_projectId",
+    ethereum.Value.fromSignedBigInt(BigInt.fromString('99'))),
+    new ethereum.EventParam("_additionalPayee",
+    ethereum.Value.fromString("0x7ee88C660eE1B8B41c1BD75C0290E25F1228BE98")),
+    new ethereum.EventParam("_additionalPayeePercentage",
+    ethereum.Value.fromSignedBigInt(BigInt.fromString('20'))) 
+  ]
+
+  handleUpdateProjectAdditionalPayeeInfo(call);
+
+  assert.fieldEquals(PROJECT_ENTITY_TYPE, "0xa7d8d9ef8d8ce8992df33d8b8cf4aebabd5bd270-99", "additionalPayee", "0x7ee88C660eE1B8B41c1BD75C0290E25F1228BE98")
+  assert.fieldEquals(PROJECT_ENTITY_TYPE, "0xa7d8d9ef8d8ce8992df33d8b8cf4aebabd5bd270-99", "additionalPayeePercentage", "20")
+  assert.fieldEquals(PROJECT_ENTITY_TYPE, "0xa7d8d9ef8d8ce8992df33d8b8cf4aebabd5bd270-99", "updatedAt", "230")
+
+  clearStore();
+  }, true);
+
+test("Can update a projects artist address", () => {
+  clearStore();
+  logStore();
+  mockRefreshContractCalls();
+  mockProjectContractCalls();
+
+  createProjectToLoad();
+  
+  let call = changetype<UpdateProjectArtistAddressCall>(newMockCall())
+  
+  call.to = Address.fromString("0xa7d8d9ef8D8Ce8992Df33D8b8CF4Aebabd5bD270")
+  call.block.timestamp = BigInt.fromString('230')
+  call.inputValues = [
+    new ethereum.EventParam("_projectId",
+    ethereum.Value.fromSignedBigInt(BigInt.fromString('99'))),
+    new ethereum.EventParam("_artistAddress",
+    ethereum.Value.fromAddress(Address.fromString("0xF1687E6b9D811e01C2a03B473d9155315a82A812")))
+  ]
+
+  handleUpdateProjectArtistAddress(call);
+
+  assert.fieldEquals(PROJECT_ENTITY_TYPE, "0xa7d8d9ef8d8ce8992df33d8b8cf4aebabd5bd270-99", "artistAddress", "0xf1687e6b9d811e01c2a03b473d9155315a82a812")
+  assert.fieldEquals(PROJECT_ENTITY_TYPE, "0xa7d8d9ef8d8ce8992df33d8b8cf4aebabd5bd270-99", "artist", "0xf1687e6b9d811e01c2a03b473d9155315a82a812")
+  assert.fieldEquals(PROJECT_ENTITY_TYPE, "0xa7d8d9ef8d8ce8992df33d8b8cf4aebabd5bd270-99", "updatedAt", "230")
+
+  clearStore();
+  }, true);
+
+test("Can update a projects artist name", () => {
+  mockRefreshContractCalls();
+  mockProjectContractCalls();
+
+  createProjectToLoad();
+  
+  let call = changetype<UpdateProjectArtistNameCall>(newMockCall())
+  
+  call.to = Address.fromString("0xa7d8d9ef8D8Ce8992Df33D8b8CF4Aebabd5bD270")
+  call.block.timestamp = BigInt.fromString('230')
+  call.inputValues = [
+    new ethereum.EventParam("_projectId",
+    ethereum.Value.fromSignedBigInt(BigInt.fromString('99'))),
+    new ethereum.EventParam("_projectArtistName",
+    ethereum.Value.fromString("Beeple"))
+  ]
+
+  handleUpdateProjectArtistName(call);
+
+  assert.fieldEquals(PROJECT_ENTITY_TYPE, "0xa7d8d9ef8d8ce8992df33d8b8cf4aebabd5bd270-99", "artistName", "Beeple")
+  assert.fieldEquals(PROJECT_ENTITY_TYPE, "0xa7d8d9ef8d8ce8992df33d8b8cf4aebabd5bd270-99", "updatedAt", "230")
+
+  clearStore();
+  }, true);
+
+test("Can update a projects base Ipfs URI", () => {
+  mockRefreshContractCalls();
+  mockProjectContractCalls();
+
+  createProjectToLoad();
+  
+  let call = changetype<UpdateProjectBaseIpfsURICall>(newMockCall())
+  
+  call.to = Address.fromString("0xa7d8d9ef8D8Ce8992Df33D8b8CF4Aebabd5bD270")
+  call.block.timestamp = BigInt.fromString('230')
+  call.inputValues = [
+    new ethereum.EventParam("_projectId",
+    ethereum.Value.fromSignedBigInt(BigInt.fromString('99'))),
+    new ethereum.EventParam("_projectBaseIpfsURI",
+    ethereum.Value.fromString("Qme7ss3ARVgxv6rXqVPiikMJ8u2NLgmgszg13pYrDKEoiu"))
+  ]
+
+  handleUpdateProjectBaseIpfsURI(call);
+
+  assert.fieldEquals(PROJECT_ENTITY_TYPE, "0xa7d8d9ef8d8ce8992df33d8b8cf4aebabd5bd270-99", "baseIpfsUri", "Qme7ss3ARVgxv6rXqVPiikMJ8u2NLgmgszg13pYrDKEoiu")
+
+  clearStore();
+  }, true);
+
+test("Can update a projects base URI", () => {
+  mockRefreshContractCalls();
+  mockProjectContractCalls();
+
+  createProjectToLoad();
+  
+  let call = changetype<UpdateProjectBaseURICall>(newMockCall())
+  
+  call.to = Address.fromString("0xa7d8d9ef8D8Ce8992Df33D8b8CF4Aebabd5bD270")
+  call.block.timestamp = BigInt.fromString('230')
+  call.inputValues = [
+    new ethereum.EventParam("_projectId",
+    ethereum.Value.fromSignedBigInt(BigInt.fromString('99'))),
+    new ethereum.EventParam("_newBaseURI",
+    ethereum.Value.fromString("random_new_base_URI"))
+  ]
+
+  handleUpdateProjectBaseURI(call);
+  
+  assert.fieldEquals(PROJECT_ENTITY_TYPE, "0xa7d8d9ef8d8ce8992df33d8b8cf4aebabd5bd270-99", "baseUri", "random_new_base_URI")
+
+  clearStore();
+  }, true);
+
+test("Can update a projects currency info", () => {
+  mockRefreshContractCalls();
+  mockProjectContractCalls();
+
+  createProjectToLoad();
+  
+  let call = changetype<UpdateProjectCurrencyInfoCall>(newMockCall())
+  
+  call.to = Address.fromString("0xa7d8d9ef8D8Ce8992Df33D8b8CF4Aebabd5bD270")
+  call.block.timestamp = BigInt.fromString('230')
+  call.inputValues = [
+    new ethereum.EventParam("_projectId",
+    ethereum.Value.fromSignedBigInt(BigInt.fromString('99'))),
+    new ethereum.EventParam("_currencySymbol",
+    ethereum.Value.fromString("SOS")),
+    new ethereum.EventParam("_currencyAddress",
+    ethereum.Value.fromAddress(Address.fromString("0x3b484b82567a09e2588A13D54D032153f0c0aEe0")))
+  ]
+
+  assert.fieldEquals(PROJECT_ENTITY_TYPE, "0xa7d8d9ef8d8ce8992df33d8b8cf4aebabd5bd270-99", "currencySymbol", "GRT")
+
+  handleUpdateProjectCurrencyInfo(call);
+  
+  assert.fieldEquals(PROJECT_ENTITY_TYPE, "0xa7d8d9ef8d8ce8992df33d8b8cf4aebabd5bd270-99", "currencySymbol", "SOS")
+  assert.fieldEquals(PROJECT_ENTITY_TYPE, "0xa7d8d9ef8d8ce8992df33d8b8cf4aebabd5bd270-99", "currencyAddress", "0x3b484b82567a09e2588a13d54d032153f0c0aee0")
+  assert.fieldEquals(PROJECT_ENTITY_TYPE, "0xa7d8d9ef8d8ce8992df33d8b8cf4aebabd5bd270-99", "updatedAt", "230")
+
+  clearStore();
+  }, true);
+
+test("Can update a projects description", () => {
+  mockRefreshContractCalls();
+  mockProjectContractCalls();
+
+  createProjectToLoad();
+  
+  let call = changetype<UpdateProjectDescriptionCall>(newMockCall())
+  
+  call.to = Address.fromString("0xa7d8d9ef8D8Ce8992Df33D8b8CF4Aebabd5bD270")
+  call.block.timestamp = BigInt.fromString('230')
+  call.inputValues = [
+    new ethereum.EventParam("_projectId",
+    ethereum.Value.fromSignedBigInt(BigInt.fromString('99'))),
+    new ethereum.EventParam("_projectDescription",
+    ethereum.Value.fromString("Template description blah blah blah"))
+  ]
+
+  handleUpdateProjectDescription(call);
+  
+  assert.fieldEquals(PROJECT_ENTITY_TYPE, "0xa7d8d9ef8d8ce8992df33d8b8cf4aebabd5bd270-99", "description", "Template description blah blah blah")
+  assert.fieldEquals(PROJECT_ENTITY_TYPE, "0xa7d8d9ef8d8ce8992df33d8b8cf4aebabd5bd270-99", "updatedAt", "230")
+
+  clearStore();
+  }, true);
+
+test("Can update a projects IPFS Hash", () => {
+  mockRefreshContractCalls();
+  mockProjectContractCalls();
+
+  createProjectToLoad();
+  
+  let call = changetype<UpdateProjectIpfsHashCall>(newMockCall())
+  
+  call.to = Address.fromString("0xa7d8d9ef8D8Ce8992Df33D8b8CF4Aebabd5bD270")
+  call.block.timestamp = BigInt.fromString('230')
+  call.inputValues = [
+    new ethereum.EventParam("_projectId",
+    ethereum.Value.fromSignedBigInt(BigInt.fromString('99'))),
+    new ethereum.EventParam("_ipfsHash",
+    ethereum.Value.fromString("bafybeigdyrzt5sfp7udm7hu76uh7y26nf3efuylqabf3oclgtqy55fbzdi"))
+  ]
+
+  handleUpdateProjectIpfsHash(call);
+  
+  assert.fieldEquals(PROJECT_ENTITY_TYPE, "0xa7d8d9ef8d8ce8992df33d8b8cf4aebabd5bd270-99", "ipfsHash", "bafybeigdyrzt5sfp7udm7hu76uh7y26nf3efuylqabf3oclgtqy55fbzdi")
+  assert.fieldEquals(PROJECT_ENTITY_TYPE, "0xa7d8d9ef8d8ce8992df33d8b8cf4aebabd5bd270-99", "updatedAt", "230")
+
+  clearStore();
+  }, true);
+
+test("Can update a project license", () => {
+  mockRefreshContractCalls();
+  mockProjectContractCalls();
+
+  createProjectToLoad();
+  
+  let call = changetype<UpdateProjectLicenseCall>(newMockCall())
+  
+  call.to = Address.fromString("0xa7d8d9ef8D8Ce8992Df33D8b8CF4Aebabd5bD270")
+  call.block.timestamp = BigInt.fromString('230')
+  call.inputValues = [
+    new ethereum.EventParam("_projectId",
+    ethereum.Value.fromSignedBigInt(BigInt.fromString('99'))),
+    new ethereum.EventParam("_projectLicense",
+    ethereum.Value.fromString("MIT License - please copy if you want"))
+  ]
+
+  handleUpdateProjectLicense(call);
+  
+  assert.fieldEquals(PROJECT_ENTITY_TYPE, "0xa7d8d9ef8d8ce8992df33d8b8cf4aebabd5bd270-99", "license", "MIT License - please copy if you want")
+  assert.fieldEquals(PROJECT_ENTITY_TYPE, "0xa7d8d9ef8d8ce8992df33d8b8cf4aebabd5bd270-99", "updatedAt", "230")
+
+  clearStore();
+  }, true);
+
+test("Can update a project max invocations", () => {
+  mockRefreshContractCalls();
+  mockProjectContractCalls();
+
+  createProjectToLoad();
+  
+  let call = changetype<UpdateProjectMaxInvocationsCall>(newMockCall())
+  
+  call.to = Address.fromString("0xa7d8d9ef8D8Ce8992Df33D8b8CF4Aebabd5bD270")
+  call.block.timestamp = BigInt.fromString('230')
+  call.inputValues = [
+    new ethereum.EventParam("_projectId",
+    ethereum.Value.fromSignedBigInt(BigInt.fromString('99'))),
+    new ethereum.EventParam("_maxInvocations",
+    ethereum.Value.fromSignedBigInt(BigInt.fromString('9999')))
+  ]
+  
+  assert.fieldEquals(PROJECT_ENTITY_TYPE, "0xa7d8d9ef8d8ce8992df33d8b8cf4aebabd5bd270-99", "maxInvocations", "1024")
+  handleUpdateProjectMaxInvocations(call);
+  
+  assert.fieldEquals(PROJECT_ENTITY_TYPE, "0xa7d8d9ef8d8ce8992df33d8b8cf4aebabd5bd270-99", "maxInvocations", "9999")
+  assert.fieldEquals(PROJECT_ENTITY_TYPE, "0xa7d8d9ef8d8ce8992df33d8b8cf4aebabd5bd270-99", "complete", "false")
+  assert.fieldEquals(PROJECT_ENTITY_TYPE, "0xa7d8d9ef8d8ce8992df33d8b8cf4aebabd5bd270-99", "updatedAt", "230")
+
+  clearStore();
+  }, true);
+
+test("Can update a project name", () => {
+  mockRefreshContractCalls();
+  mockProjectContractCalls();
+
+  createProjectToLoad();
+  
+  let call = changetype<UpdateProjectNameCall>(newMockCall())
+  
+  call.to = Address.fromString("0xa7d8d9ef8D8Ce8992Df33D8b8CF4Aebabd5bD270")
+  call.block.timestamp = BigInt.fromString('230')
+  call.inputValues = [
+    new ethereum.EventParam("_projectId",
+    ethereum.Value.fromSignedBigInt(BigInt.fromString('99'))),
+    new ethereum.EventParam("_projectName",
+    ethereum.Value.fromString("Chimera"))
+  ]
+  
+  assert.fieldEquals(PROJECT_ENTITY_TYPE, "0xa7d8d9ef8d8ce8992df33d8b8cf4aebabd5bd270-99", "name", "string1")
+  handleUpdateProjectName(call);
+  
+  assert.fieldEquals(PROJECT_ENTITY_TYPE, "0xa7d8d9ef8d8ce8992df33d8b8cf4aebabd5bd270-99", "name", "Chimera")
+  assert.fieldEquals(PROJECT_ENTITY_TYPE, "0xa7d8d9ef8d8ce8992df33d8b8cf4aebabd5bd270-99", "updatedAt", "230")
+
+  clearStore();
+  }, true);
+
+test("Can update a project price per token in wei", () => {
+  mockRefreshContractCalls();
+  mockProjectContractCalls();
+
+  createProjectToLoad();
+  
+  let call = changetype<UpdateProjectPricePerTokenInWeiCall>(newMockCall())
+  
+  call.to = Address.fromString("0xa7d8d9ef8D8Ce8992Df33D8b8CF4Aebabd5bD270")
+  call.block.timestamp = BigInt.fromString('230')
+  call.inputValues = [
+    new ethereum.EventParam("_projectId",
+    ethereum.Value.fromSignedBigInt(BigInt.fromString('99'))),
+    new ethereum.EventParam("_pricePerTokenInWei",
+    ethereum.Value.fromString("987654321"))
+  ]
+
+  assert.fieldEquals(PROJECT_ENTITY_TYPE, "0xa7d8d9ef8d8ce8992df33d8b8cf4aebabd5bd270-99", "pricePerTokenInWei", "100000000")
+  handleUpdateProjectPricePerTokenInWei(call);
+  
+  assert.fieldEquals(PROJECT_ENTITY_TYPE, "0xa7d8d9ef8d8ce8992df33d8b8cf4aebabd5bd270-99", "pricePerTokenInWei", "987654321")
+  assert.fieldEquals(PROJECT_ENTITY_TYPE, "0xa7d8d9ef8d8ce8992df33d8b8cf4aebabd5bd270-99", "updatedAt", "230")
+
+  clearStore();
+  }, true);
+
+test("Can update project secondary market royalties", () => {
+  clearStore();
+  mockRefreshContractCalls();
+  mockProjectContractCalls();
+
+  createProjectToLoad();
+  
+  let call = changetype<UpdateProjectSecondaryMarketRoyaltyPercentageCall>(newMockCall())
+  
+  call.to = Address.fromString("0xa7d8d9ef8D8Ce8992Df33D8b8CF4Aebabd5bD270")
+  call.block.timestamp = BigInt.fromString('230')
+  call.inputValues = [
+    new ethereum.EventParam("_projectId",
+    ethereum.Value.fromSignedBigInt(BigInt.fromString('99'))),
+    new ethereum.EventParam("_secondMarketRoyalty",
+    ethereum.Value.fromSignedBigInt(BigInt.fromString('125')))
+  ]
+
+  handleUpdateProjectSecondaryMarketRoyaltyPercentage(call);
+  
+  assert.fieldEquals(PROJECT_ENTITY_TYPE, "0xa7d8d9ef8d8ce8992df33d8b8cf4aebabd5bd270-99", "royaltyPercentage", "125")
+  assert.fieldEquals(PROJECT_ENTITY_TYPE, "0xa7d8d9ef8d8ce8992df33d8b8cf4aebabd5bd270-99", "updatedAt", "230")
+
+  clearStore();
+  }, true);
+
+test("Can update a project website", () => {
+  clearStore();
+  mockRefreshContractCalls();
+  mockProjectContractCalls();
+
+  createProjectToLoad();
+  
+  let call = changetype<UpdateProjectWebsiteCall>(newMockCall())
+  
+  call.to = Address.fromString("0xa7d8d9ef8D8Ce8992Df33D8b8CF4Aebabd5bD270")
+  call.block.timestamp = BigInt.fromString('230')
+  call.inputValues = [
+    new ethereum.EventParam("_projectId",
+    ethereum.Value.fromSignedBigInt(BigInt.fromString('99'))),
+    new ethereum.EventParam("_projectWebsite",
+    ethereum.Value.fromString("artblocks.io"))
+  ]
+
+  handleUpdateProjectWebsite(call);
+  
+  assert.fieldEquals(PROJECT_ENTITY_TYPE, "0xa7d8d9ef8d8ce8992df33d8b8cf4aebabd5bd270-99", "website", "artblocks.io")
+  assert.fieldEquals(PROJECT_ENTITY_TYPE, "0xa7d8d9ef8d8ce8992df33d8b8cf4aebabd5bd270-99", "updatedAt", "230")
+
+  clearStore();
+  }, true);
