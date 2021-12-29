@@ -36,3 +36,25 @@ For mainnet subgraph deployments, we deploy first to the hosted subgraph service
 11. Update the Hasura `ARTBLOCKS_SUBGRAPH_URL` environment variable to be the new subgraph deployment url (`https://gateway.thegraph.com/api/<API KEY>/deployments/id/<DEPLOYMENT ID>`)
 12. Verify that the frontend is working as expected
 13. If the newly published changes include indexing any new contracts run the sync-from.ts script in the artblocks repo. When prompted enter the list of added contract addresses separated by spaces and the unix timestamp from which to sync from (use the time the earliest deployed contract was deployed).
+
+## Testing
+
+To run unit tests using [Matchstick](https://thegraph.com/docs/en/developer/matchstick) (Graph protocol's recommended testing framework), simply run `yarn test`.
+
+**Testing pattern:** unit tests in a `.test.ts` file will mock a Solidity call or event using newMockCal(). Additional mocks are needed for any Solidity function calls (say, contract.projectDetails()). Next, make a call to a handler in a `mapping.ts` file to create/edit/delete a GraphQL entity in a local in-memory store. Finally, `assert()` against the entity to confirm your logic ran as expected.
+
+Logging utils can be imported from matchstick-as and used to:
+1. Print all GraphQL entities currently saved in the local store (`logStore()`)
+2. Print from a given line and print a stored val (`log.info("user_message"{}’, [user_val.toString()])`)
+    Note: 
+        - the array is required as a second argument with or without a value to print.
+        - Curly braces after the logged messages are only required to interpolate a printed var.
+        - Multiple vars can be printed like so: (`log.info("testing..."{}{}{}’, [val1.toString(), val2.toString(), val3.toString()])`)
+
+To write to & read from the in-memory data store, use .save() and .load(). You can delete and re-build the store between tests using clearStore().
+
+`derivedFrom` GraphQL entity fields cannot be tested by Matchstick (v0.2.2). These are added at query time.
+
+**Matchstick error handling "gotcha's" -**
+    - Test assertions can still "pass" with a green checkmark... with broken logic in your code (without creating & asserting against a GraphQL entity, for example). To fix, write assertions that will fail first with an incorrect value --> then once your mocks & setup are correct, update your assert. value to pass to confirm your call handler is covered. You can also use logStore() to confirm your entity was created/modified successfuly
+    - Type conversion is a MUST, especially when mocking the Solidity call inputValues. Matchstick won't always flag a type mismatch. Instead, the test might pass, or break with no verbose error message. You may want to set logging breakpoints throughout your test to see which are missed by the unit test breaking. Try logging your inputValues in your mapping file to confirm the type conversion was successful- if not, your log message will print but your val will be missing.

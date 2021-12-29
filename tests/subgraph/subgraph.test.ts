@@ -1,7 +1,9 @@
 import { assert, clearStore, test,  newMockCall, createMockedFunction } from "matchstick-as/assembly/index"
-import { Address, BigInt, Bytes, ethereum, store, Value, log } from "@graphprotocol/graph-ts"
-import { GenArt721Core,
-         AddProjectCall,
+import { Address, BigInt, ethereum } from "@graphprotocol/graph-ts"
+import { meridianScript } from '../meridianScript';
+import { mockRefreshContractCalls, mockProjectContractCalls, mockRefreshProjectScript, createProjectToLoad, createTokenToLoad } from './mocks';
+import { Token } from "../../generated/schema";
+import { AddProjectCall,
          AddWhitelistedCall, 
          RemoveWhitelistedCall, 
          AddMintWhitelistedCall, 
@@ -31,10 +33,10 @@ import { GenArt721Core,
          UpdateProjectNameCall,
          UpdateProjectPricePerTokenInWeiCall,
          UpdateProjectWebsiteCall,
-         UpdateProjectSecondaryMarketRoyaltyPercentageCall } from '../../generated/GenArt721Core/GenArt721Core';
-import { Contract, Project, Token } from "../../generated/schema";
-import { generateContractSpecificId } from '../../src/helpers';
-import { logStore } from "matchstick-as";
+         UpdateProjectSecondaryMarketRoyaltyPercentageCall,
+         RemoveMintWhitelistedCall,
+         UpdateProjectScriptCall,
+         UpdateProjectScriptJSONCall } from '../../generated/GenArt721Core/GenArt721Core';
 import { handleAddProject,
          handleAddWhitelisted, 
          handleRemoveWhitelisted, 
@@ -65,9 +67,10 @@ import { handleAddProject,
          handleUpdateProjectName,
          handleUpdateProjectPricePerTokenInWei,
          handleUpdateProjectWebsite,
-         handleUpdateProjectSecondaryMarketRoyaltyPercentage } from '../../src/mapping';
-import { meridianScript } from '../meridianScript';
-import { mockRefreshContractCalls, mockProjectContractCalls, mockRefreshProjectScript, createProjectToLoad, createTokenToLoad } from './mocks';
+         handleUpdateProjectSecondaryMarketRoyaltyPercentage,
+         handleRemoveMintWhitelisted,
+         handleUpdateProjectScript,
+         handleUpdateProjectScriptJSON } from '../../src/mapping';
 
 let ACCOUNT_ENTITY_TYPE = "Account"
 let PROJECT_ENTITY_TYPE = "Project"
@@ -76,18 +79,13 @@ let WHITELISTING_ENTITY_TYPE = "Whitelisting"
 let PROJECTSCRIPT_ENTITY_TYPE = "ProjectScript"
 let TOKEN_ENTITY_TYPE = "Token"
 
-test("Should throw an error", () => {
-  throw new Error()
-}, true)
-
 test("Can add a new project", () => {
   mockRefreshContractCalls();
   mockProjectContractCalls();
 
   let call = changetype<AddProjectCall>(newMockCall())
-  call.to = Address.fromString("0xa7d8d9ef8D8Ce8992Df33D8b8CF4Aebabd5bD270")  // must be 721Core?
+  call.to = Address.fromString("0xa7d8d9ef8D8Ce8992Df33D8b8CF4Aebabd5bD270")
   call.block.timestamp = BigInt.fromString('1230')
-  let addr = Address.fromString("0x1233973F9aEa61250e98b697246cb10146903672")
 
   call.inputValues = [
     new ethereum.EventParam("projectName", 
@@ -117,13 +115,13 @@ test("Can add a new project", () => {
   clearStore();
 });
 
-// don't test handleUpdateAdmin -- function needs to interact with Core2?
+// don't test handleUpdateAdmin -- function needs to interact with Core2
 // test("Can update admin", () => {
 //   log.info('call1: ',[])
 //   let call = changetype<UpdateAdminCall>(newMockCall())
   
 //   let core2ContractAddress = Address.fromString("0xa7d8d9ef8D8Ce8992Df33D8b8CF4Aebabd5bD270")
-//   call.to = Address.fromString("0xa7d8d9ef8D8Ce8992Df33D8b8CF4Aebabd5bD270")  // must be 721Core?
+//   call.to = Address.fromString("0xa7d8d9ef8D8Ce8992Df33D8b8CF4Aebabd5bD270")
 //   call.inputValues = [
 //     new ethereum.EventParam("_adminAddress",
 //     ethereum.Value.fromString("0x1233973F9aEa61250e98b697246cb10146903672"))
@@ -149,7 +147,7 @@ test("Can add a new project", () => {
 test("Can add whitelisting to a contract and account", () => {
   let call = changetype<AddWhitelistedCall>(newMockCall())
   
-  call.to = Address.fromString("0xa7d8d9ef8D8Ce8992Df33D8b8CF4Aebabd5bD270")  // must be 721Core?
+  call.to = Address.fromString("0xa7d8d9ef8D8Ce8992Df33D8b8CF4Aebabd5bD270")
   call.block.timestamp = BigInt.fromString('1230')
   let addr = Address.fromString("0x1233973F9aEa61250e98b697246cb10146903672")
   call.inputValues = [
@@ -175,20 +173,20 @@ test("Can add whitelisting to a contract and account", () => {
 }, true)
 
 
-test("Can delete whitelisting", () => {
+test("Can remove whitelisting", () => {
   let callToAddWhitelist = changetype<AddWhitelistedCall>(newMockCall())
   let callToRemoveWhitelist = changetype<RemoveWhitelistedCall>(newMockCall())
   let addr1 = Address.fromString("0x1233973F9aEa61250e98b697246cb10146903672")
   let addr2 = Address.fromString("0x1233973F9aEa61250e98b697246cb10146903672")
   
-  callToAddWhitelist.to = Address.fromString("0xa7d8d9ef8D8Ce8992Df33D8b8CF4Aebabd5bD270")  // must be 721Core?
+  callToAddWhitelist.to = Address.fromString("0xa7d8d9ef8D8Ce8992Df33D8b8CF4Aebabd5bD270")
   callToAddWhitelist.block.timestamp = BigInt.fromString('1230')
   callToAddWhitelist.inputValues = [
     new ethereum.EventParam("_address",
     ethereum.Value.fromAddress(addr1))
   ]
   
-  callToRemoveWhitelist.to = Address.fromString("0xa7d8d9ef8D8Ce8992Df33D8b8CF4Aebabd5bD270")  // must be 721Core?
+  callToRemoveWhitelist.to = Address.fromString("0xa7d8d9ef8D8Ce8992Df33D8b8CF4Aebabd5bD270")
   callToRemoveWhitelist.block.timestamp = BigInt.fromString('1230')
   callToRemoveWhitelist.inputValues = [
     new ethereum.EventParam("_address",
@@ -211,7 +209,7 @@ test("Can add and mint whitelisted call", () => {
   let call = changetype<AddMintWhitelistedCall>(newMockCall())
   let addr1 = Address.fromString("0x1233973F9aEa61250e98b697246cb10146903672")
   
-  call.to = Address.fromString("0xa7d8d9ef8D8Ce8992Df33D8b8CF4Aebabd5bD270")  // must be 721Core?
+  call.to = Address.fromString("0xa7d8d9ef8D8Ce8992Df33D8b8CF4Aebabd5bD270")
   call.block.timestamp = BigInt.fromString('1231')
   call.inputValues = [
     new ethereum.EventParam("_address",
@@ -229,19 +227,44 @@ test("Can add and mint whitelisted call", () => {
   clearStore();
 }, true)
 
-// test("Can remove a mint whitelisted address", () => {
+test("Can remove a mint whitelisted address", () => {
+  mockRefreshContractCalls();
 
-//   assert.fieldEquals(CONTRACT_ENTITY_TYPE, "0xa7d8d9ef8d8ce8992df33d8b8cf4aebabd5bd270", "id", "0xa7d8d9ef8d8ce8992df33d8b8cf4aebabd5bd270")
-//   assert.fieldEquals(CONTRACT_ENTITY_TYPE, "0xa7d8d9ef8d8ce8992df33d8b8cf4aebabd5bd270", "mintWhitelisted", "[0x1233973f9aea61250e98b697246cb10146903672]")
+  let addWhitelistCall = changetype<AddMintWhitelistedCall>(newMockCall())
+  addWhitelistCall.to = Address.fromString("0xa7d8d9ef8D8Ce8992Df33D8b8CF4Aebabd5bD270")
+  addWhitelistCall.block.timestamp = BigInt.fromString('1230')
+  addWhitelistCall.inputValues = [
+    new ethereum.EventParam("_address",
+    ethereum.Value.fromAddress(Address.fromString("0x1233973F9aEa61250e98b697246cb10146903672")))
+  ]
+
+  let removeWhitelistCall = changetype<RemoveMintWhitelistedCall>(newMockCall())
+  removeWhitelistCall.to = Address.fromString("0xa7d8d9ef8D8Ce8992Df33D8b8CF4Aebabd5bD270")
+  removeWhitelistCall.block.timestamp = BigInt.fromString('1231')
+  removeWhitelistCall.inputValues = [
+    new ethereum.EventParam("_address",
+    ethereum.Value.fromAddress(Address.fromString("0x1233973F9aEa61250e98b697246cb10146903672")))
+  ]
+
+  handleAddMintWhitelisted(addWhitelistCall);
+  addWhitelistCall.inputValues = [
+    new ethereum.EventParam("_address",
+    ethereum.Value.fromAddress(Address.fromString("0x1233973f9aea61250e98b697246cb10146912345")))
+  ];
+  handleAddMintWhitelisted(addWhitelistCall);
+
+  assert.fieldEquals(CONTRACT_ENTITY_TYPE, "0xa7d8d9ef8d8ce8992df33d8b8cf4aebabd5bd270", "mintWhitelisted", "[0x1233973f9aea61250e98b697246cb10146903672, 0x1233973f9aea61250e98b697246cb10146912345]")
+  handleRemoveMintWhitelisted(removeWhitelistCall);
   
-//   assert.notInStore(WHITELISTING_ENTITY_TYPE, "0xa7d8d9ef8d8ce8992df33d8b8cf4aebabd5bd270-0x1233973f9aea61250e98b697246cb10146903672")
-//   clearStore();
-// }, true)
+  assert.fieldEquals(CONTRACT_ENTITY_TYPE, "0xa7d8d9ef8d8ce8992df33d8b8cf4aebabd5bd270", "mintWhitelisted", "[0x1233973f9aea61250e98b697246cb10146912345]")
+  
+  clearStore();
+}, true)
 
 test("Can update randomizer address", () => {
   let call = changetype<UpdateRandomizerAddressCall>(newMockCall())
   
-  call.to = Address.fromString("0xa7d8d9ef8D8Ce8992Df33D8b8CF4Aebabd5bD270")  // must be 721Core?
+  call.to = Address.fromString("0xa7d8d9ef8D8Ce8992Df33D8b8CF4Aebabd5bD270")
   call.block.timestamp = BigInt.fromString('1230')
   let addr = Address.fromString("0x1233973F9aEa61250e98b697246cb10146903672")
   call.inputValues = [
@@ -261,7 +284,7 @@ test("Can update randomizer address", () => {
 test("Can update ArtBlocks address", () => {
   let call = changetype<UpdateArtblocksAddressCall>(newMockCall())
   
-  call.to = Address.fromString("0xa7d8d9ef8D8Ce8992Df33D8b8CF4Aebabd5bD270")  // must be 721Core?
+  call.to = Address.fromString("0xa7d8d9ef8D8Ce8992Df33D8b8CF4Aebabd5bD270")
   call.block.timestamp = BigInt.fromString('1230')
   let addr = Address.fromString("0x1233973F9aEa61250e98b697246cb10146903672")
   call.inputValues = [
@@ -282,7 +305,7 @@ test("Can update ArtBlocks address", () => {
 test("Can update ArtBlocks percentage", () => {
   let call = changetype<UpdateArtblocksPercentageCall>(newMockCall())
   
-  call.to = Address.fromString("0xa7d8d9ef8D8Ce8992Df33D8b8CF4Aebabd5bD270")  // must be 721Core?
+  call.to = Address.fromString("0xa7d8d9ef8D8Ce8992Df33D8b8CF4Aebabd5bD270")
   call.block.timestamp = BigInt.fromString('1230')
   let addr = Address.fromString("0x1233973F9aEa61250e98b697246cb10146903672")
   call.inputValues = [
@@ -309,7 +332,7 @@ test("Can handle add project script", () => {
   createProjectToLoad();
 
   let refreshScriptCall = changetype<AddProjectScriptCall>(newMockCall())
-  refreshScriptCall.to = Address.fromString("0xa7d8d9ef8D8Ce8992Df33D8b8CF4Aebabd5bD270")  // must be 721Core?
+  refreshScriptCall.to = Address.fromString("0xa7d8d9ef8D8Ce8992Df33D8b8CF4Aebabd5bD270")
   refreshScriptCall.block.timestamp = BigInt.fromString('1231')
   refreshScriptCall.inputValues = [
     new ethereum.EventParam("_projectId",
@@ -330,7 +353,7 @@ test("Can handle add project script", () => {
 test("Can clear a Token IPFS image uri", () => {
   let call = changetype<ClearTokenIpfsImageUriCall>(newMockCall())
   
-  call.to = Address.fromString("0xa7d8d9ef8D8Ce8992Df33D8b8CF4Aebabd5bD270")  // must be 721Core?
+  call.to = Address.fromString("0xa7d8d9ef8D8Ce8992Df33D8b8CF4Aebabd5bD270")
   call.block.timestamp = BigInt.fromString('1230')
   call.inputValues = [
     new ethereum.EventParam("_tokenId",
@@ -605,7 +628,6 @@ test("Can update a projects additional payee info", () => {
 
 test("Can update a projects artist address", () => {
   clearStore();
-  logStore();
   mockRefreshContractCalls();
   mockProjectContractCalls();
 
@@ -884,6 +906,65 @@ test("Can update a project price per token in wei", () => {
   
   assert.fieldEquals(PROJECT_ENTITY_TYPE, "0xa7d8d9ef8d8ce8992df33d8b8cf4aebabd5bd270-99", "pricePerTokenInWei", "987654321")
   assert.fieldEquals(PROJECT_ENTITY_TYPE, "0xa7d8d9ef8d8ce8992df33d8b8cf4aebabd5bd270-99", "updatedAt", "230")
+
+  clearStore();
+  }, true);
+
+test("Can handleUpdateProjectScript", () => {
+  clearStore();
+  mockRefreshContractCalls();
+  mockProjectContractCalls();
+  mockRefreshProjectScript();
+  createProjectToLoad();
+
+  let call = changetype<UpdateProjectScriptCall>(newMockCall())
+  
+  call.to = Address.fromString("0xa7d8d9ef8D8Ce8992Df33D8b8CF4Aebabd5bD270")
+  call.block.timestamp = BigInt.fromString('530')
+  call.inputValues = [
+    new ethereum.EventParam("_projectId",
+    ethereum.Value.fromSignedBigInt(BigInt.fromString('99'))),
+    new ethereum.EventParam("_scriptId",
+    ethereum.Value.fromSignedBigInt(BigInt.fromString('0'))),
+    new ethereum.EventParam("_script",
+    ethereum.Value.fromString(meridianScript))
+  ]
+
+  handleUpdateProjectScript(call);
+  
+  assert.fieldEquals(PROJECTSCRIPT_ENTITY_TYPE, "0xa7d8d9ef8d8ce8992df33d8b8cf4aebabd5bd270-99-0", "project", "0xa7d8d9ef8d8ce8992df33d8b8cf4aebabd5bd270-99")
+  assert.fieldEquals(PROJECTSCRIPT_ENTITY_TYPE, "0xa7d8d9ef8d8ce8992df33d8b8cf4aebabd5bd270-99-0", "script", meridianScript.toString())
+  assert.fieldEquals(PROJECT_ENTITY_TYPE, "0xa7d8d9ef8d8ce8992df33d8b8cf4aebabd5bd270-99", "script", meridianScript.toString())
+  assert.fieldEquals(PROJECT_ENTITY_TYPE, "0xa7d8d9ef8d8ce8992df33d8b8cf4aebabd5bd270-99", "updatedAt", "530")
+  assert.fieldEquals(PROJECT_ENTITY_TYPE, "0xa7d8d9ef8d8ce8992df33d8b8cf4aebabd5bd270-99", "scriptUpdatedAt", "530")
+
+  clearStore();
+  }, true);
+
+
+test("Can handleUpdateProjectScriptJSON", () => {
+  clearStore();
+  mockRefreshContractCalls();
+  mockProjectContractCalls();
+  mockRefreshProjectScript();
+
+  createProjectToLoad();
+  
+  let call = changetype<UpdateProjectScriptJSONCall>(newMockCall())
+  
+  call.to = Address.fromString("0xa7d8d9ef8D8Ce8992Df33D8b8CF4Aebabd5bD270")
+  call.block.timestamp = BigInt.fromString('232')
+  call.inputValues = [
+    new ethereum.EventParam("_projectId",
+    ethereum.Value.fromSignedBigInt(BigInt.fromString('99'))),
+    new ethereum.EventParam("_projectScriptJSON",
+    ethereum.Value.fromString("{\"type\":\"p5js\",\"version\":\"1.0.0\",\"instructions\":\"click to animate | space bar changes background color\",\"aspectRatio\":\"1.5\",\"interactive\":\"true\",\"curation_status\":\"curated\"}"))
+  ]
+  
+  handleUpdateProjectScriptJSON(call);
+  
+  assert.fieldEquals(PROJECT_ENTITY_TYPE, "0xa7d8d9ef8d8ce8992df33d8b8cf4aebabd5bd270-99", "scriptJSON", "{\"type\":\"p5js\",\"version\":\"1.0.0\",\"instructions\":\"click to animate | space bar changes background color\",\"aspectRatio\":\"1.5\",\"interactive\":\"true\",\"curation_status\":\"curated\"}")
+  assert.fieldEquals(PROJECT_ENTITY_TYPE, "0xa7d8d9ef8d8ce8992df33d8b8cf4aebabd5bd270-99", "updatedAt", "232")
 
   clearStore();
   }, true);
