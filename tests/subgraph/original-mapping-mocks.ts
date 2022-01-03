@@ -1,8 +1,8 @@
 import { createMockedFunction, newMockCall } from "matchstick-as/assembly/index"
 import { Address, BigInt, ethereum } from "@graphprotocol/graph-ts"
 import { meridianScript } from '../meridianScript';
-import { AddProjectCall } from '../../generated/GenArt721Core/GenArt721Core';
-import { handleAddProject } from '../../src/mapping';
+import { AddProjectCall } from '../../generated/GenArt721/GenArt721';
+import { handleAddProject } from '../../src/original-mapping';
 import { Token } from "../../generated/schema";
 import { generateContractSpecificId } from '../../src/helpers';
 
@@ -26,24 +26,6 @@ createMockedFunction(coreContractAddress, 'randomizerContract', 'randomizerContr
   .returns([ethereum.Value.fromAddress(Address.fromString('0xa7d8d9ef8d8ce8992df33d8b8cf4aebabd5bd270'))])
 }
 
-  // mocks return values for PBAB Soldity contract calls in refreshContract() helper function
-  export const mockPBABRefreshContractCalls = function(): void {
-    createMockedFunction(coreContractAddress, 'admin', 'admin():(address)')
-    .returns([ethereum.Value.fromAddress(Address.fromString('0x90cBa2Bbb19ecc291A12066Fd8329D65FA1f1947'))])
-  
-  createMockedFunction(coreContractAddress, 'renderProviderAddress', 'renderProviderAddress():(address)')
-    .returns([ethereum.Value.fromAddress(Address.fromString('0xa7d8d9ef8d8ce8992df33d8b8cf4aebabd5bd270'))])
-    
-  createMockedFunction(coreContractAddress, 'renderProviderPercentage', 'renderProviderPercentage():(uint256)')
-    .returns([ethereum.Value.fromSignedBigInt(BigInt.fromString('10'))])
-    
-  createMockedFunction(coreContractAddress, 'nextProjectId', 'nextProjectId():(uint256)')
-    .returns([ethereum.Value.fromSignedBigInt(BigInt.fromString('100'))])
-    
-  createMockedFunction(coreContractAddress, 'randomizerContract', 'randomizerContract():(address)')
-    .returns([ethereum.Value.fromAddress(Address.fromString('0xa7d8d9ef8d8ce8992df33d8b8cf4aebabd5bd270'))])
-  }
-
     // mocks return values for Soldity contract calls in handleAddProject() helper function
 export const mockProjectContractCalls = function(): void {
   let projectDetailsReturnArray: Array<ethereum.Value> = [
@@ -64,57 +46,19 @@ export const mockProjectContractCalls = function(): void {
     ethereum.Value.fromSignedBigInt(BigInt.fromString("1024")),                                     // maxInvocations
     ethereum.Value.fromBoolean(false),                                                              // active
     ethereum.Value.fromAddress(Address.fromString("0xc079F0A6E8809E41A2A39D6532ff3dfa6B48e6bB")),   // additionalPayee
-    ethereum.Value.fromSignedBigInt(BigInt.fromString("10")),                                       // additionalPayeePercentage
-    ethereum.Value.fromString("GRT"),                                                               // currency
-    ethereum.Value.fromAddress(Address.fromString("0xc944e90c64b2c07662a292be6244bdf05cda44a7"))];  // currencyAddress
-  createMockedFunction(coreContractAddress, 'projectTokenInfo', 'projectTokenInfo(uint256):(address,uint256,uint256,uint256,bool,address,uint256,string,address)')
+    ethereum.Value.fromSignedBigInt(BigInt.fromString("10"))]                                       // additionalPayeePercentage
+  createMockedFunction(coreContractAddress, 'projectTokenInfo', 'projectTokenInfo(uint256):(address,uint256,uint256,uint256,bool,address,uint256)')
   .withArgs([ethereum.Value.fromSignedBigInt(BigInt.fromString("99"))])
     .returns(projectTokenInfoReturnArray)
   
   let projectScriptInfoReturnArray: Array<ethereum.Value> = [
     ethereum.Value.fromString(meridianScript),                                           // scriptJSON
     ethereum.Value.fromSignedBigInt(BigInt.fromString("1")),                             // scriptCount
-    ethereum.Value.fromBoolean(true),                                                    // useHashString
-    ethereum.Value.fromString("mtwirsqawjuoloq2gvtyug2tc3jbf5htm2zeo4rsknfiv3fdp46a"),   // IPFSHash
+    ethereum.Value.fromSignedBigInt(BigInt.fromString("1")),                             // hashes
+    ethereum.Value.fromString("mtwirsqawjuoloq2gvtyug2tc3jbf5htm2zeo4rsknfiv3fdp46a"),   // ipfsHash
     ethereum.Value.fromBoolean(true),                                                    // locked
     ethereum.Value.fromBoolean(true)];                                                   // paused
-  createMockedFunction(coreContractAddress, 'projectScriptInfo', 'projectScriptInfo(uint256):(string,uint256,bool,string,bool,bool)')
-  .withArgs([ethereum.Value.fromSignedBigInt(BigInt.fromString("99"))])
-    .returns(projectScriptInfoReturnArray)
-}
-
-export const mockPBABProjectContractCalls = function(): void {
-  let projectDetailsReturnArray: Array<ethereum.Value> = [
-    ethereum.Value.fromString("string1"),     // projectName
-    ethereum.Value.fromString("string2"),     // artist
-    ethereum.Value.fromString("string3"),     // description
-    ethereum.Value.fromString("string4"),     // website
-    ethereum.Value.fromString("string7")]     // license
-  createMockedFunction(coreContractAddress, 'projectDetails', 'projectDetails(uint256):(string,string,string,string,string)')
-    .withArgs([ethereum.Value.fromSignedBigInt(BigInt.fromString("99"))])
-    .returns(projectDetailsReturnArray)
-  
-  let projectTokenInfoReturnArray: Array<ethereum.Value> = [
-    ethereum.Value.fromAddress(Address.fromString("0xa7d8d9ef8d8ce8992df33d8b8cf4aebabd5bd270")),   // artistAddress
-    ethereum.Value.fromSignedBigInt(BigInt.fromString("100000000")),                                // pricePerTokenInWei
-    ethereum.Value.fromSignedBigInt(BigInt.fromString("1024")),                                     // invocations
-    ethereum.Value.fromSignedBigInt(BigInt.fromString("1024")),                                     // maxInvocations
-    ethereum.Value.fromBoolean(false),                                                              // active
-    ethereum.Value.fromAddress(Address.fromString("0xc079F0A6E8809E41A2A39D6532ff3dfa6B48e6bB")),   // additionalPayee
-    ethereum.Value.fromSignedBigInt(BigInt.fromString("10")),                                       // additionalPayeePercentage
-    ethereum.Value.fromString("GRT"),                                                               // currency
-    ethereum.Value.fromAddress(Address.fromString("0xc944e90c64b2c07662a292be6244bdf05cda44a7"))];  // currencyAddress
-  createMockedFunction(coreContractAddress, 'projectTokenInfo', 'projectTokenInfo(uint256):(address,uint256,uint256,uint256,bool,address,uint256,string,address)')
-  .withArgs([ethereum.Value.fromSignedBigInt(BigInt.fromString("99"))])
-    .returns(projectTokenInfoReturnArray)
-  
-  let projectScriptInfoReturnArray: Array<ethereum.Value> = [
-    ethereum.Value.fromString(meridianScript),                                           // scriptJSON
-    ethereum.Value.fromSignedBigInt(BigInt.fromString("1")),                             // scriptCount
-    ethereum.Value.fromString("mtwirsqawjuoloq2gvtyug2tc3jbf5htm2zeo4rsknfiv3fdp46a"),   // IPFSHash
-    ethereum.Value.fromBoolean(true),                                                    // locked
-    ethereum.Value.fromBoolean(true)];                                                   // paused
-  createMockedFunction(coreContractAddress, 'projectScriptInfo', 'projectScriptInfo(uint256):(string,uint256,string,bool,bool)')
+  createMockedFunction(coreContractAddress, 'projectScriptInfo', 'projectScriptInfo(uint256):(string,uint256,uint256,string,bool,bool)')
   .withArgs([ethereum.Value.fromSignedBigInt(BigInt.fromString("99"))])
     .returns(projectScriptInfoReturnArray)
 }
