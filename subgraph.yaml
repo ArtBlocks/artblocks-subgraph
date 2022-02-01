@@ -3,12 +3,12 @@ schema:
   file: ./schema.graphql
 dataSources:
   - kind: ethereum/contract
-    name: 'GenArt721Core-0xa7d8d9ef8D8Ce8992Df33D8b8CF4Aebabd5bD270'
-    network: mainnet
+    name: 'GenArt721Core2-0x1CD623a86751d4C4f20c96000FEC763941f098A2'
+    network: ropsten
     source:
-      address: '0xa7d8d9ef8D8Ce8992Df33D8b8CF4Aebabd5bD270'
-      abi: GenArt721Core
-      startBlock: 11437151
+      address: '0x1CD623a86751d4C4f20c96000FEC763941f098A2'
+      abi: GenArt721Core2
+      startBlock: 10760915
     mapping:
       kind: ethereum/events
       apiVersion: 0.0.5
@@ -24,6 +24,8 @@ dataSources:
         - OpenSeaSale
         - TokenOpenSeaSaleLookupTable
       abis:
+        - name: GenArt721Core2
+          file: ./abis/GenArt721Core2.json
         - name: GenArt721Core
           file: ./abis/GenArt721Core.json
       eventHandlers:
@@ -32,6 +34,8 @@ dataSources:
         - event: Transfer(indexed address,indexed address,indexed uint256)
           handler: handleTransfer
       callHandlers:
+        - function: updateAdmin(address)
+          handler: handleUpdateAdmin 
         - function: addWhitelisted(address)
           handler: handleAddWhitelisted
         - function: removeWhitelisted(address)
@@ -102,12 +106,12 @@ dataSources:
           handler: handleUpdateProjectWebsite
       file: ./src/mapping.ts
   - kind: ethereum/contract
-    name: 'GenArt721Core2PBAB-0x28f2D3805652FB5d359486dFfb7D08320D403240'
-    network: mainnet
+    name: 'GenArt721Core2PBAB-0xd9f14781f6cba1f4ffb0743bcfd5fc860d1da847'
+    network: ropsten
     source:
-      address: '0x28f2D3805652FB5d359486dFfb7D08320D403240'
+      address: '0xd9f14781f6cba1f4ffb0743bcfd5fc860d1da847'
       abi: GenArt721Core2PBAB
-      startBlock: 13426126
+      startBlock: 10760915
     mapping:
       kind: ethereum/events
       apiVersion: 0.0.5
@@ -191,279 +195,12 @@ dataSources:
           handler: handleUpdateProjectWebsite
       file: ./src/pbab-mapping.ts
   - kind: ethereum/contract
-    name: 'GenArt721Core2PBAB-0xbdde08bd57e5c9fd563ee7ac61618cb2ecdc0ce0'
-    network: mainnet
+    name: 'GenArt721Core2PBAB-0x06710498339b30834653459Ac90F52Cbd2F1D085'
+    network: ropsten
     source:
-      address: '0xbdde08bd57e5c9fd563ee7ac61618cb2ecdc0ce0'
+      address: '0x06710498339b30834653459Ac90F52Cbd2F1D085'
       abi: GenArt721Core2PBAB
-      startBlock: 13711854
-    mapping:
-      kind: ethereum/events
-      apiVersion: 0.0.5
-      language: wasm/assemblyscript
-      entities:
-        - Project
-        - ProjectScript
-        - Token
-        - Contract
-        - Account
-        - AccountProject
-        - Whitelisting
-        - OpenSeaSale
-        - TokenOpenSeaSaleLookupTable
-      abis:
-        - name: GenArt721Core2PBAB
-          file: ./abis/GenArt721Core2PBAB.json
-      eventHandlers:
-        - event: Mint(indexed address,indexed uint256,indexed uint256)
-          handler: handleMint
-        - event: Transfer(indexed address,indexed address,indexed uint256)
-          handler: handleTransfer
-      callHandlers:
-        - function: updateAdmin(address)
-          handler: handleUpdateAdmin
-        - function: addWhitelisted(address)
-          handler: handleAddWhitelisted
-        - function: removeWhitelisted(address)
-          handler: handleRemoveWhitelisted
-        - function: addMintWhitelisted(address)
-          handler: handleAddMintWhitelisted
-        - function: removeMintWhitelisted(address)
-          handler: handleRemoveMintWhitelisted
-        - function: updateRandomizerAddress(address)
-          handler: handleUpdateRandomizerAddress
-        - function: updateRenderProviderAddress(address)
-          handler: handleUpdateRenderProviderAddress
-        - function: updateRenderProviderPercentage(uint256)
-          handler: handleUpdateRenderProviderPercentage
-        - function: addProject(string,address,uint256)
-          handler: handleAddProject
-        - function: addProjectScript(uint256,string)
-          handler: handleAddProjectScript
-        - function: removeProjectLastScript(uint256)
-          handler: handleRemoveProjectLastScript
-        - function: toggleProjectIsActive(uint256)
-          handler: handleToggleProjectIsActive
-        - function: toggleProjectIsLocked(uint256)
-          handler: handleToggleProjectIsLocked
-        - function: toggleProjectIsPaused(uint256)
-          handler: handleToggleProjectIsPaused
-        - function: updateProjectAdditionalPayeeInfo(uint256,address,uint256)
-          handler: handleUpdateProjectAdditionalPayeeInfo
-        - function: updateProjectArtistAddress(uint256,address)
-          handler: handleUpdateProjectArtistAddress
-        - function: updateProjectArtistName(uint256,string)
-          handler: handleUpdateProjectArtistName
-        - function: updateProjectBaseURI(uint256,string)
-          handler: handleUpdateProjectBaseURI
-        - function: updateProjectCurrencyInfo(uint256,string,address)
-          handler: handleUpdateProjectCurrencyInfo
-        - function: updateProjectDescription(uint256,string)
-          handler: handleUpdateProjectDescription
-        - function: updateProjectIpfsHash(uint256,string)
-          handler: handleUpdateProjectIpfsHash
-        - function: updateProjectLicense(uint256,string)
-          handler: handleUpdateProjectLicense
-        - function: updateProjectMaxInvocations(uint256,uint256)
-          handler: handleUpdateProjectMaxInvocations
-        - function: updateProjectName(uint256,string)
-          handler: handleUpdateProjectName
-        - function: updateProjectPricePerTokenInWei(uint256,uint256)
-          handler: handleUpdateProjectPricePerTokenInWei
-        - function: updateProjectScript(uint256,uint256,string)
-          handler: handleUpdateProjectScript
-        - function: updateProjectScriptJSON(uint256,string)
-          handler: handleUpdateProjectScriptJSON
-        - function: updateProjectSecondaryMarketRoyaltyPercentage(uint256,uint256)
-          handler: handleUpdateProjectSecondaryMarketRoyaltyPercentage
-        - function: updateProjectWebsite(uint256,string)
-          handler: handleUpdateProjectWebsite
-      file: ./src/pbab-mapping.ts
-  - kind: ethereum/contract
-    name: 'GenArt721Core2PBAB-0x13aAe6f9599880edbB7d144BB13F1212CeE99533'
-    network: mainnet
-    source:
-      address: '0x13aAe6f9599880edbB7d144BB13F1212CeE99533'
-      abi: GenArt721Core2PBAB
-      startBlock: 13711972
-    mapping:
-      kind: ethereum/events
-      apiVersion: 0.0.5
-      language: wasm/assemblyscript
-      entities:
-        - Project
-        - ProjectScript
-        - Token
-        - Contract
-        - Account
-        - AccountProject
-        - Whitelisting
-        - OpenSeaSale
-        - TokenOpenSeaSaleLookupTable
-      abis:
-        - name: GenArt721Core2PBAB
-          file: ./abis/GenArt721Core2PBAB.json
-      eventHandlers:
-        - event: Mint(indexed address,indexed uint256,indexed uint256)
-          handler: handleMint
-        - event: Transfer(indexed address,indexed address,indexed uint256)
-          handler: handleTransfer
-      callHandlers:
-        - function: updateAdmin(address)
-          handler: handleUpdateAdmin
-        - function: addWhitelisted(address)
-          handler: handleAddWhitelisted
-        - function: removeWhitelisted(address)
-          handler: handleRemoveWhitelisted
-        - function: addMintWhitelisted(address)
-          handler: handleAddMintWhitelisted
-        - function: removeMintWhitelisted(address)
-          handler: handleRemoveMintWhitelisted
-        - function: updateRandomizerAddress(address)
-          handler: handleUpdateRandomizerAddress
-        - function: updateRenderProviderAddress(address)
-          handler: handleUpdateRenderProviderAddress
-        - function: updateRenderProviderPercentage(uint256)
-          handler: handleUpdateRenderProviderPercentage
-        - function: addProject(string,address,uint256)
-          handler: handleAddProject
-        - function: addProjectScript(uint256,string)
-          handler: handleAddProjectScript
-        - function: removeProjectLastScript(uint256)
-          handler: handleRemoveProjectLastScript
-        - function: toggleProjectIsActive(uint256)
-          handler: handleToggleProjectIsActive
-        - function: toggleProjectIsLocked(uint256)
-          handler: handleToggleProjectIsLocked
-        - function: toggleProjectIsPaused(uint256)
-          handler: handleToggleProjectIsPaused
-        - function: updateProjectAdditionalPayeeInfo(uint256,address,uint256)
-          handler: handleUpdateProjectAdditionalPayeeInfo
-        - function: updateProjectArtistAddress(uint256,address)
-          handler: handleUpdateProjectArtistAddress
-        - function: updateProjectArtistName(uint256,string)
-          handler: handleUpdateProjectArtistName
-        - function: updateProjectBaseURI(uint256,string)
-          handler: handleUpdateProjectBaseURI
-        - function: updateProjectCurrencyInfo(uint256,string,address)
-          handler: handleUpdateProjectCurrencyInfo
-        - function: updateProjectDescription(uint256,string)
-          handler: handleUpdateProjectDescription
-        - function: updateProjectIpfsHash(uint256,string)
-          handler: handleUpdateProjectIpfsHash
-        - function: updateProjectLicense(uint256,string)
-          handler: handleUpdateProjectLicense
-        - function: updateProjectMaxInvocations(uint256,uint256)
-          handler: handleUpdateProjectMaxInvocations
-        - function: updateProjectName(uint256,string)
-          handler: handleUpdateProjectName
-        - function: updateProjectPricePerTokenInWei(uint256,uint256)
-          handler: handleUpdateProjectPricePerTokenInWei
-        - function: updateProjectScript(uint256,uint256,string)
-          handler: handleUpdateProjectScript
-        - function: updateProjectScriptJSON(uint256,string)
-          handler: handleUpdateProjectScriptJSON
-        - function: updateProjectSecondaryMarketRoyaltyPercentage(uint256,uint256)
-          handler: handleUpdateProjectSecondaryMarketRoyaltyPercentage
-        - function: updateProjectWebsite(uint256,string)
-          handler: handleUpdateProjectWebsite
-      file: ./src/pbab-mapping.ts
-  - kind: ethereum/contract
-    name: 'GenArt721Core2PBAB-0x62e37f664b5945629B6549a87F8e10Ed0B6D923b'
-    network: mainnet
-    source:
-      address: '0x62e37f664b5945629B6549a87F8e10Ed0B6D923b'
-      abi: GenArt721Core2PBAB
-      startBlock: 13712223
-    mapping:
-      kind: ethereum/events
-      apiVersion: 0.0.5
-      language: wasm/assemblyscript
-      entities:
-        - Project
-        - ProjectScript
-        - Token
-        - Contract
-        - Account
-        - AccountProject
-        - Whitelisting
-        - OpenSeaSale
-        - TokenOpenSeaSaleLookupTable
-      abis:
-        - name: GenArt721Core2PBAB
-          file: ./abis/GenArt721Core2PBAB.json
-      eventHandlers:
-        - event: Mint(indexed address,indexed uint256,indexed uint256)
-          handler: handleMint
-        - event: Transfer(indexed address,indexed address,indexed uint256)
-          handler: handleTransfer
-      callHandlers:
-        - function: updateAdmin(address)
-          handler: handleUpdateAdmin
-        - function: addWhitelisted(address)
-          handler: handleAddWhitelisted
-        - function: removeWhitelisted(address)
-          handler: handleRemoveWhitelisted
-        - function: addMintWhitelisted(address)
-          handler: handleAddMintWhitelisted
-        - function: removeMintWhitelisted(address)
-          handler: handleRemoveMintWhitelisted
-        - function: updateRandomizerAddress(address)
-          handler: handleUpdateRandomizerAddress
-        - function: updateRenderProviderAddress(address)
-          handler: handleUpdateRenderProviderAddress
-        - function: updateRenderProviderPercentage(uint256)
-          handler: handleUpdateRenderProviderPercentage
-        - function: addProject(string,address,uint256)
-          handler: handleAddProject
-        - function: addProjectScript(uint256,string)
-          handler: handleAddProjectScript
-        - function: removeProjectLastScript(uint256)
-          handler: handleRemoveProjectLastScript
-        - function: toggleProjectIsActive(uint256)
-          handler: handleToggleProjectIsActive
-        - function: toggleProjectIsLocked(uint256)
-          handler: handleToggleProjectIsLocked
-        - function: toggleProjectIsPaused(uint256)
-          handler: handleToggleProjectIsPaused
-        - function: updateProjectAdditionalPayeeInfo(uint256,address,uint256)
-          handler: handleUpdateProjectAdditionalPayeeInfo
-        - function: updateProjectArtistAddress(uint256,address)
-          handler: handleUpdateProjectArtistAddress
-        - function: updateProjectArtistName(uint256,string)
-          handler: handleUpdateProjectArtistName
-        - function: updateProjectBaseURI(uint256,string)
-          handler: handleUpdateProjectBaseURI
-        - function: updateProjectCurrencyInfo(uint256,string,address)
-          handler: handleUpdateProjectCurrencyInfo
-        - function: updateProjectDescription(uint256,string)
-          handler: handleUpdateProjectDescription
-        - function: updateProjectIpfsHash(uint256,string)
-          handler: handleUpdateProjectIpfsHash
-        - function: updateProjectLicense(uint256,string)
-          handler: handleUpdateProjectLicense
-        - function: updateProjectMaxInvocations(uint256,uint256)
-          handler: handleUpdateProjectMaxInvocations
-        - function: updateProjectName(uint256,string)
-          handler: handleUpdateProjectName
-        - function: updateProjectPricePerTokenInWei(uint256,uint256)
-          handler: handleUpdateProjectPricePerTokenInWei
-        - function: updateProjectScript(uint256,uint256,string)
-          handler: handleUpdateProjectScript
-        - function: updateProjectScriptJSON(uint256,string)
-          handler: handleUpdateProjectScriptJSON
-        - function: updateProjectSecondaryMarketRoyaltyPercentage(uint256,uint256)
-          handler: handleUpdateProjectSecondaryMarketRoyaltyPercentage
-        - function: updateProjectWebsite(uint256,string)
-          handler: handleUpdateProjectWebsite
-      file: ./src/pbab-mapping.ts
-  - kind: ethereum/contract
-    name: 'GenArt721Core2PBAB-0xa319C382a702682129fcbF55d514E61a16f97f9c'
-    network: mainnet
-    source:
-      address: '0xa319C382a702682129fcbF55d514E61a16f97f9c'
-      abi: GenArt721Core2PBAB
-      startBlock: 13712123
+      startBlock: 10760915
     mapping:
       kind: ethereum/events
       apiVersion: 0.0.5
@@ -548,11 +285,11 @@ dataSources:
       file: ./src/pbab-mapping.ts
   - kind: ethereum/contract
     name: 'GenArt721Core2PBAB-0xd10e3DEe203579FcEE90eD7d0bDD8086F7E53beB'
-    network: mainnet
+    network: ropsten
     source:
       address: '0xd10e3DEe203579FcEE90eD7d0bDD8086F7E53beB'
       abi: GenArt721Core2PBAB
-      startBlock: 14122786
+      startBlock: 10760915
     mapping:
       kind: ethereum/events
       apiVersion: 0.0.5
@@ -636,12 +373,12 @@ dataSources:
           handler: handleUpdateProjectWebsite
       file: ./src/pbab-mapping.ts
   - kind: ethereum/contract
-    name: GenArt721
-    network: mainnet
+    name: 'GenArt721Core2PBAB-0x7DC2c066251A21520Ae03cd2C3567a3c073Be60A'
+    network: ropsten
     source:
-      address: '0x059EDD72Cd353dF5106D2B9cC5ab83a52287aC3a'
-      abi: GenArt721
-      startBlock: 11338811
+      address: '0x7DC2c066251A21520Ae03cd2C3567a3c073Be60A'
+      abi: GenArt721Core2PBAB
+      startBlock: 10760915
     mapping:
       kind: ethereum/events
       apiVersion: 0.0.5
@@ -657,58 +394,54 @@ dataSources:
         - OpenSeaSale
         - TokenOpenSeaSaleLookupTable
       abis:
-        - name: GenArt721
-          file: ./abis/GenArt721.json
+        - name: GenArt721Core2PBAB
+          file: ./abis/GenArt721Core2PBAB.json
       eventHandlers:
-        - event: Mint(indexed address,indexed uint256,indexed uint256,uint256,uint256)
+        - event: Mint(indexed address,indexed uint256,indexed uint256)
           handler: handleMint
         - event: Transfer(indexed address,indexed address,indexed uint256)
           handler: handleTransfer
       callHandlers:
+        - function: updateAdmin(address)
+          handler: handleUpdateAdmin
         - function: addWhitelisted(address)
           handler: handleAddWhitelisted
         - function: removeWhitelisted(address)
           handler: handleRemoveWhitelisted
-        - function: updateArtblocksAddress(address)
-          handler: handleUpdateArtblocksAddress
-        - function: updateArtblocksPercentage(uint256)
-          handler: handleUpdateArtblocksPercentage
-        - function: addProject(uint256,bool)
+        - function: addMintWhitelisted(address)
+          handler: handleAddMintWhitelisted
+        - function: removeMintWhitelisted(address)
+          handler: handleRemoveMintWhitelisted
+        - function: updateRandomizerAddress(address)
+          handler: handleUpdateRandomizerAddress
+        - function: updateRenderProviderAddress(address)
+          handler: handleUpdateRenderProviderAddress
+        - function: updateRenderProviderPercentage(uint256)
+          handler: handleUpdateRenderProviderPercentage
+        - function: addProject(string,address,uint256)
           handler: handleAddProject
         - function: addProjectScript(uint256,string)
           handler: handleAddProjectScript
-        - function: clearTokenIpfsImageUri(uint256)
-          handler: handleClearTokenIpfsImageUri
-        - function: overrideTokenDynamicImageWithIpfsLink(uint256,string)
-          handler: handleOverrideTokenDynamicImageWithIpfsLink
         - function: removeProjectLastScript(uint256)
           handler: handleRemoveProjectLastScript
-        - function: removeWhitelisted(address)
-          handler: handleRemoveWhitelisted
         - function: toggleProjectIsActive(uint256)
           handler: handleToggleProjectIsActive
-        - function: toggleProjectIsDynamic(uint256)
-          handler: handleToggleProjectIsDynamic
         - function: toggleProjectIsLocked(uint256)
           handler: handleToggleProjectIsLocked
         - function: toggleProjectIsPaused(uint256)
           handler: handleToggleProjectIsPaused
-        - function: toggleProjectUseIpfsForStatic(uint256)
-          handler: handleToggleProjectUseIpfsForStatic
         - function: updateProjectAdditionalPayeeInfo(uint256,address,uint256)
           handler: handleUpdateProjectAdditionalPayeeInfo
         - function: updateProjectArtistAddress(uint256,address)
           handler: handleUpdateProjectArtistAddress
         - function: updateProjectArtistName(uint256,string)
           handler: handleUpdateProjectArtistName
-        - function: updateProjectBaseIpfsURI(uint256,string)
-          handler: handleUpdateProjectBaseIpfsURI
         - function: updateProjectBaseURI(uint256,string)
           handler: handleUpdateProjectBaseURI
+        - function: updateProjectCurrencyInfo(uint256,string,address)
+          handler: handleUpdateProjectCurrencyInfo
         - function: updateProjectDescription(uint256,string)
           handler: handleUpdateProjectDescription
-        - function: updateProjectHashesGenerated(uint256,uint256)
-          handler: handleUpdateProjectHashesGenerated
         - function: updateProjectIpfsHash(uint256,string)
           handler: handleUpdateProjectIpfsHash
         - function: updateProjectLicense(uint256,string)
@@ -727,14 +460,14 @@ dataSources:
           handler: handleUpdateProjectSecondaryMarketRoyaltyPercentage
         - function: updateProjectWebsite(uint256,string)
           handler: handleUpdateProjectWebsite
-      file: ./src/original-mapping.ts
+      file: ./src/pbab-mapping.ts
   - kind: ethereum/contract
-    name: WyvernExchange
-    network: mainnet
+    name: 'GenArt721Core2PBAB-0x86732cd7DC0A6fc559C62736083298E78310B8dC'
+    network: ropsten
     source:
-      address: '0x7Be8076f4EA4A4AD08075C2508e481d6C946D12b'
-      abi: WyvernExchange
-      startBlock: 11338811
+      address: '0x86732cd7DC0A6fc559C62736083298E78310B8dC'
+      abi: GenArt721Core2PBAB
+      startBlock: 10760915
     mapping:
       kind: ethereum/events
       apiVersion: 0.0.5
@@ -750,9 +483,337 @@ dataSources:
         - OpenSeaSale
         - TokenOpenSeaSaleLookupTable
       abis:
-        - name: WyvernExchange
-          file: ./abis/WyvernExchange.json
-      callHandlers: 
-        - function: atomicMatch_(address[14],uint256[18],uint8[8],bytes,bytes,bytes,bytes,bytes,bytes,uint8[2],bytes32[5])
-          handler: handleAtomicMatch_
-      file: ./src/os-mapping.ts
+        - name: GenArt721Core2PBAB
+          file: ./abis/GenArt721Core2PBAB.json
+      eventHandlers:
+        - event: Mint(indexed address,indexed uint256,indexed uint256)
+          handler: handleMint
+        - event: Transfer(indexed address,indexed address,indexed uint256)
+          handler: handleTransfer
+      callHandlers:
+        - function: updateAdmin(address)
+          handler: handleUpdateAdmin
+        - function: addWhitelisted(address)
+          handler: handleAddWhitelisted
+        - function: removeWhitelisted(address)
+          handler: handleRemoveWhitelisted
+        - function: addMintWhitelisted(address)
+          handler: handleAddMintWhitelisted
+        - function: removeMintWhitelisted(address)
+          handler: handleRemoveMintWhitelisted
+        - function: updateRandomizerAddress(address)
+          handler: handleUpdateRandomizerAddress
+        - function: updateRenderProviderAddress(address)
+          handler: handleUpdateRenderProviderAddress
+        - function: updateRenderProviderPercentage(uint256)
+          handler: handleUpdateRenderProviderPercentage
+        - function: addProject(string,address,uint256)
+          handler: handleAddProject
+        - function: addProjectScript(uint256,string)
+          handler: handleAddProjectScript
+        - function: removeProjectLastScript(uint256)
+          handler: handleRemoveProjectLastScript
+        - function: toggleProjectIsActive(uint256)
+          handler: handleToggleProjectIsActive
+        - function: toggleProjectIsLocked(uint256)
+          handler: handleToggleProjectIsLocked
+        - function: toggleProjectIsPaused(uint256)
+          handler: handleToggleProjectIsPaused
+        - function: updateProjectAdditionalPayeeInfo(uint256,address,uint256)
+          handler: handleUpdateProjectAdditionalPayeeInfo
+        - function: updateProjectArtistAddress(uint256,address)
+          handler: handleUpdateProjectArtistAddress
+        - function: updateProjectArtistName(uint256,string)
+          handler: handleUpdateProjectArtistName
+        - function: updateProjectBaseURI(uint256,string)
+          handler: handleUpdateProjectBaseURI
+        - function: updateProjectCurrencyInfo(uint256,string,address)
+          handler: handleUpdateProjectCurrencyInfo
+        - function: updateProjectDescription(uint256,string)
+          handler: handleUpdateProjectDescription
+        - function: updateProjectIpfsHash(uint256,string)
+          handler: handleUpdateProjectIpfsHash
+        - function: updateProjectLicense(uint256,string)
+          handler: handleUpdateProjectLicense
+        - function: updateProjectMaxInvocations(uint256,uint256)
+          handler: handleUpdateProjectMaxInvocations
+        - function: updateProjectName(uint256,string)
+          handler: handleUpdateProjectName
+        - function: updateProjectPricePerTokenInWei(uint256,uint256)
+          handler: handleUpdateProjectPricePerTokenInWei
+        - function: updateProjectScript(uint256,uint256,string)
+          handler: handleUpdateProjectScript
+        - function: updateProjectScriptJSON(uint256,string)
+          handler: handleUpdateProjectScriptJSON
+        - function: updateProjectSecondaryMarketRoyaltyPercentage(uint256,uint256)
+          handler: handleUpdateProjectSecondaryMarketRoyaltyPercentage
+        - function: updateProjectWebsite(uint256,string)
+          handler: handleUpdateProjectWebsite
+      file: ./src/pbab-mapping.ts
+  - kind: ethereum/contract
+    name: 'GenArt721Core2PBAB-0x24CCA47Fcc4fe09b51aBE8A8124C3da01765bE14'
+    network: ropsten
+    source:
+      address: '0x24CCA47Fcc4fe09b51aBE8A8124C3da01765bE14'
+      abi: GenArt721Core2PBAB
+      startBlock: 10760915
+    mapping:
+      kind: ethereum/events
+      apiVersion: 0.0.5
+      language: wasm/assemblyscript
+      entities:
+        - Project
+        - ProjectScript
+        - Token
+        - Contract
+        - Account
+        - AccountProject
+        - Whitelisting
+        - OpenSeaSale
+        - TokenOpenSeaSaleLookupTable
+      abis:
+        - name: GenArt721Core2PBAB
+          file: ./abis/GenArt721Core2PBAB.json
+      eventHandlers:
+        - event: Mint(indexed address,indexed uint256,indexed uint256)
+          handler: handleMint
+        - event: Transfer(indexed address,indexed address,indexed uint256)
+          handler: handleTransfer
+      callHandlers:
+        - function: updateAdmin(address)
+          handler: handleUpdateAdmin
+        - function: addWhitelisted(address)
+          handler: handleAddWhitelisted
+        - function: removeWhitelisted(address)
+          handler: handleRemoveWhitelisted
+        - function: addMintWhitelisted(address)
+          handler: handleAddMintWhitelisted
+        - function: removeMintWhitelisted(address)
+          handler: handleRemoveMintWhitelisted
+        - function: updateRandomizerAddress(address)
+          handler: handleUpdateRandomizerAddress
+        - function: updateRenderProviderAddress(address)
+          handler: handleUpdateRenderProviderAddress
+        - function: updateRenderProviderPercentage(uint256)
+          handler: handleUpdateRenderProviderPercentage
+        - function: addProject(string,address,uint256)
+          handler: handleAddProject
+        - function: addProjectScript(uint256,string)
+          handler: handleAddProjectScript
+        - function: removeProjectLastScript(uint256)
+          handler: handleRemoveProjectLastScript
+        - function: toggleProjectIsActive(uint256)
+          handler: handleToggleProjectIsActive
+        - function: toggleProjectIsLocked(uint256)
+          handler: handleToggleProjectIsLocked
+        - function: toggleProjectIsPaused(uint256)
+          handler: handleToggleProjectIsPaused
+        - function: updateProjectAdditionalPayeeInfo(uint256,address,uint256)
+          handler: handleUpdateProjectAdditionalPayeeInfo
+        - function: updateProjectArtistAddress(uint256,address)
+          handler: handleUpdateProjectArtistAddress
+        - function: updateProjectArtistName(uint256,string)
+          handler: handleUpdateProjectArtistName
+        - function: updateProjectBaseURI(uint256,string)
+          handler: handleUpdateProjectBaseURI
+        - function: updateProjectCurrencyInfo(uint256,string,address)
+          handler: handleUpdateProjectCurrencyInfo
+        - function: updateProjectDescription(uint256,string)
+          handler: handleUpdateProjectDescription
+        - function: updateProjectIpfsHash(uint256,string)
+          handler: handleUpdateProjectIpfsHash
+        - function: updateProjectLicense(uint256,string)
+          handler: handleUpdateProjectLicense
+        - function: updateProjectMaxInvocations(uint256,uint256)
+          handler: handleUpdateProjectMaxInvocations
+        - function: updateProjectName(uint256,string)
+          handler: handleUpdateProjectName
+        - function: updateProjectPricePerTokenInWei(uint256,uint256)
+          handler: handleUpdateProjectPricePerTokenInWei
+        - function: updateProjectScript(uint256,uint256,string)
+          handler: handleUpdateProjectScript
+        - function: updateProjectScriptJSON(uint256,string)
+          handler: handleUpdateProjectScriptJSON
+        - function: updateProjectSecondaryMarketRoyaltyPercentage(uint256,uint256)
+          handler: handleUpdateProjectSecondaryMarketRoyaltyPercentage
+        - function: updateProjectWebsite(uint256,string)
+          handler: handleUpdateProjectWebsite
+      file: ./src/pbab-mapping.ts
+  - kind: ethereum/contract
+    name: 'GenArt721Core2PBAB-0xf17A2577eFaA269E02d2cFBEB15dfE9860C90A38'
+    network: ropsten
+    source:
+      address: '0xf17A2577eFaA269E02d2cFBEB15dfE9860C90A38'
+      abi: GenArt721Core2PBAB
+      startBlock: 10760915
+    mapping:
+      kind: ethereum/events
+      apiVersion: 0.0.5
+      language: wasm/assemblyscript
+      entities:
+        - Project
+        - ProjectScript
+        - Token
+        - Contract
+        - Account
+        - AccountProject
+        - Whitelisting
+        - OpenSeaSale
+        - TokenOpenSeaSaleLookupTable
+      abis:
+        - name: GenArt721Core2PBAB
+          file: ./abis/GenArt721Core2PBAB.json
+      eventHandlers:
+        - event: Mint(indexed address,indexed uint256,indexed uint256)
+          handler: handleMint
+        - event: Transfer(indexed address,indexed address,indexed uint256)
+          handler: handleTransfer
+      callHandlers:
+        - function: updateAdmin(address)
+          handler: handleUpdateAdmin
+        - function: addWhitelisted(address)
+          handler: handleAddWhitelisted
+        - function: removeWhitelisted(address)
+          handler: handleRemoveWhitelisted
+        - function: addMintWhitelisted(address)
+          handler: handleAddMintWhitelisted
+        - function: removeMintWhitelisted(address)
+          handler: handleRemoveMintWhitelisted
+        - function: updateRandomizerAddress(address)
+          handler: handleUpdateRandomizerAddress
+        - function: updateRenderProviderAddress(address)
+          handler: handleUpdateRenderProviderAddress
+        - function: updateRenderProviderPercentage(uint256)
+          handler: handleUpdateRenderProviderPercentage
+        - function: addProject(string,address,uint256)
+          handler: handleAddProject
+        - function: addProjectScript(uint256,string)
+          handler: handleAddProjectScript
+        - function: removeProjectLastScript(uint256)
+          handler: handleRemoveProjectLastScript
+        - function: toggleProjectIsActive(uint256)
+          handler: handleToggleProjectIsActive
+        - function: toggleProjectIsLocked(uint256)
+          handler: handleToggleProjectIsLocked
+        - function: toggleProjectIsPaused(uint256)
+          handler: handleToggleProjectIsPaused
+        - function: updateProjectAdditionalPayeeInfo(uint256,address,uint256)
+          handler: handleUpdateProjectAdditionalPayeeInfo
+        - function: updateProjectArtistAddress(uint256,address)
+          handler: handleUpdateProjectArtistAddress
+        - function: updateProjectArtistName(uint256,string)
+          handler: handleUpdateProjectArtistName
+        - function: updateProjectBaseURI(uint256,string)
+          handler: handleUpdateProjectBaseURI
+        - function: updateProjectCurrencyInfo(uint256,string,address)
+          handler: handleUpdateProjectCurrencyInfo
+        - function: updateProjectDescription(uint256,string)
+          handler: handleUpdateProjectDescription
+        - function: updateProjectIpfsHash(uint256,string)
+          handler: handleUpdateProjectIpfsHash
+        - function: updateProjectLicense(uint256,string)
+          handler: handleUpdateProjectLicense
+        - function: updateProjectMaxInvocations(uint256,uint256)
+          handler: handleUpdateProjectMaxInvocations
+        - function: updateProjectName(uint256,string)
+          handler: handleUpdateProjectName
+        - function: updateProjectPricePerTokenInWei(uint256,uint256)
+          handler: handleUpdateProjectPricePerTokenInWei
+        - function: updateProjectScript(uint256,uint256,string)
+          handler: handleUpdateProjectScript
+        - function: updateProjectScriptJSON(uint256,string)
+          handler: handleUpdateProjectScriptJSON
+        - function: updateProjectSecondaryMarketRoyaltyPercentage(uint256,uint256)
+          handler: handleUpdateProjectSecondaryMarketRoyaltyPercentage
+        - function: updateProjectWebsite(uint256,string)
+          handler: handleUpdateProjectWebsite
+      file: ./src/pbab-mapping.ts
+  - kind: ethereum/contract
+    name: 'GenArt721Core2PBAB-0x0583379345586d5219cA842c6eC463f8cdDdBC84'
+    network: ropsten
+    source:
+      address: '0x0583379345586d5219cA842c6eC463f8cdDdBC84'
+      abi: GenArt721Core2PBAB
+      startBlock: 10760915
+    mapping:
+      kind: ethereum/events
+      apiVersion: 0.0.5
+      language: wasm/assemblyscript
+      entities:
+        - Project
+        - ProjectScript
+        - Token
+        - Contract
+        - Account
+        - AccountProject
+        - Whitelisting
+        - OpenSeaSale
+        - TokenOpenSeaSaleLookupTable
+      abis:
+        - name: GenArt721Core2PBAB
+          file: ./abis/GenArt721Core2PBAB.json
+      eventHandlers:
+        - event: Mint(indexed address,indexed uint256,indexed uint256)
+          handler: handleMint
+        - event: Transfer(indexed address,indexed address,indexed uint256)
+          handler: handleTransfer
+      callHandlers:
+        - function: updateAdmin(address)
+          handler: handleUpdateAdmin
+        - function: addWhitelisted(address)
+          handler: handleAddWhitelisted
+        - function: removeWhitelisted(address)
+          handler: handleRemoveWhitelisted
+        - function: addMintWhitelisted(address)
+          handler: handleAddMintWhitelisted
+        - function: removeMintWhitelisted(address)
+          handler: handleRemoveMintWhitelisted
+        - function: updateRandomizerAddress(address)
+          handler: handleUpdateRandomizerAddress
+        - function: updateRenderProviderAddress(address)
+          handler: handleUpdateRenderProviderAddress
+        - function: updateRenderProviderPercentage(uint256)
+          handler: handleUpdateRenderProviderPercentage
+        - function: addProject(string,address,uint256)
+          handler: handleAddProject
+        - function: addProjectScript(uint256,string)
+          handler: handleAddProjectScript
+        - function: removeProjectLastScript(uint256)
+          handler: handleRemoveProjectLastScript
+        - function: toggleProjectIsActive(uint256)
+          handler: handleToggleProjectIsActive
+        - function: toggleProjectIsLocked(uint256)
+          handler: handleToggleProjectIsLocked
+        - function: toggleProjectIsPaused(uint256)
+          handler: handleToggleProjectIsPaused
+        - function: updateProjectAdditionalPayeeInfo(uint256,address,uint256)
+          handler: handleUpdateProjectAdditionalPayeeInfo
+        - function: updateProjectArtistAddress(uint256,address)
+          handler: handleUpdateProjectArtistAddress
+        - function: updateProjectArtistName(uint256,string)
+          handler: handleUpdateProjectArtistName
+        - function: updateProjectBaseURI(uint256,string)
+          handler: handleUpdateProjectBaseURI
+        - function: updateProjectCurrencyInfo(uint256,string,address)
+          handler: handleUpdateProjectCurrencyInfo
+        - function: updateProjectDescription(uint256,string)
+          handler: handleUpdateProjectDescription
+        - function: updateProjectIpfsHash(uint256,string)
+          handler: handleUpdateProjectIpfsHash
+        - function: updateProjectLicense(uint256,string)
+          handler: handleUpdateProjectLicense
+        - function: updateProjectMaxInvocations(uint256,uint256)
+          handler: handleUpdateProjectMaxInvocations
+        - function: updateProjectName(uint256,string)
+          handler: handleUpdateProjectName
+        - function: updateProjectPricePerTokenInWei(uint256,uint256)
+          handler: handleUpdateProjectPricePerTokenInWei
+        - function: updateProjectScript(uint256,uint256,string)
+          handler: handleUpdateProjectScript
+        - function: updateProjectScriptJSON(uint256,string)
+          handler: handleUpdateProjectScriptJSON
+        - function: updateProjectSecondaryMarketRoyaltyPercentage(uint256,uint256)
+          handler: handleUpdateProjectSecondaryMarketRoyaltyPercentage
+        - function: updateProjectWebsite(uint256,string)
+          handler: handleUpdateProjectWebsite
+      file: ./src/pbab-mapping.ts
