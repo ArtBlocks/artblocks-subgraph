@@ -239,7 +239,7 @@ type Minter @entity {
 }
 
 type ProjectMinterConfiguration @entity {
-  "Unique identifier made up of project id and minter contract address"
+  "Unique identifier made up of minter contract address-projectId"
   id: ID!
 
   "The associated project"
@@ -253,6 +253,9 @@ type ProjectMinterConfiguration @entity {
 
   "Dutch auction start price, in wei"
   startPrice: BigInt
+
+  "Dutch auction resting price, in wei"
+  endPrice: BigInt
 
   "Dutch auction start time (unix timestamp)"
   startTime: BigInt
