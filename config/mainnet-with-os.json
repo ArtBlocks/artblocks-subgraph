@@ -37,11 +37,10 @@
       "address": "0xa319C382a702682129fcbF55d514E61a16f97f9c",
       "name": "Plottables",
       "startBlock": 13712123
-    },
-    {
-      "address": "0xd10e3DEe203579FcEE90eD7d0bDD8086F7E53beB",
-      "name": "ArtCode",
-      "startBlock": 14122786
     }
-  ]
+  ],
+  "openSeaContract": {
+    "address": "0x7Be8076f4EA4A4AD08075C2508e481d6C946D12b",
+    "startBlock": 11338811
+  }
 }
