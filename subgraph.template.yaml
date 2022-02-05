@@ -440,7 +440,7 @@ dataSources:
         - name: GenArt721FilteredMinter
           file: ./abis/GenArt721FilteredMinter.json
       # todo - add event handlers when implemented
-      file: ./src/filtered-minter-mappings.ts
+      file: ./src/filtered-minter-mapping.ts
   {{/filteredMinterContracts}}
   {{#filteredMinterETHContracts}}
   - kind: ethereum/contract
@@ -469,7 +469,7 @@ dataSources:
         - name: GenArt721FilteredMinterETH
           file: ./abis/GenArt721FilteredMinterETH.json
       # todo - add event handlers when defined
-      file: ./src/filtered-minter-mappings.ts
+      file: ./src/filtered-minter-mapping.ts
   {{/filteredMinterETHContracts}}
   {{#filteredMinterETHAuctionContracts}}
   - kind: ethereum/contract
@@ -493,7 +493,7 @@ dataSources:
         - name: GenArt721FilteredMinterETHAuction
           file: ./abis/GenArt721FilteredMinterETHAuction.json
       # todo - add event handlers when defined
-      file: ./src/filtered-minter-mappings.ts
+      file: ./src/filtered-minter-mapping.ts
   {{/filteredMinterETHAuctionContracts}}
   {{#openSeaContract}}
   - kind: ethereum/contract
