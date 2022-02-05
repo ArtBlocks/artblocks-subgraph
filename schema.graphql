@@ -226,12 +226,18 @@ type MinterFilter @entity {
   updatedAt: BigInt!
 }
 
+enum MinterType {
+  GenArt721FilteredMinter
+  GenArt721FilteredMinterETH
+  GenArt721FilteredMinterETHAuction
+}
+
 type Minter @entity {
   "Unique identifier made up of minter contract address"
   id: ID!
 
-  "Minter type - specific to each type of minter (static price, DA, etc.)"
-  type: String!
+  "Minter type"
+  type: MinterType!
 
   "Associated Minter Filter"
   minterFilter: MinterFilter!
