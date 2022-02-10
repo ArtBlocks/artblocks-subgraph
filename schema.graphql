@@ -222,14 +222,22 @@ type MinterFilter @entity {
 
   "Minters allowlisted on MinterFilter"
   minterAllowlist: [Minter!]!
+
+  updatedAt: BigInt!
+}
+
+enum MinterType {
+  GenArt721FilteredMinter
+  GenArt721FilteredMinterETH
+  GenArt721FilteredMinterETHAuction
 }
 
 type Minter @entity {
   "Unique identifier made up of minter contract address"
   id: ID!
 
-  "Minter type - specific to each type of minter (static price, DA, etc.)"
-  type: String!
+  "Minter type"
+  type: MinterType!
 
   "Associated Minter Filter"
   minterFilter: MinterFilter!
@@ -239,7 +247,7 @@ type Minter @entity {
 }
 
 type ProjectMinterConfiguration @entity {
-  "Unique identifier made up of project id and minter contract address"
+  "Unique identifier made up of minter contract address-projectId"
   id: ID!
 
   "The associated project"
@@ -248,8 +256,20 @@ type ProjectMinterConfiguration @entity {
   "The associated minter"
   minter: Minter!
 
+  "true if project's token price has been configured on minter"
+  priceIsConfigured: Bool!
+
+  "currency symbol as defined on minter - ETH reserved for ether"
+  currencySymbol: String!
+
+  "currency address as defined on minter - address(0) reserved for ether"
+  currencyAddress: Bytes!
+
   "Defines if purchasing token to another is allowed"
   purchaseToDisabled: Boolean!
+
+  "price of token or resting price of Duch auction, in wei"
+  basePrice: BigInt
 
   "Dutch auction start price, in wei"
   startPrice: BigInt
