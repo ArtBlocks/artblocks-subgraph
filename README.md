@@ -16,7 +16,7 @@ Mainnet subgraph deployments should **only** be done on Wednesdays, barring the 
 
 For mainnet subgraph deployments, we deploy first to the hosted subgraph service provided by The Graph, which takes ~36 hours to sync, and then proceed to deploying to the decentralized Graph network if all is confirmed to be working as intended, which takes an additional ~12 hours to sync.
 
-## Graph Network Subgraph Publish Checklist
+## Decentralized Graph Network Subgraph Publish Checklist
 1. Deploy any contracts to be indexed
     - Please see [ArtBlocks/artblocks-contracts](https://github.com/ArtBlocks/artblocks-contracts) for more info on contract deployment.
 2. Update the corresponding `config/` file for the desired network (e.g. `mainnet.json` for mainnet EVM) to include the newly deployed contracts
@@ -36,3 +36,17 @@ For mainnet subgraph deployments, we deploy first to the hosted subgraph service
 11. Update the Hasura `ARTBLOCKS_SUBGRAPH_URL` environment variable to be the new subgraph deployment url (`https://gateway.thegraph.com/api/<API KEY>/deployments/id/<DEPLOYMENT ID>`)
 12. Verify that the frontend is working as expected
 13. If the newly published changes include indexing any new contracts run the sync-from.ts script in the artblocks repo. When prompted enter the list of added contract addresses separated by spaces and the unix timestamp from which to sync from (use the time the earliest deployed contract was deployed).
+
+## Hosted Subgraph Publish Checklist
+>slightly less involved than publishing to the decentralized graph network
+
+1. Deploy any contracts to be indexed
+    - Please see [ArtBlocks/artblocks-contracts](https://github.com/ArtBlocks/artblocks-contracts) for more info on contract deployment.
+2. Update the corresponding `config/` file for the desired network (e.g. `mainnet.json` for mainnet EVM) to include the newly deployed contracts
+    - Verify that contract addresses added are for the correct contracts by checking Etherscan at the contract address
+3. Run `yarn prepare:{NETWORK}`, (e.g. `yarn prepare:mainnet` for mainnet) to generate subgraph manifest (subgraph.yaml)
+4. Manually look over the generated subgraph manifest to make sure it is correct
+5. Run `yarn codegen` to generate contract mappings
+6. Deploy subgraph to The Graph's hosted service `yarn deploy:{NETWORK}-hosted` (e.g. `yarn deploy:mainnet-hosted`)
+  - 6A. If you are deploying `mainnet-hosted`, don't forget to also prepare and deploy `mainnet-with-secondary-hosted` to keep those subgraphs in sync
+  
