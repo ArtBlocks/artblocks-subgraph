@@ -264,7 +264,7 @@ type ProjectMinterConfiguration @entity {
   minter: Minter!
 
   "true if project's token price has been configured on minter"
-  priceIsConfigured: Bool!
+  priceIsConfigured: Boolean!
 
   "currency symbol as defined on minter - ETH reserved for ether"
   currencySymbol: String!
