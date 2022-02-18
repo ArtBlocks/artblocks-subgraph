@@ -394,13 +394,13 @@ dataSources:
           handler: handleUpdateProjectWebsite
       file: ./src/original-mapping.ts
   {{/genArt721Contracts}}
-  {{#minterFilterContracts}}
+  {{#minterFilterV0Contracts}}
   - kind: ethereum/contract
-    name: 'MinterFilter-{{address}}'
+    name: 'MinterFilterV0-{{address}}'
     network: {{network}}
     source:
       address: '{{address}}'
-      abi: MinterFilter
+      abi: MinterFilterV0
       startBlock: {{startBlock}}
     mapping:
       kind: ethereum/events
@@ -413,11 +413,11 @@ dataSources:
         - Minter
         - ProjectMinterConfiguration
       abis:
-        - name: MinterFilter
-          file: ./abis/MinterFilter.json
+        - name: MinterFilterV0
+          file: ./abis/MinterFilterV0.json
       # todo - add event handlers when implemented
       file: ./src/minter-filter-mapping.ts
-  {{/minterFilterContracts}}
+  {{/minterFilterV0Contracts}}
   {{#minterSetPriceERC20V0Contracts}}
   - kind: ethereum/contract
     name: 'minterSetPriceERC20V0-{{address}}'
