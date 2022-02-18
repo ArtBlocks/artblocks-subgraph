@@ -418,13 +418,13 @@ dataSources:
       # todo - add event handlers when implemented
       file: ./src/minter-filter-mapping.ts
   {{/minterFilterContracts}}
-  {{#filteredMinterContracts}}
+  {{#minterSetPriceERC20V0Contracts}}
   - kind: ethereum/contract
-    name: 'GenArt721FilteredMinter-{{address}}'
+    name: 'minterSetPriceERC20V0-{{address}}'
     network: {{network}}
     source:
       address: '{{address}}'
-      abi: GenArt721FilteredMinter
+      abi: MinterSetPriceERC20V0
       startBlock: {{startBlock}}
     mapping:
       kind: ethereum/events
@@ -437,18 +437,18 @@ dataSources:
         - Minter
         - ProjectMinterConfiguration
       abis:
-        - name: GenArt721FilteredMinter
-          file: ./abis/GenArt721FilteredMinter.json
+        - name: MinterSetPriceERC20V0
+          file: ./abis/MinterSetPriceERC20V0.json
       # todo - add event handlers when implemented
-      file: ./src/filtered-minter-mapping.ts
-  {{/filteredMinterContracts}}
-  {{#filteredMinterETHContracts}}
+      file: ./src/minter-suite-mapping.ts
+  {{/minterSetPriceERC20V0Contracts}}
+  {{#minterSetPriceV0Contracts}}
   - kind: ethereum/contract
-    name: 'GenArt721FilteredMinterETH-{{address}}'
+    name: 'MinterSetPriceV0-{{address}}'
     network: {{network}}
     source:
       address: '{{address}}'
-      abi: GenArt721FilteredMinterETH
+      abi: MinterSetPriceV0
       startBlock: {{startBlock}}
     mapping:
       kind: ethereum/events
@@ -466,18 +466,18 @@ dataSources:
         - Minter
         - ProjectMinterConfiguration
       abis:
-        - name: GenArt721FilteredMinterETH
-          file: ./abis/GenArt721FilteredMinterETH.json
+        - name: MinterSetPriceV0
+          file: ./abis/MinterSetPriceV0.json
       # todo - add event handlers when defined
-      file: ./src/filtered-minter-mapping.ts
-  {{/filteredMinterETHContracts}}
-  {{#filteredMinterETHAuctionContracts}}
+      file: ./src/minter-suite-mapping.ts
+  {{/minterSetPriceV0Contracts}}
+  {{#minterDALinV0Contracts}}
   - kind: ethereum/contract
-    name: 'GenArt721FilteredMinterETHAuction-{{address}}'
+    name: 'MinterDALinV0-{{address}}'
     network: {{network}}
     source:
       address: '{{address}}'
-      abi: GenArt721FilteredMinterETHAuction
+      abi: MinterDALinV0
       startBlock: {{startBlock}}
     mapping:
       kind: ethereum/events
@@ -490,11 +490,35 @@ dataSources:
         - Minter
         - ProjectMinterConfiguration
       abis:
-        - name: GenArt721FilteredMinterETHAuction
-          file: ./abis/GenArt721FilteredMinterETHAuction.json
+        - name: MinterDALinV0
+          file: ./abis/MinterDALinV0.json
       # todo - add event handlers when defined
-      file: ./src/filtered-minter-mapping.ts
-  {{/filteredMinterETHAuctionContracts}}
+      file: ./src/minter-suite-mapping.ts
+  {{/minterDALinV0Contracts}}
+  {{#minterDAExpV0Contracts}}
+  - kind: ethereum/contract
+    name: 'MinterDAExpV0-{{address}}'
+    network: {{network}}
+    source:
+      address: '{{address}}'
+      abi: MinterDAExpV0
+      startBlock: {{startBlock}}
+    mapping:
+      kind: ethereum/events
+      apiVersion: 0.0.5
+      language: wasm/assemblyscript
+      entities:
+        - Project
+        - Contract
+        - MinterFilter
+        - Minter
+        - ProjectMinterConfiguration
+      abis:
+        - name: MinterDAExpV0
+          file: ./abis/MinterDAExpV0.json
+      # todo - add event handlers when defined
+      file: ./src/minter-suite-mapping.ts
+  {{/minterDAExpV0Contracts}}
   {{#openSeaContract}}
   - kind: ethereum/contract
     name: WyvernExchange
