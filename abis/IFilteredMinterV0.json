@@ -1,7 +1,7 @@
 {
   "_format": "hh-sol-artifact-1",
-  "contractName": "IFilteredMinter",
-  "sourceName": "contracts/interfaces/0.8.x/IFilteredMinter.sol",
+  "contractName": "IFilteredMinterV0",
+  "sourceName": "contracts/interfaces/0.8.x/IFilteredMinterV0.sol",
   "abi": [
     {
       "anonymous": false,
