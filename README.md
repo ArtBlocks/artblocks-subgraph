@@ -2,6 +2,10 @@
 
 The Art Blocks subgraph definitions for The Graph.
 
+## Initial Setup
+
+If you haven't already connected your Github account to The Graph's account system, please do so by following the [instructions here](https://thegraph.com/docs/en/hosted-service/deploy-subgraph-hosted/). You should ensure that you connect your account and set the appropriate auth-token for Art Blocks using the `graph auth --product hosted-service <ACCESS_TOKEN>` command. Please take care to ensure that you are copy-pasting the auth-token for *Art Blocks* and not for your personal account.
+
 ## Subgraph Deployments
 
 ### Ropsten
@@ -49,4 +53,3 @@ For mainnet subgraph deployments, we deploy first to the hosted subgraph service
 5. Run `yarn codegen` to generate contract mappings
 6. Deploy subgraph to The Graph's hosted service `yarn deploy:{NETWORK}-hosted` (e.g. `yarn deploy:mainnet-hosted`)
   - 6A. If you are deploying `mainnet-hosted`, don't forget to also prepare and deploy `mainnet-with-secondary-hosted` to keep those subgraphs in sync
-  
