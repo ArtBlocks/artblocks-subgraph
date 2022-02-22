@@ -4,7 +4,11 @@ The Art Blocks subgraph definitions for The Graph.
 
 ## Initial Setup
 
-If you haven't already connected your Github account to The Graph's account system, please do so by following the [instructions here](https://thegraph.com/docs/en/hosted-service/deploy-subgraph-hosted/). You should ensure that you connect your account and set the appropriate auth-token for Art Blocks using the `graph auth --product hosted-service <ACCESS_TOKEN>` command. Please take care to ensure that you are copy-pasting the auth-token for *Art Blocks* and not for your personal account.
+If you haven't already connected your Github account to The Graph's account system, please do so by following the [instructions here](https://thegraph.com/docs/en/hosted-service/deploy-subgraph-hosted/). You should ensure that you connect your account _and_ set the appropriate auth-token for Art Blocks using the `graph auth --product hosted-service <ACCESS_TOKEN>` command.
+
+<img width="1433" alt="Screen Shot 2022-02-22 at 1 01 20 PM" src="https://user-images.githubusercontent.com/8602661/155210396-e211b2a8-d386-4a49-96ce-8bb66c2ac07f.png">
+
+Please take care to ensure that you are copy-pasting the auth-token for *Art Blocks* and not for your personal account.
 
 ## Subgraph Deployments
 
