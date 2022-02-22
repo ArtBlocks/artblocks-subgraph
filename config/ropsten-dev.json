@@ -12,28 +12,35 @@
       "startBlock": 10216817
     }
   ],
-  "minterFilterContracts": [
+  "minterFilterV0Contracts": [
     {
       "address": "0x0000000000000000000000000000000000000000",
       "name": "TODO - update to actual ropsten deployed contract",
       "startBlock": 10216817
     }
   ],
-  "filteredMinterContracts": [
+  "minterSetPriceV0Contracts": [
     {
       "address": "0x0000000000000000000000000000000000000000",
       "name": "TODO - update to actual ropsten deployed contract",
       "startBlock": 10216817
     }
   ],
-  "filteredMinterETHContracts": [
+  "minterSetPriceERC20V0Contracts": [
     {
       "address": "0x0000000000000000000000000000000000000000",
       "name": "TODO - update to actual ropsten deployed contract",
       "startBlock": 10216817
     }
   ],
-  "filteredMinterETHAuctionContracts": [
+  "minterDALinV0Contracts": [
+    {
+      "address": "0x0000000000000000000000000000000000000000",
+      "name": "TODO - update to actual ropsten deployed contract",
+      "startBlock": 10216817
+    }
+  ],
+  "minterDAExpV0Contracts": [
     {
       "address": "0x0000000000000000000000000000000000000000",
       "name": "TODO - update to actual ropsten deployed contract",
