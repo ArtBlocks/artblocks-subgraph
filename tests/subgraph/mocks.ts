@@ -1,4 +1,4 @@
-import { createMockedFunction, newMockCall } from "matchstick-as/assembly/index"
+import { createMockedFunction, log, newMockCall } from "matchstick-as/assembly/index"
 import { Address, BigInt, ethereum } from "@graphprotocol/graph-ts"
 import { meridianScript } from '../meridianScript';
 import { AddProjectCall } from '../../generated/GenArt721Core/GenArt721Core';
@@ -30,6 +30,9 @@ createMockedFunction(coreContractAddress, 'randomizerContract', 'randomizerContr
   export const mockPBABRefreshContractCalls = function(): void {
     createMockedFunction(coreContractAddress, 'admin', 'admin():(address)')
     .returns([ethereum.Value.fromAddress(Address.fromString('0x90cBa2Bbb19ecc291A12066Fd8329D65FA1f1947'))])
+
+  createMockedFunction(coreContractAddress, 'artblocksAddress', 'artblocksAddress():(address)')
+    .returns([ethereum.Value.fromAddress(Address.fromString('0xa7d8d9ef8d8ce8992df33d8b8cf4aebabd5bd270'))])
   
   createMockedFunction(coreContractAddress, 'renderProviderAddress', 'renderProviderAddress():(address)')
     .returns([ethereum.Value.fromAddress(Address.fromString('0xa7d8d9ef8d8ce8992df33d8b8cf4aebabd5bd270'))])
@@ -82,6 +85,42 @@ export const mockProjectContractCalls = function(): void {
   .withArgs([ethereum.Value.fromSignedBigInt(BigInt.fromString("99"))])
     .returns(projectScriptInfoReturnArray)
 }
+
+  export const mockOGProjectContractCalls = function(): void {
+    let projectDetailsReturnArray: Array<ethereum.Value> = [
+      ethereum.Value.fromString("string1"),     // projectName
+      ethereum.Value.fromString("string2"),     // artist
+      ethereum.Value.fromString("string3"),     // description
+      ethereum.Value.fromString("string4"),     // website
+      ethereum.Value.fromString("string7"),     // license
+      ethereum.Value.fromBoolean(true)];        // dynamic
+    createMockedFunction(coreContractAddress, 'projectDetails', 'projectDetails(uint256):(string,string,string,string,string,bool)')
+      .withArgs([ethereum.Value.fromSignedBigInt(BigInt.fromString("99"))])
+      .returns(projectDetailsReturnArray)
+    
+    let projectTokenInfoReturnArray: Array<ethereum.Value> = [
+      ethereum.Value.fromAddress(Address.fromString("0xa7d8d9ef8d8ce8992df33d8b8cf4aebabd5bd270")),   // artistAddress
+      ethereum.Value.fromSignedBigInt(BigInt.fromString("100000000")),                                // pricePerTokenInWei
+      ethereum.Value.fromSignedBigInt(BigInt.fromString("1024")),                                     // invocations
+      ethereum.Value.fromSignedBigInt(BigInt.fromString("1024")),                                     // maxInvocations
+      ethereum.Value.fromBoolean(false),                                                              // active
+      ethereum.Value.fromAddress(Address.fromString("0xc079F0A6E8809E41A2A39D6532ff3dfa6B48e6bB")),   // additionalPayee
+      ethereum.Value.fromSignedBigInt(BigInt.fromString("10"))]                                       // additionalPayeePercentage
+    createMockedFunction(coreContractAddress, 'projectTokenInfo', 'projectTokenInfo(uint256):(address,uint256,uint256,uint256,bool,address,uint256)')
+    .withArgs([ethereum.Value.fromSignedBigInt(BigInt.fromString("99"))])
+      .returns(projectTokenInfoReturnArray)
+    
+    let projectScriptInfoReturnArray: Array<ethereum.Value> = [
+      ethereum.Value.fromString(meridianScript),                                           // scriptJSON
+      ethereum.Value.fromSignedBigInt(BigInt.fromString("1")),                             // scriptCount
+      ethereum.Value.fromSignedBigInt(BigInt.fromString("1")),                             // hashes
+      ethereum.Value.fromString("mtwirsqawjuoloq2gvtyug2tc3jbf5htm2zeo4rsknfiv3fdp46a"),   // ipfsHash
+      ethereum.Value.fromBoolean(true),                                                    // locked
+      ethereum.Value.fromBoolean(true)];                                                   // paused
+    createMockedFunction(coreContractAddress, 'projectScriptInfo', 'projectScriptInfo(uint256):(string,uint256,uint256,string,bool,bool)')
+    .withArgs([ethereum.Value.fromSignedBigInt(BigInt.fromString("99"))])
+      .returns(projectScriptInfoReturnArray)
+  }
 
 export const mockPBABProjectContractCalls = function(): void {
   let projectDetailsReturnArray: Array<ethereum.Value> = [

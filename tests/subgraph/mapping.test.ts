@@ -1,4 +1,4 @@
-import { assert, clearStore, test,  newMockCall, createMockedFunction } from "matchstick-as/assembly/index"
+import { assert, clearStore, test,  newMockCall, logStore, createMockedFunction } from "matchstick-as/assembly/index"
 import { Address, BigInt, ethereum } from "@graphprotocol/graph-ts"
 import { meridianScript } from '../meridianScript';
 import { mockRefreshContractCalls, mockProjectContractCalls, mockRefreshProjectScript, createProjectToLoad, createTokenToLoad } from './mocks';
@@ -115,35 +115,6 @@ test("Can add a new project", () => {
   clearStore();
 });
 
-// don't test handleUpdateAdmin -- function needs to interact with Core2
-// test("Can update admin", () => {
-//   log.info('call1: ',[])
-//   let call = changetype<UpdateAdminCall>(newMockCall())
-  
-//   let core2ContractAddress = Address.fromString("0xa7d8d9ef8D8Ce8992Df33D8b8CF4Aebabd5bD270")
-//   call.to = Address.fromString("0xa7d8d9ef8D8Ce8992Df33D8b8CF4Aebabd5bD270")
-//   call.inputValues = [
-//     new ethereum.EventParam("_adminAddress",
-//     ethereum.Value.fromString("0x1233973F9aEa61250e98b697246cb10146903672"))
-//   ]
-//   log.info('call2: ',[])
-
-// mockRefreshContractCalls();
-
-//   //add a contract to the store that my mapping will .load() from
-//   let contract = new Contract("123")
-//   contract.save()
-//   log.info('call4: ',[])
-  
-//   handleUpdateAdmin(call)
-//   log.info('call5: ',[])
-//   assert.fieldEquals(CONTRACT_ENTITY_TYPE, "123", "admin", "0x90cBa2Bbb19ecc291A12066Fd8329D65FA1f1947")
-//   assert.fieldEquals(CONTRACT_ENTITY_TYPE, "123", "renderProviderAddress", "0xa7d8d9ef8d8ce8992df33d8b8cf4aebabd5bd270")
-//   assert.fieldEquals(CONTRACT_ENTITY_TYPE, "123", "renderProviderPercentage", "100")
-
-//   clearStore();
-// }, true)
-
 test("Can add whitelisting to a contract and account", () => {
   let call = changetype<AddWhitelistedCall>(newMockCall())
   
@@ -170,7 +141,7 @@ test("Can add whitelisting to a contract and account", () => {
   assert.fieldEquals(WHITELISTING_ENTITY_TYPE, "0xa7d8d9ef8d8ce8992df33d8b8cf4aebabd5bd270-0x1233973f9aea61250e98b697246cb10146903672", "contract", "0xa7d8d9ef8d8ce8992df33d8b8cf4aebabd5bd270")
   assert.fieldEquals(WHITELISTING_ENTITY_TYPE, "0xa7d8d9ef8d8ce8992df33d8b8cf4aebabd5bd270-0x1233973f9aea61250e98b697246cb10146903672", "account", "0x1233973f9aea61250e98b697246cb10146903672")
   clearStore();
-}, true)
+})
 
 
 test("Can remove whitelisting", () => {
@@ -203,7 +174,7 @@ test("Can remove whitelisting", () => {
   
   assert.notInStore(WHITELISTING_ENTITY_TYPE, "0xa7d8d9ef8d8ce8992df33d8b8cf4aebabd5bd270-0x1233973f9aea61250e98b697246cb10146903672")
   clearStore();
-}, true)
+})
 
 test("Can add and mint whitelisted call", () => {
   let call = changetype<AddMintWhitelistedCall>(newMockCall())
@@ -225,7 +196,7 @@ test("Can add and mint whitelisted call", () => {
   
   assert.notInStore(WHITELISTING_ENTITY_TYPE, "0xa7d8d9ef8d8ce8992df33d8b8cf4aebabd5bd270-0x1233973f9aea61250e98b697246cb10146903672")
   clearStore();
-}, true)
+})
 
 test("Can remove a mint whitelisted address", () => {
   mockRefreshContractCalls();
@@ -259,7 +230,7 @@ test("Can remove a mint whitelisted address", () => {
   assert.fieldEquals(CONTRACT_ENTITY_TYPE, "0xa7d8d9ef8d8ce8992df33d8b8cf4aebabd5bd270", "mintWhitelisted", "[0x1233973f9aea61250e98b697246cb10146912345]")
   
   clearStore();
-}, true)
+})
 
 test("Can update randomizer address", () => {
   let call = changetype<UpdateRandomizerAddressCall>(newMockCall())
@@ -279,7 +250,7 @@ test("Can update randomizer address", () => {
   assert.fieldEquals(CONTRACT_ENTITY_TYPE, "0xa7d8d9ef8d8ce8992df33d8b8cf4aebabd5bd270", "randomizerContract", "0xa7d8d9ef8d8ce8992df33d8b8cf4aebabd5bd270")
 
   clearStore();
-}, true)
+})
 
 test("Can update ArtBlocks address", () => {
   let call = changetype<UpdateArtblocksAddressCall>(newMockCall())
@@ -300,7 +271,7 @@ test("Can update ArtBlocks address", () => {
   assert.fieldEquals(CONTRACT_ENTITY_TYPE, "0xa7d8d9ef8d8ce8992df33d8b8cf4aebabd5bd270", "renderProviderAddress", "0xa7d8d9ef8d8ce8992df33d8b8cf4aebabd5bd270")
 
   clearStore();
-}, true)
+})
 
 test("Can update ArtBlocks percentage", () => {
   let call = changetype<UpdateArtblocksPercentageCall>(newMockCall())
@@ -321,7 +292,7 @@ test("Can update ArtBlocks percentage", () => {
   assert.fieldEquals(CONTRACT_ENTITY_TYPE, "0xa7d8d9ef8d8ce8992df33d8b8cf4aebabd5bd270", "renderProviderPercentage", "10")
 
   clearStore();
-}, true)
+})
 
 test("Can handle add project script", () => {
   mockRefreshContractCalls();
@@ -347,7 +318,7 @@ test("Can handle add project script", () => {
   assert.fieldEquals(PROJECTSCRIPT_ENTITY_TYPE, "0xa7d8d9ef8d8ce8992df33d8b8cf4aebabd5bd270-99-0", "script", meridianScript.toString())
 
   clearStore();
-}, true)
+})
 
 
 test("Can clear a Token IPFS image uri", () => {
@@ -375,7 +346,7 @@ test("Can clear a Token IPFS image uri", () => {
   assert.fieldEquals(TOKEN_ENTITY_TYPE, "0xa7d8d9ef8d8ce8992df33d8b8cf4aebabd5bd270-123", "uri", "mtwirsqawjuoloq2gvtyug2tc3jbf5htm2zeo4rsknfiv3fdp46a")
 
   clearStore();
-}, true);
+})
 
 test("Can override token dynamic image with IPFS link", () => {
   let call = changetype<OverrideTokenDynamicImageWithIpfsLinkCall>(newMockCall())
@@ -404,7 +375,7 @@ if (token) {
   assert.fieldEquals(TOKEN_ENTITY_TYPE, "0xa7d8d9ef8d8ce8992df33d8b8cf4aebabd5bd270-123", "uri", "mtwirsqawjuoloq2gvtyug2tc3jbf5htm2zeo4rsknfiv3fdp46a")
 
   clearStore();
-}, true);
+})
 
 test("Can remove and update a project's last script", () => {
   mockRefreshContractCalls();
@@ -443,7 +414,7 @@ test("Can remove and update a project's last script", () => {
   assert.fieldEquals(PROJECTSCRIPT_ENTITY_TYPE, "0xa7d8d9ef8d8ce8992df33d8b8cf4aebabd5bd270-99-0", "script", meridianScript.toString())
 
   clearStore();
-  }, true);
+  })
 
 test("Can toggle if a project is active", () => {
   mockRefreshContractCalls();
@@ -469,7 +440,7 @@ test("Can toggle if a project is active", () => {
   assert.fieldEquals(PROJECT_ENTITY_TYPE, "0xa7d8d9ef8d8ce8992df33d8b8cf4aebabd5bd270-99", "updatedAt", "230")
   assert.fieldEquals(PROJECT_ENTITY_TYPE, "0xa7d8d9ef8d8ce8992df33d8b8cf4aebabd5bd270-99", "activatedAt", "230")
   clearStore();
-  }, true);
+  })
 
 test("Can toggle if a project is dynamic", () => {
   mockRefreshContractCalls();
@@ -495,7 +466,7 @@ test("Can toggle if a project is dynamic", () => {
   assert.fieldEquals(PROJECT_ENTITY_TYPE, "0xa7d8d9ef8d8ce8992df33d8b8cf4aebabd5bd270-99", "useHashString", "true")
 
   clearStore();
-  }, true);
+  })
 
 test("Can toggle if a project is locked", () => {
   mockRefreshContractCalls();
@@ -521,7 +492,7 @@ test("Can toggle if a project is locked", () => {
   assert.fieldEquals(PROJECT_ENTITY_TYPE, "0xa7d8d9ef8d8ce8992df33d8b8cf4aebabd5bd270-99", "updatedAt", "230")
 
   clearStore();
-  }, true);
+  })
 
 test("Can toggle if a project is paused", () => {
   mockRefreshContractCalls();
@@ -547,7 +518,7 @@ test("Can toggle if a project is paused", () => {
   assert.fieldEquals(PROJECT_ENTITY_TYPE, "0xa7d8d9ef8d8ce8992df33d8b8cf4aebabd5bd270-99", "updatedAt", "230")
 
   clearStore();
-  }, true);
+  })
 
 test("Can toggle a project's useHashString", () => {
   mockRefreshContractCalls();
@@ -572,7 +543,7 @@ test("Can toggle a project's useHashString", () => {
   assert.fieldEquals(PROJECT_ENTITY_TYPE, "0xa7d8d9ef8d8ce8992df33d8b8cf4aebabd5bd270-99", "useHashString", "true")
 
   clearStore();
-  }, true);
+  })
 
 test("Can toggle if a project uses Ipfs", () => {
   mockRefreshContractCalls();
@@ -596,7 +567,7 @@ test("Can toggle if a project uses Ipfs", () => {
   assert.fieldEquals(PROJECT_ENTITY_TYPE, "0xa7d8d9ef8d8ce8992df33d8b8cf4aebabd5bd270-99", "useIpfs", "true")
 
   clearStore();
-  }, true);
+  })
 
 test("Can update a projects additional payee info", () => {
   mockRefreshContractCalls();
@@ -612,19 +583,19 @@ test("Can update a projects additional payee info", () => {
     new ethereum.EventParam("_projectId",
     ethereum.Value.fromSignedBigInt(BigInt.fromString('99'))),
     new ethereum.EventParam("_additionalPayee",
-    ethereum.Value.fromString("0x7ee88C660eE1B8B41c1BD75C0290E25F1228BE98")),
+    ethereum.Value.fromAddress(Address.fromString("0x7ee88C660eE1B8B41c1BD75C0290E25F1228BE98"))),
     new ethereum.EventParam("_additionalPayeePercentage",
     ethereum.Value.fromSignedBigInt(BigInt.fromString('20'))) 
   ]
 
   handleUpdateProjectAdditionalPayeeInfo(call);
 
-  assert.fieldEquals(PROJECT_ENTITY_TYPE, "0xa7d8d9ef8d8ce8992df33d8b8cf4aebabd5bd270-99", "additionalPayee", "0x7ee88C660eE1B8B41c1BD75C0290E25F1228BE98")
+  assert.fieldEquals(PROJECT_ENTITY_TYPE, "0xa7d8d9ef8d8ce8992df33d8b8cf4aebabd5bd270-99", "additionalPayee", "0x7ee88c660ee1b8b41c1bd75c0290e25f1228be98")
   assert.fieldEquals(PROJECT_ENTITY_TYPE, "0xa7d8d9ef8d8ce8992df33d8b8cf4aebabd5bd270-99", "additionalPayeePercentage", "20")
   assert.fieldEquals(PROJECT_ENTITY_TYPE, "0xa7d8d9ef8d8ce8992df33d8b8cf4aebabd5bd270-99", "updatedAt", "230")
 
   clearStore();
-  }, true);
+  })
 
 test("Can update a projects artist address", () => {
   clearStore();
@@ -651,7 +622,7 @@ test("Can update a projects artist address", () => {
   assert.fieldEquals(PROJECT_ENTITY_TYPE, "0xa7d8d9ef8d8ce8992df33d8b8cf4aebabd5bd270-99", "updatedAt", "230")
 
   clearStore();
-  }, true);
+  })
 
 test("Can update a projects artist name", () => {
   mockRefreshContractCalls();
@@ -676,7 +647,7 @@ test("Can update a projects artist name", () => {
   assert.fieldEquals(PROJECT_ENTITY_TYPE, "0xa7d8d9ef8d8ce8992df33d8b8cf4aebabd5bd270-99", "updatedAt", "230")
 
   clearStore();
-  }, true);
+  })
 
 test("Can update a projects base Ipfs URI", () => {
   mockRefreshContractCalls();
@@ -700,7 +671,7 @@ test("Can update a projects base Ipfs URI", () => {
   assert.fieldEquals(PROJECT_ENTITY_TYPE, "0xa7d8d9ef8d8ce8992df33d8b8cf4aebabd5bd270-99", "baseIpfsUri", "Qme7ss3ARVgxv6rXqVPiikMJ8u2NLgmgszg13pYrDKEoiu")
 
   clearStore();
-  }, true);
+  })
 
 test("Can update a projects base URI", () => {
   mockRefreshContractCalls();
@@ -724,7 +695,7 @@ test("Can update a projects base URI", () => {
   assert.fieldEquals(PROJECT_ENTITY_TYPE, "0xa7d8d9ef8d8ce8992df33d8b8cf4aebabd5bd270-99", "baseUri", "random_new_base_URI")
 
   clearStore();
-  }, true);
+  })
 
 test("Can update a projects currency info", () => {
   mockRefreshContractCalls();
@@ -754,7 +725,7 @@ test("Can update a projects currency info", () => {
   assert.fieldEquals(PROJECT_ENTITY_TYPE, "0xa7d8d9ef8d8ce8992df33d8b8cf4aebabd5bd270-99", "updatedAt", "230")
 
   clearStore();
-  }, true);
+  })
 
 test("Can update a projects description", () => {
   mockRefreshContractCalls();
@@ -779,7 +750,7 @@ test("Can update a projects description", () => {
   assert.fieldEquals(PROJECT_ENTITY_TYPE, "0xa7d8d9ef8d8ce8992df33d8b8cf4aebabd5bd270-99", "updatedAt", "230")
 
   clearStore();
-  }, true);
+  })
 
 test("Can update a projects IPFS Hash", () => {
   mockRefreshContractCalls();
@@ -804,7 +775,7 @@ test("Can update a projects IPFS Hash", () => {
   assert.fieldEquals(PROJECT_ENTITY_TYPE, "0xa7d8d9ef8d8ce8992df33d8b8cf4aebabd5bd270-99", "updatedAt", "230")
 
   clearStore();
-  }, true);
+  })
 
 test("Can update a project license", () => {
   mockRefreshContractCalls();
@@ -829,7 +800,7 @@ test("Can update a project license", () => {
   assert.fieldEquals(PROJECT_ENTITY_TYPE, "0xa7d8d9ef8d8ce8992df33d8b8cf4aebabd5bd270-99", "updatedAt", "230")
 
   clearStore();
-  }, true);
+  })
 
 test("Can update a project max invocations", () => {
   mockRefreshContractCalls();
@@ -856,7 +827,7 @@ test("Can update a project max invocations", () => {
   assert.fieldEquals(PROJECT_ENTITY_TYPE, "0xa7d8d9ef8d8ce8992df33d8b8cf4aebabd5bd270-99", "updatedAt", "230")
 
   clearStore();
-  }, true);
+  })
 
 test("Can update a project name", () => {
   mockRefreshContractCalls();
@@ -882,7 +853,7 @@ test("Can update a project name", () => {
   assert.fieldEquals(PROJECT_ENTITY_TYPE, "0xa7d8d9ef8d8ce8992df33d8b8cf4aebabd5bd270-99", "updatedAt", "230")
 
   clearStore();
-  }, true);
+  })
 
 test("Can update a project price per token in wei", () => {
   mockRefreshContractCalls();
@@ -898,7 +869,7 @@ test("Can update a project price per token in wei", () => {
     new ethereum.EventParam("_projectId",
     ethereum.Value.fromSignedBigInt(BigInt.fromString('99'))),
     new ethereum.EventParam("_pricePerTokenInWei",
-    ethereum.Value.fromString("987654321"))
+    ethereum.Value.fromSignedBigInt(BigInt.fromString("987654321")))
   ]
 
   assert.fieldEquals(PROJECT_ENTITY_TYPE, "0xa7d8d9ef8d8ce8992df33d8b8cf4aebabd5bd270-99", "pricePerTokenInWei", "100000000")
@@ -908,7 +879,7 @@ test("Can update a project price per token in wei", () => {
   assert.fieldEquals(PROJECT_ENTITY_TYPE, "0xa7d8d9ef8d8ce8992df33d8b8cf4aebabd5bd270-99", "updatedAt", "230")
 
   clearStore();
-  }, true);
+  })
 
 test("Can handleUpdateProjectScript", () => {
   clearStore();
@@ -939,7 +910,7 @@ test("Can handleUpdateProjectScript", () => {
   assert.fieldEquals(PROJECT_ENTITY_TYPE, "0xa7d8d9ef8d8ce8992df33d8b8cf4aebabd5bd270-99", "scriptUpdatedAt", "530")
 
   clearStore();
-  }, true);
+  })
 
 
 test("Can handleUpdateProjectScriptJSON", () => {
@@ -967,7 +938,7 @@ test("Can handleUpdateProjectScriptJSON", () => {
   assert.fieldEquals(PROJECT_ENTITY_TYPE, "0xa7d8d9ef8d8ce8992df33d8b8cf4aebabd5bd270-99", "updatedAt", "232")
 
   clearStore();
-  }, true);
+  })
 
 test("Can update project secondary market royalties", () => {
   clearStore();
@@ -993,7 +964,7 @@ test("Can update project secondary market royalties", () => {
   assert.fieldEquals(PROJECT_ENTITY_TYPE, "0xa7d8d9ef8d8ce8992df33d8b8cf4aebabd5bd270-99", "updatedAt", "230")
 
   clearStore();
-  }, true);
+  })
 
 test("Can update a project website", () => {
   clearStore();
@@ -1019,4 +990,4 @@ test("Can update a project website", () => {
   assert.fieldEquals(PROJECT_ENTITY_TYPE, "0xa7d8d9ef8d8ce8992df33d8b8cf4aebabd5bd270-99", "updatedAt", "230")
 
   clearStore();
-  }, true);
+  })

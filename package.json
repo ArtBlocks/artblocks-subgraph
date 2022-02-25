@@ -5,6 +5,7 @@
     "codegen": "graph codegen",
     "build": "graph build",
     "test": "graph test",
+    "coverage": "graph test -- -c",
     "deploy": "graph deploy --product hosted-service --ac --node https://api.thegraph.com/deploy/ --ipfs https://api.thegraph.com/ipfs/ ArtBlocks/art-blocks",
     "deploy-studio": "graph deploy --studio art-blocks",
     "deploy-ropsten-dev": "yarn prepare:ropsten-dev && graph deploy --product hosted-service --node https://api.thegraph.com/deploy/ --ipfs https://api.thegraph.com/ipfs/ ArtBlocks/art-blocks-dev",

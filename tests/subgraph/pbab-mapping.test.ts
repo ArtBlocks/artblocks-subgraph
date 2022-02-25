@@ -1,4 +1,4 @@
-import { assert, clearStore, test,  newMockCall, createMockedFunction } from "matchstick-as/assembly/index"
+import { assert, clearStore, test,  newMockCall, logStore } from "matchstick-as/assembly/index"
 import { Address, BigInt, ethereum } from "@graphprotocol/graph-ts"
 import { meridianScript } from '../meridianScript';
 import { mockPBABRefreshContractCalls, mockPBABProjectContractCalls, mockRefreshProjectScript, createProjectToLoad, createTokenToLoad } from './mocks';
@@ -98,35 +98,6 @@ test("PBAB: Can add a new project", () => {
     clearStore();
   });
   
-  // don't test handleUpdateAdmin -- function needs to interact with Core2
-  // test("PBAB: Can update admin", () => {
-  //   log.info('call1: ',[])
-  //   let call = changetype<UpdateAdminCall>(newMockCall())
-    
-  //   let core2ContractAddress = Address.fromString("0xa7d8d9ef8D8Ce8992Df33D8b8CF4Aebabd5bD270")
-  //   call.to = Address.fromString("0xa7d8d9ef8D8Ce8992Df33D8b8CF4Aebabd5bD270")
-  //   call.inputValues = [
-  //     new ethereum.EventParam("_adminAddress",
-  //     ethereum.Value.fromString("0x1233973F9aEa61250e98b697246cb10146903672"))
-  //   ]
-  //   log.info('call2: ',[])
-  
-  // mockPBABRefreshContractCalls();
-  
-  //   //add a contract to the store that my mapping will .load() from
-  //   let contract = new Contract("123")
-  //   contract.save()
-  //   log.info('call4: ',[])
-    
-  //   handleUpdateAdmin(call)
-  //   log.info('call5: ',[])
-  //   assert.fieldEquals(CONTRACT_ENTITY_TYPE, "123", "admin", "0x90cBa2Bbb19ecc291A12066Fd8329D65FA1f1947")
-  //   assert.fieldEquals(CONTRACT_ENTITY_TYPE, "123", "renderProviderAddress", "0xa7d8d9ef8d8ce8992df33d8b8cf4aebabd5bd270")
-  //   assert.fieldEquals(CONTRACT_ENTITY_TYPE, "123", "renderProviderPercentage", "100")
-  
-  //   clearStore();
-  // }, true)
-  
   test("PBAB: Can add whitelisting to a contract and account", () => {
     let call = changetype<AddWhitelistedCall>(newMockCall())
     
@@ -153,7 +124,7 @@ test("PBAB: Can add a new project", () => {
     assert.fieldEquals(WHITELISTING_ENTITY_TYPE, "0xa7d8d9ef8d8ce8992df33d8b8cf4aebabd5bd270-0x1233973f9aea61250e98b697246cb10146903672", "contract", "0xa7d8d9ef8d8ce8992df33d8b8cf4aebabd5bd270")
     assert.fieldEquals(WHITELISTING_ENTITY_TYPE, "0xa7d8d9ef8d8ce8992df33d8b8cf4aebabd5bd270-0x1233973f9aea61250e98b697246cb10146903672", "account", "0x1233973f9aea61250e98b697246cb10146903672")
     clearStore();
-  }, true)
+  })
   
   
   test("PBAB: Can remove whitelisting", () => {
@@ -186,7 +157,7 @@ test("PBAB: Can add a new project", () => {
     
     assert.notInStore(WHITELISTING_ENTITY_TYPE, "0xa7d8d9ef8d8ce8992df33d8b8cf4aebabd5bd270-0x1233973f9aea61250e98b697246cb10146903672")
     clearStore();
-  }, true)
+  })
   
   test("PBAB: Can add and mint whitelisted call", () => {
     let call = changetype<AddMintWhitelistedCall>(newMockCall())
@@ -208,7 +179,7 @@ test("PBAB: Can add a new project", () => {
     
     assert.notInStore(WHITELISTING_ENTITY_TYPE, "0xa7d8d9ef8d8ce8992df33d8b8cf4aebabd5bd270-0x1233973f9aea61250e98b697246cb10146903672")
     clearStore();
-  }, true)
+  })
   
   test("PBAB: Can remove a mint whitelisted address", () => {
     mockPBABRefreshContractCalls();
@@ -242,7 +213,7 @@ test("PBAB: Can add a new project", () => {
     assert.fieldEquals(CONTRACT_ENTITY_TYPE, "0xa7d8d9ef8d8ce8992df33d8b8cf4aebabd5bd270", "mintWhitelisted", "[0x1233973f9aea61250e98b697246cb10146912345]")
     
     clearStore();
-  }, true)
+  })
   
   test("PBAB: Can update randomizer address", () => {
     let call = changetype<UpdateRandomizerAddressCall>(newMockCall())
@@ -262,57 +233,13 @@ test("PBAB: Can add a new project", () => {
     assert.fieldEquals(CONTRACT_ENTITY_TYPE, "0xa7d8d9ef8d8ce8992df33d8b8cf4aebabd5bd270", "randomizerContract", "0xa7d8d9ef8d8ce8992df33d8b8cf4aebabd5bd270")
   
     clearStore();
-  }, true)
-  
-//   test("PBAB: Can update ArtBlocks address", () => {
-//     let call = changetype<UpdateArtblocksAddressCall>(newMockCall())
-    
-//     call.to = Address.fromString("0xa7d8d9ef8D8Ce8992Df33D8b8CF4Aebabd5bD270")
-//     call.block.timestamp = BigInt.fromString('1230')
-//     let addr = Address.fromString("0x1233973F9aEa61250e98b697246cb10146903672")
-//     call.inputValues = [
-//       new ethereum.EventParam("_address",
-//       ethereum.Value.fromAddress(addr))
-//     ]
-  
-//     mockPBABRefreshContractCalls();
-    
-//     handleUpdateArtblocksAddress(call)
-    
-//     assert.fieldEquals(CONTRACT_ENTITY_TYPE, "0xa7d8d9ef8d8ce8992df33d8b8cf4aebabd5bd270", "id", "0xa7d8d9ef8d8ce8992df33d8b8cf4aebabd5bd270")
-//     assert.fieldEquals(CONTRACT_ENTITY_TYPE, "0xa7d8d9ef8d8ce8992df33d8b8cf4aebabd5bd270", "renderProviderAddress", "0xa7d8d9ef8d8ce8992df33d8b8cf4aebabd5bd270")
-  
-//     clearStore();
-//   }, true)
-  
-//   test("PBAB: Can update ArtBlocks percentage", () => {
-//     let call = changetype<UpdateArtblocksPercentageCall>(newMockCall())
-    
-//     call.to = Address.fromString("0xa7d8d9ef8D8Ce8992Df33D8b8CF4Aebabd5bD270")
-//     call.block.timestamp = BigInt.fromString('1230')
-//     let addr = Address.fromString("0x1233973F9aEa61250e98b697246cb10146903672")
-//     call.inputValues = [
-//       new ethereum.EventParam("_address",
-//       ethereum.Value.fromAddress(addr))
-//     ]
-  
-//     mockPBABRefreshContractCalls();
-    
-//     handleUpdateArtblocksPercentage(call)
-    
-//     assert.fieldEquals(CONTRACT_ENTITY_TYPE, "0xa7d8d9ef8d8ce8992df33d8b8cf4aebabd5bd270", "id", "0xa7d8d9ef8d8ce8992df33d8b8cf4aebabd5bd270")
-//     assert.fieldEquals(CONTRACT_ENTITY_TYPE, "0xa7d8d9ef8d8ce8992df33d8b8cf4aebabd5bd270", "renderProviderPercentage", "10")
-  
-//     clearStore();
-//   }, true)
+  })
   
   test("PBAB: Can handle add project script", () => {
+    clearStore();
     mockPBABRefreshContractCalls();
     mockPBABProjectContractCalls();
     mockRefreshProjectScript();
-  
-    // mock a full Project entity before refreshing an existing script
-    createProjectToLoad();
   
     let refreshScriptCall = changetype<AddProjectScriptCall>(newMockCall())
     refreshScriptCall.to = Address.fromString("0xa7d8d9ef8D8Ce8992Df33D8b8CF4Aebabd5bD270")
@@ -324,72 +251,19 @@ test("PBAB: Can add a new project", () => {
       ethereum.Value.fromString(meridianScript))
     ]
     
+    // mock a full Project entity before refreshing an existing script
+    createProjectToLoad();
+
     handleAddProjectScript(refreshScriptCall)
   
     assert.fieldEquals(PROJECTSCRIPT_ENTITY_TYPE, "0xa7d8d9ef8d8ce8992df33d8b8cf4aebabd5bd270-99-0", "project", "0xa7d8d9ef8d8ce8992df33d8b8cf4aebabd5bd270-99")
     assert.fieldEquals(PROJECTSCRIPT_ENTITY_TYPE, "0xa7d8d9ef8d8ce8992df33d8b8cf4aebabd5bd270-99-0", "script", meridianScript.toString())
   
     clearStore();
-  }, true)
-  
-  
-//   test("PBAB: Can clear a Token IPFS image uri", () => {
-//     let call = changetype<ClearTokenIpfsImageUriCall>(newMockCall())
-    
-//     call.to = Address.fromString("0xa7d8d9ef8D8Ce8992Df33D8b8CF4Aebabd5bD270")
-//     call.block.timestamp = BigInt.fromString('1230')
-//     call.inputValues = [
-//       new ethereum.EventParam("_tokenId",
-//       ethereum.Value.fromSignedBigInt(BigInt.fromString('123')))
-//     ]
-  
-//     createMockedFunction(Address.fromString("0xa7d8d9ef8D8Ce8992Df33D8b8CF4Aebabd5bD270"), 'tokenURI', 'tokenURI(uint256):(string)')
-//       .withArgs([ethereum.Value.fromSignedBigInt(BigInt.fromString('123'))])
-//       .returns([ethereum.Value.fromString('mtwirsqawjuoloq2gvtyug2tc3jbf5htm2zeo4rsknfiv3fdp46a')])
-  
-//     createTokenToLoad(call.to, call.inputs._tokenId);
-//     let token = Token.load("0xa7d8d9ef8d8ce8992df33d8b8cf4aebabd5bd270-123");
-    
-//     if (token) {
-//       assert.assertNull(token.uri);
-//     }
-      
-//     handleClearTokenIpfsImageUri(call);
-//     assert.fieldEquals(TOKEN_ENTITY_TYPE, "0xa7d8d9ef8d8ce8992df33d8b8cf4aebabd5bd270-123", "uri", "mtwirsqawjuoloq2gvtyug2tc3jbf5htm2zeo4rsknfiv3fdp46a")
-  
-//     clearStore();
-//   }, true);
-  
-//   test("PBAB: Can override token dynamic image with IPFS link", () => {
-//     let call = changetype<OverrideTokenDynamicImageWithIpfsLinkCall>(newMockCall())
-    
-//     call.to = Address.fromString("0xa7d8d9ef8D8Ce8992Df33D8b8CF4Aebabd5bD270")
-//     call.block.timestamp = BigInt.fromString('1230')
-//     call.inputValues = [
-//       new ethereum.EventParam("_tokenId",
-//       ethereum.Value.fromSignedBigInt(BigInt.fromString('123'))),
-//       new ethereum.EventParam("_ipfsHash",
-//       ethereum.Value.fromString('mtwirsqawjuoloq2gvtyug2tc3jbf5htm2zeo4rsknfiv3fdp46a'))
-//     ]
-  
-//   createMockedFunction(Address.fromString("0xa7d8d9ef8D8Ce8992Df33D8b8CF4Aebabd5bD270"), 'tokenURI', 'tokenURI(uint256):(string)')
-//     .withArgs([ethereum.Value.fromSignedBigInt(BigInt.fromString('123'))])
-//     .returns([ethereum.Value.fromString('mtwirsqawjuoloq2gvtyug2tc3jbf5htm2zeo4rsknfiv3fdp46a')])
-  
-//   createTokenToLoad(call.to, call.inputs._tokenId);
-//   let token = Token.load("0xa7d8d9ef8d8ce8992df33d8b8cf4aebabd5bd270-123");
-  
-//   if (token) {
-//     assert.assertNull(token.uri);
-//   }
-  
-//     handleOverrideTokenDynamicImageWithIpfsLink(call);
-//     assert.fieldEquals(TOKEN_ENTITY_TYPE, "0xa7d8d9ef8d8ce8992df33d8b8cf4aebabd5bd270-123", "uri", "mtwirsqawjuoloq2gvtyug2tc3jbf5htm2zeo4rsknfiv3fdp46a")
-  
-//     clearStore();
-//   }, true);
+  })
   
   test("PBAB: Can remove and update a project's last script", () => {
+    clearStore();
     mockPBABRefreshContractCalls();
     mockPBABProjectContractCalls();
     mockRefreshProjectScript();
@@ -426,7 +300,7 @@ test("PBAB: Can add a new project", () => {
     assert.fieldEquals(PROJECTSCRIPT_ENTITY_TYPE, "0xa7d8d9ef8d8ce8992df33d8b8cf4aebabd5bd270-99-0", "script", meridianScript.toString())
   
     clearStore();
-    }, true);
+    })
   
   test("PBAB: Can toggle if a project is active", () => {
     mockPBABRefreshContractCalls();
@@ -452,33 +326,7 @@ test("PBAB: Can add a new project", () => {
     assert.fieldEquals(PROJECT_ENTITY_TYPE, "0xa7d8d9ef8d8ce8992df33d8b8cf4aebabd5bd270-99", "updatedAt", "230")
     assert.fieldEquals(PROJECT_ENTITY_TYPE, "0xa7d8d9ef8d8ce8992df33d8b8cf4aebabd5bd270-99", "activatedAt", "230")
     clearStore();
-    }, true);
-  
-//   test("PBAB: Can toggle if a project is dynamic", () => {
-//     mockPBABRefreshContractCalls();
-//     mockPBABProjectContractCalls();
-  
-//     createProjectToLoad();
-  
-//     let call = changetype<ToggleProjectIsDynamicCall>(newMockCall())
-    
-//     call.to = Address.fromString("0xa7d8d9ef8D8Ce8992Df33D8b8CF4Aebabd5bD270")
-//     call.block.timestamp = BigInt.fromString('230')
-//     call.inputValues = [
-//       new ethereum.EventParam("_projectId",
-//       ethereum.Value.fromSignedBigInt(BigInt.fromString('99')))
-//     ]
-  
-//     assert.fieldEquals(PROJECT_ENTITY_TYPE, "0xa7d8d9ef8d8ce8992df33d8b8cf4aebabd5bd270-99", "dynamic", "true")
-//     assert.fieldEquals(PROJECT_ENTITY_TYPE, "0xa7d8d9ef8d8ce8992df33d8b8cf4aebabd5bd270-99", "useHashString", "true")
-  
-//     handleToggleProjectIsDynamic(call);
-  
-//     assert.fieldEquals(PROJECT_ENTITY_TYPE, "0xa7d8d9ef8d8ce8992df33d8b8cf4aebabd5bd270-99", "dynamic", "false")
-//     assert.fieldEquals(PROJECT_ENTITY_TYPE, "0xa7d8d9ef8d8ce8992df33d8b8cf4aebabd5bd270-99", "useHashString", "true")
-  
-//     clearStore();
-//     }, true);
+    })
   
   test("PBAB: Can toggle if a project is locked", () => {
     mockPBABRefreshContractCalls();
@@ -504,7 +352,7 @@ test("PBAB: Can add a new project", () => {
     assert.fieldEquals(PROJECT_ENTITY_TYPE, "0xa7d8d9ef8d8ce8992df33d8b8cf4aebabd5bd270-99", "updatedAt", "230")
   
     clearStore();
-    }, true);
+    })
   
   test("PBAB: Can toggle if a project is paused", () => {
     mockPBABRefreshContractCalls();
@@ -530,56 +378,7 @@ test("PBAB: Can add a new project", () => {
     assert.fieldEquals(PROJECT_ENTITY_TYPE, "0xa7d8d9ef8d8ce8992df33d8b8cf4aebabd5bd270-99", "updatedAt", "230")
   
     clearStore();
-    }, true);
-  
-//   test("PBAB: Can toggle a project's useHashString", () => {
-//     mockPBABRefreshContractCalls();
-//     mockPBABProjectContractCalls();
-  
-//     createProjectToLoad();
-  
-//     let call = changetype<ToggleProjectUseHashStringCall>(newMockCall())
-    
-//     call.to = Address.fromString("0xa7d8d9ef8D8Ce8992Df33D8b8CF4Aebabd5bD270")
-//     call.block.timestamp = BigInt.fromString('230')
-//     call.inputValues = [
-//       new ethereum.EventParam("_projectId",
-//       ethereum.Value.fromSignedBigInt(BigInt.fromString('99')))
-//     ]
-  
-//     handleToggleProjectUseHashString(call);
-//     assert.fieldEquals(PROJECT_ENTITY_TYPE, "0xa7d8d9ef8d8ce8992df33d8b8cf4aebabd5bd270-99", "useHashString", "false")
-  
-//     handleToggleProjectUseHashString(call);
-  
-//     assert.fieldEquals(PROJECT_ENTITY_TYPE, "0xa7d8d9ef8d8ce8992df33d8b8cf4aebabd5bd270-99", "useHashString", "true")
-  
-//     clearStore();
-//     }, true);
-  
-//   test("PBAB: Can toggle if a project uses Ipfs", () => {
-//     mockPBABRefreshContractCalls();
-//     mockPBABProjectContractCalls();
-  
-//     createProjectToLoad();
-  
-//     let call = changetype<ToggleProjectUseIpfsForStaticCall>(newMockCall())
-    
-//     call.to = Address.fromString("0xa7d8d9ef8D8Ce8992Df33D8b8CF4Aebabd5bD270")
-//     call.block.timestamp = BigInt.fromString('230')
-//     call.inputValues = [
-//       new ethereum.EventParam("_projectId",
-//       ethereum.Value.fromSignedBigInt(BigInt.fromString('99')))
-//     ]
-  
-//     assert.fieldEquals(PROJECT_ENTITY_TYPE, "0xa7d8d9ef8d8ce8992df33d8b8cf4aebabd5bd270-99", "useIpfs", "false")
-  
-//     handleToggleProjectUseIpfsForStatic(call);
-  
-//     assert.fieldEquals(PROJECT_ENTITY_TYPE, "0xa7d8d9ef8d8ce8992df33d8b8cf4aebabd5bd270-99", "useIpfs", "true")
-  
-//     clearStore();
-//     }, true);
+    })
   
   test("PBAB: Can update a projects additional payee info", () => {
     mockPBABRefreshContractCalls();
@@ -595,19 +394,19 @@ test("PBAB: Can add a new project", () => {
       new ethereum.EventParam("_projectId",
       ethereum.Value.fromSignedBigInt(BigInt.fromString('99'))),
       new ethereum.EventParam("_additionalPayee",
-      ethereum.Value.fromString("0x7ee88C660eE1B8B41c1BD75C0290E25F1228BE98")),
+      ethereum.Value.fromAddress(Address.fromString("0x7ee88C660eE1B8B41c1BD75C0290E25F1228BE98"))),
       new ethereum.EventParam("_additionalPayeePercentage",
       ethereum.Value.fromSignedBigInt(BigInt.fromString('20'))) 
     ]
   
     handleUpdateProjectAdditionalPayeeInfo(call);
   
-    assert.fieldEquals(PROJECT_ENTITY_TYPE, "0xa7d8d9ef8d8ce8992df33d8b8cf4aebabd5bd270-99", "additionalPayee", "0x7ee88C660eE1B8B41c1BD75C0290E25F1228BE98")
+    assert.fieldEquals(PROJECT_ENTITY_TYPE, "0xa7d8d9ef8d8ce8992df33d8b8cf4aebabd5bd270-99", "additionalPayee", "0x7ee88c660ee1b8b41c1bd75c0290e25f1228be98")
     assert.fieldEquals(PROJECT_ENTITY_TYPE, "0xa7d8d9ef8d8ce8992df33d8b8cf4aebabd5bd270-99", "additionalPayeePercentage", "20")
     assert.fieldEquals(PROJECT_ENTITY_TYPE, "0xa7d8d9ef8d8ce8992df33d8b8cf4aebabd5bd270-99", "updatedAt", "230")
   
     clearStore();
-    }, true);
+    })
   
   test("PBAB: Can update a projects artist address", () => {
     clearStore();
@@ -634,7 +433,7 @@ test("PBAB: Can add a new project", () => {
     assert.fieldEquals(PROJECT_ENTITY_TYPE, "0xa7d8d9ef8d8ce8992df33d8b8cf4aebabd5bd270-99", "updatedAt", "230")
   
     clearStore();
-    }, true);
+    })
   
   test("PBAB: Can update a projects artist name", () => {
     mockPBABRefreshContractCalls();
@@ -659,31 +458,7 @@ test("PBAB: Can add a new project", () => {
     assert.fieldEquals(PROJECT_ENTITY_TYPE, "0xa7d8d9ef8d8ce8992df33d8b8cf4aebabd5bd270-99", "updatedAt", "230")
   
     clearStore();
-    }, true);
-  
-//   test("PBAB: Can update a projects base Ipfs URI", () => {
-//     mockPBABRefreshContractCalls();
-//     mockPBABProjectContractCalls();
-  
-//     createProjectToLoad();
-    
-//     let call = changetype<UpdateProjectBaseIpfsURICall>(newMockCall())
-    
-//     call.to = Address.fromString("0xa7d8d9ef8D8Ce8992Df33D8b8CF4Aebabd5bD270")
-//     call.block.timestamp = BigInt.fromString('230')
-//     call.inputValues = [
-//       new ethereum.EventParam("_projectId",
-//       ethereum.Value.fromSignedBigInt(BigInt.fromString('99'))),
-//       new ethereum.EventParam("_projectBaseIpfsURI",
-//       ethereum.Value.fromString("Qme7ss3ARVgxv6rXqVPiikMJ8u2NLgmgszg13pYrDKEoiu"))
-//     ]
-  
-//     handleUpdateProjectBaseIpfsURI(call);
-  
-//     assert.fieldEquals(PROJECT_ENTITY_TYPE, "0xa7d8d9ef8d8ce8992df33d8b8cf4aebabd5bd270-99", "baseIpfsUri", "Qme7ss3ARVgxv6rXqVPiikMJ8u2NLgmgszg13pYrDKEoiu")
-  
-//     clearStore();
-//     }, true);
+    })
   
   test("PBAB: Can update a projects base URI", () => {
     mockPBABRefreshContractCalls();
@@ -707,7 +482,7 @@ test("PBAB: Can add a new project", () => {
     assert.fieldEquals(PROJECT_ENTITY_TYPE, "0xa7d8d9ef8d8ce8992df33d8b8cf4aebabd5bd270-99", "baseUri", "random_new_base_URI")
   
     clearStore();
-    }, true);
+    })
   
   test("PBAB: Can update a projects currency info", () => {
     mockPBABRefreshContractCalls();
@@ -737,7 +512,7 @@ test("PBAB: Can add a new project", () => {
     assert.fieldEquals(PROJECT_ENTITY_TYPE, "0xa7d8d9ef8d8ce8992df33d8b8cf4aebabd5bd270-99", "updatedAt", "230")
   
     clearStore();
-    }, true);
+    })
   
   test("PBAB: Can update a projects description", () => {
     mockPBABRefreshContractCalls();
@@ -762,7 +537,7 @@ test("PBAB: Can add a new project", () => {
     assert.fieldEquals(PROJECT_ENTITY_TYPE, "0xa7d8d9ef8d8ce8992df33d8b8cf4aebabd5bd270-99", "updatedAt", "230")
   
     clearStore();
-    }, true);
+    })
   
   test("PBAB: Can update a projects IPFS Hash", () => {
     mockPBABRefreshContractCalls();
@@ -787,7 +562,7 @@ test("PBAB: Can add a new project", () => {
     assert.fieldEquals(PROJECT_ENTITY_TYPE, "0xa7d8d9ef8d8ce8992df33d8b8cf4aebabd5bd270-99", "updatedAt", "230")
   
     clearStore();
-    }, true);
+    })
   
   test("PBAB: Can update a project license", () => {
     mockPBABRefreshContractCalls();
@@ -812,7 +587,7 @@ test("PBAB: Can add a new project", () => {
     assert.fieldEquals(PROJECT_ENTITY_TYPE, "0xa7d8d9ef8d8ce8992df33d8b8cf4aebabd5bd270-99", "updatedAt", "230")
   
     clearStore();
-    }, true);
+    })
   
   test("PBAB: Can update a project max invocations", () => {
     mockPBABRefreshContractCalls();
@@ -839,7 +614,7 @@ test("PBAB: Can add a new project", () => {
     assert.fieldEquals(PROJECT_ENTITY_TYPE, "0xa7d8d9ef8d8ce8992df33d8b8cf4aebabd5bd270-99", "updatedAt", "230")
   
     clearStore();
-    }, true);
+    })
   
   test("PBAB: Can update a project name", () => {
     mockPBABRefreshContractCalls();
@@ -865,7 +640,7 @@ test("PBAB: Can add a new project", () => {
     assert.fieldEquals(PROJECT_ENTITY_TYPE, "0xa7d8d9ef8d8ce8992df33d8b8cf4aebabd5bd270-99", "updatedAt", "230")
   
     clearStore();
-    }, true);
+    })
   
   test("PBAB: Can update a project price per token in wei", () => {
     mockPBABRefreshContractCalls();
@@ -881,7 +656,7 @@ test("PBAB: Can add a new project", () => {
       new ethereum.EventParam("_projectId",
       ethereum.Value.fromSignedBigInt(BigInt.fromString('99'))),
       new ethereum.EventParam("_pricePerTokenInWei",
-      ethereum.Value.fromString("987654321"))
+      ethereum.Value.fromSignedBigInt(BigInt.fromString("987654321")))
     ]
   
     assert.fieldEquals(PROJECT_ENTITY_TYPE, "0xa7d8d9ef8d8ce8992df33d8b8cf4aebabd5bd270-99", "pricePerTokenInWei", "100000000")
@@ -891,7 +666,7 @@ test("PBAB: Can add a new project", () => {
     assert.fieldEquals(PROJECT_ENTITY_TYPE, "0xa7d8d9ef8d8ce8992df33d8b8cf4aebabd5bd270-99", "updatedAt", "230")
   
     clearStore();
-    }, true);
+    })
   
   test("PBAB: Can handleUpdateProjectScript", () => {
     clearStore();
@@ -922,7 +697,7 @@ test("PBAB: Can add a new project", () => {
     assert.fieldEquals(PROJECT_ENTITY_TYPE, "0xa7d8d9ef8d8ce8992df33d8b8cf4aebabd5bd270-99", "scriptUpdatedAt", "530")
   
     clearStore();
-    }, true);
+    })
   
   
   test("PBAB: Can handleUpdateProjectScriptJSON", () => {
@@ -950,7 +725,7 @@ test("PBAB: Can add a new project", () => {
     assert.fieldEquals(PROJECT_ENTITY_TYPE, "0xa7d8d9ef8d8ce8992df33d8b8cf4aebabd5bd270-99", "updatedAt", "232")
   
     clearStore();
-    }, true);
+    })
   
   test("PBAB: Can update project secondary market royalties", () => {
     clearStore();
@@ -976,7 +751,7 @@ test("PBAB: Can add a new project", () => {
     assert.fieldEquals(PROJECT_ENTITY_TYPE, "0xa7d8d9ef8d8ce8992df33d8b8cf4aebabd5bd270-99", "updatedAt", "230")
   
     clearStore();
-    }, true);
+    })
   
   test("PBAB: Can update a project website", () => {
     clearStore();
@@ -1002,4 +777,4 @@ test("PBAB: Can add a new project", () => {
     assert.fieldEquals(PROJECT_ENTITY_TYPE, "0xa7d8d9ef8d8ce8992df33d8b8cf4aebabd5bd270-99", "updatedAt", "230")
   
     clearStore();
-    }, true);
+    })
