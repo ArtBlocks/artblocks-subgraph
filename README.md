@@ -2,6 +2,14 @@
 
 The Art Blocks subgraph definitions for The Graph.
 
+## Initial Setup
+
+If you haven't already connected your Github account to The Graph's account system, please do so by following the [instructions here](https://thegraph.com/docs/en/hosted-service/deploy-subgraph-hosted/). You should ensure that you connect your account _and_ set the appropriate auth-token for Art Blocks using the `graph auth --product hosted-service <ACCESS_TOKEN>` command.
+
+<img width="1433" alt="Screen Shot 2022-02-22 at 1 01 20 PM" src="https://user-images.githubusercontent.com/8602661/155210396-e211b2a8-d386-4a49-96ce-8bb66c2ac07f.png">
+
+Please take care to ensure that you are copy-pasting the auth-token for *Art Blocks* and not for your personal account.
+
 ## Subgraph Deployments
 
 ### Ropsten
@@ -16,7 +24,7 @@ Mainnet subgraph deployments should **only** be done on Wednesdays, barring the 
 
 For mainnet subgraph deployments, we deploy first to the hosted subgraph service provided by The Graph, which takes ~36 hours to sync, and then proceed to deploying to the decentralized Graph network if all is confirmed to be working as intended, which takes an additional ~12 hours to sync.
 
-## Graph Network Subgraph Publish Checklist
+## Decentralized Graph Network Subgraph Publish Checklist
 1. Deploy any contracts to be indexed
     - Please see [ArtBlocks/artblocks-contracts](https://github.com/ArtBlocks/artblocks-contracts) for more info on contract deployment.
 2. Update the corresponding `config/` file for the desired network (e.g. `mainnet.json` for mainnet EVM) to include the newly deployed contracts
@@ -58,3 +66,15 @@ To write to & read from the in-memory data store, use .save() and .load(). You c
 **Matchstick error handling "gotcha's" -**
     - Test assertions can still "pass" with a green checkmark... with broken logic in your code (without creating & asserting against a GraphQL entity, for example). To fix, write assertions that will fail first with an incorrect value --> then once your mocks & setup are correct, update your assert. value to pass to confirm your call handler is covered. You can also use logStore() to confirm your entity was created/modified successfuly
     - Type conversion is a MUST, especially when mocking the Solidity call inputValues. Matchstick won't always flag a type mismatch. Instead, the test might pass, or break with no verbose error message. You may want to set logging breakpoints throughout your test to see which are missed by the unit test breaking. Try logging your inputValues in your mapping file to confirm the type conversion was successful- if not, your log message will print but your val will be missing.
+## Hosted Subgraph Publish Checklist
+>slightly less involved than publishing to the decentralized graph network
+
+1. Deploy any contracts to be indexed
+    - Please see [ArtBlocks/artblocks-contracts](https://github.com/ArtBlocks/artblocks-contracts) for more info on contract deployment.
+2. Update the corresponding `config/` file for the desired network (e.g. `mainnet.json` for mainnet EVM) to include the newly deployed contracts
+    - Verify that contract addresses added are for the correct contracts by checking Etherscan at the contract address
+3. Run `yarn prepare:{NETWORK}`, (e.g. `yarn prepare:mainnet` for mainnet) to generate subgraph manifest (subgraph.yaml)
+4. Manually look over the generated subgraph manifest to make sure it is correct
+5. Run `yarn codegen` to generate contract mappings
+6. Deploy subgraph to The Graph's hosted service `yarn deploy:{NETWORK}-hosted` (e.g. `yarn deploy:mainnet-hosted`)
+  - 6A. If you are deploying `mainnet-hosted`, don't forget to also prepare and deploy `mainnet-with-secondary-hosted` to keep those subgraphs in sync

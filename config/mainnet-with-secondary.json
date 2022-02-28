@@ -43,5 +43,9 @@
       "name": "ArtCode",
       "startBlock": 14122786
     }
-  ]
+  ],
+  "openSeaContract": {
+    "address": "0x7Be8076f4EA4A4AD08075C2508e481d6C946D12b",
+    "startBlock": 11338811
+  }
 }
