@@ -12,7 +12,14 @@ import {
   mockOGProjectContractCalls,
   mockRefreshProjectScript,
   createProjectToLoad,
-  createTokenToLoad
+  createTokenToLoad,
+  TEST_PROJECT,
+  ACCOUNT_ENTITY_TYPE,
+  PROJECT_ENTITY_TYPE,
+  CONTRACT_ENTITY_TYPE,
+  WHITELISTING_ENTITY_TYPE,
+  PROJECTSCRIPT_ENTITY_TYPE,
+  TOKEN_ENTITY_TYPE
 } from "./mocks";
 import { Token } from "../../generated/schema";
 import {
@@ -78,26 +85,19 @@ import {
   handleUpdateProjectScriptJSON
 } from "../../src/original-mapping";
 
-let ACCOUNT_ENTITY_TYPE = "Account";
-let PROJECT_ENTITY_TYPE = "Project";
-let CONTRACT_ENTITY_TYPE = "Contract";
-let WHITELISTING_ENTITY_TYPE = "Whitelisting";
-let PROJECTSCRIPT_ENTITY_TYPE = "ProjectScript";
-let TOKEN_ENTITY_TYPE = "Token";
-
 test("OG: Can add a new project", () => {
   clearStore();
   mockRefreshContractCalls();
   mockOGProjectContractCalls();
   let call = changetype<AddProjectCall>(newMockCall());
-  call.to = Address.fromString("0xa7d8d9ef8D8Ce8992Df33D8b8CF4Aebabd5bD270");
+  call.to = Address.fromString(TEST_PROJECT.contract);
   call.block.timestamp = BigInt.fromString("1230");
 
   call.inputValues = [
     new ethereum.EventParam("projectName", ethereum.Value.fromString("Ringer")),
     new ethereum.EventParam(
       "artistAddress",
-      ethereum.Value.fromString("0x1233973F9aEa61250e98b697246cb10146903672")
+      ethereum.Value.fromString(TEST_PROJECT.artistAddress)
     ),
     new ethereum.EventParam(
       "pricePerTokenInWei",
@@ -109,69 +109,59 @@ test("OG: Can add a new project", () => {
 
   assert.fieldEquals(
     ACCOUNT_ENTITY_TYPE,
-    "0xa7d8d9ef8d8ce8992df33d8b8cf4aebabd5bd270",
+    TEST_PROJECT.contract,
     "id",
-    "0xa7d8d9ef8d8ce8992df33d8b8cf4aebabd5bd270"
+    TEST_PROJECT.contract
   );
 
   assert.fieldEquals(
     CONTRACT_ENTITY_TYPE,
-    "0xa7d8d9ef8d8ce8992df33d8b8cf4aebabd5bd270",
+    TEST_PROJECT.contract,
     "admin",
-    "0x90cba2bbb19ecc291a12066fd8329d65fa1f1947"
+    TEST_PROJECT.admin
   );
   assert.fieldEquals(
     CONTRACT_ENTITY_TYPE,
-    "0xa7d8d9ef8d8ce8992df33d8b8cf4aebabd5bd270",
+    TEST_PROJECT.contract,
     "renderProviderAddress",
-    "0xa7d8d9ef8d8ce8992df33d8b8cf4aebabd5bd270"
+    TEST_PROJECT.contract
   );
   assert.fieldEquals(
     CONTRACT_ENTITY_TYPE,
-    "0xa7d8d9ef8d8ce8992df33d8b8cf4aebabd5bd270",
+    TEST_PROJECT.contract,
     "createdAt",
     "1230"
   );
   assert.fieldEquals(
     CONTRACT_ENTITY_TYPE,
-    "0xa7d8d9ef8d8ce8992df33d8b8cf4aebabd5bd270",
+    TEST_PROJECT.contract,
     "nextProjectId",
     "101"
   );
 
   assert.fieldEquals(
     PROJECT_ENTITY_TYPE,
-    "0xa7d8d9ef8d8ce8992df33d8b8cf4aebabd5bd270-99",
+    TEST_PROJECT.id,
     "projectId",
-    "99"
+    TEST_PROJECT.projectId
   );
+  assert.fieldEquals(PROJECT_ENTITY_TYPE, TEST_PROJECT.id, "complete", "false");
+  assert.fieldEquals(PROJECT_ENTITY_TYPE, TEST_PROJECT.id, "active", "false");
   assert.fieldEquals(
     PROJECT_ENTITY_TYPE,
-    "0xa7d8d9ef8d8ce8992df33d8b8cf4aebabd5bd270-99",
-    "complete",
-    "false"
-  );
-  assert.fieldEquals(
-    PROJECT_ENTITY_TYPE,
-    "0xa7d8d9ef8d8ce8992df33d8b8cf4aebabd5bd270-99",
-    "active",
-    "false"
-  );
-  assert.fieldEquals(
-    PROJECT_ENTITY_TYPE,
-    "0xa7d8d9ef8d8ce8992df33d8b8cf4aebabd5bd270-99",
+    TEST_PROJECT.id,
     "artistAddress",
-    "0xa7d8d9ef8d8ce8992df33d8b8cf4aebabd5bd270"
+    TEST_PROJECT.contract
   );
   assert.fieldEquals(
     PROJECT_ENTITY_TYPE,
-    "0xa7d8d9ef8d8ce8992df33d8b8cf4aebabd5bd270-99",
+    TEST_PROJECT.id,
     "maxInvocations",
-    "1024"
+    TEST_PROJECT.maxInvocations
   );
   assert.fieldEquals(
     PROJECT_ENTITY_TYPE,
-    "0xa7d8d9ef8d8ce8992df33d8b8cf4aebabd5bd270-99",
+    TEST_PROJECT.id,
     "pricePerTokenInWei",
     "100000000"
   );
@@ -182,9 +172,9 @@ test("OG: Can add a new project", () => {
 test("OG: Can add whitelisting to a contract and account", () => {
   let call = changetype<AddWhitelistedCall>(newMockCall());
 
-  call.to = Address.fromString("0xa7d8d9ef8D8Ce8992Df33D8b8CF4Aebabd5bD270");
+  call.to = Address.fromString(TEST_PROJECT.contract);
   call.block.timestamp = BigInt.fromString("1230");
-  let addr = Address.fromString("0x1233973F9aEa61250e98b697246cb10146903672");
+  let addr = Address.fromString(TEST_PROJECT.artistAddress);
   call.inputValues = [
     new ethereum.EventParam("_address", ethereum.Value.fromAddress(addr))
   ];
@@ -195,53 +185,53 @@ test("OG: Can add whitelisting to a contract and account", () => {
 
   assert.fieldEquals(
     CONTRACT_ENTITY_TYPE,
-    "0xa7d8d9ef8d8ce8992df33d8b8cf4aebabd5bd270",
+    TEST_PROJECT.contract,
     "admin",
-    "0x90cba2bbb19ecc291a12066fd8329d65fa1f1947"
+    TEST_PROJECT.admin
   );
   assert.fieldEquals(
     CONTRACT_ENTITY_TYPE,
-    "0xa7d8d9ef8d8ce8992df33d8b8cf4aebabd5bd270",
+    TEST_PROJECT.contract,
     "renderProviderAddress",
-    "0xa7d8d9ef8d8ce8992df33d8b8cf4aebabd5bd270"
+    TEST_PROJECT.contract
   );
   assert.fieldEquals(
     CONTRACT_ENTITY_TYPE,
-    "0xa7d8d9ef8d8ce8992df33d8b8cf4aebabd5bd270",
+    TEST_PROJECT.contract,
     "renderProviderPercentage",
-    "10"
+    TEST_PROJECT.renderProviderPercentage
   );
   assert.fieldEquals(
     CONTRACT_ENTITY_TYPE,
-    "0xa7d8d9ef8d8ce8992df33d8b8cf4aebabd5bd270",
+    TEST_PROJECT.contract,
     "nextProjectId",
     "100"
   );
   assert.fieldEquals(
     CONTRACT_ENTITY_TYPE,
-    "0xa7d8d9ef8d8ce8992df33d8b8cf4aebabd5bd270",
+    TEST_PROJECT.contract,
     "createdAt",
     "1230"
   );
 
   assert.fieldEquals(
     ACCOUNT_ENTITY_TYPE,
-    "0x1233973f9aea61250e98b697246cb10146903672",
+    TEST_PROJECT.artistAddress,
     "id",
-    "0x1233973f9aea61250e98b697246cb10146903672"
+    TEST_PROJECT.artistAddress
   );
 
   assert.fieldEquals(
     WHITELISTING_ENTITY_TYPE,
     "0xa7d8d9ef8d8ce8992df33d8b8cf4aebabd5bd270-0x1233973f9aea61250e98b697246cb10146903672",
     "contract",
-    "0xa7d8d9ef8d8ce8992df33d8b8cf4aebabd5bd270"
+    TEST_PROJECT.contract
   );
   assert.fieldEquals(
     WHITELISTING_ENTITY_TYPE,
     "0xa7d8d9ef8d8ce8992df33d8b8cf4aebabd5bd270-0x1233973f9aea61250e98b697246cb10146903672",
     "account",
-    "0x1233973f9aea61250e98b697246cb10146903672"
+    TEST_PROJECT.artistAddress
   );
   clearStore();
 });
@@ -249,20 +239,16 @@ test("OG: Can add whitelisting to a contract and account", () => {
 test("OG: Can remove whitelisting", () => {
   let callToAddWhitelist = changetype<AddWhitelistedCall>(newMockCall());
   let callToRemoveWhitelist = changetype<RemoveWhitelistedCall>(newMockCall());
-  let addr1 = Address.fromString("0x1233973F9aEa61250e98b697246cb10146903672");
-  let addr2 = Address.fromString("0x1233973F9aEa61250e98b697246cb10146903672");
+  let addr1 = Address.fromString(TEST_PROJECT.artistAddress);
+  let addr2 = Address.fromString(TEST_PROJECT.artistAddress);
 
-  callToAddWhitelist.to = Address.fromString(
-    "0xa7d8d9ef8D8Ce8992Df33D8b8CF4Aebabd5bD270"
-  );
+  callToAddWhitelist.to = Address.fromString(TEST_PROJECT.contract);
   callToAddWhitelist.block.timestamp = BigInt.fromString("1230");
   callToAddWhitelist.inputValues = [
     new ethereum.EventParam("_address", ethereum.Value.fromAddress(addr1))
   ];
 
-  callToRemoveWhitelist.to = Address.fromString(
-    "0xa7d8d9ef8D8Ce8992Df33D8b8CF4Aebabd5bD270"
-  );
+  callToRemoveWhitelist.to = Address.fromString(TEST_PROJECT.contract);
   callToRemoveWhitelist.block.timestamp = BigInt.fromString("1230");
   callToRemoveWhitelist.inputValues = [
     new ethereum.EventParam("_address", ethereum.Value.fromAddress(addr2))
@@ -275,13 +261,13 @@ test("OG: Can remove whitelisting", () => {
     WHITELISTING_ENTITY_TYPE,
     "0xa7d8d9ef8d8ce8992df33d8b8cf4aebabd5bd270-0x1233973f9aea61250e98b697246cb10146903672",
     "contract",
-    "0xa7d8d9ef8d8ce8992df33d8b8cf4aebabd5bd270"
+    TEST_PROJECT.contract
   );
   assert.fieldEquals(
     WHITELISTING_ENTITY_TYPE,
     "0xa7d8d9ef8d8ce8992df33d8b8cf4aebabd5bd270-0x1233973f9aea61250e98b697246cb10146903672",
     "account",
-    "0x1233973f9aea61250e98b697246cb10146903672"
+    TEST_PROJECT.artistAddress
   );
 
   handleRemoveWhitelisted(callToRemoveWhitelist);
@@ -296,9 +282,9 @@ test("OG: Can remove whitelisting", () => {
 test("OG: Can update ArtBlocks address", () => {
   let call = changetype<UpdateArtblocksAddressCall>(newMockCall());
 
-  call.to = Address.fromString("0xa7d8d9ef8D8Ce8992Df33D8b8CF4Aebabd5bD270");
+  call.to = Address.fromString(TEST_PROJECT.contract);
   call.block.timestamp = BigInt.fromString("1230");
-  let addr = Address.fromString("0x1233973F9aEa61250e98b697246cb10146903672");
+  let addr = Address.fromString(TEST_PROJECT.artistAddress);
   call.inputValues = [
     new ethereum.EventParam("_address", ethereum.Value.fromAddress(addr))
   ];
@@ -309,15 +295,15 @@ test("OG: Can update ArtBlocks address", () => {
 
   assert.fieldEquals(
     CONTRACT_ENTITY_TYPE,
-    "0xa7d8d9ef8d8ce8992df33d8b8cf4aebabd5bd270",
+    TEST_PROJECT.contract,
     "id",
-    "0xa7d8d9ef8d8ce8992df33d8b8cf4aebabd5bd270"
+    TEST_PROJECT.contract
   );
   assert.fieldEquals(
     CONTRACT_ENTITY_TYPE,
-    "0xa7d8d9ef8d8ce8992df33d8b8cf4aebabd5bd270",
+    TEST_PROJECT.contract,
     "renderProviderAddress",
-    "0xa7d8d9ef8d8ce8992df33d8b8cf4aebabd5bd270"
+    TEST_PROJECT.contract
   );
 
   clearStore();
@@ -326,9 +312,9 @@ test("OG: Can update ArtBlocks address", () => {
 test("OG: Can update ArtBlocks percentage", () => {
   let call = changetype<UpdateArtblocksPercentageCall>(newMockCall());
 
-  call.to = Address.fromString("0xa7d8d9ef8D8Ce8992Df33D8b8CF4Aebabd5bD270");
+  call.to = Address.fromString(TEST_PROJECT.contract);
   call.block.timestamp = BigInt.fromString("1230");
-  let addr = Address.fromString("0x1233973F9aEa61250e98b697246cb10146903672");
+  let addr = Address.fromString(TEST_PROJECT.artistAddress);
   call.inputValues = [
     new ethereum.EventParam("_address", ethereum.Value.fromAddress(addr))
   ];
@@ -339,15 +325,15 @@ test("OG: Can update ArtBlocks percentage", () => {
 
   assert.fieldEquals(
     CONTRACT_ENTITY_TYPE,
-    "0xa7d8d9ef8d8ce8992df33d8b8cf4aebabd5bd270",
+    TEST_PROJECT.contract,
     "id",
-    "0xa7d8d9ef8d8ce8992df33d8b8cf4aebabd5bd270"
+    TEST_PROJECT.contract
   );
   assert.fieldEquals(
     CONTRACT_ENTITY_TYPE,
-    "0xa7d8d9ef8d8ce8992df33d8b8cf4aebabd5bd270",
+    TEST_PROJECT.contract,
     "renderProviderPercentage",
-    "10"
+    TEST_PROJECT.renderProviderPercentage
   );
 
   clearStore();
@@ -363,14 +349,12 @@ test("OG: Can handle add project script", () => {
   createProjectToLoad();
 
   let refreshScriptCall = changetype<AddProjectScriptCall>(newMockCall());
-  refreshScriptCall.to = Address.fromString(
-    "0xa7d8d9ef8D8Ce8992Df33D8b8CF4Aebabd5bD270"
-  );
+  refreshScriptCall.to = Address.fromString(TEST_PROJECT.contract);
   refreshScriptCall.block.timestamp = BigInt.fromString("1231");
   refreshScriptCall.inputValues = [
     new ethereum.EventParam(
       "_projectId",
-      ethereum.Value.fromSignedBigInt(BigInt.fromString("99"))
+      ethereum.Value.fromSignedBigInt(BigInt.fromString(TEST_PROJECT.projectId))
     ),
     new ethereum.EventParam(
       "_script",
@@ -382,13 +366,13 @@ test("OG: Can handle add project script", () => {
 
   assert.fieldEquals(
     PROJECTSCRIPT_ENTITY_TYPE,
-    "0xa7d8d9ef8d8ce8992df33d8b8cf4aebabd5bd270-99-0",
+    TEST_PROJECT.projectScriptId,
     "project",
-    "0xa7d8d9ef8d8ce8992df33d8b8cf4aebabd5bd270-99"
+    TEST_PROJECT.id
   );
   assert.fieldEquals(
     PROJECTSCRIPT_ENTITY_TYPE,
-    "0xa7d8d9ef8d8ce8992df33d8b8cf4aebabd5bd270-99-0",
+    TEST_PROJECT.projectScriptId,
     "script",
     meridianScript.toString()
   );
@@ -399,7 +383,7 @@ test("OG: Can handle add project script", () => {
 test("OG: Can clear a Token IPFS image uri", () => {
   let call = changetype<ClearTokenIpfsImageUriCall>(newMockCall());
 
-  call.to = Address.fromString("0xa7d8d9ef8D8Ce8992Df33D8b8CF4Aebabd5bD270");
+  call.to = Address.fromString(TEST_PROJECT.contract);
   call.block.timestamp = BigInt.fromString("1230");
   call.inputValues = [
     new ethereum.EventParam(
@@ -409,19 +393,15 @@ test("OG: Can clear a Token IPFS image uri", () => {
   ];
 
   createMockedFunction(
-    Address.fromString("0xa7d8d9ef8D8Ce8992Df33D8b8CF4Aebabd5bD270"),
+    Address.fromString(TEST_PROJECT.contract),
     "tokenURI",
     "tokenURI(uint256):(string)"
   )
     .withArgs([ethereum.Value.fromSignedBigInt(BigInt.fromString("123"))])
-    .returns([
-      ethereum.Value.fromString(
-        "mtwirsqawjuoloq2gvtyug2tc3jbf5htm2zeo4rsknfiv3fdp46a"
-      )
-    ]);
+    .returns([ethereum.Value.fromString(TEST_PROJECT.ipfsHash)]);
 
   createTokenToLoad(call.to, call.inputs._tokenId);
-  let token = Token.load("0xa7d8d9ef8d8ce8992df33d8b8cf4aebabd5bd270-123");
+  let token = Token.load(TEST_PROJECT.tokenId);
 
   if (token) {
     assert.assertNull(token.uri);
@@ -430,9 +410,9 @@ test("OG: Can clear a Token IPFS image uri", () => {
   handleClearTokenIpfsImageUri(call);
   assert.fieldEquals(
     TOKEN_ENTITY_TYPE,
-    "0xa7d8d9ef8d8ce8992df33d8b8cf4aebabd5bd270-123",
+    TEST_PROJECT.tokenId,
     "uri",
-    "mtwirsqawjuoloq2gvtyug2tc3jbf5htm2zeo4rsknfiv3fdp46a"
+    TEST_PROJECT.ipfsHash
   );
 
   clearStore();
@@ -443,7 +423,7 @@ test("OG: Can override token dynamic image with IPFS link", () => {
     newMockCall()
   );
 
-  call.to = Address.fromString("0xa7d8d9ef8D8Ce8992Df33D8b8CF4Aebabd5bD270");
+  call.to = Address.fromString(TEST_PROJECT.contract);
   call.block.timestamp = BigInt.fromString("1230");
   call.inputValues = [
     new ethereum.EventParam(
@@ -452,26 +432,20 @@ test("OG: Can override token dynamic image with IPFS link", () => {
     ),
     new ethereum.EventParam(
       "_ipfsHash",
-      ethereum.Value.fromString(
-        "mtwirsqawjuoloq2gvtyug2tc3jbf5htm2zeo4rsknfiv3fdp46a"
-      )
+      ethereum.Value.fromString(TEST_PROJECT.ipfsHash)
     )
   ];
 
   createMockedFunction(
-    Address.fromString("0xa7d8d9ef8D8Ce8992Df33D8b8CF4Aebabd5bD270"),
+    Address.fromString(TEST_PROJECT.contract),
     "tokenURI",
     "tokenURI(uint256):(string)"
   )
     .withArgs([ethereum.Value.fromSignedBigInt(BigInt.fromString("123"))])
-    .returns([
-      ethereum.Value.fromString(
-        "mtwirsqawjuoloq2gvtyug2tc3jbf5htm2zeo4rsknfiv3fdp46a"
-      )
-    ]);
+    .returns([ethereum.Value.fromString(TEST_PROJECT.ipfsHash)]);
 
   createTokenToLoad(call.to, call.inputs._tokenId);
-  let token = Token.load("0xa7d8d9ef8d8ce8992df33d8b8cf4aebabd5bd270-123");
+  let token = Token.load(TEST_PROJECT.tokenId);
 
   if (token) {
     assert.assertNull(token.uri);
@@ -480,9 +454,9 @@ test("OG: Can override token dynamic image with IPFS link", () => {
   handleOverrideTokenDynamicImageWithIpfsLink(call);
   assert.fieldEquals(
     TOKEN_ENTITY_TYPE,
-    "0xa7d8d9ef8d8ce8992df33d8b8cf4aebabd5bd270-123",
+    TEST_PROJECT.tokenId,
     "uri",
-    "mtwirsqawjuoloq2gvtyug2tc3jbf5htm2zeo4rsknfiv3fdp46a"
+    TEST_PROJECT.ipfsHash
   );
 
   clearStore();
@@ -495,12 +469,12 @@ test("OG: Can remove and update a project's last script", () => {
 
   let call = changetype<RemoveProjectLastScriptCall>(newMockCall());
 
-  call.to = Address.fromString("0xa7d8d9ef8D8Ce8992Df33D8b8CF4Aebabd5bD270");
+  call.to = Address.fromString(TEST_PROJECT.contract);
   call.block.timestamp = BigInt.fromString("1230");
   call.inputValues = [
     new ethereum.EventParam(
       "_projectId",
-      ethereum.Value.fromSignedBigInt(BigInt.fromString("99"))
+      ethereum.Value.fromSignedBigInt(BigInt.fromString(TEST_PROJECT.projectId))
     )
   ];
 
@@ -510,7 +484,7 @@ test("OG: Can remove and update a project's last script", () => {
   refreshScriptCall.inputValues = [
     new ethereum.EventParam(
       "_projectId",
-      ethereum.Value.fromSignedBigInt(BigInt.fromString("99"))
+      ethereum.Value.fromSignedBigInt(BigInt.fromString(TEST_PROJECT.projectId))
     ),
     new ethereum.EventParam(
       "_script",
@@ -524,13 +498,13 @@ test("OG: Can remove and update a project's last script", () => {
 
   assert.fieldEquals(
     PROJECTSCRIPT_ENTITY_TYPE,
-    "0xa7d8d9ef8d8ce8992df33d8b8cf4aebabd5bd270-99-0",
+    TEST_PROJECT.projectScriptId,
     "project",
-    "0xa7d8d9ef8d8ce8992df33d8b8cf4aebabd5bd270-99"
+    TEST_PROJECT.id
   );
   assert.fieldEquals(
     PROJECTSCRIPT_ENTITY_TYPE,
-    "0xa7d8d9ef8d8ce8992df33d8b8cf4aebabd5bd270-99-0",
+    TEST_PROJECT.projectScriptId,
     "script",
     meridianScript.toString()
   );
@@ -539,13 +513,13 @@ test("OG: Can remove and update a project's last script", () => {
 
   assert.fieldEquals(
     PROJECTSCRIPT_ENTITY_TYPE,
-    "0xa7d8d9ef8d8ce8992df33d8b8cf4aebabd5bd270-99-0",
+    TEST_PROJECT.projectScriptId,
     "project",
-    "0xa7d8d9ef8d8ce8992df33d8b8cf4aebabd5bd270-99"
+    TEST_PROJECT.id
   );
   assert.fieldEquals(
     PROJECTSCRIPT_ENTITY_TYPE,
-    "0xa7d8d9ef8d8ce8992df33d8b8cf4aebabd5bd270-99-0",
+    TEST_PROJECT.projectScriptId,
     "script",
     meridianScript.toString()
   );
@@ -561,45 +535,30 @@ test("OG: Can toggle if a project is active", () => {
 
   let call = changetype<ToggleProjectIsActiveCall>(newMockCall());
 
-  call.to = Address.fromString("0xa7d8d9ef8D8Ce8992Df33D8b8CF4Aebabd5bD270");
+  call.to = Address.fromString(TEST_PROJECT.contract);
   call.block.timestamp = BigInt.fromString("230");
   call.inputValues = [
     new ethereum.EventParam(
       "_projectId",
-      ethereum.Value.fromSignedBigInt(BigInt.fromString("99"))
+      ethereum.Value.fromSignedBigInt(BigInt.fromString(TEST_PROJECT.projectId))
     )
   ];
 
   assert.fieldEquals(
     PROJECT_ENTITY_TYPE,
-    "0xa7d8d9ef8d8ce8992df33d8b8cf4aebabd5bd270-99",
+    TEST_PROJECT.id,
     "active",
-    "false"
+    TEST_PROJECT.active.toString()
   );
-  assert.fieldEquals(
-    PROJECT_ENTITY_TYPE,
-    "0xa7d8d9ef8d8ce8992df33d8b8cf4aebabd5bd270-99",
-    "updatedAt",
-    "1232"
-  );
+  assert.fieldEquals(PROJECT_ENTITY_TYPE, TEST_PROJECT.id, "updatedAt", "1232");
 
   handleToggleProjectIsActive(call);
 
+  assert.fieldEquals(PROJECT_ENTITY_TYPE, TEST_PROJECT.id, "active", "true");
+  assert.fieldEquals(PROJECT_ENTITY_TYPE, TEST_PROJECT.id, "updatedAt", "230");
   assert.fieldEquals(
     PROJECT_ENTITY_TYPE,
-    "0xa7d8d9ef8d8ce8992df33d8b8cf4aebabd5bd270-99",
-    "active",
-    "true"
-  );
-  assert.fieldEquals(
-    PROJECT_ENTITY_TYPE,
-    "0xa7d8d9ef8d8ce8992df33d8b8cf4aebabd5bd270-99",
-    "updatedAt",
-    "230"
-  );
-  assert.fieldEquals(
-    PROJECT_ENTITY_TYPE,
-    "0xa7d8d9ef8d8ce8992df33d8b8cf4aebabd5bd270-99",
+    TEST_PROJECT.id,
     "activatedAt",
     "230"
   );
@@ -614,41 +573,36 @@ test("OG: Can toggle if a project is dynamic", () => {
 
   let call = changetype<ToggleProjectIsDynamicCall>(newMockCall());
 
-  call.to = Address.fromString("0xa7d8d9ef8D8Ce8992Df33D8b8CF4Aebabd5bD270");
+  call.to = Address.fromString(TEST_PROJECT.contract);
   call.block.timestamp = BigInt.fromString("230");
   call.inputValues = [
     new ethereum.EventParam(
       "_projectId",
-      ethereum.Value.fromSignedBigInt(BigInt.fromString("99"))
+      ethereum.Value.fromSignedBigInt(BigInt.fromString(TEST_PROJECT.projectId))
     )
   ];
 
   assert.fieldEquals(
     PROJECT_ENTITY_TYPE,
-    "0xa7d8d9ef8d8ce8992df33d8b8cf4aebabd5bd270-99",
+    TEST_PROJECT.id,
     "dynamic",
-    "true"
+    TEST_PROJECT.dynamic.toString()
   );
   assert.fieldEquals(
     PROJECT_ENTITY_TYPE,
-    "0xa7d8d9ef8d8ce8992df33d8b8cf4aebabd5bd270-99",
+    TEST_PROJECT.id,
     "useHashString",
-    "true"
+    TEST_PROJECT.useHashString.toString()
   );
 
   handleToggleProjectIsDynamic(call);
 
+  assert.fieldEquals(PROJECT_ENTITY_TYPE, TEST_PROJECT.id, "dynamic", "false");
   assert.fieldEquals(
     PROJECT_ENTITY_TYPE,
-    "0xa7d8d9ef8d8ce8992df33d8b8cf4aebabd5bd270-99",
-    "dynamic",
-    "false"
-  );
-  assert.fieldEquals(
-    PROJECT_ENTITY_TYPE,
-    "0xa7d8d9ef8d8ce8992df33d8b8cf4aebabd5bd270-99",
+    TEST_PROJECT.id,
     "useHashString",
-    "true"
+    TEST_PROJECT.useHashString.toString()
   );
 
   clearStore();
@@ -662,42 +616,27 @@ test("OG: Can toggle if a project is locked", () => {
 
   let call = changetype<ToggleProjectIsLockedCall>(newMockCall());
 
-  call.to = Address.fromString("0xa7d8d9ef8D8Ce8992Df33D8b8CF4Aebabd5bD270");
+  call.to = Address.fromString(TEST_PROJECT.contract);
   call.block.timestamp = BigInt.fromString("230");
   call.inputValues = [
     new ethereum.EventParam(
       "_projectId",
-      ethereum.Value.fromSignedBigInt(BigInt.fromString("99"))
+      ethereum.Value.fromSignedBigInt(BigInt.fromString(TEST_PROJECT.projectId))
     )
   ];
 
   assert.fieldEquals(
     PROJECT_ENTITY_TYPE,
-    "0xa7d8d9ef8d8ce8992df33d8b8cf4aebabd5bd270-99",
+    TEST_PROJECT.id,
     "locked",
-    "false"
+    TEST_PROJECT.locked.toString()
   );
-  assert.fieldEquals(
-    PROJECT_ENTITY_TYPE,
-    "0xa7d8d9ef8d8ce8992df33d8b8cf4aebabd5bd270-99",
-    "updatedAt",
-    "1232"
-  );
+  assert.fieldEquals(PROJECT_ENTITY_TYPE, TEST_PROJECT.id, "updatedAt", "1232");
 
   handleToggleProjectIsLocked(call);
 
-  assert.fieldEquals(
-    PROJECT_ENTITY_TYPE,
-    "0xa7d8d9ef8d8ce8992df33d8b8cf4aebabd5bd270-99",
-    "locked",
-    "true"
-  );
-  assert.fieldEquals(
-    PROJECT_ENTITY_TYPE,
-    "0xa7d8d9ef8d8ce8992df33d8b8cf4aebabd5bd270-99",
-    "updatedAt",
-    "230"
-  );
+  assert.fieldEquals(PROJECT_ENTITY_TYPE, TEST_PROJECT.id, "locked", "true");
+  assert.fieldEquals(PROJECT_ENTITY_TYPE, TEST_PROJECT.id, "updatedAt", "230");
 
   clearStore();
 });
@@ -710,42 +649,27 @@ test("OG: Can toggle if a project is paused", () => {
 
   let call = changetype<ToggleProjectIsPausedCall>(newMockCall());
 
-  call.to = Address.fromString("0xa7d8d9ef8D8Ce8992Df33D8b8CF4Aebabd5bD270");
+  call.to = Address.fromString(TEST_PROJECT.contract);
   call.block.timestamp = BigInt.fromString("230");
   call.inputValues = [
     new ethereum.EventParam(
       "_projectId",
-      ethereum.Value.fromSignedBigInt(BigInt.fromString("99"))
+      ethereum.Value.fromSignedBigInt(BigInt.fromString(TEST_PROJECT.projectId))
     )
   ];
 
   assert.fieldEquals(
     PROJECT_ENTITY_TYPE,
-    "0xa7d8d9ef8d8ce8992df33d8b8cf4aebabd5bd270-99",
+    TEST_PROJECT.id,
     "paused",
-    "true"
+    TEST_PROJECT.paused.toString()
   );
-  assert.fieldEquals(
-    PROJECT_ENTITY_TYPE,
-    "0xa7d8d9ef8d8ce8992df33d8b8cf4aebabd5bd270-99",
-    "updatedAt",
-    "1232"
-  );
+  assert.fieldEquals(PROJECT_ENTITY_TYPE, TEST_PROJECT.id, "updatedAt", "1232");
 
   handleToggleProjectIsPaused(call);
 
-  assert.fieldEquals(
-    PROJECT_ENTITY_TYPE,
-    "0xa7d8d9ef8d8ce8992df33d8b8cf4aebabd5bd270-99",
-    "paused",
-    "false"
-  );
-  assert.fieldEquals(
-    PROJECT_ENTITY_TYPE,
-    "0xa7d8d9ef8d8ce8992df33d8b8cf4aebabd5bd270-99",
-    "updatedAt",
-    "230"
-  );
+  assert.fieldEquals(PROJECT_ENTITY_TYPE, TEST_PROJECT.id, "paused", "false");
+  assert.fieldEquals(PROJECT_ENTITY_TYPE, TEST_PROJECT.id, "updatedAt", "230");
 
   clearStore();
 });
@@ -758,30 +682,25 @@ test("OG: Can toggle if a project uses Ipfs", () => {
 
   let call = changetype<ToggleProjectUseIpfsForStaticCall>(newMockCall());
 
-  call.to = Address.fromString("0xa7d8d9ef8D8Ce8992Df33D8b8CF4Aebabd5bD270");
+  call.to = Address.fromString(TEST_PROJECT.contract);
   call.block.timestamp = BigInt.fromString("230");
   call.inputValues = [
     new ethereum.EventParam(
       "_projectId",
-      ethereum.Value.fromSignedBigInt(BigInt.fromString("99"))
+      ethereum.Value.fromSignedBigInt(BigInt.fromString(TEST_PROJECT.projectId))
     )
   ];
 
   assert.fieldEquals(
     PROJECT_ENTITY_TYPE,
-    "0xa7d8d9ef8d8ce8992df33d8b8cf4aebabd5bd270-99",
+    TEST_PROJECT.id,
     "useIpfs",
-    "false"
+    TEST_PROJECT.useIpfs.toString()
   );
 
   handleToggleProjectUseIpfsForStatic(call);
 
-  assert.fieldEquals(
-    PROJECT_ENTITY_TYPE,
-    "0xa7d8d9ef8d8ce8992df33d8b8cf4aebabd5bd270-99",
-    "useIpfs",
-    "true"
-  );
+  assert.fieldEquals(PROJECT_ENTITY_TYPE, TEST_PROJECT.id, "useIpfs", "true");
 
   clearStore();
 });
@@ -794,12 +713,12 @@ test("OG: Can update a projects additional payee info", () => {
 
   let call = changetype<UpdateProjectAdditionalPayeeInfoCall>(newMockCall());
 
-  call.to = Address.fromString("0xa7d8d9ef8D8Ce8992Df33D8b8CF4Aebabd5bD270");
+  call.to = Address.fromString(TEST_PROJECT.contract);
   call.block.timestamp = BigInt.fromString("230");
   call.inputValues = [
     new ethereum.EventParam(
       "_projectId",
-      ethereum.Value.fromSignedBigInt(BigInt.fromString("99"))
+      ethereum.Value.fromSignedBigInt(BigInt.fromString(TEST_PROJECT.projectId))
     ),
     new ethereum.EventParam(
       "_additionalPayee",
@@ -817,22 +736,17 @@ test("OG: Can update a projects additional payee info", () => {
 
   assert.fieldEquals(
     PROJECT_ENTITY_TYPE,
-    "0xa7d8d9ef8d8ce8992df33d8b8cf4aebabd5bd270-99",
+    TEST_PROJECT.id,
     "additionalPayee",
     "0x7ee88c660ee1b8b41c1bd75c0290e25f1228be98"
   );
   assert.fieldEquals(
     PROJECT_ENTITY_TYPE,
-    "0xa7d8d9ef8d8ce8992df33d8b8cf4aebabd5bd270-99",
+    TEST_PROJECT.id,
     "additionalPayeePercentage",
     "20"
   );
-  assert.fieldEquals(
-    PROJECT_ENTITY_TYPE,
-    "0xa7d8d9ef8d8ce8992df33d8b8cf4aebabd5bd270-99",
-    "updatedAt",
-    "230"
-  );
+  assert.fieldEquals(PROJECT_ENTITY_TYPE, TEST_PROJECT.id, "updatedAt", "230");
 
   clearStore();
 });
@@ -846,12 +760,12 @@ test("OG: Can update a projects artist address", () => {
 
   let call = changetype<UpdateProjectArtistAddressCall>(newMockCall());
 
-  call.to = Address.fromString("0xa7d8d9ef8D8Ce8992Df33D8b8CF4Aebabd5bD270");
+  call.to = Address.fromString(TEST_PROJECT.contract);
   call.block.timestamp = BigInt.fromString("230");
   call.inputValues = [
     new ethereum.EventParam(
       "_projectId",
-      ethereum.Value.fromSignedBigInt(BigInt.fromString("99"))
+      ethereum.Value.fromSignedBigInt(BigInt.fromString(TEST_PROJECT.projectId))
     ),
     new ethereum.EventParam(
       "_artistAddress",
@@ -865,22 +779,17 @@ test("OG: Can update a projects artist address", () => {
 
   assert.fieldEquals(
     PROJECT_ENTITY_TYPE,
-    "0xa7d8d9ef8d8ce8992df33d8b8cf4aebabd5bd270-99",
+    TEST_PROJECT.id,
     "artistAddress",
     "0xf1687e6b9d811e01c2a03b473d9155315a82a812"
   );
   assert.fieldEquals(
     PROJECT_ENTITY_TYPE,
-    "0xa7d8d9ef8d8ce8992df33d8b8cf4aebabd5bd270-99",
+    TEST_PROJECT.id,
     "artist",
     "0xf1687e6b9d811e01c2a03b473d9155315a82a812"
   );
-  assert.fieldEquals(
-    PROJECT_ENTITY_TYPE,
-    "0xa7d8d9ef8d8ce8992df33d8b8cf4aebabd5bd270-99",
-    "updatedAt",
-    "230"
-  );
+  assert.fieldEquals(PROJECT_ENTITY_TYPE, TEST_PROJECT.id, "updatedAt", "230");
 
   clearStore();
 });
@@ -893,12 +802,12 @@ test("OG: Can update a projects artist name", () => {
 
   let call = changetype<UpdateProjectArtistNameCall>(newMockCall());
 
-  call.to = Address.fromString("0xa7d8d9ef8D8Ce8992Df33D8b8CF4Aebabd5bD270");
+  call.to = Address.fromString(TEST_PROJECT.contract);
   call.block.timestamp = BigInt.fromString("230");
   call.inputValues = [
     new ethereum.EventParam(
       "_projectId",
-      ethereum.Value.fromSignedBigInt(BigInt.fromString("99"))
+      ethereum.Value.fromSignedBigInt(BigInt.fromString(TEST_PROJECT.projectId))
     ),
     new ethereum.EventParam(
       "_projectArtistName",
@@ -910,16 +819,11 @@ test("OG: Can update a projects artist name", () => {
 
   assert.fieldEquals(
     PROJECT_ENTITY_TYPE,
-    "0xa7d8d9ef8d8ce8992df33d8b8cf4aebabd5bd270-99",
+    TEST_PROJECT.id,
     "artistName",
     "Beeple"
   );
-  assert.fieldEquals(
-    PROJECT_ENTITY_TYPE,
-    "0xa7d8d9ef8d8ce8992df33d8b8cf4aebabd5bd270-99",
-    "updatedAt",
-    "230"
-  );
+  assert.fieldEquals(PROJECT_ENTITY_TYPE, TEST_PROJECT.id, "updatedAt", "230");
 
   clearStore();
 });
@@ -932,12 +836,12 @@ test("OG: Can update a projects base Ipfs URI", () => {
 
   let call = changetype<UpdateProjectBaseIpfsURICall>(newMockCall());
 
-  call.to = Address.fromString("0xa7d8d9ef8D8Ce8992Df33D8b8CF4Aebabd5bD270");
+  call.to = Address.fromString(TEST_PROJECT.contract);
   call.block.timestamp = BigInt.fromString("230");
   call.inputValues = [
     new ethereum.EventParam(
       "_projectId",
-      ethereum.Value.fromSignedBigInt(BigInt.fromString("99"))
+      ethereum.Value.fromSignedBigInt(BigInt.fromString(TEST_PROJECT.projectId))
     ),
     new ethereum.EventParam(
       "_projectBaseIpfsURI",
@@ -951,7 +855,7 @@ test("OG: Can update a projects base Ipfs URI", () => {
 
   assert.fieldEquals(
     PROJECT_ENTITY_TYPE,
-    "0xa7d8d9ef8d8ce8992df33d8b8cf4aebabd5bd270-99",
+    TEST_PROJECT.id,
     "baseIpfsUri",
     "Qme7ss3ARVgxv6rXqVPiikMJ8u2NLgmgszg13pYrDKEoiu"
   );
@@ -967,12 +871,12 @@ test("OG: Can update a projects base URI", () => {
 
   let call = changetype<UpdateProjectBaseURICall>(newMockCall());
 
-  call.to = Address.fromString("0xa7d8d9ef8D8Ce8992Df33D8b8CF4Aebabd5bD270");
+  call.to = Address.fromString(TEST_PROJECT.contract);
   call.block.timestamp = BigInt.fromString("230");
   call.inputValues = [
     new ethereum.EventParam(
       "_projectId",
-      ethereum.Value.fromSignedBigInt(BigInt.fromString("99"))
+      ethereum.Value.fromSignedBigInt(BigInt.fromString(TEST_PROJECT.projectId))
     ),
     new ethereum.EventParam(
       "_newBaseURI",
@@ -984,7 +888,7 @@ test("OG: Can update a projects base URI", () => {
 
   assert.fieldEquals(
     PROJECT_ENTITY_TYPE,
-    "0xa7d8d9ef8d8ce8992df33d8b8cf4aebabd5bd270-99",
+    TEST_PROJECT.id,
     "baseUri",
     "random_new_base_URI"
   );
@@ -1000,12 +904,12 @@ test("OG: Can update a projects description", () => {
 
   let call = changetype<UpdateProjectDescriptionCall>(newMockCall());
 
-  call.to = Address.fromString("0xa7d8d9ef8D8Ce8992Df33D8b8CF4Aebabd5bD270");
+  call.to = Address.fromString(TEST_PROJECT.contract);
   call.block.timestamp = BigInt.fromString("230");
   call.inputValues = [
     new ethereum.EventParam(
       "_projectId",
-      ethereum.Value.fromSignedBigInt(BigInt.fromString("99"))
+      ethereum.Value.fromSignedBigInt(BigInt.fromString(TEST_PROJECT.projectId))
     ),
     new ethereum.EventParam(
       "_projectDescription",
@@ -1017,16 +921,11 @@ test("OG: Can update a projects description", () => {
 
   assert.fieldEquals(
     PROJECT_ENTITY_TYPE,
-    "0xa7d8d9ef8d8ce8992df33d8b8cf4aebabd5bd270-99",
+    TEST_PROJECT.id,
     "description",
     "Template description blah blah blah"
   );
-  assert.fieldEquals(
-    PROJECT_ENTITY_TYPE,
-    "0xa7d8d9ef8d8ce8992df33d8b8cf4aebabd5bd270-99",
-    "updatedAt",
-    "230"
-  );
+  assert.fieldEquals(PROJECT_ENTITY_TYPE, TEST_PROJECT.id, "updatedAt", "230");
 
   clearStore();
 });
@@ -1039,12 +938,12 @@ test("OG: Can update a projects IPFS Hash", () => {
 
   let call = changetype<UpdateProjectIpfsHashCall>(newMockCall());
 
-  call.to = Address.fromString("0xa7d8d9ef8D8Ce8992Df33D8b8CF4Aebabd5bD270");
+  call.to = Address.fromString(TEST_PROJECT.contract);
   call.block.timestamp = BigInt.fromString("230");
   call.inputValues = [
     new ethereum.EventParam(
       "_projectId",
-      ethereum.Value.fromSignedBigInt(BigInt.fromString("99"))
+      ethereum.Value.fromSignedBigInt(BigInt.fromString(TEST_PROJECT.projectId))
     ),
     new ethereum.EventParam(
       "_ipfsHash",
@@ -1058,16 +957,11 @@ test("OG: Can update a projects IPFS Hash", () => {
 
   assert.fieldEquals(
     PROJECT_ENTITY_TYPE,
-    "0xa7d8d9ef8d8ce8992df33d8b8cf4aebabd5bd270-99",
+    TEST_PROJECT.id,
     "ipfsHash",
     "bafybeigdyrzt5sfp7udm7hu76uh7y26nf3efuylqabf3oclgtqy55fbzdi"
   );
-  assert.fieldEquals(
-    PROJECT_ENTITY_TYPE,
-    "0xa7d8d9ef8d8ce8992df33d8b8cf4aebabd5bd270-99",
-    "updatedAt",
-    "230"
-  );
+  assert.fieldEquals(PROJECT_ENTITY_TYPE, TEST_PROJECT.id, "updatedAt", "230");
 
   clearStore();
 });
@@ -1080,12 +974,12 @@ test("OG: Can update a project license", () => {
 
   let call = changetype<UpdateProjectLicenseCall>(newMockCall());
 
-  call.to = Address.fromString("0xa7d8d9ef8D8Ce8992Df33D8b8CF4Aebabd5bD270");
+  call.to = Address.fromString(TEST_PROJECT.contract);
   call.block.timestamp = BigInt.fromString("230");
   call.inputValues = [
     new ethereum.EventParam(
       "_projectId",
-      ethereum.Value.fromSignedBigInt(BigInt.fromString("99"))
+      ethereum.Value.fromSignedBigInt(BigInt.fromString(TEST_PROJECT.projectId))
     ),
     new ethereum.EventParam(
       "_projectLicense",
@@ -1097,16 +991,11 @@ test("OG: Can update a project license", () => {
 
   assert.fieldEquals(
     PROJECT_ENTITY_TYPE,
-    "0xa7d8d9ef8d8ce8992df33d8b8cf4aebabd5bd270-99",
+    TEST_PROJECT.id,
     "license",
     "MIT License - please copy if you want"
   );
-  assert.fieldEquals(
-    PROJECT_ENTITY_TYPE,
-    "0xa7d8d9ef8d8ce8992df33d8b8cf4aebabd5bd270-99",
-    "updatedAt",
-    "230"
-  );
+  assert.fieldEquals(PROJECT_ENTITY_TYPE, TEST_PROJECT.id, "updatedAt", "230");
 
   clearStore();
 });
@@ -1119,12 +1008,12 @@ test("OG: Can update a project max invocations", () => {
 
   let call = changetype<UpdateProjectMaxInvocationsCall>(newMockCall());
 
-  call.to = Address.fromString("0xa7d8d9ef8D8Ce8992Df33D8b8CF4Aebabd5bD270");
+  call.to = Address.fromString(TEST_PROJECT.contract);
   call.block.timestamp = BigInt.fromString("230");
   call.inputValues = [
     new ethereum.EventParam(
       "_projectId",
-      ethereum.Value.fromSignedBigInt(BigInt.fromString("99"))
+      ethereum.Value.fromSignedBigInt(BigInt.fromString(TEST_PROJECT.projectId))
     ),
     new ethereum.EventParam(
       "_maxInvocations",
@@ -1134,7 +1023,7 @@ test("OG: Can update a project max invocations", () => {
 
   assert.fieldEquals(
     PROJECT_ENTITY_TYPE,
-    "0xa7d8d9ef8d8ce8992df33d8b8cf4aebabd5bd270-99",
+    TEST_PROJECT.id,
     "maxInvocations",
     "1024"
   );
@@ -1142,22 +1031,12 @@ test("OG: Can update a project max invocations", () => {
 
   assert.fieldEquals(
     PROJECT_ENTITY_TYPE,
-    "0xa7d8d9ef8d8ce8992df33d8b8cf4aebabd5bd270-99",
+    TEST_PROJECT.id,
     "maxInvocations",
     "9999"
   );
-  assert.fieldEquals(
-    PROJECT_ENTITY_TYPE,
-    "0xa7d8d9ef8d8ce8992df33d8b8cf4aebabd5bd270-99",
-    "complete",
-    "false"
-  );
-  assert.fieldEquals(
-    PROJECT_ENTITY_TYPE,
-    "0xa7d8d9ef8d8ce8992df33d8b8cf4aebabd5bd270-99",
-    "updatedAt",
-    "230"
-  );
+  assert.fieldEquals(PROJECT_ENTITY_TYPE, TEST_PROJECT.id, "complete", "false");
+  assert.fieldEquals(PROJECT_ENTITY_TYPE, TEST_PROJECT.id, "updatedAt", "230");
 
   clearStore();
 });
@@ -1170,12 +1049,12 @@ test("OG: Can update a project name", () => {
 
   let call = changetype<UpdateProjectNameCall>(newMockCall());
 
-  call.to = Address.fromString("0xa7d8d9ef8D8Ce8992Df33D8b8CF4Aebabd5bD270");
+  call.to = Address.fromString(TEST_PROJECT.contract);
   call.block.timestamp = BigInt.fromString("230");
   call.inputValues = [
     new ethereum.EventParam(
       "_projectId",
-      ethereum.Value.fromSignedBigInt(BigInt.fromString("99"))
+      ethereum.Value.fromSignedBigInt(BigInt.fromString(TEST_PROJECT.projectId))
     ),
     new ethereum.EventParam(
       "_projectName",
@@ -1183,26 +1062,11 @@ test("OG: Can update a project name", () => {
     )
   ];
 
-  assert.fieldEquals(
-    PROJECT_ENTITY_TYPE,
-    "0xa7d8d9ef8d8ce8992df33d8b8cf4aebabd5bd270-99",
-    "name",
-    "string1"
-  );
+  assert.fieldEquals(PROJECT_ENTITY_TYPE, TEST_PROJECT.id, "name", "string1");
   handleUpdateProjectName(call);
 
-  assert.fieldEquals(
-    PROJECT_ENTITY_TYPE,
-    "0xa7d8d9ef8d8ce8992df33d8b8cf4aebabd5bd270-99",
-    "name",
-    "Chimera"
-  );
-  assert.fieldEquals(
-    PROJECT_ENTITY_TYPE,
-    "0xa7d8d9ef8d8ce8992df33d8b8cf4aebabd5bd270-99",
-    "updatedAt",
-    "230"
-  );
+  assert.fieldEquals(PROJECT_ENTITY_TYPE, TEST_PROJECT.id, "name", "Chimera");
+  assert.fieldEquals(PROJECT_ENTITY_TYPE, TEST_PROJECT.id, "updatedAt", "230");
 
   clearStore();
 });
@@ -1215,12 +1079,12 @@ test("OG: Can update a project price per token in wei", () => {
 
   let call = changetype<UpdateProjectPricePerTokenInWeiCall>(newMockCall());
 
-  call.to = Address.fromString("0xa7d8d9ef8D8Ce8992Df33D8b8CF4Aebabd5bD270");
+  call.to = Address.fromString(TEST_PROJECT.contract);
   call.block.timestamp = BigInt.fromString("230");
   call.inputValues = [
     new ethereum.EventParam(
       "_projectId",
-      ethereum.Value.fromSignedBigInt(BigInt.fromString("99"))
+      ethereum.Value.fromSignedBigInt(BigInt.fromString(TEST_PROJECT.projectId))
     ),
     new ethereum.EventParam(
       "_pricePerTokenInWei",
@@ -1230,7 +1094,7 @@ test("OG: Can update a project price per token in wei", () => {
 
   assert.fieldEquals(
     PROJECT_ENTITY_TYPE,
-    "0xa7d8d9ef8d8ce8992df33d8b8cf4aebabd5bd270-99",
+    TEST_PROJECT.id,
     "pricePerTokenInWei",
     "100000000"
   );
@@ -1238,16 +1102,11 @@ test("OG: Can update a project price per token in wei", () => {
 
   assert.fieldEquals(
     PROJECT_ENTITY_TYPE,
-    "0xa7d8d9ef8d8ce8992df33d8b8cf4aebabd5bd270-99",
+    TEST_PROJECT.id,
     "pricePerTokenInWei",
     "987654321"
   );
-  assert.fieldEquals(
-    PROJECT_ENTITY_TYPE,
-    "0xa7d8d9ef8d8ce8992df33d8b8cf4aebabd5bd270-99",
-    "updatedAt",
-    "230"
-  );
+  assert.fieldEquals(PROJECT_ENTITY_TYPE, TEST_PROJECT.id, "updatedAt", "230");
 
   clearStore();
 });
@@ -1261,12 +1120,12 @@ test("OG: Can handleUpdateProjectScript", () => {
 
   let call = changetype<UpdateProjectScriptCall>(newMockCall());
 
-  call.to = Address.fromString("0xa7d8d9ef8D8Ce8992Df33D8b8CF4Aebabd5bD270");
+  call.to = Address.fromString(TEST_PROJECT.contract);
   call.block.timestamp = BigInt.fromString("530");
   call.inputValues = [
     new ethereum.EventParam(
       "_projectId",
-      ethereum.Value.fromSignedBigInt(BigInt.fromString("99"))
+      ethereum.Value.fromSignedBigInt(BigInt.fromString(TEST_PROJECT.projectId))
     ),
     new ethereum.EventParam(
       "_scriptId",
@@ -1282,31 +1141,26 @@ test("OG: Can handleUpdateProjectScript", () => {
 
   assert.fieldEquals(
     PROJECTSCRIPT_ENTITY_TYPE,
-    "0xa7d8d9ef8d8ce8992df33d8b8cf4aebabd5bd270-99-0",
+    TEST_PROJECT.projectScriptId,
     "project",
-    "0xa7d8d9ef8d8ce8992df33d8b8cf4aebabd5bd270-99"
+    TEST_PROJECT.id
   );
   assert.fieldEquals(
     PROJECTSCRIPT_ENTITY_TYPE,
-    "0xa7d8d9ef8d8ce8992df33d8b8cf4aebabd5bd270-99-0",
+    TEST_PROJECT.projectScriptId,
     "script",
     meridianScript.toString()
   );
   assert.fieldEquals(
     PROJECT_ENTITY_TYPE,
-    "0xa7d8d9ef8d8ce8992df33d8b8cf4aebabd5bd270-99",
+    TEST_PROJECT.id,
     "script",
     meridianScript.toString()
   );
+  assert.fieldEquals(PROJECT_ENTITY_TYPE, TEST_PROJECT.id, "updatedAt", "530");
   assert.fieldEquals(
     PROJECT_ENTITY_TYPE,
-    "0xa7d8d9ef8d8ce8992df33d8b8cf4aebabd5bd270-99",
-    "updatedAt",
-    "530"
-  );
-  assert.fieldEquals(
-    PROJECT_ENTITY_TYPE,
-    "0xa7d8d9ef8d8ce8992df33d8b8cf4aebabd5bd270-99",
+    TEST_PROJECT.id,
     "scriptUpdatedAt",
     "530"
   );
@@ -1324,18 +1178,16 @@ test("OG: Can handleUpdateProjectScriptJSON", () => {
 
   let call = changetype<UpdateProjectScriptJSONCall>(newMockCall());
 
-  call.to = Address.fromString("0xa7d8d9ef8D8Ce8992Df33D8b8CF4Aebabd5bD270");
+  call.to = Address.fromString(TEST_PROJECT.contract);
   call.block.timestamp = BigInt.fromString("232");
   call.inputValues = [
     new ethereum.EventParam(
       "_projectId",
-      ethereum.Value.fromSignedBigInt(BigInt.fromString("99"))
+      ethereum.Value.fromSignedBigInt(BigInt.fromString(TEST_PROJECT.projectId))
     ),
     new ethereum.EventParam(
       "_projectScriptJSON",
-      ethereum.Value.fromString(
-        '{"type":"p5js","version":"1.0.0","instructions":"click to animate | space bar changes background color","aspectRatio":"1.5","interactive":"true","curation_status":"curated"}'
-      )
+      ethereum.Value.fromString(TEST_PROJECT.projectScriptJSON)
     )
   ];
 
@@ -1343,16 +1195,11 @@ test("OG: Can handleUpdateProjectScriptJSON", () => {
 
   assert.fieldEquals(
     PROJECT_ENTITY_TYPE,
-    "0xa7d8d9ef8d8ce8992df33d8b8cf4aebabd5bd270-99",
+    TEST_PROJECT.id,
     "scriptJSON",
-    '{"type":"p5js","version":"1.0.0","instructions":"click to animate | space bar changes background color","aspectRatio":"1.5","interactive":"true","curation_status":"curated"}'
+    TEST_PROJECT.projectScriptJSON
   );
-  assert.fieldEquals(
-    PROJECT_ENTITY_TYPE,
-    "0xa7d8d9ef8d8ce8992df33d8b8cf4aebabd5bd270-99",
-    "updatedAt",
-    "232"
-  );
+  assert.fieldEquals(PROJECT_ENTITY_TYPE, TEST_PROJECT.id, "updatedAt", "232");
 
   clearStore();
 });
@@ -1368,12 +1215,12 @@ test("OG: Can update project secondary market royalties", () => {
     newMockCall()
   );
 
-  call.to = Address.fromString("0xa7d8d9ef8D8Ce8992Df33D8b8CF4Aebabd5bD270");
+  call.to = Address.fromString(TEST_PROJECT.contract);
   call.block.timestamp = BigInt.fromString("230");
   call.inputValues = [
     new ethereum.EventParam(
       "_projectId",
-      ethereum.Value.fromSignedBigInt(BigInt.fromString("99"))
+      ethereum.Value.fromSignedBigInt(BigInt.fromString(TEST_PROJECT.projectId))
     ),
     new ethereum.EventParam(
       "_secondMarketRoyalty",
@@ -1385,16 +1232,11 @@ test("OG: Can update project secondary market royalties", () => {
 
   assert.fieldEquals(
     PROJECT_ENTITY_TYPE,
-    "0xa7d8d9ef8d8ce8992df33d8b8cf4aebabd5bd270-99",
+    TEST_PROJECT.id,
     "royaltyPercentage",
     "125"
   );
-  assert.fieldEquals(
-    PROJECT_ENTITY_TYPE,
-    "0xa7d8d9ef8d8ce8992df33d8b8cf4aebabd5bd270-99",
-    "updatedAt",
-    "230"
-  );
+  assert.fieldEquals(PROJECT_ENTITY_TYPE, TEST_PROJECT.id, "updatedAt", "230");
 
   clearStore();
 });
@@ -1408,16 +1250,16 @@ test("OG: Can update a project website", () => {
 
   let call = changetype<UpdateProjectWebsiteCall>(newMockCall());
 
-  call.to = Address.fromString("0xa7d8d9ef8D8Ce8992Df33D8b8CF4Aebabd5bD270");
+  call.to = Address.fromString(TEST_PROJECT.contract);
   call.block.timestamp = BigInt.fromString("230");
   call.inputValues = [
     new ethereum.EventParam(
       "_projectId",
-      ethereum.Value.fromSignedBigInt(BigInt.fromString("99"))
+      ethereum.Value.fromSignedBigInt(BigInt.fromString(TEST_PROJECT.projectId))
     ),
     new ethereum.EventParam(
       "_projectWebsite",
-      ethereum.Value.fromString("artblocks.io")
+      ethereum.Value.fromString(TEST_PROJECT.website)
     )
   ];
 
@@ -1425,16 +1267,11 @@ test("OG: Can update a project website", () => {
 
   assert.fieldEquals(
     PROJECT_ENTITY_TYPE,
-    "0xa7d8d9ef8d8ce8992df33d8b8cf4aebabd5bd270-99",
+    TEST_PROJECT.id,
     "website",
-    "artblocks.io"
+    TEST_PROJECT.website
   );
-  assert.fieldEquals(
-    PROJECT_ENTITY_TYPE,
-    "0xa7d8d9ef8d8ce8992df33d8b8cf4aebabd5bd270-99",
-    "updatedAt",
-    "230"
-  );
+  assert.fieldEquals(PROJECT_ENTITY_TYPE, TEST_PROJECT.id, "updatedAt", "230");
 
   clearStore();
 });

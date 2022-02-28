@@ -11,15 +11,16 @@ import { generateContractSpecificId } from "../../src/helpers";
 
 class ProjectValues {
   active: boolean;
-  admin: Address;
-  additionalPayee: Address;
+  admin: string;
+  additionalPayee: string;
   additionalPayeePercentage: string;
   artistAddress: string;
+  artistName: string;
   artblocksPercentage: string;
   complete: boolean;
-  contract: Address;
+  contract: string;
   createdAt: string;
-  currencyAddress: Address;
+  currencyAddress: string;
   currencySymbol: string;
   dynamic: boolean;
   id: string;
@@ -29,30 +30,33 @@ class ProjectValues {
   maxInvocations: string;
   name: string;
   paused: boolean;
+  projectDescription: string;
+  projectLicense: string;
   pricePerTokenInWei: string;
   projectId: string;
+  projectScriptId: string;
+  projectScriptJSON: string;
   renderProviderPercentage: string;
   scriptCount: string;
+  tokenId: string;
   updatedAt: string;
   useHashString: boolean;
   useIpfs: boolean;
+  website: string;
 }
 
 export const TEST_PROJECT: ProjectValues = {
   active: false,
-  admin: Address.fromString("0x90cBa2Bbb19ecc291A12066Fd8329D65FA1f1947"),
-  additionalPayee: Address.fromString(
-    "0xc079F0A6E8809E41A2A39D6532ff3dfa6B48e6bB"
-  ),
+  admin: "0x90cba2bbb19ecc291a12066fd8329d65fa1f1947",
+  additionalPayee: "0xc079F0A6E8809E41A2A39D6532ff3dfa6B48e6bB",
   additionalPayeePercentage: "10",
-  artistAddress: "0x1233973F9aEa61250e98b697246cb10146903672",
+  artistAddress: "0x1233973f9aea61250e98b697246cb10146903672",
+  artistName: "Beeple",
   artblocksPercentage: "10",
   complete: false,
-  contract: Address.fromString("0xa7d8d9ef8d8ce8992df33d8b8cf4aebabd5bd270"),
+  contract: "0xa7d8d9ef8d8ce8992df33d8b8cf4aebabd5bd270",
   createdAt: "1232",
-  currencyAddress: Address.fromString(
-    "0xc944e90c64b2c07662a292be6244bdf05cda44a7"
-  ),
+  currencyAddress: "0xc944e90c64b2c07662a292be6244bdf05cda44a7",
   currencySymbol: "GRT",
   dynamic: true,
   id: "0xa7d8d9ef8d8ce8992df33d8b8cf4aebabd5bd270-99",
@@ -63,30 +67,48 @@ export const TEST_PROJECT: ProjectValues = {
   name: "Ringers",
   paused: true,
   pricePerTokenInWei: "123",
+  projectDescription: "Template description blah blah blah",
   projectId: "99",
+  projectLicense: "MIT License - please copy if you want",
+  projectScriptId: "0xa7d8d9ef8d8ce8992df33d8b8cf4aebabd5bd270-99-0",
+  projectScriptJSON:
+    '{"type":"p5js","version":"1.0.0","instructions":"click to animate | space bar changes background color","aspectRatio":"1.5","interactive":"true","curation_status":"curated"}',
   renderProviderPercentage: "10",
   scriptCount: "1",
+  tokenId: "0xa7d8d9ef8d8ce8992df33d8b8cf4aebabd5bd270-123",
   updatedAt: "1232",
   useHashString: true,
-  useIpfs: false
+  useIpfs: false,
+  website: "artblocks.io"
 };
+
+export const ACCOUNT_ENTITY_TYPE = "Account";
+export const PROJECT_ENTITY_TYPE = "Project";
+export const CONTRACT_ENTITY_TYPE = "Contract";
+export const WHITELISTING_ENTITY_TYPE = "Whitelisting";
+export const PROJECTSCRIPT_ENTITY_TYPE = "ProjectScript";
+export const TOKEN_ENTITY_TYPE = "Token";
 
 // mocks return values for Soldity contract calls in refreshContract() helper function
 export const mockRefreshContractCalls = function(): void {
   createMockedFunction(
-    TEST_PROJECT.contract,
+    Address.fromString(TEST_PROJECT.contract),
     "admin",
     "admin():(address)"
-  ).returns([ethereum.Value.fromAddress(TEST_PROJECT.admin)]);
+  ).returns([
+    ethereum.Value.fromAddress(Address.fromString(TEST_PROJECT.admin))
+  ]);
 
   createMockedFunction(
-    TEST_PROJECT.contract,
+    Address.fromString(TEST_PROJECT.contract),
     "artblocksAddress",
     "artblocksAddress():(address)"
-  ).returns([ethereum.Value.fromAddress(TEST_PROJECT.contract)]);
+  ).returns([
+    ethereum.Value.fromAddress(Address.fromString(TEST_PROJECT.contract))
+  ]);
 
   createMockedFunction(
-    TEST_PROJECT.contract,
+    Address.fromString(TEST_PROJECT.contract),
     "artblocksPercentage",
     "artblocksPercentage():(uint256)"
   ).returns([
@@ -96,40 +118,48 @@ export const mockRefreshContractCalls = function(): void {
   ]);
 
   createMockedFunction(
-    TEST_PROJECT.contract,
+    Address.fromString(TEST_PROJECT.contract),
     "nextProjectId",
     "nextProjectId():(uint256)"
   ).returns([ethereum.Value.fromSignedBigInt(BigInt.fromString("100"))]);
 
   createMockedFunction(
-    TEST_PROJECT.contract,
+    Address.fromString(TEST_PROJECT.contract),
     "randomizerContract",
     "randomizerContract():(address)"
-  ).returns([ethereum.Value.fromAddress(TEST_PROJECT.contract)]);
+  ).returns([
+    ethereum.Value.fromAddress(Address.fromString(TEST_PROJECT.contract))
+  ]);
 };
 
 // mocks return values for PBAB Soldity contract calls in refreshContract() helper function
 export const mockPBABRefreshContractCalls = function(): void {
   createMockedFunction(
-    TEST_PROJECT.contract,
+    Address.fromString(TEST_PROJECT.contract),
     "admin",
     "admin():(address)"
-  ).returns([ethereum.Value.fromAddress(TEST_PROJECT.admin)]);
+  ).returns([
+    ethereum.Value.fromAddress(Address.fromString(TEST_PROJECT.admin))
+  ]);
 
   createMockedFunction(
-    TEST_PROJECT.contract,
+    Address.fromString(TEST_PROJECT.contract),
     "artblocksAddress",
     "artblocksAddress():(address)"
-  ).returns([ethereum.Value.fromAddress(TEST_PROJECT.contract)]);
+  ).returns([
+    ethereum.Value.fromAddress(Address.fromString(TEST_PROJECT.contract))
+  ]);
 
   createMockedFunction(
-    TEST_PROJECT.contract,
+    Address.fromString(TEST_PROJECT.contract),
     "renderProviderAddress",
     "renderProviderAddress():(address)"
-  ).returns([ethereum.Value.fromAddress(TEST_PROJECT.contract)]);
+  ).returns([
+    ethereum.Value.fromAddress(Address.fromString(TEST_PROJECT.contract))
+  ]);
 
   createMockedFunction(
-    TEST_PROJECT.contract,
+    Address.fromString(TEST_PROJECT.contract),
     "renderProviderPercentage",
     "renderProviderPercentage():(uint256)"
   ).returns([
@@ -139,16 +169,18 @@ export const mockPBABRefreshContractCalls = function(): void {
   ]);
 
   createMockedFunction(
-    TEST_PROJECT.contract,
+    Address.fromString(TEST_PROJECT.contract),
     "nextProjectId",
     "nextProjectId():(uint256)"
   ).returns([ethereum.Value.fromSignedBigInt(BigInt.fromString("100"))]);
 
   createMockedFunction(
-    TEST_PROJECT.contract,
+    Address.fromString(TEST_PROJECT.contract),
     "randomizerContract",
     "randomizerContract():(address)"
-  ).returns([ethereum.Value.fromAddress(TEST_PROJECT.contract)]);
+  ).returns([
+    ethereum.Value.fromAddress(Address.fromString(TEST_PROJECT.contract))
+  ]);
 };
 
 // mocks return values for Soldity contract calls in handleAddProject() helper function
@@ -162,7 +194,7 @@ export const mockProjectContractCalls = function(): void {
     ethereum.Value.fromBoolean(true)
   ]; // dynamic
   createMockedFunction(
-    TEST_PROJECT.contract,
+    Address.fromString(TEST_PROJECT.contract),
     "projectDetails",
     "projectDetails(uint256):(string,string,string,string,string,bool)"
   )
@@ -172,7 +204,7 @@ export const mockProjectContractCalls = function(): void {
     .returns(projectDetailsReturnArray);
 
   let projectTokenInfoReturnArray: Array<ethereum.Value> = [
-    ethereum.Value.fromAddress(TEST_PROJECT.contract), // artistAddress
+    ethereum.Value.fromAddress(Address.fromString(TEST_PROJECT.contract)), // artistAddress
     ethereum.Value.fromSignedBigInt(BigInt.fromString("100000000")), // pricePerTokenInWei
     ethereum.Value.fromSignedBigInt(
       BigInt.fromString(TEST_PROJECT.invocations)
@@ -181,15 +213,17 @@ export const mockProjectContractCalls = function(): void {
       BigInt.fromString(TEST_PROJECT.maxInvocations)
     ), // maxInvocations
     ethereum.Value.fromBoolean(TEST_PROJECT.active), // active
-    ethereum.Value.fromAddress(TEST_PROJECT.additionalPayee), // additionalPayee
+    ethereum.Value.fromAddress(
+      Address.fromString(TEST_PROJECT.additionalPayee)
+    ), // additionalPayee
     ethereum.Value.fromSignedBigInt(
       BigInt.fromString(TEST_PROJECT.additionalPayeePercentage)
     ), // additionalPayeePercentage
     ethereum.Value.fromString(TEST_PROJECT.currencySymbol), // currency
-    ethereum.Value.fromAddress(TEST_PROJECT.currencyAddress)
+    ethereum.Value.fromAddress(Address.fromString(TEST_PROJECT.currencyAddress))
   ]; // currencyAddress
   createMockedFunction(
-    TEST_PROJECT.contract,
+    Address.fromString(TEST_PROJECT.contract),
     "projectTokenInfo",
     "projectTokenInfo(uint256):(address,uint256,uint256,uint256,bool,address,uint256,string,address)"
   )
@@ -207,7 +241,7 @@ export const mockProjectContractCalls = function(): void {
     ethereum.Value.fromBoolean(TEST_PROJECT.paused)
   ]; // paused
   createMockedFunction(
-    TEST_PROJECT.contract,
+    Address.fromString(TEST_PROJECT.contract),
     "projectScriptInfo",
     "projectScriptInfo(uint256):(string,uint256,bool,string,bool,bool)"
   )
@@ -227,7 +261,7 @@ export const mockOGProjectContractCalls = function(): void {
     ethereum.Value.fromBoolean(true)
   ]; // dynamic
   createMockedFunction(
-    TEST_PROJECT.contract,
+    Address.fromString(TEST_PROJECT.contract),
     "projectDetails",
     "projectDetails(uint256):(string,string,string,string,string,bool)"
   )
@@ -237,7 +271,7 @@ export const mockOGProjectContractCalls = function(): void {
     .returns(projectDetailsReturnArray);
 
   let projectTokenInfoReturnArray: Array<ethereum.Value> = [
-    ethereum.Value.fromAddress(TEST_PROJECT.contract), // artistAddress
+    ethereum.Value.fromAddress(Address.fromString(TEST_PROJECT.contract)), // artistAddress
     ethereum.Value.fromSignedBigInt(BigInt.fromString("100000000")), // pricePerTokenInWei
     ethereum.Value.fromSignedBigInt(
       BigInt.fromString(TEST_PROJECT.invocations)
@@ -246,13 +280,15 @@ export const mockOGProjectContractCalls = function(): void {
       BigInt.fromString(TEST_PROJECT.maxInvocations)
     ), // maxInvocations
     ethereum.Value.fromBoolean(TEST_PROJECT.active), // active
-    ethereum.Value.fromAddress(TEST_PROJECT.additionalPayee), // additionalPayee
+    ethereum.Value.fromAddress(
+      Address.fromString(TEST_PROJECT.additionalPayee)
+    ), // additionalPayee
     ethereum.Value.fromSignedBigInt(
       BigInt.fromString(TEST_PROJECT.additionalPayeePercentage)
     )
   ]; // additionalPayeePercentage
   createMockedFunction(
-    TEST_PROJECT.contract,
+    Address.fromString(TEST_PROJECT.contract),
     "projectTokenInfo",
     "projectTokenInfo(uint256):(address,uint256,uint256,uint256,bool,address,uint256)"
   )
@@ -270,7 +306,7 @@ export const mockOGProjectContractCalls = function(): void {
     ethereum.Value.fromBoolean(TEST_PROJECT.paused) // paused
   ];
   createMockedFunction(
-    TEST_PROJECT.contract,
+    Address.fromString(TEST_PROJECT.contract),
     "projectScriptInfo",
     "projectScriptInfo(uint256):(string,uint256,uint256,string,bool,bool)"
   )
@@ -289,7 +325,7 @@ export const mockPBABProjectContractCalls = function(): void {
     ethereum.Value.fromString("string7") // license
   ];
   createMockedFunction(
-    TEST_PROJECT.contract,
+    Address.fromString(TEST_PROJECT.contract),
     "projectDetails",
     "projectDetails(uint256):(string,string,string,string,string)"
   )
@@ -299,7 +335,7 @@ export const mockPBABProjectContractCalls = function(): void {
     .returns(projectDetailsReturnArray);
 
   let projectTokenInfoReturnArray: Array<ethereum.Value> = [
-    ethereum.Value.fromAddress(TEST_PROJECT.contract), // artistAddress
+    ethereum.Value.fromAddress(Address.fromString(TEST_PROJECT.contract)), // artistAddress
     ethereum.Value.fromSignedBigInt(BigInt.fromString("100000000")), // pricePerTokenInWei
     ethereum.Value.fromSignedBigInt(
       BigInt.fromString(TEST_PROJECT.invocations)
@@ -308,15 +344,17 @@ export const mockPBABProjectContractCalls = function(): void {
       BigInt.fromString(TEST_PROJECT.maxInvocations)
     ), // maxInvocations
     ethereum.Value.fromBoolean(TEST_PROJECT.active), // active
-    ethereum.Value.fromAddress(TEST_PROJECT.additionalPayee), // additionalPayee
+    ethereum.Value.fromAddress(
+      Address.fromString(TEST_PROJECT.additionalPayee)
+    ), // additionalPayee
     ethereum.Value.fromSignedBigInt(
       BigInt.fromString(TEST_PROJECT.additionalPayeePercentage)
     ), // additionalPayeePercentage
     ethereum.Value.fromString(TEST_PROJECT.currencySymbol), // currency
-    ethereum.Value.fromAddress(TEST_PROJECT.currencyAddress)
+    ethereum.Value.fromAddress(Address.fromString(TEST_PROJECT.currencyAddress))
   ]; // currencyAddress
   createMockedFunction(
-    TEST_PROJECT.contract,
+    Address.fromString(TEST_PROJECT.contract),
     "projectTokenInfo",
     "projectTokenInfo(uint256):(address,uint256,uint256,uint256,bool,address,uint256,string,address)"
   )
@@ -333,7 +371,7 @@ export const mockPBABProjectContractCalls = function(): void {
     ethereum.Value.fromBoolean(TEST_PROJECT.paused)
   ]; // paused
   createMockedFunction(
-    TEST_PROJECT.contract,
+    Address.fromString(TEST_PROJECT.contract),
     "projectScriptInfo",
     "projectScriptInfo(uint256):(string,uint256,string,bool,bool)"
   )
@@ -350,7 +388,7 @@ export const mockRefreshProjectScript = function(): void {
     ethereum.Value.fromSignedBigInt(BigInt.fromString("0"))
   ]; // _index;
   createMockedFunction(
-    TEST_PROJECT.contract,
+    Address.fromString(TEST_PROJECT.contract),
     "projectScriptByIndex",
     "projectScriptByIndex(uint256,uint256):(string)"
   )
@@ -361,7 +399,7 @@ export const mockRefreshProjectScript = function(): void {
 // helper mock function to initialize a Project entity in local in-memory store
 export const createProjectToLoad = function(): void {
   let newProjectCall = changetype<AddProjectCall>(newMockCall());
-  newProjectCall.to = TEST_PROJECT.contract;
+  newProjectCall.to = Address.fromString(TEST_PROJECT.contract);
   newProjectCall.block.timestamp = BigInt.fromString("1232");
 
   newProjectCall.inputValues = [
