@@ -492,7 +492,11 @@ dataSources:
       abis:
         - name: MinterDALinV0
           file: ./abis/MinterDALinV0.json
-      # todo - add event handlers when defined
+      eventHandlers: 
+        - event: SetAuctionDetails(uint256 indexed projectId, uint256 _auctionTimestampStart, uint256 _auctionTimestampEnd, uint256 _startPrice, uint256 _basePrice)
+          handler: handleSetAuctionDetails
+        - event: ResetAuctionDetails(uint256 indexed projectId)
+          handler: handleResetAuctionDetails
       file: ./src/minter-suite-mapping.ts
   {{/minterDALinV0Contracts}}
   {{#minterDAExpV0Contracts}}
@@ -516,7 +520,11 @@ dataSources:
       abis:
         - name: MinterDAExpV0
           file: ./abis/MinterDAExpV0.json
-      # todo - add event handlers when defined
+      eventHandlers: 
+        - event: SetAuctionDetails(uint256 indexed projectId, uint256 _auctionTimestampStart, uint256 _auctionTimestampEnd, uint256 _startPrice, uint256 _basePrice)
+          handler: handleSetAuctionDetails
+        - event: ResetAuctionDetails(uint256 indexed projectId)
+          handler: handleResetAuctionDetails
       file: ./src/minter-suite-mapping.ts
   {{/minterDAExpV0Contracts}}
   {{#openSeaContract}}
