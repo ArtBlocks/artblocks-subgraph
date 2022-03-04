@@ -13,6 +13,7 @@ generated/*
 !generated/GenArt721Core2
 !generated/GenArt721Core2PBAB
 !generated/GenArt721CorePlus
+!generated/MinterFilterV0
 !generated/MinterDAExpV0
 !generated/MinterDALinV0
 !generated/MinterSetPriceERC20V0
