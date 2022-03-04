@@ -236,6 +236,7 @@ export function handleAddProject(call: AddProjectCall): void {
   project.complete = false;
   project.createdAt = timestamp;
   project.updatedAt = timestamp;
+  project.useIpfs = false;
 
   project.save();
 

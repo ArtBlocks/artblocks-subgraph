@@ -31,6 +31,18 @@
     {
       "address": "0xf17A2577eFaA269E02d2cFBEB15dfE9860C90A38",
       "name": "ARTCODE"
+    },
+    {
+      "address": "0x0583379345586d5219cA842c6eC463f8cdDdBC84",
+      "name": "MechSuit"
+    },
+    {
+      "address": "0xD06A5109bEdEf92696B29FcC0F6184640b19c310",
+      "name": "Colors and Shapes"
+    },
+    {
+      "address": "0x0711A9767a41290D7f52714204618345C584f450",
+      "name": "Legends of Metaterra"
     }
   ],
   "startBlock": 10760915
