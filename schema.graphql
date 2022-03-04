@@ -218,7 +218,7 @@ type MinterFilter @entity {
   id: ID!
 
   "Associated core contract"
-  contract: Contract!
+  coreContract: Contract!
 
   "Minters allowlisted on MinterFilter"
   minterAllowlist: [Minter!]!
@@ -251,6 +251,8 @@ type Minter @entity {
 
   "Maximum allowed half life in seconds (exponential Dutch auction minters)"
   maximumHalfLifeInSeconds: BigInt
+
+  updatedAt: BigInt!
 }
 
 type ProjectMinterConfiguration @entity {
