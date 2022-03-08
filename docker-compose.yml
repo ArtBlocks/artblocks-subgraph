@@ -1,0 +1,28 @@
+version: '3'
+services:
+  graph-node:
+    image: graphprotocol/graph-node
+    ports:
+      - '8000:8000'
+      - '8001:8001'
+      - '8020:8020'
+      - '8030:8030'
+      - '8040:8040'
+    depends_on:
+      - ipfs
+    environment:
+      postgres_host: graph-node-ropsten.cpcbg45ipljv.us-east-1.rds.amazonaws.com
+      postgres_port: 5432
+      postgres_user: postgres
+      postgres_pass: 
+      postgres_db: postgres
+      ipfs: 'ipfs:5001'
+      ethereum: 'ropsten:https://eth-ropsten.alchemyapi.io/v2/JYC-mHQq1cZThzB3QHn7M7klIQtYpU8O'
+      GRAPH_LOG: info
+  ipfs:
+    image: ipfs/go-ipfs:v0.4.23
+    ports:
+      - '5001:5001'
+    volumes:
+      - ./data/ipfs:/data/ipfs
+ 

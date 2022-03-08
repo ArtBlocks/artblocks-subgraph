@@ -18,6 +18,7 @@
     "prepare:mainnet-with-secondary": "mustache config/mainnet-with-secondary.json subgraph.template.yaml > subgraph.yaml",
     "prepare:ropsten-dev": "mustache config/ropsten-dev.json subgraph.template.yaml > subgraph.yaml",
     "prepare:ropsten-staging": "mustache config/ropsten-staging.json subgraph.template.yaml > subgraph.yaml",
+    "prepare:ropsten-staging-local": "mustache config/ropsten-staging.json subgraph-local.template.yaml > subgraph.yaml",
     "prepare:palm": "mustache config/palm.json subgraph.template.yaml > subgraph.yaml",
     "prepare:local": "mustache config/local.json subgraph.template.yaml > subgraph.yaml"
   },
