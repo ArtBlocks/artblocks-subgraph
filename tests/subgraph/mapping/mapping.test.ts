@@ -3,29 +3,40 @@ import {
   clearStore,
   test,
   newMockCall,
+  logStore,
   createMockedFunction
 } from "matchstick-as/assembly/index";
 import { Address, BigInt, ethereum } from "@graphprotocol/graph-ts";
-import { meridianScript } from "../meridianScript";
+import { meridianScript } from "../../meridianScript";
 import {
-  mockRefreshContractCalls,
-  mockOGProjectContractCalls,
-  mockRefreshProjectScript,
   createProjectToLoad,
   createTokenToLoad,
+  mockRefreshProjectScript,
   TEST_PROJECT,
   ACCOUNT_ENTITY_TYPE,
   PROJECT_ENTITY_TYPE,
   CONTRACT_ENTITY_TYPE,
   WHITELISTING_ENTITY_TYPE,
   PROJECTSCRIPT_ENTITY_TYPE,
-  TOKEN_ENTITY_TYPE
+  TOKEN_ENTITY_TYPE,
+  currentBlock,
+  TEST_CONTRACT
+} from "../shared-mocks";
+
+import {
+  mockRefreshContractCalls,
+  mockProjectTokenInfoCall,
+  mockProjectScriptInfoCall,
+  mockProjectDetailsCall
 } from "./mocks";
-import { Token } from "../../generated/schema";
+
+import { Token } from "../../../generated/schema";
 import {
   AddProjectCall,
   AddWhitelistedCall,
   RemoveWhitelistedCall,
+  AddMintWhitelistedCall,
+  UpdateRandomizerAddressCall,
   UpdateArtblocksAddressCall,
   UpdateArtblocksPercentageCall,
   AddProjectScriptCall,
@@ -36,12 +47,14 @@ import {
   ToggleProjectIsDynamicCall,
   ToggleProjectIsLockedCall,
   ToggleProjectIsPausedCall,
+  ToggleProjectUseHashStringCall,
   ToggleProjectUseIpfsForStaticCall,
   UpdateProjectAdditionalPayeeInfoCall,
   UpdateProjectArtistAddressCall,
   UpdateProjectArtistNameCall,
   UpdateProjectBaseIpfsURICall,
   UpdateProjectBaseURICall,
+  UpdateProjectCurrencyInfoCall,
   UpdateProjectDescriptionCall,
   UpdateProjectIpfsHashCall,
   UpdateProjectLicenseCall,
@@ -50,13 +63,16 @@ import {
   UpdateProjectPricePerTokenInWeiCall,
   UpdateProjectWebsiteCall,
   UpdateProjectSecondaryMarketRoyaltyPercentageCall,
+  RemoveMintWhitelistedCall,
   UpdateProjectScriptCall,
   UpdateProjectScriptJSONCall
-} from "../../generated/GenArt721/GenArt721";
+} from "../../../generated/GenArt721Core/GenArt721Core";
 import {
   handleAddProject,
   handleAddWhitelisted,
   handleRemoveWhitelisted,
+  handleAddMintWhitelisted,
+  handleUpdateRandomizerAddress,
   handleUpdateArtblocksAddress,
   handleUpdateArtblocksPercentage,
   handleAddProjectScript,
@@ -67,12 +83,14 @@ import {
   handleToggleProjectIsDynamic,
   handleToggleProjectIsLocked,
   handleToggleProjectIsPaused,
+  handleToggleProjectUseHashString,
   handleToggleProjectUseIpfsForStatic,
   handleUpdateProjectAdditionalPayeeInfo,
   handleUpdateProjectArtistAddress,
   handleUpdateProjectArtistName,
   handleUpdateProjectBaseIpfsURI,
   handleUpdateProjectBaseURI,
+  handleUpdateProjectCurrencyInfo,
   handleUpdateProjectDescription,
   handleUpdateProjectIpfsHash,
   handleUpdateProjectLicense,
@@ -81,64 +99,76 @@ import {
   handleUpdateProjectPricePerTokenInWei,
   handleUpdateProjectWebsite,
   handleUpdateProjectSecondaryMarketRoyaltyPercentage,
+  handleRemoveMintWhitelisted,
   handleUpdateProjectScript,
   handleUpdateProjectScriptJSON
-} from "../../src/original-mapping";
+} from "../../../src/mapping";
 
-test("OG: Can add a new project", () => {
-  clearStore();
+test("Can add a new project", () => {
   mockRefreshContractCalls();
-  mockOGProjectContractCalls();
+  mockProjectTokenInfoCall();
+  mockProjectDetailsCall();
+  mockProjectScriptInfoCall();
+
   let call = changetype<AddProjectCall>(newMockCall());
-  call.to = Address.fromString(TEST_PROJECT.contract);
-  call.block.timestamp = BigInt.fromString("1230");
+  call.to = Address.fromString(TEST_CONTRACT.id);
+  call.block.timestamp = currentBlock;
 
   call.inputValues = [
-    new ethereum.EventParam("projectName", ethereum.Value.fromString("Ringer")),
+    new ethereum.EventParam(
+      "projectName",
+      ethereum.Value.fromString(TEST_PROJECT.name)
+    ),
     new ethereum.EventParam(
       "artistAddress",
       ethereum.Value.fromString(TEST_PROJECT.artistAddress)
     ),
     new ethereum.EventParam(
       "pricePerTokenInWei",
-      ethereum.Value.fromString("123")
+      ethereum.Value.fromString(TEST_PROJECT.pricePerTokenInWei)
     )
   ];
 
   handleAddProject(call);
 
+  // Account created for artist
   assert.fieldEquals(
     ACCOUNT_ENTITY_TYPE,
-    TEST_PROJECT.contract,
+    TEST_CONTRACT.id,
     "id",
-    TEST_PROJECT.contract
+    TEST_PROJECT.artistAddress
+  );
+
+  // Contract setup in refreshContracts
+  assert.fieldEquals(
+    CONTRACT_ENTITY_TYPE,
+    TEST_CONTRACT.id,
+    "admin",
+    TEST_CONTRACT.admin
   );
 
   assert.fieldEquals(
     CONTRACT_ENTITY_TYPE,
-    TEST_PROJECT.contract,
-    "admin",
-    TEST_PROJECT.admin
-  );
-  assert.fieldEquals(
-    CONTRACT_ENTITY_TYPE,
-    TEST_PROJECT.contract,
+    TEST_CONTRACT.id,
     "renderProviderAddress",
-    TEST_PROJECT.contract
+    TEST_CONTRACT.renderProviderAddress
   );
+
   assert.fieldEquals(
     CONTRACT_ENTITY_TYPE,
-    TEST_PROJECT.contract,
+    TEST_CONTRACT.id,
     "createdAt",
-    "1230"
+    currentBlock.toString()
   );
+
   assert.fieldEquals(
     CONTRACT_ENTITY_TYPE,
-    TEST_PROJECT.contract,
+    TEST_CONTRACT.id,
     "nextProjectId",
     "101"
   );
 
+  // Initial project fields
   assert.fieldEquals(
     PROJECT_ENTITY_TYPE,
     TEST_PROJECT.id,
@@ -151,7 +181,7 @@ test("OG: Can add a new project", () => {
     PROJECT_ENTITY_TYPE,
     TEST_PROJECT.id,
     "artistAddress",
-    TEST_PROJECT.contract
+    TEST_PROJECT.artistAddress
   );
   assert.fieldEquals(
     PROJECT_ENTITY_TYPE,
@@ -163,13 +193,13 @@ test("OG: Can add a new project", () => {
     PROJECT_ENTITY_TYPE,
     TEST_PROJECT.id,
     "pricePerTokenInWei",
-    "100000000"
+    TEST_PROJECT.pricePerTokenInWei
   );
 
   clearStore();
 });
 
-test("OG: Can add whitelisting to a contract and account", () => {
+test("Can add whitelisting to a contract and account", () => {
   let call = changetype<AddWhitelistedCall>(newMockCall());
 
   call.to = Address.fromString(TEST_PROJECT.contract);
@@ -236,7 +266,7 @@ test("OG: Can add whitelisting to a contract and account", () => {
   clearStore();
 });
 
-test("OG: Can remove whitelisting", () => {
+test("Can remove whitelisting", () => {
   let callToAddWhitelist = changetype<AddWhitelistedCall>(newMockCall());
   let callToRemoveWhitelist = changetype<RemoveWhitelistedCall>(newMockCall());
   let addr1 = Address.fromString(TEST_PROJECT.artistAddress);
@@ -279,7 +309,124 @@ test("OG: Can remove whitelisting", () => {
   clearStore();
 });
 
-test("OG: Can update ArtBlocks address", () => {
+test("Can add and mint whitelisted call", () => {
+  let call = changetype<AddMintWhitelistedCall>(newMockCall());
+  let addr1 = Address.fromString(TEST_PROJECT.artistAddress);
+
+  call.to = Address.fromString(TEST_PROJECT.contract);
+  call.block.timestamp = BigInt.fromString("1231");
+  call.inputValues = [
+    new ethereum.EventParam("_address", ethereum.Value.fromAddress(addr1))
+  ];
+
+  mockRefreshContractCalls();
+
+  handleAddMintWhitelisted(call);
+
+  assert.fieldEquals(
+    CONTRACT_ENTITY_TYPE,
+    TEST_PROJECT.contract,
+    "id",
+    TEST_PROJECT.contract
+  );
+  assert.fieldEquals(
+    CONTRACT_ENTITY_TYPE,
+    TEST_PROJECT.contract,
+    "mintWhitelisted",
+    "[0x1233973f9aea61250e98b697246cb10146903672]"
+  );
+
+  assert.notInStore(
+    WHITELISTING_ENTITY_TYPE,
+    "0xa7d8d9ef8d8ce8992df33d8b8cf4aebabd5bd270-0x1233973f9aea61250e98b697246cb10146903672"
+  );
+  clearStore();
+});
+
+test("Can remove a mint whitelisted address", () => {
+  mockRefreshContractCalls();
+
+  let addWhitelistCall = changetype<AddMintWhitelistedCall>(newMockCall());
+  addWhitelistCall.to = Address.fromString(TEST_PROJECT.contract);
+  addWhitelistCall.block.timestamp = BigInt.fromString("1230");
+  addWhitelistCall.inputValues = [
+    new ethereum.EventParam(
+      "_address",
+      ethereum.Value.fromAddress(Address.fromString(TEST_PROJECT.artistAddress))
+    )
+  ];
+
+  let removeWhitelistCall = changetype<RemoveMintWhitelistedCall>(
+    newMockCall()
+  );
+  removeWhitelistCall.to = Address.fromString(TEST_PROJECT.contract);
+  removeWhitelistCall.block.timestamp = BigInt.fromString("1231");
+  removeWhitelistCall.inputValues = [
+    new ethereum.EventParam(
+      "_address",
+      ethereum.Value.fromAddress(Address.fromString(TEST_PROJECT.artistAddress))
+    )
+  ];
+
+  handleAddMintWhitelisted(addWhitelistCall);
+  addWhitelistCall.inputValues = [
+    new ethereum.EventParam(
+      "_address",
+      ethereum.Value.fromAddress(
+        Address.fromString("0x1233973f9aea61250e98b697246cb10146912345")
+      )
+    )
+  ];
+  handleAddMintWhitelisted(addWhitelistCall);
+
+  assert.fieldEquals(
+    CONTRACT_ENTITY_TYPE,
+    TEST_PROJECT.contract,
+    "mintWhitelisted",
+    "[0x1233973f9aea61250e98b697246cb10146903672, 0x1233973f9aea61250e98b697246cb10146912345]"
+  );
+  handleRemoveMintWhitelisted(removeWhitelistCall);
+
+  assert.fieldEquals(
+    CONTRACT_ENTITY_TYPE,
+    TEST_PROJECT.contract,
+    "mintWhitelisted",
+    "[0x1233973f9aea61250e98b697246cb10146912345]"
+  );
+
+  clearStore();
+});
+
+test("Can update randomizer address", () => {
+  let call = changetype<UpdateRandomizerAddressCall>(newMockCall());
+
+  call.to = Address.fromString(TEST_PROJECT.contract);
+  call.block.timestamp = BigInt.fromString("1230");
+  let addr = Address.fromString(TEST_PROJECT.artistAddress);
+  call.inputValues = [
+    new ethereum.EventParam("_address", ethereum.Value.fromAddress(addr))
+  ];
+
+  mockRefreshContractCalls();
+
+  handleUpdateRandomizerAddress(call);
+  assert.fieldEquals(
+    CONTRACT_ENTITY_TYPE,
+    TEST_PROJECT.contract,
+    "id",
+    TEST_PROJECT.contract
+  );
+  assert.fieldEquals(
+    CONTRACT_ENTITY_TYPE,
+    TEST_PROJECT.contract,
+    "randomizerContract",
+    TEST_PROJECT.contract
+  );
+
+  clearStore();
+});
+
+test("Can update ArtBlocks address", () => {
   let call = changetype<UpdateArtblocksAddressCall>(newMockCall());
 
   call.to = Address.fromString(TEST_PROJECT.contract);
@@ -309,7 +456,7 @@ test("OG: Can update ArtBlocks address", () => {
   clearStore();
 });
 
-test("OG: Can update ArtBlocks percentage", () => {
+test("Can update ArtBlocks percentage", () => {
   let call = changetype<UpdateArtblocksPercentageCall>(newMockCall());
 
   call.to = Address.fromString(TEST_PROJECT.contract);
@@ -339,10 +486,9 @@ test("OG: Can update ArtBlocks percentage", () => {
   clearStore();
 });
 
-test("OG: Can handle add project script", () => {
-  clearStore();
+test("Can handle add project script", () => {
   mockRefreshContractCalls();
-  mockOGProjectContractCalls();
+  mockProjectContractCalls();
   mockRefreshProjectScript();
 
   // mock a full Project entity before refreshing an existing script
@@ -354,7 +500,7 @@ test("OG: Can handle add project script", () => {
   refreshScriptCall.inputValues = [
     new ethereum.EventParam(
       "_projectId",
-      ethereum.Value.fromSignedBigInt(BigInt.fromString(TEST_PROJECT.projectId))
+      ethereum.Value.fromSignedBigInt(BigInt.fromString("99"))
     ),
     new ethereum.EventParam(
       "_script",
@@ -380,7 +526,7 @@ test("OG: Can handle add project script", () => {
   clearStore();
 });
 
-test("OG: Can clear a Token IPFS image uri", () => {
+test("Can clear a Token IPFS image uri", () => {
   let call = changetype<ClearTokenIpfsImageUriCall>(newMockCall());
 
   call.to = Address.fromString(TEST_PROJECT.contract);
@@ -418,7 +564,7 @@ test("OG: Can clear a Token IPFS image uri", () => {
   clearStore();
 });
 
-test("OG: Can override token dynamic image with IPFS link", () => {
+test("Can override token dynamic image with IPFS link", () => {
   let call = changetype<OverrideTokenDynamicImageWithIpfsLinkCall>(
     newMockCall()
   );
@@ -462,9 +608,9 @@ test("OG: Can override token dynamic image with IPFS link", () => {
   clearStore();
 });
 
-test("OG: Can remove and update a project's last script", () => {
+test("Can remove and update a project's last script", () => {
   mockRefreshContractCalls();
-  mockOGProjectContractCalls();
+  mockProjectContractCalls();
   mockRefreshProjectScript();
 
   let call = changetype<RemoveProjectLastScriptCall>(newMockCall());
@@ -474,7 +620,7 @@ test("OG: Can remove and update a project's last script", () => {
   call.inputValues = [
     new ethereum.EventParam(
       "_projectId",
-      ethereum.Value.fromSignedBigInt(BigInt.fromString(TEST_PROJECT.projectId))
+      ethereum.Value.fromSignedBigInt(BigInt.fromString("99"))
     )
   ];
 
@@ -484,7 +630,7 @@ test("OG: Can remove and update a project's last script", () => {
   refreshScriptCall.inputValues = [
     new ethereum.EventParam(
       "_projectId",
-      ethereum.Value.fromSignedBigInt(BigInt.fromString(TEST_PROJECT.projectId))
+      ethereum.Value.fromSignedBigInt(BigInt.fromString("99"))
     ),
     new ethereum.EventParam(
       "_script",
@@ -527,9 +673,9 @@ test("OG: Can remove and update a project's last script", () => {
   clearStore();
 });
 
-test("OG: Can toggle if a project is active", () => {
+test("Can toggle if a project is active", () => {
   mockRefreshContractCalls();
-  mockOGProjectContractCalls();
+  mockProjectContractCalls();
 
   createProjectToLoad();
 
@@ -540,7 +686,7 @@ test("OG: Can toggle if a project is active", () => {
   call.inputValues = [
     new ethereum.EventParam(
       "_projectId",
-      ethereum.Value.fromSignedBigInt(BigInt.fromString(TEST_PROJECT.projectId))
+      ethereum.Value.fromSignedBigInt(BigInt.fromString("99"))
     )
   ];
 
@@ -565,9 +711,9 @@ test("OG: Can toggle if a project is active", () => {
   clearStore();
 });
 
-test("OG: Can toggle if a project is dynamic", () => {
+test("Can toggle if a project is dynamic", () => {
   mockRefreshContractCalls();
-  mockOGProjectContractCalls();
+  mockProjectContractCalls();
 
   createProjectToLoad();
 
@@ -578,7 +724,7 @@ test("OG: Can toggle if a project is dynamic", () => {
   call.inputValues = [
     new ethereum.EventParam(
       "_projectId",
-      ethereum.Value.fromSignedBigInt(BigInt.fromString(TEST_PROJECT.projectId))
+      ethereum.Value.fromSignedBigInt(BigInt.fromString("99"))
     )
   ];
 
@@ -608,9 +754,9 @@ test("OG: Can toggle if a project is dynamic", () => {
   clearStore();
 });
 
-test("OG: Can toggle if a project is locked", () => {
+test("Can toggle if a project is locked", () => {
   mockRefreshContractCalls();
-  mockOGProjectContractCalls();
+  mockProjectContractCalls();
 
   createProjectToLoad();
 
@@ -621,7 +767,7 @@ test("OG: Can toggle if a project is locked", () => {
   call.inputValues = [
     new ethereum.EventParam(
       "_projectId",
-      ethereum.Value.fromSignedBigInt(BigInt.fromString(TEST_PROJECT.projectId))
+      ethereum.Value.fromSignedBigInt(BigInt.fromString("99"))
     )
   ];
 
@@ -641,9 +787,9 @@ test("OG: Can toggle if a project is locked", () => {
   clearStore();
 });
 
-test("OG: Can toggle if a project is paused", () => {
+test("Can toggle if a project is paused", () => {
   mockRefreshContractCalls();
-  mockOGProjectContractCalls();
+  mockProjectContractCalls();
 
   createProjectToLoad();
 
@@ -654,7 +800,7 @@ test("OG: Can toggle if a project is paused", () => {
   call.inputValues = [
     new ethereum.EventParam(
       "_projectId",
-      ethereum.Value.fromSignedBigInt(BigInt.fromString(TEST_PROJECT.projectId))
+      ethereum.Value.fromSignedBigInt(BigInt.fromString("99"))
     )
   ];
 
@@ -674,9 +820,46 @@ test("OG: Can toggle if a project is paused", () => {
   clearStore();
 });
 
-test("OG: Can toggle if a project uses Ipfs", () => {
+test("Can toggle a project's useHashString", () => {
   mockRefreshContractCalls();
-  mockOGProjectContractCalls();
+  mockProjectContractCalls();
+
+  createProjectToLoad();
+
+  let call = changetype<ToggleProjectUseHashStringCall>(newMockCall());
+
+  call.to = Address.fromString(TEST_PROJECT.contract);
+  call.block.timestamp = BigInt.fromString("230");
+  call.inputValues = [
+    new ethereum.EventParam(
+      "_projectId",
+      ethereum.Value.fromSignedBigInt(BigInt.fromString("99"))
+    )
+  ];
+
+  handleToggleProjectUseHashString(call);
+  assert.fieldEquals(
+    PROJECT_ENTITY_TYPE,
+    TEST_PROJECT.id,
+    "useHashString",
+    "false"
+  );
+
+  handleToggleProjectUseHashString(call);
+
+  assert.fieldEquals(
+    PROJECT_ENTITY_TYPE,
+    TEST_PROJECT.id,
+    "useHashString",
+    "true"
+  );
+
+  clearStore();
+});
+
+test("Can toggle if a project uses Ipfs", () => {
+  mockRefreshContractCalls();
+  mockProjectContractCalls();
 
   createProjectToLoad();
 
@@ -687,7 +870,7 @@ test("OG: Can toggle if a project uses Ipfs", () => {
   call.inputValues = [
     new ethereum.EventParam(
       "_projectId",
-      ethereum.Value.fromSignedBigInt(BigInt.fromString(TEST_PROJECT.projectId))
+      ethereum.Value.fromSignedBigInt(BigInt.fromString("99"))
     )
   ];
 
@@ -705,9 +888,9 @@ test("OG: Can toggle if a project uses Ipfs", () => {
   clearStore();
 });
 
-test("OG: Can update a projects additional payee info", () => {
+test("Can update a projects additional payee info", () => {
   mockRefreshContractCalls();
-  mockOGProjectContractCalls();
+  mockProjectContractCalls();
 
   createProjectToLoad();
 
@@ -718,7 +901,7 @@ test("OG: Can update a projects additional payee info", () => {
   call.inputValues = [
     new ethereum.EventParam(
       "_projectId",
-      ethereum.Value.fromSignedBigInt(BigInt.fromString(TEST_PROJECT.projectId))
+      ethereum.Value.fromSignedBigInt(BigInt.fromString("99"))
     ),
     new ethereum.EventParam(
       "_additionalPayee",
@@ -751,10 +934,10 @@ test("OG: Can update a projects additional payee info", () => {
   clearStore();
 });
 
-test("OG: Can update a projects artist address", () => {
+test("Can update a projects artist address", () => {
   clearStore();
   mockRefreshContractCalls();
-  mockOGProjectContractCalls();
+  mockProjectContractCalls();
 
   createProjectToLoad();
 
@@ -765,7 +948,7 @@ test("OG: Can update a projects artist address", () => {
   call.inputValues = [
     new ethereum.EventParam(
       "_projectId",
-      ethereum.Value.fromSignedBigInt(BigInt.fromString(TEST_PROJECT.projectId))
+      ethereum.Value.fromSignedBigInt(BigInt.fromString("99"))
     ),
     new ethereum.EventParam(
       "_artistAddress",
@@ -794,9 +977,9 @@ test("OG: Can update a projects artist address", () => {
   clearStore();
 });
 
-test("OG: Can update a projects artist name", () => {
+test("Can update a projects artist name", () => {
   mockRefreshContractCalls();
-  mockOGProjectContractCalls();
+  mockProjectContractCalls();
 
   createProjectToLoad();
 
@@ -811,7 +994,7 @@ test("OG: Can update a projects artist name", () => {
     ),
     new ethereum.EventParam(
       "_projectArtistName",
-      ethereum.Value.fromString("Beeple")
+      ethereum.Value.fromString(TEST_PROJECT.artistName)
     )
   ];
 
@@ -821,16 +1004,16 @@ test("OG: Can update a projects artist name", () => {
     PROJECT_ENTITY_TYPE,
     TEST_PROJECT.id,
     "artistName",
-    "Beeple"
+    TEST_PROJECT.artistName
   );
   assert.fieldEquals(PROJECT_ENTITY_TYPE, TEST_PROJECT.id, "updatedAt", "230");
 
   clearStore();
 });
 
-test("OG: Can update a projects base Ipfs URI", () => {
+test("Can update a projects base Ipfs URI", () => {
   mockRefreshContractCalls();
-  mockOGProjectContractCalls();
+  mockProjectContractCalls();
 
   createProjectToLoad();
 
@@ -841,7 +1024,7 @@ test("OG: Can update a projects base Ipfs URI", () => {
   call.inputValues = [
     new ethereum.EventParam(
       "_projectId",
-      ethereum.Value.fromSignedBigInt(BigInt.fromString(TEST_PROJECT.projectId))
+      ethereum.Value.fromSignedBigInt(BigInt.fromString("99"))
     ),
     new ethereum.EventParam(
       "_projectBaseIpfsURI",
@@ -863,9 +1046,9 @@ test("OG: Can update a projects base Ipfs URI", () => {
   clearStore();
 });
 
-test("OG: Can update a projects base URI", () => {
+test("Can update a projects base URI", () => {
   mockRefreshContractCalls();
-  mockOGProjectContractCalls();
+  mockProjectContractCalls();
 
   createProjectToLoad();
 
@@ -876,7 +1059,7 @@ test("OG: Can update a projects base URI", () => {
   call.inputValues = [
     new ethereum.EventParam(
       "_projectId",
-      ethereum.Value.fromSignedBigInt(BigInt.fromString(TEST_PROJECT.projectId))
+      ethereum.Value.fromSignedBigInt(BigInt.fromString("99"))
     ),
     new ethereum.EventParam(
       "_newBaseURI",
@@ -896,9 +1079,62 @@ test("OG: Can update a projects base URI", () => {
   clearStore();
 });
 
-test("OG: Can update a projects description", () => {
+test("Can update a projects currency info", () => {
   mockRefreshContractCalls();
-  mockOGProjectContractCalls();
+  mockProjectContractCalls();
+
+  createProjectToLoad();
+
+  let call = changetype<UpdateProjectCurrencyInfoCall>(newMockCall());
+
+  call.to = Address.fromString(TEST_PROJECT.contract);
+  call.block.timestamp = BigInt.fromString("230");
+  call.inputValues = [
+    new ethereum.EventParam(
+      "_projectId",
+      ethereum.Value.fromSignedBigInt(BigInt.fromString("99"))
+    ),
+    new ethereum.EventParam(
+      "_currencySymbol",
+      ethereum.Value.fromString("SOS")
+    ),
+    new ethereum.EventParam(
+      "_currencyAddress",
+      ethereum.Value.fromAddress(
+        Address.fromString("0x3b484b82567a09e2588A13D54D032153f0c0aEe0")
+      )
+    )
+  ];
+
+  assert.fieldEquals(
+    PROJECT_ENTITY_TYPE,
+    TEST_PROJECT.id,
+    "currencySymbol",
+    TEST_PROJECT.currencySymbol
+  );
+
+  handleUpdateProjectCurrencyInfo(call);
+
+  assert.fieldEquals(
+    PROJECT_ENTITY_TYPE,
+    TEST_PROJECT.id,
+    "currencySymbol",
+    "SOS"
+  );
+  assert.fieldEquals(
+    PROJECT_ENTITY_TYPE,
+    TEST_PROJECT.id,
+    "currencyAddress",
+    "0x3b484b82567a09e2588a13d54d032153f0c0aee0"
+  );
+  assert.fieldEquals(PROJECT_ENTITY_TYPE, TEST_PROJECT.id, "updatedAt", "230");
+
+  clearStore();
+});
+
+test("Can update a projects description", () => {
+  mockRefreshContractCalls();
+  mockProjectContractCalls();
 
   createProjectToLoad();
 
@@ -909,11 +1145,11 @@ test("OG: Can update a projects description", () => {
   call.inputValues = [
     new ethereum.EventParam(
       "_projectId",
-      ethereum.Value.fromSignedBigInt(BigInt.fromString(TEST_PROJECT.projectId))
+      ethereum.Value.fromSignedBigInt(BigInt.fromString("99"))
     ),
     new ethereum.EventParam(
       "_projectDescription",
-      ethereum.Value.fromString("Template description blah blah blah")
+      ethereum.Value.fromString(TEST_PROJECT.projectDescription)
     )
   ];
 
@@ -923,16 +1159,16 @@ test("OG: Can update a projects description", () => {
     PROJECT_ENTITY_TYPE,
     TEST_PROJECT.id,
     "description",
-    "Template description blah blah blah"
+    TEST_PROJECT.projectDescription
   );
   assert.fieldEquals(PROJECT_ENTITY_TYPE, TEST_PROJECT.id, "updatedAt", "230");
 
   clearStore();
 });
 
-test("OG: Can update a projects IPFS Hash", () => {
+test("Can update a projects IPFS Hash", () => {
   mockRefreshContractCalls();
-  mockOGProjectContractCalls();
+  mockProjectContractCalls();
 
   createProjectToLoad();
 
@@ -943,7 +1179,7 @@ test("OG: Can update a projects IPFS Hash", () => {
   call.inputValues = [
     new ethereum.EventParam(
       "_projectId",
-      ethereum.Value.fromSignedBigInt(BigInt.fromString(TEST_PROJECT.projectId))
+      ethereum.Value.fromSignedBigInt(BigInt.fromString("99"))
     ),
     new ethereum.EventParam(
       "_ipfsHash",
@@ -966,9 +1202,9 @@ test("OG: Can update a projects IPFS Hash", () => {
   clearStore();
 });
 
-test("OG: Can update a project license", () => {
+test("Can update a project license", () => {
   mockRefreshContractCalls();
-  mockOGProjectContractCalls();
+  mockProjectContractCalls();
 
   createProjectToLoad();
 
@@ -979,11 +1215,11 @@ test("OG: Can update a project license", () => {
   call.inputValues = [
     new ethereum.EventParam(
       "_projectId",
-      ethereum.Value.fromSignedBigInt(BigInt.fromString(TEST_PROJECT.projectId))
+      ethereum.Value.fromSignedBigInt(BigInt.fromString("99"))
     ),
     new ethereum.EventParam(
       "_projectLicense",
-      ethereum.Value.fromString("MIT License - please copy if you want")
+      ethereum.Value.fromString(TEST_PROJECT.projectLicense)
     )
   ];
 
@@ -993,16 +1229,16 @@ test("OG: Can update a project license", () => {
     PROJECT_ENTITY_TYPE,
     TEST_PROJECT.id,
     "license",
-    "MIT License - please copy if you want"
+    TEST_PROJECT.projectLicense
   );
   assert.fieldEquals(PROJECT_ENTITY_TYPE, TEST_PROJECT.id, "updatedAt", "230");
 
   clearStore();
 });
 
-test("OG: Can update a project max invocations", () => {
+test("Can update a project max invocations", () => {
   mockRefreshContractCalls();
-  mockOGProjectContractCalls();
+  mockProjectContractCalls();
 
   createProjectToLoad();
 
@@ -1013,7 +1249,7 @@ test("OG: Can update a project max invocations", () => {
   call.inputValues = [
     new ethereum.EventParam(
       "_projectId",
-      ethereum.Value.fromSignedBigInt(BigInt.fromString(TEST_PROJECT.projectId))
+      ethereum.Value.fromSignedBigInt(BigInt.fromString("99"))
     ),
     new ethereum.EventParam(
       "_maxInvocations",
@@ -1041,9 +1277,9 @@ test("OG: Can update a project max invocations", () => {
   clearStore();
 });
 
-test("OG: Can update a project name", () => {
+test("Can update a project name", () => {
   mockRefreshContractCalls();
-  mockOGProjectContractCalls();
+  mockProjectContractCalls();
 
   createProjectToLoad();
 
@@ -1054,7 +1290,7 @@ test("OG: Can update a project name", () => {
   call.inputValues = [
     new ethereum.EventParam(
       "_projectId",
-      ethereum.Value.fromSignedBigInt(BigInt.fromString(TEST_PROJECT.projectId))
+      ethereum.Value.fromSignedBigInt(BigInt.fromString("99"))
     ),
     new ethereum.EventParam(
       "_projectName",
@@ -1071,9 +1307,9 @@ test("OG: Can update a project name", () => {
   clearStore();
 });
 
-test("OG: Can update a project price per token in wei", () => {
+test("Can update a project price per token in wei", () => {
   mockRefreshContractCalls();
-  mockOGProjectContractCalls();
+  mockProjectContractCalls();
 
   createProjectToLoad();
 
@@ -1084,7 +1320,7 @@ test("OG: Can update a project price per token in wei", () => {
   call.inputValues = [
     new ethereum.EventParam(
       "_projectId",
-      ethereum.Value.fromSignedBigInt(BigInt.fromString(TEST_PROJECT.projectId))
+      ethereum.Value.fromSignedBigInt(BigInt.fromString("99"))
     ),
     new ethereum.EventParam(
       "_pricePerTokenInWei",
@@ -1111,10 +1347,10 @@ test("OG: Can update a project price per token in wei", () => {
   clearStore();
 });
 
-test("OG: Can handleUpdateProjectScript", () => {
+test("Can handleUpdateProjectScript", () => {
   clearStore();
   mockRefreshContractCalls();
-  mockOGProjectContractCalls();
+  mockProjectContractCalls();
   mockRefreshProjectScript();
   createProjectToLoad();
 
@@ -1125,7 +1361,7 @@ test("OG: Can handleUpdateProjectScript", () => {
   call.inputValues = [
     new ethereum.EventParam(
       "_projectId",
-      ethereum.Value.fromSignedBigInt(BigInt.fromString(TEST_PROJECT.projectId))
+      ethereum.Value.fromSignedBigInt(BigInt.fromString("99"))
     ),
     new ethereum.EventParam(
       "_scriptId",
@@ -1168,10 +1404,10 @@ test("OG: Can handleUpdateProjectScript", () => {
   clearStore();
 });
 
-test("OG: Can handleUpdateProjectScriptJSON", () => {
+test("Can handleUpdateProjectScriptJSON", () => {
   clearStore();
   mockRefreshContractCalls();
-  mockOGProjectContractCalls();
+  mockProjectContractCalls();
   mockRefreshProjectScript();
 
   createProjectToLoad();
@@ -1183,7 +1419,7 @@ test("OG: Can handleUpdateProjectScriptJSON", () => {
   call.inputValues = [
     new ethereum.EventParam(
       "_projectId",
-      ethereum.Value.fromSignedBigInt(BigInt.fromString(TEST_PROJECT.projectId))
+      ethereum.Value.fromSignedBigInt(BigInt.fromString("99"))
     ),
     new ethereum.EventParam(
       "_projectScriptJSON",
@@ -1204,10 +1440,10 @@ test("OG: Can handleUpdateProjectScriptJSON", () => {
   clearStore();
 });
 
-test("OG: Can update project secondary market royalties", () => {
+test("Can update project secondary market royalties", () => {
   clearStore();
   mockRefreshContractCalls();
-  mockOGProjectContractCalls();
+  mockProjectContractCalls();
 
   createProjectToLoad();
 
@@ -1220,7 +1456,7 @@ test("OG: Can update project secondary market royalties", () => {
   call.inputValues = [
     new ethereum.EventParam(
       "_projectId",
-      ethereum.Value.fromSignedBigInt(BigInt.fromString(TEST_PROJECT.projectId))
+      ethereum.Value.fromSignedBigInt(BigInt.fromString("99"))
     ),
     new ethereum.EventParam(
       "_secondMarketRoyalty",
@@ -1241,10 +1477,10 @@ test("OG: Can update project secondary market royalties", () => {
   clearStore();
 });
 
-test("OG: Can update a project website", () => {
+test("Can update a project website", () => {
   clearStore();
   mockRefreshContractCalls();
-  mockOGProjectContractCalls();
+  mockProjectContractCalls();
 
   createProjectToLoad();
 
@@ -1255,7 +1491,7 @@ test("OG: Can update a project website", () => {
   call.inputValues = [
     new ethereum.EventParam(
       "_projectId",
-      ethereum.Value.fromSignedBigInt(BigInt.fromString(TEST_PROJECT.projectId))
+      ethereum.Value.fromSignedBigInt(BigInt.fromString("99"))
     ),
     new ethereum.EventParam(
       "_projectWebsite",
