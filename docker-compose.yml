@@ -24,5 +24,8 @@ services:
     ports:
       - '5001:5001'
     volumes:
-      - ./data/ipfs:/data/ipfs
+      - ipfs:/data/ipfs
+volumes:
+  ipfs:
+
  
