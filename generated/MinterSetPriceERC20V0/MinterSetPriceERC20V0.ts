@@ -49,12 +49,12 @@ export class ProjectCurrencyInfoUpdated__Params {
     return this._event.parameters[0].value.toBigInt();
   }
 
-  get _currencySymbol(): Bytes {
-    return this._event.parameters[1].value.toBytes();
+  get _currencyAddress(): Address {
+    return this._event.parameters[1].value.toAddress();
   }
 
-  get _currencyAddress(): Address {
-    return this._event.parameters[2].value.toAddress();
+  get _currencySymbol(): string {
+    return this._event.parameters[2].value.toString();
   }
 }
 

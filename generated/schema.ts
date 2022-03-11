@@ -1225,7 +1225,6 @@ export class MinterFilter extends Entity {
     this.set("id", Value.fromString(id));
 
     this.set("coreContract", Value.fromString(""));
-    this.set("minterAllowlist", Value.fromStringArray(new Array(0)));
     this.set("updatedAt", Value.fromBigInt(BigInt.zero()));
   }
 
@@ -1290,6 +1289,7 @@ export class Minter extends Entity {
 
     this.set("type", Value.fromString(""));
     this.set("minterFilter", Value.fromString(""));
+    this.set("coreContract", Value.fromString(""));
     this.set("updatedAt", Value.fromBigInt(BigInt.zero()));
   }
 
@@ -1389,6 +1389,15 @@ export class Minter extends Entity {
     } else {
       this.set("maximumHalfLifeInSeconds", Value.fromBigInt(<BigInt>value));
     }
+  }
+
+  get coreContract(): string {
+    let value = this.get("coreContract");
+    return value!.toString();
+  }
+
+  set coreContract(value: string) {
+    this.set("coreContract", Value.fromString(value));
   }
 
   get updatedAt(): BigInt {

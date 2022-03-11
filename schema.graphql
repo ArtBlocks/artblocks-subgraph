@@ -221,7 +221,7 @@ type MinterFilter @entity {
   coreContract: Contract!
 
   "Minters allowlisted on MinterFilter"
-  minterAllowlist: [Minter!]!
+  minterAllowlist: [Minter!]! @derivedFrom(field: "minterFilter")
 
   updatedAt: BigInt!
 }
@@ -251,6 +251,8 @@ type Minter @entity {
 
   "Maximum allowed half life in seconds (exponential Dutch auction minters)"
   maximumHalfLifeInSeconds: BigInt
+
+  coreContract: Contract!
 
   updatedAt: BigInt!
 }

@@ -28,7 +28,7 @@ import {
   ProjectMinterConfiguration
 } from "../generated/schema";
 
-import { generateContractSpecificId } from "./helpers";
+import { generateContractSpecificId, loadOrCreateMinter } from "./helpers";
 
 export function handleIsCanonicalMinterFilter(
   event: IsCanonicalMinterFilter
@@ -117,25 +117,10 @@ export function handleMinterApproved(event: MinterApproved): void {
     event.block.timestamp
   );
 
-  let minter = new Minter(event.params._minterAddress.toHexString());
-  minter.minterFilter = event.address.toHexString();
-  minter.type = event.params._minterType.toString();
-
-  if (event.params._minterType.toString() === "MinterDALinV0") {
-    let minterDALinV0Contract = MinterDALinV0.bind(event.params._minterAddress);
-    minter.minimumAuctionLengthInSeconds = minterDALinV0Contract.minimumAuctionLengthSeconds();
-  }
-
-  if (event.params._minterType.toString() === "MinterDAExpV0") {
-    let MinterDAExpV0Contract = MinterDAExpV0.bind(event.params._minterAddress);
-    minter.minimumHalfLifeInSeconds = MinterDAExpV0Contract.minimumPriceDecayHalfLifeSeconds();
-    minter.maximumHalfLifeInSeconds = MinterDAExpV0Contract.maximumPriceDecayHalfLifeSeconds();
-  }
+  loadOrCreateMinter(event.params._minterAddress, event.block.timestamp);
 
   minterFilter.updatedAt = event.block.timestamp;
-
-  minter.updatedAt = event.block.timestamp;
-  minter.save();
+  minterFilter.save();
 }
 
 export function handleMinterRevoked(event: MinterRevoked): void {
@@ -177,7 +162,7 @@ export function handleProjectMinterRegistered(
 
     // Create project configuration
     let minterAddress = event.params._minterAddress;
-    let minterType = event.params._minterType.toString();
+    let minterType = event.params._minterType;
 
     createAndPopulateProjectMinterConfiguration(
       project,
@@ -221,9 +206,18 @@ function createAndPopulateProjectMinterConfiguration(
   minterType: string,
   timestamp: BigInt
 ): ProjectMinterConfiguration {
+  // Bootstrap minter if it doesn't exist already
+  loadOrCreateMinter(minterAddress, timestamp);
+
   let projectMinterConfig = new ProjectMinterConfiguration(project.id);
   projectMinterConfig.project = project.id;
   projectMinterConfig.minter = minterAddress.toHexString();
+
+  // We're using MinterSetPriceV0 in place of a generic filtered minter here
+  let filteredMinterContract = MinterSetPriceV0.bind(minterAddress);
+  projectMinterConfig.purchaseToDisabled = filteredMinterContract.purchaseToDisabled(
+    project.projectId
+  );
 
   let projectPriceInfo: GetPriceInfoResult;
 
@@ -304,14 +298,16 @@ function loadOrCreateMinterFilter(
   timestamp: BigInt
 ): MinterFilter {
   let minterFilter = MinterFilter.load(minterFilterAddress.toHexString());
-  if (!minterFilter) {
-    minterFilter = new MinterFilter(minterFilterAddress.toHexString());
-    let minterFilterContract = MinterFilterV0.bind(minterFilterAddress);
-    let coreContractAddress = minterFilterContract.genArt721CoreAddress();
-    minterFilter.coreContract = coreContractAddress.toHexString();
-    minterFilter.updatedAt = timestamp;
-    minterFilter.save();
+  if (minterFilter) {
+    return minterFilter;
   }
+
+  minterFilter = new MinterFilter(minterFilterAddress.toHexString());
+  let minterFilterContract = MinterFilterV0.bind(minterFilterAddress);
+  let coreContractAddress = minterFilterContract.genArt721CoreAddress();
+  minterFilter.coreContract = coreContractAddress.toHexString();
+  minterFilter.updatedAt = timestamp;
+  minterFilter.save();
 
   return minterFilter;
 }

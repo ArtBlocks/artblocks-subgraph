@@ -418,11 +418,11 @@ dataSources:
       eventHandlers:
         - event: IsCanonicalMinterFilter(indexed address)
           handler: handleIsCanonicalMinterFilter
-        - event: MinterApproved(indexed address,indexed string)
+        - event: MinterApproved(indexed address,string)
           handler: handleMinterApproved
         - event: MinterRevoked(indexed address)
           handler: handleMinterRevoked
-        - event: ProjectMinterRegistered(indexed uint256,indexed address,indexed string)
+        - event: ProjectMinterRegistered(indexed uint256,indexed address,string)
           handler: handleProjectMinterRegistered
         - event: ProjectMinterRemoved(indexed uint256)
           handler: handleProjectMinterRemoved
@@ -449,10 +449,12 @@ dataSources:
       abis:
         - name: MinterSetPriceERC20V0
           file: ./abis/MinterSetPriceERC20V0.json
+        - name: IFilteredMinterV0
+          file: ./abis/IFilteredMinterV0.json
       eventHandlers:
         - event: PricePerTokenInWeiUpdated(indexed uint256,indexed uint256)
           handler: handlePricePerTokenInWeiUpdated
-        - event: ProjectCurrencyInfoUpdated(indexed uint256,indexed string,indexed address)
+        - event: ProjectCurrencyInfoUpdated(indexed uint256,indexed address,string)
           handler: handleProjectCurrencyInfoUpdated
         - event: PurchaseToDisabledUpdated(indexed uint256,bool)
           handler: handlePurchaseToDisabledUpdated
@@ -484,10 +486,12 @@ dataSources:
       abis:
         - name: MinterSetPriceV0
           file: ./abis/MinterSetPriceV0.json
+        - name: IFilteredMinterV0
+          file: ./abis/IFilteredMinterV0.json
       eventHandlers:
         - event: PricePerTokenInWeiUpdated(indexed uint256,indexed uint256)
           handler: handlePricePerTokenInWeiUpdated
-        - event: ProjectCurrencyInfoUpdated(indexed uint256,indexed string,indexed address)
+        - event: ProjectCurrencyInfoUpdated(indexed uint256,indexed address,string)
           handler: handleProjectCurrencyInfoUpdated
         - event: PurchaseToDisabledUpdated(indexed uint256,bool)
           handler: handlePurchaseToDisabledUpdated
@@ -514,12 +518,14 @@ dataSources:
       abis:
         - name: MinterDALinV0
           file: ./abis/MinterDALinV0.json
+        - name: IFilteredMinterV0
+          file: ./abis/IFilteredMinterV0.json
       eventHandlers:
         - event: MinimumAuctionLengthSecondsUpdated(uint256)
           handler: handleMinimumAuctionLengthSecondsUpdated
         - event: PricePerTokenInWeiUpdated(indexed uint256,indexed uint256)
           handler: handlePricePerTokenInWeiUpdated
-        - event: ProjectCurrencyInfoUpdated(indexed uint256,indexed string,indexed address)
+        - event: ProjectCurrencyInfoUpdated(indexed uint256,indexed address,string)
           handler: handleProjectCurrencyInfoUpdated
         - event: PurchaseToDisabledUpdated(indexed uint256,bool)
           handler: handlePurchaseToDisabledUpdated
@@ -550,12 +556,14 @@ dataSources:
       abis:
         - name: MinterDAExpV0
           file: ./abis/MinterDAExpV0.json
+        - name: IFilteredMinterV0
+          file: ./abis/IFilteredMinterV0.json
       eventHandlers:
         - event: AuctionHalfLifeRangeSecondsUpdated(uint256,uint256)
           handler: handleAuctionHalfLifeRangeSecondsUpdated
         - event: PricePerTokenInWeiUpdated(indexed uint256,indexed uint256)
           handler: handlePricePerTokenInWeiUpdated
-        - event: ProjectCurrencyInfoUpdated(indexed uint256,indexed string,indexed address)
+        - event: ProjectCurrencyInfoUpdated(indexed uint256,indexed address,string)
           handler: handleProjectCurrencyInfoUpdated
         - event: PurchaseToDisabledUpdated(indexed uint256,bool)
           handler: handlePurchaseToDisabledUpdated

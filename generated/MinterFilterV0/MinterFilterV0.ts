@@ -45,8 +45,8 @@ export class MinterApproved__Params {
     return this._event.parameters[0].value.toAddress();
   }
 
-  get _minterType(): Bytes {
-    return this._event.parameters[1].value.toBytes();
+  get _minterType(): string {
+    return this._event.parameters[1].value.toString();
   }
 }
 
@@ -89,8 +89,8 @@ export class ProjectMinterRegistered__Params {
     return this._event.parameters[1].value.toAddress();
   }
 
-  get _minterType(): Bytes {
-    return this._event.parameters[2].value.toBytes();
+  get _minterType(): string {
+    return this._event.parameters[2].value.toString();
   }
 }
 
