@@ -415,6 +415,16 @@ dataSources:
       abis:
         - name: MinterFilterV0
           file: ./abis/MinterFilterV0.json
+        - name: IFilteredMinterV0
+          file: ./abis/IFilteredMinterV0.json
+        - name: MinterSetPriceERC20V0
+          file: ./abis/MinterSetPriceERC20V0.json
+        - name: MinterSetPriceV0
+          file: ./abis/MinterSetPriceV0.json
+        - name: MinterDALinV0
+          file: ./abis/MinterDALinV0.json
+        - name: MinterDAExpV0
+          file: ./abis/MinterDAExpV0.json
       eventHandlers:
         - event: IsCanonicalMinterFilter(indexed address)
           handler: handleIsCanonicalMinterFilter

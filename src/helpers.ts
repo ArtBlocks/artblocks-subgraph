@@ -1,8 +1,6 @@
 import { Address, BigInt } from "@graphprotocol/graph-ts";
 import { MinterDAExpV0 } from "../generated/MinterDAExpV0/MinterDAExpV0";
 import { MinterDALinV0 } from "../generated/MinterDALinV0/MinterDALinV0";
-import { MinterSetPriceERC20V0 } from "../generated/MinterSetPriceERC20V0/MinterSetPriceERC20V0";
-import { MinterSetPriceV0 } from "../generated/MinterSetPriceV0/MinterSetPriceV0";
 import { IFilteredMinterV0 } from "../generated/MinterSetPriceV0/IFilteredMinterV0";
 import { Minter } from "../generated/schema";
 

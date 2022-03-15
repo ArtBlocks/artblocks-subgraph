@@ -1,10 +1,4 @@
-import {
-  BigInt,
-  store,
-  Address,
-  TypedMap,
-  ethereum
-} from "@graphprotocol/graph-ts";
+import { BigInt, store, Address } from "@graphprotocol/graph-ts";
 
 import {
   MinterFilterV0,
@@ -29,6 +23,7 @@ import {
 } from "../generated/schema";
 
 import { generateContractSpecificId, loadOrCreateMinter } from "./helpers";
+import { IFilteredMinterV0 } from "../generated/MinterSetPriceV0/IFilteredMinterV0";
 
 export function handleIsCanonicalMinterFilter(
   event: IsCanonicalMinterFilter
@@ -41,19 +36,9 @@ export function handleIsCanonicalMinterFilter(
     return;
   }
 
-  // Only set the minter filter on the core contract if it is whitelisted
-  let minterFilterIsWhitelisted = false;
-  for (let i = 0; i < coreContract.mintWhitelisted.length; i++) {
-    if (coreContract.mintWhitelisted[i] == event.address) {
-      minterFilterIsWhitelisted = true;
-      break;
-    }
-  }
-
-  if (!minterFilterIsWhitelisted) {
-    return;
-  }
-
+  // Note: there's a guard on the function that emits this event
+  // so we can assume that this MinterFilter is whitelisted on the
+  // associated core contract
   let minterFilter = MinterFilter.load(event.address.toHexString());
   if (!minterFilter) {
     minterFilter = new MinterFilter(event.address.toHexString());
@@ -62,7 +47,8 @@ export function handleIsCanonicalMinterFilter(
     minterFilter.save();
   }
 
-  // Reset the minter config for all projects on core contract when a new minter filter is set
+  // Reset the minter config for all projects on core contract
+  // when a new minter filter is set
   let nextProjectId = coreContract.nextProjectId.toI32();
   for (let i = 0; i < nextProjectId; i++) {
     let fullProjectId = coreContract.id + "-" + i.toString();
@@ -124,6 +110,9 @@ export function handleMinterApproved(event: MinterApproved): void {
 }
 
 export function handleMinterRevoked(event: MinterRevoked): void {
+  // Note: there's a guard on the function that only allows a minter
+  // to be revoked if it is not set for any project. This means that
+  // we can avoid resetting any minter config for a project here.
   store.remove("Minter", event.params._minterAddress.toHexString());
   let minterFilter = MinterFilter.load(event.address.toHexString());
   if (minterFilter) {
@@ -197,6 +186,10 @@ export function handleProjectMinterRemoved(event: ProjectMinterRemoved): void {
 
   if (project) {
     store.remove("ProjectMinterConfiguration", project.id);
+    if (project.minterConfiguration) {
+      project.minterConfiguration = null;
+      project.updatedAt = event.block.timestamp;
+    }
   }
 }
 
@@ -214,19 +207,15 @@ function createAndPopulateProjectMinterConfiguration(
   projectMinterConfig.minter = minterAddress.toHexString();
 
   // We're using MinterSetPriceV0 in place of a generic filtered minter here
-  let filteredMinterContract = MinterSetPriceV0.bind(minterAddress);
-  projectMinterConfig.purchaseToDisabled = filteredMinterContract.purchaseToDisabled(
-    project.projectId
-  );
-
-  let projectPriceInfo: GetPriceInfoResult;
+  let filteredMinterContract = IFilteredMinterV0.bind(minterAddress);
+  let projectPriceInfo = filteredMinterContract.getPriceInfo(project.projectId);
+  projectMinterConfig.priceIsConfigured = projectPriceInfo.value0;
+  projectMinterConfig.basePrice = projectPriceInfo.value1;
+  projectMinterConfig.currencySymbol = projectPriceInfo.value2;
+  projectMinterConfig.currencyAddress = projectPriceInfo.value3;
 
   if (minterType === "MinterDALinV0") {
     let minterDALinV0Contract = MinterDALinV0.bind(minterAddress);
-
-    projectPriceInfo = changetype<GetPriceInfoResult>(
-      minterDALinV0Contract.getPriceInfo(project.projectId)
-    );
 
     let projectAuctionParameters = minterDALinV0Contract.projectAuctionParameters(
       project.projectId
@@ -236,12 +225,12 @@ function createAndPopulateProjectMinterConfiguration(
     projectMinterConfig.endTime = projectAuctionParameters.value1;
     projectMinterConfig.startPrice = projectAuctionParameters.value2;
     projectMinterConfig.basePrice = projectAuctionParameters.value3;
+
+    projectMinterConfig.purchaseToDisabled = minterDALinV0Contract.purchaseToDisabled(
+      project.projectId
+    );
   } else if (minterType == "MinterDAExpV0") {
     let minterDAExpV0Contract = MinterDAExpV0.bind(minterAddress);
-
-    projectPriceInfo = changetype<GetPriceInfoResult>(
-      minterDAExpV0Contract.getPriceInfo(project.projectId)
-    );
 
     let projectAuctionParameters = minterDAExpV0Contract.projectAuctionParameters(
       project.projectId
@@ -251,46 +240,33 @@ function createAndPopulateProjectMinterConfiguration(
     projectMinterConfig.halfLifeSeconds = projectAuctionParameters.value1;
     projectMinterConfig.startPrice = projectAuctionParameters.value2;
     projectMinterConfig.basePrice = projectAuctionParameters.value3;
+
+    projectMinterConfig.purchaseToDisabled = minterDAExpV0Contract.purchaseToDisabled(
+      project.projectId
+    );
   } else if (minterType == "MinterSetPriceV0") {
     let minterSetPriceV0Contract = MinterSetPriceV0.bind(minterAddress);
 
-    projectPriceInfo = changetype<GetPriceInfoResult>(
-      minterSetPriceV0Contract.getPriceInfo(project.projectId)
+    projectMinterConfig.purchaseToDisabled = minterSetPriceV0Contract.purchaseToDisabled(
+      project.projectId
     );
   } else if (minterType == "MinterSetPriceERC20V0") {
     let minterSetPriceERC20V0Contract = MinterSetPriceERC20V0.bind(
       minterAddress
     );
 
-    projectPriceInfo = changetype<GetPriceInfoResult>(
-      minterSetPriceERC20V0Contract.getPriceInfo(project.projectId)
+    projectMinterConfig.purchaseToDisabled = minterSetPriceERC20V0Contract.purchaseToDisabled(
+      project.projectId
     );
   }
 
-  if (projectPriceInfo) {
-    setProjectMinterConfigurationPriceInfo(
-      projectMinterConfig,
-      projectPriceInfo
-    );
-  }
+  projectMinterConfig.save();
 
   project.updatedAt = timestamp;
   project.minterConfiguration = projectMinterConfig.id;
   project.save();
 
   return projectMinterConfig;
-}
-
-function setProjectMinterConfigurationPriceInfo(
-  projectMinterConfig: ProjectMinterConfiguration,
-  priceInfo: GetPriceInfoResult
-): void {
-  projectMinterConfig.priceIsConfigured = priceInfo.value0;
-  projectMinterConfig.basePrice = priceInfo.value1;
-  projectMinterConfig.currencySymbol = priceInfo.value2;
-  projectMinterConfig.currencyAddress = priceInfo.value3;
-
-  projectMinterConfig.save();
 }
 
 function loadOrCreateMinterFilter(
@@ -310,33 +286,4 @@ function loadOrCreateMinterFilter(
   minterFilter.save();
 
   return minterFilter;
-}
-
-// Generic version of classes generated for each contract getPriceInfo function
-class GetPriceInfoResult {
-  value0: boolean;
-  value1: BigInt;
-  value2: string;
-  value3: Address;
-
-  constructor(
-    value0: boolean,
-    value1: BigInt,
-    value2: string,
-    value3: Address
-  ) {
-    this.value0 = value0;
-    this.value1 = value1;
-    this.value2 = value2;
-    this.value3 = value3;
-  }
-
-  toMap(): TypedMap<string, ethereum.Value> {
-    let map = new TypedMap<string, ethereum.Value>();
-    map.set("value0", ethereum.Value.fromBoolean(this.value0));
-    map.set("value1", ethereum.Value.fromUnsignedBigInt(this.value1));
-    map.set("value2", ethereum.Value.fromString(this.value2));
-    map.set("value3", ethereum.Value.fromAddress(this.value3));
-    return map;
-  }
 }

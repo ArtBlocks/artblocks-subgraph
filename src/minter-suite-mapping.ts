@@ -98,7 +98,10 @@ function loadMinterProjectAndConfig(
   let minter = loadOrCreateMinter(minterAddress, timestamp);
 
   let project = Project.load(
-    generateContractSpecificId(minterAddress, projectId)
+    generateContractSpecificId(
+      Address.fromString(minter.coreContract),
+      projectId
+    )
   );
   if (!project) {
     return null;
