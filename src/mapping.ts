@@ -9,6 +9,8 @@ import {
   ByteArray
 } from "@graphprotocol/graph-ts";
 
+import { log as testLog } from "matchstick-as";
+
 import {
   GenArt721Core,
   Mint,
@@ -190,6 +192,9 @@ export function handleAddProject(call: AddProjectCall): void {
     }
   } else {
     projectId = contractEntity.nextProjectId;
+    contractEntity.nextProjectId = contractEntity.nextProjectId.plus(
+      BigInt.fromI32(1)
+    );
   }
 
   let projectDetails = contract.projectDetails(projectId);
@@ -219,32 +224,29 @@ export function handleAddProject(call: AddProjectCall): void {
     generateContractSpecificId(contractAddress, projectId)
   );
 
-  project.contract = contractAddress.toHexString();
-  project.artist = artist.id;
-  project.projectId = projectId;
-  project.name = name;
-  project.dynamic = dynamic;
-  project.artistAddress = artistAddress;
-  project.pricePerTokenInWei = pricePerTokenInWei;
-  project.invocations = invocations;
-  project.maxInvocations = maxInvocations;
-  project.currencySymbol = currencySymbol;
-  project.scriptCount = scriptCount;
-  project.useHashString = useHashString;
-  project.paused = paused;
   project.active = false;
-  project.locked = false;
+  project.artist = artist.id;
+  project.artistAddress = artistAddress;
   project.complete = false;
+  project.contract = contractAddress.toHexString();
   project.createdAt = timestamp;
+  project.currencySymbol = currencySymbol;
+  project.dynamic = dynamic;
+  project.invocations = invocations;
+  project.locked = false;
+  project.maxInvocations = maxInvocations;
+  project.name = name;
+  project.paused = paused;
+  project.pricePerTokenInWei = pricePerTokenInWei;
+  project.projectId = projectId;
+  project.scriptCount = scriptCount;
   project.updatedAt = timestamp;
+  project.useHashString = useHashString;
   project.useIpfs = false;
 
   project.save();
 
   if (contractEntity) {
-    contractEntity.nextProjectId = contractEntity.nextProjectId.plus(
-      BigInt.fromI32(1)
-    );
     contractEntity.updatedAt = call.block.timestamp;
     contractEntity.save();
   }

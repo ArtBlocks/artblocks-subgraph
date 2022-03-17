@@ -1,14 +1,20 @@
+import { createMockedFunction, log } from "matchstick-as/assembly/index";
 import {
-  createMockedFunction,
-  newMockCall
-} from "matchstick-as/assembly/index";
-import { Address, BigInt, ethereum } from "@graphprotocol/graph-ts";
-import { meridianScript } from "../meridianScript";
-import { AddProjectCall } from "../../generated/GenArt721Core/GenArt721Core";
-import { handleAddProject } from "../../src/mapping";
+  Address,
+  BigInt,
+  ethereum,
+  crypto,
+  ByteArray
+} from "@graphprotocol/graph-ts";
 import { Token } from "../../generated/schema";
 import { generateContractSpecificId } from "../../src/helpers";
-import { NULL_ADDRESS } from "../../src/constants";
+
+export const ACCOUNT_ENTITY_TYPE = "Account";
+export const PROJECT_ENTITY_TYPE = "Project";
+export const CONTRACT_ENTITY_TYPE = "Contract";
+export const WHITELISTING_ENTITY_TYPE = "Whitelisting";
+export const PROJECTSCRIPT_ENTITY_TYPE = "ProjectScript";
+export const TOKEN_ENTITY_TYPE = "Token";
 
 const ONE_MILLION = 1000000;
 
@@ -19,126 +25,114 @@ export const genArt721CoreAddress =
   "0xa7d8d9ef8d8ce8992df33d8b8cf4aebabd5bd270";
 export const genArt721Core2PBABAddress =
   "0x28f2d3805652fb5d359486dffb7d08320d403240";
-export const randomizerAddress = "0x35549b4b0cc71ef151a1eaa1fd08ddfb9a608a81";
-export const minterAddress = "0xe28458729c17572977f929895e6f1f240bd0a39f";
-export const minterFilterAddress = "0xb542b9a72b1e91fb3745e93e6d8e5b6985a9aac0";
-export const createdAtBlock = 11338811;
-export const currentBlock = 11338815;
-export const adminAddress = "0x9f8f72aa9304c8b593d555f12ef6589cc3a579a2";
-export const artistAddress = "0xe28458729c17572977f929895e6f1f240bd0a39f";
-export const renderProviderAddress =
-  "0xf7a55108a6e830a809e88e74cbf5f5de9d930153";
 
-class ContractValues {
-  admin: string;
-  createdAt: string;
-  id: string;
-  mintWhitelisted: string[];
-  nextProjectId: string;
-  randomizerContract: string;
-  renderProviderAddress: string;
-  renderProviderPercentage: string;
-  updatedAt: string;
+export const RANDOMIZER_ADDRESS = Address.fromString(
+  "0x35549b4b0cc71ef151a1eaa1fd08ddfb9a608a81"
+);
+export const CURRENT_BLOCK_TIMESTAMP = BigInt.fromI32(1647051214);
+
+export class ContractValues {
+  admin: Address;
+  mintWhitelisted: Address[];
+  randomizerContract: Address;
+  renderProviderAddress: Address;
+  renderProviderPercentage: BigInt;
 }
 
-export const TEST_CONTRACT: ContractValues = {
-  id: genArt721Address,
-  admin: adminAddress,
-  renderProviderPercentage: "10",
-  renderProviderAddress: renderProviderAddress,
-  createdAt: createdAtBlock.toString(),
-  updatedAt: createdAtBlock.toString(),
-  nextProjectId: "0",
-  mintWhitelisted: ["0xe28458729c17572977f929895e6f1f240bd0a39f"],
-  randomizerContract: randomizerAddress
-};
-
 // These should be used to set return values for mock calls
-class DefaultProjectValues {
+export class DefaultProjectValues {
   active: boolean;
-  additionalPayeeAddress: string;
-  additionalPayeePercentage: string;
+  additionalPayeeAddress: Address;
+  additionalPayeePercentage: BigInt;
   artistName: string;
   baseIpfsUri: string;
   baseUri: string;
   complete: boolean;
-  currencyAddress: string;
+  currencyAddress: Address;
   currencySymbol: string;
   description: string;
   dynamic: boolean;
-  invocations: string;
+  invocations: BigInt;
   ipfsHash: string;
   license: string;
   locked: boolean;
-  maxInvocations: string;
+  maxInvocations: BigInt;
   paused: boolean;
-  royaltyPercentage: string;
-  scriptCount: string;
+  royaltyPercentage: BigInt;
+  scriptCount: BigInt;
   scriptJSON: string;
   useHashString: boolean;
   useIpfs: boolean;
   website: string;
 }
 
+// These represent the values that would be returned by a
+// GenArt721Core contract for a newly created project. They
+// are returned in type that we would expect from a contract
+// call in a handler function.
 export const DEFAULT_PROJECT_VALUES: DefaultProjectValues = {
   active: false,
-  additionalPayeeAddress: NULL_ADDRESS,
-  additionalPayeePercentage: "0",
+  additionalPayeeAddress: Address.zero(),
+  additionalPayeePercentage: BigInt.fromI32(0),
   artistName: "",
   baseIpfsUri: "",
   baseUri: "",
   complete: false,
-  currencyAddress: NULL_ADDRESS,
+  currencyAddress: Address.zero(),
   currencySymbol: "ETH",
   description: "",
   dynamic: true,
-  invocations: "0",
+  invocations: BigInt.zero(),
   ipfsHash: "",
   license: "",
   locked: false,
-  maxInvocations: ONE_MILLION.toString(),
+  maxInvocations: BigInt.fromI32(ONE_MILLION),
   paused: true,
-  royaltyPercentage: "0",
-  scriptCount: "0",
+  royaltyPercentage: BigInt.zero(),
+  scriptCount: BigInt.zero(),
   scriptJSON: "",
   useHashString: true,
   useIpfs: false,
   website: ""
 };
 
-export const ACCOUNT_ENTITY_TYPE = "Account";
-export const PROJECT_ENTITY_TYPE = "Project";
-export const CONTRACT_ENTITY_TYPE = "Contract";
-export const WHITELISTING_ENTITY_TYPE = "Whitelisting";
-export const PROJECTSCRIPT_ENTITY_TYPE = "ProjectScript";
-export const TOKEN_ENTITY_TYPE = "Token";
+export function booleanToString(b: bool): string {
+  return b ? "true" : "false";
+}
 
-// helper mock function to initialize a Project entity in local in-memory store
-export const createProjectToLoad = function(): void {
-  let newProjectCall = changetype<AddProjectCall>(newMockCall());
-  newProjectCall.to = Address.fromString(DEFAULT_PROJECT_VALUES.contract);
-  newProjectCall.block.timestamp = BigInt.fromString("1232");
+/** Start PRNG */
+// Random keccak256 hash
+const hash = crypto.keccak256(ByteArray.fromUTF8("testhash")).toHexString();
 
-  newProjectCall.inputValues = [
-    new ethereum.EventParam(
-      "projectName",
-      ethereum.Value.fromString(DEFAULT_PROJECT_VALUES.name)
-    ),
-    new ethereum.EventParam(
-      "artistAddress",
-      ethereum.Value.fromString(DEFAULT_PROJECT_VALUES.artistAddress)
-    ),
-    new ethereum.EventParam(
-      "pricePerTokenInWei",
-      ethereum.Value.fromString(DEFAULT_PROJECT_VALUES.pricePerTokenInWei)
-    )
-  ];
+// state of the PRNG
+const xs_state: Array<i32> = [0, 0, 0, 0].map<i32>((_, i) =>
+  I32.parseInt(hash.substr(i * 8 + 2, 8), 16)
+);
 
-  handleAddProject(newProjectCall);
+const prng = (): i64 => {
+  /* Algorithm "xor128" from p. 5 of Marsaglia, "Xorshift RNGs" */
+  let s = xs_state[3];
+  let t = xs_state[3];
+  xs_state[3] = xs_state[2];
+  xs_state[2] = xs_state[1];
+  xs_state[1] = s = xs_state[0];
+  t ^= t << 11;
+  t ^= t >>> 8;
+  xs_state[0] = t ^ s ^ (s >>> 19);
+  return xs_state[0] / 0x100000000;
 };
+/** End PRNG */
+
+export function generateRandomAddress(): Address {
+  const randomHash = crypto
+    .keccak256(ByteArray.fromI64(i64(Math.floor(f64(prng()) * 1000))))
+    .toHexString();
+
+  return Address.fromString(randomHash.slice(0, 42));
+}
 
 // helper mock function to initialize a Token entity in local in-memory store
-export const createTokenToLoad = function(
+export const addNewTokenToStore = function(
   address: Address,
   tokenId: BigInt
 ): void {
@@ -148,18 +142,21 @@ export const createTokenToLoad = function(
 };
 
 // mocks return values for Soldity contract calls in refreshProjectScript() helper function
-export const mockRefreshProjectScript = function(): void {
+export const mockProjectScriptByIndex = function(
+  contractAddress: Address,
+  projectId: BigInt,
+  index: BigInt,
+  script: string | null
+): void {
   let projectScriptByIndexInputs: Array<ethereum.Value> = [
-    ethereum.Value.fromSignedBigInt(
-      BigInt.fromString(DEFAULT_PROJECT_VALUES.projectId)
-    ), // projectId
-    ethereum.Value.fromSignedBigInt(BigInt.fromString("0"))
-  ]; // _index;
+    ethereum.Value.fromSignedBigInt(projectId), // projectId
+    ethereum.Value.fromSignedBigInt(index) // index
+  ];
   createMockedFunction(
-    Address.fromString(DEFAULT_PROJECT_VALUES.contract),
+    contractAddress,
     "projectScriptByIndex",
     "projectScriptByIndex(uint256,uint256):(string)"
   )
     .withArgs(projectScriptByIndexInputs)
-    .returns([ethereum.Value.fromString(meridianScript)]);
+    .returns([ethereum.Value.fromString(script ? script : "")]);
 };

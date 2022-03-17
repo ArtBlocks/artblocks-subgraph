@@ -184,6 +184,9 @@ export function handleAddProject(call: AddProjectCall): void {
     projectId = contractEntity.nextProjectId.minus(BigInt.fromI32(1));
   } else {
     projectId = contractEntity.nextProjectId;
+    contractEntity.nextProjectId = contractEntity.nextProjectId.plus(
+      BigInt.fromI32(1)
+    );
   }
 
   let projectDetails = contract.projectDetails(projectId);
@@ -225,9 +228,6 @@ export function handleAddProject(call: AddProjectCall): void {
   project.updatedAt = call.block.timestamp;
   project.save();
 
-  contractEntity.nextProjectId = contractEntity.nextProjectId.plus(
-    BigInt.fromI32(1)
-  );
   contractEntity.updatedAt = call.block.timestamp;
   contractEntity.save();
 }
