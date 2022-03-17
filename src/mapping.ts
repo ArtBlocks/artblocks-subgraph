@@ -61,7 +61,8 @@ import {
   AccountProject,
   Contract,
   Whitelisting,
-  ProjectScript
+  ProjectScript,
+  MinterFilter
 } from "../generated/schema";
 
 import {
@@ -315,13 +316,18 @@ export function handleRemoveMintWhitelisted(
   let contractEntity = refreshContract(contract, call.block.timestamp);
 
   if (contractEntity) {
-    removeMintWhitelisting(contractEntity, call.inputs._address);
+    removeMintWhitelisting(
+      contractEntity,
+      call.inputs._address,
+      call.block.timestamp
+    );
   }
 }
 
 function removeMintWhitelisting(
   contractEntity: Contract,
-  minterAddress: Address
+  minterAddress: Address,
+  timestamp: BigInt
 ): void {
   let mintWhitelisted = contractEntity.mintWhitelisted;
 
@@ -329,6 +335,27 @@ function removeMintWhitelisting(
   for (let i = 0; i < mintWhitelisted.length; i++) {
     if ((mintWhitelisted[i] as Bytes) != minterAddress) {
       newMintWhitelisted.push(mintWhitelisted[i]);
+    }
+  }
+
+  // If the minter that was removed was the minter filter for the
+  // contract then we need to null all minter configurations for
+  // the contract's projects.
+  let minterFilter = MinterFilter.load(minterAddress.toHexString());
+  if (minterFilter && contractEntity.minterFilter == minterFilter.id) {
+    contractEntity.minterFilter = null;
+    let nextProjectId = contractEntity.nextProjectId.toI32();
+    for (let i = 0; i < nextProjectId; i++) {
+      let fullProjectId = contractEntity.id + "-" + i.toString();
+      let project = Project.load(fullProjectId);
+
+      if (project && project.minterConfiguration) {
+        project.minterConfiguration = null;
+        project.updatedAt = timestamp;
+        project.save();
+      }
+
+      store.remove("ProjectMinterConfiguration", fullProjectId);
     }
   }
 
