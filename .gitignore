@@ -3,3 +3,18 @@ build
 .DS_Store
 subgraph.yaml
 .bin
+
+# Ignore codege generated for specific contract addresses
+generated/*
+
+# Track generic contract generated code
+!generated/GenArt721
+!generated/GenArt721Core
+!generated/GenArt721Core2
+!generated/GenArt721Core2PBAB
+!generated/GenArt721CorePlus
+!generated/MinterFilterV0
+!generated/MinterDAExpV0
+!generated/MinterDALinV0
+!generated/MinterSetPriceERC20V0
+!generated/MinterSetPriceV0

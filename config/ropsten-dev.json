@@ -14,37 +14,37 @@
   ],
   "minterFilterV0Contracts": [
     {
-      "address": "0x0000000000000000000000000000000000000000",
+      "address": "0xDDc77d8f935b255aD8b5651392D1284E29478b5b",
       "name": "TODO - update to actual ropsten deployed contract",
-      "startBlock": 10216817
+      "startBlock": 12070104
     }
   ],
   "minterSetPriceV0Contracts": [
     {
-      "address": "0x0000000000000000000000000000000000000000",
+      "address": "0x7CaD4e26e378FaBe8884b6609445BD4EDC099C65",
       "name": "TODO - update to actual ropsten deployed contract",
-      "startBlock": 10216817
+      "startBlock": 12070107
     }
   ],
   "minterSetPriceERC20V0Contracts": [
     {
-      "address": "0x0000000000000000000000000000000000000000",
+      "address": "0xE8D934100B560c50EE3bB2f83fC14C97dc403e44",
       "name": "TODO - update to actual ropsten deployed contract",
-      "startBlock": 10216817
+      "startBlock": 12070106
     }
   ],
   "minterDALinV0Contracts": [
     {
-      "address": "0x0000000000000000000000000000000000000000",
+      "address": "0xd2971Fa03F6b9aa2c88C1496F9e3AdBb1e1AaB64",
       "name": "TODO - update to actual ropsten deployed contract",
-      "startBlock": 10216817
+      "startBlock": 12070108
     }
   ],
   "minterDAExpV0Contracts": [
     {
-      "address": "0x0000000000000000000000000000000000000000",
+      "address": "0x631d3Bb3f360a7ed5f6De194206aBa4c4999f2c8",
       "name": "TODO - update to actual ropsten deployed contract",
-      "startBlock": 10216817
+      "startBlock": 12070109
     }
   ]
 }

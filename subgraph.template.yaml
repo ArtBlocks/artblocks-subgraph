@@ -415,12 +415,32 @@ dataSources:
       abis:
         - name: MinterFilterV0
           file: ./abis/MinterFilterV0.json
-      # todo - add event handlers when implemented
+        - name: IFilteredMinterV0
+          file: ./abis/IFilteredMinterV0.json
+        - name: MinterSetPriceERC20V0
+          file: ./abis/MinterSetPriceERC20V0.json
+        - name: MinterSetPriceV0
+          file: ./abis/MinterSetPriceV0.json
+        - name: MinterDALinV0
+          file: ./abis/MinterDALinV0.json
+        - name: MinterDAExpV0
+          file: ./abis/MinterDAExpV0.json
+      eventHandlers:
+        - event: IsCanonicalMinterFilter(indexed address)
+          handler: handleIsCanonicalMinterFilter
+        - event: MinterApproved(indexed address,string)
+          handler: handleMinterApproved
+        - event: MinterRevoked(indexed address)
+          handler: handleMinterRevoked
+        - event: ProjectMinterRegistered(indexed uint256,indexed address,string)
+          handler: handleProjectMinterRegistered
+        - event: ProjectMinterRemoved(indexed uint256)
+          handler: handleProjectMinterRemoved
       file: ./src/minter-filter-mapping.ts
   {{/minterFilterV0Contracts}}
   {{#minterSetPriceERC20V0Contracts}}
   - kind: ethereum/contract
-    name: 'minterSetPriceERC20V0-{{address}}'
+    name: 'MinterSetPriceERC20V0-{{address}}'
     network: {{network}}
     source:
       address: '{{address}}'
@@ -439,7 +459,15 @@ dataSources:
       abis:
         - name: MinterSetPriceERC20V0
           file: ./abis/MinterSetPriceERC20V0.json
-      # todo - add event handlers when implemented
+        - name: IFilteredMinterV0
+          file: ./abis/IFilteredMinterV0.json
+      eventHandlers:
+        - event: PricePerTokenInWeiUpdated(indexed uint256,indexed uint256)
+          handler: handlePricePerTokenInWeiUpdated
+        - event: ProjectCurrencyInfoUpdated(indexed uint256,indexed address,string)
+          handler: handleProjectCurrencyInfoUpdated
+        - event: PurchaseToDisabledUpdated(indexed uint256,bool)
+          handler: handlePurchaseToDisabledUpdated
       file: ./src/minter-suite-mapping.ts
   {{/minterSetPriceERC20V0Contracts}}
   {{#minterSetPriceV0Contracts}}
@@ -468,7 +496,15 @@ dataSources:
       abis:
         - name: MinterSetPriceV0
           file: ./abis/MinterSetPriceV0.json
-      # todo - add event handlers when defined
+        - name: IFilteredMinterV0
+          file: ./abis/IFilteredMinterV0.json
+      eventHandlers:
+        - event: PricePerTokenInWeiUpdated(indexed uint256,indexed uint256)
+          handler: handlePricePerTokenInWeiUpdated
+        - event: ProjectCurrencyInfoUpdated(indexed uint256,indexed address,string)
+          handler: handleProjectCurrencyInfoUpdated
+        - event: PurchaseToDisabledUpdated(indexed uint256,bool)
+          handler: handlePurchaseToDisabledUpdated
       file: ./src/minter-suite-mapping.ts
   {{/minterSetPriceV0Contracts}}
   {{#minterDALinV0Contracts}}
@@ -492,7 +528,21 @@ dataSources:
       abis:
         - name: MinterDALinV0
           file: ./abis/MinterDALinV0.json
-      # todo - add event handlers when defined
+        - name: IFilteredMinterV0
+          file: ./abis/IFilteredMinterV0.json
+      eventHandlers:
+        - event: MinimumAuctionLengthSecondsUpdated(uint256)
+          handler: handleMinimumAuctionLengthSecondsUpdated
+        - event: PricePerTokenInWeiUpdated(indexed uint256,indexed uint256)
+          handler: handlePricePerTokenInWeiUpdated
+        - event: ProjectCurrencyInfoUpdated(indexed uint256,indexed address,string)
+          handler: handleProjectCurrencyInfoUpdated
+        - event: PurchaseToDisabledUpdated(indexed uint256,bool)
+          handler: handlePurchaseToDisabledUpdated
+        - event: ResetAuctionDetails(indexed uint256)
+          handler: handleResetAuctionDetails
+        - event: SetAuctionDetails(indexed uint256,uint256,uint256,uint256,uint256)
+          handler: handleSetAuctionDetails
       file: ./src/minter-suite-mapping.ts
   {{/minterDALinV0Contracts}}
   {{#minterDAExpV0Contracts}}
@@ -516,7 +566,21 @@ dataSources:
       abis:
         - name: MinterDAExpV0
           file: ./abis/MinterDAExpV0.json
-      # todo - add event handlers when defined
+        - name: IFilteredMinterV0
+          file: ./abis/IFilteredMinterV0.json
+      eventHandlers:
+        - event: AuctionHalfLifeRangeSecondsUpdated(uint256,uint256)
+          handler: handleAuctionHalfLifeRangeSecondsUpdated
+        - event: PricePerTokenInWeiUpdated(indexed uint256,indexed uint256)
+          handler: handlePricePerTokenInWeiUpdated
+        - event: ProjectCurrencyInfoUpdated(indexed uint256,indexed address,string)
+          handler: handleProjectCurrencyInfoUpdated
+        - event: PurchaseToDisabledUpdated(indexed uint256,bool)
+          handler: handlePurchaseToDisabledUpdated
+        - event: ResetAuctionDetails(indexed uint256)
+          handler: handleResetAuctionDetails
+        - event: SetAuctionDetails(indexed uint256,uint256,uint256,uint256,uint256)
+          handler: handleSetAuctionDetails
       file: ./src/minter-suite-mapping.ts
   {{/minterDAExpV0Contracts}}
   {{#openSeaContract}}
