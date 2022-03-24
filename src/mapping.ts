@@ -47,12 +47,13 @@ import {
   UpdateArtblocksPercentageCall,
   RemoveWhitelistedCall,
   RemoveMintWhitelistedCall
-} from "../generated/GenArt721Core/GenArt721Core";
+} from "../generated/GenArt721Core-0xa7d8d9ef8D8Ce8992Df33D8b8CF4Aebabd5bD270/GenArt721Core";
+
 
 import {
   UpdateAdminCall,
-  GenArt721Core2
-} from "../generated/GenArt721Core2/GenArt721Core2";
+  GenArt721Core2PBAB
+} from "../generated/GenArt721Core2PBAB-0x13aAe6f9599880edbB7d144BB13F1212CeE99533/GenArt721Core2PBAB"; //! TODO: Fix import
 
 import {
   Project,
@@ -249,8 +250,9 @@ export function handleAddProject(call: AddProjectCall): void {
   }
 }
 
+//! TODO: Fixme
 export function handleUpdateAdmin(call: UpdateAdminCall): void {
-  let contract = GenArt721Core2.bind(call.to);
+  let contract = GenArt721Core2PBAB.bind(call.to);
   refreshContract(contract, call.block.timestamp);
 }
 
