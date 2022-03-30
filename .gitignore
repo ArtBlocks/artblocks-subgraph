@@ -8,6 +8,7 @@ subgraph.yaml
 generated/*
 
 # Track generic contract generated code
+!generated/schema.ts
 !generated/GenArt721
 !generated/GenArt721Core
 !generated/GenArt721Core2
@@ -18,3 +19,4 @@ generated/*
 !generated/MinterDALinV0
 !generated/MinterSetPriceERC20V0
 !generated/MinterSetPriceV0
+!generated/WyvernExchange

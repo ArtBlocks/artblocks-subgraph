@@ -4,7 +4,8 @@ import {
   test,
   newMockCall,
   createMockedFunction,
-  log
+  log,
+  logStore
 } from "matchstick-as/assembly/index";
 import {
   Address,
@@ -21,9 +22,11 @@ import {
   WHITELISTING_ENTITY_TYPE,
   PROJECTSCRIPT_ENTITY_TYPE,
   TOKEN_ENTITY_TYPE,
-  generateRandomAddress,
   DEFAULT_PROJECT_VALUES,
-  booleanToString
+  booleanToString,
+  CURRENT_BLOCK_TIMESTAMP,
+  RandomAddressGenerator,
+  mockProjectScriptByIndex
 } from "../shared-mocks";
 
 import {
@@ -34,12 +37,21 @@ import {
   TEST_CONTRACT,
   mockProjectTokenInfoCallWithDefaults,
   mockProjectDetailsCallWithDefaults,
-  mockProjectScriptInfoCallWithDefaults,
   TEST_CONTRACT_ADDRESS,
-  TEST_CONTRACT_CREATED_AT
-} from "./mocks";
+  TEST_CONTRACT_CREATED_AT,
+  assertNewProjectFields,
+  assertTestContractFields,
+  addTestContractToStore,
+  addNewProjectToStore,
+  mockTokenURICall
+} from "./helpers";
 
-import { Token } from "../../../generated/schema";
+import {
+  Account,
+  Contract,
+  Token,
+  Whitelisting
+} from "../../../generated/schema";
 import {
   AddProjectCall,
   AddWhitelistedCall,
@@ -112,118 +124,15 @@ import {
   handleUpdateProjectScript,
   handleUpdateProjectScriptJSON
 } from "../../../src/mapping";
-import { generateContractSpecificId } from "../../../src/helpers";
+import {
+  generateContractSpecificId,
+  generateProjectScriptId,
+  generateWhitelistingId
+} from "../../../src/helpers";
 
-function assertNewProjectFields(
-  contractAddress: Address,
-  projectId: BigInt,
-  projectName: string,
-  artistAddress: Address,
-  pricePerTokenInWei: BigInt,
-  currentBlockTimestamp: BigInt
-): void {
-  const fullProjectId = generateContractSpecificId(contractAddress, projectId);
-  assert.fieldEquals(
-    PROJECT_ENTITY_TYPE,
-    fullProjectId,
-    "active",
-    booleanToString(DEFAULT_PROJECT_VALUES.active)
-  );
-  assert.fieldEquals(
-    PROJECT_ENTITY_TYPE,
-    fullProjectId,
-    "artist",
-    artistAddress.toHexString()
-  );
-  assert.fieldEquals(
-    PROJECT_ENTITY_TYPE,
-    fullProjectId,
-    "artistAddress",
-    artistAddress.toHexString()
-  );
-  assert.fieldEquals(
-    PROJECT_ENTITY_TYPE,
-    fullProjectId,
-    "complete",
-    booleanToString(DEFAULT_PROJECT_VALUES.complete)
-  );
-  assert.fieldEquals(
-    PROJECT_ENTITY_TYPE,
-    fullProjectId,
-    "contract",
-    TEST_CONTRACT_ADDRESS.toHexString()
-  );
-  assert.fieldEquals(
-    PROJECT_ENTITY_TYPE,
-    fullProjectId,
-    "createdAt",
-    currentBlockTimestamp.toString()
-  );
-  assert.fieldEquals(
-    PROJECT_ENTITY_TYPE,
-    fullProjectId,
-    "currencySymbol",
-    DEFAULT_PROJECT_VALUES.currencySymbol.toString()
-  );
-  assert.fieldEquals(
-    PROJECT_ENTITY_TYPE,
-    fullProjectId,
-    "dynamic",
-    booleanToString(DEFAULT_PROJECT_VALUES.dynamic)
-  );
-  assert.fieldEquals(
-    PROJECT_ENTITY_TYPE,
-    fullProjectId,
-    "invocations",
-    DEFAULT_PROJECT_VALUES.invocations.toString()
-  );
-  assert.fieldEquals(
-    PROJECT_ENTITY_TYPE,
-    fullProjectId,
-    "locked",
-    booleanToString(DEFAULT_PROJECT_VALUES.locked)
-  );
-  assert.fieldEquals(
-    PROJECT_ENTITY_TYPE,
-    fullProjectId,
-    "maxInvocations",
-    DEFAULT_PROJECT_VALUES.maxInvocations.toString()
-  );
-  assert.fieldEquals(PROJECT_ENTITY_TYPE, fullProjectId, "name", projectName);
-  assert.fieldEquals(
-    PROJECT_ENTITY_TYPE,
-    fullProjectId,
-    "pricePerTokenInWei",
-    pricePerTokenInWei.toString()
-  );
-  assert.fieldEquals(
-    PROJECT_ENTITY_TYPE,
-    fullProjectId,
-    "projectId",
-    projectId.toString()
-  );
-  assert.fieldEquals(
-    PROJECT_ENTITY_TYPE,
-    fullProjectId,
-    "scriptCount",
-    DEFAULT_PROJECT_VALUES.scriptCount.toString()
-  );
-  assert.fieldEquals(
-    PROJECT_ENTITY_TYPE,
-    fullProjectId,
-    "updatedAt",
-    currentBlockTimestamp.toString()
-  );
-  assert.fieldEquals(
-    PROJECT_ENTITY_TYPE,
-    fullProjectId,
-    "useHashString",
-    booleanToString(DEFAULT_PROJECT_VALUES.useHashString)
-  );
-  assert.fieldEquals(PROJECT_ENTITY_TYPE, fullProjectId, "useIpfs", "false");
-}
+const randomAddressGenerator = new RandomAddressGenerator();
 
-test("Can add a new project when no contract exists yet", () => {
+test("Can add a new project when its contract has not yet been indexed", () => {
   // When no contract entity exists yet we figure out the
   // project id of the project being added by
   // subtracting 1 from the contracts nextProjectId
@@ -231,14 +140,14 @@ test("Can add a new project when no contract exists yet", () => {
   // added the nextProjectId will be one greater than
   // the project id of the project being added.
   const nextProjectId = BigInt.fromI32(1);
-  mockRefreshContractCalls(nextProjectId);
+  mockRefreshContractCalls(nextProjectId, new Map<string, string>());
 
   const projectId = nextProjectId.minus(BigInt.fromI32(1));
   const fullProjectId = generateContractSpecificId(
     TEST_CONTRACT_ADDRESS,
     projectId
   );
-  const artistAddress = generateRandomAddress();
+  const artistAddress = randomAddressGenerator.generateRandomAddress();
   const projectName = "Test Project";
   const pricePerTokenInWei = BigInt.fromI64(i64(1e18));
   const currentBlockTimestamp = TEST_CONTRACT_CREATED_AT.plus(
@@ -256,9 +165,9 @@ test("Can add a new project when no contract exists yet", () => {
     pricePerTokenInWei
   );
   mockProjectDetailsCallWithDefaults(projectId, projectName);
-  mockProjectScriptInfoCallWithDefaults(projectId);
+  mockProjectScriptInfoCall(projectId, null);
 
-  let call = changetype<AddProjectCall>(newMockCall());
+  const call = changetype<AddProjectCall>(newMockCall());
   call.to = TEST_CONTRACT_ADDRESS;
   call.block.timestamp = currentBlockTimestamp;
 
@@ -288,32 +197,10 @@ test("Can add a new project when no contract exists yet", () => {
   );
 
   // Contract setup in refreshContracts
-  assert.fieldEquals(
-    CONTRACT_ENTITY_TYPE,
-    TEST_CONTRACT_ADDRESS.toHexString(),
-    "admin",
-    TEST_CONTRACT.admin.toHexString()
-  );
-
-  assert.fieldEquals(
-    CONTRACT_ENTITY_TYPE,
-    TEST_CONTRACT_ADDRESS.toHexString(),
-    "renderProviderAddress",
-    TEST_CONTRACT.renderProviderAddress.toHexString()
-  );
-
-  assert.fieldEquals(
-    CONTRACT_ENTITY_TYPE,
-    TEST_CONTRACT_ADDRESS.toHexString(),
-    "createdAt",
-    currentBlockTimestamp.toString()
-  );
-
-  assert.fieldEquals(
-    CONTRACT_ENTITY_TYPE,
-    TEST_CONTRACT_ADDRESS.toHexString(),
-    "nextProjectId",
-    nextProjectId.toString()
+  assertTestContractFields(
+    currentBlockTimestamp,
+    currentBlockTimestamp,
+    projectId.plus(BigInt.fromI32(1))
   );
 
   // Project created with default values
@@ -329,373 +216,491 @@ test("Can add a new project when no contract exists yet", () => {
   clearStore();
 });
 
-// test("Can add whitelisting to a contract and account", () => {
-//   let call = changetype<AddWhitelistedCall>(newMockCall());
+test("Can add a new project when its contract has been indexed", () => {
+  const nextProjectId = BigInt.fromI32(1);
 
-//   call.to = Address.fromString(TEST_PROJECT.contract);
-//   call.block.timestamp = BigInt.fromString("1230");
-//   let addr = Address.fromString(TEST_PROJECT.artistAddress);
-//   call.inputValues = [
-//     new ethereum.EventParam("_address", ethereum.Value.fromAddress(addr))
-//   ];
+  // Prepopulate store with contract entity
+  const contract = addTestContractToStore(nextProjectId);
 
-//   mockRefreshContractCalls();
+  const projectId = nextProjectId;
+  const fullProjectId = generateContractSpecificId(
+    TEST_CONTRACT_ADDRESS,
+    projectId
+  );
+  const artistAddress = randomAddressGenerator.generateRandomAddress();
+  const projectName = "Test Project";
+  const pricePerTokenInWei = BigInt.fromI64(i64(1e18));
+  const currentBlockTimestamp = TEST_CONTRACT_CREATED_AT.plus(
+    BigInt.fromI32(100)
+  );
 
-//   handleAddWhitelisted(call);
+  // Nothing should be in the store yet
+  assert.notInStore(ACCOUNT_ENTITY_TYPE, artistAddress.toHexString());
+  assert.notInStore(PROJECT_ENTITY_TYPE, fullProjectId);
 
-//   assert.fieldEquals(
-//     CONTRACT_ENTITY_TYPE,
-//     TEST_PROJECT.contract,
-//     "admin",
-//     TEST_PROJECT.admin
-//   );
-//   assert.fieldEquals(
-//     CONTRACT_ENTITY_TYPE,
-//     TEST_PROJECT.contract,
-//     "renderProviderAddress",
-//     TEST_PROJECT.contract
-//   );
-//   assert.fieldEquals(
-//     CONTRACT_ENTITY_TYPE,
-//     TEST_PROJECT.contract,
-//     "renderProviderPercentage",
-//     TEST_PROJECT.renderProviderPercentage
-//   );
-//   assert.fieldEquals(
-//     CONTRACT_ENTITY_TYPE,
-//     TEST_PROJECT.contract,
-//     "nextProjectId",
-//     "100"
-//   );
-//   assert.fieldEquals(
-//     CONTRACT_ENTITY_TYPE,
-//     TEST_PROJECT.contract,
-//     "createdAt",
-//     "1230"
-//   );
+  mockProjectTokenInfoCallWithDefaults(
+    projectId,
+    artistAddress,
+    pricePerTokenInWei
+  );
+  mockProjectDetailsCallWithDefaults(projectId, projectName);
+  mockProjectScriptInfoCall(projectId, null);
 
-//   assert.fieldEquals(
-//     ACCOUNT_ENTITY_TYPE,
-//     TEST_PROJECT.artistAddress,
-//     "id",
-//     TEST_PROJECT.artistAddress
-//   );
+  const call = changetype<AddProjectCall>(newMockCall());
+  call.to = TEST_CONTRACT_ADDRESS;
+  call.block.timestamp = currentBlockTimestamp;
 
-//   assert.fieldEquals(
-//     WHITELISTING_ENTITY_TYPE,
-//     "0xa7d8d9ef8d8ce8992df33d8b8cf4aebabd5bd270-0x1233973f9aea61250e98b697246cb10146903672",
-//     "contract",
-//     TEST_PROJECT.contract
-//   );
-//   assert.fieldEquals(
-//     WHITELISTING_ENTITY_TYPE,
-//     "0xa7d8d9ef8d8ce8992df33d8b8cf4aebabd5bd270-0x1233973f9aea61250e98b697246cb10146903672",
-//     "account",
-//     TEST_PROJECT.artistAddress
-//   );
-//   clearStore();
-// });
+  call.inputValues = [
+    new ethereum.EventParam(
+      "projectName",
+      ethereum.Value.fromString(projectName)
+    ),
+    new ethereum.EventParam(
+      "artistAddress",
+      ethereum.Value.fromAddress(artistAddress)
+    ),
+    new ethereum.EventParam(
+      "pricePerTokenInWei",
+      ethereum.Value.fromUnsignedBigInt(pricePerTokenInWei)
+    )
+  ];
 
-// test("Can remove whitelisting", () => {
-//   let callToAddWhitelist = changetype<AddWhitelistedCall>(newMockCall());
-//   let callToRemoveWhitelist = changetype<RemoveWhitelistedCall>(newMockCall());
-//   let addr1 = Address.fromString(TEST_PROJECT.artistAddress);
-//   let addr2 = Address.fromString(TEST_PROJECT.artistAddress);
+  handleAddProject(call);
 
-//   callToAddWhitelist.to = Address.fromString(TEST_PROJECT.contract);
-//   callToAddWhitelist.block.timestamp = BigInt.fromString("1230");
-//   callToAddWhitelist.inputValues = [
-//     new ethereum.EventParam("_address", ethereum.Value.fromAddress(addr1))
-//   ];
+  // Account created for artist
+  assert.fieldEquals(
+    ACCOUNT_ENTITY_TYPE,
+    artistAddress.toHexString(),
+    "id",
+    artistAddress.toHexString()
+  );
 
-//   callToRemoveWhitelist.to = Address.fromString(TEST_PROJECT.contract);
-//   callToRemoveWhitelist.block.timestamp = BigInt.fromString("1230");
-//   callToRemoveWhitelist.inputValues = [
-//     new ethereum.EventParam("_address", ethereum.Value.fromAddress(addr2))
-//   ];
+  // Contract setup in refreshContracts
+  assertTestContractFields(
+    contract.createdAt,
+    currentBlockTimestamp,
+    projectId.plus(BigInt.fromI32(1))
+  );
 
-//   mockRefreshContractCalls();
+  // Project created with default values
+  assertNewProjectFields(
+    TEST_CONTRACT_ADDRESS,
+    projectId,
+    projectName,
+    artistAddress,
+    pricePerTokenInWei,
+    currentBlockTimestamp
+  );
 
-//   handleAddWhitelisted(callToAddWhitelist);
-//   assert.fieldEquals(
-//     WHITELISTING_ENTITY_TYPE,
-//     "0xa7d8d9ef8d8ce8992df33d8b8cf4aebabd5bd270-0x1233973f9aea61250e98b697246cb10146903672",
-//     "contract",
-//     TEST_PROJECT.contract
-//   );
-//   assert.fieldEquals(
-//     WHITELISTING_ENTITY_TYPE,
-//     "0xa7d8d9ef8d8ce8992df33d8b8cf4aebabd5bd270-0x1233973f9aea61250e98b697246cb10146903672",
-//     "account",
-//     TEST_PROJECT.artistAddress
-//   );
+  clearStore();
+});
 
-//   handleRemoveWhitelisted(callToRemoveWhitelist);
+test("Can add whitelisting to a contract that has not yet been indexed", () => {
+  const call = changetype<AddWhitelistedCall>(newMockCall());
+  call.to = TEST_CONTRACT_ADDRESS;
+  call.block.timestamp = CURRENT_BLOCK_TIMESTAMP;
+  const whitelistedAddress = randomAddressGenerator.generateRandomAddress();
+  call.inputValues = [
+    new ethereum.EventParam(
+      "_address",
+      ethereum.Value.fromAddress(whitelistedAddress)
+    )
+  ];
 
-//   assert.notInStore(
-//     WHITELISTING_ENTITY_TYPE,
-//     "0xa7d8d9ef8d8ce8992df33d8b8cf4aebabd5bd270-0x1233973f9aea61250e98b697246cb10146903672"
-//   );
-//   clearStore();
-// });
+  const nextProjectId = BigInt.fromI32(1);
+  mockRefreshContractCalls(nextProjectId, new Map<string, string>());
 
-// test("Can add and mint whitelisted call", () => {
-//   let call = changetype<AddMintWhitelistedCall>(newMockCall());
-//   let addr1 = Address.fromString(TEST_PROJECT.artistAddress);
+  assert.notInStore(CONTRACT_ENTITY_TYPE, TEST_CONTRACT_ADDRESS.toHexString());
 
-//   call.to = Address.fromString(TEST_PROJECT.contract);
-//   call.block.timestamp = BigInt.fromString("1231");
-//   call.inputValues = [
-//     new ethereum.EventParam("_address", ethereum.Value.fromAddress(addr1))
-//   ];
+  handleAddWhitelisted(call);
 
-//   mockRefreshContractCalls();
+  assertTestContractFields(
+    CURRENT_BLOCK_TIMESTAMP,
+    CURRENT_BLOCK_TIMESTAMP,
+    nextProjectId
+  );
 
-//   handleAddMintWhitelisted(call);
+  const whitelistingId = generateWhitelistingId(
+    TEST_CONTRACT_ADDRESS.toHexString(),
+    whitelistedAddress.toHexString()
+  );
 
-//   assert.fieldEquals(
-//     CONTRACT_ENTITY_TYPE,
-//     TEST_PROJECT.contract,
-//     "id",
-//     TEST_PROJECT.contract
-//   );
-//   assert.fieldEquals(
-//     CONTRACT_ENTITY_TYPE,
-//     TEST_PROJECT.contract,
-//     "mintWhitelisted",
-//     "[0x1233973f9aea61250e98b697246cb10146903672]"
-//   );
+  assert.fieldEquals(
+    WHITELISTING_ENTITY_TYPE,
+    whitelistingId,
+    "contract",
+    TEST_CONTRACT_ADDRESS.toHexString()
+  );
+  assert.fieldEquals(
+    WHITELISTING_ENTITY_TYPE,
+    whitelistingId,
+    "account",
+    whitelistedAddress.toHexString()
+  );
 
-//   assert.notInStore(
-//     WHITELISTING_ENTITY_TYPE,
-//     "0xa7d8d9ef8d8ce8992df33d8b8cf4aebabd5bd270-0x1233973f9aea61250e98b697246cb10146903672"
-//   );
-//   clearStore();
-// });
+  clearStore();
+});
 
-// test("Can remove a mint whitelisted address", () => {
-//   mockRefreshContractCalls();
+test("Can remove whitelisting", () => {
+  // Populate store with an existing whitelisting
+  addTestContractToStore(BigInt.fromI32(1));
 
-//   let addWhitelistCall = changetype<AddMintWhitelistedCall>(newMockCall());
-//   addWhitelistCall.to = Address.fromString(TEST_PROJECT.contract);
-//   addWhitelistCall.block.timestamp = BigInt.fromString("1230");
-//   addWhitelistCall.inputValues = [
-//     new ethereum.EventParam(
-//       "_address",
-//       ethereum.Value.fromAddress(Address.fromString(TEST_PROJECT.artistAddress))
-//     )
-//   ];
+  const whitelistedAddress = randomAddressGenerator.generateRandomAddress();
+  const whitelistedAccount = new Account(whitelistedAddress.toHexString());
+  whitelistedAccount.save();
 
-//   let removeWhitelistCall = changetype<RemoveMintWhitelistedCall>(
-//     newMockCall()
-//   );
-//   removeWhitelistCall.to = Address.fromString(TEST_PROJECT.contract);
-//   removeWhitelistCall.block.timestamp = BigInt.fromString("1231");
-//   removeWhitelistCall.inputValues = [
-//     new ethereum.EventParam(
-//       "_address",
-//       ethereum.Value.fromAddress(Address.fromString(TEST_PROJECT.artistAddress))
-//     )
-//   ];
+  const whitelistingId = generateWhitelistingId(
+    TEST_CONTRACT_ADDRESS.toHexString(),
+    whitelistedAddress.toHexString()
+  );
+  const whitelisting = new Whitelisting(whitelistingId);
+  whitelisting.account = whitelistedAddress.toHexString();
+  whitelisting.contract = TEST_CONTRACT_ADDRESS.toHexString();
+  whitelisting.save();
 
-//   handleAddMintWhitelisted(addWhitelistCall);
-//   addWhitelistCall.inputValues = [
-//     new ethereum.EventParam(
-//       "_address",
-//       ethereum.Value.fromAddress(
-//         Address.fromString("0x1233973f9aea61250e98b697246cb10146912345")
-//       )
-//     )
-//   ];
-//   handleAddMintWhitelisted(addWhitelistCall);
+  // Make sure the whitelisting is in the store
+  assert.fieldEquals(
+    WHITELISTING_ENTITY_TYPE,
+    whitelistingId,
+    "id",
+    whitelistingId
+  );
 
-//   assert.fieldEquals(
-//     CONTRACT_ENTITY_TYPE,
-//     TEST_PROJECT.contract,
-//     "mintWhitelisted",
-//     "[0x1233973f9aea61250e98b697246cb10146903672, 0x1233973f9aea61250e98b697246cb10146912345]"
-//   );
-//   handleRemoveMintWhitelisted(removeWhitelistCall);
+  const callToRemoveWhitelist = changetype<RemoveWhitelistedCall>(
+    newMockCall()
+  );
 
-//   assert.fieldEquals(
-//     CONTRACT_ENTITY_TYPE,
-//     TEST_PROJECT.contract,
-//     "mintWhitelisted",
-//     "[0x1233973f9aea61250e98b697246cb10146912345]"
-//   );
+  callToRemoveWhitelist.to = TEST_CONTRACT_ADDRESS;
+  callToRemoveWhitelist.block.timestamp = CURRENT_BLOCK_TIMESTAMP;
+  callToRemoveWhitelist.inputValues = [
+    new ethereum.EventParam(
+      "_address",
+      ethereum.Value.fromAddress(whitelistedAddress)
+    )
+  ];
 
-//   clearStore();
-// });
+  handleRemoveWhitelisted(callToRemoveWhitelist);
 
-// test("Can update randomizer address", () => {
-//   let call = changetype<UpdateRandomizerAddressCall>(newMockCall());
+  // Make sure the whitelisting is not in the store
+  assert.notInStore(WHITELISTING_ENTITY_TYPE, whitelistingId);
+  clearStore();
+});
 
-//   call.to = Address.fromString(TEST_PROJECT.contract);
-//   call.block.timestamp = BigInt.fromString("1230");
-//   let addr = Address.fromString(TEST_PROJECT.artistAddress);
-//   call.inputValues = [
-//     new ethereum.EventParam("_address", ethereum.Value.fromAddress(addr))
-//   ];
+test("Can add a new whitelisted minter to contract", () => {
+  const call = changetype<AddMintWhitelistedCall>(newMockCall());
+  const minterAddress = randomAddressGenerator.generateRandomAddress();
 
-//   mockRefreshContractCalls();
+  call.to = TEST_CONTRACT_ADDRESS;
+  call.block.timestamp = CURRENT_BLOCK_TIMESTAMP;
+  call.inputValues = [
+    new ethereum.EventParam(
+      "_address",
+      ethereum.Value.fromAddress(minterAddress)
+    )
+  ];
 
-//   handleUpdateRandomizerAddress(call);
-//   assert.fieldEquals(
-//     CONTRACT_ENTITY_TYPE,
-//     TEST_PROJECT.contract,
-//     "id",
-//     TEST_PROJECT.contract
-//   );
-//   assert.fieldEquals(
-//     CONTRACT_ENTITY_TYPE,
-//     TEST_PROJECT.contract,
-//     "randomizerContract",
-//     TEST_PROJECT.contract
-//   );
+  mockRefreshContractCalls(BigInt.fromI32(1), new Map<string, string>());
 
-//   clearStore();
-// });
+  handleAddMintWhitelisted(call);
 
-// test("Can update ArtBlocks address", () => {
-//   let call = changetype<UpdateArtblocksAddressCall>(newMockCall());
+  assert.fieldEquals(
+    CONTRACT_ENTITY_TYPE,
+    TEST_CONTRACT_ADDRESS.toHexString(),
+    "mintWhitelisted",
+    "[" + minterAddress.toHexString() + "]"
+  );
+  clearStore();
+});
 
-//   call.to = Address.fromString(TEST_PROJECT.contract);
-//   call.block.timestamp = BigInt.fromString("1230");
-//   let addr = Address.fromString(TEST_PROJECT.artistAddress);
-//   call.inputValues = [
-//     new ethereum.EventParam("_address", ethereum.Value.fromAddress(addr))
-//   ];
+test("Can remove whitelisted minter from contract", () => {
+  const minterAddress = randomAddressGenerator.generateRandomAddress();
+  const minterAddressToBeRemoved = randomAddressGenerator.generateRandomAddress();
 
-//   mockRefreshContractCalls();
+  const contract = addTestContractToStore(BigInt.fromI32(1));
+  contract.mintWhitelisted = [minterAddress, minterAddressToBeRemoved];
+  contract.save();
 
-//   handleUpdateArtblocksAddress(call);
+  const removeWhitelistCall = changetype<RemoveMintWhitelistedCall>(
+    newMockCall()
+  );
+  removeWhitelistCall.to = TEST_CONTRACT_ADDRESS;
+  removeWhitelistCall.block.timestamp = CURRENT_BLOCK_TIMESTAMP;
+  removeWhitelistCall.inputValues = [
+    new ethereum.EventParam(
+      "_address",
+      ethereum.Value.fromAddress(minterAddressToBeRemoved)
+    )
+  ];
 
-//   assert.fieldEquals(
-//     CONTRACT_ENTITY_TYPE,
-//     TEST_PROJECT.contract,
-//     "id",
-//     TEST_PROJECT.contract
-//   );
-//   assert.fieldEquals(
-//     CONTRACT_ENTITY_TYPE,
-//     TEST_PROJECT.contract,
-//     "renderProviderAddress",
-//     TEST_PROJECT.contract
-//   );
+  handleRemoveMintWhitelisted(removeWhitelistCall);
 
-//   clearStore();
-// });
+  assert.fieldEquals(
+    CONTRACT_ENTITY_TYPE,
+    TEST_CONTRACT_ADDRESS.toHexString(),
+    "mintWhitelisted",
+    "[" + minterAddress.toHexString() + "]"
+  );
 
-// test("Can update ArtBlocks percentage", () => {
-//   let call = changetype<UpdateArtblocksPercentageCall>(newMockCall());
+  clearStore();
+});
 
-//   call.to = Address.fromString(TEST_PROJECT.contract);
-//   call.block.timestamp = BigInt.fromString("1230");
-//   let addr = Address.fromString(TEST_PROJECT.artistAddress);
-//   call.inputValues = [
-//     new ethereum.EventParam("_address", ethereum.Value.fromAddress(addr))
-//   ];
+test("Can update randomizer address", () => {
+  assert.notInStore(CONTRACT_ENTITY_TYPE, TEST_CONTRACT_ADDRESS.toHexString());
 
-//   mockRefreshContractCalls();
+  mockRefreshContractCalls(BigInt.fromI32(1), new Map<string, string>());
 
-//   handleUpdateArtblocksPercentage(call);
+  const call = changetype<UpdateRandomizerAddressCall>(newMockCall());
+  call.to = TEST_CONTRACT_ADDRESS;
+  call.block.timestamp = CURRENT_BLOCK_TIMESTAMP;
+  call.inputValues = [
+    new ethereum.EventParam(
+      "_address",
+      ethereum.Value.fromAddress(TEST_CONTRACT.randomizerContract)
+    )
+  ];
 
-//   assert.fieldEquals(
-//     CONTRACT_ENTITY_TYPE,
-//     TEST_PROJECT.contract,
-//     "id",
-//     TEST_PROJECT.contract
-//   );
-//   assert.fieldEquals(
-//     CONTRACT_ENTITY_TYPE,
-//     TEST_PROJECT.contract,
-//     "renderProviderPercentage",
-//     TEST_PROJECT.renderProviderPercentage
-//   );
+  handleUpdateRandomizerAddress(call);
 
-//   clearStore();
-// });
+  assert.fieldEquals(
+    CONTRACT_ENTITY_TYPE,
+    TEST_CONTRACT_ADDRESS.toHexString(),
+    "randomizerContract",
+    TEST_CONTRACT.randomizerContract.toHexString()
+  );
 
-// test("Can handle add project script", () => {
-//   mockRefreshContractCalls();
-//   mockProjectContractCalls();
-//   mockRefreshProjectScript();
+  clearStore();
+});
 
-//   // mock a full Project entity before refreshing an existing script
-//   createProjectToLoad();
+test("Can update render provider address", () => {
+  assert.notInStore(CONTRACT_ENTITY_TYPE, TEST_CONTRACT_ADDRESS.toHexString());
 
-//   let refreshScriptCall = changetype<AddProjectScriptCall>(newMockCall());
-//   refreshScriptCall.to = Address.fromString(TEST_PROJECT.contract);
-//   refreshScriptCall.block.timestamp = BigInt.fromString("1231");
-//   refreshScriptCall.inputValues = [
-//     new ethereum.EventParam(
-//       "_projectId",
-//       ethereum.Value.fromSignedBigInt(BigInt.fromString("99"))
-//     ),
-//     new ethereum.EventParam(
-//       "_script",
-//       ethereum.Value.fromString(meridianScript)
-//     )
-//   ];
+  mockRefreshContractCalls(BigInt.fromI32(1), new Map<string, string>());
 
-//   handleAddProjectScript(refreshScriptCall);
+  const call = changetype<UpdateArtblocksAddressCall>(newMockCall());
+  call.to = TEST_CONTRACT_ADDRESS;
+  call.block.timestamp = CURRENT_BLOCK_TIMESTAMP;
+  call.inputValues = [
+    new ethereum.EventParam(
+      "_address",
+      ethereum.Value.fromAddress(TEST_CONTRACT.renderProviderAddress)
+    )
+  ];
 
-//   assert.fieldEquals(
-//     PROJECTSCRIPT_ENTITY_TYPE,
-//     TEST_PROJECT.projectScriptId,
-//     "project",
-//     TEST_PROJECT.id
-//   );
-//   assert.fieldEquals(
-//     PROJECTSCRIPT_ENTITY_TYPE,
-//     TEST_PROJECT.projectScriptId,
-//     "script",
-//     meridianScript.toString()
-//   );
+  handleUpdateArtblocksAddress(call);
 
-//   clearStore();
-// });
+  assert.fieldEquals(
+    CONTRACT_ENTITY_TYPE,
+    TEST_CONTRACT_ADDRESS.toHexString(),
+    "renderProviderAddress",
+    TEST_CONTRACT.renderProviderAddress.toHexString()
+  );
 
-// test("Can clear a Token IPFS image uri", () => {
-//   let call = changetype<ClearTokenIpfsImageUriCall>(newMockCall());
+  clearStore();
+});
 
-//   call.to = Address.fromString(TEST_PROJECT.contract);
-//   call.block.timestamp = BigInt.fromString("1230");
-//   call.inputValues = [
-//     new ethereum.EventParam(
-//       "_tokenId",
-//       ethereum.Value.fromSignedBigInt(BigInt.fromString("123"))
-//     )
-//   ];
+test("Can update render provider percentage", () => {
+  const call = changetype<UpdateArtblocksPercentageCall>(newMockCall());
 
-//   createMockedFunction(
-//     Address.fromString(TEST_PROJECT.contract),
-//     "tokenURI",
-//     "tokenURI(uint256):(string)"
-//   )
-//     .withArgs([ethereum.Value.fromSignedBigInt(BigInt.fromString("123"))])
-//     .returns([ethereum.Value.fromString(TEST_PROJECT.ipfsHash)]);
+  call.to = TEST_CONTRACT_ADDRESS;
+  call.block.timestamp = CURRENT_BLOCK_TIMESTAMP;
+  call.inputValues = [
+    new ethereum.EventParam(
+      "_address",
+      ethereum.Value.fromUnsignedBigInt(TEST_CONTRACT.renderProviderPercentage)
+    )
+  ];
 
-//   createTokenToLoad(call.to, call.inputs._tokenId);
-//   let token = Token.load(TEST_PROJECT.tokenId);
+  mockRefreshContractCalls(BigInt.fromI32(1), new Map<string, string>());
 
-//   if (token) {
-//     assert.assertNull(token.uri);
-//   }
+  handleUpdateArtblocksPercentage(call);
 
-//   handleClearTokenIpfsImageUri(call);
-//   assert.fieldEquals(
-//     TOKEN_ENTITY_TYPE,
-//     TEST_PROJECT.tokenId,
-//     "uri",
-//     TEST_PROJECT.ipfsHash
-//   );
+  assert.fieldEquals(
+    CONTRACT_ENTITY_TYPE,
+    TEST_CONTRACT_ADDRESS.toHexString(),
+    "renderProviderPercentage",
+    TEST_CONTRACT.renderProviderPercentage.toString()
+  );
 
-//   clearStore();
-// });
+  clearStore();
+});
+
+test("Can add project scripts", () => {
+  // Add project to store
+  const projectId = BigInt.fromI32(0);
+  const fullProjectId = generateContractSpecificId(
+    TEST_CONTRACT_ADDRESS,
+    projectId
+  );
+  addNewProjectToStore(
+    projectId,
+    "Test Project",
+    randomAddressGenerator.generateRandomAddress(),
+    BigInt.fromI64(i64(1e18)),
+    true,
+    CURRENT_BLOCK_TIMESTAMP.minus(BigInt.fromI32(100))
+  );
+
+  // Set up contract call mocks for a first script
+  const script1 = "test script";
+  const overrides = new Map<string, string>();
+  overrides.set("scriptCount", "1");
+  mockProjectScriptInfoCall(projectId, overrides);
+  mockProjectScriptByIndex(
+    TEST_CONTRACT_ADDRESS,
+    projectId,
+    BigInt.fromI32(0),
+    script1
+  );
+
+  // Set up handler call input for first script
+  const addProjectScriptCall1 = changetype<AddProjectScriptCall>(newMockCall());
+  addProjectScriptCall1.to = TEST_CONTRACT_ADDRESS;
+  addProjectScriptCall1.block.timestamp = CURRENT_BLOCK_TIMESTAMP;
+  addProjectScriptCall1.inputValues = [
+    new ethereum.EventParam(
+      "_projectId",
+      ethereum.Value.fromUnsignedBigInt(projectId)
+    ),
+    new ethereum.EventParam("_script", ethereum.Value.fromString(script1))
+  ];
+
+  handleAddProjectScript(addProjectScriptCall1);
+
+  // Assert first project script is indexed
+  const projectScriptId1 = generateProjectScriptId(
+    fullProjectId,
+    BigInt.fromI32(0)
+  );
+
+  assert.fieldEquals(PROJECT_ENTITY_TYPE, fullProjectId, "script", script1);
+  assert.fieldEquals(
+    PROJECT_ENTITY_TYPE,
+    fullProjectId,
+    "updatedAt",
+    CURRENT_BLOCK_TIMESTAMP.toString()
+  );
+
+  assert.fieldEquals(
+    PROJECTSCRIPT_ENTITY_TYPE,
+    projectScriptId1,
+    "project",
+    fullProjectId
+  );
+  assert.fieldEquals(
+    PROJECTSCRIPT_ENTITY_TYPE,
+    projectScriptId1,
+    "script",
+    script1
+  );
+
+  // Set up contract call mocks for a second script
+  const script2 = "test script 2";
+  overrides.set("scriptCount", "2");
+  mockProjectScriptInfoCall(projectId, overrides);
+  mockProjectScriptByIndex(
+    TEST_CONTRACT_ADDRESS,
+    projectId,
+    BigInt.fromI32(1),
+    script2
+  );
+
+  // Set up handler call input for second script
+  const newCurrentBlockTimestamp = CURRENT_BLOCK_TIMESTAMP.plus(
+    BigInt.fromI32(1)
+  );
+  const addProjectScriptCall2 = changetype<AddProjectScriptCall>(newMockCall());
+  addProjectScriptCall2.to = TEST_CONTRACT_ADDRESS;
+  addProjectScriptCall2.block.timestamp = newCurrentBlockTimestamp;
+  addProjectScriptCall2.inputValues = [
+    new ethereum.EventParam(
+      "_projectId",
+      ethereum.Value.fromUnsignedBigInt(projectId)
+    ),
+    new ethereum.EventParam("_script", ethereum.Value.fromString(script2))
+  ];
+
+  handleAddProjectScript(addProjectScriptCall2);
+
+  // Assert both first and second scripts have been indexed
+  const projectScriptId2 = generateProjectScriptId(
+    fullProjectId,
+    BigInt.fromI32(1)
+  );
+
+  assert.fieldEquals(
+    PROJECT_ENTITY_TYPE,
+    fullProjectId,
+    "script",
+    script1 + script2
+  );
+  assert.fieldEquals(
+    PROJECT_ENTITY_TYPE,
+    fullProjectId,
+    "updatedAt",
+    newCurrentBlockTimestamp.toString()
+  );
+
+  assert.fieldEquals(
+    PROJECTSCRIPT_ENTITY_TYPE,
+    projectScriptId1,
+    "project",
+    fullProjectId
+  );
+  assert.fieldEquals(
+    PROJECTSCRIPT_ENTITY_TYPE,
+    projectScriptId1,
+    "script",
+    script1
+  );
+
+  assert.fieldEquals(
+    PROJECTSCRIPT_ENTITY_TYPE,
+    projectScriptId2,
+    "project",
+    fullProjectId
+  );
+  assert.fieldEquals(
+    PROJECTSCRIPT_ENTITY_TYPE,
+    projectScriptId2,
+    "script",
+    script2
+  );
+
+  clearStore();
+});
+
+test("Can clear a Token IPFS image uri", () => {
+  const tokenId = BigInt.fromI32(0);
+  const fullTokenId = generateContractSpecificId(
+    TEST_CONTRACT_ADDRESS,
+    tokenId
+  );
+
+  const token = new Token(fullTokenId);
+  token.save();
+
+  const tokenUri = "https://token.artblocks.io/" + tokenId.toString();
+  mockTokenURICall(tokenId, tokenUri);
+
+  const call = changetype<ClearTokenIpfsImageUriCall>(newMockCall());
+  call.to = TEST_CONTRACT_ADDRESS;
+  call.block.timestamp = CURRENT_BLOCK_TIMESTAMP;
+  call.inputValues = [
+    new ethereum.EventParam(
+      "_tokenId",
+      ethereum.Value.fromUnsignedBigInt(tokenId)
+    )
+  ];
+
+  handleClearTokenIpfsImageUri(call);
+
+  assert.fieldEquals(TOKEN_ENTITY_TYPE, fullTokenId, "uri", tokenUri);
+
+  clearStore();
+});
 
 // test("Can override token dynamic image with IPFS link", () => {
-//   let call = changetype<OverrideTokenDynamicImageWithIpfsLinkCall>(
+//   const call = changetype<OverrideTokenDynamicImageWithIpfsLinkCall>(
 //     newMockCall()
 //   );
 
@@ -721,7 +726,7 @@ test("Can add a new project when no contract exists yet", () => {
 //     .returns([ethereum.Value.fromString(TEST_PROJECT.ipfsHash)]);
 
 //   createTokenToLoad(call.to, call.inputs._tokenId);
-//   let token = Token.load(TEST_PROJECT.tokenId);
+//   const token = Token.load(TEST_PROJECT.tokenId);
 
 //   if (token) {
 //     assert.assertNull(token.uri);
@@ -743,7 +748,7 @@ test("Can add a new project when no contract exists yet", () => {
 //   mockProjectContractCalls();
 //   mockRefreshProjectScript();
 
-//   let call = changetype<RemoveProjectLastScriptCall>(newMockCall());
+//   const call = changetype<RemoveProjectLastScriptCall>(newMockCall());
 
 //   call.to = Address.fromString(TEST_PROJECT.contract);
 //   call.block.timestamp = BigInt.fromString("1230");
@@ -754,7 +759,7 @@ test("Can add a new project when no contract exists yet", () => {
 //     )
 //   ];
 
-//   let refreshScriptCall = changetype<AddProjectScriptCall>(newMockCall());
+//   const refreshScriptCall = changetype<AddProjectScriptCall>(newMockCall());
 //   refreshScriptCall.to = call.to;
 //   refreshScriptCall.block.timestamp = call.block.timestamp;
 //   refreshScriptCall.inputValues = [
@@ -809,7 +814,7 @@ test("Can add a new project when no contract exists yet", () => {
 
 //   createProjectToLoad();
 
-//   let call = changetype<ToggleProjectIsActiveCall>(newMockCall());
+//   const call = changetype<ToggleProjectIsActiveCall>(newMockCall());
 
 //   call.to = Address.fromString(TEST_PROJECT.contract);
 //   call.block.timestamp = BigInt.fromString("230");
@@ -847,7 +852,7 @@ test("Can add a new project when no contract exists yet", () => {
 
 //   createProjectToLoad();
 
-//   let call = changetype<ToggleProjectIsDynamicCall>(newMockCall());
+//   const call = changetype<ToggleProjectIsDynamicCall>(newMockCall());
 
 //   call.to = Address.fromString(TEST_PROJECT.contract);
 //   call.block.timestamp = BigInt.fromString("230");
@@ -890,7 +895,7 @@ test("Can add a new project when no contract exists yet", () => {
 
 //   createProjectToLoad();
 
-//   let call = changetype<ToggleProjectIsLockedCall>(newMockCall());
+//   const call = changetype<ToggleProjectIsLockedCall>(newMockCall());
 
 //   call.to = Address.fromString(TEST_PROJECT.contract);
 //   call.block.timestamp = BigInt.fromString("230");
@@ -923,7 +928,7 @@ test("Can add a new project when no contract exists yet", () => {
 
 //   createProjectToLoad();
 
-//   let call = changetype<ToggleProjectIsPausedCall>(newMockCall());
+//   const call = changetype<ToggleProjectIsPausedCall>(newMockCall());
 
 //   call.to = Address.fromString(TEST_PROJECT.contract);
 //   call.block.timestamp = BigInt.fromString("230");
@@ -956,7 +961,7 @@ test("Can add a new project when no contract exists yet", () => {
 
 //   createProjectToLoad();
 
-//   let call = changetype<ToggleProjectUseHashStringCall>(newMockCall());
+//   const call = changetype<ToggleProjectUseHashStringCall>(newMockCall());
 
 //   call.to = Address.fromString(TEST_PROJECT.contract);
 //   call.block.timestamp = BigInt.fromString("230");
@@ -993,7 +998,7 @@ test("Can add a new project when no contract exists yet", () => {
 
 //   createProjectToLoad();
 
-//   let call = changetype<ToggleProjectUseIpfsForStaticCall>(newMockCall());
+//   const call = changetype<ToggleProjectUseIpfsForStaticCall>(newMockCall());
 
 //   call.to = Address.fromString(TEST_PROJECT.contract);
 //   call.block.timestamp = BigInt.fromString("230");
@@ -1024,7 +1029,7 @@ test("Can add a new project when no contract exists yet", () => {
 
 //   createProjectToLoad();
 
-//   let call = changetype<UpdateProjectAdditionalPayeeInfoCall>(newMockCall());
+//   const call = changetype<UpdateProjectAdditionalPayeeInfoCall>(newMockCall());
 
 //   call.to = Address.fromString(TEST_PROJECT.contract);
 //   call.block.timestamp = BigInt.fromString("230");
@@ -1071,7 +1076,7 @@ test("Can add a new project when no contract exists yet", () => {
 
 //   createProjectToLoad();
 
-//   let call = changetype<UpdateProjectArtistAddressCall>(newMockCall());
+//   const call = changetype<UpdateProjectArtistAddressCall>(newMockCall());
 
 //   call.to = Address.fromString(TEST_PROJECT.contract);
 //   call.block.timestamp = BigInt.fromString("230");
@@ -1113,7 +1118,7 @@ test("Can add a new project when no contract exists yet", () => {
 
 //   createProjectToLoad();
 
-//   let call = changetype<UpdateProjectArtistNameCall>(newMockCall());
+//   const call = changetype<UpdateProjectArtistNameCall>(newMockCall());
 
 //   call.to = Address.fromString(TEST_PROJECT.contract);
 //   call.block.timestamp = BigInt.fromString("230");
@@ -1147,7 +1152,7 @@ test("Can add a new project when no contract exists yet", () => {
 
 //   createProjectToLoad();
 
-//   let call = changetype<UpdateProjectBaseIpfsURICall>(newMockCall());
+//   const call = changetype<UpdateProjectBaseIpfsURICall>(newMockCall());
 
 //   call.to = Address.fromString(TEST_PROJECT.contract);
 //   call.block.timestamp = BigInt.fromString("230");
@@ -1182,7 +1187,7 @@ test("Can add a new project when no contract exists yet", () => {
 
 //   createProjectToLoad();
 
-//   let call = changetype<UpdateProjectBaseURICall>(newMockCall());
+//   const call = changetype<UpdateProjectBaseURICall>(newMockCall());
 
 //   call.to = Address.fromString(TEST_PROJECT.contract);
 //   call.block.timestamp = BigInt.fromString("230");
@@ -1215,7 +1220,7 @@ test("Can add a new project when no contract exists yet", () => {
 
 //   createProjectToLoad();
 
-//   let call = changetype<UpdateProjectCurrencyInfoCall>(newMockCall());
+//   const call = changetype<UpdateProjectCurrencyInfoCall>(newMockCall());
 
 //   call.to = Address.fromString(TEST_PROJECT.contract);
 //   call.block.timestamp = BigInt.fromString("230");
@@ -1268,7 +1273,7 @@ test("Can add a new project when no contract exists yet", () => {
 
 //   createProjectToLoad();
 
-//   let call = changetype<UpdateProjectDescriptionCall>(newMockCall());
+//   const call = changetype<UpdateProjectDescriptionCall>(newMockCall());
 
 //   call.to = Address.fromString(TEST_PROJECT.contract);
 //   call.block.timestamp = BigInt.fromString("230");
@@ -1302,7 +1307,7 @@ test("Can add a new project when no contract exists yet", () => {
 
 //   createProjectToLoad();
 
-//   let call = changetype<UpdateProjectIpfsHashCall>(newMockCall());
+//   const call = changetype<UpdateProjectIpfsHashCall>(newMockCall());
 
 //   call.to = Address.fromString(TEST_PROJECT.contract);
 //   call.block.timestamp = BigInt.fromString("230");
@@ -1338,7 +1343,7 @@ test("Can add a new project when no contract exists yet", () => {
 
 //   createProjectToLoad();
 
-//   let call = changetype<UpdateProjectLicenseCall>(newMockCall());
+//   const call = changetype<UpdateProjectLicenseCall>(newMockCall());
 
 //   call.to = Address.fromString(TEST_PROJECT.contract);
 //   call.block.timestamp = BigInt.fromString("230");
@@ -1372,7 +1377,7 @@ test("Can add a new project when no contract exists yet", () => {
 
 //   createProjectToLoad();
 
-//   let call = changetype<UpdateProjectMaxInvocationsCall>(newMockCall());
+//   const call = changetype<UpdateProjectMaxInvocationsCall>(newMockCall());
 
 //   call.to = Address.fromString(TEST_PROJECT.contract);
 //   call.block.timestamp = BigInt.fromString("230");
@@ -1413,7 +1418,7 @@ test("Can add a new project when no contract exists yet", () => {
 
 //   createProjectToLoad();
 
-//   let call = changetype<UpdateProjectNameCall>(newMockCall());
+//   const call = changetype<UpdateProjectNameCall>(newMockCall());
 
 //   call.to = Address.fromString(TEST_PROJECT.contract);
 //   call.block.timestamp = BigInt.fromString("230");
@@ -1443,7 +1448,7 @@ test("Can add a new project when no contract exists yet", () => {
 
 //   createProjectToLoad();
 
-//   let call = changetype<UpdateProjectPricePerTokenInWeiCall>(newMockCall());
+//   const call = changetype<UpdateProjectPricePerTokenInWeiCall>(newMockCall());
 
 //   call.to = Address.fromString(TEST_PROJECT.contract);
 //   call.block.timestamp = BigInt.fromString("230");
@@ -1484,7 +1489,7 @@ test("Can add a new project when no contract exists yet", () => {
 //   mockRefreshProjectScript();
 //   createProjectToLoad();
 
-//   let call = changetype<UpdateProjectScriptCall>(newMockCall());
+//   const call = changetype<UpdateProjectScriptCall>(newMockCall());
 
 //   call.to = Address.fromString(TEST_PROJECT.contract);
 //   call.block.timestamp = BigInt.fromString("530");
@@ -1542,7 +1547,7 @@ test("Can add a new project when no contract exists yet", () => {
 
 //   createProjectToLoad();
 
-//   let call = changetype<UpdateProjectScriptJSONCall>(newMockCall());
+//   const call = changetype<UpdateProjectScriptJSONCall>(newMockCall());
 
 //   call.to = Address.fromString(TEST_PROJECT.contract);
 //   call.block.timestamp = BigInt.fromString("232");
@@ -1577,7 +1582,7 @@ test("Can add a new project when no contract exists yet", () => {
 
 //   createProjectToLoad();
 
-//   let call = changetype<UpdateProjectSecondaryMarketRoyaltyPercentageCall>(
+//   const call = changetype<UpdateProjectSecondaryMarketRoyaltyPercentageCall>(
 //     newMockCall()
 //   );
 
@@ -1614,7 +1619,7 @@ test("Can add a new project when no contract exists yet", () => {
 
 //   createProjectToLoad();
 
-//   let call = changetype<UpdateProjectWebsiteCall>(newMockCall());
+//   const call = changetype<UpdateProjectWebsiteCall>(newMockCall());
 
 //   call.to = Address.fromString(TEST_PROJECT.contract);
 //   call.block.timestamp = BigInt.fromString("230");

@@ -100,35 +100,45 @@ export function booleanToString(b: bool): string {
   return b ? "true" : "false";
 }
 
-/** Start PRNG */
-// Random keccak256 hash
-const hash = crypto.keccak256(ByteArray.fromUTF8("testhash")).toHexString();
+// The built in assembly script Math.random() function does not work
+// in the test runner so the class below takes advantage of a modified version
+// of the prng described here https://github.com/mattdesl/tiny-artblocks/blob/main/README.md
+// to generate random Ethereum addresses.
+export class RandomAddressGenerator {
+  xs_state: Array<i32>;
 
-// state of the PRNG
-const xs_state: Array<i32> = [0, 0, 0, 0].map<i32>((_, i) =>
-  I32.parseInt(hash.substr(i * 8 + 2, 8), 16)
-);
+  constructor() {
+    // Random keccak256 hash
+    const hash = crypto.keccak256(ByteArray.fromUTF8("testhash")).toHexString();
 
-const prng = (): i64 => {
-  /* Algorithm "xor128" from p. 5 of Marsaglia, "Xorshift RNGs" */
-  let s = xs_state[3];
-  let t = xs_state[3];
-  xs_state[3] = xs_state[2];
-  xs_state[2] = xs_state[1];
-  xs_state[1] = s = xs_state[0];
-  t ^= t << 11;
-  t ^= t >>> 8;
-  xs_state[0] = t ^ s ^ (s >>> 19);
-  return xs_state[0] / 0x100000000;
-};
-/** End PRNG */
+    this.xs_state = [];
+    for (let i = 0; i < 4; i++) {
+      this.xs_state.push(I32.parseInt(hash.substr(i * 8 + 2, 8), 16));
+    }
+    // this.xs_state = [0, 0, 0, 0].map<i32>((_, i) =>
+    // );
+  }
 
-export function generateRandomAddress(): Address {
-  const randomHash = crypto
-    .keccak256(ByteArray.fromI64(i64(Math.floor(f64(prng()) * 1000))))
-    .toHexString();
+  prng(): i64 {
+    /* Algorithm "xor128" from p. 5 of Marsaglia, "Xorshift RNGs" */
+    let s = this.xs_state[3];
+    let t = this.xs_state[3];
+    this.xs_state[3] = this.xs_state[2];
+    this.xs_state[2] = this.xs_state[1];
+    this.xs_state[1] = s = this.xs_state[0];
+    t ^= t << 11;
+    t ^= t >>> 8;
+    this.xs_state[0] = t ^ s ^ (s >>> 19);
+    return this.xs_state[0];
+  }
 
-  return Address.fromString(randomHash.slice(0, 42));
+  generateRandomAddress(): Address {
+    const randomHash = crypto
+      .keccak256(ByteArray.fromI64(this.prng()))
+      .toHexString();
+
+    return Address.fromString(randomHash.slice(0, 42));
+  }
 }
 
 // helper mock function to initialize a Token entity in local in-memory store
@@ -149,8 +159,8 @@ export const mockProjectScriptByIndex = function(
   script: string | null
 ): void {
   let projectScriptByIndexInputs: Array<ethereum.Value> = [
-    ethereum.Value.fromSignedBigInt(projectId), // projectId
-    ethereum.Value.fromSignedBigInt(index) // index
+    ethereum.Value.fromUnsignedBigInt(projectId), // projectId
+    ethereum.Value.fromUnsignedBigInt(index) // index
   ];
   createMockedFunction(
     contractAddress,

@@ -9,7 +9,7 @@ import {
   ByteArray
 } from "@graphprotocol/graph-ts";
 
-import { log as testLog } from "matchstick-as";
+import { log as testLog, test } from "matchstick-as";
 
 import {
   GenArt721Core,
