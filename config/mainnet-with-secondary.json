@@ -42,6 +42,11 @@
       "address": "0xd10e3DEe203579FcEE90eD7d0bDD8086F7E53beB",
       "name": "ArtCode",
       "startBlock": 14122786
+    },
+    {
+      "address": "0x0A1BBD57033F57E7B6743621b79fCB9Eb2CE3676",
+      "name": "Bright Moments",
+      "startBlock": 14484184
     }
   ],
   "openSeaContract": {
