@@ -1,4 +1,4 @@
-import { BigInt, store, Address } from "@graphprotocol/graph-ts";
+import { BigInt, store, Address, log } from "@graphprotocol/graph-ts";
 
 import {
   MinterFilterV0,
@@ -103,7 +103,17 @@ export function handleMinterApproved(event: MinterApproved): void {
     event.block.timestamp
   );
 
-  loadOrCreateMinter(event.params._minterAddress, event.block.timestamp);
+  let minter = loadOrCreateMinter(
+    event.params._minterAddress,
+    event.block.timestamp
+  );
+
+  // Don't add the minter if it's minter filter is different
+  // from the minter filter that emitted this event.
+  if (minter.minterFilter != minterFilter.id) {
+    store.remove("Minter", minter.id);
+    return;
+  }
 
   minterFilter.updatedAt = event.block.timestamp;
   minterFilter.save();
@@ -129,9 +139,15 @@ export function handleProjectMinterRegistered(
     event.block.timestamp
   );
 
+  // Since only an approved minter can be registered for a project
+  // the minter should already exist. If it doesn't it means that
+  // we didn't create it because its minter filter is different from
+  // the minter filter it was approved on.
+  let minter = Minter.load(event.params._minterAddress.toHexString());
   let coreContract = Contract.load(minterFilter.coreContract);
 
   if (
+    !minter ||
     !coreContract ||
     coreContract.minterFilter != event.address.toHexString()
   ) {
@@ -206,7 +222,6 @@ function createAndPopulateProjectMinterConfiguration(
   projectMinterConfig.project = project.id;
   projectMinterConfig.minter = minterAddress.toHexString();
 
-  // We're using MinterSetPriceV0 in place of a generic filtered minter here
   let filteredMinterContract = IFilteredMinterV0.bind(minterAddress);
   let projectPriceInfo = filteredMinterContract.getPriceInfo(project.projectId);
   projectMinterConfig.priceIsConfigured = projectPriceInfo.value0;
@@ -214,7 +229,8 @@ function createAndPopulateProjectMinterConfiguration(
   projectMinterConfig.currencySymbol = projectPriceInfo.value2;
   projectMinterConfig.currencyAddress = projectPriceInfo.value3;
 
-  if (minterType === "MinterDALinV0") {
+  log.info("Minter Type {}", [minterType]);
+  if (minterType == "MinterDALinV0") {
     let minterDALinV0Contract = MinterDALinV0.bind(minterAddress);
 
     let projectAuctionParameters = minterDALinV0Contract.projectAuctionParameters(

@@ -540,9 +540,9 @@ dataSources:
         - event: PurchaseToDisabledUpdated(indexed uint256,bool)
           handler: handlePurchaseToDisabledUpdated
         - event: ResetAuctionDetails(indexed uint256)
-          handler: handleResetAuctionDetails
+          handler: handleDALinV0ResetAuctionDetails
         - event: SetAuctionDetails(indexed uint256,uint256,uint256,uint256,uint256)
-          handler: handleSetAuctionDetails
+          handler: handleDALinV0SetAuctionDetails
       file: ./src/minter-suite-mapping.ts
   {{/minterDALinV0Contracts}}
   {{#minterDAExpV0Contracts}}
@@ -578,9 +578,9 @@ dataSources:
         - event: PurchaseToDisabledUpdated(indexed uint256,bool)
           handler: handlePurchaseToDisabledUpdated
         - event: ResetAuctionDetails(indexed uint256)
-          handler: handleResetAuctionDetails
+          handler: handleDAExpV0ResetAuctionDetails
         - event: SetAuctionDetails(indexed uint256,uint256,uint256,uint256,uint256)
-          handler: handleSetAuctionDetails
+          handler: handleDAExpV0SetAuctionDetails
       file: ./src/minter-suite-mapping.ts
   {{/minterDAExpV0Contracts}}
   {{#openSeaContract}}
