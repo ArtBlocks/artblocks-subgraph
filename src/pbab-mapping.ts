@@ -42,7 +42,7 @@ import {
   RemoveWhitelistedCall,
   RemoveMintWhitelistedCall,
   UpdateAdminCall
-} from "../generated/GenArt721Core2PBAB-0x13aAe6f9599880edbB7d144BB13F1212CeE99533/GenArt721Core2PBAB"; //! TODO: Fix import
+} from "../generated/GenArt721Core2PBAB/GenArt721Core2PBAB";
 
 import {
   Project,
