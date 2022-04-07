@@ -6,7 +6,6 @@ import {
   Value,
   ValueKind,
   store,
-  Address,
   Bytes,
   BigInt,
   BigDecimal
@@ -30,7 +29,6 @@ export class Project extends Entity {
     this.set("pricePerTokenInWei", Value.fromBigInt(BigInt.zero()));
     this.set("scriptCount", Value.fromBigInt(BigInt.zero()));
     this.set("useHashString", Value.fromBoolean(false));
-    this.set("useIpfs", Value.fromBoolean(false));
     this.set("createdAt", Value.fromBigInt(BigInt.zero()));
     this.set("updatedAt", Value.fromBigInt(BigInt.zero()));
     this.set("contract", Value.fromString(""));
@@ -1192,6 +1190,8 @@ export class OpenSeaSale extends Entity {
     super();
     this.set("id", Value.fromString(id));
 
+    this.set("openSeaVersion", Value.fromString(""));
+    this.set("saleType", Value.fromString(""));
     this.set("blockNumber", Value.fromBigInt(BigInt.zero()));
     this.set("blockTimestamp", Value.fromBigInt(BigInt.zero()));
     this.set("summaryTokensSold", Value.fromString(""));
@@ -1228,21 +1228,22 @@ export class OpenSeaSale extends Entity {
     this.set("id", Value.fromString(value));
   }
 
-  get saleType(): string | null {
-    let value = this.get("saleType");
-    if (!value || value.kind == ValueKind.NULL) {
-      return null;
-    } else {
-      return value.toString();
-    }
+  get openSeaVersion(): string {
+    let value = this.get("openSeaVersion");
+    return value!.toString();
   }
 
-  set saleType(value: string | null) {
-    if (!value) {
-      this.unset("saleType");
-    } else {
-      this.set("saleType", Value.fromString(<string>value));
-    }
+  set openSeaVersion(value: string) {
+    this.set("openSeaVersion", Value.fromString(value));
+  }
+
+  get saleType(): string {
+    let value = this.get("saleType");
+    return value!.toString();
+  }
+
+  set saleType(value: string) {
+    this.set("saleType", Value.fromString(value));
   }
 
   get blockNumber(): BigInt {

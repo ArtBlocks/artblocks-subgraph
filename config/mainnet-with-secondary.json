@@ -49,8 +49,12 @@
       "startBlock": 14484184
     }
   ],
-  "openSeaContract": {
+  "openSeaContractV1": {
     "address": "0x7Be8076f4EA4A4AD08075C2508e481d6C946D12b",
     "startBlock": 11338811
+  },
+  "openSeaContractV2": {
+    "address": "0x7f268357A8c2552623316e2562D90e642bB538E5",
+    "startBlock": 14120912
   }
 }
