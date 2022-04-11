@@ -300,12 +300,21 @@ enum SaleType {
   Bundle
 }
 
+enum OpenSeaVersion {
+  V1,
+  V2
+}
+
+
 type OpenSeaSale @entity {
   "The transaction hash when the OpenSea sale occured"
   id: ID!
 
+  "The version of OpenSea exchange for this sale"
+  openSeaVersion: OpenSeaVersion!
+
   "The sale type (Single | Bundle)"
-  saleType: SaleType
+  saleType: SaleType!
 
   "The block number of the OpenSea sale"
   blockNumber: BigInt!
