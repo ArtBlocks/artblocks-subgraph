@@ -583,7 +583,7 @@ dataSources:
           handler: handleDAExpV0SetAuctionDetails
       file: ./src/minter-suite-mapping.ts
   {{/minterDAExpV0Contracts}}
-  {{#openSeaContract}}
+  {{#openSeaContractV1}}
   - kind: ethereum/contract
     name: WyvernExchange
     network: mainnet
@@ -611,5 +611,35 @@ dataSources:
       callHandlers: 
         - function: atomicMatch_(address[14],uint256[18],uint8[8],bytes,bytes,bytes,bytes,bytes,bytes,uint8[2],bytes32[5])
           handler: handleAtomicMatch_
-      file: ./src/os-mapping.ts
-  {{/openSeaContract}}
+      file: ./src/os-v1-mapping.ts
+  {{/openSeaContractV1}}
+  {{#openSeaContractV2}}
+  - kind: ethereum/contract
+    name: WyvernExchangeWithBulkCancellations
+    network: mainnet
+    source:
+      address: '{{address}}'
+      abi: WyvernExchangeWithBulkCancellations
+      startBlock: {{startBlock}}
+    mapping:
+      kind: ethereum/events
+      apiVersion: 0.0.5
+      language: wasm/assemblyscript
+      entities:
+        - Project
+        - ProjectScript
+        - Token
+        - Contract
+        - Account
+        - AccountProject
+        - Whitelisting
+        - OpenSeaSale
+        - TokenOpenSeaSaleLookupTable
+      abis:
+        - name: WyvernExchangeWithBulkCancellations
+          file: ./abis/WyvernExchangeWithBulkCancellations.json
+      callHandlers: 
+        - function: atomicMatch_(address[14],uint256[18],uint8[8],bytes,bytes,bytes,bytes,bytes,bytes,uint8[2],bytes32[5])
+          handler: handleAtomicMatch_
+      file: ./src/os-v2-mapping.ts
+  {{/openSeaContractV2}}
