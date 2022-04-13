@@ -47,6 +47,11 @@
       "address": "0x0A1BBD57033F57E7B6743621b79fCB9Eb2CE3676",
       "name": "Bright Moments",
       "startBlock": 14484184
+    },
+    {
+      "address": "0x010bE6545e14f1DC50256286d9920e833F809C6A",
+      "name": "Legends of Metaterra",
+      "startBlock": 14567671
     }
   ],
   "openSeaContractV1": {
