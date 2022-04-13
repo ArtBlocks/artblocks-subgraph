@@ -56,11 +56,11 @@ export function handleAtomicMatch_(call: AtomicMatch_Call): void {
   } else if (saleTargetAddressStr == WYVERN_MERKLE_ADDRESS) {
     /**
       * In case of normal "single asset sale", the saleTarget input is
-      * set to the NFT contract.
+      * set to the MerkleValidator contract.
       */
     _handleSingleAssetSale(call);
   } else {
-    log.warning("[OSV2 handler] Unexpected target", []);
+    log.warning("[OSV2 handler] Unexpected target: {}", [saleTargetAddressStr]);
   }
 }
 
@@ -282,7 +282,7 @@ function _retrieveDecodedDataFromCallData(callData: Bytes): ethereum.Tuple {
     callData.subarray(4)
   );
   let decoded = ethereum
-    .decode("(address,address, address, uint256)", dataWithoutFunctionSelector)!
+    .decode("(address,address,address,uint256)", dataWithoutFunctionSelector)!
     .toTuple();
   return decoded
 }

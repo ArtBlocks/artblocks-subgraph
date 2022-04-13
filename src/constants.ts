@@ -8,9 +8,9 @@ export const ARTBLOCKS_ADDRESS = "0xa7d8d9ef8d8ce8992df33d8b8cf4aebabd5bd270";
 export const WYVERN_EXCHANGE_ADDRESS = "0x7be8076f4ea4a4ad08075c2508e481d6c946d12b";
 
 // Opensea V2 contract
-export const WYVERN_EXCHANGE_WITH_BULK_CANCELLATIONS_ADDRESS = "0x7f268357A8c2552623316e2562D90e642bB538E5";
+export const WYVERN_EXCHANGE_WITH_BULK_CANCELLATIONS_ADDRESS = "0x7f268357a8c2552623316e2562d90e642bb538e5";
 // Opensea V2 contract handling the transfers
-export const WYVERN_MERKLE_ADDRESS = "0xBAf2127B49fC93CbcA6269FAdE0F7F31dF4c88a7"
+export const WYVERN_MERKLE_ADDRESS = "0xbaf2127b49fc93cbca6269fade0f7f31df4c88a7";
 
 // Opensea atomicizer contract for bundle
 export const WYVERN_ATOMICIZER_ADDRESS = "0xc99f70bfd82fb7c8f8191fdfbfb735606b15e5c5";
