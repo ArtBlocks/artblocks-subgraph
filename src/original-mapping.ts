@@ -8,6 +8,7 @@
 // contract we're indexing from.
 
 import {
+  Address,
   BigInt,
   ByteArray,
   Bytes,
@@ -209,23 +210,26 @@ export function handleAddProject(call: AddProjectCall): void {
   let paused = projectScriptInfo.value5;
 
   let project = new Project(generateContractSpecificId(call.to, projectId));
-  project.contract = contractEntity.id;
-  project.artist = artist.id;
-  project.projectId = projectId;
-  project.name = name;
-  project.dynamic = dynamic;
-  project.artistAddress = artistAddress;
-  project.pricePerTokenInWei = pricePerTokenInWei;
-  project.invocations = invocations;
-  project.maxInvocations = maxInvocations;
-  project.scriptCount = scriptCount;
-  project.useHashString = hashesPerToken.toI32() > 0;
-  project.paused = paused;
   project.active = false;
-  project.locked = false;
+  project.artist = artist.id;
+  project.artistAddress = artistAddress;
   project.complete = false;
+  project.contract = contractEntity.id;
   project.createdAt = call.block.timestamp;
+  project.currencyAddress = Address.zero();
+  project.currencySymbol = "ETH";
+  project.dynamic = dynamic;
+  project.invocations = invocations;
+  project.locked = false;
+  project.maxInvocations = maxInvocations;
+  project.name = name;
+  project.paused = paused;
+  project.pricePerTokenInWei = pricePerTokenInWei;
+  project.projectId = projectId;
+  project.scriptCount = scriptCount;
   project.updatedAt = call.block.timestamp;
+  project.useHashString = hashesPerToken.toI32() > 0;
+  project.useIpfs = false;
   project.save();
 
   contractEntity.updatedAt = call.block.timestamp;
@@ -342,7 +346,7 @@ export function handleToggleProjectIsDynamic(
 
   if (project && project.contract == call.to.toHexString()) {
     project.dynamic = !project.dynamic;
-    project.useHashString = !project.dynamic;
+    project.useHashString = project.dynamic;
     project.updatedAt = call.block.timestamp;
     project.save();
   }
@@ -398,6 +402,7 @@ export function handleToggleProjectUseIpfsForStatic(
 
   if (project && project.contract == call.to.toHexString()) {
     project.useIpfs = !project.useIpfs;
+    project.updatedAt = call.block.timestamp;
     project.save();
   }
 }
@@ -456,6 +461,7 @@ export function handleUpdateProjectBaseIpfsURI(
   );
   if (project) {
     project.baseIpfsUri = call.inputs._projectBaseIpfsURI;
+    project.updatedAt = call.block.timestamp;
     project.save();
   }
 }

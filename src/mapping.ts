@@ -9,8 +9,6 @@ import {
   ByteArray
 } from "@graphprotocol/graph-ts";
 
-import { log as testLog, test } from "matchstick-as";
-
 import {
   GenArt721Core,
   Mint,
@@ -214,6 +212,7 @@ export function handleAddProject(call: AddProjectCall): void {
   let pricePerTokenInWei = projectTokenInfo.value1;
   let invocations = projectTokenInfo.value2;
   let maxInvocations = projectTokenInfo.value3;
+  let currencyAddress = projectTokenInfo.value5;
   let currencySymbol = projectTokenInfo.value7;
 
   let scriptCount = projectScriptInfo.value1;
@@ -231,6 +230,7 @@ export function handleAddProject(call: AddProjectCall): void {
   project.contract = contractAddress.toHexString();
   project.createdAt = timestamp;
   project.currencySymbol = currencySymbol;
+  project.currencyAddress = currencyAddress;
   project.dynamic = dynamic;
   project.invocations = invocations;
   project.locked = false;
@@ -452,7 +452,8 @@ export function handleToggleProjectIsDynamic(
 
   if (project && project.contract == call.to.toHexString()) {
     project.dynamic = !project.dynamic;
-    project.useHashString = !project.dynamic;
+    project.useHashString = project.dynamic;
+    project.updatedAt = call.block.timestamp;
     project.save();
   }
 }
@@ -494,6 +495,7 @@ export function handleToggleProjectUseHashString(
 
   if (project && project.contract == call.to.toHexString()) {
     project.useHashString = !project.useHashString;
+    project.updatedAt = call.block.timestamp;
     project.save();
   }
 }
@@ -507,6 +509,7 @@ export function handleToggleProjectUseIpfsForStatic(
 
   if (project && project.contract == call.to.toHexString()) {
     project.useIpfs = !project.useIpfs;
+    project.updatedAt = call.block.timestamp;
     project.save();
   }
 }
@@ -567,6 +570,7 @@ export function handleUpdateProjectBaseIpfsURI(
 
   if (project) {
     project.baseIpfsUri = call.inputs._projectBaseIpfsURI;
+    project.updatedAt = call.block.timestamp;
     project.save();
   }
 }
