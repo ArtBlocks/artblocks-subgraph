@@ -11,10 +11,10 @@ export const WYVERN_EXCHANGE_ADDRESS =
 
 // Opensea V2 contract
 export const WYVERN_EXCHANGE_WITH_BULK_CANCELLATIONS_ADDRESS =
-  "0x7f268357A8c2552623316e2562D90e642bB538E5";
+  "0x7f268357a8c2552623316e2562d90e642bb538e5";
 // Opensea V2 contract handling the transfers
 export const WYVERN_MERKLE_ADDRESS =
-  "0xBAf2127B49fC93CbcA6269FAdE0F7F31dF4c88a7";
+  "0xbaf2127b49fc93cbca6269fade0f7f31df4c88a7";
 
 // Opensea atomicizer contract for bundle
 export const WYVERN_ATOMICIZER_ADDRESS =
