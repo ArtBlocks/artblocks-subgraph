@@ -130,6 +130,12 @@ export function guardedArrayReplace(
     replacement: Bytes,
     mask: Bytes
 ): Bytes {
+    // Sometime the replacementPattern is empty, meaning that both arrays (buyCallData and sellCallData) are identicall and
+    // no merging is necessary. In such a case randomly return the first array (buyCallData)
+    if (mask.length == 0) {
+        return array;
+    }
+
     array.reverse();
     replacement.reverse();
     mask.reverse();
