@@ -102,8 +102,12 @@ type Project @entity {
   scriptUpdatedAt: BigInt
   contract: Contract!
 
+  "Minter configuration for this project (not implemented prior to minter filters)"
+  minterConfiguration: ProjectMinterConfiguration
+
   "Lookup table to get the OpenSea Sale history of the project"
-  openSeaSaleLookupTables: [OpenSeaSaleLookupTable!]! @derivedFrom(field: "project")
+  openSeaSaleLookupTables: [OpenSeaSaleLookupTable!]!
+    @derivedFrom(field: "project")
 }
 
 type ProjectScript @entity {
@@ -143,6 +147,9 @@ type Contract @entity {
   createdAt: BigInt!
 
   updatedAt: BigInt!
+
+  "Associated minter filter (if applicable)"
+  minterFilter: MinterFilter
 }
 
 type Whitelisting @entity {
@@ -157,10 +164,10 @@ type Account @entity {
 
   "Projects the account owns tokens from"
   projectsOwned: [AccountProject!] @derivedFrom(field: "account")
-  
+
   "Projects the account is listed as artist for"
   projectsCreated: [Project!] @derivedFrom(field: "artist")
-  
+
   "Contracts the account is whitelisted on"
   whitelistedOn: [Whitelisting!] @derivedFrom(field: "account")
 }
@@ -175,34 +182,117 @@ type AccountProject @entity {
 type Token @entity {
   "Unique identifier made up of contract address and token id"
   id: ID!
-  
+
   "ID of the token on the contract"
   tokenId: BigInt!
 
   "Contract the token is on"
   contract: Contract!
-  
+
   "Invocation number of the project"
   invocation: BigInt!
-  
+
   "Unique string used as input to the tokens project script"
   hash: Bytes!
-  
+
   "Current owner of the token"
   owner: Account!
-  
+
   "Project of the token"
   project: Project!
-  
+
   uri: String
   createdAt: BigInt!
   updatedAt: BigInt!
-  
+
   "Transaction hash of token mint"
   transactionHash: Bytes!
 
   "Lookup table to get the OpenSea Sale history"
-  openSeaSaleLookupTables: [OpenSeaSaleLookupTable!]! @derivedFrom(field: "token")
+  openSeaSaleLookupTables: [OpenSeaSaleLookupTable!]!
+    @derivedFrom(field: "token")
+}
+
+type MinterFilter @entity {
+  "Unique identifier made up of minter filter contract address"
+  id: ID!
+
+  "Associated core contract"
+  coreContract: Contract!
+
+  "Minters allowlisted on MinterFilter"
+  minterAllowlist: [Minter!]! @derivedFrom(field: "minterFilter")
+
+  updatedAt: BigInt!
+}
+
+enum MinterType {
+  MinterSetPriceV0
+  MinterSetPriceERC20V0
+  MinterDALinV0
+  MinterDAExpV0
+}
+
+type Minter @entity {
+  "Unique identifier made up of minter contract address"
+  id: ID!
+
+  "Minter type"
+  type: MinterType!
+
+  "Associated Minter Filter"
+  minterFilter: MinterFilter!
+
+  "Minimum allowed auction length in seconds (linear Dutch auction minters)"
+  minimumAuctionLengthInSeconds: BigInt
+
+  "Minimum allowed half life in seconds (exponential Dutch auction minters)"
+  minimumHalfLifeInSeconds: BigInt
+
+  "Maximum allowed half life in seconds (exponential Dutch auction minters)"
+  maximumHalfLifeInSeconds: BigInt
+
+  coreContract: Contract!
+
+  updatedAt: BigInt!
+}
+
+type ProjectMinterConfiguration @entity {
+  "Unique identifier made up of minter contract address-projectId"
+  id: ID!
+
+  "The associated project"
+  project: Project!
+
+  "The associated minter"
+  minter: Minter!
+
+  "true if project's token price has been configured on minter"
+  priceIsConfigured: Boolean!
+
+  "currency symbol as defined on minter - ETH reserved for ether"
+  currencySymbol: String!
+
+  "currency address as defined on minter - address(0) reserved for ether"
+  currencyAddress: Bytes!
+
+  "Defines if purchasing token to another is allowed"
+  purchaseToDisabled: Boolean!
+
+  "price of token or resting price of Duch auction, in wei"
+  basePrice: BigInt
+
+  "Dutch auction start price, in wei"
+  startPrice: BigInt
+
+  "Half life for exponential decay Dutch auction, in seconds"
+  halfLifeSeconds: BigInt
+
+  "Dutch auction start time (unix timestamp)"
+  startTime: BigInt
+
+  "Linear Dutch auction end time (unix timestamp)"
+  endTime: BigInt
 }
 
 enum SaleType {

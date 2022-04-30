@@ -177,6 +177,9 @@ export function handleAddProject(call: AddProjectCall): void {
     projectId = contractEntity.nextProjectId.minus(BigInt.fromI32(1));
   } else {
     projectId = contractEntity.nextProjectId;
+    contractEntity.nextProjectId = contractEntity.nextProjectId.plus(
+      BigInt.fromI32(1)
+    );
   }
 
   let projectDetails = contract.projectDetails(projectId);
@@ -187,7 +190,7 @@ export function handleAddProject(call: AddProjectCall): void {
   let contractAddress = call.to;
 
   let name = projectDetails.value0;
-  let dynamic = false;
+  let dynamic = true;
 
   let artistAddress = projectTokenInfo.value0;
   let artist = new Account(artistAddress.toHexString());
@@ -197,6 +200,7 @@ export function handleAddProject(call: AddProjectCall): void {
   let invocations = projectTokenInfo.value2;
   let maxInvocations = projectTokenInfo.value3;
   let currencySymbol = projectTokenInfo.value7;
+  let currencyAddress = projectTokenInfo.value8;
 
   let scriptCount = projectScriptInfo.value1;
   let useHashString = true;
@@ -206,30 +210,29 @@ export function handleAddProject(call: AddProjectCall): void {
     generateContractSpecificId(contractAddress, projectId)
   );
 
-  project.contract = contractAddress.toHexString();
-  project.artist = artist.id;
-  project.projectId = projectId;
-  project.name = name;
-  project.dynamic = dynamic;
-  project.artistAddress = artistAddress;
-  project.pricePerTokenInWei = pricePerTokenInWei;
-  project.invocations = invocations;
-  project.maxInvocations = maxInvocations;
-  project.currencySymbol = currencySymbol;
-  project.scriptCount = scriptCount;
-  project.useHashString = useHashString;
-  project.paused = paused;
   project.active = false;
-  project.locked = false;
+  project.artist = artist.id;
+  project.artistAddress = artistAddress;
   project.complete = false;
+  project.contract = contractAddress.toHexString();
   project.createdAt = timestamp;
+  project.currencyAddress = currencyAddress;
+  project.currencySymbol = currencySymbol;
+  project.dynamic = dynamic;
+  project.invocations = invocations;
+  project.locked = false;
+  project.maxInvocations = maxInvocations;
+  project.name = name;
+  project.paused = paused;
+  project.pricePerTokenInWei = pricePerTokenInWei;
+  project.projectId = projectId;
+  project.scriptCount = scriptCount;
   project.updatedAt = timestamp;
+  project.useHashString = useHashString;
+  project.useIpfs = false;
 
   project.save();
 
-  contractEntity.nextProjectId = contractEntity.nextProjectId.plus(
-    BigInt.fromI32(1)
-  );
   contractEntity.updatedAt = call.block.timestamp;
   contractEntity.save();
 }

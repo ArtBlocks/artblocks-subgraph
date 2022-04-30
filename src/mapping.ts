@@ -61,7 +61,9 @@ import {
   AccountProject,
   Contract,
   Whitelisting,
-  ProjectScript
+  ProjectScript,
+  MinterFilter,
+  ProjectMinterConfiguration
 } from "../generated/schema";
 
 import {
@@ -189,6 +191,9 @@ export function handleAddProject(call: AddProjectCall): void {
     }
   } else {
     projectId = contractEntity.nextProjectId;
+    contractEntity.nextProjectId = contractEntity.nextProjectId.plus(
+      BigInt.fromI32(1)
+    );
   }
 
   let projectDetails = contract.projectDetails(projectId);
@@ -208,6 +213,7 @@ export function handleAddProject(call: AddProjectCall): void {
   let pricePerTokenInWei = projectTokenInfo.value1;
   let invocations = projectTokenInfo.value2;
   let maxInvocations = projectTokenInfo.value3;
+  let currencyAddress = projectTokenInfo.value5;
   let currencySymbol = projectTokenInfo.value7;
 
   let scriptCount = projectScriptInfo.value1;
@@ -218,32 +224,30 @@ export function handleAddProject(call: AddProjectCall): void {
     generateContractSpecificId(contractAddress, projectId)
   );
 
-  project.contract = contractAddress.toHexString();
-  project.artist = artist.id;
-  project.projectId = projectId;
-  project.name = name;
-  project.dynamic = dynamic;
-  project.artistAddress = artistAddress;
-  project.pricePerTokenInWei = pricePerTokenInWei;
-  project.invocations = invocations;
-  project.maxInvocations = maxInvocations;
-  project.currencySymbol = currencySymbol;
-  project.scriptCount = scriptCount;
-  project.useHashString = useHashString;
-  project.paused = paused;
   project.active = false;
-  project.locked = false;
+  project.artist = artist.id;
+  project.artistAddress = artistAddress;
   project.complete = false;
+  project.contract = contractAddress.toHexString();
   project.createdAt = timestamp;
+  project.currencySymbol = currencySymbol;
+  project.currencyAddress = currencyAddress;
+  project.dynamic = dynamic;
+  project.invocations = invocations;
+  project.locked = false;
+  project.maxInvocations = maxInvocations;
+  project.name = name;
+  project.paused = paused;
+  project.pricePerTokenInWei = pricePerTokenInWei;
+  project.projectId = projectId;
+  project.scriptCount = scriptCount;
   project.updatedAt = timestamp;
+  project.useHashString = useHashString;
   project.useIpfs = false;
 
   project.save();
 
   if (contractEntity) {
-    contractEntity.nextProjectId = contractEntity.nextProjectId.plus(
-      BigInt.fromI32(1)
-    );
     contractEntity.updatedAt = call.block.timestamp;
     contractEntity.save();
   }
@@ -315,13 +319,18 @@ export function handleRemoveMintWhitelisted(
   let contractEntity = refreshContract(contract, call.block.timestamp);
 
   if (contractEntity) {
-    removeMintWhitelisting(contractEntity, call.inputs._address);
+    removeMintWhitelisting(
+      contractEntity,
+      call.inputs._address,
+      call.block.timestamp
+    );
   }
 }
 
 function removeMintWhitelisting(
   contractEntity: Contract,
-  minterAddress: Address
+  minterAddress: Address,
+  timestamp: BigInt
 ): void {
   let mintWhitelisted = contractEntity.mintWhitelisted;
 
@@ -329,6 +338,30 @@ function removeMintWhitelisting(
   for (let i = 0; i < mintWhitelisted.length; i++) {
     if ((mintWhitelisted[i] as Bytes) != minterAddress) {
       newMintWhitelisted.push(mintWhitelisted[i]);
+    }
+  }
+
+  // If the minter that was removed was the minter filter for the
+  // contract then we need to null all minter configurations for
+  // the contract's projects.
+  let minterFilter = MinterFilter.load(minterAddress.toHexString());
+  if (minterFilter && contractEntity.minterFilter == minterFilter.id) {
+    contractEntity.minterFilter = null;
+    let nextProjectId = contractEntity.nextProjectId.toI32();
+    for (let i = 0; i < nextProjectId; i++) {
+      let fullProjectId = contractEntity.id + "-" + i.toString();
+      let project = Project.load(fullProjectId);
+
+      if (project && project.minterConfiguration) {
+        project.minterConfiguration = null;
+        project.updatedAt = timestamp;
+        project.save();
+      }
+
+      let prevMinterConfig = ProjectMinterConfiguration.load(fullProjectId);
+      if (prevMinterConfig) {
+        store.remove("ProjectMinterConfiguration", fullProjectId);
+      }
     }
   }
 
@@ -423,7 +456,8 @@ export function handleToggleProjectIsDynamic(
 
   if (project && project.contract == call.to.toHexString()) {
     project.dynamic = !project.dynamic;
-    project.useHashString = !project.dynamic;
+    project.useHashString = project.dynamic;
+    project.updatedAt = call.block.timestamp;
     project.save();
   }
 }
@@ -465,6 +499,7 @@ export function handleToggleProjectUseHashString(
 
   if (project && project.contract == call.to.toHexString()) {
     project.useHashString = !project.useHashString;
+    project.updatedAt = call.block.timestamp;
     project.save();
   }
 }
@@ -478,6 +513,7 @@ export function handleToggleProjectUseIpfsForStatic(
 
   if (project && project.contract == call.to.toHexString()) {
     project.useIpfs = !project.useIpfs;
+    project.updatedAt = call.block.timestamp;
     project.save();
   }
 }
@@ -538,6 +574,7 @@ export function handleUpdateProjectBaseIpfsURI(
 
   if (project) {
     project.baseIpfsUri = call.inputs._projectBaseIpfsURI;
+    project.updatedAt = call.block.timestamp;
     project.save();
   }
 }

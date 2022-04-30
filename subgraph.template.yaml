@@ -394,6 +394,195 @@ dataSources:
           handler: handleUpdateProjectWebsite
       file: ./src/original-mapping.ts
   {{/genArt721Contracts}}
+  {{#minterFilterV0Contracts}}
+  - kind: ethereum/contract
+    name: 'MinterFilterV0-{{address}}'
+    network: {{network}}
+    source:
+      address: '{{address}}'
+      abi: MinterFilterV0
+      startBlock: {{startBlock}}
+    mapping:
+      kind: ethereum/events
+      apiVersion: 0.0.5
+      language: wasm/assemblyscript
+      entities:
+        - Project
+        - Contract
+        - MinterFilter
+        - Minter
+        - ProjectMinterConfiguration
+      abis:
+        - name: MinterFilterV0
+          file: ./abis/MinterFilterV0.json
+        - name: IFilteredMinterV0
+          file: ./abis/IFilteredMinterV0.json
+        - name: MinterSetPriceERC20V0
+          file: ./abis/MinterSetPriceERC20V0.json
+        - name: MinterSetPriceV0
+          file: ./abis/MinterSetPriceV0.json
+        - name: MinterDALinV0
+          file: ./abis/MinterDALinV0.json
+        - name: MinterDAExpV0
+          file: ./abis/MinterDAExpV0.json
+      eventHandlers:
+        - event: IsCanonicalMinterFilter(indexed address)
+          handler: handleIsCanonicalMinterFilter
+        - event: MinterApproved(indexed address,string)
+          handler: handleMinterApproved
+        - event: MinterRevoked(indexed address)
+          handler: handleMinterRevoked
+        - event: ProjectMinterRegistered(indexed uint256,indexed address,string)
+          handler: handleProjectMinterRegistered
+        - event: ProjectMinterRemoved(indexed uint256)
+          handler: handleProjectMinterRemoved
+      file: ./src/minter-filter-mapping.ts
+  {{/minterFilterV0Contracts}}
+  {{#minterSetPriceERC20V0Contracts}}
+  - kind: ethereum/contract
+    name: 'MinterSetPriceERC20V0-{{address}}'
+    network: {{network}}
+    source:
+      address: '{{address}}'
+      abi: MinterSetPriceERC20V0
+      startBlock: {{startBlock}}
+    mapping:
+      kind: ethereum/events
+      apiVersion: 0.0.5
+      language: wasm/assemblyscript
+      entities:
+        - Project
+        - Contract
+        - MinterFilter
+        - Minter
+        - ProjectMinterConfiguration
+      abis:
+        - name: MinterSetPriceERC20V0
+          file: ./abis/MinterSetPriceERC20V0.json
+        - name: IFilteredMinterV0
+          file: ./abis/IFilteredMinterV0.json
+      eventHandlers:
+        - event: PricePerTokenInWeiUpdated(indexed uint256,indexed uint256)
+          handler: handlePricePerTokenInWeiUpdated
+        - event: ProjectCurrencyInfoUpdated(indexed uint256,indexed address,string)
+          handler: handleProjectCurrencyInfoUpdated
+        - event: PurchaseToDisabledUpdated(indexed uint256,bool)
+          handler: handlePurchaseToDisabledUpdated
+      file: ./src/minter-suite-mapping.ts
+  {{/minterSetPriceERC20V0Contracts}}
+  {{#minterSetPriceV0Contracts}}
+  - kind: ethereum/contract
+    name: 'MinterSetPriceV0-{{address}}'
+    network: {{network}}
+    source:
+      address: '{{address}}'
+      abi: MinterSetPriceV0
+      startBlock: {{startBlock}}
+    mapping:
+      kind: ethereum/events
+      apiVersion: 0.0.5
+      language: wasm/assemblyscript
+      entities:
+        - Project
+        - ProjectScript
+        - Token
+        - Contract
+        - Account
+        - AccountProject
+        - Whitelisting
+        - MinterFilter
+        - Minter
+        - ProjectMinterConfiguration
+      abis:
+        - name: MinterSetPriceV0
+          file: ./abis/MinterSetPriceV0.json
+        - name: IFilteredMinterV0
+          file: ./abis/IFilteredMinterV0.json
+      eventHandlers:
+        - event: PricePerTokenInWeiUpdated(indexed uint256,indexed uint256)
+          handler: handlePricePerTokenInWeiUpdated
+        - event: ProjectCurrencyInfoUpdated(indexed uint256,indexed address,string)
+          handler: handleProjectCurrencyInfoUpdated
+        - event: PurchaseToDisabledUpdated(indexed uint256,bool)
+          handler: handlePurchaseToDisabledUpdated
+      file: ./src/minter-suite-mapping.ts
+  {{/minterSetPriceV0Contracts}}
+  {{#minterDALinV0Contracts}}
+  - kind: ethereum/contract
+    name: 'MinterDALinV0-{{address}}'
+    network: {{network}}
+    source:
+      address: '{{address}}'
+      abi: MinterDALinV0
+      startBlock: {{startBlock}}
+    mapping:
+      kind: ethereum/events
+      apiVersion: 0.0.5
+      language: wasm/assemblyscript
+      entities:
+        - Project
+        - Contract
+        - MinterFilter
+        - Minter
+        - ProjectMinterConfiguration
+      abis:
+        - name: MinterDALinV0
+          file: ./abis/MinterDALinV0.json
+        - name: IFilteredMinterV0
+          file: ./abis/IFilteredMinterV0.json
+      eventHandlers:
+        - event: MinimumAuctionLengthSecondsUpdated(uint256)
+          handler: handleMinimumAuctionLengthSecondsUpdated
+        - event: PricePerTokenInWeiUpdated(indexed uint256,indexed uint256)
+          handler: handlePricePerTokenInWeiUpdated
+        - event: ProjectCurrencyInfoUpdated(indexed uint256,indexed address,string)
+          handler: handleProjectCurrencyInfoUpdated
+        - event: PurchaseToDisabledUpdated(indexed uint256,bool)
+          handler: handlePurchaseToDisabledUpdated
+        - event: ResetAuctionDetails(indexed uint256)
+          handler: handleDALinV0ResetAuctionDetails
+        - event: SetAuctionDetails(indexed uint256,uint256,uint256,uint256,uint256)
+          handler: handleDALinV0SetAuctionDetails
+      file: ./src/minter-suite-mapping.ts
+  {{/minterDALinV0Contracts}}
+  {{#minterDAExpV0Contracts}}
+  - kind: ethereum/contract
+    name: 'MinterDAExpV0-{{address}}'
+    network: {{network}}
+    source:
+      address: '{{address}}'
+      abi: MinterDAExpV0
+      startBlock: {{startBlock}}
+    mapping:
+      kind: ethereum/events
+      apiVersion: 0.0.5
+      language: wasm/assemblyscript
+      entities:
+        - Project
+        - Contract
+        - MinterFilter
+        - Minter
+        - ProjectMinterConfiguration
+      abis:
+        - name: MinterDAExpV0
+          file: ./abis/MinterDAExpV0.json
+        - name: IFilteredMinterV0
+          file: ./abis/IFilteredMinterV0.json
+      eventHandlers:
+        - event: AuctionHalfLifeRangeSecondsUpdated(uint256,uint256)
+          handler: handleAuctionHalfLifeRangeSecondsUpdated
+        - event: PricePerTokenInWeiUpdated(indexed uint256,indexed uint256)
+          handler: handlePricePerTokenInWeiUpdated
+        - event: ProjectCurrencyInfoUpdated(indexed uint256,indexed address,string)
+          handler: handleProjectCurrencyInfoUpdated
+        - event: PurchaseToDisabledUpdated(indexed uint256,bool)
+          handler: handlePurchaseToDisabledUpdated
+        - event: ResetAuctionDetails(indexed uint256)
+          handler: handleDAExpV0ResetAuctionDetails
+        - event: SetAuctionDetails(indexed uint256,uint256,uint256,uint256,uint256)
+          handler: handleDAExpV0SetAuctionDetails
+      file: ./src/minter-suite-mapping.ts
+  {{/minterDAExpV0Contracts}}
   {{#openSeaContractV1}}
   - kind: ethereum/contract
     name: WyvernExchange

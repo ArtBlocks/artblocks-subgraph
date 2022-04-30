@@ -570,6 +570,23 @@ export class Project extends Entity {
     this.set("contract", Value.fromString(value));
   }
 
+  get minterConfiguration(): string | null {
+    let value = this.get("minterConfiguration");
+    if (!value || value.kind == ValueKind.NULL) {
+      return null;
+    } else {
+      return value.toString();
+    }
+  }
+
+  set minterConfiguration(value: string | null) {
+    if (!value) {
+      this.unset("minterConfiguration");
+    } else {
+      this.set("minterConfiguration", Value.fromString(<string>value));
+    }
+  }
+
   get openSeaSaleLookupTables(): Array<string> {
     let value = this.get("openSeaSaleLookupTables");
     return value!.toStringArray();
@@ -813,6 +830,23 @@ export class Contract extends Entity {
 
   set updatedAt(value: BigInt) {
     this.set("updatedAt", Value.fromBigInt(value));
+  }
+
+  get minterFilter(): string | null {
+    let value = this.get("minterFilter");
+    if (!value || value.kind == ValueKind.NULL) {
+      return null;
+    } else {
+      return value.toString();
+    }
+  }
+
+  set minterFilter(value: string | null) {
+    if (!value) {
+      this.unset("minterFilter");
+    } else {
+      this.set("minterFilter", Value.fromString(<string>value));
+    }
   }
 }
 
@@ -1182,6 +1216,381 @@ export class Token extends Entity {
 
   set openSeaSaleLookupTables(value: Array<string>) {
     this.set("openSeaSaleLookupTables", Value.fromStringArray(value));
+  }
+}
+
+export class MinterFilter extends Entity {
+  constructor(id: string) {
+    super();
+    this.set("id", Value.fromString(id));
+
+    this.set("coreContract", Value.fromString(""));
+    this.set("updatedAt", Value.fromBigInt(BigInt.zero()));
+  }
+
+  save(): void {
+    let id = this.get("id");
+    assert(id != null, "Cannot save MinterFilter entity without an ID");
+    if (id) {
+      assert(
+        id.kind == ValueKind.STRING,
+        "Cannot save MinterFilter entity with non-string ID. " +
+          'Considering using .toHex() to convert the "id" to a string.'
+      );
+      store.set("MinterFilter", id.toString(), this);
+    }
+  }
+
+  static load(id: string): MinterFilter | null {
+    return changetype<MinterFilter | null>(store.get("MinterFilter", id));
+  }
+
+  get id(): string {
+    let value = this.get("id");
+    return value!.toString();
+  }
+
+  set id(value: string) {
+    this.set("id", Value.fromString(value));
+  }
+
+  get coreContract(): string {
+    let value = this.get("coreContract");
+    return value!.toString();
+  }
+
+  set coreContract(value: string) {
+    this.set("coreContract", Value.fromString(value));
+  }
+
+  get minterAllowlist(): Array<string> {
+    let value = this.get("minterAllowlist");
+    return value!.toStringArray();
+  }
+
+  set minterAllowlist(value: Array<string>) {
+    this.set("minterAllowlist", Value.fromStringArray(value));
+  }
+
+  get updatedAt(): BigInt {
+    let value = this.get("updatedAt");
+    return value!.toBigInt();
+  }
+
+  set updatedAt(value: BigInt) {
+    this.set("updatedAt", Value.fromBigInt(value));
+  }
+}
+
+export class Minter extends Entity {
+  constructor(id: string) {
+    super();
+    this.set("id", Value.fromString(id));
+
+    this.set("type", Value.fromString(""));
+    this.set("minterFilter", Value.fromString(""));
+    this.set("coreContract", Value.fromString(""));
+    this.set("updatedAt", Value.fromBigInt(BigInt.zero()));
+  }
+
+  save(): void {
+    let id = this.get("id");
+    assert(id != null, "Cannot save Minter entity without an ID");
+    if (id) {
+      assert(
+        id.kind == ValueKind.STRING,
+        "Cannot save Minter entity with non-string ID. " +
+          'Considering using .toHex() to convert the "id" to a string.'
+      );
+      store.set("Minter", id.toString(), this);
+    }
+  }
+
+  static load(id: string): Minter | null {
+    return changetype<Minter | null>(store.get("Minter", id));
+  }
+
+  get id(): string {
+    let value = this.get("id");
+    return value!.toString();
+  }
+
+  set id(value: string) {
+    this.set("id", Value.fromString(value));
+  }
+
+  get type(): string {
+    let value = this.get("type");
+    return value!.toString();
+  }
+
+  set type(value: string) {
+    this.set("type", Value.fromString(value));
+  }
+
+  get minterFilter(): string {
+    let value = this.get("minterFilter");
+    return value!.toString();
+  }
+
+  set minterFilter(value: string) {
+    this.set("minterFilter", Value.fromString(value));
+  }
+
+  get minimumAuctionLengthInSeconds(): BigInt | null {
+    let value = this.get("minimumAuctionLengthInSeconds");
+    if (!value || value.kind == ValueKind.NULL) {
+      return null;
+    } else {
+      return value.toBigInt();
+    }
+  }
+
+  set minimumAuctionLengthInSeconds(value: BigInt | null) {
+    if (!value) {
+      this.unset("minimumAuctionLengthInSeconds");
+    } else {
+      this.set(
+        "minimumAuctionLengthInSeconds",
+        Value.fromBigInt(<BigInt>value)
+      );
+    }
+  }
+
+  get minimumHalfLifeInSeconds(): BigInt | null {
+    let value = this.get("minimumHalfLifeInSeconds");
+    if (!value || value.kind == ValueKind.NULL) {
+      return null;
+    } else {
+      return value.toBigInt();
+    }
+  }
+
+  set minimumHalfLifeInSeconds(value: BigInt | null) {
+    if (!value) {
+      this.unset("minimumHalfLifeInSeconds");
+    } else {
+      this.set("minimumHalfLifeInSeconds", Value.fromBigInt(<BigInt>value));
+    }
+  }
+
+  get maximumHalfLifeInSeconds(): BigInt | null {
+    let value = this.get("maximumHalfLifeInSeconds");
+    if (!value || value.kind == ValueKind.NULL) {
+      return null;
+    } else {
+      return value.toBigInt();
+    }
+  }
+
+  set maximumHalfLifeInSeconds(value: BigInt | null) {
+    if (!value) {
+      this.unset("maximumHalfLifeInSeconds");
+    } else {
+      this.set("maximumHalfLifeInSeconds", Value.fromBigInt(<BigInt>value));
+    }
+  }
+
+  get coreContract(): string {
+    let value = this.get("coreContract");
+    return value!.toString();
+  }
+
+  set coreContract(value: string) {
+    this.set("coreContract", Value.fromString(value));
+  }
+
+  get updatedAt(): BigInt {
+    let value = this.get("updatedAt");
+    return value!.toBigInt();
+  }
+
+  set updatedAt(value: BigInt) {
+    this.set("updatedAt", Value.fromBigInt(value));
+  }
+}
+
+export class ProjectMinterConfiguration extends Entity {
+  constructor(id: string) {
+    super();
+    this.set("id", Value.fromString(id));
+
+    this.set("project", Value.fromString(""));
+    this.set("minter", Value.fromString(""));
+    this.set("priceIsConfigured", Value.fromBoolean(false));
+    this.set("currencySymbol", Value.fromString(""));
+    this.set("currencyAddress", Value.fromBytes(Bytes.empty()));
+    this.set("purchaseToDisabled", Value.fromBoolean(false));
+  }
+
+  save(): void {
+    let id = this.get("id");
+    assert(
+      id != null,
+      "Cannot save ProjectMinterConfiguration entity without an ID"
+    );
+    if (id) {
+      assert(
+        id.kind == ValueKind.STRING,
+        "Cannot save ProjectMinterConfiguration entity with non-string ID. " +
+          'Considering using .toHex() to convert the "id" to a string.'
+      );
+      store.set("ProjectMinterConfiguration", id.toString(), this);
+    }
+  }
+
+  static load(id: string): ProjectMinterConfiguration | null {
+    return changetype<ProjectMinterConfiguration | null>(
+      store.get("ProjectMinterConfiguration", id)
+    );
+  }
+
+  get id(): string {
+    let value = this.get("id");
+    return value!.toString();
+  }
+
+  set id(value: string) {
+    this.set("id", Value.fromString(value));
+  }
+
+  get project(): string {
+    let value = this.get("project");
+    return value!.toString();
+  }
+
+  set project(value: string) {
+    this.set("project", Value.fromString(value));
+  }
+
+  get minter(): string {
+    let value = this.get("minter");
+    return value!.toString();
+  }
+
+  set minter(value: string) {
+    this.set("minter", Value.fromString(value));
+  }
+
+  get priceIsConfigured(): boolean {
+    let value = this.get("priceIsConfigured");
+    return value!.toBoolean();
+  }
+
+  set priceIsConfigured(value: boolean) {
+    this.set("priceIsConfigured", Value.fromBoolean(value));
+  }
+
+  get currencySymbol(): string {
+    let value = this.get("currencySymbol");
+    return value!.toString();
+  }
+
+  set currencySymbol(value: string) {
+    this.set("currencySymbol", Value.fromString(value));
+  }
+
+  get currencyAddress(): Bytes {
+    let value = this.get("currencyAddress");
+    return value!.toBytes();
+  }
+
+  set currencyAddress(value: Bytes) {
+    this.set("currencyAddress", Value.fromBytes(value));
+  }
+
+  get purchaseToDisabled(): boolean {
+    let value = this.get("purchaseToDisabled");
+    return value!.toBoolean();
+  }
+
+  set purchaseToDisabled(value: boolean) {
+    this.set("purchaseToDisabled", Value.fromBoolean(value));
+  }
+
+  get basePrice(): BigInt | null {
+    let value = this.get("basePrice");
+    if (!value || value.kind == ValueKind.NULL) {
+      return null;
+    } else {
+      return value.toBigInt();
+    }
+  }
+
+  set basePrice(value: BigInt | null) {
+    if (!value) {
+      this.unset("basePrice");
+    } else {
+      this.set("basePrice", Value.fromBigInt(<BigInt>value));
+    }
+  }
+
+  get startPrice(): BigInt | null {
+    let value = this.get("startPrice");
+    if (!value || value.kind == ValueKind.NULL) {
+      return null;
+    } else {
+      return value.toBigInt();
+    }
+  }
+
+  set startPrice(value: BigInt | null) {
+    if (!value) {
+      this.unset("startPrice");
+    } else {
+      this.set("startPrice", Value.fromBigInt(<BigInt>value));
+    }
+  }
+
+  get halfLifeSeconds(): BigInt | null {
+    let value = this.get("halfLifeSeconds");
+    if (!value || value.kind == ValueKind.NULL) {
+      return null;
+    } else {
+      return value.toBigInt();
+    }
+  }
+
+  set halfLifeSeconds(value: BigInt | null) {
+    if (!value) {
+      this.unset("halfLifeSeconds");
+    } else {
+      this.set("halfLifeSeconds", Value.fromBigInt(<BigInt>value));
+    }
+  }
+
+  get startTime(): BigInt | null {
+    let value = this.get("startTime");
+    if (!value || value.kind == ValueKind.NULL) {
+      return null;
+    } else {
+      return value.toBigInt();
+    }
+  }
+
+  set startTime(value: BigInt | null) {
+    if (!value) {
+      this.unset("startTime");
+    } else {
+      this.set("startTime", Value.fromBigInt(<BigInt>value));
+    }
+  }
+
+  get endTime(): BigInt | null {
+    let value = this.get("endTime");
+    if (!value || value.kind == ValueKind.NULL) {
+      return null;
+    } else {
+      return value.toBigInt();
+    }
+  }
+
+  set endTime(value: BigInt | null) {
+    if (!value) {
+      this.unset("endTime");
+    } else {
+      this.set("endTime", Value.fromBigInt(<BigInt>value));
+    }
   }
 }
 
