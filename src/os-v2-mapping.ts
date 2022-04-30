@@ -136,7 +136,7 @@ function _handleSingleAssetSale(call: AtomicMatch_Call): void {
       openSeaSale.paymentToken = paymentTokenErc20Address;
       openSeaSale.price = price;
       openSeaSale.summaryTokensSold = token.id;
-      openSeaSale.isPrivate = isPrivateSale(addrs);
+      openSeaSale.isPrivate = isPrivateSale(call.from, addrs);
       openSeaSale.save();
 
       // Create the associated entry in the Nft <=> OpenSeaSale lookup table
@@ -226,7 +226,7 @@ function _handleBundleSale(call: AtomicMatch_Call): void {
     openSeaSale.seller = sellerAdress;
     openSeaSale.paymentToken = paymentTokenErc20Address;
     openSeaSale.price = price;
-    openSeaSale.isPrivate = isPrivateSale(addrs);
+    openSeaSale.isPrivate = isPrivateSale(call.from, addrs);
 
     // Build the token sold summary and create all the associated entries in the Nft <=> OpenSeaSale lookup table
     let summaryTokensSold = "";

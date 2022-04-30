@@ -158,14 +158,14 @@ export function guardedArrayReplace(
  * @param callInputAddrs The original call input addrs array
  * @returns true if the sale was private else false
  */
-export function isPrivateSale(callInputAddrs: Address[]): boolean {
+export function isPrivateSale(msgSender: Address, callInputAddrs: Address[]): boolean {
     /**
-     * If the sale was private it means the seller hardcoded the address
-     * of the buyer in the order. This is translated in code with the "taker"
-     * side of the "sell" order NOT being the NULL address
+     * For a sale to be private 2 conditions must be met:
+     *  1. The sell order taker must be hardcoded in the sell order (not NULL_ADDRESS)
+     *  2. The msg.sender must be the sell order taker
      */
     let takerOfSellOrder = callInputAddrs[9];
-    return takerOfSellOrder.toHexString() != NULL_ADDRESS;
+    return takerOfSellOrder.toHexString() != NULL_ADDRESS && msgSender == takerOfSellOrder;
 }
 
 /**
