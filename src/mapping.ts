@@ -62,7 +62,8 @@ import {
   Contract,
   Whitelisting,
   ProjectScript,
-  MinterFilter
+  MinterFilter,
+  ProjectMinterConfiguration
 } from "../generated/schema";
 
 import {
@@ -357,7 +358,10 @@ function removeMintWhitelisting(
         project.save();
       }
 
-      store.remove("ProjectMinterConfiguration", fullProjectId);
+      let prevMinterConfig = ProjectMinterConfiguration.load(fullProjectId);
+      if (prevMinterConfig) {
+        store.remove("ProjectMinterConfiguration", fullProjectId);
+      }
     }
   }
 

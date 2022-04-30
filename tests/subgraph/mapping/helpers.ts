@@ -1,39 +1,18 @@
 import { Address, BigInt, ethereum } from "@graphprotocol/graph-ts";
 import {
-  assert,
   createMockedFunction,
-  log,
   newMockCall
 } from "matchstick-as/assembly/index";
 import { AddProjectCall } from "../../../generated/GenArt721Core/GenArt721Core";
-import { Contract } from "../../../generated/schema";
+import { Project } from "../../../generated/schema";
 import { generateContractSpecificId } from "../../../src/helpers";
 import { handleAddProject } from "../../../src/mapping";
 import {
   CURRENT_BLOCK_TIMESTAMP,
-  RANDOMIZER_ADDRESS,
-  ContractValues,
   DEFAULT_PROJECT_VALUES,
-  PROJECT_ENTITY_TYPE,
-  booleanToString,
-  CONTRACT_ENTITY_TYPE
-} from "../shared-mocks";
-
-export const TEST_CONTRACT_ADDRESS = Address.fromString(
-  "0xa7d8d9ef8d8ce8992df33d8b8cf4aebabd5bd270"
-);
-
-export const TEST_CONTRACT: ContractValues = {
-  admin: Address.fromString("0x96dc73c8b5969608c77375f085949744b5177660"),
-  renderProviderPercentage: BigInt.fromI32(10),
-  renderProviderAddress: Address.fromString(
-    "0xf7a55108a6e830a809e88e74cbf5f5de9d930153"
-  ),
-  mintWhitelisted: [],
-  randomizerContract: RANDOMIZER_ADDRESS
-};
-
-export const TEST_CONTRACT_CREATED_AT = BigInt.fromI32(1607763598);
+  TEST_CONTRACT_ADDRESS,
+  TEST_CONTRACT
+} from "../shared-helpers";
 
 // helper mock function to initialize a Project entity in local in-memory store
 export function addNewProjectToStore(
@@ -43,7 +22,7 @@ export function addNewProjectToStore(
   pricePerTokenInWei: BigInt,
   mockCallsWithDefaults: boolean,
   timestamp: BigInt | null
-): void {
+): Project {
   if (mockCallsWithDefaults) {
     mockProjectDetailsCallWithDefaults(projectId, projectName);
     mockProjectTokenInfoCallWithDefaults(
@@ -74,6 +53,10 @@ export function addNewProjectToStore(
   ];
 
   handleAddProject(newProjectCall);
+
+  return changetype<Project>(
+    Project.load(generateContractSpecificId(TEST_CONTRACT_ADDRESS, projectId))
+  );
 }
 
 // mocks return values for Soldity contract calls in refreshContract() helper function
@@ -280,169 +263,4 @@ export function mockProjectScriptInfoCall(
   )
     .withArgs([ethereum.Value.fromUnsignedBigInt(projectId)])
     .returns(projectScriptInfoReturnArray);
-}
-
-export function assertTestContractFields(
-  createdAt: BigInt,
-  updatedAt: BigInt,
-  nextProjectId: BigInt
-): void {
-  // Contract setup in refreshContracts
-  assert.fieldEquals(
-    CONTRACT_ENTITY_TYPE,
-    TEST_CONTRACT_ADDRESS.toHexString(),
-    "admin",
-    TEST_CONTRACT.admin.toHexString()
-  );
-
-  assert.fieldEquals(
-    CONTRACT_ENTITY_TYPE,
-    TEST_CONTRACT_ADDRESS.toHexString(),
-    "renderProviderAddress",
-    TEST_CONTRACT.renderProviderAddress.toHexString()
-  );
-
-  assert.fieldEquals(
-    CONTRACT_ENTITY_TYPE,
-    TEST_CONTRACT_ADDRESS.toHexString(),
-    "createdAt",
-    createdAt.toString()
-  );
-
-  assert.fieldEquals(
-    CONTRACT_ENTITY_TYPE,
-    TEST_CONTRACT_ADDRESS.toHexString(),
-    "updatedAt",
-    updatedAt.toString()
-  );
-
-  assert.fieldEquals(
-    CONTRACT_ENTITY_TYPE,
-    TEST_CONTRACT_ADDRESS.toHexString(),
-    "nextProjectId",
-    nextProjectId.toString()
-  );
-}
-
-export function assertNewProjectFields(
-  contractAddress: Address,
-  projectId: BigInt,
-  projectName: string,
-  artistAddress: Address,
-  pricePerTokenInWei: BigInt,
-  currentBlockTimestamp: BigInt
-): void {
-  const fullProjectId = generateContractSpecificId(contractAddress, projectId);
-  assert.fieldEquals(
-    PROJECT_ENTITY_TYPE,
-    fullProjectId,
-    "active",
-    booleanToString(DEFAULT_PROJECT_VALUES.active)
-  );
-  assert.fieldEquals(
-    PROJECT_ENTITY_TYPE,
-    fullProjectId,
-    "artist",
-    artistAddress.toHexString()
-  );
-  assert.fieldEquals(
-    PROJECT_ENTITY_TYPE,
-    fullProjectId,
-    "artistAddress",
-    artistAddress.toHexString()
-  );
-  assert.fieldEquals(
-    PROJECT_ENTITY_TYPE,
-    fullProjectId,
-    "complete",
-    booleanToString(DEFAULT_PROJECT_VALUES.complete)
-  );
-  assert.fieldEquals(
-    PROJECT_ENTITY_TYPE,
-    fullProjectId,
-    "contract",
-    TEST_CONTRACT_ADDRESS.toHexString()
-  );
-  assert.fieldEquals(
-    PROJECT_ENTITY_TYPE,
-    fullProjectId,
-    "createdAt",
-    currentBlockTimestamp.toString()
-  );
-  assert.fieldEquals(
-    PROJECT_ENTITY_TYPE,
-    fullProjectId,
-    "currencySymbol",
-    DEFAULT_PROJECT_VALUES.currencySymbol.toString()
-  );
-  assert.fieldEquals(
-    PROJECT_ENTITY_TYPE,
-    fullProjectId,
-    "dynamic",
-    booleanToString(DEFAULT_PROJECT_VALUES.dynamic)
-  );
-  assert.fieldEquals(
-    PROJECT_ENTITY_TYPE,
-    fullProjectId,
-    "invocations",
-    DEFAULT_PROJECT_VALUES.invocations.toString()
-  );
-  assert.fieldEquals(
-    PROJECT_ENTITY_TYPE,
-    fullProjectId,
-    "locked",
-    booleanToString(DEFAULT_PROJECT_VALUES.locked)
-  );
-  assert.fieldEquals(
-    PROJECT_ENTITY_TYPE,
-    fullProjectId,
-    "maxInvocations",
-    DEFAULT_PROJECT_VALUES.maxInvocations.toString()
-  );
-  assert.fieldEquals(PROJECT_ENTITY_TYPE, fullProjectId, "name", projectName);
-  assert.fieldEquals(
-    PROJECT_ENTITY_TYPE,
-    fullProjectId,
-    "pricePerTokenInWei",
-    pricePerTokenInWei.toString()
-  );
-  assert.fieldEquals(
-    PROJECT_ENTITY_TYPE,
-    fullProjectId,
-    "projectId",
-    projectId.toString()
-  );
-  assert.fieldEquals(
-    PROJECT_ENTITY_TYPE,
-    fullProjectId,
-    "scriptCount",
-    DEFAULT_PROJECT_VALUES.scriptCount.toString()
-  );
-  assert.fieldEquals(
-    PROJECT_ENTITY_TYPE,
-    fullProjectId,
-    "updatedAt",
-    currentBlockTimestamp.toString()
-  );
-  assert.fieldEquals(
-    PROJECT_ENTITY_TYPE,
-    fullProjectId,
-    "useHashString",
-    booleanToString(DEFAULT_PROJECT_VALUES.useHashString)
-  );
-  assert.fieldEquals(PROJECT_ENTITY_TYPE, fullProjectId, "useIpfs", "false");
-}
-
-export function addTestContractToStore(nextProjectId: BigInt): Contract {
-  let contract = new Contract(TEST_CONTRACT_ADDRESS.toHexString());
-  contract.admin = TEST_CONTRACT.admin;
-  contract.createdAt = CURRENT_BLOCK_TIMESTAMP.minus(BigInt.fromI32(10));
-  contract.nextProjectId = nextProjectId;
-  contract.randomizerContract = TEST_CONTRACT.randomizerContract;
-  contract.renderProviderAddress = TEST_CONTRACT.renderProviderAddress;
-  contract.renderProviderPercentage = TEST_CONTRACT.renderProviderPercentage;
-  contract.updatedAt = contract.createdAt;
-  contract.save();
-
-  return contract;
 }

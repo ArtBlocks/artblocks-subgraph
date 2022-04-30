@@ -1,11 +1,4 @@
-import {
-  Address,
-  BigInt,
-  Bytes,
-  ethereum,
-  log
-} from "@graphprotocol/graph-ts";
-
+import { Address, BigInt, Bytes, ethereum, log } from "@graphprotocol/graph-ts";
 
 import {
   Contract,
@@ -16,10 +9,7 @@ import {
 
 import { AtomicMatch_Call } from "../generated/WyvernExchangeWithBulkCancellations/WyvernExchangeWithBulkCancellations";
 
-import {
-  WYVERN_ATOMICIZER_ADDRESS,
-  WYVERN_MERKLE_ADDRESS,
-} from "./constants";
+import { WYVERN_ATOMICIZER_ADDRESS, WYVERN_MERKLE_ADDRESS } from "./constants";
 
 import { generateContractSpecificId } from "./helpers";
 
@@ -30,7 +20,6 @@ import {
   guardedArrayReplace,
   isPrivateSale
 } from "./os-helper";
-
 
 /** Call handlers */
 /**
@@ -46,18 +35,18 @@ export function handleAtomicMatch_(call: AtomicMatch_Call): void {
 
   if (saleTargetAddressStr == WYVERN_ATOMICIZER_ADDRESS) {
     /**
-      * When dealing with bundle sale, the targeted sale address is
-      * the address of the OpenSea Atomicizer (that will atomically
-      * call every transferFrom methods of each NFT contract involved
-      * in the bundle).
-      *
-      */
+     * When dealing with bundle sale, the targeted sale address is
+     * the address of the OpenSea Atomicizer (that will atomically
+     * call every transferFrom methods of each NFT contract involved
+     * in the bundle).
+     *
+     */
     _handleBundleSale(call);
   } else if (saleTargetAddressStr == WYVERN_MERKLE_ADDRESS) {
     /**
-      * In case of normal "single asset sale", the saleTarget input is
-      * set to the MerkleValidator contract.
-      */
+     * In case of normal "single asset sale", the saleTarget input is
+     * set to the MerkleValidator contract.
+     */
     _handleSingleAssetSale(call);
   } else {
     log.warning("[OSV2 handler] Unexpected target: {}", [saleTargetAddressStr]);
@@ -88,7 +77,7 @@ function _handleSingleAssetSale(call: AtomicMatch_Call): void {
 
   //decode data (from, to, nft token address, token id), here's the difference with V1
   //We need to retrieve nft token contract and token id from call data
-  let decodedCallData = _retrieveDecodedDataFromCallData(mergedCallData)
+  let decodedCallData = _retrieveDecodedDataFromCallData(mergedCallData);
 
   // Only interested in Art Blocks sells
   let nftContract: Address = decodedCallData[2].toAddress();
@@ -116,7 +105,7 @@ function _handleSingleAssetSale(call: AtomicMatch_Call): void {
     let paymentTokenErc20Address: Address = addrs[6];
 
     // Fetch the token ID that has been sold from the call data
-    let tokenIdStr = decodedCallData[3].toBigInt().toString()
+    let tokenIdStr = decodedCallData[3].toBigInt().toString();
 
     // The token must already exist (minted) to be sold on OpenSea
     let token = Token.load(
@@ -136,7 +125,7 @@ function _handleSingleAssetSale(call: AtomicMatch_Call): void {
       openSeaSale.paymentToken = paymentTokenErc20Address;
       openSeaSale.price = price;
       openSeaSale.summaryTokensSold = token.id;
-      openSeaSale.isPrivate = isPrivateSale(addrs);
+      openSeaSale.isPrivate = isPrivateSale(call.from, addrs);
       openSeaSale.save();
 
       // Create the associated entry in the Nft <=> OpenSeaSale lookup table
@@ -164,7 +153,6 @@ function _handleSingleAssetSale(call: AtomicMatch_Call): void {
  *              A "bundle" sale is a sale that contains several assets embeded in the same, atomic, transaction.
  */
 function _handleBundleSale(call: AtomicMatch_Call): void {
-
   let callInputs = call.inputs;
   let addrs: Address[] = callInputs.addrs;
   let uints: BigInt[] = callInputs.uints;
@@ -200,7 +188,10 @@ function _handleBundleSale(call: AtomicMatch_Call): void {
   );
 
   // Fetch the token IDs list that has been sold from the call data for this bundle sale
-  let results = getNftContractAddressAndTokenIdFromAtomicizerCallData(2, mergedCallDataStr);
+  let results = getNftContractAddressAndTokenIdFromAtomicizerCallData(
+    2,
+    mergedCallDataStr
+  );
   let nftContractList = results[0];
   let bundleIncludesArtBlocks = false;
   for (let i = 0; i < nftContractList.length; i++) {
@@ -226,7 +217,7 @@ function _handleBundleSale(call: AtomicMatch_Call): void {
     openSeaSale.seller = sellerAdress;
     openSeaSale.paymentToken = paymentTokenErc20Address;
     openSeaSale.price = price;
-    openSeaSale.isPrivate = isPrivateSale(addrs);
+    openSeaSale.isPrivate = isPrivateSale(call.from, addrs);
 
     // Build the token sold summary and create all the associated entries in the Nft <=> OpenSeaSale lookup table
     let summaryTokensSold = "";
@@ -270,19 +261,18 @@ function _handleBundleSale(call: AtomicMatch_Call): void {
   }
 }
 
-
 /**
  *
  * @param callData The ABI encoded method call used by OpenSea Smart contract V2
  *                 to trigger the Nft transfer between the seller and the buyer
  * @returns Ethereum tuple corresponding to decoded call data, in the order: from, to, nft token address, token id
  */
-function _retrieveDecodedDataFromCallData(callData: Bytes): ethereum.Tuple {
-  let dataWithoutFunctionSelector = changetype<Bytes>(
-    callData.subarray(4)
-  );
+export function _retrieveDecodedDataFromCallData(
+  callData: Bytes
+): ethereum.Tuple {
+  let dataWithoutFunctionSelector = changetype<Bytes>(callData.subarray(4));
   let decoded = ethereum
     .decode("(address,address,address,uint256)", dataWithoutFunctionSelector)!
     .toTuple();
-  return decoded
+  return decoded;
 }
