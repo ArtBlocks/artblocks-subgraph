@@ -53,5 +53,35 @@
       "name": "Legends of Metaterra",
       "startBlock": 14567671
     }
+  ],
+  "minterFilterV0Contracts": [
+    {
+      "address": "0x4aafCE293b9B0faD169c78049A81e400f518E199",
+      "startBlock": 14567785
+    }
+  ],
+  "minterSetPriceV0Contracts": [
+    {
+      "address": "0x1DEC9E52f1320F7Deb29cBCd7B7d67f3dF785142",
+      "startBlock": 14567789
+    }
+  ],
+  "minterSetPriceERC20V0Contracts": [
+    {
+      "address": "0x48742D38a0809135EFd643c1150BfC13768C3907",
+      "startBlock": 14567788
+    }
+  ],
+  "minterDALinV0Contracts": [
+    {
+      "address": "0xd219f61Bb5A3ffDeCB4362610977F1dAB3930eE2",
+      "startBlock": 14567790
+    }
+  ],
+  "minterDAExpV0Contracts": [
+    {
+      "address": "0xFc74fD0f2c7EaD04f1E5E9fd82Aef55620710D7C",
+      "startBlock": 14567792
+    }
   ]
 }

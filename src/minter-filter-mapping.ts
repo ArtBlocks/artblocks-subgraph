@@ -60,7 +60,10 @@ export function handleIsCanonicalMinterFilter(
       project.save();
     }
 
-    store.remove("ProjectMinterConfiguration", fullProjectId);
+    let prevMinterConfig = ProjectMinterConfiguration.load(fullProjectId);
+    if (prevMinterConfig) {
+      store.remove("ProjectMinterConfiguration", fullProjectId);
+    }
   }
 
   // Check the new minter filter for preconfigured projects and populate accordingly
@@ -123,11 +126,14 @@ export function handleMinterRevoked(event: MinterRevoked): void {
   // Note: there's a guard on the function that only allows a minter
   // to be revoked if it is not set for any project. This means that
   // we can avoid resetting any minter config for a project here.
-  store.remove("Minter", event.params._minterAddress.toHexString());
-  let minterFilter = MinterFilter.load(event.address.toHexString());
-  if (minterFilter) {
-    minterFilter.updatedAt = event.block.timestamp;
-    minterFilter.save();
+  let minter = Minter.load(event.params._minterAddress.toHexString());
+  if (minter) {
+    store.remove("Minter", event.params._minterAddress.toHexString());
+    let minterFilter = MinterFilter.load(event.address.toHexString());
+    if (minterFilter) {
+      minterFilter.updatedAt = event.block.timestamp;
+      minterFilter.save();
+    }
   }
 }
 
@@ -163,7 +169,10 @@ export function handleProjectMinterRegistered(
 
   if (project) {
     // Clear previous minter configuration
-    store.remove("ProjectMinterConfiguration", project.id);
+    let prevMinterConfig = ProjectMinterConfiguration.load(project.id);
+    if (prevMinterConfig) {
+      store.remove("ProjectMinterConfiguration", project.id);
+    }
 
     // Create project configuration
     let minterAddress = event.params._minterAddress;
@@ -201,10 +210,14 @@ export function handleProjectMinterRemoved(event: ProjectMinterRemoved): void {
   );
 
   if (project) {
-    store.remove("ProjectMinterConfiguration", project.id);
+    let prevMinterConfig = ProjectMinterConfiguration.load(project.id);
+    if (prevMinterConfig) {
+      store.remove("ProjectMinterConfiguration", project.id);
+    }
     if (project.minterConfiguration) {
       project.minterConfiguration = null;
       project.updatedAt = event.block.timestamp;
+      project.save();
     }
   }
 }
@@ -229,7 +242,6 @@ function createAndPopulateProjectMinterConfiguration(
   projectMinterConfig.currencySymbol = projectPriceInfo.value2;
   projectMinterConfig.currencyAddress = projectPriceInfo.value3;
 
-  log.info("Minter Type {}", [minterType]);
   if (minterType == "MinterDALinV0") {
     let minterDALinV0Contract = MinterDALinV0.bind(minterAddress);
 
