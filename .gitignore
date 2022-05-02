@@ -22,3 +22,4 @@ generated/*
 !generated/WyvernExchange
 !generated/WyvernExchangeWithBulkCancellations
 !generated/LooksRareExchange
+!generated/RoyaltyFeeRegistry

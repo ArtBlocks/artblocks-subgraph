@@ -12,6 +12,7 @@ export const WYVERN_EXCHANGE_ADDRESS =
 // Opensea V2 contract
 export const WYVERN_EXCHANGE_WITH_BULK_CANCELLATIONS_ADDRESS =
   "0x7f268357a8c2552623316e2562d90e642bb538e5";
+
 // Opensea V2 contract handling the transfers
 export const WYVERN_MERKLE_ADDRESS =
   "0xbaf2127b49fc93cbca6269fade0f7f31df4c88a7";
@@ -19,6 +20,14 @@ export const WYVERN_MERKLE_ADDRESS =
 // Opensea atomicizer contract for bundle
 export const WYVERN_ATOMICIZER_ADDRESS =
   "0xc99f70bfd82fb7c8f8191fdfbfb735606b15e5c5";
+
+// LooksRare private sale strategy contract
+export const LR_PRIVATE_SALE_STRATEGY =
+  "0x58d83536d3efedb9f7f2a1ec3bdaad2b1a4dd98c";
+
+//LooksRare fee registry contract
+export const LR_FEE_REGISTRY = 
+  "0x55010472a93921a117aad9b055c141060c8d8022";
 
 // Function selectors
 export const TRANSFER_FROM_SELECTOR = "0x23b872dd";
