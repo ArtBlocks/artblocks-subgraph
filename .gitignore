@@ -20,3 +20,5 @@ generated/*
 !generated/MinterSetPriceERC20V0
 !generated/MinterSetPriceV0
 !generated/WyvernExchange
+!generated/WyvernExchangeWithBulkCancellations
+!generated/LooksRareExchange
