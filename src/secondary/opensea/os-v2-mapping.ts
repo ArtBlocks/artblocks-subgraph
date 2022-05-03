@@ -76,8 +76,8 @@ function _handleSingleAssetSale(call: AtomicMatch_Call): void {
     callInputs.replacementPatternBuy
   );
 
-  //decode data (from, to, nft token address, token id), here's the difference with V1
-  //We need to retrieve nft token contract and token id from call data
+  // Decode data (from, to, nft token address, token id), here's the difference with V1
+  // We need to retrieve nft token contract and token id from call data
   let decodedCallData = _retrieveDecodedDataFromCallData(mergedCallData);
 
   let nftContract: Address = decodedCallData[2].toAddress();
