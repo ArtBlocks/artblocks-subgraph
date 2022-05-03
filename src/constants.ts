@@ -25,10 +25,6 @@ export const WYVERN_ATOMICIZER_ADDRESS =
 export const LR_PRIVATE_SALE_STRATEGY =
   "0x58d83536d3efedb9f7f2a1ec3bdaad2b1a4dd98c";
 
-//LooksRare fee registry contract
-export const LR_FEE_REGISTRY = 
-  "0x55010472a93921a117aad9b055c141060c8d8022";
-
 // Function selectors
 export const TRANSFER_FROM_SELECTOR = "0x23b872dd";
 export const ERC721_SAFE_TRANSFER_FROM_SELECTOR = "0x42842e0e";

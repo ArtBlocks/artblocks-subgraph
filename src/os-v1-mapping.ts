@@ -130,7 +130,6 @@ function _handleSingleAssetSale(call: AtomicMatch_Call): void {
   sale.paymentToken = paymentTokenErc20Address;
   sale.price = price;
   sale.summaryTokensSold = token.id;
-  sale.fees = new BigInt(500);
   sale.isPrivate = isPrivateSale(call.from, addrs);
   sale.save();
 
@@ -218,7 +217,6 @@ function _handleBundleSale(call: AtomicMatch_Call): void {
     sale.seller = sellerAdress;
     sale.paymentToken = paymentTokenErc20Address;
     sale.price = price;
-    sale.fees = new BigInt(500);
     sale.isPrivate = isPrivateSale(call.from, addrs);
 
     // Build the token sold summary and create all the associated entries in the Nft <=> lookup table

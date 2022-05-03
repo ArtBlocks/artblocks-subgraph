@@ -1,4 +1,4 @@
-import { Address, BigInt } from "@graphprotocol/graph-ts";
+import { Address } from "@graphprotocol/graph-ts";
 
 import {
   Token,
@@ -8,11 +8,28 @@ import {
 } from "../generated/schema";
 
 import { TakerAsk, TakerBid } from "../generated/LooksRareExchange/LooksRareExchange";
-import { RoyaltyFeeRegistry } from "../generated/RoyaltyFeeRegistry/RoyaltyFeeRegistry";
 
 import { generateContractSpecificId } from "./helpers";
 import { buildTokenSaleLookupTableId } from "./os-helper";
-import { LR_FEE_REGISTRY, LR_PRIVATE_SALE_STRATEGY } from "./constants";
+import { LR_PRIVATE_SALE_STRATEGY } from "./constants";
+
+/**
+* 
+* @param event TakerAsk
+* @description Event handler for the TakerAsk event. Forward call to `handleLooksRareEvents`
+*/
+export function handleTakerAsk(event: TakerAsk): void {
+  handleSale(event);
+}
+
+/**
+* 
+* @param event TakerBid
+* @description Event handler for the TakerBid event. Forward call to `handleLooksRareEvents`
+*/
+export function handleTakerBid(event: TakerBid): void {
+  handleSale(event);
+}
 
 /**
 * 
@@ -21,7 +38,7 @@ import { LR_FEE_REGISTRY, LR_PRIVATE_SALE_STRATEGY } from "./constants";
 * @description This function handle TakerAsk/TakerBid events from LooksRare, build the associated Sale and 
 * SaleLookUpTable entities and store them 
 */
-export function handleLooksRareEvents<T>(event: T): void {
+function handleSale<T>(event: T): void {
   // Invalid call, not a valid event
   if (!(event instanceof TakerBid) && !(event instanceof TakerAsk)) {
     return;
@@ -60,25 +77,23 @@ export function handleLooksRareEvents<T>(event: T): void {
     sale.seller = event.params.maker;
   }
 
-  let royaltiesContract = RoyaltyFeeRegistry.bind(Address.fromString(LR_FEE_REGISTRY));
   sale.paymentToken = event.params.currency;
   sale.price = event.params.price;
-  sale.summaryTokensSold = token.id;
+  sale.summaryTokensSold = event.params.tokenId.toString();
   sale.isPrivate = event.params.strategy.toHexString() == LR_PRIVATE_SALE_STRATEGY;
-  sale.fees = new BigInt(royaltiesContract.royaltyFeeInfoCollection(event.params.collection)[2]);
   sale.save();
 
   // Create the associated entry in the Nft <=> lookup table
   let tableEntryId = buildTokenSaleLookupTableId(
-    token.project,
-    token.id,
+    event.params.collection.toHexString(),
+    event.params.tokenId.toString(),
     saleId
   );
 
   // Create saleLookUpTable with sale and token info
   let saleLookUpTable = new SaleLookupTable(tableEntryId);
-  saleLookUpTable.token = token.id;
-  saleLookUpTable.project = token.project;
+  saleLookUpTable.token = event.params.tokenId.toString();
+  saleLookUpTable.project = event.params.collection.toHexString();
   saleLookUpTable.sale = sale.id;
   saleLookUpTable.timestamp = sale.blockTimestamp;
   saleLookUpTable.blockNumber = sale.blockNumber;

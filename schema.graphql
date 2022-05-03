@@ -351,9 +351,6 @@ type Sale @entity {
 
   "Private sales are flagged by this boolean"
   isPrivate: Boolean!
-
-  "Percentage of fees"
-  fees: BigInt!
 }
 
 type SaleLookupTable @entity {
