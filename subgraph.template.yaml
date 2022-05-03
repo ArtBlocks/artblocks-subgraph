@@ -611,7 +611,7 @@ dataSources:
       callHandlers: 
         - function: atomicMatch_(address[14],uint256[18],uint8[8],bytes,bytes,bytes,bytes,bytes,bytes,uint8[2],bytes32[5])
           handler: handleAtomicMatch_
-      file: ./src/os-v1-mapping.ts
+      file: ./src/secondary/opensea/os-v1-mapping.ts
   {{/openSeaContractV1}}
   {{#openSeaContractV2}}
   - kind: ethereum/contract
@@ -641,5 +641,5 @@ dataSources:
       callHandlers: 
         - function: atomicMatch_(address[14],uint256[18],uint8[8],bytes,bytes,bytes,bytes,bytes,bytes,uint8[2],bytes32[5])
           handler: handleAtomicMatch_
-      file: ./src/os-v2-mapping.ts
+      file: ./src/secondary/opensea/os-v2-mapping.ts
   {{/openSeaContractV2}}

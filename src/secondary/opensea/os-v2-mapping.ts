@@ -5,13 +5,13 @@ import {
   Token,
   Sale,
   SaleLookupTable
-} from "../generated/schema";
+} from "../../../generated/schema";
 
-import { AtomicMatch_Call } from "../generated/WyvernExchangeWithBulkCancellations/WyvernExchangeWithBulkCancellations";
+import { AtomicMatch_Call } from "../../../generated/WyvernExchangeWithBulkCancellations/WyvernExchangeWithBulkCancellations";
 
-import { WYVERN_ATOMICIZER_ADDRESS, WYVERN_MERKLE_ADDRESS } from "./constants";
+import { WYVERN_ATOMICIZER_ADDRESS, WYVERN_MERKLE_ADDRESS } from "../../constants";
 
-import { generateContractSpecificId } from "./helpers";
+import { generateContractSpecificId } from "../../helpers";
 
 import {
   buildTokenSaleLookupTableId,

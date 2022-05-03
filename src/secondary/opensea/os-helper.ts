@@ -6,11 +6,11 @@ import {
     log,
 } from "@graphprotocol/graph-ts";
 
-import { WyvernExchange } from "../generated/WyvernExchange/WyvernExchange";
+import { WyvernExchange } from "../../../generated/WyvernExchange/WyvernExchange";
 
-import { WyvernExchangeWithBulkCancellations } from "../generated/WyvernExchangeWithBulkCancellations/WyvernExchangeWithBulkCancellations";
+import { WyvernExchangeWithBulkCancellations } from "../../../generated/WyvernExchangeWithBulkCancellations/WyvernExchangeWithBulkCancellations";
 
-import { ERC155_SAFE_TRANSFER_FROM_SELECTOR, ERC721_SAFE_TRANSFER_FROM_SELECTOR, NULL_ADDRESS, TRANSFER_FROM_SELECTOR, WYVERN_EXCHANGE_ADDRESS, WYVERN_EXCHANGE_WITH_BULK_CANCELLATIONS_ADDRESS } from "./constants";
+import { ERC155_SAFE_TRANSFER_FROM_SELECTOR, ERC721_SAFE_TRANSFER_FROM_SELECTOR, NULL_ADDRESS, TRANSFER_FROM_SELECTOR, WYVERN_EXCHANGE_ADDRESS, WYVERN_EXCHANGE_WITH_BULK_CANCELLATIONS_ADDRESS } from "../../constants";
 
 /**
  * @param side See `calculateFinalPrice` of WyvernExchange

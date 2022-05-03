@@ -3,18 +3,18 @@ import {
   BigInt,
 } from "@graphprotocol/graph-ts";
 
-import { AtomicMatch_Call, } from "../generated/WyvernExchange/WyvernExchange";
+import { AtomicMatch_Call, } from "../../../generated/WyvernExchange/WyvernExchange";
 
 import {
   Contract,
   Sale,
   Token,
   SaleLookupTable
-} from "../generated/schema";
+} from "../../../generated/schema";
 
-import { WYVERN_ATOMICIZER_ADDRESS, } from "./constants";
+import { WYVERN_ATOMICIZER_ADDRESS, } from "../../constants";
 
-import { generateContractSpecificId } from "./helpers";
+import { generateContractSpecificId } from "../../helpers";
 
 import {
   buildTokenSaleLookupTableId,
