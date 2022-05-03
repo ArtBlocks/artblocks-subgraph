@@ -133,6 +133,9 @@ export function guardedArrayReplace(
 ): Bytes {
   // Sometime the replacementPattern is empty, meaning that both arrays (buyCallData and sellCallData) are identicall and
   // no merging is necessary. In such a case randomly return the first array (buyCallData)
+  // Also note, that outside of the case that mask length is zero, a require on the contract
+  // will revert the transaction if all arrays are not the same length so there's no need
+  // to check for that here.
   if (mask.length == 0) {
     return array;
   }
