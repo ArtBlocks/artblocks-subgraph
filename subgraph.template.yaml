@@ -670,8 +670,8 @@ dataSources:
           file: ./abis/LooksRareExchange.json
       eventHandlers: 
         - event: TakerAsk(bytes32,uint256,indexed address,indexed address,indexed address,address,address,uint256,uint256,uint256)
-          handler: handleLooksRareEvents
+          handler: handleTakerAsk
         - event: TakerBid(bytes32,uint256,indexed address,indexed address,indexed address,address,address,uint256,uint256,uint256)
-          handler: handleLooksRareEvents
+          handler: handleTakerBid
       file: ./src/looksrare-mapping.ts
   {{/looksRare}}

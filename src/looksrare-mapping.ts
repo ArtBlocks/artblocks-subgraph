@@ -79,21 +79,21 @@ function handleSale<T>(event: T): void {
 
   sale.paymentToken = event.params.currency;
   sale.price = event.params.price;
-  sale.summaryTokensSold = event.params.tokenId.toString();
+  sale.summaryTokensSold = token.id;
   sale.isPrivate = event.params.strategy.toHexString() == LR_PRIVATE_SALE_STRATEGY;
   sale.save();
 
   // Create the associated entry in the Nft <=> lookup table
   let tableEntryId = buildTokenSaleLookupTableId(
-    event.params.collection.toHexString(),
-    event.params.tokenId.toString(),
+    token.project,
+    token.id,
     saleId
   );
 
   // Create saleLookUpTable with sale and token info
   let saleLookUpTable = new SaleLookupTable(tableEntryId);
-  saleLookUpTable.token = event.params.tokenId.toString();
-  saleLookUpTable.project = event.params.collection.toHexString();
+  saleLookUpTable.token = token.id;
+  saleLookUpTable.project = token.project;
   saleLookUpTable.sale = sale.id;
   saleLookUpTable.timestamp = sale.blockTimestamp;
   saleLookUpTable.blockNumber = sale.blockNumber;
