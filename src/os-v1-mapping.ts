@@ -7,9 +7,9 @@ import { AtomicMatch_Call, } from "../generated/WyvernExchange/WyvernExchange";
 
 import {
   Contract,
-  OpenSeaSale,
+  Sale,
   Token,
-  OpenSeaSaleLookupTable
+  SaleLookupTable
 } from "../generated/schema";
 
 import { WYVERN_ATOMICIZER_ADDRESS, } from "./constants";
@@ -30,7 +30,7 @@ import {
  *
  * @param call The AtomicMatch call that triggered this call handler.
  * @description When a sale is made on OpenSea an AtomicMatch_ call is invoked.
- *              This handler will create the associated OpenSeaSale entity
+ *              This handler will create the associated Sale entity
  */
 export function handleAtomicMatch_(call: AtomicMatch_Call): void {
   let addrs: Address[] = call.inputs.addrs;
@@ -70,78 +70,83 @@ function _handleSingleAssetSale(call: AtomicMatch_Call): void {
   let feeMethodsSidesKindsHowToCalls =
     callInputs.feeMethodsSidesKindsHowToCalls;
 
-  // Only interested in Art Blocks sells
   let nftContract: Address = addrs[11];
   let contract = Contract.load(nftContract.toHexString());
-  if (contract) {
-    let price: BigInt = calculateMatchPrice(
-      1,
-      feeMethodsSidesKindsHowToCalls[1],
-      feeMethodsSidesKindsHowToCalls[2],
-      uints[4],
-      uints[5],
-      uints[6],
-      uints[7],
-      feeMethodsSidesKindsHowToCalls[5],
-      feeMethodsSidesKindsHowToCalls[6],
-      uints[13],
-      uints[14],
-      uints[15],
-      uints[16],
-      addrs[10]
-    );
 
-    let buyerAdress: Address = addrs[1]; // Buyer.maker
-    let sellerAdress: Address = addrs[8]; // Saler.maker
-    let paymentTokenErc20Address: Address = addrs[6];
-
-    // Merge sell order data with buy order data (just like they are doing in their contract)
-    let mergedCallData = guardedArrayReplace(
-      callInputs.calldataBuy,
-      callInputs.calldataSell,
-      callInputs.replacementPatternBuy
-    );
-
-    // Fetch the token ID that has been sold from the call data
-    let tokenIdStr = getSingleTokenIdFromTransferFromCallData(mergedCallData);
-
-    // The token must already exist (minted) to be sold on OpenSea
-    let token = Token.load(
-      generateContractSpecificId(nftContract, BigInt.fromString(tokenIdStr))
-    );
-
-    if (token) {
-      // Create the OpenSeaSale
-      let openSeaSaleId = call.transaction.hash.toHexString();
-      let openSeaSale = new OpenSeaSale(openSeaSaleId);
-      openSeaSale.openSeaVersion = "V1";
-      openSeaSale.saleType = "Single";
-      openSeaSale.blockNumber = call.block.number;
-      openSeaSale.blockTimestamp = call.block.timestamp;
-      openSeaSale.buyer = buyerAdress;
-      openSeaSale.seller = sellerAdress;
-      openSeaSale.paymentToken = paymentTokenErc20Address;
-      openSeaSale.price = price;
-      openSeaSale.summaryTokensSold = token.id;
-      openSeaSale.isPrivate = isPrivateSale(call.from, addrs);
-      openSeaSale.save();
-
-      // Create the associated entry in the Nft <=> OpenSeaSale lookup table
-      let tableEntryId = buildTokenSaleLookupTableId(
-        token.project,
-        token.id,
-        openSeaSaleId
-      );
-
-      let openSeaSaleLookupTable = new OpenSeaSaleLookupTable(tableEntryId);
-      openSeaSaleLookupTable.token = token.id;
-      openSeaSaleLookupTable.project = token.project;
-      openSeaSaleLookupTable.openSeaSale = openSeaSale.id;
-      openSeaSaleLookupTable.timestamp = openSeaSale.blockTimestamp;
-      openSeaSaleLookupTable.blockNumber = openSeaSale.blockNumber;
-      openSeaSaleLookupTable.save();
-    }
+  // Only interested in Art Blocks sales
+  if (!contract) {
+    return;
   }
+
+  let price: BigInt = calculateMatchPrice(
+    1,
+    feeMethodsSidesKindsHowToCalls[1],
+    feeMethodsSidesKindsHowToCalls[2],
+    uints[4],
+    uints[5],
+    uints[6],
+    uints[7],
+    feeMethodsSidesKindsHowToCalls[5],
+    feeMethodsSidesKindsHowToCalls[6],
+    uints[13],
+    uints[14],
+    uints[15],
+    uints[16],
+    addrs[10]
+  );
+
+  let buyerAdress: Address = addrs[1]; // Buyer.maker
+  let sellerAdress: Address = addrs[8]; // Saler.maker
+  let paymentTokenErc20Address: Address = addrs[6];
+
+  // Merge sell order data with buy order data (just like they are doing in their contract)
+  let mergedCallData = guardedArrayReplace(
+    callInputs.calldataBuy,
+    callInputs.calldataSell,
+    callInputs.replacementPatternBuy
+  );
+
+  // Fetch the token ID that has been sold from the call data
+  let tokenIdStr = getSingleTokenIdFromTransferFromCallData(mergedCallData);
+
+  let token = Token.load(
+    generateContractSpecificId(nftContract, BigInt.fromString(tokenIdStr))
+  );
+  
+  // The token must already exist (minted) to be sold on OpenSea
+  if (!token) {
+    return;
+  }
+
+  // Create the Sale
+  let saleId = call.transaction.hash.toHexString();
+  let sale = new Sale(saleId);
+  sale.exchange = "OSV1";
+  sale.saleType = "Single";
+  sale.blockNumber = call.block.number;
+  sale.blockTimestamp = call.block.timestamp;
+  sale.buyer = buyerAdress;
+  sale.seller = sellerAdress;
+  sale.paymentToken = paymentTokenErc20Address;
+  sale.price = price;
+  sale.summaryTokensSold = token.id;
+  sale.isPrivate = isPrivateSale(call.from, addrs);
+  sale.save();
+
+  // Create the associated entry in the Nft <=> lookup table
+  let tableEntryId = buildTokenSaleLookupTableId(
+    token.project,
+    token.id,
+    saleId
+  );
+
+  let saleLookUpTable = new SaleLookupTable(tableEntryId);
+  saleLookUpTable.token = token.id;
+  saleLookUpTable.project = token.project;
+  saleLookUpTable.sale = sale.id;
+  saleLookUpTable.timestamp = sale.blockTimestamp;
+  saleLookUpTable.blockNumber = sale.blockNumber;
+  saleLookUpTable.save();
 }
 
 /**
@@ -199,59 +204,65 @@ function _handleBundleSale(call: AtomicMatch_Call): void {
 
   let tokenIdsList = results[1];
 
-  // If the bundle does not contain any artblocks sales we don't care
-  if (bundleIncludesArtBlocks) {
-    // Create the sale
-    let openSeaSaleId = call.transaction.hash.toHexString();
-    let openSeaSale = new OpenSeaSale(openSeaSaleId);
-    openSeaSale.openSeaVersion = "V1";
-    openSeaSale.saleType = "Bundle";
-    openSeaSale.blockNumber = call.block.number;
-    openSeaSale.blockTimestamp = call.block.timestamp;
-    openSeaSale.buyer = buyerAdress;
-    openSeaSale.seller = sellerAdress;
-    openSeaSale.paymentToken = paymentTokenErc20Address;
-    openSeaSale.price = price;
-    openSeaSale.isPrivate = isPrivateSale(call.from, addrs);
-
-    // Build the token sold summary and create all the associated entries in the Nft <=> OpenSeaSale lookup table
-    let summaryTokensSold = "";
-    for (let i = 0; i < tokenIdsList.length; i++) {
-      let tokenId = tokenIdsList[i];
-
-      let fullTokenId = generateContractSpecificId(
-        Address.fromString(nftContractList[i]),
-        BigInt.fromString(tokenId)
-      );
-
-      if (summaryTokensSold.length == 0) {
-        summaryTokensSold += fullTokenId;
-      } else {
-        summaryTokensSold += "::" + fullTokenId;
-      }
-
-      // Get the asosciated Art Blocks token if any (might not be an AB token)
-      let token = Token.load(fullTokenId);
-
-      if (token) {
-        // Link both of them (NFT with OpenSeaSale)
-        let tableEntryId = buildTokenSaleLookupTableId(
-          token.project,
-          token.id,
-          openSeaSaleId
-        );
-
-        let openSeaSaleLookupTable = new OpenSeaSaleLookupTable(tableEntryId);
-
-        openSeaSaleLookupTable.token = token.id;
-        openSeaSaleLookupTable.project = token.project;
-        openSeaSaleLookupTable.openSeaSale = openSeaSale.id;
-        openSeaSaleLookupTable.timestamp = openSeaSale.blockTimestamp;
-        openSeaSaleLookupTable.blockNumber = openSeaSale.blockNumber;
-        openSeaSaleLookupTable.save();
-      }
-    }
-    openSeaSale.summaryTokensSold = summaryTokensSold;
-    openSeaSale.save();
+  // If the bundle does not contain any artblocks sales we don't take it into account
+  if(!bundleIncludesArtBlocks) {
+    return;
   }
+
+  // Create the sale
+  let saleId = call.transaction.hash.toHexString();
+  let sale = new Sale(saleId);
+  sale.exchange = "OSV1";
+  sale.saleType = "Bundle";
+  sale.blockNumber = call.block.number;
+  sale.blockTimestamp = call.block.timestamp;
+  sale.buyer = buyerAdress;
+  sale.seller = sellerAdress;
+  sale.paymentToken = paymentTokenErc20Address;
+  sale.price = price;
+  sale.isPrivate = isPrivateSale(call.from, addrs);
+
+  // Build the token sold summary and create all the associated entries in the Nft <=> lookup table
+  let summaryTokensSold = "";
+  for (let i = 0; i < tokenIdsList.length; i++) {
+    let tokenId = tokenIdsList[i];
+
+    let fullTokenId = generateContractSpecificId(
+      Address.fromString(nftContractList[i]),
+      BigInt.fromString(tokenId)
+    );
+
+    if (summaryTokensSold.length == 0) {
+      summaryTokensSold += fullTokenId;
+    } else {
+      summaryTokensSold += "::" + fullTokenId;
+    }
+
+    // Get the asosciated Art Blocks token if any (might not be an AB token)
+    let token = Token.load(fullTokenId);
+
+    // Skip if this is not a token associated with Art Blocks
+    if(!token) {
+      continue;
+    }
+
+    // Link both of them (NFT with sale)
+    let tableEntryId = buildTokenSaleLookupTableId(
+      token.project,
+      token.id,
+      saleId
+    );
+
+    let saleLookupTable = new SaleLookupTable(tableEntryId);
+
+    saleLookupTable.token = token.id;
+    saleLookupTable.project = token.project;
+    saleLookupTable.sale = sale.id;
+    saleLookupTable.timestamp = sale.blockTimestamp;
+    saleLookupTable.blockNumber = sale.blockNumber;
+    saleLookupTable.save();
+  }
+
+  sale.summaryTokensSold = summaryTokensSold;
+  sale.save();
 }
