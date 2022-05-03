@@ -136,15 +136,15 @@ export function guardedArrayReplace(
         return array;
     }
 
-    let bigIntgArray = BigInt.fromByteArray(array);
-    let bigIntReplacement = BigInt.fromByteArray(replacement);
-    let bigIntMask = BigInt.fromByteArray(mask);
+    let array_copy = array;
 
-    // array |= replacement & mask;
-    bigIntReplacement = bigIntReplacement.bitAnd(bigIntMask);
-    bigIntgArray = bigIntgArray.bitOr(bigIntReplacement);
+    for (let i = 0; i < array.length; i++) {
+        if(mask[i] == 0xff) {
+            array_copy[i] = replacement[i];
+        }
+    }
 
-    return changetype<Bytes>(Bytes.fromBigInt(bigIntgArray));
+    return array_copy;
 }
 
 
