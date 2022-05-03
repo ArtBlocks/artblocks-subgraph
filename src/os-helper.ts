@@ -136,19 +136,15 @@ export function guardedArrayReplace(
         return array;
     }
 
-    array.reverse();
-    replacement.reverse();
-    mask.reverse();
-
-    let bigIntgArray = BigInt.fromUnsignedBytes(array);
-    let bigIntReplacement = BigInt.fromUnsignedBytes(replacement);
-    let bigIntMask = BigInt.fromUnsignedBytes(mask);
+    let bigIntgArray = BigInt.fromByteArray(array);
+    let bigIntReplacement = BigInt.fromByteArray(replacement);
+    let bigIntMask = BigInt.fromByteArray(mask);
 
     // array |= replacement & mask;
     bigIntReplacement = bigIntReplacement.bitAnd(bigIntMask);
     bigIntgArray = bigIntgArray.bitOr(bigIntReplacement);
-    // let callDataHexString = bigIntgArray.toHexString();
-    return changetype<Bytes>(Bytes.fromBigInt(bigIntgArray).reverse());
+
+    return changetype<Bytes>(Bytes.fromBigInt(bigIntgArray));
 }
 
 
