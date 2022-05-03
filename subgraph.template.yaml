@@ -643,3 +643,35 @@ dataSources:
           handler: handleAtomicMatch_
       file: ./src/secondary/opensea/os-v2-mapping.ts
   {{/openSeaContractV2}}
+  {{#looksRare}}
+  - kind: ethereum/contract
+    name: LooksRareExchange
+    network: mainnet
+    source:
+      address: '{{address}}'
+      abi: LooksRareExchange
+      startBlock: {{startBlock}}
+    mapping:
+      kind: ethereum/events
+      apiVersion: 0.0.5
+      language: wasm/assemblyscript
+      entities:
+        - Project
+        - ProjectScript
+        - Token
+        - Contract
+        - Account
+        - AccountProject
+        - Whitelisting
+        - Sale
+        - SaleLookupTable
+      abis:
+        - name: LooksRareExchange
+          file: ./abis/LooksRareExchange.json
+      eventHandlers: 
+        - event: TakerAsk(bytes32,uint256,indexed address,indexed address,indexed address,address,address,uint256,uint256,uint256)
+          handler: handleTakerAsk
+        - event: TakerBid(bytes32,uint256,indexed address,indexed address,indexed address,address,address,uint256,uint256,uint256)
+          handler: handleTakerBid
+      file: ./src/secondary/looksrare/looksrare-mapping.ts
+  {{/looksRare}}

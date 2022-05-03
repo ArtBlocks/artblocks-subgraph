@@ -17,13 +17,14 @@ import { WYVERN_ATOMICIZER_ADDRESS, } from "../../constants";
 import { generateContractSpecificId } from "../../helpers";
 
 import {
-  buildTokenSaleLookupTableId,
   calculateMatchPrice,
   getNftContractAddressAndTokenIdFromAtomicizerCallData,
   getSingleTokenIdFromTransferFromCallData,
   guardedArrayReplace,
   isPrivateSale
 } from "./os-helper";
+
+import { buildTokenSaleLookupTableId } from "../secondary-helpers";
 
 /** Call handlers */
 /**
