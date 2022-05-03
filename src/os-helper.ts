@@ -237,6 +237,8 @@ class DecodeAtomicizerCallDataReturn {
 export function decodeAtomicizerCallData(
   atomicizerCallData: Bytes
 ): DecodeAtomicizerCallDataReturn {
+  let paramChunkSize = 32;
+
   let dataWithoutFunctionSelector: Bytes = changetype<Bytes>(
     atomicizerCallData.subarray(4)
   );
@@ -257,7 +259,7 @@ export function decodeAtomicizerCallData(
     )!
     .toBigInt()
     .toI32();
-  offset += 1 * 32;
+  offset += 1 * paramChunkSize;
 
   // Now that we know the size of each params we can decode them one by one as know sized types
   // function atomicize(address[] addrs,uint256[] values,uint256[] calldataLengths,bytes calldatas)
@@ -267,17 +269,17 @@ export function decodeAtomicizerCallData(
       changetype<Bytes>(dataWithoutFunctionSelector.subarray(offset))
     )!
     .toAddressArray();
-  offset += addressesArrayLength * 32;
+  offset += addressesArrayLength * paramChunkSize;
 
-  offset += 1 * 32;
+  offset += 1 * paramChunkSize;
   // We don't need those values, just move the offset forward
   // let decodedValues: BigInt[] = ethereum.decode(
   //   `uint256[${addressesArrayLength}]`,
   //   changetype<Bytes>(dataWithoutFunctionSelector.subarray(offset))
   // )!.toBigIntArray();
-  offset += addressesArrayLength * 32;
+  offset += addressesArrayLength * paramChunkSize;
 
-  offset += 1 * 32;
+  offset += 1 * paramChunkSize;
   let callsDataIndividualLengths = ethereum
     .decode(
       `uint256[${addressesArrayLength}]`,
@@ -285,7 +287,7 @@ export function decodeAtomicizerCallData(
     )!
     .toBigIntArray()
     .map<i32>(e => e.toI32());
-  offset += addressesArrayLength * 32;
+  offset += addressesArrayLength * paramChunkSize;
 
   let callsDataLength = ethereum
     .decode(
@@ -294,7 +296,7 @@ export function decodeAtomicizerCallData(
     )!
     .toBigInt()
     .toI32();
-  offset += 1 * 32;
+  offset += 1 * paramChunkSize;
 
   let callsData: Bytes = changetype<Bytes>(
     dataWithoutFunctionSelector.subarray(offset, offset + callsDataLength)
@@ -333,7 +335,7 @@ export function getNftContractAddressAndTokenIdFromAtomicizerCallData(
     );
 
     // For OpenSeaV2, only TRANSFER_FROM and SAFE_TRANSFER_FROM should be taken into account
-    // when monitorig bundle sales
+    // when monitoring bundle sales
     let functionSelector: string = changetype<Bytes>(
       calldata.subarray(0, 4)
     ).toHexString();
