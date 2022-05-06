@@ -83,5 +83,25 @@
       "address": "0xFc74fD0f2c7EaD04f1E5E9fd82Aef55620710D7C",
       "startBlock": 14567792
     }
+  ],
+  "minterSetPriceV1Contracts": [
+    {
+      "address": "todo"
+    }
+  ],
+  "minterSetPriceERC20V1Contracts": [
+    {
+      "address": "todo"
+    }
+  ],
+  "minterDALinV1Contracts": [
+    {
+      "address": "todo"
+    }
+  ],
+  "minterDAExpV1Contracts": [
+    {
+      "address": "todo"
+    }
   ]
 }

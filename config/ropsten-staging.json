@@ -75,5 +75,29 @@
       "startBlock": 12175922
     }
   ],
+  "minterSetPriceV1Contracts": [
+    {
+      "address": "0xCD882EbF645a9D40248Fd8a2CF836E172478B6F7",
+      "startBlock": 12240920
+    }
+  ],
+  "minterSetPriceERC20V1Contracts": [
+    {
+      "address": "0xA49167F8a512981579eba57a4dDf202becBda1Ba",
+      "startBlock": 12240919
+    }
+  ],
+  "minterDALinV1Contracts": [
+    {
+      "address": "0x73b4797E2FD04fA42a9F3c9bCfbcEe19374A9060",
+      "startBlock": 12240922
+    }
+  ],
+  "minterDAExpV1Contracts": [
+    {
+      "address": "0x3BB525024093b3ba5a6C7803Fa1718Fc6fc27a37",
+      "startBlock": 12240923
+    }
+  ],
   "startBlock": 10760915
 }
