@@ -341,7 +341,7 @@ type Sale @entity {
   "The ERC20 token used for the payement"
   paymentToken: Bytes!
 
-  "The price of the Openea sale"
+  "The price of the sale"
   price: BigInt!
 
   "Private sales are flagged by this boolean"
