@@ -136,15 +136,15 @@ export function guardedArrayReplace(
         return array;
     }
 
-    let array_copy = array;
+    let arrayCopy = array;
 
     for (let i = 0; i < array.length; i++) {
         if(mask[i] == 0xff) {
-            array_copy[i] = replacement[i];
+            arrayCopy[i] = replacement[i];
         }
     }
 
-    return array_copy;
+    return arrayCopy;
 }
 
 
