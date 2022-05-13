@@ -57,6 +57,7 @@ import {
 import {
   Project,
   Token,
+  Transfer as TokenTransfer,
   Account,
   AccountProject,
   Contract,
@@ -171,9 +172,18 @@ export function handleTransfer(event: Transfer): void {
     account.save();
 
     token.owner = event.params.to.toHexString();
-    token.transactionHash = event.transaction.hash;
     token.updatedAt = event.block.timestamp;
     token.save();
+
+    let transfer = new TokenTransfer(
+      event.params.to.toHexString() + event.params.from.toHexString() + token.id
+    );
+    transfer.transactionHash = event.transaction.hash;
+    transfer.createdAt = event.block.timestamp;
+    transfer.to = event.params.to;
+    transfer.from = event.params.from;
+    transfer.token = token.id;
+    transfer.save();
   }
 }
 /*** END EVENT HANDLERS ***/

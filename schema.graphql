@@ -208,6 +208,8 @@ type Token @entity {
   "Transaction hash of token mint"
   transactionHash: Bytes!
 
+  transfers: [Transfer!] @derivedFrom(field: "token")
+
   "Lookup table to get the OpenSea Sale history"
   openSeaSaleLookupTables: [OpenSeaSaleLookupTable!]!
     @derivedFrom(field: "token")
@@ -362,4 +364,18 @@ type OpenSeaSaleLookupTable @entity {
 
   "The associated OpenSea sale"
   openSeaSale: OpenSeaSale!
+}
+
+type Transfer @entity {
+  id: ID!
+
+  transactionHash: Bytes!
+
+  token: Token! 
+
+  createdAt: BigInt!
+
+  to: Bytes!
+
+  from: Bytes!
 }
