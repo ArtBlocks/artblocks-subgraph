@@ -171,6 +171,7 @@ export function handleTransfer(event: Transfer): void {
     account.save();
 
     token.owner = event.params.to.toHexString();
+    token.transactionHash = event.transaction.hash;
     token.updatedAt = event.block.timestamp;
     token.save();
   }
