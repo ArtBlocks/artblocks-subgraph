@@ -120,31 +120,26 @@ export function calculateMatchPrice(
 /**
  * Replace bytes in an array with bytes in another array, guarded by a bitmask
  *
- * @param array The original array
+ * @param array The original array, MODIFIED in place
  * @param replacement The replacement array
  * @param mask The mask specifying which bits can be changed in the original array
- * @returns The updated byte array
  */
 export function guardedArrayReplace(
     array: Bytes,
     replacement: Bytes,
     mask: Bytes
-): Bytes {
+): void {
     // Sometime the replacementPattern is empty, meaning that both arrays (buyCallData and sellCallData) are identicall and
     // no merging is necessary. In such a case randomly return the first array (buyCallData)
     if (mask.length == 0) {
-        return array;
+        return;
     }
-
-    let arrayCopy = array;
 
     for (let i = 0; i < array.length; i++) {
         if(mask[i] == 0xff) {
-            arrayCopy[i] = replacement[i];
+            array[i] = replacement[i];
         }
     }
-
-    return arrayCopy;
 }
 
 

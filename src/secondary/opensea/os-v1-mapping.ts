@@ -101,14 +101,14 @@ function _handleSingleAssetSale(call: AtomicMatch_Call): void {
   let paymentTokenErc20Address: Address = addrs[6];
 
   // Merge sell order data with buy order data (just like they are doing in their contract)
-  let mergedCallData = guardedArrayReplace(
+  guardedArrayReplace(
     callInputs.calldataBuy,
     callInputs.calldataSell,
     callInputs.replacementPatternBuy
   );
 
   // Fetch the token ID that has been sold from the call data
-  let tokenIdStr = getSingleTokenIdFromTransferFromCallData(mergedCallData);
+  let tokenIdStr = getSingleTokenIdFromTransferFromCallData(callInputs.calldataBuy);
 
   let token = Token.load(
     generateContractSpecificId(nftContract, BigInt.fromString(tokenIdStr))
@@ -185,14 +185,14 @@ function _handleBundleSale(call: AtomicMatch_Call): void {
   let paymentTokenErc20Address: Address = addrs[6];
 
   // Merge sell order data with buy order data (just like they are doing in their contract)
-  let mergedCallDataStr = guardedArrayReplace(
+  guardedArrayReplace(
     callInputs.calldataBuy,
     callInputs.calldataSell,
     callInputs.replacementPatternBuy
   );
 
   // Fetch the token IDs list that has been sold from the call data for this bundle sale
-  let results = getNftContractAddressAndTokenIdFromAtomicizerCallData(1, mergedCallDataStr);
+  let results = getNftContractAddressAndTokenIdFromAtomicizerCallData(1, callInputs.calldataBuy);
   let nftContractList = results[0];
   let bundleIncludesArtBlocks = false;
   for (let i = 0; i < nftContractList.length; i++) {

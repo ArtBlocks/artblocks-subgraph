@@ -70,7 +70,7 @@ function _handleSingleAssetSale(call: AtomicMatch_Call): void {
     callInputs.feeMethodsSidesKindsHowToCalls;
 
   // Merge sell order data with buy order data (just like they are doing in their contract)
-  let mergedCallData = guardedArrayReplace(
+  guardedArrayReplace(
     callInputs.calldataBuy,
     callInputs.calldataSell,
     callInputs.replacementPatternBuy
@@ -78,7 +78,7 @@ function _handleSingleAssetSale(call: AtomicMatch_Call): void {
 
   // Decode data (from, to, nft token address, token id), here's the difference with V1
   // We need to retrieve nft token contract and token id from call data
-  let decodedCallData = _retrieveDecodedDataFromCallData(mergedCallData);
+  let decodedCallData = _retrieveDecodedDataFromCallData(callInputs.calldataBuy);
 
   let nftContract: Address = decodedCallData[2].toAddress();
   let contract = Contract.load(nftContract.toHexString());
@@ -187,7 +187,7 @@ function _handleBundleSale(call: AtomicMatch_Call): void {
   let paymentTokenErc20Address: Address = addrs[6];
 
   // Merge sell order data with buy order data (just like they are doing in their contract)
-  let mergedCallDataStr = guardedArrayReplace(
+  guardedArrayReplace(
     callInputs.calldataBuy,
     callInputs.calldataSell,
     callInputs.replacementPatternBuy
@@ -196,7 +196,7 @@ function _handleBundleSale(call: AtomicMatch_Call): void {
   // Fetch the token IDs list that has been sold from the call data for this bundle sale
   let results = getNftContractAddressAndTokenIdFromAtomicizerCallData(
     2,
-    mergedCallDataStr
+    callInputs.calldataBuy
   );
   let nftContractList = results[0];
   let bundleIncludesArtBlocks = false;
