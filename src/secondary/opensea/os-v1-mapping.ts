@@ -122,7 +122,7 @@ function _handleSingleAssetSale(call: AtomicMatch_Call): void {
   // Create the Sale
   let saleId = call.transaction.hash.toHexString();
   let sale = new Sale(saleId);
-  sale.exchange = "OSV1";
+  sale.exchange = "OS_V1";
   sale.saleType = "Single";
   sale.blockNumber = call.block.number;
   sale.blockTimestamp = call.block.timestamp;
@@ -213,7 +213,7 @@ function _handleBundleSale(call: AtomicMatch_Call): void {
   // Create the sale
   let saleId = call.transaction.hash.toHexString();
   let sale = new Sale(saleId);
-  sale.exchange = "OSV1";
+  sale.exchange = "OS_V1";
   sale.saleType = "Bundle";
   sale.blockNumber = call.block.number;
   sale.blockTimestamp = call.block.timestamp;

@@ -50,7 +50,7 @@ export function handleAtomicMatch_(call: AtomicMatch_Call): void {
      */
     _handleSingleAssetSale(call);
   } else {
-    log.warning("[OSV2 handler] Unexpected target in tx {}: {}", [call.transaction.hash.toHexString(), saleTargetAddressStr]);
+    log.warning("[OS_V2 handler] Unexpected target in tx {}: {}", [call.transaction.hash.toHexString(), saleTargetAddressStr]);
   }
 }
 
@@ -124,7 +124,7 @@ function _handleSingleAssetSale(call: AtomicMatch_Call): void {
   // Create the OpenSeaSale
   let saleId = call.transaction.hash.toHexString();
   let sale = new Sale(saleId);
-  sale.exchange = "OSV2";
+  sale.exchange = "OS_V2";
   sale.saleType = "Single";
   sale.blockNumber = call.block.number;
   sale.blockTimestamp = call.block.timestamp;
@@ -218,7 +218,7 @@ function _handleBundleSale(call: AtomicMatch_Call): void {
   // Create the sale
   let saleId = call.transaction.hash.toHexString();
   let sale = new Sale(saleId);
-  sale.exchange = "OSV2";
+  sale.exchange = "OS_V2";
   sale.saleType = "Bundle";
   sale.blockNumber = call.block.number;
   sale.blockTimestamp = call.block.timestamp;

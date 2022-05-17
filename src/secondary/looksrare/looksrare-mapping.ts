@@ -64,7 +64,7 @@ function handleSale<T>(event: T): void {
   // Create sale
   let saleId = event.transaction.hash.toHexString();
   let sale = new Sale(saleId);
-  sale.exchange = "LOOKSRARE";
+  sale.exchange = "LR_V1";
   sale.saleType = "Single";
   sale.blockNumber = event.block.number;
   sale.blockTimestamp = event.block.timestamp;

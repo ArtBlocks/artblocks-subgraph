@@ -302,11 +302,11 @@ enum SaleType {
 
 enum Exchange {
   "Opensea V1"
-  OSV1,
+  OS_V1,
   "Opensea V2"
-  OSV2,
+  OS_V2,
   "LooksRare"
-  LOOKSRARE
+  LR_V1
 }
 
 
