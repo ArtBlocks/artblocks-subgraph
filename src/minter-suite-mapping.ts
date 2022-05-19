@@ -357,6 +357,79 @@ export function handleDAExpResetAuctionDetails<T>(event: T): void {
   }
 }
 
+export function handleSetValue(event: any): void {
+  let minterProjectAndConfig = loadMinterProjectAndConfig(
+    event.address,
+    event.params.projectId,
+    event.block.timestamp
+  );
+  if (minterProjectAndConfig) {
+    let projectMinterConfig = minterProjectAndConfig.projectMinterConfiguration;
+    let project = minterProjectAndConfig.project;
+    project.updatedAt = event.block.timestamp;
+    const minterDetails = JSON.parse(projectMinterConfig.extraMinterDetails);
+    minterDetails[event.params.data_key] = event.params.data_value;
+    projectMinterConfig.extraMinterDetails = JSON.stringify(minterDetails);
+    project.save();
+  }
+}
+export function handleRemoveValue(event: any): void {
+  let minterProjectAndConfig = loadMinterProjectAndConfig(
+    event.address,
+    event.params.projectId,
+    event.block.timestamp
+  );
+  if (minterProjectAndConfig) {
+    let projectMinterConfig = minterProjectAndConfig.projectMinterConfiguration;
+    let project = minterProjectAndConfig.project;
+    project.updatedAt = event.block.timestamp;
+    const minterDetails = JSON.parse(projectMinterConfig.extraMinterDetails);
+    minterDetails[event.params.data_key] = null;
+    projectMinterConfig.extraMinterDetails = JSON.stringify(minterDetails);
+    project.save();
+  }
+}
+
+export function handleAddManyValue(event: any): void {
+  let minterProjectAndConfig = loadMinterProjectAndConfig(
+    event.address,
+    event.params.projectId,
+    event.block.timestamp
+  );
+  if (minterProjectAndConfig) {
+    let projectMinterConfig = minterProjectAndConfig.projectMinterConfiguration;
+    let project = minterProjectAndConfig.project;
+    project.updatedAt = event.block.timestamp;
+    const minterDetails = JSON.parse(projectMinterConfig.extraMinterDetails);
+    minterDetails[event.params.data_key] = [
+      ...minterDetails[event.params.data_key],
+      event.params.data_value
+    ];
+    projectMinterConfig.extraMinterDetails = JSON.stringify(minterDetails);
+    project.save();
+  }
+}
+
+export function handleRemoveManyValue(event: any): void {
+  let minterProjectAndConfig = loadMinterProjectAndConfig(
+    event.address,
+    event.params.projectId,
+    event.block.timestamp
+  );
+  if (minterProjectAndConfig) {
+    let projectMinterConfig = minterProjectAndConfig.projectMinterConfiguration;
+    let project = minterProjectAndConfig.project;
+    project.updatedAt = event.block.timestamp;
+    const minterDetails = JSON.parse(projectMinterConfig.extraMinterDetails);
+    const newValues = minterDetails[event.params.data_key].filter((v: any) => {
+      return v !== event.params.data_value;
+    });
+    minterDetails[event.params.data_key] = newValues;
+    projectMinterConfig.extraMinterDetails = JSON.stringify(minterDetails);
+    project.save();
+  }
+}
+
 // Helpers
 class MinterProjectAndConfig {
   minter: Minter;

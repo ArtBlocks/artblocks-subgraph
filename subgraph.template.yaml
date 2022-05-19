@@ -433,6 +433,8 @@ dataSources:
           file: ./abis/MinterDALinV1.json
         - name: MinterDAExpV1
           file: ./abis/MinterDAExpV1.json
+        - name: MinterHolderV0
+          file: ./abis/MinterHolderV0.json
       eventHandlers:
         - event: IsCanonicalMinterFilter(indexed address)
           handler: handleIsCanonicalMinterFilter

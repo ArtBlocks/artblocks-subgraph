@@ -282,6 +282,11 @@ function createAndPopulateProjectMinterConfiguration(
     projectMinterConfig.purchaseToDisabled = minterSetPriceERC20V0Contract.purchaseToDisabled(
       project.projectId
     );
+  } else if (minterType == "MinterHolderV0") {
+    let minterHolderV0Contract = MinterHolderV0.bind(minterAddress);
+    projectMinterConfig.purchaseToDisabled = minterHolderV0Contract.purchaseToDisabled(
+      project.projectId
+    );
   }
 
   projectMinterConfig.save();
