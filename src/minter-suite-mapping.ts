@@ -370,7 +370,7 @@ export function handleSetValue(event: any): void {
     const minterDetails = JSON.parse(projectMinterConfig.extraMinterDetails);
     minterDetails[event.params.data_key] = event.params.data_value;
     projectMinterConfig.extraMinterDetails = JSON.stringify(minterDetails);
-    project.save();
+    projectMinterConfig.save();
   }
 }
 export function handleRemoveValue(event: any): void {
@@ -386,7 +386,7 @@ export function handleRemoveValue(event: any): void {
     const minterDetails = JSON.parse(projectMinterConfig.extraMinterDetails);
     minterDetails[event.params.data_key] = null;
     projectMinterConfig.extraMinterDetails = JSON.stringify(minterDetails);
-    project.save();
+    projectMinterConfig.save();
   }
 }
 
@@ -406,7 +406,7 @@ export function handleAddManyValue(event: any): void {
       event.params.data_value
     ];
     projectMinterConfig.extraMinterDetails = JSON.stringify(minterDetails);
-    project.save();
+    projectMinterConfig.save();
   }
 }
 
@@ -426,7 +426,7 @@ export function handleRemoveManyValue(event: any): void {
     });
     minterDetails[event.params.data_key] = newValues;
     projectMinterConfig.extraMinterDetails = JSON.stringify(minterDetails);
-    project.save();
+    projectMinterConfig.save();
   }
 }
 

@@ -297,6 +297,9 @@ type ProjectMinterConfiguration @entity {
 
   "Linear Dutch auction end time (unix timestamp)"
   endTime: BigInt
+
+  "Configuration details used by specific minters"
+  extraMinterDetails: String!
 }
 
 enum SaleType {
