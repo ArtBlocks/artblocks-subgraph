@@ -14,19 +14,18 @@ import {
 } from "../../../../generated/LooksRareExchange/LooksRareExchange";
 import { generateContractSpecificId } from '../../../../src/helpers';
 
-const ORDER_HASH = "0xbc5a2acf703138c9562adf29a4131756ef6fe70f7a03c08cbc8a4fd22d53f1a7";
-const ORDER_NONCE = "48";
-const TAKER = "0x258a5e28aa40aef3c2c4cdf728b11dd9dd2b8bcd";
-const MAKER = "0x26a6434385cd63a88450ea06e2b2256979400b29";
-const STRATEGY = "0x56244bb70cbd3ea9dc8007399f61dfc065190031";
-const CURRENCY = "0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2";
-const COLLECTION = "0xd8a5d498ab43ed060cb6629b97a19e3e4276dd9f";
-const TOKEN_ID = "7019";
-const AMOUNT = "1";
-const PRICE = "700000000000000000";
+const DEFAULT_ORDER_HASH = "0xbc5a2acf703138c9562adf29a4131756ef6fe70f7a03c08cbc8a4fd22d53f1a7";
+const DEFAULT_ORDER_NONCE = "48";
+const DEFAULT_TAKER = "0x258a5e28aa40aef3c2c4cdf728b11dd9dd2b8bcd";
+const DEFAULT_MAKER = "0x26a6434385cd63a88450ea06e2b2256979400b29";
+const DEFAULT_STRATEGY = "0x56244bb70cbd3ea9dc8007399f61dfc065190031";
+const DEFAULT_CURRENCY = "0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2";
+const DEFAULT_COLLECTION = "0xd8a5d498ab43ed060cb6629b97a19e3e4276dd9f";
+const DEFAULT_TOKEN_ID = "7019";
+const DEFAULT_AMOUNT = "1";
+const DEFAULT_PRICE = "700000000000000000";
 
 export function addNewContractToStore(): Contract {
-    //Create contract and token entity
     let contract = new Contract("0xd8a5d498ab43ed060cb6629b97a19e3e4276dd9f");
     contract.save();
 
@@ -42,16 +41,16 @@ export function addNewTokenToStore(): Token {
 
 export function createTakerBidEvent(
     isPrivateSale: boolean,
-    orderHashParam: string = ORDER_HASH,
-    orderNonceParam: string = ORDER_NONCE,
-    takerParam: string = TAKER,
-    makerParam: string = MAKER,
-    strategyParam: string = STRATEGY,
-    currencyParam: string = CURRENCY,
-    collectionParam: string = COLLECTION,
-    tokenIdParam: string = TOKEN_ID,
-    amountParam: string = AMOUNT,
-    priceParam: string = PRICE,
+    orderHashParam: string = DEFAULT_ORDER_HASH,
+    orderNonceParam: string = DEFAULT_ORDER_NONCE,
+    takerParam: string = DEFAULT_TAKER,
+    makerParam: string = DEFAULT_MAKER,
+    strategyParam: string = DEFAULT_STRATEGY,
+    currencyParam: string = DEFAULT_CURRENCY,
+    collectionParam: string = DEFAULT_COLLECTION,
+    tokenIdParam: string = DEFAULT_TOKEN_ID,
+    amountParam: string = DEFAULT_AMOUNT,
+    priceParam: string = DEFAULT_PRICE,
 ): TakerBid {
 
     let strategyAddress = strategyParam;
@@ -59,7 +58,6 @@ export function createTakerBidEvent(
         strategyAddress = "0x58d83536d3efedb9f7f2a1ec3bdaad2b1a4dd98c";
     }
     // Create takerBid event
-    // using this tx as template https://ethtx.info/mainnet/0xb002e339fdfc53b664eccceb7410d501196422d9716a2bdb0493f11bed5b0324/
     let mockEvent = newMockEvent();
     let takerBidEvent = new TakerBid(
         mockEvent.address,
@@ -99,16 +97,16 @@ export function createTakerBidEvent(
 
 export function createTakerAskEvent(
     isPrivateSale: boolean,
-    orderHashParam: string = ORDER_HASH,
-    orderNonceParam: string = ORDER_NONCE,
-    takerParam: string = TAKER,
-    makerParam: string = MAKER,
-    strategyParam: string = STRATEGY,
-    currencyParam: string = CURRENCY,
-    collectionParam: string = COLLECTION,
-    tokenIdParam: string = TOKEN_ID,
-    amountParam: string = AMOUNT,
-    priceParam: string = PRICE,
+    orderHashParam: string = DEFAULT_ORDER_HASH,
+    orderNonceParam: string = DEFAULT_ORDER_NONCE,
+    takerParam: string = DEFAULT_TAKER,
+    makerParam: string = DEFAULT_MAKER,
+    strategyParam: string = DEFAULT_STRATEGY,
+    currencyParam: string = DEFAULT_CURRENCY,
+    collectionParam: string = DEFAULT_COLLECTION,
+    tokenIdParam: string = DEFAULT_TOKEN_ID,
+    amountParam: string = DEFAULT_AMOUNT,
+    priceParam: string = DEFAULT_PRICE,
 ): TakerAsk {
 
     let strategyAddress = "0x56244bb70cbd3ea9dc8007399f61dfc065190031";
