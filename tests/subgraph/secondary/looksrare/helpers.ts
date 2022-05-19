@@ -57,7 +57,7 @@ export function createTakerBidEvent(
     if (isPrivateSale) {
         strategyAddress = "0x58d83536d3efedb9f7f2a1ec3bdaad2b1a4dd98c";
     }
-    // Create takerBid event
+
     let mockEvent = newMockEvent();
     let takerBidEvent = new TakerBid(
         mockEvent.address,
@@ -68,7 +68,6 @@ export function createTakerBidEvent(
         mockEvent.transaction,
         mockEvent.parameters
     );
-    //bytes32,uint256,indexed address,indexed address,indexed address,address,address,uint256,uint256,uint256
     let orderHash = new ethereum.EventParam('orderHash', ethereum.Value.fromString(orderHashParam));
     let orderNonce = new ethereum.EventParam('orderNonce', ethereum.Value.fromUnsignedBigInt(BigInt.fromString(orderNonceParam)));
     let taker = new ethereum.EventParam('taker', ethereum.Value.fromAddress(Address.fromString(takerParam)));
@@ -113,8 +112,7 @@ export function createTakerAskEvent(
     if (isPrivateSale) {
         strategyAddress = "0x58d83536d3efedb9f7f2a1ec3bdaad2b1a4dd98c";
     }
-    // Create takerBid event
-    // using this tx as template https://ethtx.info/mainnet/0xb002e339fdfc53b664eccceb7410d501196422d9716a2bdb0493f11bed5b0324/
+
     let mockEvent = newMockEvent();
     let takerAsk = new TakerAsk(
         mockEvent.address,
@@ -125,7 +123,6 @@ export function createTakerAskEvent(
         mockEvent.transaction,
         mockEvent.parameters
     );
-    //bytes32,uint256,indexed address,indexed address,indexed address,address,address,uint256,uint256,uint256
     let orderHash = new ethereum.EventParam('orderHash', ethereum.Value.fromString(orderHashParam));
     let orderNonce = new ethereum.EventParam('orderNonce', ethereum.Value.fromUnsignedBigInt(BigInt.fromString(orderNonceParam)));
     let taker = new ethereum.EventParam('taker', ethereum.Value.fromAddress(Address.fromString(takerParam)));
