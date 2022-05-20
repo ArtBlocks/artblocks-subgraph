@@ -1,4 +1,4 @@
-import { BigInt, store, Address, log } from "@graphprotocol/graph-ts";
+import { BigInt, store, Address, log, TypedMap } from "@graphprotocol/graph-ts";
 
 import {
   MinterFilterV0,

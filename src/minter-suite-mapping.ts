@@ -1,6 +1,6 @@
 // We're importing these event types from MinterSetPriceV0
 // but the signature should be the same for all filtered minters
-import { Address, BigInt } from "@graphprotocol/graph-ts";
+import { Address, BigInt, json } from "@graphprotocol/graph-ts";
 
 import {
   PricePerTokenInWeiUpdated,
@@ -367,9 +367,11 @@ export function handleSetValue(event: any): void {
     let projectMinterConfig = minterProjectAndConfig.projectMinterConfiguration;
     let project = minterProjectAndConfig.project;
     project.updatedAt = event.block.timestamp;
-    const minterDetails = JSON.parse(projectMinterConfig.extraMinterDetails);
-    minterDetails[event.params.data_key] = event.params.data_value;
-    projectMinterConfig.extraMinterDetails = JSON.stringify(minterDetails);
+    const minterDetails = json
+      .fromString(projectMinterConfig.extraMinterDetails)
+      .toObject();
+    minterDetails.set(event.params.data_key, event.params.data_value);
+    projectMinterConfig.extraMinterDetails = minterDetails.toString();
     projectMinterConfig.save();
   }
 }
@@ -383,9 +385,12 @@ export function handleRemoveValue(event: any): void {
     let projectMinterConfig = minterProjectAndConfig.projectMinterConfiguration;
     let project = minterProjectAndConfig.project;
     project.updatedAt = event.block.timestamp;
-    const minterDetails = JSON.parse(projectMinterConfig.extraMinterDetails);
-    minterDetails[event.params.data_key] = null;
-    projectMinterConfig.extraMinterDetails = JSON.stringify(minterDetails);
+    const minterDetails = json
+      .fromString(projectMinterConfig.extraMinterDetails)
+      .toObject();
+    minterDetails.set(event.params.data_key, null);
+    projectMinterConfig.extraMinterDetails = minterDetails.toString();
+    project.save();
     projectMinterConfig.save();
   }
 }
@@ -400,12 +405,14 @@ export function handleAddManyValue(event: any): void {
     let projectMinterConfig = minterProjectAndConfig.projectMinterConfiguration;
     let project = minterProjectAndConfig.project;
     project.updatedAt = event.block.timestamp;
-    const minterDetails = JSON.parse(projectMinterConfig.extraMinterDetails);
-    minterDetails[event.params.data_key] = [
-      ...minterDetails[event.params.data_key],
-      event.params.data_value
-    ];
-    projectMinterConfig.extraMinterDetails = JSON.stringify(minterDetails);
+    const minterDetails = json
+      .fromString(projectMinterConfig.extraMinterDetails)
+      .toObject();
+    const arr = minterDetails.get(event.params.data_key).toArray();
+    arr.push(event.params.data_value);
+    minterDetails.set(event.params.data_key, json.fromString(arr.toString()));
+    projectMinterConfig.extraMinterDetails = minterDetails.toString();
+    project.save();
     projectMinterConfig.save();
   }
 }
@@ -420,12 +427,19 @@ export function handleRemoveManyValue(event: any): void {
     let projectMinterConfig = minterProjectAndConfig.projectMinterConfiguration;
     let project = minterProjectAndConfig.project;
     project.updatedAt = event.block.timestamp;
-    const minterDetails = JSON.parse(projectMinterConfig.extraMinterDetails);
-    const newValues = minterDetails[event.params.data_key].filter((v: any) => {
+    const minterDetails = json
+      .fromString(projectMinterConfig.extraMinterDetails)
+      .toObject();
+    const arr = minterDetails.get(event.params.data_key).toArray();
+    const newValues = arr.filter((v: any) => {
       return v !== event.params.data_value;
     });
-    minterDetails[event.params.data_key] = newValues;
-    projectMinterConfig.extraMinterDetails = JSON.stringify(minterDetails);
+    minterDetails.set(
+      event.params.data_key,
+      json.fromString(newValues.toString())
+    );
+    projectMinterConfig.extraMinterDetails = minterDetails.toString();
+    project.save();
     projectMinterConfig.save();
   }
 }
