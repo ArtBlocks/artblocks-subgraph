@@ -1,17 +1,10 @@
 import { Address, BigInt, Bytes, ethereum, log } from "@graphprotocol/graph-ts";
 
-import { WyvernExchange } from "../generated/WyvernExchange/WyvernExchange";
+import { WyvernExchange } from "../../../generated/WyvernExchange/WyvernExchange";
 
-import { WyvernExchangeWithBulkCancellations } from "../generated/WyvernExchangeWithBulkCancellations/WyvernExchangeWithBulkCancellations";
+import { WyvernExchangeWithBulkCancellations } from "../../../generated/WyvernExchangeWithBulkCancellations/WyvernExchangeWithBulkCancellations";
 
-import {
-  ERC155_SAFE_TRANSFER_FROM_SELECTOR,
-  ERC721_SAFE_TRANSFER_FROM_SELECTOR,
-  NULL_ADDRESS,
-  TRANSFER_FROM_SELECTOR,
-  WYVERN_EXCHANGE_ADDRESS,
-  WYVERN_EXCHANGE_WITH_BULK_CANCELLATIONS_ADDRESS
-} from "./constants";
+import { ERC155_SAFE_TRANSFER_FROM_SELECTOR, ERC721_SAFE_TRANSFER_FROM_SELECTOR, NULL_ADDRESS, TRANSFER_FROM_SELECTOR, WYVERN_EXCHANGE_ADDRESS, WYVERN_EXCHANGE_WITH_BULK_CANCELLATIONS_ADDRESS } from "../../constants";
 
 /**
  * @param side See `calculateFinalPrice` of WyvernExchange
@@ -121,34 +114,26 @@ export function calculateMatchPrice(
 /**
  * Replace bytes in an array with bytes in another array, guarded by a bitmask
  *
- * @param array The original array
+ * @param array The original array, MODIFIED in place
  * @param replacement The replacement array
  * @param mask The mask specifying which bits can be changed in the original array
- * @returns The updated byte array
  */
 export function guardedArrayReplace(
-  array: Bytes,
-  replacement: Bytes,
-  mask: Bytes
-): Bytes {
-  // Sometime the replacementPattern is empty, meaning that both arrays (buyCallData and sellCallData) are identicall and
-  // no merging is necessary. In such a case randomly return the first array (buyCallData)
-  // Also note, that outside of the case that mask length is zero, a require on the contract
-  // will revert the transaction if all arrays are not the same length so there's no need
-  // to check for that here.
-  if (mask.length == 0) {
-    return array;
-  }
-
-  let arrayCopy: Bytes = changetype<Bytes>(array.slice());
-
-  for (let i = 0; i < array.length; i++) {
-    if (mask[i] == 0xff) {
-      arrayCopy[i] = replacement[i];
+    array: Bytes,
+    replacement: Bytes,
+    mask: Bytes
+): void {
+    // Sometime the replacementPattern is empty, meaning that both arrays (buyCallData and sellCallData) are identicall and
+    // no merging is necessary. In such a case randomly return the first array (buyCallData)
+    if (mask.length == 0) {
+        return;
     }
-  }
 
-  return arrayCopy;
+    for (let i = 0; i < array.length; i++) {
+        if(mask[i] == 0xff) {
+            array[i] = replacement[i];
+        }
+    }
 }
 
 /**
@@ -171,21 +156,6 @@ export function isPrivateSale(
     takerOfSellOrder.toHexString() != NULL_ADDRESS &&
     msgSender == takerOfSellOrder
   );
-}
-
-/**
- *
- * @param projectId The projectId id
- * @param tokenId The token id
- * @param saleId The sale id (eth tx hash)
- * @returns The corresponding lookup table id
- */
-export function buildTokenSaleLookupTableId(
-  projectId: string,
-  tokenId: string,
-  saleId: string
-): string {
-  return projectId + "::" + tokenId + "::" + saleId;
 }
 
 /**
