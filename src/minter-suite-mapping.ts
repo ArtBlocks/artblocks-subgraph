@@ -608,7 +608,9 @@ export function handleAddManyAddressValue(event: ConfigValueAddedToSet1): void {
     let val = minterDetails.get(event.params._key.toString());
     let arr: string[] = [];
     if (val) {
-      arr = val.toArray().map<string>((v: JSONValue) => v.toString());
+      arr = val
+        .toArray()
+        .map<string>((v: JSONValue) => '"' + v.toString() + '"');
     }
 
     arr.push('"' + event.params._value.toHexString() + '"');
@@ -649,7 +651,9 @@ export function handleAddManyBytesValue(event: ConfigValueAddedToSet2): void {
     let val = minterDetails.get(event.params._key.toString());
     let arr: string[] = [];
     if (val) {
-      arr = val.toArray().map<string>((v: JSONValue) => v.toString());
+      arr = val
+        .toArray()
+        .map<string>((v: JSONValue) => '"' + v.toString() + '"');
     }
 
     arr.push('"' + event.params._value.toString() + '"');

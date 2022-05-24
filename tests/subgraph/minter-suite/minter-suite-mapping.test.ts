@@ -1750,4 +1750,13 @@ test("handleAddManyBytesValue should add a value to an array at a designated key
     "extraMinterDetails",
     '{"array":["im bytes"]}'
   );
+
+  handleAddManyBytesValue(configValueSetEvent);
+
+  assert.fieldEquals(
+    PROJECT_MINTER_CONFIGURATION_ENTITY_TYPE,
+    project.id,
+    "extraMinterDetails",
+    '{"array":["im bytes","im bytes"]}'
+  );
 });
