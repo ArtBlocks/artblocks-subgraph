@@ -1,15 +1,24 @@
 import {
   Address,
   BigInt,
+  Bytes,
+  json,
   JSONValue,
   JSONValueKind,
   TypedMap,
-  Value
+  Value,
+  ValueKind
 } from "@graphprotocol/graph-ts";
 import { MinterDAExpV0 } from "../generated/MinterDAExpV0/MinterDAExpV0";
 import { MinterDAExpV1 } from "../generated/MinterDAExpV1/MinterDAExpV1";
 import { MinterDALinV0 } from "../generated/MinterDALinV0/MinterDALinV0";
 import { MinterDALinV1 } from "../generated/MinterDALinV1/MinterDALinV1";
+import {
+  ConfigValueSet,
+  ConfigValueSet1,
+  ConfigValueSet2,
+  ConfigValueSet3
+} from "../generated/MinterFilterV0-0xDDc77d8f935b255aD8b5651392D1284E29478b5b/IFilteredMinterV1";
 import { IFilteredMinterV0 } from "../generated/MinterSetPriceV0/IFilteredMinterV0";
 import { Minter } from "../generated/schema";
 import { booleanToString } from "../tests/subgraph/shared-helpers";
@@ -92,7 +101,12 @@ export function typedMapToJSONString(map: TypedMap<String, JSONValue>): string {
     let newVal = "";
     if (JSONValueKind.BOOL == val.kind) {
       newVal = booleanToString(val.toBool());
+    } else if (JSONValueKind.NUMBER == val.kind) {
+      newVal = val.toBigInt().toString();
+    } else if (JSONValueKind.STRING == val.kind) {
+      newVal = val.toString();
     }
+
     jsonString +=
       entry.key + ": " + newVal + (i == map.entries.length - 1 ? "" : ",");
   }
