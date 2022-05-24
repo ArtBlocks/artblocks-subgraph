@@ -1,4 +1,10 @@
-import { Address, BigInt, Bytes, ethereum } from "@graphprotocol/graph-ts";
+import {
+  Address,
+  BigInt,
+  ByteArray,
+  Bytes,
+  ethereum
+} from "@graphprotocol/graph-ts";
 import {
   assert,
   clearStore,
@@ -41,7 +47,8 @@ import {
   handleMinimumAuctionLengthSecondsUpdated,
   handlePricePerTokenInWeiUpdated,
   handleProjectCurrencyInfoUpdated,
-  handlePurchaseToDisabledUpdated
+  handlePurchaseToDisabledUpdated,
+  handleSetValue
 } from "../../../src/minter-suite-mapping";
 import {
   AuctionHalfLifeRangeSecondsUpdated,
@@ -53,6 +60,8 @@ import {
   SetAuctionDetails as DAExpV1SetAuctionDetails,
   ResetAuctionDetails as DAExpV1ResetAuctionDetails
 } from "../../../generated/MinterDAExpV1/MinterDAExpV1";
+import { AllowlistedNftAddress as GenericExtraMinterDetailsEvent } from "../../../generated/MinterFilterV0-0xDDc77d8f935b255aD8b5651392D1284E29478b5b/MinterHolderV0";
+import { ConfigValueSet } from "../../../generated/MinterFilterV0-0xDDc77d8f935b255aD8b5651392D1284E29478b5b/IFilteredMinterV1";
 
 const randomAddressGenerator = new RandomAddressGenerator();
 
@@ -1413,5 +1422,55 @@ test("handleDAExpResetAuctionDetails should reset project minter config auction 
     project.id,
     "updatedAt",
     CURRENT_BLOCK_TIMESTAMP.toString()
+  );
+});
+test("handleSetValue should set a value to a designated key in extraMinterDetails", () => {
+  clearStore();
+  const minterAddress = randomAddressGenerator.generateRandomAddress();
+  const minterType = "MinterHolderV0";
+  const minter = new Minter(minterAddress.toHexString());
+  minter.coreContract = TEST_CONTRACT_ADDRESS.toHexString();
+  minter.type = minterType;
+  minter.save();
+
+  const projectId = BigInt.fromI32(0);
+  const project = addNewProjectToStore(
+    TEST_CONTRACT_ADDRESS,
+    projectId,
+    "project 0",
+    randomAddressGenerator.generateRandomAddress(),
+    BigInt.fromI32(0),
+    CURRENT_BLOCK_TIMESTAMP.minus(BigInt.fromI32(10))
+  );
+
+  const projectMinterConfig = new ProjectMinterConfiguration(project.id);
+  projectMinterConfig.minter = minterAddress.toHexString();
+  projectMinterConfig.project = project.id;
+  projectMinterConfig.save();
+
+  const configValueSetEvent: ConfigValueSet = changetype<ConfigValueSet>(
+    newMockEvent()
+  );
+  configValueSetEvent.address = minterAddress;
+  configValueSetEvent.parameters = [
+    new ethereum.EventParam(
+      "_projectId",
+      ethereum.Value.fromUnsignedBigInt(projectId)
+    ),
+    new ethereum.EventParam(
+      "_key",
+      ethereum.Value.fromBytes(Bytes.fromUTF8("customKey"))
+    ),
+    new ethereum.EventParam("_value", ethereum.Value.fromBoolean(true))
+  ];
+  configValueSetEvent.block.timestamp = CURRENT_BLOCK_TIMESTAMP;
+
+  handleSetValue(configValueSetEvent);
+
+  assert.fieldEquals(
+    PROJECT_MINTER_CONFIGURATION_ENTITY_TYPE,
+    project.id,
+    "extraMinterDetails",
+    "{customKey: true}"
   );
 });

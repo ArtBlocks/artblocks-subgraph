@@ -1,4 +1,4 @@
-import { BigInt, store, Address, log, TypedMap } from "@graphprotocol/graph-ts";
+import { BigInt, store, Address } from "@graphprotocol/graph-ts";
 
 import {
   MinterFilterV0,
@@ -280,11 +280,6 @@ function createAndPopulateProjectMinterConfiguration(
     );
 
     projectMinterConfig.purchaseToDisabled = minterSetPriceERC20V0Contract.purchaseToDisabled(
-      project.projectId
-    );
-  } else if (minterType == "MinterHolderV0") {
-    let minterHolderV0Contract = MinterHolderV0.bind(minterAddress);
-    projectMinterConfig.purchaseToDisabled = minterHolderV0Contract.purchaseToDisabled(
       project.projectId
     );
   }

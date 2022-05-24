@@ -417,6 +417,8 @@ dataSources:
           file: ./abis/MinterFilterV0.json
         - name: IFilteredMinterV0
           file: ./abis/IFilteredMinterV0.json
+        - name: IFilteredMinterV1
+          file: ./abis/IFilteredMinterV1.json
         - name: MinterSetPriceERC20V0
           file: ./abis/MinterSetPriceERC20V0.json
         - name: MinterSetPriceV0
