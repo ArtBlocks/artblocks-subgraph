@@ -99,17 +99,30 @@ export function typedMapToJSONString(map: TypedMap<String, JSONValue>): string {
     let entry = map.entries[i];
     let val = entry.value;
     let newVal = "";
+    let quoted = "";
     if (JSONValueKind.BOOL == val.kind) {
       newVal = booleanToString(val.toBool());
     } else if (JSONValueKind.NUMBER == val.kind) {
       newVal = val.toBigInt().toString();
     } else if (JSONValueKind.STRING == val.kind) {
       newVal = val.toString();
+      quoted = '"';
     }
 
     jsonString +=
-      entry.key + ": " + newVal + (i == map.entries.length - 1 ? "" : ",");
+      '"' +
+      entry.key +
+      '"' +
+      ":" +
+      quoted +
+      newVal +
+      quoted +
+      (i == map.entries.length - 1 ? "" : ",");
   }
   jsonString += "}";
   return jsonString;
+}
+
+export function stringToJSONValue(value: string): JSONValue {
+  return json.fromString('["' + value + '"]').toArray()[0];
 }

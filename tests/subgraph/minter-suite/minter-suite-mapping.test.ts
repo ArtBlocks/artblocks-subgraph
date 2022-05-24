@@ -3,13 +3,16 @@ import {
   BigInt,
   ByteArray,
   Bytes,
-  ethereum
+  ethereum,
+  json,
+  Value
 } from "@graphprotocol/graph-ts";
 import {
   assert,
   clearStore,
   test,
-  newMockEvent
+  newMockEvent,
+  logStore
 } from "matchstick-as/assembly/index";
 import { Minter, ProjectMinterConfiguration } from "../../../generated/schema";
 import {
@@ -51,8 +54,7 @@ import {
   handleSetAddressValue,
   handleSetBigIntValue,
   handleSetBooleanValue,
-  handleSetBytesValue,
-  handleSetStringValue
+  handleSetBytesValue
 } from "../../../src/minter-suite-mapping";
 import {
   AuctionHalfLifeRangeSecondsUpdated,
@@ -68,8 +70,7 @@ import {
   ConfigValueSet,
   ConfigValueSet1,
   ConfigValueSet2,
-  ConfigValueSet3,
-  ConfigValueSet4
+  ConfigValueSet3
 } from "../../../generated/MinterFilterV0-0xDDc77d8f935b255aD8b5651392D1284E29478b5b/IFilteredMinterV1";
 
 const randomAddressGenerator = new RandomAddressGenerator();
@@ -1433,7 +1434,7 @@ test("handleDAExpResetAuctionDetails should reset project minter config auction 
     CURRENT_BLOCK_TIMESTAMP.toString()
   );
 });
-test("handleSetValue should set a boolean value to a designated key in extraMinterDetails", () => {
+test("handleSetValue should set all values to a designated key in extraMinterDetails", () => {
   clearStore();
   const minterAddress = randomAddressGenerator.generateRandomAddress();
   const minterType = "MinterHolderV0";
@@ -1468,7 +1469,7 @@ test("handleSetValue should set a boolean value to a designated key in extraMint
     ),
     new ethereum.EventParam(
       "_key",
-      ethereum.Value.fromBytes(Bytes.fromUTF8("customKey"))
+      ethereum.Value.fromBytes(Bytes.fromUTF8("boolean"))
     ),
     new ethereum.EventParam("_value", ethereum.Value.fromBoolean(true))
   ];
@@ -1480,213 +1481,100 @@ test("handleSetValue should set a boolean value to a designated key in extraMint
     PROJECT_MINTER_CONFIGURATION_ENTITY_TYPE,
     project.id,
     "extraMinterDetails",
-    "{customKey: true}"
-  );
-});
-test("handleSetValue should set a BigInt value to a designated key in extraMinterDetails", () => {
-  clearStore();
-  const minterAddress = randomAddressGenerator.generateRandomAddress();
-  const minterType = "MinterHolderV0";
-  const minter = new Minter(minterAddress.toHexString());
-  minter.coreContract = TEST_CONTRACT_ADDRESS.toHexString();
-  minter.type = minterType;
-  minter.save();
-
-  const projectId = BigInt.fromI32(0);
-  const project = addNewProjectToStore(
-    TEST_CONTRACT_ADDRESS,
-    projectId,
-    "project 0",
-    randomAddressGenerator.generateRandomAddress(),
-    BigInt.fromI32(0),
-    CURRENT_BLOCK_TIMESTAMP.minus(BigInt.fromI32(10))
+    '{"boolean":true}'
   );
 
-  const projectMinterConfig = new ProjectMinterConfiguration(project.id);
-  projectMinterConfig.minter = minterAddress.toHexString();
-  projectMinterConfig.project = project.id;
-  projectMinterConfig.save();
-
-  const configValueSetEvent: ConfigValueSet1 = changetype<ConfigValueSet1>(
+  const configValueSetEvent1: ConfigValueSet1 = changetype<ConfigValueSet1>(
     newMockEvent()
   );
-  configValueSetEvent.address = minterAddress;
-  configValueSetEvent.parameters = [
+  configValueSetEvent1.address = minterAddress;
+  configValueSetEvent1.parameters = [
     new ethereum.EventParam(
       "_projectId",
       ethereum.Value.fromUnsignedBigInt(projectId)
     ),
     new ethereum.EventParam(
       "_key",
-      ethereum.Value.fromBytes(Bytes.fromUTF8("customKey"))
+      ethereum.Value.fromBytes(Bytes.fromUTF8("bigInt"))
     ),
     new ethereum.EventParam(
       "_value",
       ethereum.Value.fromSignedBigInt(BigInt.fromI32(100))
     )
   ];
-  configValueSetEvent.block.timestamp = CURRENT_BLOCK_TIMESTAMP;
+  configValueSetEvent1.block.timestamp = CURRENT_BLOCK_TIMESTAMP.plus(
+    BigInt.fromI32(10)
+  );
 
-  handleSetBigIntValue(configValueSetEvent);
+  handleSetBigIntValue(configValueSetEvent1);
 
   assert.fieldEquals(
     PROJECT_MINTER_CONFIGURATION_ENTITY_TYPE,
     project.id,
     "extraMinterDetails",
-    "{customKey: 100}"
+    '{"boolean":true,"bigInt":100}'
   );
-});
-test("handleSetValue should set a Address value to a designated key in extraMinterDetails", () => {
-  clearStore();
-  const minterAddress = randomAddressGenerator.generateRandomAddress();
-  const minterType = "MinterHolderV0";
-  const minter = new Minter(minterAddress.toHexString());
-  minter.coreContract = TEST_CONTRACT_ADDRESS.toHexString();
-  minter.type = minterType;
-  minter.save();
-
-  const projectId = BigInt.fromI32(0);
-  const project = addNewProjectToStore(
-    TEST_CONTRACT_ADDRESS,
-    projectId,
-    "project 0",
-    randomAddressGenerator.generateRandomAddress(),
-    BigInt.fromI32(0),
-    CURRENT_BLOCK_TIMESTAMP.minus(BigInt.fromI32(10))
-  );
-
-  const projectMinterConfig = new ProjectMinterConfiguration(project.id);
-  projectMinterConfig.minter = minterAddress.toHexString();
-  projectMinterConfig.project = project.id;
-  projectMinterConfig.save();
-
-  const configValueSetEvent: ConfigValueSet2 = changetype<ConfigValueSet2>(
+  const configValueSetEvent2: ConfigValueSet2 = changetype<ConfigValueSet2>(
     newMockEvent()
   );
   const testAddy = randomAddressGenerator.generateRandomAddress();
-  configValueSetEvent.address = minterAddress;
-  configValueSetEvent.parameters = [
+  configValueSetEvent2.address = minterAddress;
+  configValueSetEvent2.parameters = [
     new ethereum.EventParam(
       "_projectId",
       ethereum.Value.fromUnsignedBigInt(projectId)
     ),
     new ethereum.EventParam(
       "_key",
-      ethereum.Value.fromBytes(Bytes.fromUTF8("customKey"))
+      ethereum.Value.fromBytes(Bytes.fromUTF8("address"))
     ),
     new ethereum.EventParam("_value", ethereum.Value.fromAddress(testAddy))
   ];
-  configValueSetEvent.block.timestamp = CURRENT_BLOCK_TIMESTAMP;
+  configValueSetEvent2.block.timestamp = CURRENT_BLOCK_TIMESTAMP.plus(
+    BigInt.fromI32(20)
+  );
 
-  handleSetAddressValue(configValueSetEvent);
+  handleSetAddressValue(configValueSetEvent2);
+
+  const addressString = "" + testAddy.toHexString();
 
   assert.fieldEquals(
     PROJECT_MINTER_CONFIGURATION_ENTITY_TYPE,
     project.id,
     "extraMinterDetails",
-    `{customKey: ${testAddy.toString()}}`
+    '{"bigInt":100,"boolean":true,"address":' + '"' + addressString + '"' + "}"
   );
-});
-test("handleSetValue should set a Bytes value to a designated key in extraMinterDetails", () => {
-  clearStore();
-  const minterAddress = randomAddressGenerator.generateRandomAddress();
-  const minterType = "MinterHolderV0";
-  const minter = new Minter(minterAddress.toHexString());
-  minter.coreContract = TEST_CONTRACT_ADDRESS.toHexString();
-  minter.type = minterType;
-  minter.save();
-
-  const projectId = BigInt.fromI32(0);
-  const project = addNewProjectToStore(
-    TEST_CONTRACT_ADDRESS,
-    projectId,
-    "project 0",
-    randomAddressGenerator.generateRandomAddress(),
-    BigInt.fromI32(0),
-    CURRENT_BLOCK_TIMESTAMP.minus(BigInt.fromI32(10))
-  );
-
-  const projectMinterConfig = new ProjectMinterConfiguration(project.id);
-  projectMinterConfig.minter = minterAddress.toHexString();
-  projectMinterConfig.project = project.id;
-  projectMinterConfig.save();
-
-  const configValueSetEvent: ConfigValueSet3 = changetype<ConfigValueSet3>(
+  const configValueSetEvent3: ConfigValueSet3 = changetype<ConfigValueSet3>(
     newMockEvent()
   );
-  configValueSetEvent.address = minterAddress;
-  configValueSetEvent.parameters = [
+  configValueSetEvent3.address = minterAddress;
+  configValueSetEvent3.parameters = [
     new ethereum.EventParam(
       "_projectId",
       ethereum.Value.fromUnsignedBigInt(projectId)
     ),
     new ethereum.EventParam(
       "_key",
-      ethereum.Value.fromBytes(Bytes.fromUTF8("customKey"))
+      ethereum.Value.fromBytes(Bytes.fromUTF8("bytes"))
     ),
     new ethereum.EventParam(
       "_value",
       ethereum.Value.fromBytes(Bytes.fromUTF8("im bytes"))
     )
   ];
-  configValueSetEvent.block.timestamp = CURRENT_BLOCK_TIMESTAMP;
+  configValueSetEvent3.block.timestamp = CURRENT_BLOCK_TIMESTAMP;
 
-  handleSetBytesValue(configValueSetEvent);
-
-  assert.fieldEquals(
-    PROJECT_MINTER_CONFIGURATION_ENTITY_TYPE,
-    project.id,
-    "extraMinterDetails",
-    "{customKey: im bytes}"
-  );
-});
-test("handleSetValue should set a string value to a designated key in extraMinterDetails", () => {
-  clearStore();
-  const minterAddress = randomAddressGenerator.generateRandomAddress();
-  const minterType = "MinterHolderV0";
-  const minter = new Minter(minterAddress.toHexString());
-  minter.coreContract = TEST_CONTRACT_ADDRESS.toHexString();
-  minter.type = minterType;
-  minter.save();
-
-  const projectId = BigInt.fromI32(0);
-  const project = addNewProjectToStore(
-    TEST_CONTRACT_ADDRESS,
-    projectId,
-    "project 0",
-    randomAddressGenerator.generateRandomAddress(),
-    BigInt.fromI32(0),
-    CURRENT_BLOCK_TIMESTAMP.minus(BigInt.fromI32(10))
-  );
-
-  const projectMinterConfig = new ProjectMinterConfiguration(project.id);
-  projectMinterConfig.minter = minterAddress.toHexString();
-  projectMinterConfig.project = project.id;
-  projectMinterConfig.save();
-
-  const configValueSetEvent: ConfigValueSet4 = changetype<ConfigValueSet4>(
-    newMockEvent()
-  );
-  configValueSetEvent.address = minterAddress;
-  configValueSetEvent.parameters = [
-    new ethereum.EventParam(
-      "_projectId",
-      ethereum.Value.fromUnsignedBigInt(projectId)
-    ),
-    new ethereum.EventParam(
-      "_key",
-      ethereum.Value.fromBytes(Bytes.fromUTF8("customKey"))
-    ),
-    new ethereum.EventParam("_value", ethereum.Value.fromString("new string"))
-  ];
-  configValueSetEvent.block.timestamp = CURRENT_BLOCK_TIMESTAMP;
-
-  handleSetStringValue(configValueSetEvent);
+  handleSetBytesValue(configValueSetEvent3);
 
   assert.fieldEquals(
     PROJECT_MINTER_CONFIGURATION_ENTITY_TYPE,
     project.id,
     "extraMinterDetails",
-    "{customKey: new string}"
+    '{"address":' +
+      '"' +
+      addressString +
+      '"' +
+      "," +
+      '"bigInt":100,"boolean":true,"bytes":"im bytes"}'
   );
 });
