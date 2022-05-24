@@ -107,6 +107,24 @@ export function typedMapToJSONString(map: TypedMap<String, JSONValue>): string {
     } else if (JSONValueKind.STRING == val.kind) {
       newVal = val.toString();
       quoted = '"';
+    } else if (JSONValueKind.ARRAY == val.kind) {
+      newVal =
+        "[" +
+        val
+          .toArray()
+          .map<string>((v: JSONValue) => {
+            let mapped = "";
+            if (JSONValueKind.BOOL == v.kind) {
+              mapped = booleanToString(v.toBool());
+            } else if (JSONValueKind.STRING == v.kind) {
+              mapped = '"' + v.toString() + '"';
+            } else if (JSONValueKind.NUMBER == v.kind) {
+              mapped = v.toBigInt().toString();
+            }
+            return mapped;
+          })
+          .toString() +
+        "]";
     }
 
     jsonString +=
@@ -125,4 +143,7 @@ export function typedMapToJSONString(map: TypedMap<String, JSONValue>): string {
 
 export function stringToJSONValue(value: string): JSONValue {
   return json.fromString('["' + value + '"]').toArray()[0];
+}
+export function arrayToJSONValue(value: string): JSONValue {
+  return json.fromString("[" + value + "]");
 }

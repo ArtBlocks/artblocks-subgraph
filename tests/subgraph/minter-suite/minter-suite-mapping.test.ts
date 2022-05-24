@@ -42,6 +42,9 @@ import {
   MinimumAuctionLengthSecondsUpdated as DALinV1MinimumAuctionLengthSecondsUpdated
 } from "../../../generated/MinterDALinV1/MinterDALinV1";
 import {
+  handleAddManyAddressValue,
+  handleAddManyBigIntValue,
+  handleAddManyBytesValue,
   handleAuctionHalfLifeRangeSecondsUpdated,
   handleDAExpResetAuctionDetails,
   handleDAExpSetAuctionDetails,
@@ -67,6 +70,9 @@ import {
   ResetAuctionDetails as DAExpV1ResetAuctionDetails
 } from "../../../generated/MinterDAExpV1/MinterDAExpV1";
 import {
+  ConfigValueAddedToSet,
+  ConfigValueAddedToSet1,
+  ConfigValueAddedToSet2,
   ConfigValueSet,
   ConfigValueSet1,
   ConfigValueSet2,
@@ -1576,5 +1582,172 @@ test("handleSetValue should set all values to a designated key in extraMinterDet
       '"' +
       "," +
       '"bigInt":100,"boolean":true,"bytes":"im bytes"}'
+  );
+});
+test("handleAddManyBigIntValue should add a value to an array at a designated key extraMinterDetails", () => {
+  clearStore();
+  const minterAddress = randomAddressGenerator.generateRandomAddress();
+  const minterType = "MinterHolderV0";
+  const minter = new Minter(minterAddress.toHexString());
+  minter.coreContract = TEST_CONTRACT_ADDRESS.toHexString();
+  minter.type = minterType;
+  minter.save();
+
+  const projectId = BigInt.fromI32(0);
+  const project = addNewProjectToStore(
+    TEST_CONTRACT_ADDRESS,
+    projectId,
+    "project 0",
+    randomAddressGenerator.generateRandomAddress(),
+    BigInt.fromI32(0),
+    CURRENT_BLOCK_TIMESTAMP.minus(BigInt.fromI32(10))
+  );
+
+  const projectMinterConfig = new ProjectMinterConfiguration(project.id);
+  projectMinterConfig.minter = minterAddress.toHexString();
+  projectMinterConfig.project = project.id;
+  projectMinterConfig.save();
+
+  const configValueSetEvent: ConfigValueAddedToSet = changetype<
+    ConfigValueAddedToSet
+  >(newMockEvent());
+  configValueSetEvent.address = minterAddress;
+  configValueSetEvent.parameters = [
+    new ethereum.EventParam(
+      "_projectId",
+      ethereum.Value.fromUnsignedBigInt(projectId)
+    ),
+    new ethereum.EventParam(
+      "_key",
+      ethereum.Value.fromBytes(Bytes.fromUTF8("array"))
+    ),
+    new ethereum.EventParam(
+      "_value",
+      ethereum.Value.fromSignedBigInt(BigInt.fromI32(100))
+    )
+  ];
+  configValueSetEvent.block.timestamp = CURRENT_BLOCK_TIMESTAMP;
+
+  handleAddManyBigIntValue(configValueSetEvent);
+
+  assert.fieldEquals(
+    PROJECT_MINTER_CONFIGURATION_ENTITY_TYPE,
+    project.id,
+    "extraMinterDetails",
+    '{"array":[100]}'
+  );
+
+  handleAddManyBigIntValue(configValueSetEvent);
+
+  assert.fieldEquals(
+    PROJECT_MINTER_CONFIGURATION_ENTITY_TYPE,
+    project.id,
+    "extraMinterDetails",
+    '{"array":[100,100]}'
+  );
+});
+test("handleAddManyAddressValue should add a value to an array at a designated key extraMinterDetails", () => {
+  clearStore();
+  const minterAddress = randomAddressGenerator.generateRandomAddress();
+  const minterType = "MinterHolderV0";
+  const minter = new Minter(minterAddress.toHexString());
+  minter.coreContract = TEST_CONTRACT_ADDRESS.toHexString();
+  minter.type = minterType;
+  minter.save();
+
+  const projectId = BigInt.fromI32(0);
+  const project = addNewProjectToStore(
+    TEST_CONTRACT_ADDRESS,
+    projectId,
+    "project 0",
+    randomAddressGenerator.generateRandomAddress(),
+    BigInt.fromI32(0),
+    CURRENT_BLOCK_TIMESTAMP.minus(BigInt.fromI32(10))
+  );
+
+  const projectMinterConfig = new ProjectMinterConfiguration(project.id);
+  projectMinterConfig.minter = minterAddress.toHexString();
+  projectMinterConfig.project = project.id;
+  projectMinterConfig.save();
+
+  const testAddy = randomAddressGenerator.generateRandomAddress();
+
+  const configValueSetEvent: ConfigValueAddedToSet1 = changetype<
+    ConfigValueAddedToSet1
+  >(newMockEvent());
+  configValueSetEvent.address = minterAddress;
+  configValueSetEvent.parameters = [
+    new ethereum.EventParam(
+      "_projectId",
+      ethereum.Value.fromUnsignedBigInt(projectId)
+    ),
+    new ethereum.EventParam(
+      "_key",
+      ethereum.Value.fromBytes(Bytes.fromUTF8("array"))
+    ),
+    new ethereum.EventParam("_value", ethereum.Value.fromAddress(testAddy))
+  ];
+  configValueSetEvent.block.timestamp = CURRENT_BLOCK_TIMESTAMP;
+
+  handleAddManyAddressValue(configValueSetEvent);
+
+  assert.fieldEquals(
+    PROJECT_MINTER_CONFIGURATION_ENTITY_TYPE,
+    project.id,
+    "extraMinterDetails",
+    '{"array":[' + '"' + testAddy.toHexString() + '"' + "]}"
+  );
+});
+test("handleAddManyBytesValue should add a value to an array at a designated key extraMinterDetails", () => {
+  clearStore();
+  const minterAddress = randomAddressGenerator.generateRandomAddress();
+  const minterType = "MinterHolderV0";
+  const minter = new Minter(minterAddress.toHexString());
+  minter.coreContract = TEST_CONTRACT_ADDRESS.toHexString();
+  minter.type = minterType;
+  minter.save();
+
+  const projectId = BigInt.fromI32(0);
+  const project = addNewProjectToStore(
+    TEST_CONTRACT_ADDRESS,
+    projectId,
+    "project 0",
+    randomAddressGenerator.generateRandomAddress(),
+    BigInt.fromI32(0),
+    CURRENT_BLOCK_TIMESTAMP.minus(BigInt.fromI32(10))
+  );
+
+  const projectMinterConfig = new ProjectMinterConfiguration(project.id);
+  projectMinterConfig.minter = minterAddress.toHexString();
+  projectMinterConfig.project = project.id;
+  projectMinterConfig.save();
+
+  const configValueSetEvent: ConfigValueAddedToSet2 = changetype<
+    ConfigValueAddedToSet2
+  >(newMockEvent());
+  configValueSetEvent.address = minterAddress;
+  configValueSetEvent.parameters = [
+    new ethereum.EventParam(
+      "_projectId",
+      ethereum.Value.fromUnsignedBigInt(projectId)
+    ),
+    new ethereum.EventParam(
+      "_key",
+      ethereum.Value.fromBytes(Bytes.fromUTF8("array"))
+    ),
+    new ethereum.EventParam(
+      "_value",
+      ethereum.Value.fromBytes(Bytes.fromUTF8("im bytes"))
+    )
+  ];
+  configValueSetEvent.block.timestamp = CURRENT_BLOCK_TIMESTAMP;
+
+  handleAddManyBytesValue(configValueSetEvent);
+
+  assert.fieldEquals(
+    PROJECT_MINTER_CONFIGURATION_ENTITY_TYPE,
+    project.id,
+    "extraMinterDetails",
+    '{"array":["im bytes"]}'
   );
 });
