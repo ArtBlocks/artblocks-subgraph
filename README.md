@@ -75,6 +75,25 @@ To write to & read from the in-memory data store, use .save() and .load(). You c
     - Verify that contract addresses added are for the correct contracts by checking Etherscan at the contract address
 3. Run `yarn prepare:{NETWORK}`, (e.g. `yarn prepare:mainnet` for mainnet) to generate subgraph manifest (subgraph.yaml)
 4. Manually look over the generated subgraph manifest to make sure it is correct
+  - [Grafting](https://thegraph.com/docs/en/developer/create-subgraph-hosted/#grafting-onto-existing-subgraphs_) is possible on hosted subgraphs. If using this functionality, the following information must be manually added near the top of the generated `subgraph.yaml` file:
+    - ```
+      features:
+        - grafting
+      graft:
+        base: Qm... # Subgraph ID of base subgraph
+        block: 7345624 # Block number
+      ```
+      > :warning: Any manually added grafting information will be overwritten if scripts re-call `yarn prepare:{network}`, so be aware of any scripts being used in `package.json`
+    - Grafting on the decentralized network is not recommended at this time because it requires that the Indexer has indexed the base subgraph.
 5. Run `yarn codegen` to generate contract mappings
 6. Deploy subgraph to The Graph's hosted service `yarn deploy:{NETWORK}-hosted` (e.g. `yarn deploy:mainnet-hosted`)
   - 6A. If you are deploying `mainnet-hosted`, don't forget to also prepare and deploy `mainnet-with-secondary-hosted` to keep those subgraphs in sync
+
+## Adding New Minters Checklist
+The following typical steps should be followed when adding new minters to Art Blocks flagship MinterSuite.
+> In general, the process should be completed on testnet entirely before deploying on mainnet
+1. Deploy new minter contracts (testnet, mainnet, etc).
+2. (any order, with the caveat that if the existing subgraph deployment cannot handle the new minters, blockchain transactions should be performed AFTER the new subgraph syncs)
+   - Deploy subgraph that indexes and handles the new minters, and wait for new subgraph to sync
+   - Admin submits transactions to allowlist the new minter contracts on MinterFilter
+3. Observe the new minter options on the frontend, ensure no subgraph errors
