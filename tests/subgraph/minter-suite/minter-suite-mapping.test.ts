@@ -1,18 +1,9 @@
-import {
-  Address,
-  BigInt,
-  ByteArray,
-  Bytes,
-  ethereum,
-  json,
-  Value
-} from "@graphprotocol/graph-ts";
+import { Address, BigInt, Bytes, ethereum } from "@graphprotocol/graph-ts";
 import {
   assert,
   clearStore,
   test,
-  newMockEvent,
-  logStore
+  newMockEvent
 } from "matchstick-as/assembly/index";
 import { Minter, ProjectMinterConfiguration } from "../../../generated/schema";
 import {
@@ -54,6 +45,7 @@ import {
   handlePricePerTokenInWeiUpdated,
   handleProjectCurrencyInfoUpdated,
   handlePurchaseToDisabledUpdated,
+  handleRemoveValue,
   handleSetAddressValue,
   handleSetBigIntValue,
   handleSetBooleanValue,
@@ -70,6 +62,7 @@ import {
   ResetAuctionDetails as DAExpV1ResetAuctionDetails
 } from "../../../generated/MinterDAExpV1/MinterDAExpV1";
 import {
+  ConfigKeyRemoved,
   ConfigValueAddedToSet,
   ConfigValueAddedToSet1,
   ConfigValueAddedToSet2,
@@ -1758,5 +1751,56 @@ test("handleAddManyBytesValue should add a value to an array at a designated key
     project.id,
     "extraMinterDetails",
     '{"array":["im bytes","im bytes"]}'
+  );
+});
+test("handleRemoveValue should remove the key/value from extraMinterDetails", () => {
+  clearStore();
+  const minterAddress = randomAddressGenerator.generateRandomAddress();
+  const minterType = "MinterHolderV0";
+  const minter = new Minter(minterAddress.toHexString());
+  minter.coreContract = TEST_CONTRACT_ADDRESS.toHexString();
+  minter.type = minterType;
+  minter.save();
+
+  const projectId = BigInt.fromI32(0);
+  const project = addNewProjectToStore(
+    TEST_CONTRACT_ADDRESS,
+    projectId,
+    "project 0",
+    randomAddressGenerator.generateRandomAddress(),
+    BigInt.fromI32(0),
+    CURRENT_BLOCK_TIMESTAMP.minus(BigInt.fromI32(10))
+  );
+
+  const projectMinterConfig = new ProjectMinterConfiguration(project.id);
+  projectMinterConfig.minter = minterAddress.toHexString();
+  projectMinterConfig.project = project.id;
+  projectMinterConfig.extraMinterDetails =
+    '{"addresses": "hi","removeMe": "please"}';
+  projectMinterConfig.save();
+
+  const configValueRemoveEvent: ConfigKeyRemoved = changetype<ConfigKeyRemoved>(
+    newMockEvent()
+  );
+  configValueRemoveEvent.address = minterAddress;
+  configValueRemoveEvent.parameters = [
+    new ethereum.EventParam(
+      "_projectId",
+      ethereum.Value.fromUnsignedBigInt(projectId)
+    ),
+    new ethereum.EventParam(
+      "_key",
+      ethereum.Value.fromBytes(Bytes.fromUTF8("removeMe"))
+    )
+  ];
+  configValueRemoveEvent.block.timestamp = CURRENT_BLOCK_TIMESTAMP;
+
+  handleRemoveValue(configValueRemoveEvent);
+
+  assert.fieldEquals(
+    PROJECT_MINTER_CONFIGURATION_ENTITY_TYPE,
+    project.id,
+    "extraMinterDetails",
+    '{"addresses":"hi"}'
   );
 });

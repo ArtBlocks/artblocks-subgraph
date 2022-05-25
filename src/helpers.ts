@@ -1,27 +1,17 @@
 import {
   Address,
   BigInt,
-  Bytes,
   json,
   JSONValue,
   JSONValueKind,
-  TypedMap,
-  Value,
-  ValueKind
+  TypedMap
 } from "@graphprotocol/graph-ts";
 import { MinterDAExpV0 } from "../generated/MinterDAExpV0/MinterDAExpV0";
 import { MinterDAExpV1 } from "../generated/MinterDAExpV1/MinterDAExpV1";
 import { MinterDALinV0 } from "../generated/MinterDALinV0/MinterDALinV0";
 import { MinterDALinV1 } from "../generated/MinterDALinV1/MinterDALinV1";
-import {
-  ConfigValueSet,
-  ConfigValueSet1,
-  ConfigValueSet2,
-  ConfigValueSet3
-} from "../generated/MinterFilterV0-0xDDc77d8f935b255aD8b5651392D1284E29478b5b/IFilteredMinterV1";
 import { IFilteredMinterV0 } from "../generated/MinterSetPriceV0/IFilteredMinterV0";
-import { Minter } from "../generated/schema";
-import { booleanToString } from "../tests/subgraph/shared-helpers";
+import { Minter, ProjectMinterConfiguration } from "../generated/schema";
 
 export function generateAccountProjectId(
   accountId: string,
@@ -91,6 +81,24 @@ export function loadOrCreateMinter(
   minter.updatedAt = timestamp;
   minter.save();
   return minter;
+}
+
+export function booleanToString(b: boolean): string {
+  return b ? "true" : "false";
+}
+
+export function getMinterDetails(
+  projectMinterConfig: ProjectMinterConfiguration
+): TypedMap<string, JSONValue> {
+  let jsonResult = json.try_fromString(projectMinterConfig.extraMinterDetails);
+
+  let minterDetails: TypedMap<string, JSONValue>;
+  if (jsonResult.isOk) {
+    minterDetails = jsonResult.value.toObject();
+  } else {
+    minterDetails = new TypedMap();
+  }
+  return minterDetails;
 }
 
 export function typedMapToJSONString(map: TypedMap<String, JSONValue>): string {

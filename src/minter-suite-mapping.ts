@@ -3,14 +3,9 @@
 import {
   Address,
   BigInt,
-  ByteArray,
-  Bytes,
-  ethereum,
   json,
   JSONValue,
-  JSONValueKind,
-  TypedMap,
-  Value
+  TypedMap
 } from "@graphprotocol/graph-ts";
 
 import {
@@ -50,22 +45,23 @@ import {
 } from "../generated/schema";
 import {
   arrayToJSONValue,
+  booleanToString,
   generateContractSpecificId,
+  getMinterDetails,
   loadOrCreateMinter,
   stringToJSONValue,
   typedMapToJSONString
 } from "./helpers";
 import {
+  ConfigKeyRemoved,
   ConfigValueAddedToSet,
   ConfigValueAddedToSet1,
   ConfigValueAddedToSet2,
   ConfigValueSet,
   ConfigValueSet1,
   ConfigValueSet2,
-  ConfigValueSet3,
-  ConfigValueSet4
+  ConfigValueSet3
 } from "../generated/MinterFilterV0-0xDDc77d8f935b255aD8b5651392D1284E29478b5b/IFilteredMinterV1";
-import { booleanToString } from "../tests/subgraph/shared-helpers";
 import { log, logStore } from "matchstick-as";
 
 // IFilteredMinterV0 events
@@ -396,16 +392,9 @@ export function handleSetBooleanValue(event: ConfigValueSet): void {
     let projectMinterConfig = minterProjectAndConfig.projectMinterConfiguration;
     let project = minterProjectAndConfig.project;
     project.updatedAt = event.block.timestamp;
-    let jsonResult = json.try_fromString(
-      projectMinterConfig.extraMinterDetails
-    );
 
-    let minterDetails: TypedMap<string, JSONValue>;
-    if (jsonResult.isOk) {
-      minterDetails = jsonResult.value.toObject();
-    } else {
-      minterDetails = new TypedMap();
-    }
+    let minterDetails = getMinterDetails(projectMinterConfig);
+
     minterDetails.set(
       event.params._key.toString(),
       json.fromString(booleanToString(event.params._value))
@@ -430,21 +419,8 @@ export function handleSetBigIntValue(event: ConfigValueSet1): void {
     let project = minterProjectAndConfig.project;
     project.updatedAt = event.block.timestamp;
 
-    let jsonResult = json.try_fromString(
-      projectMinterConfig.extraMinterDetails
-    );
+    let minterDetails = getMinterDetails(projectMinterConfig);
 
-    let minterDetails: TypedMap<string, JSONValue>;
-
-    if (jsonResult.isError) {
-      logStore();
-    }
-
-    if (jsonResult.isOk) {
-      minterDetails = jsonResult.value.toObject();
-    } else {
-      minterDetails = new TypedMap();
-    }
     minterDetails.set(
       event.params._key.toString(),
       json.fromString(event.params._value.toString())
@@ -467,16 +443,9 @@ export function handleSetAddressValue(event: ConfigValueSet2): void {
     let projectMinterConfig = minterProjectAndConfig.projectMinterConfiguration;
     let project = minterProjectAndConfig.project;
     project.updatedAt = event.block.timestamp;
-    let jsonResult = json.try_fromString(
-      projectMinterConfig.extraMinterDetails
-    );
 
-    let minterDetails: TypedMap<string, JSONValue>;
-    if (jsonResult.isOk) {
-      minterDetails = jsonResult.value.toObject();
-    } else {
-      minterDetails = new TypedMap();
-    }
+    let minterDetails = getMinterDetails(projectMinterConfig);
+
     minterDetails.set(
       event.params._key.toString(),
       stringToJSONValue(event.params._value.toHexString())
@@ -500,16 +469,8 @@ export function handleSetBytesValue(event: ConfigValueSet3): void {
     let projectMinterConfig = minterProjectAndConfig.projectMinterConfiguration;
     let project = minterProjectAndConfig.project;
     project.updatedAt = event.block.timestamp;
-    let jsonResult = json.try_fromString(
-      projectMinterConfig.extraMinterDetails
-    );
 
-    let minterDetails: TypedMap<string, JSONValue>;
-    if (jsonResult.isOk) {
-      minterDetails = jsonResult.value.toObject();
-    } else {
-      minterDetails = new TypedMap();
-    }
+    let minterDetails = getMinterDetails(projectMinterConfig);
 
     minterDetails.set(
       event.params._key.toString(),
@@ -524,21 +485,32 @@ export function handleSetBytesValue(event: ConfigValueSet3): void {
   }
 }
 
-export function handleRemoveValue(event: any): void {
+export function handleRemoveValue(event: ConfigKeyRemoved): void {
   let minterProjectAndConfig = loadMinterProjectAndConfig(
     event.address,
-    event.params.projectId,
+    event.params._projectId,
     event.block.timestamp
   );
   if (minterProjectAndConfig) {
     let projectMinterConfig = minterProjectAndConfig.projectMinterConfiguration;
     let project = minterProjectAndConfig.project;
     project.updatedAt = event.block.timestamp;
-    const minterDetails = json
-      .fromString(projectMinterConfig.extraMinterDetails)
-      .toObject();
-    minterDetails.set(event.params._key, null);
-    projectMinterConfig.extraMinterDetails = minterDetails.toString();
+    let minterDetails = getMinterDetails(projectMinterConfig);
+
+    const withRemovedTypedMap: TypedMap<string, JSONValue> = new TypedMap();
+    let keyToToRemove = event.params._key.toString();
+
+    for (let i = 0; i < minterDetails.entries.length; i++) {
+      let entry = minterDetails.entries[i];
+      if (entry.key != keyToToRemove) {
+        withRemovedTypedMap.set(entry.key, entry.value);
+      }
+    }
+
+    projectMinterConfig.extraMinterDetails = typedMapToJSONString(
+      withRemovedTypedMap
+    );
+
     project.save();
     projectMinterConfig.save();
   }
