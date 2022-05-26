@@ -45,6 +45,7 @@ import {
   handlePricePerTokenInWeiUpdated,
   handleProjectCurrencyInfoUpdated,
   handlePurchaseToDisabledUpdated,
+  handleRemoveBigIntManyValue,
   handleRemoveValue,
   handleSetAddressValue,
   handleSetBigIntValue,
@@ -66,6 +67,7 @@ import {
   ConfigValueAddedToSet,
   ConfigValueAddedToSet1,
   ConfigValueAddedToSet2,
+  ConfigValueRemovedFromSet,
   ConfigValueSet,
   ConfigValueSet1,
   ConfigValueSet2,
@@ -1802,5 +1804,60 @@ test("handleRemoveValue should remove the key/value from extraMinterDetails", ()
     project.id,
     "extraMinterDetails",
     '{"addresses":"hi"}'
+  );
+});
+test("handleRemoveBigIntManyValue should remove the key/value from extraMinterDetails", () => {
+  clearStore();
+  const minterAddress = randomAddressGenerator.generateRandomAddress();
+  const minterType = "MinterHolderV0";
+  const minter = new Minter(minterAddress.toHexString());
+  minter.coreContract = TEST_CONTRACT_ADDRESS.toHexString();
+  minter.type = minterType;
+  minter.save();
+
+  const projectId = BigInt.fromI32(0);
+  const project = addNewProjectToStore(
+    TEST_CONTRACT_ADDRESS,
+    projectId,
+    "project 0",
+    randomAddressGenerator.generateRandomAddress(),
+    BigInt.fromI32(0),
+    CURRENT_BLOCK_TIMESTAMP.minus(BigInt.fromI32(10))
+  );
+
+  const projectMinterConfig = new ProjectMinterConfiguration(project.id);
+  projectMinterConfig.minter = minterAddress.toHexString();
+  projectMinterConfig.project = project.id;
+  projectMinterConfig.extraMinterDetails =
+    '{"addresses": "hi","removeMe": [100, 200]}';
+  projectMinterConfig.save();
+
+  const configValueRemoveEvent: ConfigValueRemovedFromSet = changetype<
+    ConfigValueRemovedFromSet
+  >(newMockEvent());
+  configValueRemoveEvent.address = minterAddress;
+  configValueRemoveEvent.parameters = [
+    new ethereum.EventParam(
+      "_projectId",
+      ethereum.Value.fromUnsignedBigInt(projectId)
+    ),
+    new ethereum.EventParam(
+      "_key",
+      ethereum.Value.fromBytes(Bytes.fromUTF8("removeMe"))
+    ),
+    new ethereum.EventParam(
+      "_value",
+      ethereum.Value.fromSignedBigInt(BigInt.fromI32(100))
+    )
+  ];
+  configValueRemoveEvent.block.timestamp = CURRENT_BLOCK_TIMESTAMP;
+
+  handleRemoveBigIntManyValue(configValueRemoveEvent);
+
+  assert.fieldEquals(
+    PROJECT_MINTER_CONFIGURATION_ENTITY_TYPE,
+    project.id,
+    "extraMinterDetails",
+    '{"addresses":"hi","removeMe":[200]}'
   );
 });

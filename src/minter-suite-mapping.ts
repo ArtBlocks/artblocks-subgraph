@@ -57,12 +57,12 @@ import {
   ConfigValueAddedToSet,
   ConfigValueAddedToSet1,
   ConfigValueAddedToSet2,
+  ConfigValueRemovedFromSet,
   ConfigValueSet,
   ConfigValueSet1,
   ConfigValueSet2,
   ConfigValueSet3
 } from "../generated/MinterFilterV0-0xDDc77d8f935b255aD8b5651392D1284E29478b5b/IFilteredMinterV1";
-import { log, logStore } from "matchstick-as";
 
 // IFilteredMinterV0 events
 export function handlePricePerTokenInWeiUpdated(
@@ -644,25 +644,42 @@ export function handleAddManyBytesValue(event: ConfigValueAddedToSet2): void {
   }
 }
 
-export function handleRemoveManyValue(event: any): void {
+export function handleRemoveBigIntManyValue(
+  event: ConfigValueRemovedFromSet
+): void {
   let minterProjectAndConfig = loadMinterProjectAndConfig(
     event.address,
-    event.params.projectId,
+    event.params._projectId,
     event.block.timestamp
   );
   if (minterProjectAndConfig) {
     let projectMinterConfig = minterProjectAndConfig.projectMinterConfiguration;
     let project = minterProjectAndConfig.project;
     project.updatedAt = event.block.timestamp;
-    const minterDetails = json
-      .try_fromString(projectMinterConfig.extraMinterDetails)[0]
-      .toObject();
-    const arr = minterDetails.get(event.params._key).toArray();
-    const newValues = arr.filter((v: any) => {
-      return v !== event.params._value;
-    });
-    minterDetails.set(event.params._key, json.fromString(newValues.toString()));
-    projectMinterConfig.extraMinterDetails = minterDetails.toString();
+    let minterDetails = getMinterDetails(projectMinterConfig);
+
+    let jsonArr = minterDetails.get(event.params._key.toString());
+    let arrWithRemoved: BigInt[] = [];
+    if (jsonArr) {
+      let arr = jsonArr.toArray().map<BigInt>((v: JSONValue) => {
+        return v.toBigInt();
+      });
+      for (let i = 0; i < arr.length; i++) {
+        let entry = arr[i];
+        if (entry != event.params._value) {
+          arrWithRemoved.push(entry);
+        }
+      }
+    }
+    minterDetails.set(
+      event.params._key.toString(),
+      arrayToJSONValue(arrWithRemoved.join(","))
+    );
+
+    projectMinterConfig.extraMinterDetails = typedMapToJSONString(
+      minterDetails
+    );
+
     project.save();
     projectMinterConfig.save();
   }
