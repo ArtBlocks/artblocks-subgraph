@@ -54,6 +54,60 @@
       "startBlock": 14567671
     }
   ],
+  "minterFilterV0Contracts": [
+    {
+      "address": "0x4aafCE293b9B0faD169c78049A81e400f518E199",
+      "startBlock": 14567785
+    }
+  ],
+  "minterSetPriceV0Contracts": [
+    {
+      "address": "0x1DEC9E52f1320F7Deb29cBCd7B7d67f3dF785142",
+      "startBlock": 14567789
+    }
+  ],
+  "minterSetPriceERC20V0Contracts": [
+    {
+      "address": "0x48742D38a0809135EFd643c1150BfC13768C3907",
+      "startBlock": 14567788
+    }
+  ],
+  "minterDALinV0Contracts": [
+    {
+      "address": "0xd219f61Bb5A3ffDeCB4362610977F1dAB3930eE2",
+      "startBlock": 14567790
+    }
+  ],
+  "minterDAExpV0Contracts": [
+    {
+      "address": "0xFc74fD0f2c7EaD04f1E5E9fd82Aef55620710D7C",
+      "startBlock": 14567792
+    }
+  ],
+  "minterSetPriceV1Contracts": [
+    {
+      "address": "0x934cdc04C434b8dBf3E1265F4f198D70566f7355",
+      "startBlock": "14801771"
+    }
+  ],
+  "minterSetPriceERC20V1Contracts": [
+    {
+      "address": "0x0BbB93c5d118D1dee49e96BCAdc161403f4F8612",
+      "startBlock": "14801771"
+    }
+  ],
+  "minterDALinV1Contracts": [
+    {
+      "address": "0x32710950B014c2D29EA24f480Dd02c7e4610663b",
+      "startBlock": "14801771"
+    }
+  ],
+  "minterDAExpV1Contracts": [
+    {
+      "address": "0xD94C7060808f3c876824E57e685702f3834D2e13",
+      "startBlock": "14801771"
+    }
+  ],
   "openSeaContractV1": {
     "address": "0x7Be8076f4EA4A4AD08075C2508e481d6C946D12b",
     "startBlock": 11338811

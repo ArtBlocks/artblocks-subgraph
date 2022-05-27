@@ -86,22 +86,26 @@
   ],
   "minterSetPriceV1Contracts": [
     {
-      "address": "todo"
+      "address": "0x934cdc04C434b8dBf3E1265F4f198D70566f7355",
+      "startBlock": "14801771"
     }
   ],
   "minterSetPriceERC20V1Contracts": [
     {
-      "address": "todo"
+      "address": "0x0BbB93c5d118D1dee49e96BCAdc161403f4F8612",
+      "startBlock": "14801771"
     }
   ],
   "minterDALinV1Contracts": [
     {
-      "address": "todo"
+      "address": "0x32710950B014c2D29EA24f480Dd02c7e4610663b",
+      "startBlock": "14801771"
     }
   ],
   "minterDAExpV1Contracts": [
     {
-      "address": "todo"
+      "address": "0xD94C7060808f3c876824E57e685702f3834D2e13",
+      "startBlock": "14801771"
     }
   ]
 }
