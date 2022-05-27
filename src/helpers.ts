@@ -1,6 +1,8 @@
 import { Address, BigInt } from "@graphprotocol/graph-ts";
 import { MinterDAExpV0 } from "../generated/MinterDAExpV0/MinterDAExpV0";
+import { MinterDAExpV1 } from "../generated/MinterDAExpV1/MinterDAExpV1";
 import { MinterDALinV0 } from "../generated/MinterDALinV0/MinterDALinV0";
+import { MinterDALinV1 } from "../generated/MinterDALinV1/MinterDALinV1";
 import { IFilteredMinterV0 } from "../generated/MinterSetPriceV0/IFilteredMinterV0";
 import { Minter } from "../generated/schema";
 
@@ -56,12 +58,17 @@ export function loadOrCreateMinter(
   if (minterType == "MinterDALinV0") {
     let minterDALinV0Contract = MinterDALinV0.bind(minterAddress);
     minter.minimumAuctionLengthInSeconds = minterDALinV0Contract.minimumAuctionLengthSeconds();
-  }
-
-  if (minterType == "MinterDAExpV0") {
-    let MinterDAExpV0Contract = MinterDAExpV0.bind(minterAddress);
-    minter.minimumHalfLifeInSeconds = MinterDAExpV0Contract.minimumPriceDecayHalfLifeSeconds();
-    minter.maximumHalfLifeInSeconds = MinterDAExpV0Contract.maximumPriceDecayHalfLifeSeconds();
+  } else if (minterType == "MinterDALinV1") {
+    let minterDALinV1Contract = MinterDALinV1.bind(minterAddress);
+    minter.minimumAuctionLengthInSeconds = minterDALinV1Contract.minimumAuctionLengthSeconds();
+  } else if (minterType == "MinterDAExpV0") {
+    let minterDAExpV0Contract = MinterDAExpV0.bind(minterAddress);
+    minter.minimumHalfLifeInSeconds = minterDAExpV0Contract.minimumPriceDecayHalfLifeSeconds();
+    minter.maximumHalfLifeInSeconds = minterDAExpV0Contract.maximumPriceDecayHalfLifeSeconds();
+  } else if (minterType == "MinterDAExpV1") {
+    let minterDAExpV1Contract = MinterDAExpV1.bind(minterAddress);
+    minter.minimumHalfLifeInSeconds = minterDAExpV1Contract.minimumPriceDecayHalfLifeSeconds();
+    minter.maximumHalfLifeInSeconds = minterDAExpV1Contract.maximumPriceDecayHalfLifeSeconds();
   }
 
   minter.updatedAt = timestamp;

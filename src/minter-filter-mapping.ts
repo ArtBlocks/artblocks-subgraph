@@ -13,6 +13,8 @@ import { MinterDALinV0 } from "../generated/MinterDALinV0/MinterDALinV0";
 import { MinterDAExpV0 } from "../generated/MinterDAExpV0/MinterDAExpV0";
 import { MinterSetPriceV0 } from "../generated/MinterSetPriceV0/MinterSetPriceV0";
 import { MinterSetPriceERC20V0 } from "../generated/MinterSetPriceERC20V0/MinterSetPriceERC20V0";
+import { MinterDALinV1 } from "../generated/MinterDALinV1/MinterDALinV1";
+import { MinterDAExpV1 } from "../generated/MinterDAExpV1/MinterDAExpV1";
 
 import {
   Project,
@@ -243,34 +245,28 @@ function createAndPopulateProjectMinterConfiguration(
   projectMinterConfig.currencyAddress = projectPriceInfo.value3;
 
   if (minterType == "MinterDALinV0") {
-    let minterDALinV0Contract = MinterDALinV0.bind(minterAddress);
-
-    let projectAuctionParameters = minterDALinV0Contract.projectAuctionParameters(
-      project.projectId
+    assignDALinMinterConfig(
+      MinterDALinV0.bind(minterAddress),
+      project.projectId,
+      projectMinterConfig
     );
-
-    projectMinterConfig.startTime = projectAuctionParameters.value0;
-    projectMinterConfig.endTime = projectAuctionParameters.value1;
-    projectMinterConfig.startPrice = projectAuctionParameters.value2;
-    projectMinterConfig.basePrice = projectAuctionParameters.value3;
-
-    projectMinterConfig.purchaseToDisabled = minterDALinV0Contract.purchaseToDisabled(
-      project.projectId
+  } else if (minterType == "MinterDALinV1") {
+    assignDALinMinterConfig(
+      MinterDALinV1.bind(minterAddress),
+      project.projectId,
+      projectMinterConfig
     );
   } else if (minterType == "MinterDAExpV0") {
-    let minterDAExpV0Contract = MinterDAExpV0.bind(minterAddress);
-
-    let projectAuctionParameters = minterDAExpV0Contract.projectAuctionParameters(
-      project.projectId
+    assignDAExpMinterConfig(
+      MinterDAExpV0.bind(minterAddress),
+      project.projectId,
+      projectMinterConfig
     );
-
-    projectMinterConfig.startTime = projectAuctionParameters.value0;
-    projectMinterConfig.halfLifeSeconds = projectAuctionParameters.value1;
-    projectMinterConfig.startPrice = projectAuctionParameters.value2;
-    projectMinterConfig.basePrice = projectAuctionParameters.value3;
-
-    projectMinterConfig.purchaseToDisabled = minterDAExpV0Contract.purchaseToDisabled(
-      project.projectId
+  } else if (minterType == "MinterDAExpV1") {
+    assignDAExpMinterConfig(
+      MinterDAExpV1.bind(minterAddress),
+      project.projectId,
+      projectMinterConfig
     );
   } else if (minterType == "MinterSetPriceV0") {
     let minterSetPriceV0Contract = MinterSetPriceV0.bind(minterAddress);
@@ -295,6 +291,68 @@ function createAndPopulateProjectMinterConfiguration(
   project.save();
 
   return projectMinterConfig;
+}
+
+function assignDALinMinterConfig<T>(
+  minterDALinContract: T,
+  projectId: BigInt,
+  projectMinterConfig: ProjectMinterConfiguration
+): void {
+  if (
+    !(
+      minterDALinContract instanceof MinterDALinV0 ||
+      minterDALinContract instanceof MinterDALinV1
+    )
+  ) {
+    return;
+  }
+
+  projectMinterConfig.purchaseToDisabled =
+    minterDALinContract instanceof MinterDALinV0
+      ? changetype<MinterDALinV0>(minterDALinContract).purchaseToDisabled(
+          projectId
+        )
+      : false;
+
+  let projectAuctionParameters = minterDALinContract.projectAuctionParameters(
+    projectId
+  );
+
+  projectMinterConfig.startTime = projectAuctionParameters.value0;
+  projectMinterConfig.endTime = projectAuctionParameters.value1;
+  projectMinterConfig.startPrice = projectAuctionParameters.value2;
+  projectMinterConfig.basePrice = projectAuctionParameters.value3;
+}
+
+function assignDAExpMinterConfig<T>(
+  minterDAExpContract: T,
+  projectId: BigInt,
+  projectMinterConfig: ProjectMinterConfiguration
+): void {
+  if (
+    !(
+      minterDAExpContract instanceof MinterDAExpV0 ||
+      minterDAExpContract instanceof MinterDAExpV1
+    )
+  ) {
+    return;
+  }
+
+  projectMinterConfig.purchaseToDisabled =
+    minterDAExpContract instanceof MinterDAExpV0
+      ? changetype<MinterDAExpV0>(minterDAExpContract).purchaseToDisabled(
+          projectId
+        )
+      : false;
+
+  let projectAuctionParameters = minterDAExpContract.projectAuctionParameters(
+    projectId
+  );
+
+  projectMinterConfig.startTime = projectAuctionParameters.value0;
+  projectMinterConfig.halfLifeSeconds = projectAuctionParameters.value1;
+  projectMinterConfig.startPrice = projectAuctionParameters.value2;
+  projectMinterConfig.basePrice = projectAuctionParameters.value3;
 }
 
 function loadOrCreateMinterFilter(
