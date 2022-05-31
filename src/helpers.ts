@@ -137,9 +137,7 @@ export function typedMapToJSONString(map: TypedMap<String, JSONValue>): string {
     }
 
     jsonString +=
-      '"' +
-      entry.key +
-      '"' +
+      stringToJSONString(entry.key.toString()) +
       ":" +
       quoted +
       newVal +
