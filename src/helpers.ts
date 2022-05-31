@@ -1,6 +1,7 @@
 import {
   Address,
   BigInt,
+  ethereum,
   json,
   JSONValue,
   JSONValueKind,
@@ -154,4 +155,8 @@ export function stringToJSONValue(value: string): JSONValue {
 }
 export function arrayToJSONValue(value: string): JSONValue {
   return json.fromString("[" + value + "]");
+}
+
+export function stringToJSONString(value: string): string {
+  return '"' + value + "'";
 }
