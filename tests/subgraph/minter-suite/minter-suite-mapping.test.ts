@@ -46,6 +46,7 @@ import {
   handleProjectCurrencyInfoUpdated,
   handlePurchaseToDisabledUpdated,
   handleRemoveBigIntManyValue,
+  handleRemoveBytesManyValue,
   handleRemoveValue,
   handleSetAddressValue,
   handleSetBigIntValue,
@@ -68,6 +69,8 @@ import {
   ConfigValueAddedToSet1,
   ConfigValueAddedToSet2,
   ConfigValueRemovedFromSet,
+  ConfigValueRemovedFromSet1,
+  ConfigValueRemovedFromSet2,
   ConfigValueSet,
   ConfigValueSet1,
   ConfigValueSet2,
@@ -1859,5 +1862,61 @@ test("handleRemoveBigIntManyValue should remove the key/value from extraMinterDe
     project.id,
     "extraMinterDetails",
     '{"addresses":"hi","removeMe":[200]}'
+  );
+});
+test("handleRemoveBytesManyValue should remove the key/value from extraMinterDetails", () => {
+  clearStore();
+  const minterAddress = randomAddressGenerator.generateRandomAddress();
+  const minterType = "MinterHolderV0";
+  const minter = new Minter(minterAddress.toHexString());
+  minter.coreContract = TEST_CONTRACT_ADDRESS.toHexString();
+  minter.type = minterType;
+  minter.save();
+
+  const projectId = BigInt.fromI32(0);
+  const project = addNewProjectToStore(
+    TEST_CONTRACT_ADDRESS,
+    projectId,
+    "project 0",
+    randomAddressGenerator.generateRandomAddress(),
+    BigInt.fromI32(0),
+    CURRENT_BLOCK_TIMESTAMP.minus(BigInt.fromI32(10))
+  );
+
+  const projectMinterConfig = new ProjectMinterConfiguration(project.id);
+  projectMinterConfig.minter = minterAddress.toHexString();
+  projectMinterConfig.project = project.id;
+  projectMinterConfig.extraMinterDetails =
+    '{"addresses": "hi","removeMe": ["alive", "dead"]}';
+  projectMinterConfig.save();
+
+  const configValueRemoveEvent: ConfigValueRemovedFromSet2 = changetype<
+    ConfigValueRemovedFromSet2
+  >(newMockEvent());
+  configValueRemoveEvent.address = minterAddress;
+  configValueRemoveEvent.parameters = [
+    new ethereum.EventParam(
+      "_projectId",
+      ethereum.Value.fromUnsignedBigInt(projectId)
+    ),
+    new ethereum.EventParam(
+      "_key",
+      ethereum.Value.fromBytes(Bytes.fromUTF8("removeMe"))
+    ),
+    new ethereum.EventParam(
+      "_value",
+      ethereum.Value.fromBytes(Bytes.fromUTF8("dead"))
+    )
+  ];
+
+  configValueRemoveEvent.block.timestamp = CURRENT_BLOCK_TIMESTAMP;
+
+  handleRemoveBytesManyValue(configValueRemoveEvent);
+
+  assert.fieldEquals(
+    PROJECT_MINTER_CONFIGURATION_ENTITY_TYPE,
+    project.id,
+    "extraMinterDetails",
+    '{"addresses":"hi","removeMe":["alive"]}'
   );
 });

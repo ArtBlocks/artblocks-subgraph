@@ -3,6 +3,7 @@
 import {
   Address,
   BigInt,
+  Bytes,
   json,
   JSONValue,
   TypedMap
@@ -58,6 +59,8 @@ import {
   ConfigValueAddedToSet1,
   ConfigValueAddedToSet2,
   ConfigValueRemovedFromSet,
+  ConfigValueRemovedFromSet1,
+  ConfigValueRemovedFromSet2,
   ConfigValueSet,
   ConfigValueSet1,
   ConfigValueSet2,
@@ -668,6 +671,86 @@ export function handleRemoveBigIntManyValue(
         let entry = arr[i];
         if (entry != event.params._value) {
           arrWithRemoved.push(entry);
+        }
+      }
+    }
+    minterDetails.set(
+      event.params._key.toString(),
+      arrayToJSONValue(arrWithRemoved.join(","))
+    );
+
+    projectMinterConfig.extraMinterDetails = typedMapToJSONString(
+      minterDetails
+    );
+
+    project.save();
+    projectMinterConfig.save();
+  }
+}
+export function handleRemoveAddressManyValue(
+  event: ConfigValueRemovedFromSet1
+): void {
+  let minterProjectAndConfig = loadMinterProjectAndConfig(
+    event.address,
+    event.params._projectId,
+    event.block.timestamp
+  );
+  if (minterProjectAndConfig) {
+    let projectMinterConfig = minterProjectAndConfig.projectMinterConfiguration;
+    let project = minterProjectAndConfig.project;
+    project.updatedAt = event.block.timestamp;
+    let minterDetails = getMinterDetails(projectMinterConfig);
+
+    let jsonArr = minterDetails.get(event.params._key.toString());
+    let arrWithRemoved: string[] = [];
+    if (jsonArr) {
+      let arr = jsonArr.toArray().map<string>((v: JSONValue) => {
+        return v.toString();
+      });
+      for (let i = 0; i < arr.length; i++) {
+        let entry = arr[i];
+        if (entry != event.params._value.toString()) {
+          arrWithRemoved.push('"' + entry + '"');
+        }
+      }
+    }
+    minterDetails.set(
+      event.params._key.toString(),
+      arrayToJSONValue(arrWithRemoved.toString())
+    );
+
+    projectMinterConfig.extraMinterDetails = typedMapToJSONString(
+      minterDetails
+    );
+
+    project.save();
+    projectMinterConfig.save();
+  }
+}
+export function handleRemoveBytesManyValue(
+  event: ConfigValueRemovedFromSet2
+): void {
+  let minterProjectAndConfig = loadMinterProjectAndConfig(
+    event.address,
+    event.params._projectId,
+    event.block.timestamp
+  );
+  if (minterProjectAndConfig) {
+    let projectMinterConfig = minterProjectAndConfig.projectMinterConfiguration;
+    let project = minterProjectAndConfig.project;
+    project.updatedAt = event.block.timestamp;
+    let minterDetails = getMinterDetails(projectMinterConfig);
+
+    let jsonArr = minterDetails.get(event.params._key.toString());
+    let arrWithRemoved: string[] = [];
+    if (jsonArr) {
+      let arr = jsonArr.toArray().map<string>((v: JSONValue) => {
+        return v.toString();
+      });
+      for (let i = 0; i < arr.length; i++) {
+        let entry = arr[i];
+        if (entry != event.params._value.toString()) {
+          arrWithRemoved.push('"' + entry + '"');
         }
       }
     }
