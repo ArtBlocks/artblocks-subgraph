@@ -566,9 +566,16 @@ export function handleAddManyBytesValue(event: ConfigValueAddedToSet2): void {
   handleAddManyValueGeneric(event);
 }
 
-export function handleRemoveBigIntManyValue(
-  event: ConfigValueRemovedFromSet
-): void {
+export function handleRemoveManyValueGeneric<T>(event: T): void {
+  if (
+    !(
+      event instanceof ConfigValueRemovedFromSet ||
+      event instanceof ConfigValueRemovedFromSet1 ||
+      event instanceof ConfigValueRemovedFromSet2
+    )
+  ) {
+    return;
+  }
   let minterProjectAndConfig = loadMinterProjectAndConfig(
     event.address,
     event.params._projectId,
@@ -579,24 +586,42 @@ export function handleRemoveBigIntManyValue(
     let project = minterProjectAndConfig.project;
     project.updatedAt = event.block.timestamp;
     let minterDetails = getMinterDetails(projectMinterConfig);
-
     let jsonArr = minterDetails.get(event.params._key.toString());
-    let arrWithRemoved: BigInt[] = [];
-    if (jsonArr) {
-      let arr = jsonArr.toArray().map<BigInt>((v: JSONValue) => {
-        return v.toBigInt();
-      });
-      for (let i = 0; i < arr.length; i++) {
-        let entry = arr[i];
-        if (entry != event.params._value) {
-          arrWithRemoved.push(entry);
+    let newValue: JSONValue;
+    if (event instanceof ConfigValueRemovedFromSet) {
+      let arrWithRemoved: BigInt[] = [];
+      if (jsonArr) {
+        let arr = jsonArr.toArray().map<BigInt>((v: JSONValue) => {
+          return v.toBigInt();
+        });
+        for (let i = 0; i < arr.length; i++) {
+          let entry = arr[i];
+          if (entry != event.params._value) {
+            arrWithRemoved.push(entry);
+          }
         }
       }
+      newValue = arrayToJSONValue(arrWithRemoved.toString());
+    } else if (
+      event instanceof ConfigValueRemovedFromSet1 ||
+      event instanceof ConfigValueRemovedFromSet2
+    ) {
+      let arrWithRemoved: string[] = [];
+      if (jsonArr) {
+        let arr = jsonArr.toArray().map<string>((v: JSONValue) => {
+          return v.toString();
+        });
+        for (let i = 0; i < arr.length; i++) {
+          let entry = arr[i];
+          if (entry != event.params._value.toString()) {
+            arrWithRemoved.push(stringToJSONString(entry));
+          }
+        }
+      }
+      newValue = arrayToJSONValue(arrWithRemoved.toString());
     }
-    minterDetails.set(
-      event.params._key.toString(),
-      arrayToJSONValue(arrWithRemoved.join(","))
-    );
+
+    minterDetails.set(event.params._key.toString(), newValue);
 
     projectMinterConfig.extraMinterDetails = typedMapToJSONString(
       minterDetails
@@ -606,85 +631,22 @@ export function handleRemoveBigIntManyValue(
     projectMinterConfig.save();
   }
 }
+
+export function handleRemoveBigIntManyValue(
+  event: ConfigValueRemovedFromSet
+): void {
+  handleRemoveManyValueGeneric(event);
+}
+
 export function handleRemoveAddressManyValue(
   event: ConfigValueRemovedFromSet1
 ): void {
-  let minterProjectAndConfig = loadMinterProjectAndConfig(
-    event.address,
-    event.params._projectId,
-    event.block.timestamp
-  );
-  if (minterProjectAndConfig) {
-    let projectMinterConfig = minterProjectAndConfig.projectMinterConfiguration;
-    let project = minterProjectAndConfig.project;
-    project.updatedAt = event.block.timestamp;
-    let minterDetails = getMinterDetails(projectMinterConfig);
-
-    let jsonArr = minterDetails.get(event.params._key.toString());
-    let arrWithRemoved: string[] = [];
-    if (jsonArr) {
-      let arr = jsonArr.toArray().map<string>((v: JSONValue) => {
-        return v.toString();
-      });
-      for (let i = 0; i < arr.length; i++) {
-        let entry = arr[i];
-        if (entry != event.params._value.toString()) {
-          arrWithRemoved.push('"' + entry + '"');
-        }
-      }
-    }
-    minterDetails.set(
-      event.params._key.toString(),
-      arrayToJSONValue(arrWithRemoved.toString())
-    );
-
-    projectMinterConfig.extraMinterDetails = typedMapToJSONString(
-      minterDetails
-    );
-
-    project.save();
-    projectMinterConfig.save();
-  }
+  handleRemoveManyValueGeneric(event);
 }
 export function handleRemoveBytesManyValue(
   event: ConfigValueRemovedFromSet2
 ): void {
-  let minterProjectAndConfig = loadMinterProjectAndConfig(
-    event.address,
-    event.params._projectId,
-    event.block.timestamp
-  );
-  if (minterProjectAndConfig) {
-    let projectMinterConfig = minterProjectAndConfig.projectMinterConfiguration;
-    let project = minterProjectAndConfig.project;
-    project.updatedAt = event.block.timestamp;
-    let minterDetails = getMinterDetails(projectMinterConfig);
-
-    let jsonArr = minterDetails.get(event.params._key.toString());
-    let arrWithRemoved: string[] = [];
-    if (jsonArr) {
-      let arr = jsonArr.toArray().map<string>((v: JSONValue) => {
-        return v.toString();
-      });
-      for (let i = 0; i < arr.length; i++) {
-        let entry = arr[i];
-        if (entry != event.params._value.toString()) {
-          arrWithRemoved.push('"' + entry + '"');
-        }
-      }
-    }
-    minterDetails.set(
-      event.params._key.toString(),
-      arrayToJSONValue(arrWithRemoved.join(","))
-    );
-
-    projectMinterConfig.extraMinterDetails = typedMapToJSONString(
-      minterDetails
-    );
-
-    project.save();
-    projectMinterConfig.save();
-  }
+  handleRemoveManyValueGeneric(event);
 }
 
 // Helpers
