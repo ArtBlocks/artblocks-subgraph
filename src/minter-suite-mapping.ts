@@ -4,6 +4,7 @@ import {
   Address,
   BigInt,
   Bytes,
+  ethereum,
   json,
   JSONValue,
   TypedMap
@@ -50,6 +51,7 @@ import {
   generateContractSpecificId,
   getMinterDetails,
   loadOrCreateMinter,
+  stringToJSONString,
   stringToJSONValue,
   typedMapToJSONString
 } from "./helpers";
@@ -385,107 +387,68 @@ export function handleDAExpResetAuctionDetails<T>(event: T): void {
   }
 }
 
-export function handleSetBooleanValue(event: ConfigValueSet): void {
+export function handleSetValueGeneric<T>(event: T): void {
+  if (
+    !(
+      event instanceof ConfigValueSet ||
+      event instanceof ConfigValueSet1 ||
+      event instanceof ConfigValueSet2 ||
+      event instanceof ConfigValueSet3
+    )
+  ) {
+    return;
+  }
+
   let minterProjectAndConfig = loadMinterProjectAndConfig(
     event.address,
     event.params._projectId,
     event.block.timestamp
   );
+
   if (minterProjectAndConfig) {
     let projectMinterConfig = minterProjectAndConfig.projectMinterConfiguration;
     let project = minterProjectAndConfig.project;
     project.updatedAt = event.block.timestamp;
 
     let minterDetails = getMinterDetails(projectMinterConfig);
+    let jsonKey = event.params._key.toString();
+    let jsonValue: JSONValue;
 
-    minterDetails.set(
-      event.params._key.toString(),
-      json.fromString(booleanToString(event.params._value))
-    );
+    if (event instanceof ConfigValueSet) {
+      jsonValue = json.fromString(booleanToString(event.params._value));
+    } else if (event instanceof ConfigValueSet1) {
+      jsonValue = json.fromString(event.params._value.toString());
+    } else if (event instanceof ConfigValueSet2) {
+      jsonValue = stringToJSONValue(event.params._value.toHexString());
+    } else if (event instanceof ConfigValueSet3) {
+      jsonValue = stringToJSONValue(event.params._value.toString());
+    }
+
+    minterDetails.set(jsonKey, jsonValue);
 
     projectMinterConfig.extraMinterDetails = typedMapToJSONString(
       minterDetails
     );
+
     projectMinterConfig.save();
     project.save();
   }
+}
+
+export function handleSetBooleanValue(event: ConfigValueSet): void {
+  handleSetValueGeneric(event);
 }
 
 export function handleSetBigIntValue(event: ConfigValueSet1): void {
-  let minterProjectAndConfig = loadMinterProjectAndConfig(
-    event.address,
-    event.params._projectId,
-    event.block.timestamp
-  );
-  if (minterProjectAndConfig) {
-    let projectMinterConfig = minterProjectAndConfig.projectMinterConfiguration;
-    let project = minterProjectAndConfig.project;
-    project.updatedAt = event.block.timestamp;
-
-    let minterDetails = getMinterDetails(projectMinterConfig);
-
-    minterDetails.set(
-      event.params._key.toString(),
-      json.fromString(event.params._value.toString())
-    );
-
-    projectMinterConfig.extraMinterDetails = typedMapToJSONString(
-      minterDetails
-    );
-    projectMinterConfig.save();
-    project.save();
-  }
+  handleSetValueGeneric(event);
 }
+
 export function handleSetAddressValue(event: ConfigValueSet2): void {
-  let minterProjectAndConfig = loadMinterProjectAndConfig(
-    event.address,
-    event.params._projectId,
-    event.block.timestamp
-  );
-  if (minterProjectAndConfig) {
-    let projectMinterConfig = minterProjectAndConfig.projectMinterConfiguration;
-    let project = minterProjectAndConfig.project;
-    project.updatedAt = event.block.timestamp;
-
-    let minterDetails = getMinterDetails(projectMinterConfig);
-
-    minterDetails.set(
-      event.params._key.toString(),
-      stringToJSONValue(event.params._value.toHexString())
-    );
-
-    projectMinterConfig.extraMinterDetails = typedMapToJSONString(
-      minterDetails
-    );
-    projectMinterConfig.save();
-    project.save();
-  }
+  handleSetValueGeneric(event);
 }
 
 export function handleSetBytesValue(event: ConfigValueSet3): void {
-  let minterProjectAndConfig = loadMinterProjectAndConfig(
-    event.address,
-    event.params._projectId,
-    event.block.timestamp
-  );
-  if (minterProjectAndConfig) {
-    let projectMinterConfig = minterProjectAndConfig.projectMinterConfiguration;
-    let project = minterProjectAndConfig.project;
-    project.updatedAt = event.block.timestamp;
-
-    let minterDetails = getMinterDetails(projectMinterConfig);
-
-    minterDetails.set(
-      event.params._key.toString(),
-      stringToJSONValue(event.params._value.toString())
-    );
-
-    projectMinterConfig.extraMinterDetails = typedMapToJSONString(
-      minterDetails
-    );
-    projectMinterConfig.save();
-    project.save();
-  }
+  handleSetValueGeneric(event);
 }
 
 export function handleRemoveValue(event: ConfigKeyRemoved): void {
@@ -519,7 +482,17 @@ export function handleRemoveValue(event: ConfigKeyRemoved): void {
   }
 }
 
-export function handleAddManyBigIntValue(event: ConfigValueAddedToSet): void {
+export function handleAddManyValueGeneric<T>(event: T): void {
+  if (
+    !(
+      event instanceof ConfigValueAddedToSet ||
+      event instanceof ConfigValueAddedToSet1 ||
+      event instanceof ConfigValueAddedToSet2
+    )
+  ) {
+    return;
+  }
+
   let minterProjectAndConfig = loadMinterProjectAndConfig(
     event.address,
     event.params._projectId,
@@ -534,23 +507,44 @@ export function handleAddManyBigIntValue(event: ConfigValueAddedToSet): void {
     );
 
     let minterDetails: TypedMap<string, JSONValue>;
+
     if (jsonResult.isOk) {
       minterDetails = jsonResult.value.toObject();
     } else {
       minterDetails = new TypedMap();
     }
+
     let val = minterDetails.get(event.params._key.toString());
-    let arr: BigInt[] = [];
-    if (val) {
-      arr = val.toArray().map<BigInt>((v: JSONValue) => v.toBigInt());
+    let newValue: JSONValue;
+
+    if (event instanceof ConfigValueAddedToSet) {
+      let arr: BigInt[] = [];
+      if (val) {
+        arr = val.toArray().map<BigInt>((v: JSONValue) => v.toBigInt());
+      }
+      arr.push(event.params._value);
+      newValue = arrayToJSONValue(arr.toString());
+    } else if (
+      event instanceof ConfigValueAddedToSet1 ||
+      event instanceof ConfigValueAddedToSet2
+    ) {
+      let arr: string[] = [];
+      if (val) {
+        arr = val
+          .toArray()
+          .map<string>((v: JSONValue) => stringToJSONString(v.toString()));
+      }
+      let stringVal: string;
+      if (event instanceof ConfigValueAddedToSet1) {
+        stringVal = event.params._value.toHexString();
+      } else {
+        stringVal = event.params._value.toString();
+      }
+      arr.push(stringToJSONString(stringVal));
+      newValue = arrayToJSONValue(arr.toString());
     }
 
-    arr.push(event.params._value);
-
-    minterDetails.set(
-      event.params._key.toString(),
-      arrayToJSONValue(arr.join(","))
-    );
+    minterDetails.set(event.params._key.toString(), newValue);
     projectMinterConfig.extraMinterDetails = typedMapToJSONString(
       minterDetails
     );
@@ -558,93 +552,18 @@ export function handleAddManyBigIntValue(event: ConfigValueAddedToSet): void {
     project.save();
     projectMinterConfig.save();
   }
+}
+
+export function handleAddManyBigIntValue(event: ConfigValueAddedToSet): void {
+  handleAddManyValueGeneric(event);
 }
 
 export function handleAddManyAddressValue(event: ConfigValueAddedToSet1): void {
-  let minterProjectAndConfig = loadMinterProjectAndConfig(
-    event.address,
-    event.params._projectId,
-    event.block.timestamp
-  );
-  if (minterProjectAndConfig) {
-    let projectMinterConfig = minterProjectAndConfig.projectMinterConfiguration;
-    let project = minterProjectAndConfig.project;
-    project.updatedAt = event.block.timestamp;
-    let jsonResult = json.try_fromString(
-      projectMinterConfig.extraMinterDetails
-    );
-
-    let minterDetails: TypedMap<string, JSONValue>;
-    if (jsonResult.isOk) {
-      minterDetails = jsonResult.value.toObject();
-    } else {
-      minterDetails = new TypedMap();
-    }
-    let val = minterDetails.get(event.params._key.toString());
-    let arr: string[] = [];
-    if (val) {
-      arr = val
-        .toArray()
-        .map<string>((v: JSONValue) => '"' + v.toString() + '"');
-    }
-
-    arr.push('"' + event.params._value.toHexString() + '"');
-
-    minterDetails.set(
-      event.params._key.toString(),
-      arrayToJSONValue(arr.toString())
-    );
-    projectMinterConfig.extraMinterDetails = typedMapToJSONString(
-      minterDetails
-    );
-
-    project.save();
-    projectMinterConfig.save();
-  }
+  handleAddManyValueGeneric(event);
 }
 
 export function handleAddManyBytesValue(event: ConfigValueAddedToSet2): void {
-  let minterProjectAndConfig = loadMinterProjectAndConfig(
-    event.address,
-    event.params._projectId,
-    event.block.timestamp
-  );
-  if (minterProjectAndConfig) {
-    let projectMinterConfig = minterProjectAndConfig.projectMinterConfiguration;
-    let project = minterProjectAndConfig.project;
-    project.updatedAt = event.block.timestamp;
-    let jsonResult = json.try_fromString(
-      projectMinterConfig.extraMinterDetails
-    );
-
-    let minterDetails: TypedMap<string, JSONValue>;
-    if (jsonResult.isOk) {
-      minterDetails = jsonResult.value.toObject();
-    } else {
-      minterDetails = new TypedMap();
-    }
-    let val = minterDetails.get(event.params._key.toString());
-    let arr: string[] = [];
-    if (val) {
-      arr = val
-        .toArray()
-        .map<string>((v: JSONValue) => '"' + v.toString() + '"');
-    }
-
-    arr.push('"' + event.params._value.toString() + '"');
-
-    minterDetails.set(
-      event.params._key.toString(),
-      arrayToJSONValue(arr.toString())
-    );
-
-    projectMinterConfig.extraMinterDetails = typedMapToJSONString(
-      minterDetails
-    );
-
-    project.save();
-    projectMinterConfig.save();
-  }
+  handleAddManyValueGeneric(event);
 }
 
 export function handleRemoveBigIntManyValue(

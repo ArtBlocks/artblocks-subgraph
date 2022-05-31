@@ -158,5 +158,5 @@ export function arrayToJSONValue(value: string): JSONValue {
 }
 
 export function stringToJSONString(value: string): string {
-  return '"' + value + "'";
+  return '"' + value + '"';
 }
