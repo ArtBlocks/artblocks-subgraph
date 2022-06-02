@@ -43,60 +43,99 @@
     {
       "address": "0x0711A9767a41290D7f52714204618345C584f450",
       "name": "Legends of Metaterra"
+    },
+    {
+      "address": "0xB3Cab96a2cEdF60E2E919A6F9B955cb6b493fA2c",
+      "name": "Art Blocks x Pace",
+      "startBlock": "12320635"
     }
   ],
   "minterFilterV0Contracts": [
     {
       "address": "0xF3d2a642640c928A33a087545939e5df3d0d657f",
-      "startBlock": 12175917
+      "startBlock": 12175917,
+      "name": "Art Blocks Flagship"
+    },
+    {
+      "address": "0xe268330b4450363fdb5F1259f1496d00d9A8Df37",
+      "startBlock": 12320635,
+      "name": "Art Blocks x Pace"
     }
   ],
   "minterSetPriceV0Contracts": [
     {
       "address": "0xFd50294f1ddEcCdf6ea55bC57a15916328177653",
-      "startBlock": 12175920
+      "startBlock": 12175920,
+      "name": "Art Blocks Flagship"
     }
   ],
   "minterSetPriceERC20V0Contracts": [
     {
       "address": "0xcA92128156772A424CEE092954C064B57eC481Fb",
-      "startBlock": 12175918
+      "startBlock": 12175918,
+      "name": "Art Blocks Flagship"
     }
   ],
   "minterDALinV0Contracts": [
     {
       "address": "0x84795B0FF2e0cEa1657A6A86d42623441EfCa38d",
-      "startBlock": 12175921
+      "startBlock": 12175921,
+      "name": "Art Blocks Flagship"
     }
   ],
   "minterDAExpV0Contracts": [
     {
       "address": "0x1e0235eD161A99C59FB33dE8Dd5374aB7CC3D57b",
-      "startBlock": 12175922
+      "startBlock": 12175922,
+      "name": "Art Blocks Flagship"
     }
   ],
   "minterSetPriceV1Contracts": [
     {
       "address": "0x9bC71a0380f2cc5C099e58b0d836bEddB1B5CE1C",
-      "startBlock": 12278126
+      "startBlock": 12278126,
+      "name": "Art Blocks Flagship"
+    },
+    {
+      "address": "0x824E0279dEE2E341d3B077ee4585Fa57dd0EaA92",
+      "startBlock": 12320635,
+      "name": "Art Blocks x Pace"
     }
   ],
   "minterSetPriceERC20V1Contracts": [
     {
       "address": "0xa504BF82Db6347165A39294FB0CaE761074661Ee",
-      "startBlock": 12278126
+      "startBlock": 12278126,
+      "name": "Art Blocks Flagship"
+    },
+    {
+      "address": "0x3c51E635F51FEAa5256dB49c6c924f7a08bFF021",
+      "startBlock": 12320635,
+      "name": "Art Blocks x Pace"
     }
   ],
   "minterDALinV1Contracts": [
     {
       "address": "0xfe2D6Fc2E4914CD520353F91E0c214cF1e478eeb",
-      "startBlock": 12278126
+      "startBlock": 12278126,
+      "name": "Art Blocks Flagship"
+    },
+    {
+      "address": "0x9c6C2a15cB159df34888228dc03a6c0a2DC3D98c",
+      "startBlock": 12320635,
+      "name": "Art Blocks x Pace"
     }
   ],
   "minterDAExpV1Contracts": [
     {
       "address": "0x00D59a0e11b9b8a878bacd94cb03dEe5eBfDfe1E",
-      "startBlock": 12278126
+      "startBlock": 12278126,
+      "name": "Art Blocks Flagship"
+    },
+    {
+      "address": "0xd4E8CAbee1EcC930E1b2df8D821341Ad84F42159",
+      "startBlock": 12320635,
+      "name": "Art Blocks x Pace"
     }
   ],
   "startBlock": 10760915

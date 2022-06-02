@@ -12,10 +12,22 @@
       "startBlock": 10216817
     }
   ],
+  "pbabContracts": [
+    {
+      "address": "0x712B665e98C9f2F6D53950673A115b25d606776A",
+      "name": "Art Blocks x Pace",
+      "startBlock": 12321490
+    }
+  ],
   "minterFilterV0Contracts": [
     {
       "address": "0xDDc77d8f935b255aD8b5651392D1284E29478b5b",
       "startBlock": 12070104
+    },
+    {
+      "address": "0x4A564810f9ACc328Cb29A6c359a4F49c231c8a4A",
+      "startBlock": 12321490,
+      "name": "Art Blocks x Pace"
     }
   ],
   "minterSetPriceV0Contracts": [
@@ -46,24 +58,44 @@
     {
       "address": "0x0e2Bb2Bb67cb43136c63D61829ff59FD2FC872C8",
       "startBlock": 12240973
+    },
+    {
+      "address": "0x931E1d299931Bcc62aD4aa4395Ec1F90976D554b",
+      "startBlock": 12321490,
+      "name": "Art Blocks x Pace"
     }
   ],
   "minterSetPriceERC20V1Contracts": [
     {
       "address": "0xd6d15Aa90207fD07d62bAd155838859b6f65dE07",
       "startBlock": 12240972
+    },
+    {
+      "address": "0x102d7A4B59BCDdd8f5851b61De254dcDb20b8590",
+      "startBlock": 12321490,
+      "name": "Art Blocks x Pace"
     }
   ],
   "minterDALinV1Contracts": [
     {
       "address": "0xFcaBB2dc7e5abfBD9EB36b0052F8A20cdF2830df",
       "startBlock": 12240974
+    },
+    {
+      "address": "0xB175ef3421C7800Ce7140E0170D279Fb51266CFf",
+      "startBlock": 12321490,
+      "name": "Art Blocks x Pace"
     }
   ],
   "minterDAExpV1Contracts": [
     {
       "address": "0xcfe42B288a9299f9214373D505418899ebAa5Fb4",
       "startBlock": 12240975
+    },
+    {
+      "address": "0x2dF3572e743693dD54E7519f3f88997a3d4997d9",
+      "startBlock": 12321490,
+      "name": "Art Blocks x Pace"
     }
   ]
 }
