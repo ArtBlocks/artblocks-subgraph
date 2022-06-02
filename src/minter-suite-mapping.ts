@@ -67,7 +67,7 @@ import {
   ConfigValueSet1,
   ConfigValueSet2,
   ConfigValueSet3
-} from "../generated/MinterFilterV0-0xDDc77d8f935b255aD8b5651392D1284E29478b5b/IFilteredMinterV1";
+} from "../generated/MinterFilterV0/IFilteredMinterV1";
 
 // IFilteredMinterV0 events
 export function handlePricePerTokenInWeiUpdated(
