@@ -366,7 +366,7 @@ type OpenSeaSaleLookupTable @entity {
   openSeaSale: OpenSeaSale!
 }
 
-type Transfer @entity {
+type Transfer @entity(immutable: true){
   id: ID!
 
   transactionHash: Bytes!

@@ -8,6 +8,7 @@ import {
   Address,
   ByteArray
 } from "@graphprotocol/graph-ts";
+import { logStore } from "matchstick-as";
 
 import {
   GenArt721Core,
@@ -176,7 +177,7 @@ export function handleTransfer(event: Transfer): void {
     token.save();
 
     let transfer = new TokenTransfer(
-      event.params.to.toHexString() + event.params.from.toHexString() + token.id
+      event.transaction.hash.toHex() + "-" + event.logIndex.toString()
     );
     transfer.transactionHash = event.transaction.hash;
     transfer.createdAt = event.block.timestamp;
