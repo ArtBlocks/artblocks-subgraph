@@ -19,4 +19,8 @@ generated/*
 !generated/MinterDALinV0
 !generated/MinterSetPriceERC20V0
 !generated/MinterSetPriceV0
+!generated/MinterDAExpV1
+!generated/MinterDALinV1
+!generated/MinterSetPriceERC20V1
+!generated/MinterSetPriceV1
 !generated/WyvernExchange

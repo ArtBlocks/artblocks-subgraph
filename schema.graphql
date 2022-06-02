@@ -105,9 +105,9 @@ type Project @entity {
   "Minter configuration for this project (not implemented prior to minter filters)"
   minterConfiguration: ProjectMinterConfiguration
 
-  "Lookup table to get the OpenSea Sale history of the project"
-  openSeaSaleLookupTables: [OpenSeaSaleLookupTable!]!
-    @derivedFrom(field: "project")
+  "Lookup table to get the Sale history of the project"
+  saleLookupTables: [SaleLookupTable!]! @derivedFrom(field: "project")
+
 }
 
 type ProjectScript @entity {
@@ -213,6 +213,10 @@ type Token @entity {
   "Lookup table to get the OpenSea Sale history"
   openSeaSaleLookupTables: [OpenSeaSaleLookupTable!]!
     @derivedFrom(field: "token")
+
+  "Lookup table to get the Sale history"
+  saleLookupTables: [SaleLookupTable!]! @derivedFrom(field: "token")
+  
 }
 
 type MinterFilter @entity {
@@ -233,6 +237,10 @@ enum MinterType {
   MinterSetPriceERC20V0
   MinterDALinV0
   MinterDAExpV0
+  MinterSetPriceV1
+  MinterSetPriceERC20V1
+  MinterDALinV1
+  MinterDAExpV1
 }
 
 type Minter @entity {
@@ -302,33 +310,37 @@ enum SaleType {
   Bundle
 }
 
-enum OpenSeaVersion {
-  V1,
-  V2
+enum Exchange {
+  "Opensea V1"
+  OS_V1,
+  "Opensea V2"
+  OS_V2,
+  "LooksRare"
+  LR_V1
 }
 
 
-type OpenSeaSale @entity {
-  "The transaction hash when the OpenSea sale occured"
+type Sale @entity {
+  "The transaction hash when the sale occured"
   id: ID!
 
-  "The version of OpenSea exchange for this sale"
-  openSeaVersion: OpenSeaVersion!
-
+  "The exchange used for this sale"
+  exchange: Exchange!
+  
   "The sale type (Single | Bundle)"
   saleType: SaleType!
 
-  "The block number of the OpenSea sale"
+  "The block number of the sale"
   blockNumber: BigInt!
 
-  "The timestamp of the OpenSea sale"
+  "The timestamp of the sale"
   blockTimestamp: BigInt!
 
   "A raw formated string of the token(s) sold (i.e TokenID1::TokenID2::TokenID3)"
   summaryTokensSold: String!
 
   "Lookup table to get the list of Tokens sold in this sale"
-  openSeaSaleLookupTables: [OpenSeaSaleLookupTable!]! @derivedFrom(field: "openSeaSale")
+  saleLookupTables: [SaleLookupTable!]! @derivedFrom(field: "sale")
 
   "The seller address"
   seller: Bytes!
@@ -339,15 +351,15 @@ type OpenSeaSale @entity {
   "The ERC20 token used for the payement"
   paymentToken: Bytes!
 
-  "The price of the OpenSea sale"
+  "The price of the sale"
   price: BigInt!
 
   "Private sales are flagged by this boolean"
   isPrivate: Boolean!
 }
 
-type OpenSeaSaleLookupTable @entity {
-  "Set to `Project Id::Token Id::OpenSeaSale Id"
+type SaleLookupTable @entity {
+  "Set to `Project Id::Token Id::Sale Id"
   id: ID!
 
   "The block number of the sale"
@@ -364,6 +376,9 @@ type OpenSeaSaleLookupTable @entity {
 
   "The associated OpenSea sale"
   openSeaSale: OpenSeaSale!
+  
+  "The associated sale"
+  sale: Sale!
 }
 
 type Transfer @entity(immutable: true){

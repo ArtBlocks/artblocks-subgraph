@@ -587,13 +587,13 @@ export class Project extends Entity {
     }
   }
 
-  get openSeaSaleLookupTables(): Array<string> {
-    let value = this.get("openSeaSaleLookupTables");
+  get saleLookupTables(): Array<string> {
+    let value = this.get("saleLookupTables");
     return value!.toStringArray();
   }
 
-  set openSeaSaleLookupTables(value: Array<string>) {
-    this.set("openSeaSaleLookupTables", Value.fromStringArray(value));
+  set saleLookupTables(value: Array<string>) {
+    this.set("saleLookupTables", Value.fromStringArray(value));
   }
 }
 
@@ -1228,11 +1228,15 @@ export class Token extends Entity {
 
   get openSeaSaleLookupTables(): Array<string> {
     let value = this.get("openSeaSaleLookupTables");
+
+  get saleLookupTables(): Array<string> {
+    let value = this.get("saleLookupTables");
+
     return value!.toStringArray();
   }
 
-  set openSeaSaleLookupTables(value: Array<string>) {
-    this.set("openSeaSaleLookupTables", Value.fromStringArray(value));
+  set saleLookupTables(value: Array<string>) {
+    this.set("saleLookupTables", Value.fromStringArray(value));
   }
 }
 
@@ -1611,12 +1615,12 @@ export class ProjectMinterConfiguration extends Entity {
   }
 }
 
-export class OpenSeaSale extends Entity {
+export class Sale extends Entity {
   constructor(id: string) {
     super();
     this.set("id", Value.fromString(id));
 
-    this.set("openSeaVersion", Value.fromString(""));
+    this.set("exchange", Value.fromString(""));
     this.set("saleType", Value.fromString(""));
     this.set("blockNumber", Value.fromBigInt(BigInt.zero()));
     this.set("blockTimestamp", Value.fromBigInt(BigInt.zero()));
@@ -1630,19 +1634,19 @@ export class OpenSeaSale extends Entity {
 
   save(): void {
     let id = this.get("id");
-    assert(id != null, "Cannot save OpenSeaSale entity without an ID");
+    assert(id != null, "Cannot save Sale entity without an ID");
     if (id) {
       assert(
         id.kind == ValueKind.STRING,
-        "Cannot save OpenSeaSale entity with non-string ID. " +
+        "Cannot save Sale entity with non-string ID. " +
           'Considering using .toHex() to convert the "id" to a string.'
       );
-      store.set("OpenSeaSale", id.toString(), this);
+      store.set("Sale", id.toString(), this);
     }
   }
 
-  static load(id: string): OpenSeaSale | null {
-    return changetype<OpenSeaSale | null>(store.get("OpenSeaSale", id));
+  static load(id: string): Sale | null {
+    return changetype<Sale | null>(store.get("Sale", id));
   }
 
   get id(): string {
@@ -1654,13 +1658,13 @@ export class OpenSeaSale extends Entity {
     this.set("id", Value.fromString(value));
   }
 
-  get openSeaVersion(): string {
-    let value = this.get("openSeaVersion");
+  get exchange(): string {
+    let value = this.get("exchange");
     return value!.toString();
   }
 
-  set openSeaVersion(value: string) {
-    this.set("openSeaVersion", Value.fromString(value));
+  set exchange(value: string) {
+    this.set("exchange", Value.fromString(value));
   }
 
   get saleType(): string {
@@ -1699,13 +1703,13 @@ export class OpenSeaSale extends Entity {
     this.set("summaryTokensSold", Value.fromString(value));
   }
 
-  get openSeaSaleLookupTables(): Array<string> {
-    let value = this.get("openSeaSaleLookupTables");
+  get saleLookupTables(): Array<string> {
+    let value = this.get("saleLookupTables");
     return value!.toStringArray();
   }
 
-  set openSeaSaleLookupTables(value: Array<string>) {
-    this.set("openSeaSaleLookupTables", Value.fromStringArray(value));
+  set saleLookupTables(value: Array<string>) {
+    this.set("saleLookupTables", Value.fromStringArray(value));
   }
 
   get seller(): Bytes {
@@ -1754,7 +1758,7 @@ export class OpenSeaSale extends Entity {
   }
 }
 
-export class OpenSeaSaleLookupTable extends Entity {
+export class SaleLookupTable extends Entity {
   constructor(id: string) {
     super();
     this.set("id", Value.fromString(id));
@@ -1763,29 +1767,24 @@ export class OpenSeaSaleLookupTable extends Entity {
     this.set("timestamp", Value.fromBigInt(BigInt.zero()));
     this.set("project", Value.fromString(""));
     this.set("token", Value.fromString(""));
-    this.set("openSeaSale", Value.fromString(""));
+    this.set("sale", Value.fromString(""));
   }
 
   save(): void {
     let id = this.get("id");
-    assert(
-      id != null,
-      "Cannot save OpenSeaSaleLookupTable entity without an ID"
-    );
+    assert(id != null, "Cannot save SaleLookupTable entity without an ID");
     if (id) {
       assert(
         id.kind == ValueKind.STRING,
-        "Cannot save OpenSeaSaleLookupTable entity with non-string ID. " +
+        "Cannot save SaleLookupTable entity with non-string ID. " +
           'Considering using .toHex() to convert the "id" to a string.'
       );
-      store.set("OpenSeaSaleLookupTable", id.toString(), this);
+      store.set("SaleLookupTable", id.toString(), this);
     }
   }
 
-  static load(id: string): OpenSeaSaleLookupTable | null {
-    return changetype<OpenSeaSaleLookupTable | null>(
-      store.get("OpenSeaSaleLookupTable", id)
-    );
+  static load(id: string): SaleLookupTable | null {
+    return changetype<SaleLookupTable | null>(store.get("SaleLookupTable", id));
   }
 
   get id(): string {
@@ -1833,13 +1832,13 @@ export class OpenSeaSaleLookupTable extends Entity {
     this.set("token", Value.fromString(value));
   }
 
-  get openSeaSale(): string {
-    let value = this.get("openSeaSale");
+  get sale(): string {
+    let value = this.get("sale");
     return value!.toString();
   }
 
-  set openSeaSale(value: string) {
-    this.set("openSeaSale", Value.fromString(value));
+  set sale(value: string) {
+    this.set("sale", Value.fromString(value));
   }
 }
 
