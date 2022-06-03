@@ -7,6 +7,7 @@ import {
   ethereum,
   json,
   JSONValue,
+  JSONValueKind,
   TypedMap
 } from "@graphprotocol/graph-ts";
 
@@ -508,7 +509,7 @@ export function handleAddManyValueGeneric<T>(event: T): void {
 
     let minterDetails: TypedMap<string, JSONValue>;
 
-    if (jsonResult.isOk) {
+    if (jsonResult.isOk && jsonResult.value.kind == JSONValueKind.OBJECT) {
       minterDetails = jsonResult.value.toObject();
     } else {
       minterDetails = new TypedMap();
