@@ -42,6 +42,13 @@ export function generateProjectScriptId(
   return projectId + "-" + scriptIndex.toString();
 }
 
+export function getProjectMinterConfigId(
+  minterId: string,
+  projectId: string
+): string {
+  return minterId + "-" + projectId;
+}
+
 export function loadOrCreateMinter(
   minterAddress: Address,
   timestamp: BigInt

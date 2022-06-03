@@ -24,7 +24,11 @@ import {
   ProjectMinterConfiguration
 } from "../generated/schema";
 
-import { generateContractSpecificId, loadOrCreateMinter } from "./helpers";
+import {
+  generateContractSpecificId,
+  getProjectMinterConfigId,
+  loadOrCreateMinter
+} from "./helpers";
 import { IFilteredMinterV0 } from "../generated/MinterSetPriceV0/IFilteredMinterV0";
 
 export function handleIsCanonicalMinterFilter(
@@ -60,11 +64,6 @@ export function handleIsCanonicalMinterFilter(
       project.minterConfiguration = null;
       project.updatedAt = event.block.timestamp;
       project.save();
-    }
-
-    let prevMinterConfig = ProjectMinterConfiguration.load(fullProjectId);
-    if (prevMinterConfig) {
-      store.remove("ProjectMinterConfiguration", fullProjectId);
     }
   }
 
@@ -171,9 +170,14 @@ export function handleProjectMinterRegistered(
 
   if (project) {
     // Clear previous minter configuration
-    let prevMinterConfig = ProjectMinterConfiguration.load(project.id);
+    let prevMinterConfig = ProjectMinterConfiguration.load(
+      getProjectMinterConfigId(minter.id, project.id)
+    );
     if (prevMinterConfig) {
-      store.remove("ProjectMinterConfiguration", project.id);
+      store.remove(
+        "ProjectMinterConfiguration",
+        getProjectMinterConfigId(minter.id, project.id)
+      );
     }
 
     // Create project configuration
@@ -212,15 +216,9 @@ export function handleProjectMinterRemoved(event: ProjectMinterRemoved): void {
   );
 
   if (project) {
-    let prevMinterConfig = ProjectMinterConfiguration.load(project.id);
-    if (prevMinterConfig) {
-      store.remove("ProjectMinterConfiguration", project.id);
-    }
-    if (project.minterConfiguration) {
-      project.minterConfiguration = null;
-      project.updatedAt = event.block.timestamp;
-      project.save();
-    }
+    project.minterConfiguration = null;
+    project.updatedAt = event.block.timestamp;
+    project.save();
   }
 }
 
@@ -233,7 +231,9 @@ function createAndPopulateProjectMinterConfiguration(
   // Bootstrap minter if it doesn't exist already
   loadOrCreateMinter(minterAddress, timestamp);
 
-  let projectMinterConfig = new ProjectMinterConfiguration(project.id);
+  let projectMinterConfig = new ProjectMinterConfiguration(
+    getProjectMinterConfigId(minterAddress.toHexString(), project.id)
+  );
   projectMinterConfig.project = project.id;
   projectMinterConfig.minter = minterAddress.toHexString();
 

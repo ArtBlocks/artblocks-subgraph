@@ -19,6 +19,7 @@ import {
   Project,
   ProjectMinterConfiguration
 } from "../../../generated/schema";
+import { getProjectMinterConfigId } from "../../../src/helpers";
 import {
   handleIsCanonicalMinterFilter,
   handleMinterApproved,
@@ -428,21 +429,27 @@ test("handleIsCanonicalMinterFilter should populate project minter configuration
   );
 
   // Project 0 asserts
+
+  let configId = getProjectMinterConfigId(
+    minterSetPriceV0Address.toHexString(),
+    project0.id
+  );
+
   assert.fieldEquals(
     PROJECT_ENTITY_TYPE,
     project0.id,
     "minterConfiguration",
-    project0.id
+    configId
   );
   assert.fieldEquals(
     PROJECT_MINTER_CONFIGURATION_ENTITY_TYPE,
-    project0.id.toString(),
+    configId,
     "project",
     project0.id
   );
   assert.fieldEquals(
     PROJECT_MINTER_CONFIGURATION_ENTITY_TYPE,
-    project0.id,
+    configId,
     "minter",
     minterSetPriceV0Address.toHexString()
   );
@@ -455,85 +462,59 @@ test("handleIsCanonicalMinterFilter should populate project minter configuration
 
   assert.fieldEquals(
     PROJECT_MINTER_CONFIGURATION_ENTITY_TYPE,
-    project0.id,
+    configId,
     "priceIsConfigured",
     booleanToString(project0PriceIsConfigured)
   );
   assert.fieldEquals(
     PROJECT_MINTER_CONFIGURATION_ENTITY_TYPE,
-    project0.id,
+    configId,
     "basePrice",
     project0BasePrice.toString()
   );
   assert.fieldEquals(
     PROJECT_MINTER_CONFIGURATION_ENTITY_TYPE,
-    project0.id,
+    configId,
     "currencySymbol",
     project0CurrencySymbol
   );
   assert.fieldEquals(
     PROJECT_MINTER_CONFIGURATION_ENTITY_TYPE,
-    project0.id,
+    configId,
     "currencyAddress",
     project0CurrencyAddress.toHexString()
   );
   assert.fieldEquals(
     PROJECT_MINTER_CONFIGURATION_ENTITY_TYPE,
-    project0.id,
+    configId,
     "purchaseToDisabled",
     booleanToString(project0PurchaseToDisabled)
   );
 
   // Project 1 asserts
+  let configId1 = getProjectMinterConfigId(
+    minterSetPriceERC20V0Address.toHexString(),
+    project1.id
+  );
   assert.fieldEquals(
     PROJECT_ENTITY_TYPE,
     project1.id,
     "minterConfiguration",
-    project1.id
+    configId1
   );
   assert.fieldEquals(
     PROJECT_MINTER_CONFIGURATION_ENTITY_TYPE,
-    project1.id.toString(),
+    configId1,
     "project",
     project1.id
   );
   assert.fieldEquals(
     PROJECT_MINTER_CONFIGURATION_ENTITY_TYPE,
-    project1.id,
+    configId1,
     "minter",
     minterSetPriceERC20V0Address.toHexString()
   );
 
-  assert.fieldEquals(
-    PROJECT_MINTER_CONFIGURATION_ENTITY_TYPE,
-    project1.id,
-    "priceIsConfigured",
-    booleanToString(project1PriceIsConfigured)
-  );
-  assert.fieldEquals(
-    PROJECT_MINTER_CONFIGURATION_ENTITY_TYPE,
-    project1.id,
-    "basePrice",
-    project1BasePrice.toString()
-  );
-  assert.fieldEquals(
-    PROJECT_MINTER_CONFIGURATION_ENTITY_TYPE,
-    project1.id,
-    "currencySymbol",
-    project1CurrencySymbol
-  );
-  assert.fieldEquals(
-    PROJECT_MINTER_CONFIGURATION_ENTITY_TYPE,
-    project1.id,
-    "currencyAddress",
-    project1CurrencyAddress.toHexString()
-  );
-  assert.fieldEquals(
-    PROJECT_MINTER_CONFIGURATION_ENTITY_TYPE,
-    project1.id,
-    "purchaseToDisabled",
-    booleanToString(project1PurchaseToDisabled)
-  );
   assert.fieldEquals(
     MINTER_ENTITY_TYPE,
     minterSetPriceERC20V0Address.toHexString(),
@@ -541,22 +522,52 @@ test("handleIsCanonicalMinterFilter should populate project minter configuration
     project1MinterType
   );
 
-  // Project 2 asserts
+  assert.fieldEquals(
+    PROJECT_MINTER_CONFIGURATION_ENTITY_TYPE,
+    configId1,
+    "priceIsConfigured",
+    booleanToString(project1PriceIsConfigured)
+  );
+  assert.fieldEquals(
+    PROJECT_MINTER_CONFIGURATION_ENTITY_TYPE,
+    configId1,
+    "basePrice",
+    project1BasePrice.toString()
+  );
+  assert.fieldEquals(
+    PROJECT_MINTER_CONFIGURATION_ENTITY_TYPE,
+    configId1,
+    "currencySymbol",
+    project1CurrencySymbol
+  );
+  assert.fieldEquals(
+    PROJECT_MINTER_CONFIGURATION_ENTITY_TYPE,
+    configId1,
+    "currencyAddress",
+    project1CurrencyAddress.toHexString()
+  );
+
+  //project 2 asserts
+
+  let configId2 = getProjectMinterConfigId(
+    minterDALinV0Address.toHexString(),
+    project2.id
+  );
   assert.fieldEquals(
     PROJECT_ENTITY_TYPE,
     project2.id,
     "minterConfiguration",
-    project2.id
+    configId2
   );
   assert.fieldEquals(
     PROJECT_MINTER_CONFIGURATION_ENTITY_TYPE,
-    project2.id.toString(),
+    configId2,
     "project",
     project2.id
   );
   assert.fieldEquals(
     PROJECT_MINTER_CONFIGURATION_ENTITY_TYPE,
-    project2.id,
+    configId2,
     "minter",
     minterDALinV0Address.toHexString()
   );
@@ -566,72 +577,76 @@ test("handleIsCanonicalMinterFilter should populate project minter configuration
     "type",
     project2MinterType
   );
-
   assert.fieldEquals(
     PROJECT_MINTER_CONFIGURATION_ENTITY_TYPE,
-    project2.id,
+    configId2,
     "priceIsConfigured",
     booleanToString(project2PriceIsConfigured)
   );
   assert.fieldEquals(
     PROJECT_MINTER_CONFIGURATION_ENTITY_TYPE,
-    project2.id,
+    configId2,
     "basePrice",
     project2BasePrice.toString()
   );
   assert.fieldEquals(
     PROJECT_MINTER_CONFIGURATION_ENTITY_TYPE,
-    project2.id,
+    configId2,
     "currencySymbol",
     project2CurrencySymbol
   );
   assert.fieldEquals(
     PROJECT_MINTER_CONFIGURATION_ENTITY_TYPE,
-    project2.id,
+    configId2,
     "currencyAddress",
     project2CurrencyAddress.toHexString()
   );
   assert.fieldEquals(
     PROJECT_MINTER_CONFIGURATION_ENTITY_TYPE,
-    project2.id,
+    configId2,
     "purchaseToDisabled",
     booleanToString(project2PurchaseToDisabled)
   );
   assert.fieldEquals(
     PROJECT_MINTER_CONFIGURATION_ENTITY_TYPE,
-    project2.id,
+    configId2,
     "startTime",
     project2StartTime.toString()
   );
   assert.fieldEquals(
     PROJECT_MINTER_CONFIGURATION_ENTITY_TYPE,
-    project2.id,
+    configId2,
     "endTime",
     project2EndTime.toString()
   );
   assert.fieldEquals(
     PROJECT_MINTER_CONFIGURATION_ENTITY_TYPE,
-    project2.id,
+    configId2,
     "startPrice",
     project2StartPrice.toString()
   );
 
   // Project 3 asserts
+
+  let configId3 = getProjectMinterConfigId(
+    minterDAExpV0Address.toHexString(),
+    project3.id.toString()
+  );
   assert.fieldEquals(
     PROJECT_ENTITY_TYPE,
     project3.id,
     "minterConfiguration",
-    project3.id
+    configId3
   );
   assert.fieldEquals(
     PROJECT_MINTER_CONFIGURATION_ENTITY_TYPE,
-    project3.id.toString(),
+    configId3,
     "project",
     project3.id
   );
   assert.fieldEquals(
     PROJECT_MINTER_CONFIGURATION_ENTITY_TYPE,
-    project3.id,
+    configId3,
     "minter",
     minterDAExpV0Address.toHexString()
   );
@@ -644,49 +659,49 @@ test("handleIsCanonicalMinterFilter should populate project minter configuration
 
   assert.fieldEquals(
     PROJECT_MINTER_CONFIGURATION_ENTITY_TYPE,
-    project3.id,
+    configId3,
     "priceIsConfigured",
     booleanToString(project3PriceIsConfigured)
   );
   assert.fieldEquals(
     PROJECT_MINTER_CONFIGURATION_ENTITY_TYPE,
-    project3.id,
+    configId3,
     "basePrice",
     project3BasePrice.toString()
   );
   assert.fieldEquals(
     PROJECT_MINTER_CONFIGURATION_ENTITY_TYPE,
-    project3.id,
+    configId3,
     "currencySymbol",
     project3CurrencySymbol
   );
   assert.fieldEquals(
     PROJECT_MINTER_CONFIGURATION_ENTITY_TYPE,
-    project3.id,
+    configId3,
     "currencyAddress",
     project3CurrencyAddress.toHexString()
   );
   assert.fieldEquals(
     PROJECT_MINTER_CONFIGURATION_ENTITY_TYPE,
-    project3.id,
+    configId3,
     "purchaseToDisabled",
     booleanToString(project3PurchaseToDisabled)
   );
   assert.fieldEquals(
     PROJECT_MINTER_CONFIGURATION_ENTITY_TYPE,
-    project3.id,
+    configId3,
     "startTime",
     project3StartTime.toString()
   );
   assert.fieldEquals(
     PROJECT_MINTER_CONFIGURATION_ENTITY_TYPE,
-    project3.id,
+    configId3,
     "halfLifeSeconds",
     project3HalfLifeSeconds.toString()
   );
   assert.fieldEquals(
     PROJECT_MINTER_CONFIGURATION_ENTITY_TYPE,
-    project3.id,
+    configId3,
     "startPrice",
     project3StartPrice.toString()
   );
@@ -1155,21 +1170,26 @@ test("handleProjectMinterRegistered should populate project minter configuration
 
   handleProjectMinterRegistered(projectMinterRegisteredEvent);
 
+  const configId = getProjectMinterConfigId(
+    minterAddress.toHexString(),
+    project.id
+  );
+
   assert.fieldEquals(
     PROJECT_ENTITY_TYPE,
     project.id,
     "minterConfiguration",
-    project.id
+    configId
   );
   assert.fieldEquals(
     PROJECT_MINTER_CONFIGURATION_ENTITY_TYPE,
-    project.id.toString(),
+    configId,
     "project",
     project.id
   );
   assert.fieldEquals(
     PROJECT_MINTER_CONFIGURATION_ENTITY_TYPE,
-    project.id,
+    configId,
     "minter",
     minterAddress.toHexString()
   );
@@ -1182,31 +1202,31 @@ test("handleProjectMinterRegistered should populate project minter configuration
 
   assert.fieldEquals(
     PROJECT_MINTER_CONFIGURATION_ENTITY_TYPE,
-    project.id,
+    configId,
     "priceIsConfigured",
     booleanToString(projectPriceIsConfigured)
   );
   assert.fieldEquals(
     PROJECT_MINTER_CONFIGURATION_ENTITY_TYPE,
-    project.id,
+    configId,
     "basePrice",
     projectBasePrice.toString()
   );
   assert.fieldEquals(
     PROJECT_MINTER_CONFIGURATION_ENTITY_TYPE,
-    project.id,
+    configId,
     "currencySymbol",
     projectCurrencySymbol
   );
   assert.fieldEquals(
     PROJECT_MINTER_CONFIGURATION_ENTITY_TYPE,
-    project.id,
+    configId,
     "currencyAddress",
     projectCurrencyAddress.toHexString()
   );
   assert.fieldEquals(
     PROJECT_MINTER_CONFIGURATION_ENTITY_TYPE,
-    project.id,
+    configId,
     "purchaseToDisabled",
     booleanToString(projectPurchaseToDisabled)
   );
@@ -1359,7 +1379,9 @@ test("handleProjectMinterRemoved should remove minter configuration from project
   minter.type = minterType;
   minter.save();
 
-  const projectMinterConfig = new ProjectMinterConfiguration(project.id);
+  const projectMinterConfig = new ProjectMinterConfiguration(
+    getProjectMinterConfigId(minterAddress.toHexString(), project.id)
+  );
   projectMinterConfig.minter = minterAddress.toHexString();
   projectMinterConfig.save();
 
@@ -1377,7 +1399,6 @@ test("handleProjectMinterRemoved should remove minter configuration from project
 
   handleProjectMinterRemoved(projectMinterRemovedEvent);
 
-  assert.notInStore(PROJECT_MINTER_CONFIGURATION_ENTITY_TYPE, project.id);
   assert.fieldEquals(
     PROJECT_ENTITY_TYPE,
     project.id,

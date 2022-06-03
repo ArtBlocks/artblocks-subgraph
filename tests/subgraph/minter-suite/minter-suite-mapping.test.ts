@@ -16,7 +16,10 @@ import {
   RandomAddressGenerator,
   TEST_CONTRACT_ADDRESS
 } from "../shared-helpers";
-import { generateContractSpecificId } from "../../../src/helpers";
+import {
+  generateContractSpecificId,
+  getProjectMinterConfigId
+} from "../../../src/helpers";
 import {
   PricePerTokenInWeiUpdated,
   ProjectCurrencyInfoUpdated,
@@ -134,7 +137,9 @@ test("handlePricePerTokenInWeiUpdated should update project minter config priceP
     CURRENT_BLOCK_TIMESTAMP.minus(BigInt.fromI32(10))
   );
 
-  const projectMinterConfig = new ProjectMinterConfiguration(project.id);
+  const projectMinterConfig = new ProjectMinterConfiguration(
+    getProjectMinterConfigId(minterAddress.toHexString(), project.id)
+  );
   projectMinterConfig.minter = minterAddress.toHexString();
   projectMinterConfig.project = project.id;
   projectMinterConfig.basePrice = ONE_ETH_IN_WEI.div(BigInt.fromI32(10));
@@ -164,13 +169,13 @@ test("handlePricePerTokenInWeiUpdated should update project minter config priceP
 
   assert.fieldEquals(
     PROJECT_MINTER_CONFIGURATION_ENTITY_TYPE,
-    project.id,
+    getProjectMinterConfigId(minterAddress.toHexString(), project.id),
     "basePrice",
     newPricePerTokenInWei.toString()
   );
   assert.fieldEquals(
     PROJECT_MINTER_CONFIGURATION_ENTITY_TYPE,
-    project.id,
+    getProjectMinterConfigId(minterAddress.toHexString(), project.id),
     "priceIsConfigured",
     "true"
   );
@@ -238,7 +243,9 @@ test("handleProjectCurrencyInfoUpdated should update project minter config curre
     CURRENT_BLOCK_TIMESTAMP.minus(BigInt.fromI32(10))
   );
 
-  const projectMinterConfig = new ProjectMinterConfiguration(project.id);
+  const projectMinterConfig = new ProjectMinterConfiguration(
+    getProjectMinterConfigId(minterAddress.toHexString(), project.id)
+  );
   projectMinterConfig.minter = minterAddress.toHexString();
   projectMinterConfig.project = project.id;
   projectMinterConfig.basePrice = ONE_ETH_IN_WEI.div(BigInt.fromI32(10));
@@ -275,13 +282,13 @@ test("handleProjectCurrencyInfoUpdated should update project minter config curre
 
   assert.fieldEquals(
     PROJECT_MINTER_CONFIGURATION_ENTITY_TYPE,
-    project.id,
+    getProjectMinterConfigId(minterAddress.toHexString(), project.id),
     "currencyAddress",
     newCurrencyAddress.toHexString()
   );
   assert.fieldEquals(
     PROJECT_MINTER_CONFIGURATION_ENTITY_TYPE,
-    project.id,
+    getProjectMinterConfigId(minterAddress.toHexString(), project.id),
     "currencySymbol",
     newCurrencySymbol
   );
@@ -353,7 +360,9 @@ test("handlePurchaseToDisabledUpdated should update project minter config purcha
     CURRENT_BLOCK_TIMESTAMP.minus(BigInt.fromI32(10))
   );
 
-  const projectMinterConfig = new ProjectMinterConfiguration(project.id);
+  const projectMinterConfig = new ProjectMinterConfiguration(
+    getProjectMinterConfigId(minterAddress.toHexString(), project.id)
+  );
   projectMinterConfig.minter = minterAddress.toHexString();
   projectMinterConfig.project = project.id;
   projectMinterConfig.basePrice = ONE_ETH_IN_WEI.div(BigInt.fromI32(10));
@@ -383,7 +392,7 @@ test("handlePurchaseToDisabledUpdated should update project minter config purcha
 
   assert.fieldEquals(
     PROJECT_MINTER_CONFIGURATION_ENTITY_TYPE,
-    project.id,
+    getProjectMinterConfigId(minterAddress.toHexString(), project.id),
     "purchaseToDisabled",
     "true"
   );
@@ -490,7 +499,9 @@ test("handleDALinSetAuctionDetails should update project minter config auction d
     CURRENT_BLOCK_TIMESTAMP.minus(BigInt.fromI32(10))
   );
 
-  const projectMinterConfig = new ProjectMinterConfiguration(project.id);
+  const projectMinterConfig = new ProjectMinterConfiguration(
+    getProjectMinterConfigId(minterAddress.toHexString(), project.id)
+  );
   projectMinterConfig.minter = minterAddress.toHexString();
   projectMinterConfig.project = project.id;
   projectMinterConfig.basePrice = BigInt.fromI32(0);
@@ -536,31 +547,31 @@ test("handleDALinSetAuctionDetails should update project minter config auction d
 
   assert.fieldEquals(
     PROJECT_MINTER_CONFIGURATION_ENTITY_TYPE,
-    project.id,
+    getProjectMinterConfigId(minterAddress.toHexString(), project.id),
     "basePrice",
     basePrice.toString()
   );
   assert.fieldEquals(
     PROJECT_MINTER_CONFIGURATION_ENTITY_TYPE,
-    project.id,
+    getProjectMinterConfigId(minterAddress.toHexString(), project.id),
     "startPrice",
     startPrice.toString()
   );
   assert.fieldEquals(
     PROJECT_MINTER_CONFIGURATION_ENTITY_TYPE,
-    project.id,
+    getProjectMinterConfigId(minterAddress.toHexString(), project.id),
     "startTime",
     startTime.toString()
   );
   assert.fieldEquals(
     PROJECT_MINTER_CONFIGURATION_ENTITY_TYPE,
-    project.id,
+    getProjectMinterConfigId(minterAddress.toHexString(), project.id),
     "endTime",
     endTime.toString()
   );
   assert.fieldEquals(
     PROJECT_MINTER_CONFIGURATION_ENTITY_TYPE,
-    project.id,
+    getProjectMinterConfigId(minterAddress.toHexString(), project.id),
     "priceIsConfigured",
     "true"
   );
@@ -593,7 +604,9 @@ test("handleDALinSetAuctionDetails should update project minter config auction d
     CURRENT_BLOCK_TIMESTAMP.minus(BigInt.fromI32(10))
   );
 
-  const projectMinterConfig = new ProjectMinterConfiguration(project.id);
+  const projectMinterConfig = new ProjectMinterConfiguration(
+    getProjectMinterConfigId(minterAddress.toHexString(), project.id)
+  );
   projectMinterConfig.minter = minterAddress.toHexString();
   projectMinterConfig.project = project.id;
   projectMinterConfig.basePrice = BigInt.fromI32(0);
@@ -639,31 +652,31 @@ test("handleDALinSetAuctionDetails should update project minter config auction d
 
   assert.fieldEquals(
     PROJECT_MINTER_CONFIGURATION_ENTITY_TYPE,
-    project.id,
+    getProjectMinterConfigId(minterAddress.toHexString(), project.id),
     "basePrice",
     basePrice.toString()
   );
   assert.fieldEquals(
     PROJECT_MINTER_CONFIGURATION_ENTITY_TYPE,
-    project.id,
+    getProjectMinterConfigId(minterAddress.toHexString(), project.id),
     "startPrice",
     startPrice.toString()
   );
   assert.fieldEquals(
     PROJECT_MINTER_CONFIGURATION_ENTITY_TYPE,
-    project.id,
+    getProjectMinterConfigId(minterAddress.toHexString(), project.id),
     "startTime",
     startTime.toString()
   );
   assert.fieldEquals(
     PROJECT_MINTER_CONFIGURATION_ENTITY_TYPE,
-    project.id,
+    getProjectMinterConfigId(minterAddress.toHexString(), project.id),
     "endTime",
     endTime.toString()
   );
   assert.fieldEquals(
     PROJECT_MINTER_CONFIGURATION_ENTITY_TYPE,
-    project.id,
+    getProjectMinterConfigId(minterAddress.toHexString(), project.id),
     "priceIsConfigured",
     "true"
   );
@@ -731,7 +744,9 @@ test("handleDALinResetAuctionDetails should reset project minter config auction 
     CURRENT_BLOCK_TIMESTAMP.minus(BigInt.fromI32(10))
   );
 
-  const projectMinterConfig = new ProjectMinterConfiguration(project.id);
+  const projectMinterConfig = new ProjectMinterConfiguration(
+    getProjectMinterConfigId(minterAddress.toHexString(), project.id)
+  );
   projectMinterConfig.minter = minterAddress.toHexString();
   projectMinterConfig.project = project.id;
   projectMinterConfig.startTime = CURRENT_BLOCK_TIMESTAMP.plus(
@@ -773,19 +788,19 @@ test("handleDALinResetAuctionDetails should reset project minter config auction 
 
   assert.fieldEquals(
     PROJECT_MINTER_CONFIGURATION_ENTITY_TYPE,
-    project.id,
+    getProjectMinterConfigId(minterAddress.toHexString(), project.id),
     "minter",
     minterAddress.toHexString()
   );
   assert.fieldEquals(
     PROJECT_MINTER_CONFIGURATION_ENTITY_TYPE,
-    project.id,
+    getProjectMinterConfigId(minterAddress.toHexString(), project.id),
     "priceIsConfigured",
     "false"
   );
   assert.fieldEquals(
     PROJECT_MINTER_CONFIGURATION_ENTITY_TYPE,
-    project.id,
+    getProjectMinterConfigId(minterAddress.toHexString(), project.id),
     "project",
     project.id
   );
@@ -818,7 +833,9 @@ test("handleDALinResetAuctionDetails should reset project minter config auction 
     CURRENT_BLOCK_TIMESTAMP.minus(BigInt.fromI32(10))
   );
 
-  const projectMinterConfig = new ProjectMinterConfiguration(project.id);
+  const projectMinterConfig = new ProjectMinterConfiguration(
+    getProjectMinterConfigId(minterAddress.toHexString(), project.id)
+  );
   projectMinterConfig.minter = minterAddress.toHexString();
   projectMinterConfig.project = project.id;
   projectMinterConfig.startTime = CURRENT_BLOCK_TIMESTAMP.plus(
@@ -860,19 +877,19 @@ test("handleDALinResetAuctionDetails should reset project minter config auction 
 
   assert.fieldEquals(
     PROJECT_MINTER_CONFIGURATION_ENTITY_TYPE,
-    project.id,
+    getProjectMinterConfigId(minterAddress.toHexString(), project.id),
     "minter",
     minterAddress.toHexString()
   );
   assert.fieldEquals(
     PROJECT_MINTER_CONFIGURATION_ENTITY_TYPE,
-    project.id,
+    getProjectMinterConfigId(minterAddress.toHexString(), project.id),
     "priceIsConfigured",
     "false"
   );
   assert.fieldEquals(
     PROJECT_MINTER_CONFIGURATION_ENTITY_TYPE,
-    project.id,
+    getProjectMinterConfigId(minterAddress.toHexString(), project.id),
     "project",
     project.id
   );
@@ -1044,7 +1061,9 @@ test("handleDAExpSetAuctionDetails should update project minter config auction d
     CURRENT_BLOCK_TIMESTAMP.minus(BigInt.fromI32(10))
   );
 
-  const projectMinterConfig = new ProjectMinterConfiguration(project.id);
+  const projectMinterConfig = new ProjectMinterConfiguration(
+    getProjectMinterConfigId(minterAddress.toHexString(), project.id)
+  );
   projectMinterConfig.minter = minterAddress.toHexString();
   projectMinterConfig.project = project.id;
   projectMinterConfig.basePrice = BigInt.fromI32(0);
@@ -1090,31 +1109,31 @@ test("handleDAExpSetAuctionDetails should update project minter config auction d
 
   assert.fieldEquals(
     PROJECT_MINTER_CONFIGURATION_ENTITY_TYPE,
-    project.id,
+    getProjectMinterConfigId(minterAddress.toHexString(), project.id),
     "basePrice",
     basePrice.toString()
   );
   assert.fieldEquals(
     PROJECT_MINTER_CONFIGURATION_ENTITY_TYPE,
-    project.id,
+    getProjectMinterConfigId(minterAddress.toHexString(), project.id),
     "startPrice",
     startPrice.toString()
   );
   assert.fieldEquals(
     PROJECT_MINTER_CONFIGURATION_ENTITY_TYPE,
-    project.id,
+    getProjectMinterConfigId(minterAddress.toHexString(), project.id),
     "startTime",
     startTime.toString()
   );
   assert.fieldEquals(
     PROJECT_MINTER_CONFIGURATION_ENTITY_TYPE,
-    project.id,
+    getProjectMinterConfigId(minterAddress.toHexString(), project.id),
     "halfLifeSeconds",
     halfLifeSeconds.toString()
   );
   assert.fieldEquals(
     PROJECT_MINTER_CONFIGURATION_ENTITY_TYPE,
-    project.id,
+    getProjectMinterConfigId(minterAddress.toHexString(), project.id),
     "priceIsConfigured",
     "true"
   );
@@ -1147,7 +1166,9 @@ test("handleDAExpSetAuctionDetails should update project minter config auction d
     CURRENT_BLOCK_TIMESTAMP.minus(BigInt.fromI32(10))
   );
 
-  const projectMinterConfig = new ProjectMinterConfiguration(project.id);
+  const projectMinterConfig = new ProjectMinterConfiguration(
+    getProjectMinterConfigId(minterAddress.toHexString(), project.id)
+  );
   projectMinterConfig.minter = minterAddress.toHexString();
   projectMinterConfig.project = project.id;
   projectMinterConfig.basePrice = BigInt.fromI32(0);
@@ -1193,31 +1214,31 @@ test("handleDAExpSetAuctionDetails should update project minter config auction d
 
   assert.fieldEquals(
     PROJECT_MINTER_CONFIGURATION_ENTITY_TYPE,
-    project.id,
+    getProjectMinterConfigId(minterAddress.toHexString(), project.id),
     "basePrice",
     basePrice.toString()
   );
   assert.fieldEquals(
     PROJECT_MINTER_CONFIGURATION_ENTITY_TYPE,
-    project.id,
+    getProjectMinterConfigId(minterAddress.toHexString(), project.id),
     "startPrice",
     startPrice.toString()
   );
   assert.fieldEquals(
     PROJECT_MINTER_CONFIGURATION_ENTITY_TYPE,
-    project.id,
+    getProjectMinterConfigId(minterAddress.toHexString(), project.id),
     "startTime",
     startTime.toString()
   );
   assert.fieldEquals(
     PROJECT_MINTER_CONFIGURATION_ENTITY_TYPE,
-    project.id,
+    getProjectMinterConfigId(minterAddress.toHexString(), project.id),
     "halfLifeSeconds",
     halfLifeSeconds.toString()
   );
   assert.fieldEquals(
     PROJECT_MINTER_CONFIGURATION_ENTITY_TYPE,
-    project.id,
+    getProjectMinterConfigId(minterAddress.toHexString(), project.id),
     "priceIsConfigured",
     "true"
   );
@@ -1285,7 +1306,9 @@ test("handleDAExpResetAuctionDetails should reset project minter config auction 
     CURRENT_BLOCK_TIMESTAMP.minus(BigInt.fromI32(10))
   );
 
-  const projectMinterConfig = new ProjectMinterConfiguration(project.id);
+  const projectMinterConfig = new ProjectMinterConfiguration(
+    getProjectMinterConfigId(minterAddress.toHexString(), project.id)
+  );
   projectMinterConfig.minter = minterAddress.toHexString();
   projectMinterConfig.project = project.id;
   projectMinterConfig.startTime = CURRENT_BLOCK_TIMESTAMP.plus(
@@ -1327,19 +1350,19 @@ test("handleDAExpResetAuctionDetails should reset project minter config auction 
 
   assert.fieldEquals(
     PROJECT_MINTER_CONFIGURATION_ENTITY_TYPE,
-    project.id,
+    getProjectMinterConfigId(minterAddress.toHexString(), project.id),
     "minter",
     minterAddress.toHexString()
   );
   assert.fieldEquals(
     PROJECT_MINTER_CONFIGURATION_ENTITY_TYPE,
-    project.id,
+    getProjectMinterConfigId(minterAddress.toHexString(), project.id),
     "priceIsConfigured",
     "false"
   );
   assert.fieldEquals(
     PROJECT_MINTER_CONFIGURATION_ENTITY_TYPE,
-    project.id,
+    getProjectMinterConfigId(minterAddress.toHexString(), project.id),
     "project",
     project.id
   );
@@ -1372,7 +1395,9 @@ test("handleDAExpResetAuctionDetails should reset project minter config auction 
     CURRENT_BLOCK_TIMESTAMP.minus(BigInt.fromI32(10))
   );
 
-  const projectMinterConfig = new ProjectMinterConfiguration(project.id);
+  const projectMinterConfig = new ProjectMinterConfiguration(
+    getProjectMinterConfigId(minterAddress.toHexString(), project.id)
+  );
   projectMinterConfig.minter = minterAddress.toHexString();
   projectMinterConfig.project = project.id;
   projectMinterConfig.startTime = CURRENT_BLOCK_TIMESTAMP.plus(
@@ -1414,19 +1439,19 @@ test("handleDAExpResetAuctionDetails should reset project minter config auction 
 
   assert.fieldEquals(
     PROJECT_MINTER_CONFIGURATION_ENTITY_TYPE,
-    project.id,
+    getProjectMinterConfigId(minterAddress.toHexString(), project.id),
     "minter",
     minterAddress.toHexString()
   );
   assert.fieldEquals(
     PROJECT_MINTER_CONFIGURATION_ENTITY_TYPE,
-    project.id,
+    getProjectMinterConfigId(minterAddress.toHexString(), project.id),
     "priceIsConfigured",
     "false"
   );
   assert.fieldEquals(
     PROJECT_MINTER_CONFIGURATION_ENTITY_TYPE,
-    project.id,
+    getProjectMinterConfigId(minterAddress.toHexString(), project.id),
     "project",
     project.id
   );
@@ -1457,7 +1482,9 @@ test("handleSetValue should set all values to a designated key in extraMinterDet
     CURRENT_BLOCK_TIMESTAMP.minus(BigInt.fromI32(10))
   );
 
-  const projectMinterConfig = new ProjectMinterConfiguration(project.id);
+  const projectMinterConfig = new ProjectMinterConfiguration(
+    getProjectMinterConfigId(minterAddress.toHexString(), project.id)
+  );
   projectMinterConfig.minter = minterAddress.toHexString();
   projectMinterConfig.project = project.id;
   projectMinterConfig.save();
@@ -1483,7 +1510,7 @@ test("handleSetValue should set all values to a designated key in extraMinterDet
 
   assert.fieldEquals(
     PROJECT_MINTER_CONFIGURATION_ENTITY_TYPE,
-    project.id,
+    getProjectMinterConfigId(minterAddress.toHexString(), project.id),
     "extraMinterDetails",
     '{"boolean":true}'
   );
@@ -1514,7 +1541,7 @@ test("handleSetValue should set all values to a designated key in extraMinterDet
 
   assert.fieldEquals(
     PROJECT_MINTER_CONFIGURATION_ENTITY_TYPE,
-    project.id,
+    getProjectMinterConfigId(minterAddress.toHexString(), project.id),
     "extraMinterDetails",
     '{"boolean":true,"bigInt":100}'
   );
@@ -1544,7 +1571,7 @@ test("handleSetValue should set all values to a designated key in extraMinterDet
 
   assert.fieldEquals(
     PROJECT_MINTER_CONFIGURATION_ENTITY_TYPE,
-    project.id,
+    getProjectMinterConfigId(minterAddress.toHexString(), project.id),
     "extraMinterDetails",
     '{"bigInt":100,"boolean":true,"address":' + '"' + addressString + '"' + "}"
   );
@@ -1572,7 +1599,7 @@ test("handleSetValue should set all values to a designated key in extraMinterDet
 
   assert.fieldEquals(
     PROJECT_MINTER_CONFIGURATION_ENTITY_TYPE,
-    project.id,
+    getProjectMinterConfigId(minterAddress.toHexString(), project.id),
     "extraMinterDetails",
     '{"address":' +
       '"' +
@@ -1601,7 +1628,9 @@ test("handleAddManyBigIntValue should add a value to an array at a designated ke
     CURRENT_BLOCK_TIMESTAMP.minus(BigInt.fromI32(10))
   );
 
-  const projectMinterConfig = new ProjectMinterConfiguration(project.id);
+  const projectMinterConfig = new ProjectMinterConfiguration(
+    getProjectMinterConfigId(minterAddress.toHexString(), project.id)
+  );
   projectMinterConfig.minter = minterAddress.toHexString();
   projectMinterConfig.project = project.id;
   projectMinterConfig.save();
@@ -1630,7 +1659,7 @@ test("handleAddManyBigIntValue should add a value to an array at a designated ke
 
   assert.fieldEquals(
     PROJECT_MINTER_CONFIGURATION_ENTITY_TYPE,
-    project.id,
+    getProjectMinterConfigId(minterAddress.toHexString(), project.id),
     "extraMinterDetails",
     '{"array":[100]}'
   );
@@ -1639,7 +1668,7 @@ test("handleAddManyBigIntValue should add a value to an array at a designated ke
 
   assert.fieldEquals(
     PROJECT_MINTER_CONFIGURATION_ENTITY_TYPE,
-    project.id,
+    getProjectMinterConfigId(minterAddress.toHexString(), project.id),
     "extraMinterDetails",
     '{"array":[100,100]}'
   );
@@ -1663,7 +1692,9 @@ test("handleAddManyAddressValue should add a value to an array at a designated k
     CURRENT_BLOCK_TIMESTAMP.minus(BigInt.fromI32(10))
   );
 
-  const projectMinterConfig = new ProjectMinterConfiguration(project.id);
+  const projectMinterConfig = new ProjectMinterConfiguration(
+    getProjectMinterConfigId(minterAddress.toHexString(), project.id)
+  );
   projectMinterConfig.minter = minterAddress.toHexString();
   projectMinterConfig.project = project.id;
   projectMinterConfig.save();
@@ -1691,7 +1722,7 @@ test("handleAddManyAddressValue should add a value to an array at a designated k
 
   assert.fieldEquals(
     PROJECT_MINTER_CONFIGURATION_ENTITY_TYPE,
-    project.id,
+    getProjectMinterConfigId(minterAddress.toHexString(), project.id),
     "extraMinterDetails",
     '{"array":[' + '"' + testAddy.toHexString() + '"' + "]}"
   );
@@ -1715,7 +1746,9 @@ test("handleAddManyBytesValue should add a value to an array at a designated key
     CURRENT_BLOCK_TIMESTAMP.minus(BigInt.fromI32(10))
   );
 
-  const projectMinterConfig = new ProjectMinterConfiguration(project.id);
+  const projectMinterConfig = new ProjectMinterConfiguration(
+    getProjectMinterConfigId(minterAddress.toHexString(), project.id)
+  );
   projectMinterConfig.minter = minterAddress.toHexString();
   projectMinterConfig.project = project.id;
   projectMinterConfig.save();
@@ -1744,7 +1777,7 @@ test("handleAddManyBytesValue should add a value to an array at a designated key
 
   assert.fieldEquals(
     PROJECT_MINTER_CONFIGURATION_ENTITY_TYPE,
-    project.id,
+    getProjectMinterConfigId(minterAddress.toHexString(), project.id),
     "extraMinterDetails",
     '{"array":["im bytes"]}'
   );
@@ -1753,7 +1786,7 @@ test("handleAddManyBytesValue should add a value to an array at a designated key
 
   assert.fieldEquals(
     PROJECT_MINTER_CONFIGURATION_ENTITY_TYPE,
-    project.id,
+    getProjectMinterConfigId(minterAddress.toHexString(), project.id),
     "extraMinterDetails",
     '{"array":["im bytes","im bytes"]}'
   );
@@ -1777,7 +1810,9 @@ test("handleRemoveValue should remove the key/value from extraMinterDetails", ()
     CURRENT_BLOCK_TIMESTAMP.minus(BigInt.fromI32(10))
   );
 
-  const projectMinterConfig = new ProjectMinterConfiguration(project.id);
+  const projectMinterConfig = new ProjectMinterConfiguration(
+    getProjectMinterConfigId(minterAddress.toHexString(), project.id)
+  );
   projectMinterConfig.minter = minterAddress.toHexString();
   projectMinterConfig.project = project.id;
   projectMinterConfig.extraMinterDetails =
@@ -1804,7 +1839,7 @@ test("handleRemoveValue should remove the key/value from extraMinterDetails", ()
 
   assert.fieldEquals(
     PROJECT_MINTER_CONFIGURATION_ENTITY_TYPE,
-    project.id,
+    getProjectMinterConfigId(minterAddress.toHexString(), project.id),
     "extraMinterDetails",
     '{"addresses":"hi"}'
   );
@@ -1828,7 +1863,9 @@ test("handleRemoveBigIntManyValue should remove the key/value from extraMinterDe
     CURRENT_BLOCK_TIMESTAMP.minus(BigInt.fromI32(10))
   );
 
-  const projectMinterConfig = new ProjectMinterConfiguration(project.id);
+  const projectMinterConfig = new ProjectMinterConfiguration(
+    getProjectMinterConfigId(minterAddress.toHexString(), project.id)
+  );
   projectMinterConfig.minter = minterAddress.toHexString();
   projectMinterConfig.project = project.id;
   projectMinterConfig.extraMinterDetails =
@@ -1859,7 +1896,7 @@ test("handleRemoveBigIntManyValue should remove the key/value from extraMinterDe
 
   assert.fieldEquals(
     PROJECT_MINTER_CONFIGURATION_ENTITY_TYPE,
-    project.id,
+    getProjectMinterConfigId(minterAddress.toHexString(), project.id),
     "extraMinterDetails",
     '{"addresses":"hi","removeMe":[200]}'
   );
@@ -1883,7 +1920,9 @@ test("handleRemoveBytesManyValue should remove the key/value from extraMinterDet
     CURRENT_BLOCK_TIMESTAMP.minus(BigInt.fromI32(10))
   );
 
-  const projectMinterConfig = new ProjectMinterConfiguration(project.id);
+  const projectMinterConfig = new ProjectMinterConfiguration(
+    getProjectMinterConfigId(minterAddress.toHexString(), project.id)
+  );
   projectMinterConfig.minter = minterAddress.toHexString();
   projectMinterConfig.project = project.id;
   projectMinterConfig.extraMinterDetails =
@@ -1915,7 +1954,7 @@ test("handleRemoveBytesManyValue should remove the key/value from extraMinterDet
 
   assert.fieldEquals(
     PROJECT_MINTER_CONFIGURATION_ENTITY_TYPE,
-    project.id,
+    getProjectMinterConfigId(minterAddress.toHexString(), project.id),
     "extraMinterDetails",
     '{"addresses":"hi","removeMe":["alive"]}'
   );

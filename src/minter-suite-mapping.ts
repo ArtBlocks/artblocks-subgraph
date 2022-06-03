@@ -51,6 +51,7 @@ import {
   booleanToString,
   generateContractSpecificId,
   getMinterDetails,
+  getProjectMinterConfigId,
   loadOrCreateMinter,
   stringToJSONString,
   stringToJSONValue,
@@ -680,7 +681,9 @@ function loadMinterProjectAndConfig(
     return null;
   }
 
-  let projectMinterConfig = ProjectMinterConfiguration.load(project.id);
+  let projectMinterConfig = ProjectMinterConfiguration.load(
+    getProjectMinterConfigId(minter.id, project.id)
+  );
   if (
     !projectMinterConfig ||
     projectMinterConfig.minter != minterAddress.toHexString()
