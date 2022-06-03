@@ -65,15 +65,16 @@ import {
 } from "../../../generated/MinterDAExpV1/MinterDAExpV1";
 import {
   ConfigKeyRemoved,
-  ConfigValueAddedToSet,
-  ConfigValueAddedToSet1,
-  ConfigValueAddedToSet2,
-  ConfigValueRemovedFromSet,
-  ConfigValueRemovedFromSet2,
-  ConfigValueSet,
-  ConfigValueSet1,
-  ConfigValueSet2,
-  ConfigValueSet3
+  ConfigValueAddedToSet as ConfigValueAddedToSetBigInt,
+  ConfigValueAddedToSet1 as ConfigValueAddedToSetAddress,
+  ConfigValueAddedToSet2 as ConfigValueAddedToSetBytes,
+  ConfigValueRemovedFromSet as ConfigValueRemovedFromSetBigInt,
+  ConfigValueRemovedFromSet1 as ConfigValueRemovedFromSetAddress,
+  ConfigValueRemovedFromSet2 as ConfigValueRemovedFromSetBytes,
+  ConfigValueSet as ConfigValueSetBool,
+  ConfigValueSet1 as ConfigValueSetBigInt,
+  ConfigValueSet2 as ConfigValueSetAddress,
+  ConfigValueSet3 as ConfigValueSetBytes
 } from "../../../generated/MinterFilterV0/IFilteredMinterV1";
 
 const randomAddressGenerator = new RandomAddressGenerator();
@@ -1461,9 +1462,9 @@ test("handleSetValue should set all values to a designated key in extraMinterDet
   projectMinterConfig.project = project.id;
   projectMinterConfig.save();
 
-  const configValueSetEvent: ConfigValueSet = changetype<ConfigValueSet>(
-    newMockEvent()
-  );
+  const configValueSetEvent: ConfigValueSetBool = changetype<
+    ConfigValueSetBool
+  >(newMockEvent());
   configValueSetEvent.address = minterAddress;
   configValueSetEvent.parameters = [
     new ethereum.EventParam(
@@ -1487,9 +1488,9 @@ test("handleSetValue should set all values to a designated key in extraMinterDet
     '{"boolean":true}'
   );
 
-  const configValueSetEvent1: ConfigValueSet1 = changetype<ConfigValueSet1>(
-    newMockEvent()
-  );
+  const configValueSetEvent1: ConfigValueSetBigInt = changetype<
+    ConfigValueSetBigInt
+  >(newMockEvent());
   configValueSetEvent1.address = minterAddress;
   configValueSetEvent1.parameters = [
     new ethereum.EventParam(
@@ -1517,9 +1518,9 @@ test("handleSetValue should set all values to a designated key in extraMinterDet
     "extraMinterDetails",
     '{"boolean":true,"bigInt":100}'
   );
-  const configValueSetEvent2: ConfigValueSet2 = changetype<ConfigValueSet2>(
-    newMockEvent()
-  );
+  const configValueSetEvent2: ConfigValueSetAddress = changetype<
+    ConfigValueSetAddress
+  >(newMockEvent());
   const testAddy = randomAddressGenerator.generateRandomAddress();
   configValueSetEvent2.address = minterAddress;
   configValueSetEvent2.parameters = [
@@ -1547,9 +1548,9 @@ test("handleSetValue should set all values to a designated key in extraMinterDet
     "extraMinterDetails",
     '{"bigInt":100,"boolean":true,"address":' + '"' + addressString + '"' + "}"
   );
-  const configValueSetEvent3: ConfigValueSet3 = changetype<ConfigValueSet3>(
-    newMockEvent()
-  );
+  const configValueSetEvent3: ConfigValueSetBytes = changetype<
+    ConfigValueSetBytes
+  >(newMockEvent());
   configValueSetEvent3.address = minterAddress;
   configValueSetEvent3.parameters = [
     new ethereum.EventParam(
@@ -1605,8 +1606,8 @@ test("handleAddManyBigIntValue should add a value to an array at a designated ke
   projectMinterConfig.project = project.id;
   projectMinterConfig.save();
 
-  const configValueSetEvent: ConfigValueAddedToSet = changetype<
-    ConfigValueAddedToSet
+  const configValueSetEvent: ConfigValueAddedToSetBigInt = changetype<
+    ConfigValueAddedToSetBigInt
   >(newMockEvent());
   configValueSetEvent.address = minterAddress;
   configValueSetEvent.parameters = [
@@ -1669,8 +1670,8 @@ test("handleAddManyAddressValue should add a value to an array at a designated k
 
   const testAddy = randomAddressGenerator.generateRandomAddress();
 
-  const configValueSetEvent: ConfigValueAddedToSet1 = changetype<
-    ConfigValueAddedToSet1
+  const configValueSetEvent: ConfigValueAddedToSetAddress = changetype<
+    ConfigValueAddedToSetAddress
   >(newMockEvent());
   configValueSetEvent.address = minterAddress;
   configValueSetEvent.parameters = [
@@ -1719,8 +1720,8 @@ test("handleAddManyBytesValue should add a value to an array at a designated key
   projectMinterConfig.project = project.id;
   projectMinterConfig.save();
 
-  const configValueSetEvent: ConfigValueAddedToSet2 = changetype<
-    ConfigValueAddedToSet2
+  const configValueSetEvent: ConfigValueAddedToSetBytes = changetype<
+    ConfigValueAddedToSetBytes
   >(newMockEvent());
   configValueSetEvent.address = minterAddress;
   configValueSetEvent.parameters = [
@@ -1834,8 +1835,8 @@ test("handleRemoveBigIntManyValue should remove the key/value from extraMinterDe
     '{"addresses": "hi","removeMe": [100, 200]}';
   projectMinterConfig.save();
 
-  const configValueRemoveEvent: ConfigValueRemovedFromSet = changetype<
-    ConfigValueRemovedFromSet
+  const configValueRemoveEvent: ConfigValueRemovedFromSetBigInt = changetype<
+    ConfigValueRemovedFromSetBigInt
   >(newMockEvent());
   configValueRemoveEvent.address = minterAddress;
   configValueRemoveEvent.parameters = [
@@ -1889,8 +1890,8 @@ test("handleRemoveBytesManyValue should remove the key/value from extraMinterDet
     '{"addresses": "hi","removeMe": ["alive", "dead"]}';
   projectMinterConfig.save();
 
-  const configValueRemoveEvent: ConfigValueRemovedFromSet2 = changetype<
-    ConfigValueRemovedFromSet2
+  const configValueRemoveEvent: ConfigValueRemovedFromSetBytes = changetype<
+    ConfigValueRemovedFromSetBytes
   >(newMockEvent());
   configValueRemoveEvent.address = minterAddress;
   configValueRemoveEvent.parameters = [

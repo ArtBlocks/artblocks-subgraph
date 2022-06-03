@@ -57,16 +57,16 @@ import {
 } from "./helpers";
 import {
   ConfigKeyRemoved,
-  ConfigValueAddedToSet,
-  ConfigValueAddedToSet1,
-  ConfigValueAddedToSet2,
-  ConfigValueRemovedFromSet,
-  ConfigValueRemovedFromSet1,
-  ConfigValueRemovedFromSet2,
-  ConfigValueSet,
-  ConfigValueSet1,
-  ConfigValueSet2,
-  ConfigValueSet3
+  ConfigValueAddedToSet as ConfigValueAddedToSetBigInt,
+  ConfigValueAddedToSet1 as ConfigValueAddedToSetAddress,
+  ConfigValueAddedToSet2 as ConfigValueAddedToSetBytes,
+  ConfigValueRemovedFromSet as ConfigValueRemovedFromSetBigInt,
+  ConfigValueRemovedFromSet1 as ConfigValueRemovedFromSetAddress,
+  ConfigValueRemovedFromSet2 as ConfigValueRemovedFromSetBytes,
+  ConfigValueSet as ConfigValueSetBool,
+  ConfigValueSet1 as ConfigValueSetBigInt,
+  ConfigValueSet2 as ConfigValueSetAddress,
+  ConfigValueSet3 as ConfigValueSetBytes
 } from "../generated/MinterFilterV0/IFilteredMinterV1";
 
 // IFilteredMinterV0 events
@@ -390,10 +390,10 @@ export function handleDAExpResetAuctionDetails<T>(event: T): void {
 export function handleSetValueGeneric<T>(event: T): void {
   if (
     !(
-      event instanceof ConfigValueSet ||
-      event instanceof ConfigValueSet1 ||
-      event instanceof ConfigValueSet2 ||
-      event instanceof ConfigValueSet3
+      event instanceof ConfigValueSetBool ||
+      event instanceof ConfigValueSetBigInt ||
+      event instanceof ConfigValueSetAddress ||
+      event instanceof ConfigValueSetBytes
     )
   ) {
     return;
@@ -414,13 +414,13 @@ export function handleSetValueGeneric<T>(event: T): void {
     let jsonKey = event.params._key.toString();
     let jsonValue: JSONValue;
 
-    if (event instanceof ConfigValueSet) {
+    if (event instanceof ConfigValueSetBool) {
       jsonValue = json.fromString(booleanToString(event.params._value));
-    } else if (event instanceof ConfigValueSet1) {
+    } else if (event instanceof ConfigValueSetBigInt) {
       jsonValue = json.fromString(event.params._value.toString());
-    } else if (event instanceof ConfigValueSet2) {
+    } else if (event instanceof ConfigValueSetAddress) {
       jsonValue = stringToJSONValue(event.params._value.toHexString());
-    } else if (event instanceof ConfigValueSet3) {
+    } else if (event instanceof ConfigValueSetBytes) {
       jsonValue = stringToJSONValue(event.params._value.toString());
     }
 
@@ -435,19 +435,19 @@ export function handleSetValueGeneric<T>(event: T): void {
   }
 }
 
-export function handleSetBooleanValue(event: ConfigValueSet): void {
+export function handleSetBooleanValue(event: ConfigValueSetBool): void {
   handleSetValueGeneric(event);
 }
 
-export function handleSetBigIntValue(event: ConfigValueSet1): void {
+export function handleSetBigIntValue(event: ConfigValueSetBigInt): void {
   handleSetValueGeneric(event);
 }
 
-export function handleSetAddressValue(event: ConfigValueSet2): void {
+export function handleSetAddressValue(event: ConfigValueSetAddress): void {
   handleSetValueGeneric(event);
 }
 
-export function handleSetBytesValue(event: ConfigValueSet3): void {
+export function handleSetBytesValue(event: ConfigValueSetBytes): void {
   handleSetValueGeneric(event);
 }
 
@@ -485,9 +485,9 @@ export function handleRemoveValue(event: ConfigKeyRemoved): void {
 export function handleAddManyValueGeneric<T>(event: T): void {
   if (
     !(
-      event instanceof ConfigValueAddedToSet ||
-      event instanceof ConfigValueAddedToSet1 ||
-      event instanceof ConfigValueAddedToSet2
+      event instanceof ConfigValueAddedToSetBigInt ||
+      event instanceof ConfigValueAddedToSetAddress ||
+      event instanceof ConfigValueAddedToSetBytes
     )
   ) {
     return;
@@ -517,7 +517,7 @@ export function handleAddManyValueGeneric<T>(event: T): void {
     let val = minterDetails.get(event.params._key.toString());
     let newValue: JSONValue;
 
-    if (event instanceof ConfigValueAddedToSet) {
+    if (event instanceof ConfigValueAddedToSetBigInt) {
       let arr: BigInt[] = [];
       if (val) {
         arr = val.toArray().map<BigInt>((v: JSONValue) => v.toBigInt());
@@ -525,8 +525,8 @@ export function handleAddManyValueGeneric<T>(event: T): void {
       arr.push(event.params._value);
       newValue = arrayToJSONValue(arr.toString());
     } else if (
-      event instanceof ConfigValueAddedToSet1 ||
-      event instanceof ConfigValueAddedToSet2
+      event instanceof ConfigValueAddedToSetAddress ||
+      event instanceof ConfigValueAddedToSetBytes
     ) {
       let arr: string[] = [];
       if (val) {
@@ -535,7 +535,7 @@ export function handleAddManyValueGeneric<T>(event: T): void {
           .map<string>((v: JSONValue) => stringToJSONString(v.toString()));
       }
       let stringVal: string;
-      if (event instanceof ConfigValueAddedToSet1) {
+      if (event instanceof ConfigValueAddedToSetAddress) {
         stringVal = event.params._value.toHexString();
       } else {
         stringVal = event.params._value.toString();
@@ -554,24 +554,30 @@ export function handleAddManyValueGeneric<T>(event: T): void {
   }
 }
 
-export function handleAddManyBigIntValue(event: ConfigValueAddedToSet): void {
+export function handleAddManyBigIntValue(
+  event: ConfigValueAddedToSetBigInt
+): void {
   handleAddManyValueGeneric(event);
 }
 
-export function handleAddManyAddressValue(event: ConfigValueAddedToSet1): void {
+export function handleAddManyAddressValue(
+  event: ConfigValueAddedToSetAddress
+): void {
   handleAddManyValueGeneric(event);
 }
 
-export function handleAddManyBytesValue(event: ConfigValueAddedToSet2): void {
+export function handleAddManyBytesValue(
+  event: ConfigValueAddedToSetBytes
+): void {
   handleAddManyValueGeneric(event);
 }
 
 export function handleRemoveManyValueGeneric<T>(event: T): void {
   if (
     !(
-      event instanceof ConfigValueRemovedFromSet ||
-      event instanceof ConfigValueRemovedFromSet1 ||
-      event instanceof ConfigValueRemovedFromSet2
+      event instanceof ConfigValueRemovedFromSetBigInt ||
+      event instanceof ConfigValueRemovedFromSetAddress ||
+      event instanceof ConfigValueRemovedFromSetBytes
     )
   ) {
     return;
@@ -588,7 +594,7 @@ export function handleRemoveManyValueGeneric<T>(event: T): void {
     let minterDetails = getMinterDetails(projectMinterConfig);
     let jsonArr = minterDetails.get(event.params._key.toString());
     let newValue: JSONValue;
-    if (event instanceof ConfigValueRemovedFromSet) {
+    if (event instanceof ConfigValueRemovedFromSetBigInt) {
       let arrWithRemoved: BigInt[] = [];
       if (jsonArr) {
         let arr = jsonArr.toArray().map<BigInt>((v: JSONValue) => {
@@ -603,8 +609,8 @@ export function handleRemoveManyValueGeneric<T>(event: T): void {
       }
       newValue = arrayToJSONValue(arrWithRemoved.toString());
     } else if (
-      event instanceof ConfigValueRemovedFromSet1 ||
-      event instanceof ConfigValueRemovedFromSet2
+      event instanceof ConfigValueRemovedFromSetAddress ||
+      event instanceof ConfigValueRemovedFromSetBytes
     ) {
       let arrWithRemoved: string[] = [];
       if (jsonArr) {
@@ -633,18 +639,18 @@ export function handleRemoveManyValueGeneric<T>(event: T): void {
 }
 
 export function handleRemoveBigIntManyValue(
-  event: ConfigValueRemovedFromSet
+  event: ConfigValueRemovedFromSetBigInt
 ): void {
   handleRemoveManyValueGeneric(event);
 }
 
 export function handleRemoveAddressManyValue(
-  event: ConfigValueRemovedFromSet1
+  event: ConfigValueRemovedFromSetAddress
 ): void {
   handleRemoveManyValueGeneric(event);
 }
 export function handleRemoveBytesManyValue(
-  event: ConfigValueRemovedFromSet2
+  event: ConfigValueRemovedFromSetBytes
 ): void {
   handleRemoveManyValueGeneric(event);
 }
