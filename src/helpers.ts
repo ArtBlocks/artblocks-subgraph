@@ -46,7 +46,7 @@ export function getProjectMinterConfigId(
   minterId: string,
   projectId: string
 ): string {
-  return minterId + "-" + projectId;
+  return minterId + "-" + projectId.split("-")[1];
 }
 
 export function loadOrCreateMinter(
