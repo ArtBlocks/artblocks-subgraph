@@ -18,6 +18,7 @@ import { generateContractSpecificId } from "../../helpers";
 
 import {
   calculateMatchPrice,
+  callInputsToHashId,
   getNftContractAddressAndTokenIdFromAtomicizerCallData,
   getSingleTokenIdFromTransferFromCallData,
   guardedArrayReplace,
@@ -113,15 +114,16 @@ function _handleSingleAssetSale(call: AtomicMatch_Call): void {
   let token = Token.load(
     generateContractSpecificId(nftContract, BigInt.fromString(tokenIdStr))
   );
-  
+
   // The token must already exist (minted) to be sold on OpenSea
   if (!token) {
     return;
   }
 
   // Create the Sale
-  let saleId = call.transaction.hash.toHexString();
+  let saleId = callInputsToHashId(callInputs.calldataBuy);
   let sale = new Sale(saleId);
+  sale.txHash = call.transaction.hash;
   sale.exchange = "OS_V1";
   sale.saleType = "Single";
   sale.blockNumber = call.block.number;
@@ -206,13 +208,14 @@ function _handleBundleSale(call: AtomicMatch_Call): void {
   let tokenIdsList = results[1];
 
   // If the bundle does not contain any artblocks sales we don't take it into account
-  if(!bundleIncludesArtBlocks) {
+  if (!bundleIncludesArtBlocks) {
     return;
   }
 
   // Create the sale
-  let saleId = call.transaction.hash.toHexString();
+  let saleId = callInputsToHashId(callInputs.calldataBuy);
   let sale = new Sale(saleId);
+  sale.txHash = call.transaction.hash;
   sale.exchange = "OS_V1";
   sale.saleType = "Bundle";
   sale.blockNumber = call.block.number;
@@ -243,7 +246,7 @@ function _handleBundleSale(call: AtomicMatch_Call): void {
     let token = Token.load(fullTokenId);
 
     // Skip if this is not a token associated with Art Blocks
-    if(!token) {
+    if (!token) {
       continue;
     }
 

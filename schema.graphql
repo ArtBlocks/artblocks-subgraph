@@ -318,6 +318,9 @@ type Sale @entity {
   "The transaction hash when the sale occured"
   id: ID!
 
+  "The hash of the transaction"
+  txHash: Bytes!
+
   "The exchange used for this sale"
   exchange: Exchange!
   

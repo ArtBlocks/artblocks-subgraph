@@ -1,4 +1,4 @@
-import { Address, BigInt, Bytes, ethereum, log } from "@graphprotocol/graph-ts";
+import { Address, BigInt, Bytes, ethereum, log, ByteArray, crypto } from "@graphprotocol/graph-ts";
 
 import { WyvernExchange } from "../../../generated/WyvernExchange/WyvernExchange";
 
@@ -119,21 +119,21 @@ export function calculateMatchPrice(
  * @param mask The mask specifying which bits can be changed in the original array
  */
 export function guardedArrayReplace(
-    array: Bytes,
-    replacement: Bytes,
-    mask: Bytes
+  array: Bytes,
+  replacement: Bytes,
+  mask: Bytes
 ): void {
-    // Sometime the replacementPattern is empty, meaning that both arrays (buyCallData and sellCallData) are identicall and
-    // no merging is necessary. In such a case randomly return the first array (buyCallData)
-    if (mask.length == 0) {
-        return;
-    }
+  // Sometime the replacementPattern is empty, meaning that both arrays (buyCallData and sellCallData) are identicall and
+  // no merging is necessary. In such a case randomly return the first array (buyCallData)
+  if (mask.length == 0) {
+    return;
+  }
 
-    for (let i = 0; i < array.length; i++) {
-        if(mask[i] == 0xff) {
-            array[i] = replacement[i];
-        }
+  for (let i = 0; i < array.length; i++) {
+    if (mask[i] == 0xff) {
+      array[i] = replacement[i];
     }
+  }
 }
 
 /**
@@ -334,4 +334,15 @@ export function getNftContractAddressAndTokenIdFromAtomicizerCallData(
   }
 
   return [nftContractsAddrs, tokenIds];
+}
+
+/**
+ * Generate saleId for opensea sales
+ * @param calldata merged calldata (buy and sell) 
+ * @returns hash of merged calldata from atomicMatch call
+ */
+export function callInputsToHashId(calldata: Bytes): string {
+  let paramsToHash = ByteArray.fromHexString(calldata.toHexString());
+  let saleId = crypto.keccak256(paramsToHash).toHexString();
+  return saleId;
 }

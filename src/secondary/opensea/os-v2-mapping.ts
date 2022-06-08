@@ -15,6 +15,7 @@ import { generateContractSpecificId } from "../../helpers";
 
 import {
   calculateMatchPrice,
+  callInputsToHashId,
   getNftContractAddressAndTokenIdFromAtomicizerCallData,
   guardedArrayReplace,
   isPrivateSale
@@ -115,15 +116,16 @@ function _handleSingleAssetSale(call: AtomicMatch_Call): void {
   let token = Token.load(
     generateContractSpecificId(nftContract, BigInt.fromString(tokenIdStr))
   );
-  
+
   // The token must already exist (minted) to be sold on OpenSea
   if (!token) {
     return;
   }
 
   // Create the OpenSeaSale
-  let saleId = call.transaction.hash.toHexString();
+  let saleId = callInputsToHashId(callInputs.calldataBuy);
   let sale = new Sale(saleId);
+  sale.txHash = call.transaction.hash;
   sale.exchange = "OS_V2";
   sale.saleType = "Single";
   sale.blockNumber = call.block.number;
@@ -216,8 +218,9 @@ function _handleBundleSale(call: AtomicMatch_Call): void {
   }
 
   // Create the sale
-  let saleId = call.transaction.hash.toHexString();
+  let saleId = callInputsToHashId(callInputs.calldataBuy);
   let sale = new Sale(saleId);
+  sale.txHash = call.transaction.hash;
   sale.exchange = "OS_V2";
   sale.saleType = "Bundle";
   sale.blockNumber = call.block.number;

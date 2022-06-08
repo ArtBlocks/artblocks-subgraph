@@ -1599,6 +1599,7 @@ export class Sale extends Entity {
     super();
     this.set("id", Value.fromString(id));
 
+    this.set("txHash", Value.fromBytes(Bytes.empty()));
     this.set("exchange", Value.fromString(""));
     this.set("saleType", Value.fromString(""));
     this.set("blockNumber", Value.fromBigInt(BigInt.zero()));
@@ -1635,6 +1636,15 @@ export class Sale extends Entity {
 
   set id(value: string) {
     this.set("id", Value.fromString(value));
+  }
+
+  get txHash(): Bytes {
+    let value = this.get("txHash");
+    return value!.toBytes();
+  }
+
+  set txHash(value: Bytes) {
+    this.set("txHash", Value.fromBytes(value));
   }
 
   get exchange(): string {
