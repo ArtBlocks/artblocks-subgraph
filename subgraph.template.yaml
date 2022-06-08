@@ -732,6 +732,40 @@ dataSources:
           handler: handleDAExpV1SetAuctionDetails
       file: ./src/minter-suite-mapping.ts
   {{/minterDAExpV1Contracts}}
+  {{#minterHolderV0Contracts}}
+  - kind: ethereum/contract
+    name: 'MinterHolderV0-{{address}}'
+    network: {{network}}
+    source:
+      address: '{{address}}'
+      abi: MinterHolderV0
+      startBlock: {{startBlock}}
+    mapping:
+      kind: ethereum/events
+      apiVersion: 0.0.5
+      language: wasm/assemblyscript
+      entities:
+        - Project
+        - Contract
+        - MinterFilter
+        - Minter
+        - ProjectMinterConfiguration
+      abis:
+        - name: MinterDAExpV1
+          file: ./abis/MinterDAExpV1.json
+        - name: IFilteredMinterV0
+          file: ./abis/IFilteredMinterV0.json
+      eventHandlers:
+        - event: AllowlistedNftAddress(indexed address)
+          handler: handleAddMany
+        - event: RemovedNftAddress(indexed address)
+          handler: 
+        - event: AllowHoldersOfProject(indexed uint256,address,uint256
+          handler: handleAllowHoldersOfProject
+        - event: RemovedHoldersOfProject(indexed uint256,address,uint256
+          handler: handleRemovedHoldersOfProject
+      file: ./src/minter-suite-mapping.ts
+  {{/minterHolderV0Contracts}}
   {{#openSeaContractV1}}
   - kind: ethereum/contract
     name: WyvernExchange

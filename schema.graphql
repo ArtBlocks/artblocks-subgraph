@@ -299,7 +299,7 @@ type ProjectMinterConfiguration @entity {
   endTime: BigInt
 
   "Configuration details used by specific minters (json string)"
-  extraMinterDetails: String
+  extraMinterDetails: String!
 }
 
 enum SaleType {

@@ -8,7 +8,8 @@ import {
   json,
   JSONValue,
   JSONValueKind,
-  TypedMap
+  TypedMap,
+  Value
 } from "@graphprotocol/graph-ts";
 
 import {
@@ -70,6 +71,7 @@ import {
   ConfigValueSet2 as ConfigValueSetAddress,
   ConfigValueSet3 as ConfigValueSetBytes
 } from "../generated/MinterFilterV0/IFilteredMinterV1";
+import { AllowHoldersOfProject } from "../generated/MinterFilterV0/MinterHolderV0";
 
 // IFilteredMinterV0 events
 export function handlePricePerTokenInWeiUpdated(
@@ -655,6 +657,37 @@ export function handleRemoveBytesManyValue(
   event: ConfigValueRemovedFromSetBytes
 ): void {
   handleRemoveManyValueGeneric(event);
+}
+
+// MinterHolder Specific Handlers
+
+export function handleAllowHoldersOfProject(
+  event: AllowHoldersOfProject
+): void {
+  let address = event.params._ownedNftAddress.toHexString();
+  let holderProjectId = event.params._ownedNftProjectId.toString();
+
+  let bytesValueCombined = Bytes.fromUTF8(address + "-" + holderProjectId);
+
+  let newEvent: ConfigValueAddedToSetBytes = changetype<
+    ConfigValueAddedToSetBytes
+  >(event);
+  newEvent.parameters = [
+    new ethereum.EventParam(
+      "_projectId",
+      ethereum.Value.fromUnsignedBigInt(event.params._projectId)
+    ),
+    new ethereum.EventParam(
+      "_key",
+      ethereum.Value.fromBytes(Bytes.fromUTF8("allowlistedAddressAndProjectId"))
+    ),
+    new ethereum.EventParam(
+      "_value",
+      ethereum.Value.fromBytes(bytesValueCombined)
+    )
+  ];
+
+  handleAddManyBytesValue(newEvent);
 }
 
 // Helpers
