@@ -15,7 +15,7 @@ import { generateContractSpecificId } from "../../helpers";
 
 import {
   calculateMatchPrice,
-  callInputsToHashId,
+  generateSaleId,
   getNftContractAddressAndTokenIdFromAtomicizerCallData,
   guardedArrayReplace,
   isPrivateSale
@@ -123,7 +123,7 @@ function _handleSingleAssetSale(call: AtomicMatch_Call): void {
   }
 
   // Create the OpenSeaSale
-  let saleId = callInputsToHashId(callInputs.calldataBuy);
+  let saleId = generateSaleId(token.id, token.nextSaleId);
   let sale = new Sale(saleId);
   sale.txHash = call.transaction.hash;
   sale.exchange = "OS_V2";
@@ -137,6 +137,9 @@ function _handleSingleAssetSale(call: AtomicMatch_Call): void {
   sale.summaryTokensSold = token.id;
   sale.isPrivate = isPrivateSale(call.from, addrs);
   sale.save();
+
+  token.nextSaleId = token.nextSaleId.plus(BigInt.fromI32(1));
+  token.save();
 
   // Create the associated entry in the Nft <=> OpenSeaSale lookup table
   let tableEntryId = buildTokenSaleLookupTableId(
@@ -217,19 +220,7 @@ function _handleBundleSale(call: AtomicMatch_Call): void {
     return;
   }
 
-  // Create the sale
-  let saleId = callInputsToHashId(callInputs.calldataBuy);
-  let sale = new Sale(saleId);
-  sale.txHash = call.transaction.hash;
-  sale.exchange = "OS_V2";
-  sale.saleType = "Bundle";
-  sale.blockNumber = call.block.number;
-  sale.blockTimestamp = call.block.timestamp;
-  sale.buyer = buyerAdress;
-  sale.seller = sellerAdress;
-  sale.paymentToken = paymentTokenErc20Address;
-  sale.price = price;
-  sale.isPrivate = isPrivateSale(call.from, addrs);
+  let saleId = "";
 
   // Build the token sold summary and create all the associated entries in the Nft <=> OpenSeaSale lookup table
   let summaryTokensSold = "";
@@ -255,22 +246,41 @@ function _handleBundleSale(call: AtomicMatch_Call): void {
       continue;
     }
 
-    // Link both of them (NFT with OpenSeaSale)
+    if (saleId === "") {
+      saleId = generateSaleId(token.id, token.nextSaleId);
+      token.nextSaleId = token.nextSaleId.plus(BigInt.fromI32(1));
+      token.save();
+    }
+
+    // Link both of them (NFT with sale)
     let tableEntryId = buildTokenSaleLookupTableId(
       token.project,
       token.id,
       saleId
     );
 
-    let saleLookUpTable = new SaleLookupTable(tableEntryId);
-    saleLookUpTable.token = token.id;
-    saleLookUpTable.project = token.project;
-    saleLookUpTable.sale = sale.id;
-    saleLookUpTable.timestamp = sale.blockTimestamp;
-    saleLookUpTable.blockNumber = sale.blockNumber;
-    saleLookUpTable.save();
+    let saleLookupTable = new SaleLookupTable(tableEntryId);
+
+    saleLookupTable.token = token.id;
+    saleLookupTable.project = token.project;
+    saleLookupTable.sale = saleId;
+    saleLookupTable.timestamp = call.block.timestamp;
+    saleLookupTable.blockNumber = call.block.number;
+    saleLookupTable.save();
   }
 
+  // Create the sale
+  let sale = new Sale(saleId);
+  sale.txHash = call.transaction.hash;
+  sale.exchange = "OS_V2";
+  sale.saleType = "Bundle";
+  sale.blockNumber = call.block.number;
+  sale.blockTimestamp = call.block.timestamp;
+  sale.buyer = buyerAdress;
+  sale.seller = sellerAdress;
+  sale.paymentToken = paymentTokenErc20Address;
+  sale.price = price;
+  sale.isPrivate = isPrivateSale(call.from, addrs);
   sale.summaryTokensSold = summaryTokensSold;
   sale.save();
 }

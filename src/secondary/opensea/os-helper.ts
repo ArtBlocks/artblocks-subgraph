@@ -1,8 +1,8 @@
 import { Address, BigInt, Bytes, ethereum, log, ByteArray, crypto } from "@graphprotocol/graph-ts";
 
-import { WyvernExchange } from "../../../generated/WyvernExchange/WyvernExchange";
+import { AtomicMatch_Call__Inputs as AtomicMatch_Call_V1, WyvernExchange } from "../../../generated/WyvernExchange/WyvernExchange";
 
-import { WyvernExchangeWithBulkCancellations } from "../../../generated/WyvernExchangeWithBulkCancellations/WyvernExchangeWithBulkCancellations";
+import { WyvernExchangeWithBulkCancellations, AtomicMatch_Call__Inputs as AtomicMatch_Call_V2 } from "../../../generated/WyvernExchangeWithBulkCancellations/WyvernExchangeWithBulkCancellations";
 
 import { ERC155_SAFE_TRANSFER_FROM_SELECTOR, ERC721_SAFE_TRANSFER_FROM_SELECTOR, NULL_ADDRESS, TRANSFER_FROM_SELECTOR, WYVERN_EXCHANGE_ADDRESS, WYVERN_EXCHANGE_WITH_BULK_CANCELLATIONS_ADDRESS } from "../../constants";
 
@@ -337,12 +337,13 @@ export function getNftContractAddressAndTokenIdFromAtomicizerCallData(
 }
 
 /**
- * Generate saleId for opensea sales
- * @param calldata merged calldata (buy and sell) 
- * @returns hash of merged calldata from atomicMatch call
+ * Generate sale id using token id and token nextSaleId
+ * @param tokenId 
+ * @param nextSaleId 
+ * @returns 
  */
-export function callInputsToHashId(calldata: Bytes): string {
-  let paramsToHash = ByteArray.fromHexString(calldata.toHexString());
-  let saleId = crypto.keccak256(paramsToHash).toHexString();
-  return saleId;
+export function generateSaleId(tokenId: string, nextSaleId: BigInt): string {
+  return tokenId + "-" + nextSaleId.toString();
 }
+
+

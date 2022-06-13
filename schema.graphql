@@ -107,7 +107,6 @@ type Project @entity {
 
   "Lookup table to get the Sale history of the project"
   saleLookupTables: [SaleLookupTable!]! @derivedFrom(field: "project")
-
 }
 
 type ProjectScript @entity {
@@ -211,6 +210,8 @@ type Token @entity {
   "Lookup table to get the Sale history"
   saleLookupTables: [SaleLookupTable!]! @derivedFrom(field: "token")
   
+  "Next available sale id"
+  nextSaleId: BigInt!
 }
 
 type MinterFilter @entity {
@@ -315,7 +316,7 @@ enum Exchange {
 
 
 type Sale @entity {
-  "The transaction hash when the sale occured"
+  "The sale id formated: tokenId - token.nextSaleId (using first token sold for bundles)"
   id: ID!
 
   "The hash of the transaction"

@@ -18,7 +18,7 @@ import { generateContractSpecificId } from "../../helpers";
 
 import {
   calculateMatchPrice,
-  callInputsToHashId,
+  generateSaleId,
   getNftContractAddressAndTokenIdFromAtomicizerCallData,
   getSingleTokenIdFromTransferFromCallData,
   guardedArrayReplace,
@@ -121,7 +121,7 @@ function _handleSingleAssetSale(call: AtomicMatch_Call): void {
   }
 
   // Create the Sale
-  let saleId = callInputsToHashId(callInputs.calldataBuy);
+  let saleId = generateSaleId(token.id, token.nextSaleId);
   let sale = new Sale(saleId);
   sale.txHash = call.transaction.hash;
   sale.exchange = "OS_V1";
@@ -135,6 +135,9 @@ function _handleSingleAssetSale(call: AtomicMatch_Call): void {
   sale.summaryTokensSold = token.id;
   sale.isPrivate = isPrivateSale(call.from, addrs);
   sale.save();
+
+  token.nextSaleId = token.nextSaleId.plus(BigInt.fromI32(1));
+  token.save();
 
   // Create the associated entry in the Nft <=> lookup table
   let tableEntryId = buildTokenSaleLookupTableId(
@@ -212,19 +215,7 @@ function _handleBundleSale(call: AtomicMatch_Call): void {
     return;
   }
 
-  // Create the sale
-  let saleId = callInputsToHashId(callInputs.calldataBuy);
-  let sale = new Sale(saleId);
-  sale.txHash = call.transaction.hash;
-  sale.exchange = "OS_V1";
-  sale.saleType = "Bundle";
-  sale.blockNumber = call.block.number;
-  sale.blockTimestamp = call.block.timestamp;
-  sale.buyer = buyerAdress;
-  sale.seller = sellerAdress;
-  sale.paymentToken = paymentTokenErc20Address;
-  sale.price = price;
-  sale.isPrivate = isPrivateSale(call.from, addrs);
+  let saleId = "";
 
   // Build the token sold summary and create all the associated entries in the Nft <=> lookup table
   let summaryTokensSold = "";
@@ -244,10 +235,15 @@ function _handleBundleSale(call: AtomicMatch_Call): void {
 
     // Get the asosciated Art Blocks token if any (might not be an AB token)
     let token = Token.load(fullTokenId);
-
     // Skip if this is not a token associated with Art Blocks
     if (!token) {
       continue;
+    }
+
+    if (saleId === "") {
+      saleId = generateSaleId(token.id, token.nextSaleId);
+      token.nextSaleId = token.nextSaleId.plus(BigInt.fromI32(1));
+      token.save();
     }
 
     // Link both of them (NFT with sale)
@@ -261,12 +257,24 @@ function _handleBundleSale(call: AtomicMatch_Call): void {
 
     saleLookupTable.token = token.id;
     saleLookupTable.project = token.project;
-    saleLookupTable.sale = sale.id;
-    saleLookupTable.timestamp = sale.blockTimestamp;
-    saleLookupTable.blockNumber = sale.blockNumber;
+    saleLookupTable.sale = saleId;
+    saleLookupTable.timestamp = call.block.timestamp;
+    saleLookupTable.blockNumber = call.block.number;
     saleLookupTable.save();
   }
 
+  // Create the sale
+  let sale = new Sale(saleId);
+  sale.txHash = call.transaction.hash;
+  sale.exchange = "OS_V1";
+  sale.saleType = "Bundle";
+  sale.blockNumber = call.block.number;
+  sale.blockTimestamp = call.block.timestamp;
+  sale.buyer = buyerAdress;
+  sale.seller = sellerAdress;
+  sale.paymentToken = paymentTokenErc20Address;
+  sale.price = price;
+  sale.isPrivate = isPrivateSale(call.from, addrs);
   sale.summaryTokensSold = summaryTokensSold;
   sale.save();
 }
