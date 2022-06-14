@@ -1,8 +1,8 @@
 import { Address, BigInt, Bytes, ethereum, log, ByteArray, crypto } from "@graphprotocol/graph-ts";
 
-import { AtomicMatch_Call__Inputs as AtomicMatch_Call_V1, WyvernExchange } from "../../../generated/WyvernExchange/WyvernExchange";
+import { WyvernExchange } from "../../../generated/WyvernExchange/WyvernExchange";
 
-import { WyvernExchangeWithBulkCancellations, AtomicMatch_Call__Inputs as AtomicMatch_Call_V2 } from "../../../generated/WyvernExchangeWithBulkCancellations/WyvernExchangeWithBulkCancellations";
+import { WyvernExchangeWithBulkCancellations } from "../../../generated/WyvernExchangeWithBulkCancellations/WyvernExchangeWithBulkCancellations";
 
 import { ERC155_SAFE_TRANSFER_FROM_SELECTOR, ERC721_SAFE_TRANSFER_FROM_SELECTOR, NULL_ADDRESS, TRANSFER_FROM_SELECTOR, WYVERN_EXCHANGE_ADDRESS, WYVERN_EXCHANGE_WITH_BULK_CANCELLATIONS_ADDRESS } from "../../constants";
 
