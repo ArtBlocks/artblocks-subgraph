@@ -6,6 +6,7 @@ import {
 import {
     Address,
     BigInt,
+    Bytes,
     ethereum
 } from "@graphprotocol/graph-ts";
 import {
@@ -68,7 +69,7 @@ export function createTakerBidEvent(
         mockEvent.transaction,
         mockEvent.parameters
     );
-    let orderHash = new ethereum.EventParam('orderHash', ethereum.Value.fromString(orderHashParam));
+    let orderHash = new ethereum.EventParam('orderHash', ethereum.Value.fromFixedBytes(changetype<Bytes>(Bytes.fromHexString(orderHashParam))));
     let orderNonce = new ethereum.EventParam('orderNonce', ethereum.Value.fromUnsignedBigInt(BigInt.fromString(orderNonceParam)));
     let taker = new ethereum.EventParam('taker', ethereum.Value.fromAddress(Address.fromString(takerParam)));
     let maker = new ethereum.EventParam('maker', ethereum.Value.fromAddress(Address.fromString(makerParam)));
@@ -108,7 +109,7 @@ export function createTakerAskEvent(
     priceParam: string = DEFAULT_PRICE,
 ): TakerAsk {
 
-    let strategyAddress = "0x56244bb70cbd3ea9dc8007399f61dfc065190031";
+    let strategyAddress = strategyParam;
     if (isPrivateSale) {
         strategyAddress = "0x58d83536d3efedb9f7f2a1ec3bdaad2b1a4dd98c";
     }
@@ -123,7 +124,7 @@ export function createTakerAskEvent(
         mockEvent.transaction,
         mockEvent.parameters
     );
-    let orderHash = new ethereum.EventParam('orderHash', ethereum.Value.fromString(orderHashParam));
+    let orderHash = new ethereum.EventParam('orderHash', ethereum.Value.fromFixedBytes(changetype<Bytes>(Bytes.fromHexString(orderHashParam))));
     let orderNonce = new ethereum.EventParam('orderNonce', ethereum.Value.fromUnsignedBigInt(BigInt.fromString(orderNonceParam)));
     let taker = new ethereum.EventParam('taker', ethereum.Value.fromAddress(Address.fromString(takerParam)));
     let maker = new ethereum.EventParam('maker', ethereum.Value.fromAddress(Address.fromString(makerParam)));
