@@ -1083,6 +1083,7 @@ export class Token extends Entity {
     this.set("createdAt", Value.fromBigInt(BigInt.zero()));
     this.set("updatedAt", Value.fromBigInt(BigInt.zero()));
     this.set("transactionHash", Value.fromBytes(Bytes.empty()));
+    this.set("nextSaleId", Value.fromBigInt(BigInt.zero()));
   }
 
   save(): void {
@@ -1216,6 +1217,15 @@ export class Token extends Entity {
 
   set saleLookupTables(value: Array<string>) {
     this.set("saleLookupTables", Value.fromStringArray(value));
+  }
+
+  get nextSaleId(): BigInt {
+    let value = this.get("nextSaleId");
+    return value!.toBigInt();
+  }
+
+  set nextSaleId(value: BigInt) {
+    this.set("nextSaleId", Value.fromBigInt(value));
   }
 }
 
