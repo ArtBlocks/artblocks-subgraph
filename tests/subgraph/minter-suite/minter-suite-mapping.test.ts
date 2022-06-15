@@ -2008,7 +2008,7 @@ test("handleAllowHoldersOfProject can add address + project id to extraMinterDet
       ethereum.Value.fromAddress(testAddy)
     ),
     new ethereum.EventParam(
-      "_ownedNftProjectId",
+      "_ownedNFTProjectId",
       ethereum.Value.fromUnsignedBigInt(BigInt.fromI32(1))
     )
   ];
