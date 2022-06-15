@@ -2079,11 +2079,11 @@ test("handleRemoveHoldersOfProject can remove address + project id to extraMinte
       ethereum.Value.fromUnsignedBigInt(projectId)
     ),
     new ethereum.EventParam(
-      "_ownedNftAddress",
+      "_ownedNFTAddress",
       ethereum.Value.fromAddress(testAddy)
     ),
     new ethereum.EventParam(
-      "_ownedNftProjectId",
+      "_ownedNFTProjectId",
       ethereum.Value.fromUnsignedBigInt(BigInt.fromI32(1))
     )
   ];
