@@ -688,7 +688,9 @@ function loadMinterProjectAndConfig(
     !projectMinterConfig ||
     projectMinterConfig.minter != minterAddress.toHexString()
   ) {
-    return null;
+    projectMinterConfig = new ProjectMinterConfiguration(
+      getProjectMinterConfigId(minter.id, project.id)
+    );
   }
 
   return {
