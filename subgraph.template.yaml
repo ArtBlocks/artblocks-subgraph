@@ -751,8 +751,8 @@ dataSources:
         - Minter
         - ProjectMinterConfiguration
       abis:
-        - name: MinterDAExpV1
-          file: ./abis/MinterDAExpV1.json
+        - name: MinterHolderV0
+          file: ./abis/MinterHolderV0.json
         - name: IFilteredMinterV0
           file: ./abis/IFilteredMinterV0.json
       eventHandlers:
@@ -766,6 +766,36 @@ dataSources:
           handler: handleRemoveHoldersOfProject
       file: ./src/minter-suite-mapping.ts
   {{/minterHolderV0Contracts}}
+  {{#minterMerkleV0Contracts}}
+  - kind: ethereum/contract
+    name: 'MinterMerkleV0-{{address}}'
+    network: {{network}}
+    source:
+      address: '{{address}}'
+      abi: MinterMerkleV0
+      startBlock: {{startBlock}}
+    mapping:
+      kind: ethereum/events
+      apiVersion: 0.0.5
+      language: wasm/assemblyscript
+      entities:
+        - Project
+        - Contract
+        - MinterFilter
+        - Minter
+        - ProjectMinterConfiguration
+      abis:
+        - name: MinterMerkleV0
+          file: ./abis/MinterMerkleV0.json
+        - name: IFilteredMinterV0
+          file: ./abis/IFilteredMinterV0.json
+      eventHandlers:
+        - event: ConfigValueSet(indexed uint256,bytes32,bytes32)
+          handler: handleSetBytesValue
+        - event: ConfigValueSet(indexed uint256,bytes32,bool)
+          handler: handleSetBooleanValue
+      file: ./src/minter-suite-mapping.ts
+  {{/minterMerkleV0Contracts}}
   {{#openSeaContractV1}}
   - kind: ethereum/contract
     name: WyvernExchange
