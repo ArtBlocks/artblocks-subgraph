@@ -673,8 +673,8 @@ export function handleHoldersOfProjectGeneric<T>(event: T): void {
   ) {
     return;
   }
-  let address = event.params._ownedNftAddress.toHexString();
-  let holderProjectId = event.params._ownedNftProjectId.toString();
+  let address = event.params._ownedNFTAddress.toHexString();
+  let holderProjectId = event.params._ownedNFTProjectId.toString();
   let bytesValueCombined = Bytes.fromUTF8(address + "-" + holderProjectId);
 
   let newAddEvent: ConfigValueAddedToSetBytes;
