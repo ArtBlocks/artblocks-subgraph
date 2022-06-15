@@ -757,13 +757,13 @@ dataSources:
           file: ./abis/IFilteredMinterV0.json
       eventHandlers:
         - event: AllowlistedNftAddress(indexed address)
-          handler: handleAddMany
+          handler: handleSetAddressValue
         - event: RemovedNftAddress(indexed address)
-          handler: 
-        - event: AllowHoldersOfProject(indexed uint256,address,uint256
+          handler: handleRemoveValue
+        - event: AllowHoldersOfProject(indexed uint256,address,uint256)
           handler: handleAllowHoldersOfProject
-        - event: RemovedHoldersOfProject(indexed uint256,address,uint256
-          handler: handleRemovedHoldersOfProject
+        - event: RemovedHoldersOfProject(indexed uint256,address,uint256)
+          handler: handleRemoveHoldersOfProject
       file: ./src/minter-suite-mapping.ts
   {{/minterHolderV0Contracts}}
   {{#openSeaContractV1}}

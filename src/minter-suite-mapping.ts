@@ -71,7 +71,10 @@ import {
   ConfigValueSet2 as ConfigValueSetAddress,
   ConfigValueSet3 as ConfigValueSetBytes
 } from "../generated/MinterFilterV0/IFilteredMinterV1";
-import { AllowHoldersOfProject } from "../generated/MinterFilterV0/MinterHolderV0";
+import {
+  AllowHoldersOfProject,
+  RemovedHoldersOfProject
+} from "../generated/MinterFilterV0/MinterHolderV0";
 
 // IFilteredMinterV0 events
 export function handlePricePerTokenInWeiUpdated(
@@ -661,18 +664,22 @@ export function handleRemoveBytesManyValue(
 
 // MinterHolder Specific Handlers
 
-export function handleAllowHoldersOfProject(
-  event: AllowHoldersOfProject
-): void {
+export function handleHoldersOfProjectGeneric<T>(event: T): void {
+  if (
+    !(
+      event instanceof AllowHoldersOfProject ||
+      event instanceof RemovedHoldersOfProject
+    )
+  ) {
+    return;
+  }
   let address = event.params._ownedNftAddress.toHexString();
   let holderProjectId = event.params._ownedNftProjectId.toString();
-
   let bytesValueCombined = Bytes.fromUTF8(address + "-" + holderProjectId);
 
-  let newEvent: ConfigValueAddedToSetBytes = changetype<
-    ConfigValueAddedToSetBytes
-  >(event);
-  newEvent.parameters = [
+  let newAddEvent: ConfigValueAddedToSetBytes;
+  let newRemoveEvent: ConfigValueRemovedFromSetBytes;
+  const parameters = [
     new ethereum.EventParam(
       "_projectId",
       ethereum.Value.fromUnsignedBigInt(event.params._projectId)
@@ -686,8 +693,27 @@ export function handleAllowHoldersOfProject(
       ethereum.Value.fromBytes(bytesValueCombined)
     )
   ];
+  if (event instanceof AllowHoldersOfProject) {
+    newAddEvent = changetype<ConfigValueAddedToSetBytes>(event);
+    newAddEvent.parameters = parameters;
+    handleAddManyBytesValue(newAddEvent);
+  } else if (event instanceof RemovedHoldersOfProject) {
+    newRemoveEvent = changetype<ConfigValueRemovedFromSetBytes>(event);
+    newRemoveEvent.parameters = parameters;
+    handleRemoveBytesManyValue(newRemoveEvent);
+  }
+}
 
-  handleAddManyBytesValue(newEvent);
+export function handleAllowHoldersOfProject(
+  event: AllowHoldersOfProject
+): void {
+  handleHoldersOfProjectGeneric(event);
+}
+
+export function handleRemoveHoldersOfProject(
+  event: RemovedHoldersOfProject
+): void {
+  handleHoldersOfProjectGeneric(event);
 }
 
 // Helpers
