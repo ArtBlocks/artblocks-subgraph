@@ -79,7 +79,7 @@ export function handleIsCanonicalMinterFilter(
     );
 
     if (project) {
-      createAndPopulateProjectMinterConfiguration(
+      loadOrCreateAndSetProjectMinterConfiguration(
         project,
         minterAddress,
         event.block.timestamp
@@ -163,7 +163,7 @@ export function handleProjectMinterRegistered(
     // Create project configuration
     let minterAddress = event.params._minterAddress;
 
-    createAndPopulateProjectMinterConfiguration(
+    loadOrCreateAndSetProjectMinterConfiguration(
       project,
       minterAddress,
       event.block.timestamp
@@ -200,7 +200,7 @@ export function handleProjectMinterRemoved(event: ProjectMinterRemoved): void {
   }
 }
 
-function createAndPopulateProjectMinterConfiguration(
+function loadOrCreateAndSetProjectMinterConfiguration(
   project: Project,
   minterAddress: Address,
   timestamp: BigInt
@@ -216,15 +216,13 @@ function createAndPopulateProjectMinterConfiguration(
     projectMinterConfig = new ProjectMinterConfiguration(
       getProjectMinterConfigId(minterAddress.toHexString(), project.id)
     );
+    projectMinterConfig.project = project.id;
+    projectMinterConfig.minter = minterAddress.toHexString();
+    projectMinterConfig.save();
   }
-
-  projectMinterConfig.project = project.id;
-  projectMinterConfig.minter = minterAddress.toHexString();
-  projectMinterConfig.save();
 
   project.updatedAt = timestamp;
   project.minterConfiguration = projectMinterConfig.id;
-
   project.save();
 
   return projectMinterConfig;

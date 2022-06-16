@@ -220,6 +220,7 @@ test("handleIsCanonicalMinterFilter should populate project minter configuration
     getProjectMinterConfigId(minterSetPriceV0Address.toHexString(), project0.id)
   );
   previousMinterConfig0.minter = minterSetPriceV0Address.toHexString();
+  previousMinterConfig0.project = project0.id;
   previousMinterConfig0.basePrice = project0BasePrice;
   previousMinterConfig0.priceIsConfigured = project0PriceIsConfigured;
   previousMinterConfig0.currencyAddress = project0CurrencyAddress;
@@ -256,6 +257,7 @@ test("handleIsCanonicalMinterFilter should populate project minter configuration
     )
   );
   previousMinterConfig1.minter = minterSetPriceERC20V0Address.toHexString();
+  previousMinterConfig1.project = project1.id;
   previousMinterConfig1.basePrice = project1BasePrice;
   previousMinterConfig1.priceIsConfigured = project1PriceIsConfigured;
   previousMinterConfig1.currencyAddress = project1CurrencyAddress;
@@ -292,6 +294,7 @@ test("handleIsCanonicalMinterFilter should populate project minter configuration
     getProjectMinterConfigId(minterDALinV0Address.toHexString(), project2.id)
   );
   previousMinterConfig2.minter = minterDALinV0Address.toHexString();
+  previousMinterConfig2.project = project2.id;
   previousMinterConfig2.basePrice = project2BasePrice;
   previousMinterConfig2.priceIsConfigured = project2PriceIsConfigured;
   previousMinterConfig2.currencyAddress = project2CurrencyAddress;
@@ -336,6 +339,7 @@ test("handleIsCanonicalMinterFilter should populate project minter configuration
     getProjectMinterConfigId(minterDAExpV0Address.toHexString(), project3.id)
   );
   previousMinterConfig3.minter = minterDAExpV0Address.toHexString();
+  previousMinterConfig3.project = project3.id;
   previousMinterConfig3.basePrice = project3BasePrice;
   previousMinterConfig3.priceIsConfigured = project3PriceIsConfigured;
   previousMinterConfig3.currencyAddress = project3CurrencyAddress;
@@ -1105,6 +1109,7 @@ test("handleProjectMinterRegistered should populate project from prior minter co
     getProjectMinterConfigId(minterAddress.toHexString(), project.id)
   );
   previousMinterConfig.minter = minter.id;
+  previousMinterConfig.project = project.id;
   previousMinterConfig.basePrice = projectBasePrice;
   previousMinterConfig.priceIsConfigured = projectPriceIsConfigured;
   previousMinterConfig.currencyAddress = projectCurrencyAddress;

@@ -101,7 +101,7 @@ export function getMinterDetails(
   let jsonResult = json.try_fromString(projectMinterConfig.extraMinterDetails);
 
   let minterDetails: TypedMap<string, JSONValue>;
-  if (jsonResult.isOk) {
+  if (jsonResult.isOk && jsonResult.value.kind == JSONValueKind.OBJECT) {
     minterDetails = jsonResult.value.toObject();
   } else {
     minterDetails = new TypedMap();
