@@ -210,10 +210,6 @@ type Token @entity {
 
   transfers: [Transfer!] @derivedFrom(field: "token")
 
-  "Lookup table to get the OpenSea Sale history"
-  openSeaSaleLookupTables: [OpenSeaSaleLookupTable!]!
-    @derivedFrom(field: "token")
-
   "Lookup table to get the Sale history"
   saleLookupTables: [SaleLookupTable!]! @derivedFrom(field: "token")
   
