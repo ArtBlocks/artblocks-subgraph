@@ -60,7 +60,7 @@ export function handleIsCanonicalMinterFilter(
     }
   }
 
-  // Check the new minter filter for preconfigured projects and populate accordingly
+  // Check the new minter filter for any pre-allowlisted minters and update Projects accordingly
   let minterFilterContract = MinterFilterV0.bind(event.address);
   let numProjectsWithMinters = minterFilterContract.getNumProjectsWithMinters();
   for (
@@ -226,7 +226,6 @@ function createAndPopulateProjectMinterConfiguration(
   project.minterConfiguration = projectMinterConfig.id;
 
   project.save();
-  projectMinterConfig.save();
 
   return projectMinterConfig;
 }
