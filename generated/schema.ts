@@ -1431,6 +1431,7 @@ export class ProjectMinterConfiguration extends Entity {
     this.set("currencySymbol", Value.fromString(""));
     this.set("currencyAddress", Value.fromBytes(Bytes.empty()));
     this.set("purchaseToDisabled", Value.fromBoolean(false));
+    this.set("extraMinterDetails", Value.fromString(""));
   }
 
   save(): void {
@@ -1601,6 +1602,15 @@ export class ProjectMinterConfiguration extends Entity {
     } else {
       this.set("endTime", Value.fromBigInt(<BigInt>value));
     }
+  }
+
+  get extraMinterDetails(): string {
+    let value = this.get("extraMinterDetails");
+    return value!.toString();
+  }
+
+  set extraMinterDetails(value: string) {
+    this.set("extraMinterDetails", Value.fromString(value));
   }
 }
 
