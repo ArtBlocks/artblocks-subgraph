@@ -68,6 +68,7 @@ export const CONTRACT_ENTITY_TYPE = "Contract";
 export const WHITELISTING_ENTITY_TYPE = "Whitelisting";
 export const PROJECT_SCRIPT_ENTITY_TYPE = "ProjectScript";
 export const TOKEN_ENTITY_TYPE = "Token";
+export const TRANSFER_ENTITY_TYPE = "Transfer";
 export const PROJECT_MINTER_CONFIGURATION_ENTITY_TYPE =
   "ProjectMinterConfiguration";
 export const MINTER_FILTER_ENTITY_TYPE = "MinterFilter";
