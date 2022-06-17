@@ -58,7 +58,8 @@ import {
   handleSetAddressValue,
   handleSetBigIntValue,
   handleSetBooleanValue,
-  handleSetBytesValue
+  handleSetBytesValue,
+  handleUnregisteredNFTAddress
 } from "../../../src/minter-suite-mapping";
 import {
   AuctionHalfLifeRangeSecondsUpdated,
@@ -85,9 +86,10 @@ import {
 } from "../../../generated/MinterFilterV0/IFilteredMinterV1";
 import {
   AllowHoldersOfProject,
-  RemovedHoldersOfProject
-} from "../../../generated/MinterFilterV0/MinterHolderV0";
-import { RegisteredNFTAddress } from "../../../generated/MinterHolderV0/MinterHolderV0";
+  RemovedHoldersOfProject,
+  RegisteredNFTAddress,
+  UnregisteredNFTAddress
+} from "../../../generated/MinterHolderV0/MinterHolderV0";
 
 const randomAddressGenerator = new RandomAddressGenerator();
 
@@ -2126,6 +2128,37 @@ test("handleRegisteredNFTAddress adds the address, as a string to the minter", (
     MINTER_ENTITY_TYPE,
     minter.id,
     "allowlistedNFTAddresses",
-    testAddy.toHexString()
+    "[" + testAddy.toHexString() + "]"
+  );
+});
+test("handleUnRegisteredNFTAddress adds the address, as a string to the minter", () => {
+  clearStore();
+  const minterAddress = randomAddressGenerator.generateRandomAddress();
+  const minterType = "MinterHolderV0";
+  const minter = new Minter(minterAddress.toHexString());
+  minter.coreContract = TEST_CONTRACT_ADDRESS.toHexString();
+  minter.type = minterType;
+  let addresses: string[] = [];
+  const testAddy = randomAddressGenerator.generateRandomAddress();
+  addresses.push(testAddy.toHexString());
+  minter.allowlistedNFTAddresses = addresses;
+  minter.save();
+
+  const unregisterNFTAddressEvent: UnregisteredNFTAddress = changetype<
+    UnregisteredNFTAddress
+  >(newMockEvent());
+  unregisterNFTAddressEvent.address = minterAddress;
+  unregisterNFTAddressEvent.parameters = [
+    new ethereum.EventParam("_NFTAddress", ethereum.Value.fromAddress(testAddy))
+  ];
+  unregisterNFTAddressEvent.block.timestamp = CURRENT_BLOCK_TIMESTAMP;
+
+  handleUnregisteredNFTAddress(unregisterNFTAddressEvent);
+
+  assert.fieldEquals(
+    MINTER_ENTITY_TYPE,
+    minter.id,
+    "allowlistedNFTAddresses",
+    "[]"
   );
 });

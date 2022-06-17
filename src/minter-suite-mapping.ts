@@ -75,9 +75,9 @@ import {
 import {
   AllowHoldersOfProject,
   RegisteredNFTAddress,
-  UnregisteredNFTAddress
+  UnregisteredNFTAddress,
+  RemovedHoldersOfProject
 } from "../generated/MinterHolderV0/MinterHolderV0";
-import { RemovedHoldersOfProject } from "../generated/MinterFilterV0/MinterHolderV0";
 
 // IFilteredMinterV0 events
 export function handlePricePerTokenInWeiUpdated(
@@ -719,29 +719,36 @@ export function handleRemoveHoldersOfProject(
   handleHoldersOfProjectGeneric(event);
 }
 
-export function handleRegisteredNFTAddress(event: RegisteredNFTAddress) {
+export function handleRegisteredNFTAddress(event: RegisteredNFTAddress): void {
   let minter = loadOrCreateMinter(event.address, event.block.timestamp);
-  if (!minter) {
-    return null;
+  if (minter) {
+    let addresses: string[] = [];
+    addresses.push(event.params._NFTAddress.toHexString());
+    minter.allowlistedNFTAddresses = addresses;
+    minter.updatedAt = event.block.timestamp;
+    minter.save();
   }
-
-  minter.allowlistedNFTAddresses.push(event.params._NFTAddress.toHexString());
-  minter.updatedAt = event.block.timestamp;
-  minter.save();
 }
 
-export function handleUnregisteredNFTAddress(event: UnregisteredNFTAddress) {
+export function handleUnregisteredNFTAddress(
+  event: UnregisteredNFTAddress
+): void {
   let minter = loadOrCreateMinter(event.address, event.block.timestamp);
-  if (!minter) {
-    return null;
-  }
 
-  let newAddresses = minter.allowlistedNFTAddresses.filter(
-    (address: string) => address != event.params._NFTAddress.toHexString()
-  );
-  minter.allowlistedNFTAddresses = newAddresses;
-  minter.updatedAt = event.block.timestamp;
-  minter.save();
+  if (minter) {
+    let addresses: string[] = [];
+    for (let i = 0; i < addresses.length; i++) {
+      if (
+        minter.allowlistedNFTAddresses[i] !=
+        event.params._NFTAddress.toHexString()
+      ) {
+        addresses.push(minter.allowlistedNFTAddresses[i]);
+      }
+    }
+    minter.allowlistedNFTAddresses = addresses;
+    minter.updatedAt = event.block.timestamp;
+    minter.save();
+  }
 }
 
 // Helpers
