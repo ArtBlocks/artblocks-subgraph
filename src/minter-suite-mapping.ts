@@ -725,8 +725,7 @@ export function handleRegisteredNFTAddress(event: RegisteredNFTAddress) {
     return null;
   }
 
-  let contract = Contract.load(event.params._NFTAddress.toHexString());
-  minter.allowlistedNFTAddresses.push(contract.id);
+  minter.allowlistedNFTAddresses.push(event.params._NFTAddress.toHexString());
   minter.updatedAt = event.block.timestamp;
   minter.save();
 }

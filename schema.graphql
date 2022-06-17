@@ -257,7 +257,7 @@ type Minter @entity {
   maximumHalfLifeInSeconds: BigInt
 
   "Allowed AB and PBAB NFT Contract Addresses"
-  allowlistedNFTAddresses: [Contract!] 
+  allowlistedNFTAddresses: [String!] 
 
   coreContract: Contract!
 
