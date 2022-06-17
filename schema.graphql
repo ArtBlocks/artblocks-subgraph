@@ -207,6 +207,8 @@ type Token @entity {
   "Transaction hash of token mint"
   transactionHash: Bytes!
 
+  transfers: [Transfer!] @derivedFrom(field: "token")
+
   "Lookup table to get the Sale history"
   saleLookupTables: [SaleLookupTable!]! @derivedFrom(field: "token")
   
@@ -298,6 +300,9 @@ type ProjectMinterConfiguration @entity {
 
   "Linear Dutch auction end time (unix timestamp)"
   endTime: BigInt
+
+  "Configuration details used by specific minters (json string)"
+  extraMinterDetails: String!
 }
 
 enum SaleType {
@@ -390,4 +395,18 @@ type SaleLookupTable @entity {
 
   "The associated sale"
   sale: Sale!
+}
+
+type Transfer @entity(immutable: true){
+  id: ID!
+
+  transactionHash: Bytes!
+
+  token: Token! 
+
+  createdAt: BigInt!
+
+  to: Bytes!
+
+  from: Bytes!
 }

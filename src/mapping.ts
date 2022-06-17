@@ -8,6 +8,7 @@ import {
   Address,
   ByteArray
 } from "@graphprotocol/graph-ts";
+import { logStore } from "matchstick-as";
 
 import {
   GenArt721Core,
@@ -57,6 +58,7 @@ import {
 import {
   Project,
   Token,
+  Transfer as TokenTransfer,
   Account,
   AccountProject,
   Contract,
@@ -174,6 +176,16 @@ export function handleTransfer(event: Transfer): void {
     token.owner = event.params.to.toHexString();
     token.updatedAt = event.block.timestamp;
     token.save();
+
+    let transfer = new TokenTransfer(
+      event.transaction.hash.toHex() + "-" + event.logIndex.toString()
+    );
+    transfer.transactionHash = event.transaction.hash;
+    transfer.createdAt = event.block.timestamp;
+    transfer.to = event.params.to;
+    transfer.from = event.params.from;
+    transfer.token = token.id;
+    transfer.save();
   }
 }
 /*** END EVENT HANDLERS ***/

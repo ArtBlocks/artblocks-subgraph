@@ -2,9 +2,10 @@ import {
   assert,
   clearStore,
   test,
-  newMockCall
+  newMockCall,
+  newMockEvent
 } from "matchstick-as/assembly/index";
-import { BigInt, ethereum } from "@graphprotocol/graph-ts";
+import { BigInt, Bytes, ethereum } from "@graphprotocol/graph-ts";
 import {
   ACCOUNT_ENTITY_TYPE,
   PROJECT_ENTITY_TYPE,
@@ -21,7 +22,8 @@ import {
   assertNewProjectFields,
   assertTestContractFields,
   addTestContractToStore,
-  TEST_CONTRACT
+  TEST_CONTRACT,
+  TRANSFER_ENTITY_TYPE
 } from "../shared-helpers";
 
 import {
@@ -70,7 +72,8 @@ import {
   UpdateProjectWebsiteCall,
   UpdateProjectSecondaryMarketRoyaltyPercentageCall,
   UpdateProjectScriptCall,
-  UpdateProjectScriptJSONCall
+  UpdateProjectScriptJSONCall,
+  Transfer
 } from "../../../generated/GenArt721/GenArt721";
 import {
   handleAddProject,
@@ -101,7 +104,8 @@ import {
   handleUpdateProjectWebsite,
   handleUpdateProjectSecondaryMarketRoyaltyPercentage,
   handleUpdateProjectScript,
-  handleUpdateProjectScriptJSON
+  handleUpdateProjectScriptJSON,
+  handleTransfer
 } from "../../../src/original-mapping";
 
 import {
@@ -1843,7 +1847,64 @@ test("GenArt721: Can update a project website", () => {
     updateCallBlockTimestamp.toString()
   );
 });
+test("GenArt721: Can handle transfer", () => {
+  clearStore();
+  const tokenId = BigInt.fromI32(0);
+  const fullTokenId = generateContractSpecificId(
+    TEST_CONTRACT_ADDRESS,
+    tokenId
+  );
 
+  const token = new Token(fullTokenId);
+  token.save();
+
+  const fromAddress = randomAddressGenerator.generateRandomAddress();
+  const toAddress = randomAddressGenerator.generateRandomAddress();
+
+  const hash = Bytes.fromUTF8("QmYwAPJzv5CZsnA625s3Xf2nemtYgPpHdWEz79ojWnPbdG");
+
+  const logIndex = BigInt.fromI32(0);
+
+  const event: Transfer = changetype<Transfer>(newMockEvent());
+  event.address = TEST_CONTRACT_ADDRESS;
+  event.transaction.hash = hash;
+  event.logIndex = logIndex;
+  event.parameters = [
+    new ethereum.EventParam("from", ethereum.Value.fromAddress(fromAddress)),
+    new ethereum.EventParam("to", ethereum.Value.fromAddress(toAddress)),
+    new ethereum.EventParam(
+      "tokenId",
+      ethereum.Value.fromUnsignedBigInt(tokenId)
+    )
+  ];
+
+  handleTransfer(event);
+
+  assert.fieldEquals(
+    TOKEN_ENTITY_TYPE,
+    fullTokenId,
+    "owner",
+    toAddress.toHexString()
+  );
+  assert.fieldEquals(
+    TRANSFER_ENTITY_TYPE,
+    hash.toHex() + "-" + logIndex.toString(),
+    "to",
+    toAddress.toHexString()
+  );
+  assert.fieldEquals(
+    TRANSFER_ENTITY_TYPE,
+    hash.toHex() + "-" + logIndex.toString(),
+    "from",
+    fromAddress.toHexString()
+  );
+  assert.fieldEquals(
+    TRANSFER_ENTITY_TYPE,
+    hash.toHex() + "-" + logIndex.toString(),
+    "token",
+    fullTokenId
+  );
+});
 export {
   handleAddProject,
   handleAddWhitelisted,

@@ -1,4 +1,5 @@
-import { BigInt, store, Address, log } from "@graphprotocol/graph-ts";
+import { BigInt, store, Address } from "@graphprotocol/graph-ts";
+import { logStore } from "matchstick-as";
 
 import {
   MinterFilterV0,
@@ -9,13 +10,6 @@ import {
   ProjectMinterRemoved
 } from "../generated/MinterFilterV0/MinterFilterV0";
 
-import { MinterDALinV0 } from "../generated/MinterDALinV0/MinterDALinV0";
-import { MinterDAExpV0 } from "../generated/MinterDAExpV0/MinterDAExpV0";
-import { MinterSetPriceV0 } from "../generated/MinterSetPriceV0/MinterSetPriceV0";
-import { MinterSetPriceERC20V0 } from "../generated/MinterSetPriceERC20V0/MinterSetPriceERC20V0";
-import { MinterDALinV1 } from "../generated/MinterDALinV1/MinterDALinV1";
-import { MinterDAExpV1 } from "../generated/MinterDAExpV1/MinterDAExpV1";
-
 import {
   Project,
   Contract,
@@ -24,8 +18,11 @@ import {
   ProjectMinterConfiguration
 } from "../generated/schema";
 
-import { generateContractSpecificId, loadOrCreateMinter } from "./helpers";
-import { IFilteredMinterV0 } from "../generated/MinterSetPriceV0/IFilteredMinterV0";
+import {
+  generateContractSpecificId,
+  getProjectMinterConfigId,
+  loadOrCreateMinter
+} from "./helpers";
 
 export function handleIsCanonicalMinterFilter(
   event: IsCanonicalMinterFilter
@@ -61,14 +58,9 @@ export function handleIsCanonicalMinterFilter(
       project.updatedAt = event.block.timestamp;
       project.save();
     }
-
-    let prevMinterConfig = ProjectMinterConfiguration.load(fullProjectId);
-    if (prevMinterConfig) {
-      store.remove("ProjectMinterConfiguration", fullProjectId);
-    }
   }
 
-  // Check the new minter filter for preconfigured projects and populate accordingly
+  // Check the new minter filter for any pre-allowlisted minters and update Projects accordingly
   let minterFilterContract = MinterFilterV0.bind(event.address);
   let numProjectsWithMinters = minterFilterContract.getNumProjectsWithMinters();
   for (
@@ -81,17 +73,15 @@ export function handleIsCanonicalMinterFilter(
     );
     let projectId = projectAndMinterInfo.value0;
     let minterAddress = projectAndMinterInfo.value1;
-    let minterType = projectAndMinterInfo.value2;
 
     let project = Project.load(
       generateContractSpecificId(event.params._coreContractAddress, projectId)
     );
 
     if (project) {
-      createAndPopulateProjectMinterConfiguration(
+      loadOrCreateAndSetProjectMinterConfiguration(
         project,
         minterAddress,
-        minterType,
         event.block.timestamp
       );
     }
@@ -170,20 +160,12 @@ export function handleProjectMinterRegistered(
   );
 
   if (project) {
-    // Clear previous minter configuration
-    let prevMinterConfig = ProjectMinterConfiguration.load(project.id);
-    if (prevMinterConfig) {
-      store.remove("ProjectMinterConfiguration", project.id);
-    }
-
     // Create project configuration
     let minterAddress = event.params._minterAddress;
-    let minterType = event.params._minterType;
 
-    createAndPopulateProjectMinterConfiguration(
+    loadOrCreateAndSetProjectMinterConfiguration(
       project,
       minterAddress,
-      minterType,
       event.block.timestamp
     );
   }
@@ -212,147 +194,38 @@ export function handleProjectMinterRemoved(event: ProjectMinterRemoved): void {
   );
 
   if (project) {
-    let prevMinterConfig = ProjectMinterConfiguration.load(project.id);
-    if (prevMinterConfig) {
-      store.remove("ProjectMinterConfiguration", project.id);
-    }
-    if (project.minterConfiguration) {
-      project.minterConfiguration = null;
-      project.updatedAt = event.block.timestamp;
-      project.save();
-    }
+    project.minterConfiguration = null;
+    project.updatedAt = event.block.timestamp;
+    project.save();
   }
 }
 
-function createAndPopulateProjectMinterConfiguration(
+function loadOrCreateAndSetProjectMinterConfiguration(
   project: Project,
   minterAddress: Address,
-  minterType: string,
   timestamp: BigInt
 ): ProjectMinterConfiguration {
   // Bootstrap minter if it doesn't exist already
   loadOrCreateMinter(minterAddress, timestamp);
 
-  let projectMinterConfig = new ProjectMinterConfiguration(project.id);
-  projectMinterConfig.project = project.id;
-  projectMinterConfig.minter = minterAddress.toHexString();
+  let projectMinterConfig = ProjectMinterConfiguration.load(
+    getProjectMinterConfigId(minterAddress.toHexString(), project.id)
+  );
 
-  let filteredMinterContract = IFilteredMinterV0.bind(minterAddress);
-  let projectPriceInfo = filteredMinterContract.getPriceInfo(project.projectId);
-  projectMinterConfig.priceIsConfigured = projectPriceInfo.value0;
-  projectMinterConfig.basePrice = projectPriceInfo.value1;
-  projectMinterConfig.currencySymbol = projectPriceInfo.value2;
-  projectMinterConfig.currencyAddress = projectPriceInfo.value3;
-
-  if (minterType == "MinterDALinV0") {
-    assignDALinMinterConfig(
-      MinterDALinV0.bind(minterAddress),
-      project.projectId,
-      projectMinterConfig
+  if (projectMinterConfig == null) {
+    projectMinterConfig = new ProjectMinterConfiguration(
+      getProjectMinterConfigId(minterAddress.toHexString(), project.id)
     );
-  } else if (minterType == "MinterDALinV1") {
-    assignDALinMinterConfig(
-      MinterDALinV1.bind(minterAddress),
-      project.projectId,
-      projectMinterConfig
-    );
-  } else if (minterType == "MinterDAExpV0") {
-    assignDAExpMinterConfig(
-      MinterDAExpV0.bind(minterAddress),
-      project.projectId,
-      projectMinterConfig
-    );
-  } else if (minterType == "MinterDAExpV1") {
-    assignDAExpMinterConfig(
-      MinterDAExpV1.bind(minterAddress),
-      project.projectId,
-      projectMinterConfig
-    );
-  } else if (minterType == "MinterSetPriceV0") {
-    let minterSetPriceV0Contract = MinterSetPriceV0.bind(minterAddress);
-
-    projectMinterConfig.purchaseToDisabled = minterSetPriceV0Contract.purchaseToDisabled(
-      project.projectId
-    );
-  } else if (minterType == "MinterSetPriceERC20V0") {
-    let minterSetPriceERC20V0Contract = MinterSetPriceERC20V0.bind(
-      minterAddress
-    );
-
-    projectMinterConfig.purchaseToDisabled = minterSetPriceERC20V0Contract.purchaseToDisabled(
-      project.projectId
-    );
+    projectMinterConfig.project = project.id;
+    projectMinterConfig.minter = minterAddress.toHexString();
+    projectMinterConfig.save();
   }
-
-  projectMinterConfig.save();
 
   project.updatedAt = timestamp;
   project.minterConfiguration = projectMinterConfig.id;
   project.save();
 
   return projectMinterConfig;
-}
-
-function assignDALinMinterConfig<T>(
-  minterDALinContract: T,
-  projectId: BigInt,
-  projectMinterConfig: ProjectMinterConfiguration
-): void {
-  if (
-    !(
-      minterDALinContract instanceof MinterDALinV0 ||
-      minterDALinContract instanceof MinterDALinV1
-    )
-  ) {
-    return;
-  }
-
-  projectMinterConfig.purchaseToDisabled =
-    minterDALinContract instanceof MinterDALinV0
-      ? changetype<MinterDALinV0>(minterDALinContract).purchaseToDisabled(
-          projectId
-        )
-      : false;
-
-  let projectAuctionParameters = minterDALinContract.projectAuctionParameters(
-    projectId
-  );
-
-  projectMinterConfig.startTime = projectAuctionParameters.value0;
-  projectMinterConfig.endTime = projectAuctionParameters.value1;
-  projectMinterConfig.startPrice = projectAuctionParameters.value2;
-  projectMinterConfig.basePrice = projectAuctionParameters.value3;
-}
-
-function assignDAExpMinterConfig<T>(
-  minterDAExpContract: T,
-  projectId: BigInt,
-  projectMinterConfig: ProjectMinterConfiguration
-): void {
-  if (
-    !(
-      minterDAExpContract instanceof MinterDAExpV0 ||
-      minterDAExpContract instanceof MinterDAExpV1
-    )
-  ) {
-    return;
-  }
-
-  projectMinterConfig.purchaseToDisabled =
-    minterDAExpContract instanceof MinterDAExpV0
-      ? changetype<MinterDAExpV0>(minterDAExpContract).purchaseToDisabled(
-          projectId
-        )
-      : false;
-
-  let projectAuctionParameters = minterDAExpContract.projectAuctionParameters(
-    projectId
-  );
-
-  projectMinterConfig.startTime = projectAuctionParameters.value0;
-  projectMinterConfig.halfLifeSeconds = projectAuctionParameters.value1;
-  projectMinterConfig.startPrice = projectAuctionParameters.value2;
-  projectMinterConfig.basePrice = projectAuctionParameters.value3;
 }
 
 function loadOrCreateMinterFilter(

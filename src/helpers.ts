@@ -1,10 +1,18 @@
-import { Address, BigInt } from "@graphprotocol/graph-ts";
+import {
+  Address,
+  BigInt,
+  ethereum,
+  json,
+  JSONValue,
+  JSONValueKind,
+  TypedMap
+} from "@graphprotocol/graph-ts";
 import { MinterDAExpV0 } from "../generated/MinterDAExpV0/MinterDAExpV0";
 import { MinterDAExpV1 } from "../generated/MinterDAExpV1/MinterDAExpV1";
 import { MinterDALinV0 } from "../generated/MinterDALinV0/MinterDALinV0";
 import { MinterDALinV1 } from "../generated/MinterDALinV1/MinterDALinV1";
 import { IFilteredMinterV0 } from "../generated/MinterSetPriceV0/IFilteredMinterV0";
-import { Minter } from "../generated/schema";
+import { Minter, ProjectMinterConfiguration } from "../generated/schema";
 
 export function generateAccountProjectId(
   accountId: string,
@@ -32,6 +40,13 @@ export function generateProjectScriptId(
   scriptIndex: BigInt
 ): string {
   return projectId + "-" + scriptIndex.toString();
+}
+
+export function getProjectMinterConfigId(
+  minterId: string,
+  projectId: string
+): string {
+  return minterId + "-" + projectId.split("-")[1];
 }
 
 export function loadOrCreateMinter(
@@ -74,4 +89,79 @@ export function loadOrCreateMinter(
   minter.updatedAt = timestamp;
   minter.save();
   return minter;
+}
+
+export function booleanToString(b: boolean): string {
+  return b ? "true" : "false";
+}
+
+export function getMinterDetails(
+  projectMinterConfig: ProjectMinterConfiguration
+): TypedMap<string, JSONValue> {
+  let jsonResult = json.try_fromString(projectMinterConfig.extraMinterDetails);
+
+  let minterDetails: TypedMap<string, JSONValue>;
+  if (jsonResult.isOk && jsonResult.value.kind == JSONValueKind.OBJECT) {
+    minterDetails = jsonResult.value.toObject();
+  } else {
+    minterDetails = new TypedMap();
+  }
+  return minterDetails;
+}
+
+export function typedMapToJSONString(map: TypedMap<String, JSONValue>): string {
+  let jsonString = "{";
+  for (let i = 0; i < map.entries.length; i++) {
+    let entry = map.entries[i];
+    let val = entry.value;
+    let newVal = "";
+    let quoted = "";
+    if (JSONValueKind.BOOL == val.kind) {
+      newVal = booleanToString(val.toBool());
+    } else if (JSONValueKind.NUMBER == val.kind) {
+      newVal = val.toBigInt().toString();
+    } else if (JSONValueKind.STRING == val.kind) {
+      newVal = val.toString();
+      quoted = '"';
+    } else if (JSONValueKind.ARRAY == val.kind) {
+      newVal =
+        "[" +
+        val
+          .toArray()
+          .map<string>((v: JSONValue) => {
+            let mapped = "";
+            if (JSONValueKind.BOOL == v.kind) {
+              mapped = booleanToString(v.toBool());
+            } else if (JSONValueKind.STRING == v.kind) {
+              mapped = '"' + v.toString() + '"';
+            } else if (JSONValueKind.NUMBER == v.kind) {
+              mapped = v.toBigInt().toString();
+            }
+            return mapped;
+          })
+          .toString() +
+        "]";
+    }
+
+    jsonString +=
+      stringToJSONString(entry.key.toString()) +
+      ":" +
+      quoted +
+      newVal +
+      quoted +
+      (i == map.entries.length - 1 ? "" : ",");
+  }
+  jsonString += "}";
+  return jsonString;
+}
+
+export function stringToJSONValue(value: string): JSONValue {
+  return json.fromString('["' + value + '"]').toArray()[0];
+}
+export function arrayToJSONValue(value: string): JSONValue {
+  return json.fromString("[" + value + "]");
+}
+
+export function stringToJSONString(value: string): string {
+  return '"' + value + '"';
 }
