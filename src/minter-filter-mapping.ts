@@ -21,11 +21,13 @@ import {
   Contract,
   MinterFilter,
   Minter,
-  ProjectMinterConfiguration
+  ProjectMinterConfiguration,
+  MinterFilterAllowlisting
 } from "../generated/schema";
 
 import {
   generateContractSpecificId,
+  getMinterFilterAllowlistingId,
   getProjectMinterConfigId,
   loadOrCreateMinter
 } from "./helpers";
@@ -112,13 +114,26 @@ export function handleMinterApproved(event: MinterApproved): void {
     event.block.timestamp
   );
 
-  // Don't add the minter if it's minter filter is different
+  // Don't add the allowlisting if minter's minter filter is different
   // from the minter filter that emitted this event.
   if (minter.minterFilter != minterFilter.id) {
-    store.remove("Minter", minter.id);
     return;
   }
 
+  let minterFilterAllowlisting = MinterFilterAllowlisting.load(
+    getMinterFilterAllowlistingId(minter.id, minterFilter.id)
+  );
+  if (!minterFilterAllowlisting) {
+    // create and save new MinterFilterAllowlisting
+    minterFilterAllowlisting = new MinterFilterAllowlisting(
+      getMinterFilterAllowlistingId(minter.id, minterFilter.id)
+    );
+    minterFilterAllowlisting.minter = minter.id;
+    minterFilterAllowlisting.minterFilter = minterFilter.id;
+    minterFilterAllowlisting.save();
+  }
+
+  // update minterFilter updatedAt
   minterFilter.updatedAt = event.block.timestamp;
   minterFilter.save();
 }
@@ -129,11 +144,22 @@ export function handleMinterRevoked(event: MinterRevoked): void {
   // we can avoid resetting any minter config for a project here.
   let minter = Minter.load(event.params._minterAddress.toHexString());
   if (minter) {
-    store.remove("Minter", event.params._minterAddress.toHexString());
-    let minterFilter = MinterFilter.load(event.address.toHexString());
-    if (minterFilter) {
-      minterFilter.updatedAt = event.block.timestamp;
-      minterFilter.save();
+    // keep the Minter in the store to avoid having to re-populate it is
+    // re-approved
+
+    // remove existing MinterFilterAllowlisting
+    let minterFilterAllowlisting = MinterFilterAllowlisting.load(
+      getMinterFilterAllowlistingId(minter.id, event.address.toHexString())
+    );
+    if (minterFilterAllowlisting) {
+      store.remove("MinterFilterAllowlisting", minterFilterAllowlisting.id);
+
+      // update the affected MinterFilter
+      let minterFilter = MinterFilter.load(event.address.toHexString());
+      if (minterFilter) {
+        minterFilter.updatedAt = event.block.timestamp;
+        minterFilter.save();
+      }
     }
   }
 }

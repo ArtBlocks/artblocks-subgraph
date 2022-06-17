@@ -49,6 +49,13 @@ export function getProjectMinterConfigId(
   return minterId + "-" + projectId.split("-")[1];
 }
 
+export function getMinterFilterAllowlistingId(
+  minterId: string,
+  minterfilterId: string
+): string {
+  return minterId + "-" + minterfilterId;
+}
+
 export function loadOrCreateMinter(
   minterAddress: Address,
   timestamp: BigInt
@@ -58,10 +65,17 @@ export function loadOrCreateMinter(
     return minter;
   }
 
+  // create new Minter entity
+  /**
+   * @dev Minter entities are persisted, so populating then entity with any
+   * configuration options set outside of the contract's deployment or
+   * constructor is not necessary.
+   */
   minter = new Minter(minterAddress.toHexString());
   let filteredMinterContract = IFilteredMinterV0.bind(minterAddress);
   let minterType = filteredMinterContract.minterType();
 
+  // values assigned in contract constructors
   minter.type = minterType;
   minter.minterFilter = filteredMinterContract
     .minterFilterAddress()
@@ -70,6 +84,7 @@ export function loadOrCreateMinter(
     .genArt721CoreAddress()
     .toHexString();
 
+  // values assigned during contract deployments
   if (minterType == "MinterDALinV0") {
     let minterDALinV0Contract = MinterDALinV0.bind(minterAddress);
     minter.minimumAuctionLengthInSeconds = minterDALinV0Contract.minimumAuctionLengthSeconds();

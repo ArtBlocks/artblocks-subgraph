@@ -1282,6 +1282,65 @@ export class MinterFilter extends Entity {
   }
 }
 
+export class MinterFilterAllowlisting extends Entity {
+  constructor(id: string) {
+    super();
+    this.set("id", Value.fromString(id));
+
+    this.set("minter", Value.fromString(""));
+    this.set("minterFilter", Value.fromString(""));
+  }
+
+  save(): void {
+    let id = this.get("id");
+    assert(
+      id != null,
+      "Cannot save MinterFilterAllowlisting entity without an ID"
+    );
+    if (id) {
+      assert(
+        id.kind == ValueKind.STRING,
+        "Cannot save MinterFilterAllowlisting entity with non-string ID. " +
+          'Considering using .toHex() to convert the "id" to a string.'
+      );
+      store.set("MinterFilterAllowlisting", id.toString(), this);
+    }
+  }
+
+  static load(id: string): MinterFilterAllowlisting | null {
+    return changetype<MinterFilterAllowlisting | null>(
+      store.get("MinterFilterAllowlisting", id)
+    );
+  }
+
+  get id(): string {
+    let value = this.get("id");
+    return value!.toString();
+  }
+
+  set id(value: string) {
+    this.set("id", Value.fromString(value));
+  }
+
+  get minter(): string {
+    let value = this.get("minter");
+    return value!.toString();
+  }
+
+  set minter(value: string) {
+    this.set("minter", Value.fromString(value));
+  }
+
+  get minterFilter(): string {
+    let value = this.get("minterFilter");
+    return value!.toString();
+  }
+
+  set minterFilter(value: string) {
+    this.set("minterFilter", Value.fromString(value));
+  }
+}
+
 export class Minter extends Entity {
   constructor(id: string) {
     super();
@@ -1336,6 +1395,15 @@ export class Minter extends Entity {
 
   set minterFilter(value: string) {
     this.set("minterFilter", Value.fromString(value));
+  }
+
+  get allowlistedOn(): Array<string> {
+    let value = this.get("allowlistedOn");
+    return value!.toStringArray();
+  }
+
+  set allowlistedOn(value: Array<string>) {
+    this.set("allowlistedOn", Value.fromStringArray(value));
   }
 
   get minimumAuctionLengthInSeconds(): BigInt | null {
