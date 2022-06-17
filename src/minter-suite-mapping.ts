@@ -43,6 +43,7 @@ import {
 } from "../generated/MinterDAExpV1/MinterDAExpV1";
 
 import {
+  Contract,
   Minter,
   Project,
   ProjectMinterConfiguration
@@ -73,8 +74,10 @@ import {
 } from "../generated/MinterFilterV0/IFilteredMinterV1";
 import {
   AllowHoldersOfProject,
-  RemovedHoldersOfProject
-} from "../generated/MinterFilterV0/MinterHolderV0";
+  RegisteredNFTAddress,
+  UnregisteredNFTAddress
+} from "../generated/MinterHolderV0/MinterHolderV0";
+import { RemovedHoldersOfProject } from "../generated/MinterFilterV0/MinterHolderV0";
 
 // IFilteredMinterV0 events
 export function handlePricePerTokenInWeiUpdated(
@@ -714,6 +717,32 @@ export function handleRemoveHoldersOfProject(
   event: RemovedHoldersOfProject
 ): void {
   handleHoldersOfProjectGeneric(event);
+}
+
+export function handleRegisteredNFTAddress(event: RegisteredNFTAddress) {
+  let minter = loadOrCreateMinter(event.address, event.block.timestamp);
+  if (!minter) {
+    return null;
+  }
+
+  let contract = Contract.load(event.params._NFTAddress.toHexString());
+  minter.allowlistedNFTAddresses.push(contract.id);
+  minter.updatedAt = event.block.timestamp;
+  minter.save();
+}
+
+export function handleUnregisteredNFTAddress(event: UnregisteredNFTAddress) {
+  let minter = loadOrCreateMinter(event.address, event.block.timestamp);
+  if (!minter) {
+    return null;
+  }
+
+  let newAddresses = minter.allowlistedNFTAddresses.filter(
+    (address: string) => address != event.params._NFTAddress.toHexString()
+  );
+  minter.allowlistedNFTAddresses = newAddresses;
+  minter.updatedAt = event.block.timestamp;
+  minter.save();
 }
 
 // Helpers

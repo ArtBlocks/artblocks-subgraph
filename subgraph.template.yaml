@@ -757,9 +757,9 @@ dataSources:
           file: ./abis/IFilteredMinterV0.json
       eventHandlers:
         - event: RegisteredNFTAddress(indexed address)
-          handler: handleSetAddressValue
+          handler: handleRegisteredNFTAddress
         - event: UnregisteredNFTAddress(indexed address)
-          handler: handleRemoveValue
+          handler: handleUnregisteredNFTAddress
         - event: AllowHoldersOfProject(indexed uint256,address,uint256)
           handler: handleAllowHoldersOfProject
         - event: RemovedHoldersOfProject(indexed uint256,address,uint256)

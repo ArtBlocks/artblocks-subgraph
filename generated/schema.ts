@@ -1391,6 +1391,26 @@ export class Minter extends Entity {
     }
   }
 
+  get allowlistedNFTAddresses(): Array<string> | null {
+    let value = this.get("allowlistedNFTAddresses");
+    if (!value || value.kind == ValueKind.NULL) {
+      return null;
+    } else {
+      return value.toStringArray();
+    }
+  }
+
+  set allowlistedNFTAddresses(value: Array<string> | null) {
+    if (!value) {
+      this.unset("allowlistedNFTAddresses");
+    } else {
+      this.set(
+        "allowlistedNFTAddresses",
+        Value.fromStringArray(<Array<string>>value)
+      );
+    }
+  }
+
   get coreContract(): string {
     let value = this.get("coreContract");
     return value!.toString();
