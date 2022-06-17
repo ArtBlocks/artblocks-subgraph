@@ -723,6 +723,9 @@ export function handleRegisteredNFTAddress(event: RegisteredNFTAddress): void {
   let minter = loadOrCreateMinter(event.address, event.block.timestamp);
   if (minter) {
     let addresses: string[] = [];
+    for (let i = 0; i < addresses.length; i++) {
+      addresses.push(minter.allowlistedNFTAddresses[i]);
+    }
     addresses.push(event.params._NFTAddress.toHexString());
     minter.allowlistedNFTAddresses = addresses;
     minter.updatedAt = event.block.timestamp;
