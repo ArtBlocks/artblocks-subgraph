@@ -23,7 +23,7 @@ dataSources:
         - AccountProject
         - Whitelisting
         - OpenSeaSale
-        - TokenOpenSeaSaleLookupTable
+        - SaleLookupTable
       abis:
         - name: GenArt721Core
           file: ./abis/GenArt721Core.json
@@ -124,7 +124,7 @@ dataSources:
         - AccountProject
         - Whitelisting
         - OpenSeaSale
-        - TokenOpenSeaSaleLookupTable
+        - SaleLookupTable
       abis:
         - name: GenArt721Core2
           file: ./abis/GenArt721Core2.json
@@ -229,7 +229,7 @@ dataSources:
         - AccountProject
         - Whitelisting
         - OpenSeaSale
-        - TokenOpenSeaSaleLookupTable
+        - SaleLookupTable
       abis:
         - name: GenArt721Core2PBAB
           file: ./abis/GenArt721Core2PBAB.json
@@ -320,7 +320,7 @@ dataSources:
         - AccountProject
         - Whitelisting
         - OpenSeaSale
-        - TokenOpenSeaSaleLookupTable
+        - SaleLookupTable
       abis:
         - name: GenArt721
           file: ./abis/GenArt721.json
@@ -749,7 +749,7 @@ dataSources:
         - AccountProject
         - Whitelisting
         - OpenSeaSale
-        - TokenOpenSeaSaleLookupTable
+        - SaleLookupTable
       abis:
         - name: WyvernExchange
           file: ./abis/WyvernExchange.json
@@ -779,7 +779,7 @@ dataSources:
         - AccountProject
         - Whitelisting
         - OpenSeaSale
-        - TokenOpenSeaSaleLookupTable
+        - SaleLookupTable
       abis:
         - name: WyvernExchangeWithBulkCancellations
           file: ./abis/WyvernExchangeWithBulkCancellations.json
@@ -820,3 +820,33 @@ dataSources:
           handler: handleTakerBid
       file: ./src/secondary/looksrare/looksrare-mapping.ts
   {{/looksRare}}
+  {{#openSeaSeaport}}
+  - kind: ethereum/contract
+    name: SeaportExchange
+    network: mainnet
+    source:
+      address: '{{address}}'
+      abi: SeaportExchange
+      startBlock: {{startBlock}}
+    mapping:
+      kind: ethereum/events
+      apiVersion: 0.0.5
+      language: wasm/assemblyscript
+      entities:
+        - Project
+        - ProjectScript
+        - Token
+        - Contract
+        - Account
+        - AccountProject
+        - Whitelisting
+        - OpenSeaSale
+        - SaleLookupTable
+      abis:
+        - name: SeaportExchange
+          file: ./abis/SeaportExchange.json
+      eventHandlers: 
+        - event: OrderFulfilled(bytes32,indexed address,indexed address,address,(uint8,address,uint256,uint256)[],(uint8,address,uint256,uint256,address)[])
+          handler: handleOrderFulfilled
+      file: ./src/secondary/opensea/os-v2-mapping.ts
+  {{/openSeaSeaport}}
