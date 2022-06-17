@@ -65,5 +65,17 @@
       "address": "0xcfe42B288a9299f9214373D505418899ebAa5Fb4",
       "startBlock": 12240975
     }
+  ],
+  "minterHolderV0Contracts": [
+    {
+      "address": "0xcfe42B288a9299f9214373D505418899ebAa5Fb4",
+      "startBlock": 12240975
+    }
+  ],
+  "minterMerkleV0Contracts": [
+    {
+      "address": "0xcfe42B288a9299f9214373D505418899ebAa5Fb4",
+      "startBlock": 12240975
+    }
   ]
 }

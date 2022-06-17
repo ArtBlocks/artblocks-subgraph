@@ -50,6 +50,7 @@ import {
   handlePricePerTokenInWeiUpdated,
   handleProjectCurrencyInfoUpdated,
   handlePurchaseToDisabledUpdated,
+  handleRegisteredNFTAddress,
   handleRemoveBigIntManyValue,
   handleRemoveBytesManyValue,
   handleRemoveHoldersOfProject,
@@ -86,6 +87,7 @@ import {
   AllowHoldersOfProject,
   RemovedHoldersOfProject
 } from "../../../generated/MinterFilterV0/MinterHolderV0";
+import { RegisteredNFTAddress } from "../../../generated/MinterHolderV0/MinterHolderV0";
 
 const randomAddressGenerator = new RandomAddressGenerator();
 
@@ -2096,5 +2098,34 @@ test("handleRemoveHoldersOfProject can remove address + project id to extraMinte
     getProjectMinterConfigId(minterAddress.toHexString(), project.id),
     "extraMinterDetails",
     '{"allowlistedAddressAndProjectId":["dontremove-0"]}'
+  );
+});
+test("handleRegisteredNFTAddress adds the address, as a string to the minter", () => {
+  clearStore();
+  const minterAddress = randomAddressGenerator.generateRandomAddress();
+  const minterType = "MinterHolderV0";
+  const minter = new Minter(minterAddress.toHexString());
+  minter.coreContract = TEST_CONTRACT_ADDRESS.toHexString();
+  minter.type = minterType;
+  minter.save();
+
+  const testAddy = randomAddressGenerator.generateRandomAddress();
+
+  const registerNFTAddressEvent: RegisteredNFTAddress = changetype<
+    RegisteredNFTAddress
+  >(newMockEvent());
+  registerNFTAddressEvent.address = minterAddress;
+  registerNFTAddressEvent.parameters = [
+    new ethereum.EventParam("_NFTAddress", ethereum.Value.fromAddress(testAddy))
+  ];
+  registerNFTAddressEvent.block.timestamp = CURRENT_BLOCK_TIMESTAMP;
+
+  handleRegisteredNFTAddress(registerNFTAddressEvent);
+
+  assert.fieldEquals(
+    MINTER_ENTITY_TYPE,
+    minter.id,
+    "allowlistedNFTAddresses",
+    testAddy.toHexString()
   );
 });
