@@ -49,13 +49,6 @@ export function getProjectMinterConfigId(
   return minterId + "-" + projectId.split("-")[1];
 }
 
-export function getMinterFilterAllowlistingId(
-  minterId: string,
-  minterfilterId: string
-): string {
-  return minterId + "-" + minterfilterId;
-}
-
 export function loadOrCreateMinter(
   minterAddress: Address,
   timestamp: BigInt

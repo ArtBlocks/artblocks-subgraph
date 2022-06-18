@@ -221,17 +221,12 @@ type MinterFilter @entity {
   coreContract: Contract!
 
   "Minters allowlisted on MinterFilter"
-  minterAllowlist: [MinterFilterAllowlisting!]! @derivedFrom(field: "minterFilter")
+  minterAllowlist: [Minter!]!
+
+  "Minters associated with MinterFilter"
+  minters: [Minter!]! @derivedFrom(field: "minterFilter")
 
   updatedAt: BigInt!
-}
-
-type MinterFilterAllowlisting @entity {
-  "Unique identifier made up of Minter address - MinterFilter address"
-  id: ID!
-
-  minter: Minter!
-  minterFilter: MinterFilter!
 }
 
 enum MinterType {
@@ -254,9 +249,6 @@ type Minter @entity {
 
   "Associated Minter Filter"
   minterFilter: MinterFilter!
-
-  "Allowlisted on Minter Filter"
-  allowlistedOn: [MinterFilterAllowlisting!]! @derivedFrom(field: "minter")
 
   "Minimum allowed auction length in seconds (linear Dutch auction minters)"
   minimumAuctionLengthInSeconds: BigInt

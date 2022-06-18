@@ -21,13 +21,11 @@ import {
   Contract,
   MinterFilter,
   Minter,
-  ProjectMinterConfiguration,
-  MinterFilterAllowlisting
+  ProjectMinterConfiguration
 } from "../generated/schema";
 
 import {
   generateContractSpecificId,
-  getMinterFilterAllowlistingId,
   getProjectMinterConfigId,
   loadOrCreateMinter
 } from "./helpers";
@@ -120,47 +118,45 @@ export function handleMinterApproved(event: MinterApproved): void {
     return;
   }
 
-  let minterFilterAllowlisting = MinterFilterAllowlisting.load(
-    getMinterFilterAllowlistingId(minter.id, minterFilter.id)
-  );
-  if (!minterFilterAllowlisting) {
-    // create and save new MinterFilterAllowlisting
-    minterFilterAllowlisting = new MinterFilterAllowlisting(
-      getMinterFilterAllowlistingId(minter.id, minterFilter.id)
-    );
-    minterFilterAllowlisting.minter = minter.id;
-    minterFilterAllowlisting.minterFilter = minterFilter.id;
-    minterFilterAllowlisting.save();
+  // add minter to the list of allowlisted minters if it's not already there
+  let minterAlreadyInAllowlist = false;
+  for (let i = 0; i < minterFilter.minterAllowlist.length; i++) {
+    if (minterFilter.minterAllowlist[i] == minter.id) {
+      minterAlreadyInAllowlist = true;
+    }
   }
-
-  // update minterFilter updatedAt
-  minterFilter.updatedAt = event.block.timestamp;
-  minterFilter.save();
+  if (!minterAlreadyInAllowlist) {
+    minterFilter.minterAllowlist.push(minter.id);
+    minterFilter.updatedAt = event.block.timestamp;
+    minterFilter.save();
+  }
 }
 
 export function handleMinterRevoked(event: MinterRevoked): void {
   // Note: there's a guard on the function that only allows a minter
   // to be revoked if it is not set for any project. This means that
-  // we can avoid resetting any minter config for a project here.
+  // we can avoid resetting any projects' minter configurations here.
+  let minterFilter = loadOrCreateMinterFilter(
+    event.address,
+    event.block.timestamp
+  );
+
   let minter = Minter.load(event.params._minterAddress.toHexString());
-  if (minter) {
+
+  if (minter && minterFilter) {
     // keep the Minter in the store to avoid having to re-populate it is
     // re-approved
 
-    // remove existing MinterFilterAllowlisting
-    let minterFilterAllowlisting = MinterFilterAllowlisting.load(
-      getMinterFilterAllowlistingId(minter.id, event.address.toHexString())
-    );
-    if (minterFilterAllowlisting) {
-      store.remove("MinterFilterAllowlisting", minterFilterAllowlisting.id);
-
-      // update the affected MinterFilter
-      let minterFilter = MinterFilter.load(event.address.toHexString());
-      if (minterFilter) {
-        minterFilter.updatedAt = event.block.timestamp;
-        minterFilter.save();
+    // remove the minter from the list of allowlisted minters
+    let newMinterAllowlist: string[] = [];
+    for (let i = 0; i < minterFilter.minterAllowlist.length; i++) {
+      if (minterFilter.minterAllowlist[i] != minter.id) {
+        newMinterAllowlist.push(minterFilter.minterAllowlist[i]);
       }
     }
+    minterFilter.minterAllowlist = newMinterAllowlist;
+    minterFilter.updatedAt = event.block.timestamp;
+    minterFilter.save();
   }
 }
 
