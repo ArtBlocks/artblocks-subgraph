@@ -258,8 +258,7 @@ type Minter @entity {
   "Maximum allowed half life in seconds (exponential Dutch auction minters)"
   maximumHalfLifeInSeconds: BigInt
 
-  "Allowed AB and PBAB NFT Contract Addresses"
-  allowlistedNFTAddresses: [String!]!
+  extraMinterDetails: String!
 
   coreContract: Contract!
 

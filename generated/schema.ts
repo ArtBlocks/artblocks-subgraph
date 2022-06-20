@@ -1289,7 +1289,7 @@ export class Minter extends Entity {
 
     this.set("type", Value.fromString(""));
     this.set("minterFilter", Value.fromString(""));
-    this.set("allowlistedNFTAddresses", Value.fromStringArray(new Array(0)));
+    this.set("extraMinterDetails", Value.fromString(""));
     this.set("coreContract", Value.fromString(""));
     this.set("updatedAt", Value.fromBigInt(BigInt.zero()));
   }
@@ -1392,13 +1392,13 @@ export class Minter extends Entity {
     }
   }
 
-  get allowlistedNFTAddresses(): Array<string> {
-    let value = this.get("allowlistedNFTAddresses");
-    return value!.toStringArray();
+  get extraMinterDetails(): string {
+    let value = this.get("extraMinterDetails");
+    return value!.toString();
   }
 
-  set allowlistedNFTAddresses(value: Array<string>) {
-    this.set("allowlistedNFTAddresses", Value.fromStringArray(value));
+  set extraMinterDetails(value: string) {
+    this.set("extraMinterDetails", Value.fromString(value));
   }
 
   get coreContract(): string {
