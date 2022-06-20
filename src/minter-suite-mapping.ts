@@ -480,13 +480,9 @@ export function handleSetValueMinterConfig<T>(event: T): void {
   ) {
     return;
   }
-  let minterProjectAndConfig = loadMinterProjectAndConfig(
-    event.address,
-    event.params._projectId,
-    event.block.timestamp
-  );
-  if (minterProjectAndConfig) {
-    handleSetValueGeneric(event, minterProjectAndConfig.minter, null);
+  let minter = loadOrCreateMinter(event.address, event.block.timestamp);
+  if (minter) {
+    handleSetValueGeneric(event, minter, null);
   }
 }
 export function handleSetBooleanValueProjectConfig(
@@ -588,13 +584,9 @@ export function handleRemoveValueProjectConfig(event: ConfigKeyRemoved): void {
 }
 
 export function handleRemoveValueMinterConfig(event: ConfigKeyRemoved): void {
-  let minterProjectAndConfig = loadMinterProjectAndConfig(
-    event.address,
-    event.params._projectId,
-    event.block.timestamp
-  );
-  if (minterProjectAndConfig) {
-    handleRemoveValueGeneric(event, minterProjectAndConfig.minter, null);
+  let minter = loadOrCreateMinter(event.address, event.block.timestamp);
+  if (minter) {
+    handleRemoveValueGeneric(event, minter, null);
   }
 }
 
@@ -705,13 +697,10 @@ export function handleAddManyMinterConfig<T>(event: T): void {
   ) {
     return;
   }
-  let minterProjectAndConfig = loadMinterProjectAndConfig(
-    event.address,
-    event.params._projectId,
-    event.block.timestamp
-  );
-  if (minterProjectAndConfig) {
-    handleAddManyValueGeneric(event, minterProjectAndConfig.minter, null);
+
+  let minter = loadOrCreateMinter(event.address, event.block.timestamp);
+  if (minter) {
+    handleAddManyValueGeneric(event, minter, null);
   }
 }
 
@@ -803,7 +792,14 @@ export function handleRemoveManyValueGeneric<T, C>(
       });
       for (let i = 0; i < arr.length; i++) {
         let entry = arr[i];
-        if (entry != event.params._value.toString()) {
+        let paramsVal: string = "";
+        if (event instanceof ConfigValueRemovedFromSetAddress) {
+          paramsVal = event.params._value.toHexString();
+        }
+        if (event instanceof ConfigValueRemovedFromSetBytes) {
+          paramsVal = event.params._value.toString();
+        }
+        if (entry != paramsVal) {
           arrWithRemoved.push(stringToJSONString(entry));
         }
       }
@@ -855,13 +851,9 @@ export function handleRemoveManyMinterConfig<T>(event: T): void {
   ) {
     return;
   }
-  let minterProjectAndConfig = loadMinterProjectAndConfig(
-    event.address,
-    event.params._projectId,
-    event.block.timestamp
-  );
-  if (minterProjectAndConfig) {
-    handleRemoveManyValueGeneric(event, minterProjectAndConfig.minter, null);
+  let minter = loadOrCreateMinter(event.address, event.block.timestamp);
+  if (minter) {
+    handleRemoveManyValueGeneric(event, minter, null);
   }
 }
 
@@ -953,47 +945,53 @@ export function handleRemoveHoldersOfProject(
   handleHoldersOfProjectGeneric(event);
 }
 
-// export function handleRegisteredNFTAddress(event: RegisteredNFTAddress): void {
-//   let minter = loadOrCreateMinter(event.address, event.block.timestamp);
-//   if (minter) {
-//     if (
-//       minter.allowlistedNFTAddresses.includes(
-//         event.params._NFTAddress.toHexString()
-//       )
-//     ) {
-//       return;
-//     }
-//     let addresses: string[] = [];
-//     for (let i = 0; i < minter.allowlistedNFTAddresses.length; i++) {
-//       addresses.push(minter.allowlistedNFTAddresses[i]);
-//     }
-//     addresses.push(event.params._NFTAddress.toHexString());
-//     minter.allowlistedNFTAddresses = addresses;
-//     minter.updatedAt = event.block.timestamp;
-//     minter.save();
-//   }
-// }
+export function handleRegistrationNFTAddresses<T>(event: T): void {
+  if (
+    !(
+      event instanceof RegisteredNFTAddress ||
+      event instanceof UnregisteredNFTAddress
+    )
+  ) {
+    return;
+  }
 
-// export function handleUnregisteredNFTAddress(
-//   event: UnregisteredNFTAddress
-// ): void {
-//   let minter = loadOrCreateMinter(event.address, event.block.timestamp);
+  let newAddEvent: ConfigValueAddedToSetAddress;
+  let newRemoveEvent: ConfigValueRemovedFromSetAddress;
 
-//   if (minter) {
-//     let addresses: string[] = [];
-//     for (let i = 0; i < minter.allowlistedNFTAddresses.length; i++) {
-//       if (
-//         minter.allowlistedNFTAddresses[i] !=
-//         event.params._NFTAddress.toHexString()
-//       ) {
-//         addresses.push(minter.allowlistedNFTAddresses[i]);
-//       }
-//     }
-//     minter.allowlistedNFTAddresses = addresses;
-//     minter.updatedAt = event.block.timestamp;
-//     minter.save();
-//   }
-// }
+  const parameters = [
+    new ethereum.EventParam(
+      "_projectId",
+      ethereum.Value.fromUnsignedBigInt(BigInt.fromI32(0))
+    ),
+    new ethereum.EventParam(
+      "_key",
+      ethereum.Value.fromBytes(Bytes.fromUTF8("registeredNFTAddresses"))
+    ),
+    new ethereum.EventParam(
+      "_value",
+      ethereum.Value.fromAddress(event.params._NFTAddress)
+    )
+  ];
+
+  if (event instanceof RegisteredNFTAddress) {
+    newAddEvent = changetype<ConfigValueAddedToSetAddress>(event);
+    newAddEvent.parameters = parameters;
+    handleAddManyAddressValueMinterConfig(newAddEvent);
+  } else if (event instanceof UnregisteredNFTAddress) {
+    newRemoveEvent = changetype<ConfigValueRemovedFromSetAddress>(event);
+    newRemoveEvent.parameters = parameters;
+    handleRemoveAddressManyValueMinterConfig(newRemoveEvent);
+  }
+}
+export function handleRegisteredNFTAddress(event: RegisteredNFTAddress): void {
+  handleRegistrationNFTAddresses(event);
+}
+
+export function handleUnregisteredNFTAddress(
+  event: UnregisteredNFTAddress
+): void {
+  handleRegistrationNFTAddresses(event);
+}
 
 // Helpers
 class MinterProjectAndConfig {
