@@ -722,8 +722,15 @@ export function handleRemoveHoldersOfProject(
 export function handleRegisteredNFTAddress(event: RegisteredNFTAddress): void {
   let minter = loadOrCreateMinter(event.address, event.block.timestamp);
   if (minter) {
+    if (
+      minter.allowlistedNFTAddresses.includes(
+        event.params._NFTAddress.toHexString()
+      )
+    ) {
+      return;
+    }
     let addresses: string[] = [];
-    for (let i = 0; i < addresses.length; i++) {
+    for (let i = 0; i < minter.allowlistedNFTAddresses.length; i++) {
       addresses.push(minter.allowlistedNFTAddresses[i]);
     }
     addresses.push(event.params._NFTAddress.toHexString());
@@ -740,7 +747,7 @@ export function handleUnregisteredNFTAddress(
 
   if (minter) {
     let addresses: string[] = [];
-    for (let i = 0; i < addresses.length; i++) {
+    for (let i = 0; i < minter.allowlistedNFTAddresses.length; i++) {
       if (
         minter.allowlistedNFTAddresses[i] !=
         event.params._NFTAddress.toHexString()

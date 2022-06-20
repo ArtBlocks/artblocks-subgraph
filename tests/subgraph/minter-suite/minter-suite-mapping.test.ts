@@ -2162,3 +2162,34 @@ test("handleUnRegisteredNFTAddress adds the address, as a string to the minter",
     "[]"
   );
 });
+test("handleRegisteredNFTAddress won't add a duplicate", () => {
+  clearStore();
+  const minterAddress = randomAddressGenerator.generateRandomAddress();
+  const minterType = "MinterHolderV0";
+  const minter = new Minter(minterAddress.toHexString());
+  minter.coreContract = TEST_CONTRACT_ADDRESS.toHexString();
+  minter.type = minterType;
+  let addresses: string[] = [];
+  const testAddy = randomAddressGenerator.generateRandomAddress();
+  addresses.push(testAddy.toHexString());
+  minter.allowlistedNFTAddresses = addresses;
+  minter.save();
+
+  const registerNFTAddressEvent: RegisteredNFTAddress = changetype<
+    RegisteredNFTAddress
+  >(newMockEvent());
+  registerNFTAddressEvent.address = minterAddress;
+  registerNFTAddressEvent.parameters = [
+    new ethereum.EventParam("_NFTAddress", ethereum.Value.fromAddress(testAddy))
+  ];
+  registerNFTAddressEvent.block.timestamp = CURRENT_BLOCK_TIMESTAMP;
+
+  handleRegisteredNFTAddress(registerNFTAddressEvent);
+
+  assert.fieldEquals(
+    MINTER_ENTITY_TYPE,
+    minter.id,
+    "allowlistedNFTAddresses",
+    "[" + testAddy.toHexString() + "]"
+  );
+});
