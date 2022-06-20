@@ -1173,12 +1173,8 @@ export class Token extends Entity {
     }
   }
 
-  get openSeaSaleLookupTables(): Array<string> {
-    let value = this.get("openSeaSaleLookupTables");
-
   get saleLookupTables(): Array<string> {
     let value = this.get("saleLookupTables");
-
     return value!.toStringArray();
   }
 
@@ -1851,12 +1847,6 @@ export class Transfer extends Entity {
   constructor(id: string) {
     super();
     this.set("id", Value.fromString(id));
-
-    this.set("transactionHash", Value.fromBytes(Bytes.empty()));
-    this.set("token", Value.fromString(""));
-    this.set("createdAt", Value.fromBigInt(BigInt.zero()));
-    this.set("to", Value.fromBytes(Bytes.empty()));
-    this.set("from", Value.fromBytes(Bytes.empty()));
   }
 
   save(): void {
@@ -1865,8 +1855,7 @@ export class Transfer extends Entity {
     if (id) {
       assert(
         id.kind == ValueKind.STRING,
-        "Cannot save Transfer entity with non-string ID. " +
-          'Considering using .toHex() to convert the "id" to a string.'
+        `Entities of type Transfer must have an ID of type String but the id '${id.displayData()}' is of type ${id.displayKind()}`
       );
       store.set("Transfer", id.toString(), this);
     }

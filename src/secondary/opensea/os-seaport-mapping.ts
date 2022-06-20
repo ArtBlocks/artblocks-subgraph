@@ -86,8 +86,6 @@ export function handleOrderFulfilled(event: OrderFulfilled): void {
     saleLookupTable.timestamp = event.block.timestamp;
     saleLookupTable.blockNumber = event.block.number;
     saleLookupTables.push(saleLookupTable);
-
-    log.info("AA {}", [saleLookupTable.sale]);
   }
 
   if (numValidTokens == 0) {
@@ -121,7 +119,6 @@ export function handleOrderFulfilled(event: OrderFulfilled): void {
     p.price = p.price.plus(considerationItem.amount);
     p.save();
   }
-
   // Create sale
   let sale = new Sale(saleId);
   sale.txHash = event.transaction.hash;
@@ -142,5 +139,6 @@ export function handleOrderFulfilled(event: OrderFulfilled): void {
   // Lastly, save the lookup tables (must be saved AFTER project gets saved)
   for (let i = 0; i < saleLookupTables.length; i++) {
     saleLookupTables[i].save();
+    log.info("Project {}", [saleLookupTables[i].project]);
   }
 }

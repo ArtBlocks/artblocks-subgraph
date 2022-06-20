@@ -218,6 +218,7 @@ function loadOrCreateAndSetProjectMinterConfiguration(
     );
     projectMinterConfig.project = project.id;
     projectMinterConfig.minter = minterAddress.toHexString();
+    projectMinterConfig.priceIsConfigured = false;
     projectMinterConfig.save();
   }
 
