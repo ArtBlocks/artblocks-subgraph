@@ -23,4 +23,5 @@ generated/*
 !generated/MinterDALinV1
 !generated/MinterSetPriceERC20V1
 !generated/MinterSetPriceV1
+!generated/SeaportExchange
 !generated/WyvernExchange

@@ -1487,7 +1487,6 @@ test("handleSetValue should set all values to a designated key in extraMinterDet
   );
   projectMinterConfig.minter = minterAddress.toHexString();
   projectMinterConfig.project = project.id;
-  projectMinterConfig.extraMinterDetails = "";
   projectMinterConfig.save();
 
   const configValueSetEvent: ConfigValueSetBool = changetype<
@@ -1634,7 +1633,6 @@ test("handleAddManyBigIntValue should add a value to an array at a designated ke
   );
   projectMinterConfig.minter = minterAddress.toHexString();
   projectMinterConfig.project = project.id;
-  projectMinterConfig.extraMinterDetails = "";
   projectMinterConfig.save();
 
   const configValueSetEvent: ConfigValueAddedToSetBigInt = changetype<
@@ -1699,7 +1697,6 @@ test("handleAddManyAddressValue should add a value to an array at a designated k
   );
   projectMinterConfig.minter = minterAddress.toHexString();
   projectMinterConfig.project = project.id;
-  projectMinterConfig.extraMinterDetails = "";
   projectMinterConfig.save();
 
   const testAddy = randomAddressGenerator.generateRandomAddress();
@@ -1754,7 +1751,6 @@ test("handleAddManyBytesValue should add a value to an array at a designated key
   );
   projectMinterConfig.minter = minterAddress.toHexString();
   projectMinterConfig.project = project.id;
-  projectMinterConfig.extraMinterDetails = "";
   projectMinterConfig.save();
 
   const configValueSetEvent: ConfigValueAddedToSetBytes = changetype<

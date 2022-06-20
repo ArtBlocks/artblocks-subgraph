@@ -148,22 +148,6 @@ export class GenArt721__getRoyaltyDataResult {
     map.set("value3", ethereum.Value.fromUnsignedBigInt(this.value3));
     return map;
   }
-
-  getArtistAddress(): Address {
-    return this.value0;
-  }
-
-  getAdditionalPayee(): Address {
-    return this.value1;
-  }
-
-  getAdditionalPayeePercentage(): BigInt {
-    return this.value2;
-  }
-
-  getRoyaltyFeeByID(): BigInt {
-    return this.value3;
-  }
 }
 
 export class GenArt721__projectDetailsResult {
@@ -200,30 +184,6 @@ export class GenArt721__projectDetailsResult {
     map.set("value5", ethereum.Value.fromBoolean(this.value5));
     return map;
   }
-
-  getProjectName(): string {
-    return this.value0;
-  }
-
-  getArtist(): string {
-    return this.value1;
-  }
-
-  getDescription(): string {
-    return this.value2;
-  }
-
-  getWebsite(): string {
-    return this.value3;
-  }
-
-  getLicense(): string {
-    return this.value4;
-  }
-
-  getDynamic(): boolean {
-    return this.value5;
-  }
 }
 
 export class GenArt721__projectScriptInfoResult {
@@ -259,30 +219,6 @@ export class GenArt721__projectScriptInfoResult {
     map.set("value4", ethereum.Value.fromBoolean(this.value4));
     map.set("value5", ethereum.Value.fromBoolean(this.value5));
     return map;
-  }
-
-  getScriptJSON(): string {
-    return this.value0;
-  }
-
-  getScriptCount(): BigInt {
-    return this.value1;
-  }
-
-  getHashes(): BigInt {
-    return this.value2;
-  }
-
-  getIpfsHash(): string {
-    return this.value3;
-  }
-
-  getLocked(): boolean {
-    return this.value4;
-  }
-
-  getPaused(): boolean {
-    return this.value5;
   }
 }
 
@@ -324,34 +260,6 @@ export class GenArt721__projectTokenInfoResult {
     map.set("value6", ethereum.Value.fromUnsignedBigInt(this.value6));
     return map;
   }
-
-  getArtistAddress(): Address {
-    return this.value0;
-  }
-
-  getPricePerTokenInWei(): BigInt {
-    return this.value1;
-  }
-
-  getInvocations(): BigInt {
-    return this.value2;
-  }
-
-  getMaxInvocations(): BigInt {
-    return this.value3;
-  }
-
-  getActive(): boolean {
-    return this.value4;
-  }
-
-  getAdditionalPayee(): Address {
-    return this.value5;
-  }
-
-  getAdditionalPayeePercentage(): BigInt {
-    return this.value6;
-  }
 }
 
 export class GenArt721__projectURIInfoResult {
@@ -371,18 +279,6 @@ export class GenArt721__projectURIInfoResult {
     map.set("value1", ethereum.Value.fromString(this.value1));
     map.set("value2", ethereum.Value.fromBoolean(this.value2));
     return map;
-  }
-
-  getProjectBaseURI(): string {
-    return this.value0;
-  }
-
-  getProjectBaseIpfsURI(): string {
-    return this.value1;
-  }
-
-  getUseIpfs(): boolean {
-    return this.value2;
   }
 }
 

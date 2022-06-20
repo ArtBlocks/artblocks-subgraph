@@ -12,7 +12,6 @@ import {
   OrderFulfilledOfferStruct
 } from "../../../generated/SeaportExchange/SeaportExchange";
 import { ItemType } from "../../../src/secondary/opensea/os-seaport-mapping";
-import { DEFAULT_PROJECT_ID } from "../shared-helpers";
 
 export const DEFAULT_ORDER_HASH =
   "0xbc5a2acf703138c9562adf29a4131756ef6fe70f7a03c08cbc8a4fd22d53f1a7";
@@ -22,6 +21,7 @@ export const DEFAULT_MAKER = "0x26a6434385cd63a88450ea06e2b2256979400b29";
 export const DEFAULT_STRATEGY = "0x56244bb70cbd3ea9dc8007399f61dfc065190031";
 export const DEFAULT_CURRENCY = "0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2";
 export const DEFAULT_COLLECTION = "0xd8a5d498ab43ed060cb6629b97a19e3e4276dd9f";
+export const DEFAULT_PROJECT_ID = "18";
 export const DEFAULT_TOKEN_ID = "7019";
 export const DEFAULT_AMOUNT = "1";
 export const DEFAULT_PRICE = "700000000000000000";
@@ -80,8 +80,7 @@ export function createOrderFulfilledEvent(
     mockEvent.logType,
     mockEvent.block,
     mockEvent.transaction,
-    mockEvent.parameters,
-    mockEvent.receipt
+    mockEvent.parameters
   );
   let orderHash = new ethereum.EventParam(
     "orderHash",
@@ -195,8 +194,7 @@ export function createTakerBidEvent(
     mockEvent.logType,
     mockEvent.block,
     mockEvent.transaction,
-    mockEvent.parameters,
-    mockEvent.receipt
+    mockEvent.parameters
   );
   let orderHash = new ethereum.EventParam(
     "orderHash",
@@ -282,8 +280,7 @@ export function createTakerAskEvent(
     mockEvent.logType,
     mockEvent.block,
     mockEvent.transaction,
-    mockEvent.parameters,
-    mockEvent.receipt
+    mockEvent.parameters
   );
   let orderHash = new ethereum.EventParam(
     "orderHash",

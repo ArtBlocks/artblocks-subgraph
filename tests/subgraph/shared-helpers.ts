@@ -13,8 +13,6 @@ import {
 import { Contract, Project, Token } from "../../generated/schema";
 import { generateContractSpecificId } from "../../src/helpers";
 
-export const DEFAULT_PROJECT_ID = "18";
-
 // Utils
 // The built in assembly script Math.random() function does not work
 // in the test runner so the class below takes advantage of a modified version

@@ -27,8 +27,7 @@ import {
   assertTestContractFields,
   addTestContractToStore,
   addNewTokenToStore,
-  TRANSFER_ENTITY_TYPE,
-  DEFAULT_PROJECT_ID
+  TRANSFER_ENTITY_TYPE
 } from "../shared-helpers";
 
 import {
@@ -2233,7 +2232,6 @@ test("GenArt721Core: Can handle transfer", () => {
   );
 
   const token = new Token(fullTokenId);
-  token.project = DEFAULT_PROJECT_ID;
   token.save();
 
   const fromAddress = randomAddressGenerator.generateRandomAddress();

@@ -119,6 +119,7 @@ export function handleOrderFulfilled(event: OrderFulfilled): void {
     p.price = p.price.plus(considerationItem.amount);
     p.save();
   }
+
   // Create sale
   let sale = new Sale(saleId);
   sale.txHash = event.transaction.hash;

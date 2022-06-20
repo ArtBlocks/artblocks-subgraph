@@ -140,22 +140,6 @@ export class GenArt721Core2PBAB__getRoyaltyDataResult {
     map.set("value3", ethereum.Value.fromUnsignedBigInt(this.value3));
     return map;
   }
-
-  getArtistAddress(): Address {
-    return this.value0;
-  }
-
-  getAdditionalPayee(): Address {
-    return this.value1;
-  }
-
-  getAdditionalPayeePercentage(): BigInt {
-    return this.value2;
-  }
-
-  getRoyaltyFeeByID(): BigInt {
-    return this.value3;
-  }
 }
 
 export class GenArt721Core2PBAB__projectDetailsResult {
@@ -188,26 +172,6 @@ export class GenArt721Core2PBAB__projectDetailsResult {
     map.set("value4", ethereum.Value.fromString(this.value4));
     return map;
   }
-
-  getProjectName(): string {
-    return this.value0;
-  }
-
-  getArtist(): string {
-    return this.value1;
-  }
-
-  getDescription(): string {
-    return this.value2;
-  }
-
-  getWebsite(): string {
-    return this.value3;
-  }
-
-  getLicense(): string {
-    return this.value4;
-  }
 }
 
 export class GenArt721Core2PBAB__projectScriptInfoResult {
@@ -239,26 +203,6 @@ export class GenArt721Core2PBAB__projectScriptInfoResult {
     map.set("value3", ethereum.Value.fromBoolean(this.value3));
     map.set("value4", ethereum.Value.fromBoolean(this.value4));
     return map;
-  }
-
-  getScriptJSON(): string {
-    return this.value0;
-  }
-
-  getScriptCount(): BigInt {
-    return this.value1;
-  }
-
-  getIpfsHash(): string {
-    return this.value2;
-  }
-
-  getLocked(): boolean {
-    return this.value3;
-  }
-
-  getPaused(): boolean {
-    return this.value4;
   }
 }
 
@@ -307,42 +251,6 @@ export class GenArt721Core2PBAB__projectTokenInfoResult {
     map.set("value7", ethereum.Value.fromString(this.value7));
     map.set("value8", ethereum.Value.fromAddress(this.value8));
     return map;
-  }
-
-  getArtistAddress(): Address {
-    return this.value0;
-  }
-
-  getPricePerTokenInWei(): BigInt {
-    return this.value1;
-  }
-
-  getInvocations(): BigInt {
-    return this.value2;
-  }
-
-  getMaxInvocations(): BigInt {
-    return this.value3;
-  }
-
-  getActive(): boolean {
-    return this.value4;
-  }
-
-  getAdditionalPayee(): Address {
-    return this.value5;
-  }
-
-  getAdditionalPayeePercentage(): BigInt {
-    return this.value6;
-  }
-
-  getCurrency(): string {
-    return this.value7;
-  }
-
-  getCurrencyAddress(): Address {
-    return this.value8;
   }
 }
 
