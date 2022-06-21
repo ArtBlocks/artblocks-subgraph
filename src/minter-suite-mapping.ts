@@ -76,6 +76,7 @@ import {
   UnregisteredNFTAddress,
   RemovedHoldersOfProject
 } from "../generated/MinterHolderV0/MinterHolderV0";
+import { MinterConfigSetAddressEvent } from "./util-types";
 
 // IFilteredMinterV0 events
 export function handlePricePerTokenInWeiUpdated(
@@ -469,22 +470,6 @@ export function handleSetValueProjectConfig<T>(event: T): void {
     );
   }
 }
-export function handleSetValueMinterConfig<T>(event: T): void {
-  if (
-    !(
-      event instanceof ConfigValueSetBool ||
-      event instanceof ConfigValueSetBigInt ||
-      event instanceof ConfigValueSetAddress ||
-      event instanceof ConfigValueSetBytes
-    )
-  ) {
-    return;
-  }
-  let minter = loadOrCreateMinter(event.address, event.block.timestamp);
-  if (minter) {
-    handleSetValueGeneric(event, minter, null);
-  }
-}
 export function handleSetBooleanValueProjectConfig(
   event: ConfigValueSetBool
 ): void {
@@ -507,30 +492,6 @@ export function handleSetBytesValueProjectConfig(
   event: ConfigValueSetBytes
 ): void {
   handleSetValueProjectConfig(event);
-}
-
-export function handleSetBooleanValueMinterConfig(
-  event: ConfigValueSetBool
-): void {
-  handleSetValueMinterConfig(event);
-}
-
-export function handleSetBigIntValueMinterConfig(
-  event: ConfigValueSetBigInt
-): void {
-  handleSetValueMinterConfig(event);
-}
-
-export function handleSetAddressValueMinterConfig(
-  event: ConfigValueSetAddress
-): void {
-  handleSetValueMinterConfig(event);
-}
-
-export function handleSetBytesValueMinterConfig(
-  event: ConfigValueSetBytes
-): void {
-  handleSetValueMinterConfig(event);
 }
 
 export function handleRemoveValueGeneric<T>(
@@ -583,13 +544,6 @@ export function handleRemoveValueProjectConfig(event: ConfigKeyRemoved): void {
   }
 }
 
-export function handleRemoveValueMinterConfig(event: ConfigKeyRemoved): void {
-  let minter = loadOrCreateMinter(event.address, event.block.timestamp);
-  if (minter) {
-    handleRemoveValueGeneric(event, minter, null);
-  }
-}
-
 export function handleAddManyValueGeneric<T, C>(
   event: T,
   config: C,
@@ -599,7 +553,8 @@ export function handleAddManyValueGeneric<T, C>(
     !(
       event instanceof ConfigValueAddedToSetBigInt ||
       event instanceof ConfigValueAddedToSetAddress ||
-      event instanceof ConfigValueAddedToSetBytes
+      event instanceof ConfigValueAddedToSetBytes ||
+      event instanceof MinterConfigSetAddressEvent
     )
   ) {
     return;
@@ -636,7 +591,8 @@ export function handleAddManyValueGeneric<T, C>(
     newValue = arrayToJSONValue(arr.toString());
   } else if (
     event instanceof ConfigValueAddedToSetAddress ||
-    event instanceof ConfigValueAddedToSetBytes
+    event instanceof ConfigValueAddedToSetBytes ||
+    event instanceof MinterConfigSetAddressEvent
   ) {
     let arr: string[] = [];
     if (val) {
@@ -645,7 +601,10 @@ export function handleAddManyValueGeneric<T, C>(
         .map<string>((v: JSONValue) => stringToJSONString(v.toString()));
     }
     let stringVal: string;
-    if (event instanceof ConfigValueAddedToSetAddress) {
+    if (
+      event instanceof ConfigValueAddedToSetAddress ||
+      event instanceof MinterConfigSetAddressEvent
+    ) {
       stringVal = event.params._value.toHexString();
     } else {
       stringVal = event.params._value.toString();
@@ -688,13 +647,7 @@ export function handleAddManyProjectConfig<T>(event: T): void {
 }
 
 export function handleAddManyMinterConfig<T>(event: T): void {
-  if (
-    !(
-      event instanceof ConfigValueAddedToSetBigInt ||
-      event instanceof ConfigValueAddedToSetAddress ||
-      event instanceof ConfigValueAddedToSetBytes
-    )
-  ) {
+  if (!(event instanceof MinterConfigSetAddressEvent)) {
     return;
   }
 
@@ -722,20 +675,8 @@ export function handleAddManyBytesValueProjectConfig(
   handleAddManyProjectConfig(event);
 }
 
-export function handleAddManyBigIntValueMinterConfig(
-  event: ConfigValueAddedToSetBigInt
-): void {
-  handleAddManyMinterConfig(event);
-}
-
 export function handleAddManyAddressValueMinterConfig(
-  event: ConfigValueAddedToSetAddress
-): void {
-  handleAddManyMinterConfig(event);
-}
-
-export function handleAddManyBytesValueMinterConfig(
-  event: ConfigValueAddedToSetBytes
+  event: MinterConfigSetAddressEvent
 ): void {
   handleAddManyMinterConfig(event);
 }
@@ -749,7 +690,8 @@ export function handleRemoveManyValueGeneric<T, C>(
     !(
       event instanceof ConfigValueRemovedFromSetBigInt ||
       event instanceof ConfigValueRemovedFromSetAddress ||
-      event instanceof ConfigValueRemovedFromSetBytes
+      event instanceof ConfigValueRemovedFromSetBytes ||
+      event instanceof MinterConfigSetAddressEvent
     )
   ) {
     return;
@@ -783,7 +725,8 @@ export function handleRemoveManyValueGeneric<T, C>(
     newValue = arrayToJSONValue(arrWithRemoved.toString());
   } else if (
     event instanceof ConfigValueRemovedFromSetAddress ||
-    event instanceof ConfigValueRemovedFromSetBytes
+    event instanceof ConfigValueRemovedFromSetBytes ||
+    event instanceof MinterConfigSetAddressEvent
   ) {
     let arrWithRemoved: string[] = [];
     if (jsonArr) {
@@ -793,7 +736,10 @@ export function handleRemoveManyValueGeneric<T, C>(
       for (let i = 0; i < arr.length; i++) {
         let entry = arr[i];
         let paramsVal: string = "";
-        if (event instanceof ConfigValueRemovedFromSetAddress) {
+        if (
+          event instanceof ConfigValueRemovedFromSetAddress ||
+          event instanceof MinterConfigSetAddressEvent
+        ) {
           paramsVal = event.params._value.toHexString();
         }
         if (event instanceof ConfigValueRemovedFromSetBytes) {
@@ -842,13 +788,7 @@ export function handleRemoveManyProjectConfig<T>(event: T): void {
 }
 
 export function handleRemoveManyMinterConfig<T>(event: T): void {
-  if (
-    !(
-      event instanceof ConfigValueRemovedFromSetBigInt ||
-      event instanceof ConfigValueRemovedFromSetAddress ||
-      event instanceof ConfigValueRemovedFromSetBytes
-    )
-  ) {
+  if (!(event instanceof MinterConfigSetAddressEvent)) {
     return;
   }
   let minter = loadOrCreateMinter(event.address, event.block.timestamp);
@@ -874,19 +814,8 @@ export function handleRemoveBytesManyValueProjectConfig(
   handleRemoveManyProjectConfig(event);
 }
 
-export function handleRemoveBigIntManyValueMinterConfig(
-  event: ConfigValueRemovedFromSetBigInt
-): void {
-  handleRemoveManyMinterConfig(event);
-}
-
 export function handleRemoveAddressManyValueMinterConfig(
-  event: ConfigValueRemovedFromSetAddress
-): void {
-  handleRemoveManyMinterConfig(event);
-}
-export function handleRemoveBytesManyValueMinterConfig(
-  event: ConfigValueRemovedFromSetBytes
+  event: MinterConfigSetAddressEvent
 ): void {
   handleRemoveManyMinterConfig(event);
 }
@@ -955,14 +884,10 @@ export function handleRegistrationNFTAddresses<T>(event: T): void {
     return;
   }
 
-  let newAddEvent: ConfigValueAddedToSetAddress;
-  let newRemoveEvent: ConfigValueRemovedFromSetAddress;
+  let genericEvent: MinterConfigSetAddressEvent;
+  genericEvent = changetype<MinterConfigSetAddressEvent>(event);
 
-  const parameters = [
-    new ethereum.EventParam(
-      "_projectId",
-      ethereum.Value.fromUnsignedBigInt(BigInt.fromI32(0))
-    ),
+  genericEvent.parameters = [
     new ethereum.EventParam(
       "_key",
       ethereum.Value.fromBytes(Bytes.fromUTF8("registeredNFTAddresses"))
@@ -974,13 +899,9 @@ export function handleRegistrationNFTAddresses<T>(event: T): void {
   ];
 
   if (event instanceof RegisteredNFTAddress) {
-    newAddEvent = changetype<ConfigValueAddedToSetAddress>(event);
-    newAddEvent.parameters = parameters;
-    handleAddManyAddressValueMinterConfig(newAddEvent);
+    handleAddManyAddressValueMinterConfig(genericEvent);
   } else if (event instanceof UnregisteredNFTAddress) {
-    newRemoveEvent = changetype<ConfigValueRemovedFromSetAddress>(event);
-    newRemoveEvent.parameters = parameters;
-    handleRemoveAddressManyValueMinterConfig(newRemoveEvent);
+    handleRemoveAddressManyValueMinterConfig(genericEvent);
   }
 }
 export function handleRegisteredNFTAddress(event: RegisteredNFTAddress): void {

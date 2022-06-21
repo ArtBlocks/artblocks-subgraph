@@ -1,6 +1,7 @@
 import {
   Address,
   BigInt,
+  Bytes,
   ethereum,
   json,
   JSONValue,
@@ -99,7 +100,7 @@ export function getMinterDetails<T>(config: T): TypedMap<string, JSONValue> {
   if (
     !(config instanceof ProjectMinterConfiguration || config instanceof Minter)
   ) {
-    return;
+    throw new Error("cannot find extra minter details on " + config);
   }
   let jsonResult = json.try_fromString(config.extraMinterDetails);
 
