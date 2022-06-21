@@ -1,0 +1,77 @@
+{
+  "network": "goerli",
+  "genArt721CoreContracts": [
+    {
+      "address": "0x1Bf03F29c4FEFFFe4eE26704aaA31d85c026aCE6",
+      "name": "Dev Goerli Flagship Core Contract",
+      "startBlock": 7010933
+    }
+  ],
+  "pbabContracts": [
+    {
+      "address": "0xBA86aCdc62331a14DFc215729AEf69E7C87bef87",
+      "name": "Art Blocks x Pace, Goerli Dev",
+      "startBlock": 7010933
+    }
+  ],
+  "minterFilterV0Contracts": [
+    {
+      "address": "0x7c4FB14F0c020109cB95A9B92BC4c8267C421Cc4",
+      "name": "Flagship Minter Filter",
+      "startBlock": 7010933
+    },
+    {
+      "address": "0x3411D5bf1a6Bf5FE8C66909Ec71752B7d66517f0",
+      "name": "Art Blocks x Pace Minter Filter",
+      "startBlock": 7010933
+    }
+  ],
+  "minterSetPriceV1Contracts": [
+    {
+      "address": "0x6be72fd483Ee32F0B9FF18380999A3e444dC6c66",
+      "name": "Flagship Minter",
+      "startBlock": 7010933
+    },
+    {
+      "address": "0x2c2E62967c5fDC4eD5Eb1342FA064E6413dADB2E",
+      "name": "Art Blocks x Pace Minter",
+      "startBlock": 7010933
+    }
+  ],
+  "minterSetPriceERC20V1Contracts": [
+    {
+      "address": "0xE4595f25cFb40e28aD5bc66575dA56e8ea9f77d8",
+      "name": "Flagship Minter",
+      "startBlock": 7010933
+    },
+    {
+      "address": "0x5941d55296b55A2b0C380E652bce0Ab42D466384",
+      "name": "Art Blocks x Pace Minter",
+      "startBlock": 7010933
+    }
+  ],
+  "minterDALinV1Contracts": [
+    {
+      "address": "0xB49D800C5c0c02CB06855Cb73D90c6da3Bda9856",
+      "name": "Flagship Minter",
+      "startBlock": 7010933
+    },
+    {
+      "address": "0x04aF1595B7e18F3237985054CaF94a2FB8cF4eb1",
+      "name": "Art Blocks x Pace Minter",
+      "startBlock": 7010933
+    }
+  ],
+  "minterDAExpV1Contracts": [
+    {
+      "address": "0x66af214f5B89d57DED2373096C67127aA47d4CDd",
+      "name": "Flagship Minter",
+      "startBlock": 7010933
+    },
+    {
+      "address": "0xe25D9B8F5Cd8E8E8ccb68F26fc70E6AD4e0C7845",
+      "name": "Art Blocks x Pace Minter",
+      "startBlock": 7010933
+    }
+  ]
+}

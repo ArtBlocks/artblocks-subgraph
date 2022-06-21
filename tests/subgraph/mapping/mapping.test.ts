@@ -4,9 +4,10 @@ import {
   test,
   newMockCall,
   log,
-  logStore
+  logStore,
+  newMockEvent
 } from "matchstick-as/assembly/index";
-import { BigInt, ethereum } from "@graphprotocol/graph-ts";
+import { BigInt, Bytes, ethereum, store, Value } from "@graphprotocol/graph-ts";
 import {
   ACCOUNT_ENTITY_TYPE,
   PROJECT_ENTITY_TYPE,
@@ -24,7 +25,9 @@ import {
   TEST_CONTRACT,
   assertNewProjectFields,
   assertTestContractFields,
-  addTestContractToStore
+  addTestContractToStore,
+  addNewTokenToStore,
+  TRANSFER_ENTITY_TYPE
 } from "../shared-helpers";
 
 import {
@@ -80,7 +83,8 @@ import {
   UpdateProjectSecondaryMarketRoyaltyPercentageCall,
   RemoveMintWhitelistedCall,
   UpdateProjectScriptCall,
-  UpdateProjectScriptJSONCall
+  UpdateProjectScriptJSONCall,
+  Transfer
 } from "../../../generated/GenArt721Core/GenArt721Core";
 import {
   handleAddProject,
@@ -116,7 +120,8 @@ import {
   handleUpdateProjectSecondaryMarketRoyaltyPercentage,
   handleRemoveMintWhitelisted,
   handleUpdateProjectScript,
-  handleUpdateProjectScriptJSON
+  handleUpdateProjectScriptJSON,
+  handleTransfer
 } from "../../../src/mapping";
 import {
   generateContractSpecificId,
@@ -2216,6 +2221,64 @@ test("GenArt721Core: Can update a project website", () => {
     fullProjectId,
     "updatedAt",
     updateCallBlockTimestamp.toString()
+  );
+});
+test("GenArt721Core: Can handle transfer", () => {
+  clearStore();
+  const tokenId = BigInt.fromI32(0);
+  const fullTokenId = generateContractSpecificId(
+    TEST_CONTRACT_ADDRESS,
+    tokenId
+  );
+
+  const token = new Token(fullTokenId);
+  token.save();
+
+  const fromAddress = randomAddressGenerator.generateRandomAddress();
+  const toAddress = randomAddressGenerator.generateRandomAddress();
+
+  const hash = Bytes.fromUTF8("QmYwAPJzv5CZsnA625s3Xf2nemtYgPpHdWEz79ojWnPbdG");
+
+  const logIndex = BigInt.fromI32(0);
+
+  const event: Transfer = changetype<Transfer>(newMockEvent());
+  event.address = TEST_CONTRACT_ADDRESS;
+  event.transaction.hash = hash;
+  event.logIndex = logIndex;
+  event.parameters = [
+    new ethereum.EventParam("from", ethereum.Value.fromAddress(fromAddress)),
+    new ethereum.EventParam("to", ethereum.Value.fromAddress(toAddress)),
+    new ethereum.EventParam(
+      "tokenId",
+      ethereum.Value.fromUnsignedBigInt(tokenId)
+    )
+  ];
+
+  handleTransfer(event);
+
+  assert.fieldEquals(
+    TOKEN_ENTITY_TYPE,
+    fullTokenId,
+    "owner",
+    toAddress.toHexString()
+  );
+  assert.fieldEquals(
+    TRANSFER_ENTITY_TYPE,
+    hash.toHex() + "-" + logIndex.toString(),
+    "to",
+    toAddress.toHexString()
+  );
+  assert.fieldEquals(
+    TRANSFER_ENTITY_TYPE,
+    hash.toHex() + "-" + logIndex.toString(),
+    "from",
+    fromAddress.toHexString()
+  );
+  assert.fieldEquals(
+    TRANSFER_ENTITY_TYPE,
+    hash.toHex() + "-" + logIndex.toString(),
+    "token",
+    fullTokenId
   );
 });
 

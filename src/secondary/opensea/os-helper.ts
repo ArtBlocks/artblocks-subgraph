@@ -1,4 +1,4 @@
-import { Address, BigInt, Bytes, ethereum, log } from "@graphprotocol/graph-ts";
+import { Address, BigInt, Bytes, ethereum, log, ByteArray, crypto } from "@graphprotocol/graph-ts";
 
 import { WyvernExchange } from "../../../generated/WyvernExchange/WyvernExchange";
 
@@ -119,21 +119,21 @@ export function calculateMatchPrice(
  * @param mask The mask specifying which bits can be changed in the original array
  */
 export function guardedArrayReplace(
-    array: Bytes,
-    replacement: Bytes,
-    mask: Bytes
+  array: Bytes,
+  replacement: Bytes,
+  mask: Bytes
 ): void {
-    // Sometime the replacementPattern is empty, meaning that both arrays (buyCallData and sellCallData) are identicall and
-    // no merging is necessary. In such a case randomly return the first array (buyCallData)
-    if (mask.length == 0) {
-        return;
-    }
+  // Sometime the replacementPattern is empty, meaning that both arrays (buyCallData and sellCallData) are identicall and
+  // no merging is necessary. In such a case randomly return the first array (buyCallData)
+  if (mask.length == 0) {
+    return;
+  }
 
-    for (let i = 0; i < array.length; i++) {
-        if(mask[i] == 0xff) {
-            array[i] = replacement[i];
-        }
+  for (let i = 0; i < array.length; i++) {
+    if (mask[i] == 0xff) {
+      array[i] = replacement[i];
     }
+  }
 }
 
 /**
@@ -335,3 +335,15 @@ export function getNftContractAddressAndTokenIdFromAtomicizerCallData(
 
   return [nftContractsAddrs, tokenIds];
 }
+
+/**
+ * Generate sale id using token id and token nextSaleId
+ * @param tokenId 
+ * @param nextSaleId 
+ * @returns 
+ */
+export function generateSaleId(tokenId: string, nextSaleId: BigInt): string {
+  return tokenId + "-" + nextSaleId.toString();
+}
+
+

@@ -47,6 +47,7 @@ import {
 import {
   Project,
   Token,
+  Transfer as TokenTransfer,
   Account,
   AccountProject,
   Contract,
@@ -86,6 +87,7 @@ export function handleMint(event: Mint): void {
     token.createdAt = event.block.timestamp;
     token.updatedAt = event.block.timestamp;
     token.transactionHash = event.transaction.hash;
+    token.nextSaleId = BigInt.fromI32(0);
     token.save();
 
     project.invocations = invocation.plus(BigInt.fromI32(1));
@@ -161,6 +163,17 @@ export function handleTransfer(event: Transfer): void {
     token.owner = event.params.to.toHexString();
     token.updatedAt = event.block.timestamp;
     token.save();
+
+    let transfer = new TokenTransfer(
+      event.transaction.hash.toHex() + "-" + event.logIndex.toString()
+    );
+
+    transfer.transactionHash = event.transaction.hash;
+    transfer.createdAt = event.block.timestamp;
+    transfer.to = event.params.to;
+    transfer.from = event.params.from;
+    transfer.token = token.id;
+    transfer.save();
   }
 }
 /*** END EVENT HANDLERS ***/

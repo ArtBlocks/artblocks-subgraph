@@ -107,7 +107,6 @@ type Project @entity {
 
   "Lookup table to get the Sale history of the project"
   saleLookupTables: [SaleLookupTable!]! @derivedFrom(field: "project")
-
 }
 
 type ProjectScript @entity {
@@ -208,9 +207,13 @@ type Token @entity {
   "Transaction hash of token mint"
   transactionHash: Bytes!
 
+  transfers: [Transfer!] @derivedFrom(field: "token")
+
   "Lookup table to get the Sale history"
   saleLookupTables: [SaleLookupTable!]! @derivedFrom(field: "token")
   
+  "Next available sale id"
+  nextSaleId: BigInt!
 }
 
 type MinterFilter @entity {
@@ -323,8 +326,11 @@ enum Exchange {
 
 
 type Sale @entity {
-  "The transaction hash when the sale occured"
+  "The sale id formated: tokenId - token.nextSaleId (using first token sold for bundles) for Opensea, orderHash from sale event for Looksrare"
   id: ID!
+
+  "The hash of the transaction"
+  txHash: Bytes!
 
   "The exchange used for this sale"
   exchange: Exchange!
@@ -378,4 +384,18 @@ type SaleLookupTable @entity {
 
   "The associated sale"
   sale: Sale!
+}
+
+type Transfer @entity(immutable: true){
+  id: ID!
+
+  transactionHash: Bytes!
+
+  token: Token! 
+
+  createdAt: BigInt!
+
+  to: Bytes!
+
+  from: Bytes!
 }

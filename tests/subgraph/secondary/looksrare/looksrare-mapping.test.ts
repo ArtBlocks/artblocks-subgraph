@@ -1,7 +1,6 @@
-import { clearStore, test, assert, newMockEvent } from 'matchstick-as/assembly/index'
+import { clearStore, test, assert } from 'matchstick-as/assembly/index'
 import {
     Token,
-    Contract,
     SaleLookupTable,
     Sale,
     Project,
@@ -24,10 +23,10 @@ test('handleTakerBid should create sale if contract and token are in store', () 
 
     handleTakerBid(takerBidEvent);
 
-    let saleId = takerBidEvent.transaction.hash.toHexString();
+    let saleId = takerBidEvent.params.orderHash.toHexString();
 
     // Assert the state of the store
-    assert.fieldEquals('Sale', saleId, 'id', takerBidEvent.transaction.hash.toHexString());
+    assert.fieldEquals('Sale', saleId, 'id', "0xbc5a2acf703138c9562adf29a4131756ef6fe70f7a03c08cbc8a4fd22d53f1a7");
     assert.fieldEquals('Sale', saleId, 'exchange', "LR_V1");
     assert.fieldEquals('Sale', saleId, 'saleType', "Single");
     assert.fieldEquals('Sale', saleId, 'blockNumber', takerBidEvent.block.number.toString());
@@ -48,7 +47,7 @@ test('handleTakerBid should create sale marked as private if private sale strate
 
     handleTakerBid(takerBidEvent);
 
-    let saleId = takerBidEvent.transaction.hash.toHexString();
+    let saleId = takerBidEvent.params.orderHash.toHexString();
 
     // Assert the state of the store
     assert.fieldEquals('Sale', saleId, 'isPrivate', "true");
@@ -64,7 +63,7 @@ test('handleTakerBid should create sale with seller as maker and buyer as taker'
 
     handleTakerBid(takerBidEvent);
 
-    let saleId = takerBidEvent.transaction.hash.toHexString();
+    let saleId = takerBidEvent.params.orderHash.toHexString();
 
     // Assert the state of the store
     assert.fieldEquals('Sale', saleId, 'seller', '0x26a6434385cd63a88450ea06e2b2256979400b29');
@@ -82,7 +81,7 @@ test('handleTakerBid should create saleLookUpTable if contract and token are in 
     handleTakerBid(takerBidEvent);
 
     // Get the sale
-    let saleId = takerBidEvent.transaction.hash.toHexString();
+    let saleId = takerBidEvent.params.orderHash.toHexString();
     let sale = Sale.load(saleId)!;
     // Get the id of the saleLookupTable 
     let saleLookUpTableId = buildTokenSaleLookupTableId(
@@ -110,7 +109,7 @@ test('handleTakerBid should update saleLookUpTables of token if contract and tok
     handleTakerBid(takerBidEvent);
 
     // Get the sale
-    let saleId = takerBidEvent.transaction.hash.toHexString();
+    let saleId = takerBidEvent.params.orderHash.toHexString();
     let sale = Sale.load(saleId)!;
     // Get the saleLookupTable 
     let saleLookUpTableId = buildTokenSaleLookupTableId(
@@ -144,7 +143,7 @@ test('handleTakerBid should update saleLookUpTables of sale if contract and toke
     handleTakerBid(takerBidEvent);
 
     // Get the sale
-    let saleId = takerBidEvent.transaction.hash.toHexString();
+    let saleId = takerBidEvent.params.orderHash.toHexString();
     let sale = Sale.load(saleId)!;
     // Get the saleLookupTable 
     let saleLookUpTableId = buildTokenSaleLookupTableId(
@@ -179,7 +178,7 @@ test('handleTakerBid should update saleLookUpTables of project if contract and t
     handleTakerBid(takerBidEvent);
 
     // Get the sale
-    let saleId = takerBidEvent.transaction.hash.toHexString();
+    let saleId = takerBidEvent.params.orderHash.toHexString();
     let sale = Sale.load(saleId)!;
     // Get the saleLookupTable 
     let saleLookUpTableId = buildTokenSaleLookupTableId(
@@ -210,7 +209,7 @@ test('handleTakerBid should not create sale if token is not in store', () => {
 
     handleTakerBid(takerBidEvent);
 
-    let saleId = takerBidEvent.transaction.hash.toHexString();
+    let saleId = takerBidEvent.params.orderHash.toHexString();
 
     // Assert the state of the store
     assert.assertNull(Sale.load(saleId));
@@ -225,7 +224,7 @@ test('handleTakerBid should not create sale if contract is not in store', () => 
 
     handleTakerBid(takerBidEvent);
 
-    let saleId = takerBidEvent.transaction.hash.toHexString();
+    let saleId = takerBidEvent.params.orderHash.toHexString();
 
     // Assert the state of the store
     assert.assertNull(Sale.load(saleId));
@@ -242,10 +241,10 @@ test('handleTakerAsk should create sale if contract and token are in store', () 
 
     handleTakerAsk(TakerAskEvent);
 
-    let saleId = TakerAskEvent.transaction.hash.toHexString();
+    let saleId = TakerAskEvent.params.orderHash.toHexString();
 
     // Assert the state of the store
-    assert.fieldEquals('Sale', saleId, 'id', TakerAskEvent.transaction.hash.toHexString());
+    assert.fieldEquals('Sale', saleId, 'id', "0xbc5a2acf703138c9562adf29a4131756ef6fe70f7a03c08cbc8a4fd22d53f1a7");
     assert.fieldEquals('Sale', saleId, 'exchange', "LR_V1");
     assert.fieldEquals('Sale', saleId, 'saleType', "Single");
     assert.fieldEquals('Sale', saleId, 'blockNumber', TakerAskEvent.block.number.toString());
@@ -266,7 +265,7 @@ test('handleTakerAsk should create sale marked as private if private sale strate
 
     handleTakerAsk(TakerAskEvent);
 
-    let saleId = TakerAskEvent.transaction.hash.toHexString();
+    let saleId = TakerAskEvent.params.orderHash.toHexString();
 
     // Assert the state of the store
     assert.fieldEquals('Sale', saleId, 'isPrivate', "true");
@@ -282,7 +281,7 @@ test('handleTakerAsk should create sale with seller as taker and buyer as maker'
 
     handleTakerAsk(TakerAskEvent);
 
-    let saleId = TakerAskEvent.transaction.hash.toHexString();
+    let saleId = TakerAskEvent.params.orderHash.toHexString();
 
     // Assert the state of the store
     assert.fieldEquals('Sale', saleId, 'seller', '0x258a5e28aa40aef3c2c4cdf728b11dd9dd2b8bcd');
@@ -300,7 +299,7 @@ test('handleTakerAsk should create saleLookUpTable if contract and token are in 
     handleTakerAsk(TakerAskEvent);
 
     // Get the sale
-    let saleId = TakerAskEvent.transaction.hash.toHexString();
+    let saleId = TakerAskEvent.params.orderHash.toHexString();
     let sale = Sale.load(saleId)!;
     // Get the id of the saleLookupTable 
     let saleLookUpTableId = buildTokenSaleLookupTableId(
@@ -328,7 +327,7 @@ test('handleTakerAsk should update saleLookUpTables of token if contract and tok
     handleTakerAsk(TakerAskEvent);
 
     // Get the sale
-    let saleId = TakerAskEvent.transaction.hash.toHexString();
+    let saleId = TakerAskEvent.params.orderHash.toHexString();
     let sale = Sale.load(saleId)!;
     // Get the saleLookupTable 
     let saleLookUpTableId = buildTokenSaleLookupTableId(
@@ -362,7 +361,7 @@ test('handleTakerAsk should update saleLookUpTables of sale if contract and toke
     handleTakerAsk(TakerAskEvent);
 
     // Get the sale
-    let saleId = TakerAskEvent.transaction.hash.toHexString();
+    let saleId = TakerAskEvent.params.orderHash.toHexString();
     let sale = Sale.load(saleId)!;
     // Get the saleLookupTable 
     let saleLookUpTableId = buildTokenSaleLookupTableId(
@@ -397,7 +396,7 @@ test('handleTakerAsk should update saleLookUpTables of project if contract and t
     handleTakerAsk(TakerAskEvent);
 
     // Get the sale
-    let saleId = TakerAskEvent.transaction.hash.toHexString();
+    let saleId = TakerAskEvent.params.orderHash.toHexString();
     let sale = Sale.load(saleId)!;
     // Get the saleLookupTable 
     let saleLookUpTableId = buildTokenSaleLookupTableId(
@@ -428,7 +427,7 @@ test('handleTakerAsk should not create sale if token is not in store', () => {
 
     handleTakerAsk(TakerAskEvent);
 
-    let saleId = TakerAskEvent.transaction.hash.toHexString();
+    let saleId = TakerAskEvent.params.orderHash.toHexString();
 
     // Assert the state of the store
     assert.assertNull(Sale.load(saleId));
@@ -443,7 +442,7 @@ test('handleTakerAsk should not create sale if contract is not in store', () => 
 
     handleTakerAsk(takerAskEvent);
 
-    let saleId = takerAskEvent.transaction.hash.toHexString();
+    let saleId = takerAskEvent.params.orderHash.toHexString();
 
     // Assert the state of the store
     assert.assertNull(Sale.load(saleId));
