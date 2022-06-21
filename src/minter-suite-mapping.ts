@@ -396,6 +396,106 @@ export function handleDAExpResetAuctionDetails<T>(event: T): void {
   }
 }
 
+// MinterHolder Specific Handlers
+
+export function handleHoldersOfProjectGeneric<T>(event: T): void {
+  if (
+    !(
+      event instanceof AllowHoldersOfProject ||
+      event instanceof RemovedHoldersOfProject
+    )
+  ) {
+    return;
+  }
+  let address = event.params._ownedNFTAddress.toHexString();
+  let holderProjectId = event.params._ownedNFTProjectId.toString();
+  let bytesValueCombined = Bytes.fromUTF8(address + "-" + holderProjectId);
+
+  let newAddEvent: ConfigValueAddedToSetBytes;
+  let newRemoveEvent: ConfigValueRemovedFromSetBytes;
+  const parameters = [
+    new ethereum.EventParam(
+      "_projectId",
+      ethereum.Value.fromUnsignedBigInt(event.params._projectId)
+    ),
+    new ethereum.EventParam(
+      "_key",
+      ethereum.Value.fromBytes(Bytes.fromUTF8("allowlistedAddressAndProjectId"))
+    ),
+    new ethereum.EventParam(
+      "_value",
+      ethereum.Value.fromBytes(bytesValueCombined)
+    )
+  ];
+  if (event instanceof AllowHoldersOfProject) {
+    newAddEvent = changetype<ConfigValueAddedToSetBytes>(event);
+    newAddEvent.parameters = parameters;
+    handleAddManyBytesValueProjectConfig(newAddEvent);
+  } else if (event instanceof RemovedHoldersOfProject) {
+    newRemoveEvent = changetype<ConfigValueRemovedFromSetBytes>(event);
+    newRemoveEvent.parameters = parameters;
+    handleRemoveBytesManyValueProjectConfig(newRemoveEvent);
+  }
+}
+
+export function handleAllowHoldersOfProject(
+  event: AllowHoldersOfProject
+): void {
+  handleHoldersOfProjectGeneric(event);
+}
+
+export function handleRemoveHoldersOfProject(
+  event: RemovedHoldersOfProject
+): void {
+  handleHoldersOfProjectGeneric(event);
+}
+
+export function handleRegistrationNFTAddresses<T>(event: T): void {
+  if (
+    !(
+      event instanceof RegisteredNFTAddress ||
+      event instanceof UnregisteredNFTAddress
+    )
+  ) {
+    return;
+  }
+
+  let genericEvent: MinterConfigSetAddressEvent;
+  genericEvent = changetype<MinterConfigSetAddressEvent>(event);
+
+  genericEvent.parameters = [
+    new ethereum.EventParam(
+      "_key",
+      ethereum.Value.fromBytes(Bytes.fromUTF8("registeredNFTAddresses"))
+    ),
+    new ethereum.EventParam(
+      "_value",
+      ethereum.Value.fromAddress(event.params._NFTAddress)
+    )
+  ];
+
+  if (event instanceof RegisteredNFTAddress) {
+    handleAddManyAddressValueMinterConfig(genericEvent);
+  } else if (event instanceof UnregisteredNFTAddress) {
+    handleRemoveAddressManyValueMinterConfig(genericEvent);
+  }
+}
+export function handleRegisteredNFTAddress(event: RegisteredNFTAddress): void {
+  handleRegistrationNFTAddresses(event);
+}
+
+export function handleUnregisteredNFTAddress(
+  event: UnregisteredNFTAddress
+): void {
+  handleRegistrationNFTAddresses(event);
+}
+
+// Generic Handlers
+// Below is all logic pertaining to generic handlers used for maintaining JSON config stores on both the ProjectMinterConfiguration and Minter entities.
+// Most logic is shared and bubbled up each respective handler for each action. We utilize ducktype to allow these to work on either a Minter or ProjectMinterConfiguration
+// Because AssemblyScript does not support union types, we need to manually type check inside each method, to ensure correct usage.
+// For any questions reach out to @jon or @ryley-o.eth. or see the following document https://docs.google.com/document/d/1XSxl04eJyTxc_rbj6cmq-j00zaYDzApBBLT67JXtaOw/edit?disco=AAAAZa8xp-Q
+
 export function handleSetValueGeneric<T, C>(
   event: T,
   config: C,
@@ -559,7 +659,6 @@ export function handleAddManyValueGeneric<T, C>(
   ) {
     return;
   }
-
   if (
     !(config instanceof ProjectMinterConfiguration || config instanceof Minter)
   ) {
@@ -818,100 +917,6 @@ export function handleRemoveAddressManyValueMinterConfig(
   event: MinterConfigSetAddressEvent
 ): void {
   handleRemoveManyMinterConfig(event);
-}
-
-// MinterHolder Specific Handlers
-
-export function handleHoldersOfProjectGeneric<T>(event: T): void {
-  if (
-    !(
-      event instanceof AllowHoldersOfProject ||
-      event instanceof RemovedHoldersOfProject
-    )
-  ) {
-    return;
-  }
-  let address = event.params._ownedNFTAddress.toHexString();
-  let holderProjectId = event.params._ownedNFTProjectId.toString();
-  let bytesValueCombined = Bytes.fromUTF8(address + "-" + holderProjectId);
-
-  let newAddEvent: ConfigValueAddedToSetBytes;
-  let newRemoveEvent: ConfigValueRemovedFromSetBytes;
-  const parameters = [
-    new ethereum.EventParam(
-      "_projectId",
-      ethereum.Value.fromUnsignedBigInt(event.params._projectId)
-    ),
-    new ethereum.EventParam(
-      "_key",
-      ethereum.Value.fromBytes(Bytes.fromUTF8("allowlistedAddressAndProjectId"))
-    ),
-    new ethereum.EventParam(
-      "_value",
-      ethereum.Value.fromBytes(bytesValueCombined)
-    )
-  ];
-  if (event instanceof AllowHoldersOfProject) {
-    newAddEvent = changetype<ConfigValueAddedToSetBytes>(event);
-    newAddEvent.parameters = parameters;
-    handleAddManyBytesValueProjectConfig(newAddEvent);
-  } else if (event instanceof RemovedHoldersOfProject) {
-    newRemoveEvent = changetype<ConfigValueRemovedFromSetBytes>(event);
-    newRemoveEvent.parameters = parameters;
-    handleRemoveBytesManyValueProjectConfig(newRemoveEvent);
-  }
-}
-
-export function handleAllowHoldersOfProject(
-  event: AllowHoldersOfProject
-): void {
-  handleHoldersOfProjectGeneric(event);
-}
-
-export function handleRemoveHoldersOfProject(
-  event: RemovedHoldersOfProject
-): void {
-  handleHoldersOfProjectGeneric(event);
-}
-
-export function handleRegistrationNFTAddresses<T>(event: T): void {
-  if (
-    !(
-      event instanceof RegisteredNFTAddress ||
-      event instanceof UnregisteredNFTAddress
-    )
-  ) {
-    return;
-  }
-
-  let genericEvent: MinterConfigSetAddressEvent;
-  genericEvent = changetype<MinterConfigSetAddressEvent>(event);
-
-  genericEvent.parameters = [
-    new ethereum.EventParam(
-      "_key",
-      ethereum.Value.fromBytes(Bytes.fromUTF8("registeredNFTAddresses"))
-    ),
-    new ethereum.EventParam(
-      "_value",
-      ethereum.Value.fromAddress(event.params._NFTAddress)
-    )
-  ];
-
-  if (event instanceof RegisteredNFTAddress) {
-    handleAddManyAddressValueMinterConfig(genericEvent);
-  } else if (event instanceof UnregisteredNFTAddress) {
-    handleRemoveAddressManyValueMinterConfig(genericEvent);
-  }
-}
-export function handleRegisteredNFTAddress(event: RegisteredNFTAddress): void {
-  handleRegistrationNFTAddresses(event);
-}
-
-export function handleUnregisteredNFTAddress(
-  event: UnregisteredNFTAddress
-): void {
-  handleRegistrationNFTAddresses(event);
 }
 
 // Helpers
