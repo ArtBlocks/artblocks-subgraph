@@ -1,6 +1,7 @@
 import {
   Address,
   BigInt,
+  Bytes,
   ethereum,
   json,
   JSONValue,
@@ -95,10 +96,13 @@ export function booleanToString(b: boolean): string {
   return b ? "true" : "false";
 }
 
-export function getMinterDetails(
-  projectMinterConfig: ProjectMinterConfiguration
-): TypedMap<string, JSONValue> {
-  let jsonResult = json.try_fromString(projectMinterConfig.extraMinterDetails);
+export function getMinterDetails<T>(config: T): TypedMap<string, JSONValue> {
+  if (
+    !(config instanceof ProjectMinterConfiguration || config instanceof Minter)
+  ) {
+    throw new Error("cannot find extra minter details on " + config);
+  }
+  let jsonResult = json.try_fromString(config.extraMinterDetails);
 
   let minterDetails: TypedMap<string, JSONValue>;
   if (jsonResult.isOk && jsonResult.value.kind == JSONValueKind.OBJECT) {

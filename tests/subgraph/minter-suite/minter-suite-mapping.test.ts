@@ -3,7 +3,8 @@ import {
   assert,
   clearStore,
   test,
-  newMockEvent
+  newMockEvent,
+  logStore
 } from "matchstick-as/assembly/index";
 import { Minter, ProjectMinterConfiguration } from "../../../generated/schema";
 import {
@@ -36,9 +37,10 @@ import {
   MinimumAuctionLengthSecondsUpdated as DALinV1MinimumAuctionLengthSecondsUpdated
 } from "../../../generated/MinterDALinV1/MinterDALinV1";
 import {
-  handleAddManyAddressValue,
-  handleAddManyBigIntValue,
-  handleAddManyBytesValue,
+  handleAddManyAddressValueProjectConfig as handleAddManyAddressValue,
+  handleAddManyBigIntValueProjectConfig as handleAddManyBigIntValue,
+  handleAddManyBytesValueProjectConfig as handleAddManyBytesValue,
+  handleAllowHoldersOfProject,
   handleAuctionHalfLifeRangeSecondsUpdated,
   handleDAExpResetAuctionDetails,
   handleDAExpSetAuctionDetails,
@@ -48,13 +50,16 @@ import {
   handlePricePerTokenInWeiUpdated,
   handleProjectCurrencyInfoUpdated,
   handlePurchaseToDisabledUpdated,
-  handleRemoveBigIntManyValue,
-  handleRemoveBytesManyValue,
-  handleRemoveValue,
-  handleSetAddressValue,
-  handleSetBigIntValue,
-  handleSetBooleanValue,
-  handleSetBytesValue
+  handleRegisteredNFTAddress,
+  handleRemoveBigIntManyValueProjectConfig as handleRemoveBigIntManyValue,
+  handleRemoveBytesManyValueProjectConfig as handleRemoveBytesManyValue,
+  handleRemoveHoldersOfProject,
+  handleRemoveValueProjectConfig as handleRemoveValue,
+  handleSetAddressValueProjectConfig as handleSetAddressValue,
+  handleSetBigIntValueProjectConfig as handleSetBigIntValue,
+  handleSetBooleanValueProjectConfig as handleSetBooleanValue,
+  handleSetBytesValueProjectConfig as handleSetBytesValue,
+  handleUnregisteredNFTAddress
 } from "../../../src/minter-suite-mapping";
 import {
   AuctionHalfLifeRangeSecondsUpdated,
@@ -79,6 +84,12 @@ import {
   ConfigValueSet2 as ConfigValueSetAddress,
   ConfigValueSet3 as ConfigValueSetBytes
 } from "../../../generated/MinterFilterV0/IFilteredMinterV1";
+import {
+  AllowHoldersOfProject,
+  RemovedHoldersOfProject,
+  RegisteredNFTAddress,
+  UnregisteredNFTAddress
+} from "../../../generated/MinterHolderV0/MinterHolderV0";
 
 const randomAddressGenerator = new RandomAddressGenerator();
 
@@ -1957,5 +1968,205 @@ test("handleRemoveBytesManyValue should remove the key/value from extraMinterDet
     getProjectMinterConfigId(minterAddress.toHexString(), project.id),
     "extraMinterDetails",
     '{"addresses":"hi","removeMe":["alive"]}'
+  );
+});
+test("handleAllowHoldersOfProject can add address + project id to extraMinterDetails", () => {
+  clearStore();
+  const minterAddress = randomAddressGenerator.generateRandomAddress();
+  const minterType = "MinterHolderV0";
+  const minter = new Minter(minterAddress.toHexString());
+  minter.coreContract = TEST_CONTRACT_ADDRESS.toHexString();
+  minter.type = minterType;
+  minter.save();
+
+  const projectId = BigInt.fromI32(0);
+  const project = addNewProjectToStore(
+    TEST_CONTRACT_ADDRESS,
+    projectId,
+    "project 0",
+    randomAddressGenerator.generateRandomAddress(),
+    BigInt.fromI32(0),
+    CURRENT_BLOCK_TIMESTAMP.minus(BigInt.fromI32(10))
+  );
+
+  const projectMinterConfig = new ProjectMinterConfiguration(
+    getProjectMinterConfigId(minterAddress.toHexString(), project.id)
+  );
+  projectMinterConfig.minter = minterAddress.toHexString();
+  projectMinterConfig.project = project.id;
+  projectMinterConfig.save();
+
+  let testAddy = randomAddressGenerator.generateRandomAddress();
+
+  const allowHolderEvent: AllowHoldersOfProject = changetype<
+    AllowHoldersOfProject
+  >(newMockEvent());
+  allowHolderEvent.address = minterAddress;
+  allowHolderEvent.parameters = [
+    new ethereum.EventParam(
+      "_projectId",
+      ethereum.Value.fromUnsignedBigInt(projectId)
+    ),
+    new ethereum.EventParam(
+      "_ownedNFTAddress",
+      ethereum.Value.fromAddress(testAddy)
+    ),
+    new ethereum.EventParam(
+      "_ownedNFTProjectId",
+      ethereum.Value.fromUnsignedBigInt(BigInt.fromI32(1))
+    )
+  ];
+  allowHolderEvent.block.timestamp = CURRENT_BLOCK_TIMESTAMP;
+
+  handleAllowHoldersOfProject(allowHolderEvent);
+
+  assert.fieldEquals(
+    PROJECT_MINTER_CONFIGURATION_ENTITY_TYPE,
+    getProjectMinterConfigId(minterAddress.toHexString(), project.id),
+    "extraMinterDetails",
+    '{"allowlistedAddressAndProjectId":[' +
+      '"' +
+      testAddy.toHexString() +
+      "-" +
+      "1" +
+      '"' +
+      "]}"
+  );
+});
+test("handleRemoveHoldersOfProject can remove address + project id to extraMinterDetails", () => {
+  clearStore();
+  const minterAddress = randomAddressGenerator.generateRandomAddress();
+  const minterType = "MinterHolderV0";
+  const minter = new Minter(minterAddress.toHexString());
+  minter.coreContract = TEST_CONTRACT_ADDRESS.toHexString();
+  minter.type = minterType;
+  minter.save();
+
+  const projectId = BigInt.fromI32(0);
+  const project = addNewProjectToStore(
+    TEST_CONTRACT_ADDRESS,
+    projectId,
+    "project 0",
+    randomAddressGenerator.generateRandomAddress(),
+    BigInt.fromI32(0),
+    CURRENT_BLOCK_TIMESTAMP.minus(BigInt.fromI32(10))
+  );
+
+  let testAddy = randomAddressGenerator.generateRandomAddress();
+
+  const projectMinterConfig = new ProjectMinterConfiguration(
+    getProjectMinterConfigId(minterAddress.toHexString(), project.id)
+  );
+  projectMinterConfig.minter = minterAddress.toHexString();
+  projectMinterConfig.project = project.id;
+  projectMinterConfig.extraMinterDetails =
+    '{"allowlistedAddressAndProjectId":' +
+    "[" +
+    '"' +
+    testAddy.toHexString() +
+    "-1" +
+    '"' +
+    "," +
+    '"' +
+    "dontremove-0" +
+    '"' +
+    "]}";
+  projectMinterConfig.save();
+
+  const removeHolderEvent: RemovedHoldersOfProject = changetype<
+    RemovedHoldersOfProject
+  >(newMockEvent());
+  removeHolderEvent.address = minterAddress;
+  removeHolderEvent.parameters = [
+    new ethereum.EventParam(
+      "_projectId",
+      ethereum.Value.fromUnsignedBigInt(projectId)
+    ),
+    new ethereum.EventParam(
+      "_ownedNFTAddress",
+      ethereum.Value.fromAddress(testAddy)
+    ),
+    new ethereum.EventParam(
+      "_ownedNFTProjectId",
+      ethereum.Value.fromUnsignedBigInt(BigInt.fromI32(1))
+    )
+  ];
+  removeHolderEvent.block.timestamp = CURRENT_BLOCK_TIMESTAMP;
+
+  handleRemoveHoldersOfProject(removeHolderEvent);
+
+  assert.fieldEquals(
+    PROJECT_MINTER_CONFIGURATION_ENTITY_TYPE,
+    getProjectMinterConfigId(minterAddress.toHexString(), project.id),
+    "extraMinterDetails",
+    '{"allowlistedAddressAndProjectId":["dontremove-0"]}'
+  );
+});
+test("handleRegisteredNFTAddress adds the address, as a string to the minter", () => {
+  clearStore();
+  const minterAddress = randomAddressGenerator.generateRandomAddress();
+  const minterType = "MinterHolderV0";
+  const minter = new Minter(minterAddress.toHexString());
+  minter.coreContract = TEST_CONTRACT_ADDRESS.toHexString();
+  minter.type = minterType;
+  minter.save();
+
+  const testAddy = randomAddressGenerator.generateRandomAddress();
+
+  const registerNFTAddressEvent: RegisteredNFTAddress = changetype<
+    RegisteredNFTAddress
+  >(newMockEvent());
+  registerNFTAddressEvent.address = minterAddress;
+  registerNFTAddressEvent.parameters = [
+    new ethereum.EventParam("_NFTAddress", ethereum.Value.fromAddress(testAddy))
+  ];
+  registerNFTAddressEvent.block.timestamp = CURRENT_BLOCK_TIMESTAMP;
+
+  handleRegisteredNFTAddress(registerNFTAddressEvent);
+
+  assert.fieldEquals(
+    MINTER_ENTITY_TYPE,
+    minter.id,
+    "extraMinterDetails",
+    '{"registeredNFTAddresses":[' + '"' + testAddy.toHexString() + '"' + "]}"
+  );
+});
+test("handleUnRegisteredNFTAddress removes the address from the minter", () => {
+  clearStore();
+  const minterAddress = randomAddressGenerator.generateRandomAddress();
+  const minterType = "MinterHolderV0";
+  const minter = new Minter(minterAddress.toHexString());
+  minter.coreContract = TEST_CONTRACT_ADDRESS.toHexString();
+  minter.type = minterType;
+  const testAddy = randomAddressGenerator.generateRandomAddress();
+  minter.extraMinterDetails =
+    '{"registeredNFTAddresses":' +
+    "[" +
+    '"' +
+    testAddy.toHexString() +
+    '"' +
+    "," +
+    '"' +
+    "0x" +
+    '"' +
+    "]}";
+  minter.save();
+
+  const unregisterNFTAddressEvent: UnregisteredNFTAddress = changetype<
+    UnregisteredNFTAddress
+  >(newMockEvent());
+  unregisterNFTAddressEvent.address = minterAddress;
+  unregisterNFTAddressEvent.parameters = [
+    new ethereum.EventParam("_NFTAddress", ethereum.Value.fromAddress(testAddy))
+  ];
+  unregisterNFTAddressEvent.block.timestamp = CURRENT_BLOCK_TIMESTAMP;
+
+  handleUnregisteredNFTAddress(unregisterNFTAddressEvent);
+
+  assert.fieldEquals(
+    MINTER_ENTITY_TYPE,
+    minter.id,
+    "extraMinterDetails",
+    '{"registeredNFTAddresses":["0x"]}'
   );
 });

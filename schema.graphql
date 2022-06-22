@@ -238,6 +238,8 @@ enum MinterType {
   MinterSetPriceERC20V1
   MinterDALinV1
   MinterDAExpV1
+  MinterHolderV0
+  MinterMerkleV0
 }
 
 type Minter @entity {
@@ -258,6 +260,9 @@ type Minter @entity {
 
   "Maximum allowed half life in seconds (exponential Dutch auction minters)"
   maximumHalfLifeInSeconds: BigInt
+
+  "Configuration details used by specific minters (json string)"
+  extraMinterDetails: String!
 
   coreContract: Contract!
 
@@ -301,7 +306,7 @@ type ProjectMinterConfiguration @entity {
   "Linear Dutch auction end time (unix timestamp)"
   endTime: BigInt
 
-  "Configuration details used by specific minters (json string)"
+  "Configuration details used by specific minter project configurations (json string)"
   extraMinterDetails: String!
 }
 
