@@ -1227,12 +1227,8 @@ export class Token extends Entity {
     }
   }
 
-  get openSeaSaleLookupTables(): Array<string> {
-    let value = this.get("openSeaSaleLookupTables");
-
   get saleLookupTables(): Array<string> {
     let value = this.get("saleLookupTables");
-
     return value!.toStringArray();
   }
 
