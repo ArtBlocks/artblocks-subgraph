@@ -227,7 +227,7 @@ type MinterFilter @entity {
   minterAllowlist: [Minter!]!
 
   "Minters associated with MinterFilter"
-  minters: [Minter!]! @derivedFrom(field: "minterFilter")
+  associatedMinters: [Minter!]! @derivedFrom(field: "minterFilter")
 
   updatedAt: BigInt!
 }
