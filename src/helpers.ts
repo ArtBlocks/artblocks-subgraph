@@ -67,10 +67,8 @@ export function loadOrCreateMinter(
    */
   minter = new Minter(minterAddress.toHexString());
   let filteredMinterContract = IFilteredMinterV0.bind(minterAddress);
-  let minterType = filteredMinterContract.minterType();
 
   // values assigned in contract constructors
-  minter.type = minterType;
   minter.minterFilter = filteredMinterContract
     .minterFilterAddress()
     .toHexString();
@@ -79,6 +77,8 @@ export function loadOrCreateMinter(
     .toHexString();
 
   // values assigned during contract deployments
+  let minterType = filteredMinterContract.minterType();
+  minter.type = minterType;
   if (minterType == "MinterDALinV0") {
     let minterDALinV0Contract = MinterDALinV0.bind(minterAddress);
     minter.minimumAuctionLengthInSeconds = minterDALinV0Contract.minimumAuctionLengthSeconds();
