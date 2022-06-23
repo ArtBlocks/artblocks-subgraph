@@ -1,18 +1,16 @@
-import {
-  Address,
-  BigInt,
-} from "@graphprotocol/graph-ts";
+import { Address, BigInt } from "@graphprotocol/graph-ts";
 
-import { AtomicMatch_Call, } from "../../../generated/WyvernExchange/WyvernExchange";
+import { AtomicMatch_Call } from "../../../generated/WyvernExchange/WyvernExchange";
 
 import {
   Contract,
   Sale,
   Token,
-  SaleLookupTable
+  SaleLookupTable,
+  Payment
 } from "../../../generated/schema";
 
-import { WYVERN_ATOMICIZER_ADDRESS, } from "../../constants";
+import { WYVERN_ATOMICIZER_ADDRESS } from "../../constants";
 
 import { generateContractSpecificId } from "../../helpers";
 
@@ -97,8 +95,8 @@ function _handleSingleAssetSale(call: AtomicMatch_Call): void {
     addrs[10]
   );
 
-  let buyerAdress: Address = addrs[1]; // Buyer.maker
-  let sellerAdress: Address = addrs[8]; // Saler.maker
+  let buyerAddress: Address = addrs[1]; // Buyer.maker
+  let sellerAddress: Address = addrs[8]; // Saler.maker
   let paymentTokenErc20Address: Address = addrs[6];
 
   // Merge sell order data with buy order data (just like they are doing in their contract)
@@ -109,7 +107,9 @@ function _handleSingleAssetSale(call: AtomicMatch_Call): void {
   );
 
   // Fetch the token ID that has been sold from the call data
-  let tokenIdStr = getSingleTokenIdFromTransferFromCallData(callInputs.calldataBuy);
+  let tokenIdStr = getSingleTokenIdFromTransferFromCallData(
+    callInputs.calldataBuy
+  );
 
   let token = Token.load(
     generateContractSpecificId(nftContract, BigInt.fromString(tokenIdStr))
@@ -128,16 +128,21 @@ function _handleSingleAssetSale(call: AtomicMatch_Call): void {
   sale.saleType = "Single";
   sale.blockNumber = call.block.number;
   sale.blockTimestamp = call.block.timestamp;
-  sale.buyer = buyerAdress;
-  sale.seller = sellerAdress;
-  sale.paymentToken = paymentTokenErc20Address;
-  sale.price = price;
+  sale.buyer = buyerAddress;
+  sale.seller = sellerAddress;
   sale.summaryTokensSold = token.id;
   sale.isPrivate = isPrivateSale(call.from, addrs);
   sale.save();
 
   token.nextSaleId = token.nextSaleId.plus(BigInt.fromI32(1));
   token.save();
+
+  let payment = new Payment(saleId + "-0");
+  payment.sale = saleId;
+  payment.paymentToken = paymentTokenErc20Address;
+  payment.price = price;
+  payment.recipient = buyerAddress;
+  payment.save();
 
   // Create the associated entry in the Nft <=> lookup table
   let tableEntryId = buildTokenSaleLookupTableId(
@@ -197,7 +202,10 @@ function _handleBundleSale(call: AtomicMatch_Call): void {
   );
 
   // Fetch the token IDs list that has been sold from the call data for this bundle sale
-  let results = getNftContractAddressAndTokenIdFromAtomicizerCallData(1, callInputs.calldataBuy);
+  let results = getNftContractAddressAndTokenIdFromAtomicizerCallData(
+    1,
+    callInputs.calldataBuy
+  );
   let nftContractList = results[0];
   let bundleIncludesArtBlocks = false;
   for (let i = 0; i < nftContractList.length; i++) {

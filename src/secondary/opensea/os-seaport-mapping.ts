@@ -1,4 +1,3 @@
-import { BigInt } from "@graphprotocol/graph-ts";
 import { log } from "matchstick-as";
 
 import {
@@ -92,7 +91,7 @@ export function handleOrderFulfilled(event: OrderFulfilled): void {
     return;
   }
 
-  let payments = new Map<string, Payment>();
+  let payments = new Array<Payment>();
   for (let i = 0; i < event.params.consideration.length; i++) {
     const considerationItem = event.params.consideration[i];
 
@@ -104,20 +103,12 @@ export function handleOrderFulfilled(event: OrderFulfilled): void {
       continue;
     }
 
-    let p: Payment | null = payments.has(considerationItem.token.toHexString())
-      ? payments.get(considerationItem.token.toHexString())
-      : null;
-
-    // Create payment if haven't created yet
-    if (!p) {
-      p = new Payment(saleId + "-" + i.toString());
-      p.sale = saleId;
-      p.paymentToken = considerationItem.token;
-      p.price = BigInt.zero();
-      payments.set(considerationItem.token.toHexString(), p);
-    }
-    p.price = p.price.plus(considerationItem.amount);
-    p.save();
+    let p = new Payment(saleId + "-" + i.toString());
+    p.sale = saleId;
+    p.paymentToken = considerationItem.token;
+    p.price = considerationItem.amount;
+    p.recipient = considerationItem.recipient;
+    payments.push(p);
   }
 
   // Create sale
@@ -131,15 +122,13 @@ export function handleOrderFulfilled(event: OrderFulfilled): void {
   sale.seller = event.params.offerer;
   sale.isPrivate = false; //isPrivateSale(call.from, addrs);
   sale.summaryTokensSold = summaryTokensSold;
-  if (payments.size == 1) {
-    sale.paymentToken = payments.values()[0].paymentToken;
-    sale.price = payments.values()[0].price;
-  }
   sale.save();
 
+  for (let i = 0; i < payments.length; i++) {
+    payments[i].save();
+  }
   // Lastly, save the lookup tables (must be saved AFTER project gets saved)
   for (let i = 0; i < saleLookupTables.length; i++) {
     saleLookupTables[i].save();
-    log.info("Project {}", [saleLookupTables[i].project]);
   }
 }

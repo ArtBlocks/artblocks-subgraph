@@ -3,25 +3,30 @@ import {
   Token,
   SaleLookupTable,
   Sale,
-  Project
+  Project,
+  Payment
 } from "../../../../generated/schema";
 import { Address, BigInt } from "@graphprotocol/graph-ts";
 
 import { buildTokenSaleLookupTableId } from "../../../../src/secondary/secondary-helpers";
-import { addNewContractToStore, addNewTokenToStore } from "../secondaryHelpers";
-import { generateContractSpecificId } from "../../../../src/helpers";
-import { addNewProjectToStore } from "../../shared-helpers";
-import { handleOrderFulfilled } from "../../../../src/secondary/opensea/os-seaport-mapping";
-import { DEFAULT_PRICE, DEFAULT_COLLECTION } from "../secondaryHelpers";
 import {
+  addNewContractToStore,
+  addNewProjectToStore,
+  addNewTokenToStore,
+  DEFAULT_COLLECTION,
   DEFAULT_CURRENCY,
   DEFAULT_MAKER,
+  DEFAULT_ORDER_HASH,
+  DEFAULT_PRICE,
   DEFAULT_TAKER
-} from "../secondaryHelpers";
+} from "../../shared-helpers";
+import { generateContractSpecificId } from "../../../../src/helpers";
+import { handleOrderFulfilled } from "../../../../src/secondary/opensea/os-seaport-mapping";
 import {
   createOrderFulfilledEvent,
-  DEFAULT_ORDER_HASH
-} from "../secondaryHelpers";
+  MOCK_AB_ADDRESS,
+  MOCK_OS_ADDRESS
+} from "./seaportHelpers";
 
 test("handleOrderFulfilled should create sale if contract and token are in store", () => {
   addNewContractToStore();
@@ -51,13 +56,100 @@ test("handleOrderFulfilled should create sale if contract and token are in store
     "txHash",
     orderFulfilledEvent.transaction.hash.toHexString()
   );
-  assert.fieldEquals("Sale", saleId, "seller", DEFAULT_MAKER);
-  assert.fieldEquals("Sale", saleId, "buyer", DEFAULT_TAKER);
-  assert.fieldEquals("Sale", saleId, "paymentToken", DEFAULT_CURRENCY);
-  assert.fieldEquals("Sale", saleId, "price", DEFAULT_PRICE);
+  assert.fieldEquals("Sale", saleId, "seller", DEFAULT_MAKER.toHexString());
+  assert.fieldEquals("Sale", saleId, "buyer", DEFAULT_TAKER.toHexString());
   assert.fieldEquals("Sale", saleId, "summaryTokensSold", token.id);
   assert.fieldEquals("Sale", saleId, "isPrivate", "false");
   // Clear the store in order to start the next test off on a clean slate
+  clearStore();
+});
+
+test("handleOrderFulfilled should create Payment table", () => {
+  addNewContractToStore();
+  let token = addNewTokenToStore();
+  let orderFulfilledEvent = createOrderFulfilledEvent(false);
+  handleOrderFulfilled(orderFulfilledEvent);
+  let saleId = orderFulfilledEvent.params.orderHash.toHexString();
+
+  let sale = Sale.load(saleId)!;
+  let paymentsFromSale = sale.payments;
+  let one = Payment.load(paymentsFromSale[0]);
+  // log.info("Present {} {} {}", [
+  //   paymentsFromSale[0],
+  //   one?.recipient.toString(),
+  //   one?.price.toString()
+  // ]);
+  assert.i32Equals(paymentsFromSale.length, 3);
+
+  // Buyer portion
+  assert.fieldEquals(
+    "Payment",
+    paymentsFromSale[0],
+    "price",
+    DEFAULT_PRICE.div(BigInt.fromI32(10))
+      .times(BigInt.fromI32(9))
+      .toString()
+  );
+  assert.fieldEquals(
+    "Payment",
+    paymentsFromSale[0],
+    "paymentToken",
+    DEFAULT_CURRENCY.toHexString()
+  );
+  assert.fieldEquals("Payment", paymentsFromSale[0], "sale", saleId);
+  assert.fieldEquals(
+    "Payment",
+    paymentsFromSale[0],
+    "recipient",
+    DEFAULT_TAKER.toHexString()
+  );
+
+  // AB Portion
+  assert.fieldEquals(
+    "Payment",
+    paymentsFromSale[1],
+    "price",
+    DEFAULT_PRICE.div(BigInt.fromI32(1000))
+      .times(BigInt.fromI32(75))
+      .toString()
+  );
+  assert.fieldEquals(
+    "Payment",
+    paymentsFromSale[1],
+    "paymentToken",
+    DEFAULT_CURRENCY.toHexString()
+  );
+  assert.fieldEquals("Payment", paymentsFromSale[1], "sale", saleId);
+  assert.fieldEquals(
+    "Payment",
+    paymentsFromSale[1],
+    "recipient",
+    MOCK_AB_ADDRESS.toHexString()
+  );
+
+  // OS Portion
+  assert.fieldEquals(
+    "Payment",
+    paymentsFromSale[2],
+    "price",
+    DEFAULT_PRICE.div(BigInt.fromI32(1000))
+      .times(BigInt.fromI32(25))
+      .toString()
+  );
+  assert.fieldEquals(
+    "Payment",
+    paymentsFromSale[2],
+    "paymentToken",
+    DEFAULT_CURRENCY.toHexString()
+  );
+  assert.fieldEquals("Payment", paymentsFromSale[2], "sale", saleId);
+  assert.fieldEquals(
+    "Payment",
+    paymentsFromSale[2],
+    "recipient",
+    MOCK_OS_ADDRESS.toHexString()
+  );
+
   clearStore();
 });
 
@@ -213,6 +305,7 @@ test("handleOrderFulfilled should update saleLookUpTables of sale if contract an
     "blockNumber",
     saleLookUpTable.blockNumber.toString()
   );
+  clearStore();
 });
 
 test("handleOrderFulfilled should update saleLookUpTables of project if contract and token are in store", () => {
@@ -301,10 +394,16 @@ test("handleOrderFulfilled should not create sale if token is not in store", () 
 
 // --------------- BUNDLE SALE TESTS --------------------------------
 
-test("handleOrderFulfilled should create bundle sale if contract and token are in store", () => {
+test("Bundle - handleOrderFulfilled should create bundle sale if contract and token are in store", () => {
   addNewContractToStore();
-  let token1 = addNewTokenToStore(DEFAULT_COLLECTION, "10", "7019");
-  let token2 = addNewTokenToStore(DEFAULT_COLLECTION, "11", "7020");
+  let token1 = addNewTokenToStore(
+    DEFAULT_COLLECTION,
+    BigInt.fromString("7019")
+  );
+  let token2 = addNewTokenToStore(
+    DEFAULT_COLLECTION,
+    BigInt.fromString("7020")
+  );
   let orderFulfilledEvent = createOrderFulfilledEvent(false, true);
   handleOrderFulfilled(orderFulfilledEvent);
   let saleId = orderFulfilledEvent.params.orderHash.toHexString();
@@ -330,10 +429,8 @@ test("handleOrderFulfilled should create bundle sale if contract and token are i
     "txHash",
     orderFulfilledEvent.transaction.hash.toHexString()
   );
-  assert.fieldEquals("Sale", saleId, "seller", DEFAULT_MAKER);
-  assert.fieldEquals("Sale", saleId, "buyer", DEFAULT_TAKER);
-  assert.fieldEquals("Sale", saleId, "paymentToken", DEFAULT_CURRENCY);
-  assert.fieldEquals("Sale", saleId, "price", DEFAULT_PRICE);
+  assert.fieldEquals("Sale", saleId, "seller", DEFAULT_MAKER.toHexString());
+  assert.fieldEquals("Sale", saleId, "buyer", DEFAULT_TAKER.toHexString());
   assert.fieldEquals(
     "Sale",
     saleId,
@@ -345,10 +442,107 @@ test("handleOrderFulfilled should create bundle sale if contract and token are i
   clearStore();
 });
 
-test("handleOrderFulfilled should create saleLookUpTables for bundle if contract and token are in store", () => {
+test("Bundle - handleOrderFulfilled should create Payment table", () => {
   addNewContractToStore();
-  let token1 = addNewTokenToStore(DEFAULT_COLLECTION, "10", "7019");
-  let token2 = addNewTokenToStore(DEFAULT_COLLECTION, "11", "7020");
+  let token1 = addNewTokenToStore(
+    DEFAULT_COLLECTION,
+    BigInt.fromString("7019")
+  );
+  let token2 = addNewTokenToStore(
+    DEFAULT_COLLECTION,
+    BigInt.fromString("7020")
+  );
+  let orderFulfilledEvent = createOrderFulfilledEvent(false, true);
+  handleOrderFulfilled(orderFulfilledEvent);
+  let saleId = orderFulfilledEvent.params.orderHash.toHexString();
+
+  let sale = Sale.load(saleId)!;
+  let paymentsFromSale = sale.payments;
+
+  assert.i32Equals(paymentsFromSale.length, 3);
+
+  // Buyer portion
+  assert.fieldEquals(
+    "Payment",
+    paymentsFromSale[0],
+    "price",
+    DEFAULT_PRICE.div(BigInt.fromI32(10))
+      .times(BigInt.fromI32(9))
+      .toString()
+  );
+  assert.fieldEquals(
+    "Payment",
+    paymentsFromSale[0],
+    "paymentToken",
+    DEFAULT_CURRENCY.toHexString()
+  );
+  assert.fieldEquals("Payment", paymentsFromSale[0], "sale", saleId);
+  assert.fieldEquals(
+    "Payment",
+    paymentsFromSale[0],
+    "recipient",
+    DEFAULT_TAKER.toHexString()
+  );
+
+  // AB Portion
+  assert.fieldEquals(
+    "Payment",
+    paymentsFromSale[1],
+    "price",
+    DEFAULT_PRICE.div(BigInt.fromI32(1000))
+      .times(BigInt.fromI32(75))
+      .toString()
+  );
+  assert.fieldEquals(
+    "Payment",
+    paymentsFromSale[1],
+    "paymentToken",
+    DEFAULT_CURRENCY.toHexString()
+  );
+  assert.fieldEquals("Payment", paymentsFromSale[1], "sale", saleId);
+  assert.fieldEquals(
+    "Payment",
+    paymentsFromSale[1],
+    "recipient",
+    MOCK_AB_ADDRESS.toHexString()
+  );
+
+  // OS Portion
+  assert.fieldEquals(
+    "Payment",
+    paymentsFromSale[2],
+    "price",
+    DEFAULT_PRICE.div(BigInt.fromI32(1000))
+      .times(BigInt.fromI32(25))
+      .toString()
+  );
+  assert.fieldEquals(
+    "Payment",
+    paymentsFromSale[2],
+    "paymentToken",
+    DEFAULT_CURRENCY.toHexString()
+  );
+  assert.fieldEquals("Payment", paymentsFromSale[2], "sale", saleId);
+  assert.fieldEquals(
+    "Payment",
+    paymentsFromSale[2],
+    "recipient",
+    MOCK_OS_ADDRESS.toHexString()
+  );
+
+  clearStore();
+});
+
+test("Bundle - handleOrderFulfilled should create saleLookUpTables for bundle if contract and token are in store", () => {
+  addNewContractToStore();
+  let token1 = addNewTokenToStore(
+    DEFAULT_COLLECTION,
+    BigInt.fromString("7019")
+  );
+  let token2 = addNewTokenToStore(
+    DEFAULT_COLLECTION,
+    BigInt.fromString("7020")
+  );
   let orderFulfilledEvent = createOrderFulfilledEvent(false, true);
   handleOrderFulfilled(orderFulfilledEvent);
 
@@ -412,10 +606,16 @@ test("handleOrderFulfilled should create saleLookUpTables for bundle if contract
   clearStore();
 });
 
-test("handleOrderFulfilled should update saleLookUpTables of tokens if contract and token are in store", () => {
+test("Bundle - handleOrderFulfilled should update saleLookUpTables of tokens if contract and token are in store", () => {
   addNewContractToStore();
-  let token1 = addNewTokenToStore(DEFAULT_COLLECTION, "10", "7019");
-  let token2 = addNewTokenToStore(DEFAULT_COLLECTION, "11", "7020");
+  let token1 = addNewTokenToStore(
+    DEFAULT_COLLECTION,
+    BigInt.fromString("7019")
+  );
+  let token2 = addNewTokenToStore(
+    DEFAULT_COLLECTION,
+    BigInt.fromString("7020")
+  );
   let orderFulfilledEvent = createOrderFulfilledEvent(false, true);
   handleOrderFulfilled(orderFulfilledEvent);
 
@@ -437,16 +637,10 @@ test("handleOrderFulfilled should update saleLookUpTables of tokens if contract 
   let saleLookUpTable2 = SaleLookupTable.load(saleLookUpTableId2)!;
 
   token1 = Token.load(
-    generateContractSpecificId(
-      Address.fromString(DEFAULT_COLLECTION),
-      BigInt.fromString("7019")
-    )
+    generateContractSpecificId(DEFAULT_COLLECTION, BigInt.fromString("7019"))
   )!;
   token2 = Token.load(
-    generateContractSpecificId(
-      Address.fromString(DEFAULT_COLLECTION),
-      BigInt.fromString("7020")
-    )
+    generateContractSpecificId(DEFAULT_COLLECTION, BigInt.fromString("7020"))
   )!;
   let saleLookUpTableFromToken1 = token1.saleLookupTables;
   let saleLookUpTableFromToken2 = token2.saleLookupTables;
@@ -518,10 +712,16 @@ test("handleOrderFulfilled should update saleLookUpTables of tokens if contract 
   clearStore();
 });
 
-test("handleOrderFulfilled should update saleLookUpTables of bundle sale if contract and token are in store", () => {
+test("Bundle - handleOrderFulfilled should update saleLookUpTables of bundle sale if contract and token are in store", () => {
   addNewContractToStore();
-  let token1 = addNewTokenToStore(DEFAULT_COLLECTION, "10", "7019");
-  let token2 = addNewTokenToStore(DEFAULT_COLLECTION, "11", "7020");
+  let token1 = addNewTokenToStore(
+    DEFAULT_COLLECTION,
+    BigInt.fromString("7019")
+  );
+  let token2 = addNewTokenToStore(
+    DEFAULT_COLLECTION,
+    BigInt.fromString("7020")
+  );
   let orderFulfilledEvent = createOrderFulfilledEvent(false, true);
   handleOrderFulfilled(orderFulfilledEvent);
 
@@ -573,7 +773,7 @@ test("handleOrderFulfilled should update saleLookUpTables of bundle sale if cont
   clearStore();
 });
 
-test("handleOrderFulfilled should update saleLookUpTables of projects if contract and token are in store", () => {
+test("Bundle - handleOrderFulfilled should update saleLookUpTables of projects if contract and token are in store", () => {
   addNewContractToStore();
   let randomAddress = Address.fromString(
     "0xd8a5d498ab43ed060cb6629b97a19e3e4276dd9f"
@@ -594,8 +794,16 @@ test("handleOrderFulfilled should update saleLookUpTables of projects if contrac
     BigInt.fromString("1"),
     BigInt.fromString("1621328822")
   );
-  let token1 = addNewTokenToStore(DEFAULT_COLLECTION, "10", "7019");
-  let token2 = addNewTokenToStore(DEFAULT_COLLECTION, "11", "7020");
+  let token1 = addNewTokenToStore(
+    DEFAULT_COLLECTION,
+    BigInt.fromString("7019"),
+    project1.projectId
+  );
+  let token2 = addNewTokenToStore(
+    DEFAULT_COLLECTION,
+    BigInt.fromString("7020"),
+    project2.projectId
+  );
 
   let orderFulfilledEvent = createOrderFulfilledEvent(false, true);
 
@@ -693,7 +901,7 @@ test("handleOrderFulfilled should update saleLookUpTables of projects if contrac
   clearStore();
 });
 
-test("handleOrderFulfilled should not create sale if token is not in store", () => {
+test("Bundle - handleOrderFulfilled should not create sale if token is not in store", () => {
   addNewContractToStore();
   let orderFulfilledEvent = createOrderFulfilledEvent(false, true);
 

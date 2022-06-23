@@ -1316,6 +1316,7 @@ export class Minter extends Entity {
 
     this.set("type", Value.fromString(""));
     this.set("minterFilter", Value.fromString(""));
+    this.set("extraMinterDetails", Value.fromString(""));
     this.set("coreContract", Value.fromString(""));
     this.set("updatedAt", Value.fromBigInt(BigInt.zero()));
   }
@@ -1416,6 +1417,15 @@ export class Minter extends Entity {
     } else {
       this.set("maximumHalfLifeInSeconds", Value.fromBigInt(<BigInt>value));
     }
+  }
+
+  get extraMinterDetails(): string {
+    let value = this.get("extraMinterDetails");
+    return value!.toString();
+  }
+
+  set extraMinterDetails(value: string) {
+    this.set("extraMinterDetails", Value.fromString(value));
   }
 
   get coreContract(): string {
@@ -1639,6 +1649,7 @@ export class Payment extends Entity {
     this.set("paymentToken", Value.fromBytes(Bytes.empty()));
     this.set("price", Value.fromBigInt(BigInt.zero()));
     this.set("sale", Value.fromString(""));
+    this.set("recipient", Value.fromBytes(Bytes.empty()));
   }
 
   save(): void {
@@ -1693,6 +1704,15 @@ export class Payment extends Entity {
   set sale(value: string) {
     this.set("sale", Value.fromString(value));
   }
+
+  get recipient(): Bytes {
+    let value = this.get("recipient");
+    return value!.toBytes();
+  }
+
+  set recipient(value: Bytes) {
+    this.set("recipient", Value.fromBytes(value));
+  }
 }
 
 export class Sale extends Entity {
@@ -1708,8 +1728,6 @@ export class Sale extends Entity {
     this.set("summaryTokensSold", Value.fromString(""));
     this.set("seller", Value.fromBytes(Bytes.empty()));
     this.set("buyer", Value.fromBytes(Bytes.empty()));
-    this.set("paymentToken", Value.fromBytes(Bytes.empty()));
-    this.set("price", Value.fromBigInt(BigInt.zero()));
     this.set("isPrivate", Value.fromBoolean(false));
   }
 
@@ -1818,24 +1836,6 @@ export class Sale extends Entity {
 
   set buyer(value: Bytes) {
     this.set("buyer", Value.fromBytes(value));
-  }
-
-  get paymentToken(): Bytes {
-    let value = this.get("paymentToken");
-    return value!.toBytes();
-  }
-
-  set paymentToken(value: Bytes) {
-    this.set("paymentToken", Value.fromBytes(value));
-  }
-
-  get price(): BigInt {
-    let value = this.get("price");
-    return value!.toBigInt();
-  }
-
-  set price(value: BigInt) {
-    this.set("price", Value.fromBigInt(value));
   }
 
   get payments(): Array<string> {

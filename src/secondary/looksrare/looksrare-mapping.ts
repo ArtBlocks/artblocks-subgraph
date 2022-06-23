@@ -4,40 +4,44 @@ import {
   Token,
   Sale,
   SaleLookupTable,
-  Contract
+  Contract,
+  Payment
 } from "../../../generated/schema";
 
-import { TakerAsk, TakerBid } from "../../../generated/LooksRareExchange/LooksRareExchange";
+import {
+  TakerAsk,
+  TakerBid
+} from "../../../generated/LooksRareExchange/LooksRareExchange";
 
 import { generateContractSpecificId } from "../../helpers";
 import { buildTokenSaleLookupTableId } from "../secondary-helpers";
 import { LR_PRIVATE_SALE_STRATEGY } from "../../constants";
 
 /**
-* 
-* @param event TakerAsk
-* @description Event handler for the TakerAsk event. Forward call to `handleLooksRareEvents`
-*/
+ *
+ * @param event TakerAsk
+ * @description Event handler for the TakerAsk event. Forward call to `handleLooksRareEvents`
+ */
 export function handleTakerAsk(event: TakerAsk): void {
   handleSale(event);
 }
 
 /**
-* 
-* @param event TakerBid
-* @description Event handler for the TakerBid event. Forward call to `handleLooksRareEvents`
-*/
+ *
+ * @param event TakerBid
+ * @description Event handler for the TakerBid event. Forward call to `handleLooksRareEvents`
+ */
 export function handleTakerBid(event: TakerBid): void {
   handleSale(event);
 }
 
 /**
-* 
-* @param event TakerAsk or TakerBid event from looksrare, beeing emitted when a seller accept
-* an offer from a buyer (TakerAsk) or when a buyer accept to buy from a seller (TakerBid)
-* @description This function handle TakerAsk/TakerBid events from LooksRare, build the associated Sale and 
-* SaleLookUpTable entities and store them 
-*/
+ *
+ * @param event TakerAsk or TakerBid event from looksrare, beeing emitted when a seller accept
+ * an offer from a buyer (TakerAsk) or when a buyer accept to buy from a seller (TakerBid)
+ * @description This function handle TakerAsk/TakerBid events from LooksRare, build the associated Sale and
+ * SaleLookUpTable entities and store them
+ */
 function handleSale<T>(event: T): void {
   // Invalid call, not a valid event
   if (!(event instanceof TakerBid) && !(event instanceof TakerAsk)) {
@@ -53,7 +57,10 @@ function handleSale<T>(event: T): void {
 
   // The token must already exists (minted) to be sold on LooksRare
   let token = Token.load(
-    generateContractSpecificId(Address.fromString(event.params.collection.toHexString()), event.params.tokenId)
+    generateContractSpecificId(
+      Address.fromString(event.params.collection.toHexString()),
+      event.params.tokenId
+    )
   );
 
   // The token must already exist (minted) to be sold on LooksRare
@@ -77,11 +84,9 @@ function handleSale<T>(event: T): void {
     sale.buyer = event.params.taker;
     sale.seller = event.params.maker;
   }
-
-  sale.paymentToken = event.params.currency;
-  sale.price = event.params.price;
   sale.summaryTokensSold = token.id;
-  sale.isPrivate = event.params.strategy.toHexString() == LR_PRIVATE_SALE_STRATEGY;
+  sale.isPrivate =
+    event.params.strategy.toHexString() == LR_PRIVATE_SALE_STRATEGY;
   sale.save();
 
   // Create the associated entry in the Nft <=> lookup table
@@ -90,6 +95,13 @@ function handleSale<T>(event: T): void {
     token.id,
     saleId
   );
+
+  let payment = new Payment(saleId + "-0");
+  payment.sale = saleId;
+  payment.paymentToken = event.params.currency;
+  payment.price = event.params.price;
+  payment.recipient = event.params.taker;
+  payment.save();
 
   // Create saleLookUpTable with sale and token info
   let saleLookUpTable = new SaleLookupTable(tableEntryId);

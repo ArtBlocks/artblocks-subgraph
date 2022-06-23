@@ -732,6 +732,70 @@ dataSources:
           handler: handleDAExpV1SetAuctionDetails
       file: ./src/minter-suite-mapping.ts
   {{/minterDAExpV1Contracts}}
+  {{#minterHolderV0Contracts}}
+  - kind: ethereum/contract
+    name: 'MinterHolderV0-{{address}}'
+    network: {{network}}
+    source:
+      address: '{{address}}'
+      abi: MinterHolderV0
+      startBlock: {{startBlock}}
+    mapping:
+      kind: ethereum/events
+      apiVersion: 0.0.5
+      language: wasm/assemblyscript
+      entities:
+        - Project
+        - Contract
+        - MinterFilter
+        - Minter
+        - ProjectMinterConfiguration
+      abis:
+        - name: MinterHolderV0
+          file: ./abis/MinterHolderV0.json
+        - name: IFilteredMinterV0
+          file: ./abis/IFilteredMinterV0.json
+      eventHandlers:
+        - event: RegisteredNFTAddress(indexed address)
+          handler: handleRegisteredNFTAddress
+        - event: UnregisteredNFTAddress(indexed address)
+          handler: handleUnregisteredNFTAddress
+        - event: AllowHoldersOfProject(indexed uint256,address,uint256)
+          handler: handleAllowHoldersOfProject
+        - event: RemovedHoldersOfProject(indexed uint256,address,uint256)
+          handler: handleRemoveHoldersOfProject
+      file: ./src/minter-suite-mapping.ts
+  {{/minterHolderV0Contracts}}
+  {{#minterMerkleV0Contracts}}
+  - kind: ethereum/contract
+    name: 'MinterMerkleV0-{{address}}'
+    network: {{network}}
+    source:
+      address: '{{address}}'
+      abi: MinterMerkleV0
+      startBlock: {{startBlock}}
+    mapping:
+      kind: ethereum/events
+      apiVersion: 0.0.5
+      language: wasm/assemblyscript
+      entities:
+        - Project
+        - Contract
+        - MinterFilter
+        - Minter
+        - ProjectMinterConfiguration
+      abis:
+        - name: MinterMerkleV0
+          file: ./abis/MinterMerkleV0.json
+        - name: IFilteredMinterV0
+          file: ./abis/IFilteredMinterV0.json
+      eventHandlers:
+        - event: ConfigValueSet(indexed uint256,bytes32,bytes32)
+          handler: handleSetBytesValueProjectConfig
+        - event: ConfigValueSet(indexed uint256,bytes32,bool)
+          handler: handleSetBooleanValueProjectConfig
+      file: ./src/minter-suite-mapping.ts
+  {{/minterMerkleV0Contracts}}
   {{#openSeaContractV1}}
   - kind: ethereum/contract
     name: WyvernExchange

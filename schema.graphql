@@ -238,6 +238,8 @@ enum MinterType {
   MinterSetPriceERC20V1
   MinterDALinV1
   MinterDAExpV1
+  MinterHolderV0
+  MinterMerkleV0
 }
 
 type Minter @entity {
@@ -258,6 +260,9 @@ type Minter @entity {
 
   "Maximum allowed half life in seconds (exponential Dutch auction minters)"
   maximumHalfLifeInSeconds: BigInt
+
+  "Configuration details used by specific minters (json string)"
+  extraMinterDetails: String!
 
   coreContract: Contract!
 
@@ -301,7 +306,7 @@ type ProjectMinterConfiguration @entity {
   "Linear Dutch auction end time (unix timestamp)"
   endTime: BigInt
 
-  "Configuration details used by specific minters (json string)"
+  "Configuration details used by specific minter project configurations (json string)"
   extraMinterDetails: String!
 }
 
@@ -332,6 +337,9 @@ type Payment @entity {
 
   "The associated sale"
   sale: Sale!
+
+  "The recipient address"
+  recipient: Bytes!
 }
 
 type Sale @entity {
@@ -365,12 +373,7 @@ type Sale @entity {
   "The buyer address"
   buyer: Bytes!
 
-  "The ERC20 token used for the payement"
-  paymentToken: Bytes!
-
-  "The price of the sale"
-  price: BigInt!
-
+  "Array of Payments, should be referenced if multiplePaymentTypes is true"
   payments: [Payment!]! @derivedFrom(field: "sale")
 
   "Private sales are flagged by this boolean"

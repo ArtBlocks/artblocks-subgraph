@@ -12,15 +12,15 @@ import {
   handleTakerBid
 } from "../../../../src/secondary/looksrare/looksrare-mapping";
 import { buildTokenSaleLookupTableId } from "../../../../src/secondary/secondary-helpers";
+import { generateContractSpecificId } from "../../../../src/helpers";
+import { createTakerAskEvent, createTakerBidEvent } from "./looksrareHelpers";
+import { DEFAULT_PRICE, DEFAULT_TAKER } from "../../shared-helpers";
 import {
   addNewContractToStore,
+  addNewProjectToStore,
   addNewTokenToStore,
-  createTakerAskEvent,
-  createTakerBidEvent
-} from "../secondaryHelpers";
-import { generateContractSpecificId } from "../../../../src/helpers";
-import { addNewProjectToStore } from "../../shared-helpers";
-
+  DEFAULT_CURRENCY
+} from "../../shared-helpers";
 test("handleTakerBid should create sale if contract and token are in store", () => {
   addNewContractToStore();
   let token = addNewTokenToStore();
@@ -51,13 +51,28 @@ test("handleTakerBid should create sale if contract and token are in store", () 
     "blockTimestamp",
     takerBidEvent.block.timestamp.toString()
   );
+  let sale = Sale.load(saleId)!;
+  let paymentsFromSale = sale.payments;
   assert.fieldEquals(
-    "Sale",
-    saleId,
-    "paymentToken",
-    "0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2"
+    "Payment",
+    paymentsFromSale[0],
+    "price",
+    DEFAULT_PRICE.toString()
   );
-  assert.fieldEquals("Sale", saleId, "price", "700000000000000000");
+  assert.fieldEquals(
+    "Payment",
+    paymentsFromSale[0],
+    "paymentToken",
+    DEFAULT_CURRENCY.toHexString()
+  );
+  assert.fieldEquals(
+    "Payment",
+    paymentsFromSale[0],
+    "recipient",
+    DEFAULT_TAKER.toHexString()
+  );
+  assert.fieldEquals("Payment", paymentsFromSale[0], "sale", saleId);
+
   assert.fieldEquals("Sale", saleId, "summaryTokensSold", token.id);
   assert.fieldEquals("Sale", saleId, "isPrivate", "false");
 
@@ -401,13 +416,27 @@ test("handleTakerAsk should create sale if contract and token are in store", () 
     "blockTimestamp",
     TakerAskEvent.block.timestamp.toString()
   );
+  let sale = Sale.load(saleId)!;
+  let paymentsFromSale = sale.payments;
   assert.fieldEquals(
-    "Sale",
-    saleId,
-    "paymentToken",
-    "0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2"
+    "Payment",
+    paymentsFromSale[0],
+    "price",
+    DEFAULT_PRICE.toString()
   );
-  assert.fieldEquals("Sale", saleId, "price", "700000000000000000");
+  assert.fieldEquals(
+    "Payment",
+    paymentsFromSale[0],
+    "paymentToken",
+    DEFAULT_CURRENCY.toHexString()
+  );
+  assert.fieldEquals(
+    "Payment",
+    paymentsFromSale[0],
+    "recipient",
+    DEFAULT_TAKER.toHexString()
+  );
+  assert.fieldEquals("Payment", paymentsFromSale[0], "sale", saleId);
   assert.fieldEquals("Sale", saleId, "summaryTokensSold", token.id);
   assert.fieldEquals("Sale", saleId, "isPrivate", "false");
 

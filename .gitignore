@@ -3,6 +3,7 @@ build
 .DS_Store
 subgraph.yaml
 .bin
+tests/.latest.json
 
 # Ignore codege generated for specific contract addresses
 generated/*
@@ -23,5 +24,7 @@ generated/*
 !generated/MinterDALinV1
 !generated/MinterSetPriceERC20V1
 !generated/MinterSetPriceV1
+!generated/MinterHolderV0
+!generated/MinterMerkleV0
 !generated/SeaportExchange
 !generated/WyvernExchange

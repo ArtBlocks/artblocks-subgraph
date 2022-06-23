@@ -4,12 +4,16 @@ import {
   Contract,
   Token,
   Sale,
-  SaleLookupTable
+  SaleLookupTable,
+  Payment
 } from "../../../generated/schema";
 
 import { AtomicMatch_Call } from "../../../generated/WyvernExchangeWithBulkCancellations/WyvernExchangeWithBulkCancellations";
 
-import { WYVERN_ATOMICIZER_ADDRESS, WYVERN_MERKLE_ADDRESS } from "../../constants";
+import {
+  WYVERN_ATOMICIZER_ADDRESS,
+  WYVERN_MERKLE_ADDRESS
+} from "../../constants";
 
 import { generateContractSpecificId } from "../../helpers";
 
@@ -51,7 +55,10 @@ export function handleAtomicMatch_(call: AtomicMatch_Call): void {
      */
     _handleSingleAssetSale(call);
   } else {
-    log.warning("[OS_V2 handler] Unexpected target in tx {}: {}", [call.transaction.hash.toHexString(), saleTargetAddressStr]);
+    log.warning("[OS_V2 handler] Unexpected target in tx {}: {}", [
+      call.transaction.hash.toHexString(),
+      saleTargetAddressStr
+    ]);
   }
 }
 
@@ -79,7 +86,9 @@ function _handleSingleAssetSale(call: AtomicMatch_Call): void {
 
   // Decode data (from, to, nft token address, token id), here's the difference with V1
   // We need to retrieve nft token contract and token id from call data
-  let decodedCallData = _retrieveDecodedDataFromCallData(callInputs.calldataBuy);
+  let decodedCallData = _retrieveDecodedDataFromCallData(
+    callInputs.calldataBuy
+  );
 
   let nftContract: Address = decodedCallData[2].toAddress();
   let contract = Contract.load(nftContract.toHexString());
@@ -187,8 +196,8 @@ function _handleBundleSale(call: AtomicMatch_Call): void {
     addrs[10]
   );
 
-  let buyerAdress: Address = addrs[1]; // Buyer.maker
-  let sellerAdress: Address = addrs[8]; // Saler.maker
+  let buyerAddress: Address = addrs[1]; // Buyer.maker
+  let sellerAddress: Address = addrs[8]; // Saler.maker
   let paymentTokenErc20Address: Address = addrs[6];
 
   // Merge sell order data with buy order data (just like they are doing in their contract)
@@ -276,13 +285,18 @@ function _handleBundleSale(call: AtomicMatch_Call): void {
   sale.saleType = "Bundle";
   sale.blockNumber = call.block.number;
   sale.blockTimestamp = call.block.timestamp;
-  sale.buyer = buyerAdress;
-  sale.seller = sellerAdress;
-  sale.paymentToken = paymentTokenErc20Address;
-  sale.price = price;
+  sale.buyer = buyerAddress;
+  sale.seller = sellerAddress;
   sale.isPrivate = isPrivateSale(call.from, addrs);
   sale.summaryTokensSold = summaryTokensSold;
   sale.save();
+
+  let payment = new Payment(saleId + "-0");
+  payment.sale = saleId;
+  payment.paymentToken = paymentTokenErc20Address;
+  payment.price = price;
+  payment.recipient = buyerAddress;
+  payment.save();
 }
 
 /**
