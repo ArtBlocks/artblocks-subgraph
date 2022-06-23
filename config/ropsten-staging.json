@@ -43,6 +43,10 @@
     {
       "address": "0x0711A9767a41290D7f52714204618345C584f450",
       "name": "Legends of Metaterra"
+    },
+    {
+      "address": "0xb17e8d4cBcd0Ff0F8891e8d01Faeed41025C6B2e",
+      "name": "Fireworks by Samsung"
     }
   ],
   "minterFilterV0Contracts": [

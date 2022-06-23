@@ -1,0 +1,117 @@
+{
+  "network": "goerli",
+  "genArt721CoreContracts": [
+    {
+      "address": "0xDa62f67BE7194775A75BE91CBF9FEeDcC5776D4b",
+      "name": "Artist Staging Goerli Flagship Core Contract",
+      "startBlock": 7011002
+    }
+  ],
+  "pbabContracts": [
+    {
+      "address": "0x5503a3B96D845f33F135429AB18C03C79477B14f",
+      "name": "Doodle Labs"
+    },
+    {
+      "address": "0xF0Fe88146dDdC938Db342D68E9FA7d7a59924870",
+      "name": "Flamingo Flutter"
+    },
+    {
+      "address": "0x9B0c67496Be8c6422fED0372be7a87707e3a6F09",
+      "name": "Plottables"
+    },
+    {
+      "address": "0x104da4d1BE666A5516894006Af2d42F82813C276",
+      "name": "Tboa Club"
+    },
+    {
+      "address": "0xe745243b82ebC46E5c23d9B1B968612c65d45f3d",
+      "name": "Bright Moments"
+    },
+    {
+      "address": "0xfA89AB6211273f84E3Aa0235B1Ae37a2ED37cfc6",
+      "name": "Crypto Citizens"
+    },
+    {
+      "address": "0x86f62001be58BCDB14E298038912c77027D5F945",
+      "name": "ARTCODE"
+    },
+    {
+      "address": "0x81236b5A105d3ad6B56aC41a03E1Fd8893A08859",
+      "name": "MechSuit"
+    },
+    {
+      "address": "0xb8C11dD092Fbb4177b4b09f01416077D542D79c3",
+      "name": "Colors and Shapes"
+    },
+    {
+      "address": "0x7e0CC872a2Aa320399011416F4569AaDf37bb5f9",
+      "name": "Legends of Metaterra"
+    },
+    {
+      "address": "0xCa40b3b63F7181aeC95F74dBEb477655a7B87EC0",
+      "name": "Art Blocks x Pace"
+    }
+  ],
+  "minterFilterV0Contracts": [
+    {
+      "address": "0xdB2f4B10Bb32D1E0cfD9468bE48C1C8c63Bc0DDD",
+      "name": "Art Blocks Flagship",
+      "startBlock": 7011002
+    },
+    {
+      "address": "0x8aD21E9eebfDa9Af4D4384C747b74723E29FBB51",
+      "name": "Art Blocks x Pace",
+      "startBlock": 7011002
+    }
+  ],
+  "minterSetPriceV1Contracts": [
+    {
+      "address": "0x7d7571E8D507e8AEB61a6484c42a98e50894Aa80",
+      "name": "Art Blocks Flagship",
+      "startBlock": 7011002
+    },
+    {
+      "address": "0x3851b8f754E77f07e0a08425d280c1B4fe4e3363",
+      "name": "Art Blocks x Pace",
+      "startBlock": 7011002
+    }
+  ],
+  "minterSetPriceERC20V1Contracts": [
+    {
+      "address": "0x67688F11ccf152B3baC51e0256245467AfEE60DB",
+      "name": "Art Blocks Flagship",
+      "startBlock": 7011002
+    },
+    {
+      "address": "0x5749E012767FDA174389d77Adc032e3e880b166c",
+      "name": "Art Blocks x Pace",
+      "startBlock": 7011002
+    }
+  ],
+  "minterDALinV1Contracts": [
+    {
+      "address": "0xc96cBfb0E378a2474E176da4D41DF3d04f17aCa6",
+      "name": "Art Blocks Flagship",
+      "startBlock": 7011002
+    },
+    {
+      "address": "0xd125111461557f2d8A52848f55Ac4651d2426f88",
+      "name": "Art Blocks x Pace",
+      "startBlock": 7011002
+    }
+  ],
+  "minterDAExpV1Contracts": [
+    {
+      "address": "0xDBB6e9443afC40104B319F51AFD82B38f3c87BA0",
+      "name": "Art Blocks Flagship",
+      "startBlock": 7011002
+    },
+    {
+      "address": "0xf4015573db8f9E80206296e53a32E20B87Ab1578",
+      "name": "Art Blocks x Pace",
+      "startBlock": 7011002
+    }
+  ],
+  "startBlock": 7011002
+}

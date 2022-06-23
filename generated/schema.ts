@@ -1083,6 +1083,7 @@ export class Token extends Entity {
     this.set("createdAt", Value.fromBigInt(BigInt.zero()));
     this.set("updatedAt", Value.fromBigInt(BigInt.zero()));
     this.set("transactionHash", Value.fromBytes(Bytes.empty()));
+    this.set("nextSaleId", Value.fromBigInt(BigInt.zero()));
   }
 
   save(): void {
@@ -1209,13 +1210,43 @@ export class Token extends Entity {
     this.set("transactionHash", Value.fromBytes(value));
   }
 
+  get transfers(): Array<string> | null {
+    let value = this.get("transfers");
+    if (!value || value.kind == ValueKind.NULL) {
+      return null;
+    } else {
+      return value.toStringArray();
+    }
+  }
+
+  set transfers(value: Array<string> | null) {
+    if (!value) {
+      this.unset("transfers");
+    } else {
+      this.set("transfers", Value.fromStringArray(<Array<string>>value));
+    }
+  }
+
+  get openSeaSaleLookupTables(): Array<string> {
+    let value = this.get("openSeaSaleLookupTables");
+
   get saleLookupTables(): Array<string> {
     let value = this.get("saleLookupTables");
+
     return value!.toStringArray();
   }
 
   set saleLookupTables(value: Array<string>) {
     this.set("saleLookupTables", Value.fromStringArray(value));
+  }
+
+  get nextSaleId(): BigInt {
+    let value = this.get("nextSaleId");
+    return value!.toBigInt();
+  }
+
+  set nextSaleId(value: BigInt) {
+    this.set("nextSaleId", Value.fromBigInt(value));
   }
 }
 
@@ -1299,7 +1330,7 @@ export class Minter extends Entity {
 
     this.set("type", Value.fromString(""));
     this.set("minterFilter", Value.fromString(""));
-    this.set("allowlistedNFTAddresses", Value.fromStringArray(new Array(0)));
+    this.set("extraMinterDetails", Value.fromString(""));
     this.set("coreContract", Value.fromString(""));
     this.set("updatedAt", Value.fromBigInt(BigInt.zero()));
   }
@@ -1402,13 +1433,13 @@ export class Minter extends Entity {
     }
   }
 
-  get allowlistedNFTAddresses(): Array<string> {
-    let value = this.get("allowlistedNFTAddresses");
-    return value!.toStringArray();
+  get extraMinterDetails(): string {
+    let value = this.get("extraMinterDetails");
+    return value!.toString();
   }
 
-  set allowlistedNFTAddresses(value: Array<string>) {
-    this.set("allowlistedNFTAddresses", Value.fromStringArray(value));
+  set extraMinterDetails(value: string) {
+    this.set("extraMinterDetails", Value.fromString(value));
   }
 
   get coreContract(): string {
@@ -1629,6 +1660,7 @@ export class Sale extends Entity {
     super();
     this.set("id", Value.fromString(id));
 
+    this.set("txHash", Value.fromBytes(Bytes.empty()));
     this.set("exchange", Value.fromString(""));
     this.set("saleType", Value.fromString(""));
     this.set("blockNumber", Value.fromBigInt(BigInt.zero()));
@@ -1665,6 +1697,15 @@ export class Sale extends Entity {
 
   set id(value: string) {
     this.set("id", Value.fromString(value));
+  }
+
+  get txHash(): Bytes {
+    let value = this.get("txHash");
+    return value!.toBytes();
+  }
+
+  set txHash(value: Bytes) {
+    this.set("txHash", Value.fromBytes(value));
   }
 
   get exchange(): string {
@@ -1848,5 +1889,89 @@ export class SaleLookupTable extends Entity {
 
   set sale(value: string) {
     this.set("sale", Value.fromString(value));
+  }
+}
+
+export class Transfer extends Entity {
+  constructor(id: string) {
+    super();
+    this.set("id", Value.fromString(id));
+
+    this.set("transactionHash", Value.fromBytes(Bytes.empty()));
+    this.set("token", Value.fromString(""));
+    this.set("createdAt", Value.fromBigInt(BigInt.zero()));
+    this.set("to", Value.fromBytes(Bytes.empty()));
+    this.set("from", Value.fromBytes(Bytes.empty()));
+  }
+
+  save(): void {
+    let id = this.get("id");
+    assert(id != null, "Cannot save Transfer entity without an ID");
+    if (id) {
+      assert(
+        id.kind == ValueKind.STRING,
+        "Cannot save Transfer entity with non-string ID. " +
+          'Considering using .toHex() to convert the "id" to a string.'
+      );
+      store.set("Transfer", id.toString(), this);
+    }
+  }
+
+  static load(id: string): Transfer | null {
+    return changetype<Transfer | null>(store.get("Transfer", id));
+  }
+
+  get id(): string {
+    let value = this.get("id");
+    return value!.toString();
+  }
+
+  set id(value: string) {
+    this.set("id", Value.fromString(value));
+  }
+
+  get transactionHash(): Bytes {
+    let value = this.get("transactionHash");
+    return value!.toBytes();
+  }
+
+  set transactionHash(value: Bytes) {
+    this.set("transactionHash", Value.fromBytes(value));
+  }
+
+  get token(): string {
+    let value = this.get("token");
+    return value!.toString();
+  }
+
+  set token(value: string) {
+    this.set("token", Value.fromString(value));
+  }
+
+  get createdAt(): BigInt {
+    let value = this.get("createdAt");
+    return value!.toBigInt();
+  }
+
+  set createdAt(value: BigInt) {
+    this.set("createdAt", Value.fromBigInt(value));
+  }
+
+  get to(): Bytes {
+    let value = this.get("to");
+    return value!.toBytes();
+  }
+
+  set to(value: Bytes) {
+    this.set("to", Value.fromBytes(value));
+  }
+
+  get from(): Bytes {
+    let value = this.get("from");
+    return value!.toBytes();
+  }
+
+  set from(value: Bytes) {
+    this.set("from", Value.fromBytes(value));
   }
 }

@@ -791,9 +791,9 @@ dataSources:
           file: ./abis/IFilteredMinterV0.json
       eventHandlers:
         - event: ConfigValueSet(indexed uint256,bytes32,bytes32)
-          handler: handleSetBytesValue
+          handler: handleSetBytesValueProjectConfig
         - event: ConfigValueSet(indexed uint256,bytes32,bool)
-          handler: handleSetBooleanValue
+          handler: handleSetBooleanValueProjectConfig
       file: ./src/minter-suite-mapping.ts
   {{/minterMerkleV0Contracts}}
   {{#openSeaContractV1}}

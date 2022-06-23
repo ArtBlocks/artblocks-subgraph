@@ -4,7 +4,8 @@ import {
   clearStore,
   test,
   newMockEvent,
-  createMockedFunction
+  createMockedFunction,
+  logStore
 } from "matchstick-as/assembly/index";
 import {
   IsCanonicalMinterFilter,
@@ -215,27 +216,26 @@ test("handleIsCanonicalMinterFilter should populate project minter configuration
   const project0PurchaseToDisabled = true;
   const project0MinterType = "MinterSetPriceV0";
 
+  const previousMinterConfig0 = new ProjectMinterConfiguration(
+    getProjectMinterConfigId(minterSetPriceV0Address.toHexString(), project0.id)
+  );
+  previousMinterConfig0.minter = minterSetPriceV0Address.toHexString();
+  previousMinterConfig0.project = project0.id;
+  previousMinterConfig0.basePrice = project0BasePrice;
+  previousMinterConfig0.priceIsConfigured = project0PriceIsConfigured;
+  previousMinterConfig0.currencyAddress = project0CurrencyAddress;
+  previousMinterConfig0.currencySymbol = project0CurrencySymbol;
+  previousMinterConfig0.purchaseToDisabled = project0PurchaseToDisabled;
+  previousMinterConfig0.extraMinterDetails = "{}";
+
+  previousMinterConfig0.save();
+
   mockGetProjectAndMinterInfoAt(
     minterFilterAddress,
     BigInt.fromI32(0),
     project0.projectId,
     minterSetPriceV0Address,
     project0MinterType
-  );
-
-  mockGetPriceInfo(
-    minterSetPriceV0Address,
-    project0.projectId,
-    project0PriceIsConfigured,
-    project0BasePrice,
-    project0CurrencySymbol,
-    project0CurrencyAddress
-  );
-
-  mockPurchaseToDisabled(
-    minterSetPriceV0Address,
-    project0.projectId,
-    project0PurchaseToDisabled
   );
 
   mockMinterType(minterSetPriceV0Address, project0MinterType);
@@ -250,27 +250,29 @@ test("handleIsCanonicalMinterFilter should populate project minter configuration
   const project1PurchaseToDisabled = false;
   const project1MinterType = "MinterSetPriceERC20V0";
 
+  const previousMinterConfig1 = new ProjectMinterConfiguration(
+    getProjectMinterConfigId(
+      minterSetPriceERC20V0Address.toHexString(),
+      project1.id
+    )
+  );
+  previousMinterConfig1.minter = minterSetPriceERC20V0Address.toHexString();
+  previousMinterConfig1.project = project1.id;
+  previousMinterConfig1.basePrice = project1BasePrice;
+  previousMinterConfig1.priceIsConfigured = project1PriceIsConfigured;
+  previousMinterConfig1.currencyAddress = project1CurrencyAddress;
+  previousMinterConfig1.currencySymbol = project1CurrencySymbol;
+  previousMinterConfig1.purchaseToDisabled = project1PurchaseToDisabled;
+  previousMinterConfig1.extraMinterDetails = "{}";
+
+  previousMinterConfig1.save();
+
   mockGetProjectAndMinterInfoAt(
     minterFilterAddress,
     BigInt.fromI32(1),
     project1.projectId,
     minterSetPriceERC20V0Address,
     project1MinterType
-  );
-
-  mockGetPriceInfo(
-    minterSetPriceERC20V0Address,
-    project1.projectId,
-    project1PriceIsConfigured,
-    project1BasePrice,
-    project1CurrencySymbol,
-    project1CurrencyAddress
-  );
-
-  mockPurchaseToDisabled(
-    minterSetPriceERC20V0Address,
-    project1.projectId,
-    project1PurchaseToDisabled
   );
 
   mockMinterType(minterSetPriceERC20V0Address, project1MinterType);
@@ -288,14 +290,22 @@ test("handleIsCanonicalMinterFilter should populate project minter configuration
   const project2BasePrice = ONE_ETH_IN_WEI.div(BigInt.fromI32(5));
   const project2MinterType = "MinterDALinV0";
 
-  mockGetPriceInfo(
-    minterDALinV0Address,
-    project2.projectId,
-    project2PriceIsConfigured,
-    project2BasePrice,
-    project2CurrencySymbol,
-    project2CurrencyAddress
+  const previousMinterConfig2 = new ProjectMinterConfiguration(
+    getProjectMinterConfigId(minterDALinV0Address.toHexString(), project2.id)
   );
+  previousMinterConfig2.minter = minterDALinV0Address.toHexString();
+  previousMinterConfig2.project = project2.id;
+  previousMinterConfig2.basePrice = project2BasePrice;
+  previousMinterConfig2.priceIsConfigured = project2PriceIsConfigured;
+  previousMinterConfig2.currencyAddress = project2CurrencyAddress;
+  previousMinterConfig2.currencySymbol = project2CurrencySymbol;
+  previousMinterConfig2.purchaseToDisabled = project2PurchaseToDisabled;
+  previousMinterConfig2.startTime = project2StartTime;
+  previousMinterConfig2.endTime = project2EndTime;
+  previousMinterConfig2.startPrice = project2StartPrice;
+  previousMinterConfig2.extraMinterDetails = "{}";
+
+  previousMinterConfig2.save();
 
   mockGetProjectAndMinterInfoAt(
     minterFilterAddress,
@@ -303,25 +313,6 @@ test("handleIsCanonicalMinterFilter should populate project minter configuration
     project2.projectId,
     minterDALinV0Address,
     project2MinterType
-  );
-
-  createMockedFunction(
-    minterDALinV0Address,
-    "projectAuctionParameters",
-    "projectAuctionParameters(uint256):(uint256,uint256,uint256,uint256)"
-  )
-    .withArgs([ethereum.Value.fromUnsignedBigInt(project2.projectId)])
-    .returns([
-      ethereum.Value.fromUnsignedBigInt(project2StartTime),
-      ethereum.Value.fromUnsignedBigInt(project2EndTime),
-      ethereum.Value.fromUnsignedBigInt(project2StartPrice),
-      ethereum.Value.fromUnsignedBigInt(project2BasePrice)
-    ]);
-
-  mockPurchaseToDisabled(
-    minterDALinV0Address,
-    project2.projectId,
-    project2PurchaseToDisabled
   );
 
   mockMinterType(minterDALinV0Address, project2MinterType);
@@ -344,14 +335,22 @@ test("handleIsCanonicalMinterFilter should populate project minter configuration
   const project3BasePrice = ONE_ETH_IN_WEI.div(BigInt.fromI32(10));
   const project3Mintertype = "MinterDAExpV0";
 
-  mockGetPriceInfo(
-    minterDAExpV0Address,
-    project3.projectId,
-    project3PriceIsConfigured,
-    project3BasePrice,
-    project3CurrencySymbol,
-    project3CurrencyAddress
+  const previousMinterConfig3 = new ProjectMinterConfiguration(
+    getProjectMinterConfigId(minterDAExpV0Address.toHexString(), project3.id)
   );
+  previousMinterConfig3.minter = minterDAExpV0Address.toHexString();
+  previousMinterConfig3.project = project3.id;
+  previousMinterConfig3.basePrice = project3BasePrice;
+  previousMinterConfig3.priceIsConfigured = project3PriceIsConfigured;
+  previousMinterConfig3.currencyAddress = project3CurrencyAddress;
+  previousMinterConfig3.currencySymbol = project3CurrencySymbol;
+  previousMinterConfig3.purchaseToDisabled = project3PurchaseToDisabled;
+  previousMinterConfig3.halfLifeSeconds = project3HalfLifeSeconds;
+  previousMinterConfig3.startTime = project3StartTime;
+  previousMinterConfig3.startPrice = project3StartPrice;
+  previousMinterConfig3.extraMinterDetails = "{}";
+
+  previousMinterConfig3.save();
 
   mockGetProjectAndMinterInfoAt(
     minterFilterAddress,
@@ -359,25 +358,6 @@ test("handleIsCanonicalMinterFilter should populate project minter configuration
     project3.projectId,
     minterDAExpV0Address,
     project3Mintertype
-  );
-
-  createMockedFunction(
-    minterDAExpV0Address,
-    "projectAuctionParameters",
-    "projectAuctionParameters(uint256):(uint256,uint256,uint256,uint256)"
-  )
-    .withArgs([ethereum.Value.fromUnsignedBigInt(project3.projectId)])
-    .returns([
-      ethereum.Value.fromUnsignedBigInt(project3StartTime),
-      ethereum.Value.fromUnsignedBigInt(project3HalfLifeSeconds),
-      ethereum.Value.fromUnsignedBigInt(project3StartPrice),
-      ethereum.Value.fromUnsignedBigInt(project3BasePrice)
-    ]);
-
-  mockPurchaseToDisabled(
-    minterDAExpV0Address,
-    project3.projectId,
-    project3PurchaseToDisabled
   );
 
   mockMinterType(minterDAExpV0Address, project3Mintertype);
@@ -1087,7 +1067,7 @@ test("handleProjectMinterRegistered should do nothing if the minter filter is no
   );
 });
 
-test("handleProjectMinterRegistered should populate project minter configuration for project", () => {
+test("handleProjectMinterRegistered should populate project from prior minter configuration for project", () => {
   clearStore();
 
   const projectId = BigInt.fromI32(0);
@@ -1125,28 +1105,19 @@ test("handleProjectMinterRegistered should populate project minter configuration
   minter.type = minterType;
   minter.save();
 
-  mockGetProjectAndMinterInfoAt(
-    minterFilterAddress,
-    BigInt.fromI32(0),
-    project.projectId,
-    minterAddress,
-    minterType
+  const previousMinterConfig = new ProjectMinterConfiguration(
+    getProjectMinterConfigId(minterAddress.toHexString(), project.id)
   );
+  previousMinterConfig.minter = minter.id;
+  previousMinterConfig.project = project.id;
+  previousMinterConfig.basePrice = projectBasePrice;
+  previousMinterConfig.priceIsConfigured = projectPriceIsConfigured;
+  previousMinterConfig.currencyAddress = projectCurrencyAddress;
+  previousMinterConfig.currencySymbol = projectCurrencySymbol;
+  previousMinterConfig.purchaseToDisabled = projectPurchaseToDisabled;
+  previousMinterConfig.extraMinterDetails = "{}";
 
-  mockGetPriceInfo(
-    minterAddress,
-    projectId,
-    projectPriceIsConfigured,
-    projectBasePrice,
-    projectCurrencySymbol,
-    projectCurrencyAddress
-  );
-
-  mockPurchaseToDisabled(
-    minterAddress,
-    project.projectId,
-    projectPurchaseToDisabled
-  );
+  previousMinterConfig.save();
 
   const projectMinterRegisteredEvent: ProjectMinterRegistered = changetype<
     ProjectMinterRegistered
@@ -1229,6 +1200,103 @@ test("handleProjectMinterRegistered should populate project minter configuration
     configId,
     "purchaseToDisabled",
     booleanToString(projectPurchaseToDisabled)
+  );
+  assert.fieldEquals(
+    PROJECT_ENTITY_TYPE,
+    project.id,
+    "updatedAt",
+    CURRENT_BLOCK_TIMESTAMP.toString()
+  );
+});
+test("handleProjectMinterRegistered should populate project from scratch for project", () => {
+  clearStore();
+
+  const projectId = BigInt.fromI32(0);
+  const projectUpdatedAt = CURRENT_BLOCK_TIMESTAMP.minus(BigInt.fromI32(10));
+  const project = addNewProjectToStore(
+    TEST_CONTRACT_ADDRESS,
+    projectId,
+    "project 0",
+    randomAddressGenerator.generateRandomAddress(),
+    ONE_ETH_IN_WEI.div(BigInt.fromI32(10)),
+    projectUpdatedAt
+  );
+
+  const minterFilterAddress = randomAddressGenerator.generateRandomAddress();
+  const minterFilterUpdatedAt = CURRENT_BLOCK_TIMESTAMP.minus(
+    BigInt.fromI32(10)
+  );
+  const minterFilter = new MinterFilter(minterFilterAddress.toHexString());
+  minterFilter.coreContract = TEST_CONTRACT_ADDRESS.toHexString();
+  minterFilter.updatedAt = minterFilterUpdatedAt;
+  minterFilter.save();
+
+  const contract = addTestContractToStore(BigInt.fromI32(1));
+  contract.minterFilter = minterFilterAddress.toHexString();
+  contract.save();
+
+  const minterAddress = randomAddressGenerator.generateRandomAddress();
+  const minterType = "MinterSetPriceV0";
+  const minter = new Minter(minterAddress.toHexString());
+  minter.type = minterType;
+  minter.save();
+
+  const projectMinterRegisteredEvent: ProjectMinterRegistered = changetype<
+    ProjectMinterRegistered
+  >(newMockEvent());
+  projectMinterRegisteredEvent.address = minterFilterAddress;
+  projectMinterRegisteredEvent.block.timestamp = CURRENT_BLOCK_TIMESTAMP;
+  projectMinterRegisteredEvent.parameters = [
+    new ethereum.EventParam(
+      "_projectId",
+      ethereum.Value.fromUnsignedBigInt(projectId)
+    ),
+    new ethereum.EventParam(
+      "_minterAddress",
+      ethereum.Value.fromAddress(minterAddress)
+    ),
+    new ethereum.EventParam(
+      "_minterType",
+      ethereum.Value.fromString("MinterSetPriceV0")
+    )
+  ];
+
+  handleProjectMinterRegistered(projectMinterRegisteredEvent);
+
+  const configId = getProjectMinterConfigId(
+    minterAddress.toHexString(),
+    project.id
+  );
+
+  assert.fieldEquals(
+    PROJECT_ENTITY_TYPE,
+    project.id,
+    "minterConfiguration",
+    configId
+  );
+  assert.fieldEquals(
+    PROJECT_MINTER_CONFIGURATION_ENTITY_TYPE,
+    configId,
+    "project",
+    project.id
+  );
+  assert.fieldEquals(
+    PROJECT_MINTER_CONFIGURATION_ENTITY_TYPE,
+    configId,
+    "minter",
+    minterAddress.toHexString()
+  );
+  assert.fieldEquals(
+    MINTER_ENTITY_TYPE,
+    minterAddress.toHexString(),
+    "type",
+    minterType
+  );
+  assert.fieldEquals(
+    PROJECT_MINTER_CONFIGURATION_ENTITY_TYPE,
+    configId,
+    "priceIsConfigured",
+    "false"
   );
   assert.fieldEquals(
     PROJECT_ENTITY_TYPE,

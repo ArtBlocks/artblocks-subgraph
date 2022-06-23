@@ -37,9 +37,9 @@ import {
   MinimumAuctionLengthSecondsUpdated as DALinV1MinimumAuctionLengthSecondsUpdated
 } from "../../../generated/MinterDALinV1/MinterDALinV1";
 import {
-  handleAddManyAddressValue,
-  handleAddManyBigIntValue,
-  handleAddManyBytesValue,
+  handleAddManyAddressValueProjectConfig as handleAddManyAddressValue,
+  handleAddManyBigIntValueProjectConfig as handleAddManyBigIntValue,
+  handleAddManyBytesValueProjectConfig as handleAddManyBytesValue,
   handleAllowHoldersOfProject,
   handleAuctionHalfLifeRangeSecondsUpdated,
   handleDAExpResetAuctionDetails,
@@ -51,14 +51,14 @@ import {
   handleProjectCurrencyInfoUpdated,
   handlePurchaseToDisabledUpdated,
   handleRegisteredNFTAddress,
-  handleRemoveBigIntManyValue,
-  handleRemoveBytesManyValue,
+  handleRemoveBigIntManyValueProjectConfig as handleRemoveBigIntManyValue,
+  handleRemoveBytesManyValueProjectConfig as handleRemoveBytesManyValue,
   handleRemoveHoldersOfProject,
-  handleRemoveValue,
-  handleSetAddressValue,
-  handleSetBigIntValue,
-  handleSetBooleanValue,
-  handleSetBytesValue,
+  handleRemoveValueProjectConfig as handleRemoveValue,
+  handleSetAddressValueProjectConfig as handleSetAddressValue,
+  handleSetBigIntValueProjectConfig as handleSetBigIntValue,
+  handleSetBooleanValueProjectConfig as handleSetBooleanValue,
+  handleSetBytesValueProjectConfig as handleSetBytesValue,
   handleUnregisteredNFTAddress
 } from "../../../src/minter-suite-mapping";
 import {
@@ -2127,21 +2127,29 @@ test("handleRegisteredNFTAddress adds the address, as a string to the minter", (
   assert.fieldEquals(
     MINTER_ENTITY_TYPE,
     minter.id,
-    "allowlistedNFTAddresses",
-    "[" + testAddy.toHexString() + "]"
+    "extraMinterDetails",
+    '{"registeredNFTAddresses":[' + '"' + testAddy.toHexString() + '"' + "]}"
   );
 });
-test("handleUnRegisteredNFTAddress adds the address, as a string to the minter", () => {
+test("handleUnRegisteredNFTAddress removes the address from the minter", () => {
   clearStore();
   const minterAddress = randomAddressGenerator.generateRandomAddress();
   const minterType = "MinterHolderV0";
   const minter = new Minter(minterAddress.toHexString());
   minter.coreContract = TEST_CONTRACT_ADDRESS.toHexString();
   minter.type = minterType;
-  let addresses: string[] = [];
   const testAddy = randomAddressGenerator.generateRandomAddress();
-  addresses.push(testAddy.toHexString());
-  minter.allowlistedNFTAddresses = addresses;
+  minter.extraMinterDetails =
+    '{"registeredNFTAddresses":' +
+    "[" +
+    '"' +
+    testAddy.toHexString() +
+    '"' +
+    "," +
+    '"' +
+    "0x" +
+    '"' +
+    "]}";
   minter.save();
 
   const unregisterNFTAddressEvent: UnregisteredNFTAddress = changetype<
@@ -2158,7 +2166,7 @@ test("handleUnRegisteredNFTAddress adds the address, as a string to the minter",
   assert.fieldEquals(
     MINTER_ENTITY_TYPE,
     minter.id,
-    "allowlistedNFTAddresses",
-    "[]"
+    "extraMinterDetails",
+    '{"registeredNFTAddresses":["0x"]}'
   );
 });
