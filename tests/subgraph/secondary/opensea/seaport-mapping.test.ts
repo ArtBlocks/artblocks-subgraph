@@ -73,12 +73,7 @@ test("handleOrderFulfilled should create Payment table", () => {
 
   let sale = Sale.load(saleId)!;
   let paymentsFromSale = sale.payments;
-  let one = Payment.load(paymentsFromSale[0]);
-  // log.info("Present {} {} {}", [
-  //   paymentsFromSale[0],
-  //   one?.recipient.toString(),
-  //   one?.price.toString()
-  // ]);
+
   assert.i32Equals(paymentsFromSale.length, 3);
 
   // Buyer portion
@@ -101,7 +96,7 @@ test("handleOrderFulfilled should create Payment table", () => {
     "Payment",
     paymentsFromSale[0],
     "recipient",
-    DEFAULT_TAKER.toHexString()
+    DEFAULT_MAKER.toHexString()
   );
 
   // AB Portion
@@ -150,6 +145,110 @@ test("handleOrderFulfilled should create Payment table", () => {
     MOCK_OS_ADDRESS.toHexString()
   );
 
+  clearStore();
+});
+
+test("handleOrderFulfilled should create Payment table for multiple payments", () => {
+  addNewContractToStore();
+  let token = addNewTokenToStore();
+  let orderFulfilledEvent = createOrderFulfilledEvent(false, false, true);
+  handleOrderFulfilled(orderFulfilledEvent);
+  let saleId = orderFulfilledEvent.params.orderHash.toHexString();
+
+  let sale = Sale.load(saleId)!;
+  let paymentsFromSale = sale.payments;
+
+  assert.i32Equals(paymentsFromSale.length, 4);
+
+  // Buyer portion
+  assert.fieldEquals(
+    "Payment",
+    paymentsFromSale[0],
+    "price",
+    DEFAULT_PRICE.div(BigInt.fromI32(10))
+      .times(BigInt.fromI32(9))
+      .toString()
+  );
+  assert.fieldEquals(
+    "Payment",
+    paymentsFromSale[0],
+    "paymentToken",
+    DEFAULT_CURRENCY.toHexString()
+  );
+  assert.fieldEquals("Payment", paymentsFromSale[0], "sale", saleId);
+  assert.fieldEquals(
+    "Payment",
+    paymentsFromSale[0],
+    "recipient",
+    DEFAULT_MAKER.toHexString()
+  );
+
+  // AB Portion
+  assert.fieldEquals(
+    "Payment",
+    paymentsFromSale[1],
+    "price",
+    DEFAULT_PRICE.div(BigInt.fromI32(1000))
+      .times(BigInt.fromI32(75))
+      .toString()
+  );
+  assert.fieldEquals(
+    "Payment",
+    paymentsFromSale[1],
+    "paymentToken",
+    DEFAULT_CURRENCY.toHexString()
+  );
+  assert.fieldEquals("Payment", paymentsFromSale[1], "sale", saleId);
+  assert.fieldEquals(
+    "Payment",
+    paymentsFromSale[1],
+    "recipient",
+    MOCK_AB_ADDRESS.toHexString()
+  );
+
+  // OS Portion
+  assert.fieldEquals(
+    "Payment",
+    paymentsFromSale[2],
+    "price",
+    DEFAULT_PRICE.div(BigInt.fromI32(1000))
+      .times(BigInt.fromI32(25))
+      .toString()
+  );
+  assert.fieldEquals(
+    "Payment",
+    paymentsFromSale[2],
+    "paymentToken",
+    DEFAULT_CURRENCY.toHexString()
+  );
+  assert.fieldEquals("Payment", paymentsFromSale[2], "sale", saleId);
+  assert.fieldEquals(
+    "Payment",
+    paymentsFromSale[2],
+    "recipient",
+    MOCK_OS_ADDRESS.toHexString()
+  );
+
+  // New payment
+  assert.fieldEquals(
+    "Payment",
+    paymentsFromSale[3],
+    "price",
+    BigInt.fromI32(1000).toString()
+  );
+  assert.fieldEquals(
+    "Payment",
+    paymentsFromSale[3],
+    "paymentToken",
+    "0x11111139b223fe8d0a0e5c4f27ead9083c756cc2"
+  );
+  assert.fieldEquals("Payment", paymentsFromSale[3], "sale", saleId);
+  assert.fieldEquals(
+    "Payment",
+    paymentsFromSale[3],
+    "recipient",
+    DEFAULT_MAKER.toHexString()
+  );
   clearStore();
 });
 
@@ -481,7 +580,7 @@ test("Bundle - handleOrderFulfilled should create Payment table", () => {
     "Payment",
     paymentsFromSale[0],
     "recipient",
-    DEFAULT_TAKER.toHexString()
+    DEFAULT_MAKER.toHexString()
   );
 
   // AB Portion
@@ -530,6 +629,117 @@ test("Bundle - handleOrderFulfilled should create Payment table", () => {
     MOCK_OS_ADDRESS.toHexString()
   );
 
+  clearStore();
+});
+
+test("Bundle - handleOrderFulfilled should create Payment table for multiple payments", () => {
+  addNewContractToStore();
+  let token1 = addNewTokenToStore(
+    DEFAULT_COLLECTION,
+    BigInt.fromString("7019")
+  );
+  let token2 = addNewTokenToStore(
+    DEFAULT_COLLECTION,
+    BigInt.fromString("7020")
+  );
+  let orderFulfilledEvent = createOrderFulfilledEvent(false, true, true);
+  handleOrderFulfilled(orderFulfilledEvent);
+  let saleId = orderFulfilledEvent.params.orderHash.toHexString();
+
+  let sale = Sale.load(saleId)!;
+  let paymentsFromSale = sale.payments;
+
+  assert.i32Equals(paymentsFromSale.length, 4);
+
+  // Buyer portion
+  assert.fieldEquals(
+    "Payment",
+    paymentsFromSale[0],
+    "price",
+    DEFAULT_PRICE.div(BigInt.fromI32(10))
+      .times(BigInt.fromI32(9))
+      .toString()
+  );
+  assert.fieldEquals(
+    "Payment",
+    paymentsFromSale[0],
+    "paymentToken",
+    DEFAULT_CURRENCY.toHexString()
+  );
+  assert.fieldEquals("Payment", paymentsFromSale[0], "sale", saleId);
+  assert.fieldEquals(
+    "Payment",
+    paymentsFromSale[0],
+    "recipient",
+    DEFAULT_MAKER.toHexString()
+  );
+
+  // AB Portion
+  assert.fieldEquals(
+    "Payment",
+    paymentsFromSale[1],
+    "price",
+    DEFAULT_PRICE.div(BigInt.fromI32(1000))
+      .times(BigInt.fromI32(75))
+      .toString()
+  );
+  assert.fieldEquals(
+    "Payment",
+    paymentsFromSale[1],
+    "paymentToken",
+    DEFAULT_CURRENCY.toHexString()
+  );
+  assert.fieldEquals("Payment", paymentsFromSale[1], "sale", saleId);
+  assert.fieldEquals(
+    "Payment",
+    paymentsFromSale[1],
+    "recipient",
+    MOCK_AB_ADDRESS.toHexString()
+  );
+
+  // OS Portion
+  assert.fieldEquals(
+    "Payment",
+    paymentsFromSale[2],
+    "price",
+    DEFAULT_PRICE.div(BigInt.fromI32(1000))
+      .times(BigInt.fromI32(25))
+      .toString()
+  );
+  assert.fieldEquals(
+    "Payment",
+    paymentsFromSale[2],
+    "paymentToken",
+    DEFAULT_CURRENCY.toHexString()
+  );
+  assert.fieldEquals("Payment", paymentsFromSale[2], "sale", saleId);
+  assert.fieldEquals(
+    "Payment",
+    paymentsFromSale[2],
+    "recipient",
+    MOCK_OS_ADDRESS.toHexString()
+  );
+
+  // New payment
+  assert.fieldEquals(
+    "Payment",
+    paymentsFromSale[3],
+    "price",
+    BigInt.fromI32(1000).toString()
+  );
+  assert.fieldEquals(
+    "Payment",
+    paymentsFromSale[3],
+    "paymentToken",
+    "0x11111139b223fe8d0a0e5c4f27ead9083c756cc2"
+  );
+  assert.fieldEquals("Payment", paymentsFromSale[3], "sale", saleId);
+  assert.fieldEquals(
+    "Payment",
+    paymentsFromSale[3],
+    "recipient",
+    DEFAULT_MAKER.toHexString()
+  );
   clearStore();
 });
 

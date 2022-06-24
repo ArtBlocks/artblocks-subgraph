@@ -116,7 +116,7 @@ export function createOrderFulfilledEvent(
   // Simulate standard OS txn (90% to buyer, 7.5% to AB, 2.5% to OS)
   considerationTupleArray.push(
     buildConsiderationTuple(
-      recipientParam,
+      offererParam,
       priceParam.div(BigInt.fromI32(10)).times(BigInt.fromI32(9))
     )
   );
@@ -137,7 +137,7 @@ export function createOrderFulfilledEvent(
     // Add additional ERC20 payment
     considerationTupleArray.push(
       buildConsiderationTuple(
-        recipientParam,
+        offererParam,
         BigInt.fromI32(1000),
         ItemType.ERC20,
         Address.fromString("0x11111139b223fe8d0a0e5c4f27ead9083c756cc2")
@@ -147,7 +147,7 @@ export function createOrderFulfilledEvent(
     // Add ERC721 payment
     considerationTupleArray.push(
       buildConsiderationTuple(
-        recipientParam,
+        offererParam,
         BigInt.fromI32(1),
         ItemType.ERC721,
         Address.fromString("0x22222239b223fe8d0a0e5c4f27ead9083c756cc2")
