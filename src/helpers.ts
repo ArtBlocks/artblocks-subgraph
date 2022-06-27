@@ -59,11 +59,16 @@ export function loadOrCreateMinter(
     return minter;
   }
 
+  // create new Minter entity
+  /**
+   * @dev Minter entities are persisted, so populating then entity with any
+   * configuration options set outside of the contract's deployment or
+   * constructor is not necessary.
+   */
   minter = new Minter(minterAddress.toHexString());
   let filteredMinterContract = IFilteredMinterV0.bind(minterAddress);
-  let minterType = filteredMinterContract.minterType();
 
-  minter.type = minterType;
+  // values assigned in contract constructors
   minter.minterFilter = filteredMinterContract
     .minterFilterAddress()
     .toHexString();
@@ -71,6 +76,9 @@ export function loadOrCreateMinter(
     .genArt721CoreAddress()
     .toHexString();
 
+  // values assigned during contract deployments
+  let minterType = filteredMinterContract.minterType();
+  minter.type = minterType;
   if (minterType == "MinterDALinV0") {
     let minterDALinV0Contract = MinterDALinV0.bind(minterAddress);
     minter.minimumAuctionLengthInSeconds = minterDALinV0Contract.minimumAuctionLengthSeconds();

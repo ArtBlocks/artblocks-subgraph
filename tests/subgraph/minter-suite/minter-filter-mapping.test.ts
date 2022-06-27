@@ -687,7 +687,7 @@ test("handleIsCanonicalMinterFilter should populate project minter configuration
   );
 });
 
-test("handleMinterApproved should do nothing if the approved minter has a different minter filter", () => {
+test("handleMinterApproved should not add minter to minterAllowlist if the approved minter has a different minter filter", () => {
   clearStore();
   const minterFilterAddress = randomAddressGenerator.generateRandomAddress();
   const minterFilter = new MinterFilter(minterFilterAddress.toHexString());
@@ -726,10 +726,14 @@ test("handleMinterApproved should do nothing if the approved minter has a differ
 
   handleMinterApproved(minterApprovedEvent);
 
-  assert.notInStore(
-    MINTER_ENTITY_TYPE,
-    minterToBeApprovedAddress.toHexString()
+  // MinterFilter minterAllowlist should still be empty array
+  assert.fieldEquals(
+    MINTER_FILTER_ENTITY_TYPE,
+    minterFilterAddress.toHexString(),
+    "minterAllowlist",
+    "[]"
   );
+  // MinterFilter should not have been updated
   assert.fieldEquals(
     MINTER_FILTER_ENTITY_TYPE,
     minterFilterAddress.toHexString(),
@@ -794,7 +798,64 @@ test("handleMinterApproved should add new minter to store", () => {
   );
 });
 
-test("handleMinterRevoke should do nothing if minter is not in store", () => {
+test("handleMinterApproved should handle the same minter being approved more than once", () => {
+  clearStore();
+  const minterFilterAddress = randomAddressGenerator.generateRandomAddress();
+  const minterFilter = new MinterFilter(minterFilterAddress.toHexString());
+  const minterFilterUpdatedAt = CURRENT_BLOCK_TIMESTAMP.minus(
+    BigInt.fromI32(10)
+  );
+  minterFilter.coreContract = TEST_CONTRACT_ADDRESS.toHexString();
+  minterFilter.updatedAt = minterFilterUpdatedAt;
+  minterFilter.save();
+
+  const minterToBeApprovedAddress = randomAddressGenerator.generateRandomAddress();
+  const minterToBeApprovedType = "MinterSetPriceV0";
+  mockMinterType(minterToBeApprovedAddress, minterToBeApprovedType);
+  mockMinterFilterAddress(minterToBeApprovedAddress, minterFilterAddress);
+  mockCoreContract(minterToBeApprovedAddress, TEST_CONTRACT_ADDRESS);
+
+  const minterApprovedEvent: MinterApproved = changetype<MinterApproved>(
+    newMockEvent()
+  );
+  minterApprovedEvent.address = minterFilterAddress;
+  minterApprovedEvent.block.timestamp = CURRENT_BLOCK_TIMESTAMP;
+  minterApprovedEvent.parameters = [
+    new ethereum.EventParam(
+      "_minterAddress",
+      ethereum.Value.fromAddress(minterToBeApprovedAddress)
+    ),
+    new ethereum.EventParam(
+      "_minterType",
+      ethereum.Value.fromString(minterToBeApprovedType)
+    )
+  ];
+
+  handleMinterApproved(minterApprovedEvent);
+  handleMinterApproved(minterApprovedEvent);
+
+  assert.fieldEquals(
+    MINTER_ENTITY_TYPE,
+    minterToBeApprovedAddress.toHexString(),
+    "type",
+    minterToBeApprovedType
+  );
+  assert.fieldEquals(
+    MINTER_ENTITY_TYPE,
+    minterToBeApprovedAddress.toHexString(),
+    "updatedAt",
+    CURRENT_BLOCK_TIMESTAMP.toString()
+  );
+
+  assert.fieldEquals(
+    MINTER_FILTER_ENTITY_TYPE,
+    minterFilterAddress.toHexString(),
+    "updatedAt",
+    CURRENT_BLOCK_TIMESTAMP.toString()
+  );
+});
+
+test("handleMinterRevoke should do nothing to MinterFilter if minter is not in store", () => {
   clearStore();
   const minterFilterAddress = randomAddressGenerator.generateRandomAddress();
   const minterFilter = new MinterFilter(minterFilterAddress.toHexString());
@@ -821,6 +882,9 @@ test("handleMinterRevoke should do nothing if minter is not in store", () => {
 
   handleMinterRevoked(minterRevokedEvent);
 
+  // Minter should not be in store because it was never created before this event
+  assert.assertNull(Minter.load(minterToBeRevokedAddress.toHexString()));
+  // MinterFilter should not have been updated
   assert.fieldEquals(
     MINTER_FILTER_ENTITY_TYPE,
     minterFilterAddress.toHexString(),
@@ -829,7 +893,7 @@ test("handleMinterRevoke should do nothing if minter is not in store", () => {
   );
 });
 
-test("handleMinterRevoke should remove minter from store", () => {
+test("handleMinterRevoke should remove minter from MinterFilter's minterAllowlist, but keep Minter as an associated minter", () => {
   clearStore();
   const minterFilterAddress = randomAddressGenerator.generateRandomAddress();
   const minterFilter = new MinterFilter(minterFilterAddress.toHexString());
@@ -862,7 +926,82 @@ test("handleMinterRevoke should remove minter from store", () => {
 
   handleMinterRevoked(minterRevokedEvent);
 
-  assert.notInStore(MINTER_ENTITY_TYPE, minterToBeRevokedAddress.toHexString());
+  // MinterFilter minterAllowlist should still be empty array
+  assert.fieldEquals(
+    MINTER_FILTER_ENTITY_TYPE,
+    minterFilterAddress.toHexString(),
+    "minterAllowlist",
+    "[]"
+  );
+  // Minter should remain in store (to persist any populated fields)
+  assert.assertNotNull(Minter.load(minter.id));
+  // MinterFilter should still recognize the revoked Minter as an associated minter
+  assert.fieldEquals(
+    MINTER_FILTER_ENTITY_TYPE,
+    minterFilterAddress.toHexString(),
+    "associatedMinters",
+    `[${minterToBeRevokedAddress.toHexString()}]`
+  );
+  // MinterFilter should have been updated
+  assert.fieldEquals(
+    MINTER_FILTER_ENTITY_TYPE,
+    minterFilterAddress.toHexString(),
+    "updatedAt",
+    CURRENT_BLOCK_TIMESTAMP.toString()
+  );
+});
+
+test("handleMinterRevoke should handle revoking a minter more than once", () => {
+  clearStore();
+  const minterFilterAddress = randomAddressGenerator.generateRandomAddress();
+  const minterFilter = new MinterFilter(minterFilterAddress.toHexString());
+  const minterFilterUpdatedAt = CURRENT_BLOCK_TIMESTAMP.minus(
+    BigInt.fromI32(10)
+  );
+  minterFilter.coreContract = TEST_CONTRACT_ADDRESS.toHexString();
+  minterFilter.updatedAt = minterFilterUpdatedAt;
+  minterFilter.save();
+
+  const minterToBeRevokedAddress = randomAddressGenerator.generateRandomAddress();
+  const minter = new Minter(minterToBeRevokedAddress.toHexString());
+  minter.type = "MinterSetPriceV0";
+  minter.minterFilter = minterFilterAddress.toHexString();
+  minter.coreContract = TEST_CONTRACT_ADDRESS.toHexString();
+  minter.updatedAt = CURRENT_BLOCK_TIMESTAMP.minus(BigInt.fromI32(10));
+  minter.save();
+
+  const minterRevokedEvent: MinterRevoked = changetype<MinterRevoked>(
+    newMockEvent()
+  );
+  minterRevokedEvent.address = minterFilterAddress;
+  minterRevokedEvent.block.timestamp = CURRENT_BLOCK_TIMESTAMP;
+  minterRevokedEvent.parameters = [
+    new ethereum.EventParam(
+      "_minterAddress",
+      ethereum.Value.fromAddress(minterToBeRevokedAddress)
+    )
+  ];
+
+  handleMinterRevoked(minterRevokedEvent);
+  handleMinterRevoked(minterRevokedEvent);
+
+  // MinterFilter minterAllowlist should still be empty array
+  assert.fieldEquals(
+    MINTER_FILTER_ENTITY_TYPE,
+    minterFilterAddress.toHexString(),
+    "minterAllowlist",
+    "[]"
+  );
+  // Minter should remain in store (to persist any populated fields)
+  assert.assertNotNull(Minter.load(minter.id));
+  // MinterFilter should still recognize the revoked Minter as an associated minter
+  assert.fieldEquals(
+    MINTER_FILTER_ENTITY_TYPE,
+    minterFilterAddress.toHexString(),
+    "associatedMinters",
+    `[${minterToBeRevokedAddress.toHexString()}]`
+  );
+  // MinterFilter should have been updated
   assert.fieldEquals(
     MINTER_FILTER_ENTITY_TYPE,
     minterFilterAddress.toHexString(),

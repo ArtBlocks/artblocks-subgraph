@@ -1227,12 +1227,8 @@ export class Token extends Entity {
     }
   }
 
-  get openSeaSaleLookupTables(): Array<string> {
-    let value = this.get("openSeaSaleLookupTables");
-
   get saleLookupTables(): Array<string> {
     let value = this.get("saleLookupTables");
-
     return value!.toStringArray();
   }
 
@@ -1256,6 +1252,7 @@ export class MinterFilter extends Entity {
     this.set("id", Value.fromString(id));
 
     this.set("coreContract", Value.fromString(""));
+    this.set("minterAllowlist", Value.fromStringArray(new Array(0)));
     this.set("updatedAt", Value.fromBigInt(BigInt.zero()));
   }
 
@@ -1301,6 +1298,15 @@ export class MinterFilter extends Entity {
 
   set minterAllowlist(value: Array<string>) {
     this.set("minterAllowlist", Value.fromStringArray(value));
+  }
+
+  get minters(): Array<string> {
+    let value = this.get("minters");
+    return value!.toStringArray();
+  }
+
+  set minters(value: Array<string>) {
+    this.set("minters", Value.fromStringArray(value));
   }
 
   get updatedAt(): BigInt {

@@ -103,29 +103,45 @@ export function handleMinterApproved(event: MinterApproved): void {
     event.block.timestamp
   );
 
-  // Don't add the minter if it's minter filter is different
+  // Don't add the allowlisting if minter's minter filter is different
   // from the minter filter that emitted this event.
   if (minter.minterFilter != minterFilter.id) {
-    store.remove("Minter", minter.id);
     return;
   }
 
-  minterFilter.updatedAt = event.block.timestamp;
-  minterFilter.save();
+  // add minter to the list of allowlisted minters if it's not already there
+  if (!minterFilter.minterAllowlist.includes(minter.id)) {
+    minterFilter.minterAllowlist.push(minter.id);
+    minterFilter.updatedAt = event.block.timestamp;
+    minterFilter.save();
+  }
 }
 
 export function handleMinterRevoked(event: MinterRevoked): void {
   // Note: there's a guard on the function that only allows a minter
   // to be revoked if it is not set for any project. This means that
-  // we can avoid resetting any minter config for a project here.
+  // we can avoid resetting any projects' minter configurations here.
+  let minterFilter = loadOrCreateMinterFilter(
+    event.address,
+    event.block.timestamp
+  );
+
   let minter = Minter.load(event.params._minterAddress.toHexString());
-  if (minter) {
-    store.remove("Minter", event.params._minterAddress.toHexString());
-    let minterFilter = MinterFilter.load(event.address.toHexString());
-    if (minterFilter) {
-      minterFilter.updatedAt = event.block.timestamp;
-      minterFilter.save();
+
+  if (minter && minterFilter) {
+    // keep the Minter in the store to avoid having to re-populate it is
+    // re-approved
+
+    // remove the minter from the list of allowlisted minters
+    let newMinterAllowlist: string[] = [];
+    for (let i = 0; i < minterFilter.minterAllowlist.length; i++) {
+      if (minterFilter.minterAllowlist[i] != minter.id) {
+        newMinterAllowlist.push(minterFilter.minterAllowlist[i]);
+      }
     }
+    minterFilter.minterAllowlist = newMinterAllowlist;
+    minterFilter.updatedAt = event.block.timestamp;
+    minterFilter.save();
   }
 }
 
