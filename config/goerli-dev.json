@@ -73,5 +73,17 @@
       "name": "Art Blocks x Pace Minter",
       "startBlock": 7010933
     }
+  ],
+  "minterHolderV0Contracts": [
+    {
+      "address": "0xA9a7974d92eCD49C4E3F19937eDb9e3173dF1fd6",
+      "startBlock": 7105455
+    }
+  ],
+  "minterMerkleV0Contracts": [
+    {
+      "address": "0xE14757AC0075898Ad3343e22D828FAaeF2bb7595",
+      "startBlock": 7105457
+    }
   ]
 }
