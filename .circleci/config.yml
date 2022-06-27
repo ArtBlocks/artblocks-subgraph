@@ -1,0 +1,31 @@
+version: 2.1
+
+orbs:
+  node: circleci/node@4.7
+
+jobs:
+  test:
+    docker:
+      - image: 'cimg/base:stable'
+    steps:
+      - checkout
+      - node/install:
+          install-yarn: true
+          lts: true
+      - node/install-packages:
+          pkg-manager: yarn
+      - run: node --version
+      - run:
+          name: prepare
+          command: yarn prepare:mainnet-with-secondary
+      - run:
+          name: codegen
+          command: yarn codegen
+      - run:
+          name: Run tests
+          command: yarn test
+
+workflows:
+  run-ci:
+    jobs:
+      - test
