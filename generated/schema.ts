@@ -1300,13 +1300,13 @@ export class MinterFilter extends Entity {
     this.set("minterAllowlist", Value.fromStringArray(value));
   }
 
-  get minters(): Array<string> {
-    let value = this.get("minters");
+  get associatedMinters(): Array<string> {
+    let value = this.get("associatedMinters");
     return value!.toStringArray();
   }
 
-  set minters(value: Array<string>) {
-    this.set("minters", Value.fromStringArray(value));
+  set associatedMinters(value: Array<string>) {
+    this.set("associatedMinters", Value.fromStringArray(value));
   }
 
   get updatedAt(): BigInt {

@@ -111,7 +111,9 @@ export function handleMinterApproved(event: MinterApproved): void {
 
   // add minter to the list of allowlisted minters if it's not already there
   if (!minterFilter.minterAllowlist.includes(minter.id)) {
-    minterFilter.minterAllowlist.push(minter.id);
+    minterFilter.minterAllowlist = minterFilter.minterAllowlist.concat([
+      minter.id
+    ]);
     minterFilter.updatedAt = event.block.timestamp;
     minterFilter.save();
   }
