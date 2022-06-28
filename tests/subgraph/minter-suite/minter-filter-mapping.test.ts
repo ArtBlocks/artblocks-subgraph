@@ -789,6 +789,13 @@ test("handleMinterApproved should add new minter to store", () => {
     "updatedAt",
     CURRENT_BLOCK_TIMESTAMP.toString()
   );
+  // MinterFilter minterAllowlist should include the approved minter
+  assert.fieldEquals(
+    MINTER_FILTER_ENTITY_TYPE,
+    minterFilterAddress.toHexString(),
+    "minterAllowlist",
+    `[${minterToBeApprovedAddress.toHexString()}]`
+  );
 
   assert.fieldEquals(
     MINTER_FILTER_ENTITY_TYPE,
@@ -845,6 +852,13 @@ test("handleMinterApproved should handle the same minter being approved more tha
     minterToBeApprovedAddress.toHexString(),
     "updatedAt",
     CURRENT_BLOCK_TIMESTAMP.toString()
+  );
+  // MinterFilter minterAllowlist should include the approved minter
+  assert.fieldEquals(
+    MINTER_FILTER_ENTITY_TYPE,
+    minterFilterAddress.toHexString(),
+    "minterAllowlist",
+    `[${minterToBeApprovedAddress.toHexString()}]`
   );
 
   assert.fieldEquals(
@@ -904,14 +918,35 @@ test("handleMinterRevoke should remove minter from MinterFilter's minterAllowlis
   minterFilter.updatedAt = minterFilterUpdatedAt;
   minterFilter.save();
 
-  const minterToBeRevokedAddress = randomAddressGenerator.generateRandomAddress();
+  const minterToBeApprovedAddress = randomAddressGenerator.generateRandomAddress();
+  const minterType = "MinterSetPriceV0";
+
+  const minterToBeRevokedAddress = minterToBeApprovedAddress;
   const minter = new Minter(minterToBeRevokedAddress.toHexString());
-  minter.type = "MinterSetPriceV0";
+  minter.type = minterType;
   minter.minterFilter = minterFilterAddress.toHexString();
   minter.coreContract = TEST_CONTRACT_ADDRESS.toHexString();
   minter.updatedAt = CURRENT_BLOCK_TIMESTAMP.minus(BigInt.fromI32(10));
   minter.save();
 
+  // approve minter event
+  const minterApprovedEvent: MinterApproved = changetype<MinterApproved>(
+    newMockEvent()
+  );
+  minterApprovedEvent.address = minterFilterAddress;
+  minterApprovedEvent.block.timestamp = CURRENT_BLOCK_TIMESTAMP;
+  minterApprovedEvent.parameters = [
+    new ethereum.EventParam(
+      "_minterAddress",
+      ethereum.Value.fromAddress(minterToBeApprovedAddress)
+    ),
+    new ethereum.EventParam(
+      "_minterType",
+      ethereum.Value.fromString(minterType)
+    )
+  ];
+
+  // revoke minter event
   const minterRevokedEvent: MinterRevoked = changetype<MinterRevoked>(
     newMockEvent()
   );
@@ -924,9 +959,10 @@ test("handleMinterRevoke should remove minter from MinterFilter's minterAllowlis
     )
   ];
 
+  handleMinterApproved(minterApprovedEvent);
   handleMinterRevoked(minterRevokedEvent);
 
-  // MinterFilter minterAllowlist should still be empty array
+  // MinterFilter minterAllowlist should be empty array
   assert.fieldEquals(
     MINTER_FILTER_ENTITY_TYPE,
     minterFilterAddress.toHexString(),
