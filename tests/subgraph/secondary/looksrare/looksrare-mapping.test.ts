@@ -21,6 +21,7 @@ import {
   addNewTokenToStore,
   DEFAULT_CURRENCY
 } from "../../shared-helpers";
+import { LR_V1 } from "../../../../src/constants";
 test("handleTakerBid should create sale if contract and token are in store", () => {
   addNewContractToStore();
   let token = addNewTokenToStore();
@@ -37,7 +38,7 @@ test("handleTakerBid should create sale if contract and token are in store", () 
     "id",
     "0xbc5a2acf703138c9562adf29a4131756ef6fe70f7a03c08cbc8a4fd22d53f1a7"
   );
-  assert.fieldEquals("Sale", saleId, "exchange", "LR_V1");
+  assert.fieldEquals("Sale", saleId, "exchange", LR_V1);
   assert.fieldEquals("Sale", saleId, "saleType", "Single");
   assert.fieldEquals(
     "Sale",
@@ -402,7 +403,7 @@ test("handleTakerAsk should create sale if contract and token are in store", () 
     "id",
     "0xbc5a2acf703138c9562adf29a4131756ef6fe70f7a03c08cbc8a4fd22d53f1a7"
   );
-  assert.fieldEquals("Sale", saleId, "exchange", "LR_V1");
+  assert.fieldEquals("Sale", saleId, "exchange", LR_V1);
   assert.fieldEquals("Sale", saleId, "saleType", "Single");
   assert.fieldEquals(
     "Sale",

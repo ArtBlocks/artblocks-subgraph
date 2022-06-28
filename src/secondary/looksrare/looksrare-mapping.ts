@@ -15,7 +15,7 @@ import {
 
 import { generateContractSpecificId } from "../../helpers";
 import { buildTokenSaleLookupTableId } from "../secondary-helpers";
-import { LR_PRIVATE_SALE_STRATEGY } from "../../constants";
+import { LR_PRIVATE_SALE_STRATEGY, LR_V1, NATIVE } from "../../constants";
 
 /**
  *
@@ -72,7 +72,7 @@ function handleSale<T>(event: T): void {
   let saleId = event.params.orderHash.toHexString();
   let sale = new Sale(saleId);
   sale.txHash = event.transaction.hash;
-  sale.exchange = "LR_V1";
+  sale.exchange = LR_V1;
   sale.saleType = "Single";
   sale.blockNumber = event.block.number;
   sale.blockTimestamp = event.block.timestamp;
@@ -98,6 +98,7 @@ function handleSale<T>(event: T): void {
 
   let payment = new Payment(saleId + "-0");
   payment.sale = saleId;
+  payment.paymentType = NATIVE;
   payment.paymentToken = event.params.currency;
   payment.price = event.params.price;
   payment.recipient = event.params.taker;

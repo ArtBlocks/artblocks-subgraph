@@ -10,7 +10,7 @@ import {
   Payment
 } from "../../../generated/schema";
 
-import { WYVERN_ATOMICIZER_ADDRESS } from "../../constants";
+import { NATIVE, OS_V1, WYVERN_ATOMICIZER_ADDRESS } from "../../constants";
 
 import { generateContractSpecificId } from "../../helpers";
 
@@ -124,7 +124,7 @@ function _handleSingleAssetSale(call: AtomicMatch_Call): void {
   let saleId = generateSaleId(token.id, token.nextSaleId);
   let sale = new Sale(saleId);
   sale.txHash = call.transaction.hash;
-  sale.exchange = "OS_V1";
+  sale.exchange = OS_V1;
   sale.saleType = "Single";
   sale.blockNumber = call.block.number;
   sale.blockTimestamp = call.block.timestamp;
@@ -139,6 +139,7 @@ function _handleSingleAssetSale(call: AtomicMatch_Call): void {
 
   let payment = new Payment(saleId + "-0");
   payment.sale = saleId;
+  payment.paymentType = NATIVE;
   payment.paymentToken = paymentTokenErc20Address;
   payment.price = price;
   payment.recipient = buyerAddress;
@@ -274,15 +275,21 @@ function _handleBundleSale(call: AtomicMatch_Call): void {
   // Create the sale
   let sale = new Sale(saleId);
   sale.txHash = call.transaction.hash;
-  sale.exchange = "OS_V1";
+  sale.exchange = OS_V1;
   sale.saleType = "Bundle";
   sale.blockNumber = call.block.number;
   sale.blockTimestamp = call.block.timestamp;
   sale.buyer = buyerAdress;
   sale.seller = sellerAdress;
-  sale.paymentToken = paymentTokenErc20Address;
-  sale.price = price;
   sale.isPrivate = isPrivateSale(call.from, addrs);
   sale.summaryTokensSold = summaryTokensSold;
   sale.save();
+
+  let payment = new Payment(saleId + "-0");
+  payment.sale = saleId;
+  payment.paymentType = NATIVE;
+  payment.paymentToken = paymentTokenErc20Address;
+  payment.price = price;
+  payment.recipient = sellerAdress;
+  payment.save();
 }

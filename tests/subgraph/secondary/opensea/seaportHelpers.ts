@@ -157,10 +157,22 @@ export function createOrderFulfilledEvent(
     // Add ERC1155 payment
     considerationTupleArray.push(
       buildConsiderationTuple(
-        recipientParam,
+        offererParam,
         BigInt.fromI32(1),
         ItemType.ERC1155,
         Address.fromString("0x33333339b223fe8d0a0e5c4f27ead9083c756cc2")
+      )
+    );
+  }
+
+  if (isPrivateSale) {
+    // Add ERC1155 payment
+    considerationTupleArray.push(
+      buildConsiderationTuple(
+        recipientParam,
+        tokenIdParam,
+        ItemType.ERC721,
+        collectionParam
       )
     );
   }

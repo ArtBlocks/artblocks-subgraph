@@ -11,6 +11,8 @@ import {
 import { AtomicMatch_Call } from "../../../generated/WyvernExchangeWithBulkCancellations/WyvernExchangeWithBulkCancellations";
 
 import {
+  NATIVE,
+  OS_V2,
   WYVERN_ATOMICIZER_ADDRESS,
   WYVERN_MERKLE_ADDRESS
 } from "../../constants";
@@ -115,8 +117,8 @@ function _handleSingleAssetSale(call: AtomicMatch_Call): void {
     addrs[10]
   );
 
-  let buyerAdress: Address = addrs[1]; // Buyer.maker
-  let sellerAdress: Address = addrs[8]; // Saler.maker
+  let buyerAddress: Address = addrs[1]; // Buyer.maker
+  let sellerAddress: Address = addrs[8]; // Saler.maker
   let paymentTokenErc20Address: Address = addrs[6];
 
   // Fetch the token ID that has been sold from the call data
@@ -135,17 +137,23 @@ function _handleSingleAssetSale(call: AtomicMatch_Call): void {
   let saleId = generateSaleId(token.id, token.nextSaleId);
   let sale = new Sale(saleId);
   sale.txHash = call.transaction.hash;
-  sale.exchange = "OS_V2";
+  sale.exchange = OS_V2;
   sale.saleType = "Single";
   sale.blockNumber = call.block.number;
   sale.blockTimestamp = call.block.timestamp;
-  sale.buyer = buyerAdress;
-  sale.seller = sellerAdress;
-  sale.paymentToken = paymentTokenErc20Address;
-  sale.price = price;
+  sale.buyer = buyerAddress;
+  sale.seller = sellerAddress;
   sale.summaryTokensSold = token.id;
   sale.isPrivate = isPrivateSale(call.from, addrs);
   sale.save();
+
+  let payment = new Payment(saleId + "-0");
+  payment.sale = saleId;
+  payment.paymentType = NATIVE;
+  payment.paymentToken = paymentTokenErc20Address;
+  payment.price = price;
+  payment.recipient = buyerAddress;
+  payment.save();
 
   token.nextSaleId = token.nextSaleId.plus(BigInt.fromI32(1));
   token.save();
@@ -281,7 +289,7 @@ function _handleBundleSale(call: AtomicMatch_Call): void {
   // Create the sale
   let sale = new Sale(saleId);
   sale.txHash = call.transaction.hash;
-  sale.exchange = "OS_V2";
+  sale.exchange = OS_V2;
   sale.saleType = "Bundle";
   sale.blockNumber = call.block.number;
   sale.blockTimestamp = call.block.timestamp;
@@ -293,6 +301,7 @@ function _handleBundleSale(call: AtomicMatch_Call): void {
 
   let payment = new Payment(saleId + "-0");
   payment.sale = saleId;
+  payment.paymentType = NATIVE;
   payment.paymentToken = paymentTokenErc20Address;
   payment.price = price;
   payment.recipient = buyerAddress;

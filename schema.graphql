@@ -318,6 +318,13 @@ enum SaleType {
   Bundle
 }
 
+enum PaymentType {
+  Native,
+  ERC20,
+  ERC721,
+  ERC1155
+}
+
 enum Exchange {
   "Opensea V1"
   OS_V1,
@@ -330,9 +337,13 @@ enum Exchange {
 }
 
 type Payment @entity {
+  "Payment id formatted: '{SaleId}-{paymentNumber}' (paymentNumber will be 0 for non-Seaport trades)"
   id: ID!
 
-  "The ERC20 token used for the payment"
+  "Type of token transferred in this payment"
+  paymentType: PaymentType!
+
+  "The address of the token used for the payment"
   paymentToken: Bytes!
 
   "The price of the sale"
@@ -376,7 +387,7 @@ type Sale @entity {
   "The buyer address"
   buyer: Bytes!
 
-  "Array of Payments, should be referenced if multiplePaymentTypes is true"
+  "List of Payment tokens involved in this sale"
   payments: [Payment!]! @derivedFrom(field: "sale")
 
   "Private sales are flagged by this boolean"

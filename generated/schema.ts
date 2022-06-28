@@ -1300,13 +1300,13 @@ export class MinterFilter extends Entity {
     this.set("minterAllowlist", Value.fromStringArray(value));
   }
 
-  get minters(): Array<string> {
-    let value = this.get("minters");
+  get associatedMinters(): Array<string> {
+    let value = this.get("associatedMinters");
     return value!.toStringArray();
   }
 
-  set minters(value: Array<string>) {
-    this.set("minters", Value.fromStringArray(value));
+  set associatedMinters(value: Array<string>) {
+    this.set("associatedMinters", Value.fromStringArray(value));
   }
 
   get updatedAt(): BigInt {
@@ -1656,6 +1656,7 @@ export class Payment extends Entity {
     super();
     this.set("id", Value.fromString(id));
 
+    this.set("paymentType", Value.fromString(""));
     this.set("paymentToken", Value.fromBytes(Bytes.empty()));
     this.set("price", Value.fromBigInt(BigInt.zero()));
     this.set("sale", Value.fromString(""));
@@ -1686,6 +1687,15 @@ export class Payment extends Entity {
 
   set id(value: string) {
     this.set("id", Value.fromString(value));
+  }
+
+  get paymentType(): string {
+    let value = this.get("paymentType");
+    return value!.toString();
+  }
+
+  set paymentType(value: string) {
+    this.set("paymentType", Value.fromString(value));
   }
 
   get paymentToken(): Bytes {
