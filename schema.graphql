@@ -224,7 +224,10 @@ type MinterFilter @entity {
   coreContract: Contract!
 
   "Minters allowlisted on MinterFilter"
-  minterAllowlist: [Minter!]! @derivedFrom(field: "minterFilter")
+  minterAllowlist: [Minter!]!
+
+  "Minters associated with MinterFilter"
+  associatedMinters: [Minter!]! @derivedFrom(field: "minterFilter")
 
   updatedAt: BigInt!
 }
