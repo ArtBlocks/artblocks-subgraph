@@ -71,10 +71,10 @@ import {
   ConfigValueSet3 as ConfigValueSetBytes
 } from "../generated/MinterFilterV0/IFilteredMinterV1";
 import {
-  AllowHoldersOfProject,
+  AllowedHoldersOfProjects,
   RegisteredNFTAddress,
   UnregisteredNFTAddress,
-  RemovedHoldersOfProject
+  RemovedHoldersOfProjects
 } from "../generated/MinterHolderV0/MinterHolderV0";
 import { MinterConfigSetAddressEvent } from "./util-types";
 
@@ -398,56 +398,74 @@ export function handleDAExpResetAuctionDetails<T>(event: T): void {
 
 // MinterHolder Specific Handlers
 
-export function handleHoldersOfProjectGeneric<T>(event: T): void {
+export function handleHoldersOfProjectsGeneric<T>(event: T): void {
   if (
     !(
-      event instanceof AllowHoldersOfProject ||
-      event instanceof RemovedHoldersOfProject
+      event instanceof AllowedHoldersOfProjects ||
+      event instanceof RemovedHoldersOfProjects
     )
   ) {
     return;
   }
-  let address = event.params._ownedNFTAddress.toHexString();
-  let holderProjectId = event.params._ownedNFTProjectId.toString();
-  let bytesValueCombined = Bytes.fromUTF8(address + "-" + holderProjectId);
+  for (let i = 0; i < event.params._ownedNFTAddresses.length; i++) {
+    let address = event.params._ownedNFTAddresses[i].toHexString();
+    let holderProjectId = event.params._ownedNFTProjectIds[i].toString();
+    let bytesValueCombined = Bytes.fromUTF8(address + "-" + holderProjectId);
 
-  let newAddEvent: ConfigValueAddedToSetBytes;
-  let newRemoveEvent: ConfigValueRemovedFromSetBytes;
-  const parameters = [
-    new ethereum.EventParam(
-      "_projectId",
-      ethereum.Value.fromUnsignedBigInt(event.params._projectId)
-    ),
-    new ethereum.EventParam(
-      "_key",
-      ethereum.Value.fromBytes(Bytes.fromUTF8("allowlistedAddressAndProjectId"))
-    ),
-    new ethereum.EventParam(
-      "_value",
-      ethereum.Value.fromBytes(bytesValueCombined)
-    )
-  ];
-  if (event instanceof AllowHoldersOfProject) {
-    newAddEvent = changetype<ConfigValueAddedToSetBytes>(event);
-    newAddEvent.parameters = parameters;
-    handleAddManyBytesValueProjectConfig(newAddEvent);
-  } else if (event instanceof RemovedHoldersOfProject) {
-    newRemoveEvent = changetype<ConfigValueRemovedFromSetBytes>(event);
-    newRemoveEvent.parameters = parameters;
-    handleRemoveBytesManyValueProjectConfig(newRemoveEvent);
+    let newAddEvent: ConfigValueAddedToSetBytes;
+    let newRemoveEvent: ConfigValueRemovedFromSetBytes;
+    const parameters = [
+      new ethereum.EventParam(
+        "_projectId",
+        ethereum.Value.fromUnsignedBigInt(event.params._projectId)
+      ),
+      new ethereum.EventParam(
+        "_key",
+        ethereum.Value.fromBytes(
+          Bytes.fromUTF8("allowlistedAddressAndProjectId")
+        )
+      ),
+      new ethereum.EventParam(
+        "_value",
+        ethereum.Value.fromBytes(bytesValueCombined)
+      )
+    ];
+    if (event instanceof AllowedHoldersOfProjects) {
+      newAddEvent = new ConfigValueAddedToSetBytes(
+        event.address,
+        event.logIndex,
+        event.transactionLogIndex,
+        event.logType,
+        event.block,
+        event.transaction,
+        parameters
+      );
+      handleAddManyBytesValueProjectConfig(newAddEvent);
+    } else if (event instanceof RemovedHoldersOfProjects) {
+      newRemoveEvent = new ConfigValueRemovedFromSetBytes(
+        event.address,
+        event.logIndex,
+        event.transactionLogIndex,
+        event.logType,
+        event.block,
+        event.transaction,
+        parameters
+      );
+      handleRemoveBytesManyValueProjectConfig(newRemoveEvent);
+    }
   }
 }
 
-export function handleAllowHoldersOfProject(
-  event: AllowHoldersOfProject
+export function handleAllowHoldersOfProjects(
+  event: AllowedHoldersOfProjects
 ): void {
-  handleHoldersOfProjectGeneric(event);
+  handleHoldersOfProjectsGeneric(event);
 }
 
-export function handleRemoveHoldersOfProject(
-  event: RemovedHoldersOfProject
+export function handleRemoveHoldersOfProjects(
+  event: RemovedHoldersOfProjects
 ): void {
-  handleHoldersOfProjectGeneric(event);
+  handleHoldersOfProjectsGeneric(event);
 }
 
 export function handleRegistrationNFTAddresses<T>(event: T): void {

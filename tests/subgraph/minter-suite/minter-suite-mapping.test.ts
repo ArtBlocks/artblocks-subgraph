@@ -40,7 +40,7 @@ import {
   handleAddManyAddressValueProjectConfig as handleAddManyAddressValue,
   handleAddManyBigIntValueProjectConfig as handleAddManyBigIntValue,
   handleAddManyBytesValueProjectConfig as handleAddManyBytesValue,
-  handleAllowHoldersOfProject,
+  handleAllowHoldersOfProjects,
   handleAuctionHalfLifeRangeSecondsUpdated,
   handleDAExpResetAuctionDetails,
   handleDAExpSetAuctionDetails,
@@ -53,7 +53,7 @@ import {
   handleRegisteredNFTAddress,
   handleRemoveBigIntManyValueProjectConfig as handleRemoveBigIntManyValue,
   handleRemoveBytesManyValueProjectConfig as handleRemoveBytesManyValue,
-  handleRemoveHoldersOfProject,
+  handleRemoveHoldersOfProjects,
   handleRemoveValueProjectConfig as handleRemoveValue,
   handleSetAddressValueProjectConfig as handleSetAddressValue,
   handleSetBigIntValueProjectConfig as handleSetBigIntValue,
@@ -85,8 +85,8 @@ import {
   ConfigValueSet3 as ConfigValueSetBytes
 } from "../../../generated/MinterFilterV0/IFilteredMinterV1";
 import {
-  AllowHoldersOfProject,
-  RemovedHoldersOfProject,
+  AllowedHoldersOfProjects,
+  RemovedHoldersOfProjects,
   RegisteredNFTAddress,
   UnregisteredNFTAddress
 } from "../../../generated/MinterHolderV0/MinterHolderV0";
@@ -1970,7 +1970,7 @@ test("handleRemoveBytesManyValue should remove the key/value from extraMinterDet
     '{"addresses":"hi","removeMe":["alive"]}'
   );
 });
-test("handleAllowHoldersOfProject can add address + project id to extraMinterDetails", () => {
+test("handleAllowHoldersOfProjects can add address + project id to extraMinterDetails", () => {
   clearStore();
   const minterAddress = randomAddressGenerator.generateRandomAddress();
   const minterType = "MinterHolderV0";
@@ -1996,29 +1996,33 @@ test("handleAllowHoldersOfProject can add address + project id to extraMinterDet
   projectMinterConfig.project = project.id;
   projectMinterConfig.save();
 
-  let testAddy = randomAddressGenerator.generateRandomAddress();
+  let testAddy: Address = randomAddressGenerator.generateRandomAddress();
+  let testAddyArray: Array<Address> = new Array(1);
+  testAddyArray[0] = testAddy;
+  let testNFTProjectIdsArray: Array<BigInt> = new Array(1);
+  testNFTProjectIdsArray[0] = BigInt.fromI32(1);
 
-  const allowHolderEvent: AllowHoldersOfProject = changetype<
-    AllowHoldersOfProject
+  const allowHoldersEvent: AllowedHoldersOfProjects = changetype<
+    AllowedHoldersOfProjects
   >(newMockEvent());
-  allowHolderEvent.address = minterAddress;
-  allowHolderEvent.parameters = [
+  allowHoldersEvent.address = minterAddress;
+  allowHoldersEvent.parameters = [
     new ethereum.EventParam(
       "_projectId",
       ethereum.Value.fromUnsignedBigInt(projectId)
     ),
     new ethereum.EventParam(
-      "_ownedNFTAddress",
-      ethereum.Value.fromAddress(testAddy)
+      "_ownedNFTAddresses",
+      ethereum.Value.fromAddressArray(testAddyArray)
     ),
     new ethereum.EventParam(
-      "_ownedNFTProjectId",
-      ethereum.Value.fromUnsignedBigInt(BigInt.fromI32(1))
+      "_ownedNFTProjectIds",
+      ethereum.Value.fromUnsignedBigIntArray(testNFTProjectIdsArray)
     )
   ];
-  allowHolderEvent.block.timestamp = CURRENT_BLOCK_TIMESTAMP;
+  allowHoldersEvent.block.timestamp = CURRENT_BLOCK_TIMESTAMP;
 
-  handleAllowHoldersOfProject(allowHolderEvent);
+  handleAllowHoldersOfProjects(allowHoldersEvent);
 
   assert.fieldEquals(
     PROJECT_MINTER_CONFIGURATION_ENTITY_TYPE,
@@ -2033,7 +2037,7 @@ test("handleAllowHoldersOfProject can add address + project id to extraMinterDet
       "]}"
   );
 });
-test("handleRemoveHoldersOfProject can remove address + project id to extraMinterDetails", () => {
+test("handleRemoveHoldersOfProjects can remove address + project id to extraMinterDetails", () => {
   clearStore();
   const minterAddress = randomAddressGenerator.generateRandomAddress();
   const minterType = "MinterHolderV0";
@@ -2053,6 +2057,10 @@ test("handleRemoveHoldersOfProject can remove address + project id to extraMinte
   );
 
   let testAddy = randomAddressGenerator.generateRandomAddress();
+  let testAddyArray: Array<Address> = new Array<Address>(1);
+  testAddyArray[0] = testAddy;
+  let testNFTProjectIdsArray: Array<BigInt> = new Array(1);
+  testNFTProjectIdsArray[0] = BigInt.fromI32(1);
 
   const projectMinterConfig = new ProjectMinterConfiguration(
     getProjectMinterConfigId(minterAddress.toHexString(), project.id)
@@ -2073,27 +2081,27 @@ test("handleRemoveHoldersOfProject can remove address + project id to extraMinte
     "]}";
   projectMinterConfig.save();
 
-  const removeHolderEvent: RemovedHoldersOfProject = changetype<
-    RemovedHoldersOfProject
+  const removeHoldersEvent: RemovedHoldersOfProjects = changetype<
+    RemovedHoldersOfProjects
   >(newMockEvent());
-  removeHolderEvent.address = minterAddress;
-  removeHolderEvent.parameters = [
+  removeHoldersEvent.address = minterAddress;
+  removeHoldersEvent.parameters = [
     new ethereum.EventParam(
       "_projectId",
       ethereum.Value.fromUnsignedBigInt(projectId)
     ),
     new ethereum.EventParam(
-      "_ownedNFTAddress",
-      ethereum.Value.fromAddress(testAddy)
+      "_ownedNFTAddresses",
+      ethereum.Value.fromAddressArray(testAddyArray)
     ),
     new ethereum.EventParam(
-      "_ownedNFTProjectId",
-      ethereum.Value.fromUnsignedBigInt(BigInt.fromI32(1))
+      "_ownedNFTProjectIds",
+      ethereum.Value.fromUnsignedBigIntArray(testNFTProjectIdsArray)
     )
   ];
-  removeHolderEvent.block.timestamp = CURRENT_BLOCK_TIMESTAMP;
+  removeHoldersEvent.block.timestamp = CURRENT_BLOCK_TIMESTAMP;
 
-  handleRemoveHoldersOfProject(removeHolderEvent);
+  handleRemoveHoldersOfProjects(removeHoldersEvent);
 
   assert.fieldEquals(
     PROJECT_MINTER_CONFIGURATION_ENTITY_TYPE,
@@ -2102,6 +2110,7 @@ test("handleRemoveHoldersOfProject can remove address + project id to extraMinte
     '{"allowlistedAddressAndProjectId":["dontremove-0"]}'
   );
 });
+
 test("handleRegisteredNFTAddress adds the address, as a string to the minter", () => {
   clearStore();
   const minterAddress = randomAddressGenerator.generateRandomAddress();

@@ -764,10 +764,10 @@ dataSources:
           handler: handleRegisteredNFTAddress
         - event: UnregisteredNFTAddress(indexed address)
           handler: handleUnregisteredNFTAddress
-        - event: AllowHoldersOfProject(indexed uint256,address,uint256)
-          handler: handleAllowHoldersOfProject
-        - event: RemovedHoldersOfProject(indexed uint256,address,uint256)
-          handler: handleRemoveHoldersOfProject
+        - event: AllowedHoldersOfProjects(indexed uint256,address[],uint256[])
+          handler: handleAllowHoldersOfProjects
+        - event: RemovedHoldersOfProjects(indexed uint256,address[],uint256[])
+          handler: handleRemoveHoldersOfProjects
       file: ./src/minter-suite-mapping.ts
   {{/minterHolderV0Contracts}}
   {{#minterMerkleV0Contracts}}
