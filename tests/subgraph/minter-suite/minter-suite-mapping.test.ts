@@ -1997,10 +1997,6 @@ test("handleAllowHoldersOfProjects can add address + project id to extraMinterDe
   projectMinterConfig.save();
 
   let testAddy: Address = randomAddressGenerator.generateRandomAddress();
-  let testAddyArray: Array<Address> = new Array(1);
-  testAddyArray[0] = testAddy;
-  let testNFTProjectIdsArray: Array<BigInt> = new Array(1);
-  testNFTProjectIdsArray[0] = BigInt.fromI32(1);
 
   const allowHoldersEvent: AllowedHoldersOfProjects = changetype<
     AllowedHoldersOfProjects
@@ -2013,11 +2009,11 @@ test("handleAllowHoldersOfProjects can add address + project id to extraMinterDe
     ),
     new ethereum.EventParam(
       "_ownedNFTAddresses",
-      ethereum.Value.fromAddressArray(testAddyArray)
+      ethereum.Value.fromAddressArray([testAddy])
     ),
     new ethereum.EventParam(
       "_ownedNFTProjectIds",
-      ethereum.Value.fromUnsignedBigIntArray(testNFTProjectIdsArray)
+      ethereum.Value.fromUnsignedBigIntArray([BigInt.fromI32(1)])
     )
   ];
   allowHoldersEvent.block.timestamp = CURRENT_BLOCK_TIMESTAMP;
@@ -2057,10 +2053,6 @@ test("handleRemoveHoldersOfProjects can remove address + project id to extraMint
   );
 
   let testAddy = randomAddressGenerator.generateRandomAddress();
-  let testAddyArray: Array<Address> = new Array<Address>(1);
-  testAddyArray[0] = testAddy;
-  let testNFTProjectIdsArray: Array<BigInt> = new Array(1);
-  testNFTProjectIdsArray[0] = BigInt.fromI32(1);
 
   const projectMinterConfig = new ProjectMinterConfiguration(
     getProjectMinterConfigId(minterAddress.toHexString(), project.id)
@@ -2092,11 +2084,11 @@ test("handleRemoveHoldersOfProjects can remove address + project id to extraMint
     ),
     new ethereum.EventParam(
       "_ownedNFTAddresses",
-      ethereum.Value.fromAddressArray(testAddyArray)
+      ethereum.Value.fromAddressArray([testAddy])
     ),
     new ethereum.EventParam(
       "_ownedNFTProjectIds",
-      ethereum.Value.fromUnsignedBigIntArray(testNFTProjectIdsArray)
+      ethereum.Value.fromUnsignedBigIntArray([BigInt.fromI32(1)])
     )
   ];
   removeHoldersEvent.block.timestamp = CURRENT_BLOCK_TIMESTAMP;
