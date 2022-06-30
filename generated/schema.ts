@@ -1651,6 +1651,90 @@ export class ProjectMinterConfiguration extends Entity {
   }
 }
 
+export class Payment extends Entity {
+  constructor(id: string) {
+    super();
+    this.set("id", Value.fromString(id));
+
+    this.set("paymentType", Value.fromString(""));
+    this.set("paymentToken", Value.fromBytes(Bytes.empty()));
+    this.set("price", Value.fromBigInt(BigInt.zero()));
+    this.set("sale", Value.fromString(""));
+    this.set("recipient", Value.fromBytes(Bytes.empty()));
+  }
+
+  save(): void {
+    let id = this.get("id");
+    assert(id != null, "Cannot save Payment entity without an ID");
+    if (id) {
+      assert(
+        id.kind == ValueKind.STRING,
+        "Cannot save Payment entity with non-string ID. " +
+          'Considering using .toHex() to convert the "id" to a string.'
+      );
+      store.set("Payment", id.toString(), this);
+    }
+  }
+
+  static load(id: string): Payment | null {
+    return changetype<Payment | null>(store.get("Payment", id));
+  }
+
+  get id(): string {
+    let value = this.get("id");
+    return value!.toString();
+  }
+
+  set id(value: string) {
+    this.set("id", Value.fromString(value));
+  }
+
+  get paymentType(): string {
+    let value = this.get("paymentType");
+    return value!.toString();
+  }
+
+  set paymentType(value: string) {
+    this.set("paymentType", Value.fromString(value));
+  }
+
+  get paymentToken(): Bytes {
+    let value = this.get("paymentToken");
+    return value!.toBytes();
+  }
+
+  set paymentToken(value: Bytes) {
+    this.set("paymentToken", Value.fromBytes(value));
+  }
+
+  get price(): BigInt {
+    let value = this.get("price");
+    return value!.toBigInt();
+  }
+
+  set price(value: BigInt) {
+    this.set("price", Value.fromBigInt(value));
+  }
+
+  get sale(): string {
+    let value = this.get("sale");
+    return value!.toString();
+  }
+
+  set sale(value: string) {
+    this.set("sale", Value.fromString(value));
+  }
+
+  get recipient(): Bytes {
+    let value = this.get("recipient");
+    return value!.toBytes();
+  }
+
+  set recipient(value: Bytes) {
+    this.set("recipient", Value.fromBytes(value));
+  }
+}
+
 export class Sale extends Entity {
   constructor(id: string) {
     super();
@@ -1664,8 +1748,6 @@ export class Sale extends Entity {
     this.set("summaryTokensSold", Value.fromString(""));
     this.set("seller", Value.fromBytes(Bytes.empty()));
     this.set("buyer", Value.fromBytes(Bytes.empty()));
-    this.set("paymentToken", Value.fromBytes(Bytes.empty()));
-    this.set("price", Value.fromBigInt(BigInt.zero()));
     this.set("isPrivate", Value.fromBoolean(false));
   }
 
@@ -1776,22 +1858,13 @@ export class Sale extends Entity {
     this.set("buyer", Value.fromBytes(value));
   }
 
-  get paymentToken(): Bytes {
-    let value = this.get("paymentToken");
-    return value!.toBytes();
+  get payments(): Array<string> {
+    let value = this.get("payments");
+    return value!.toStringArray();
   }
 
-  set paymentToken(value: Bytes) {
-    this.set("paymentToken", Value.fromBytes(value));
-  }
-
-  get price(): BigInt {
-    let value = this.get("price");
-    return value!.toBigInt();
-  }
-
-  set price(value: BigInt) {
-    this.set("price", Value.fromBigInt(value));
+  set payments(value: Array<string>) {
+    this.set("payments", Value.fromStringArray(value));
   }
 
   get isPrivate(): boolean {

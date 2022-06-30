@@ -79,6 +79,31 @@ export const CURRENT_BLOCK_TIMESTAMP = BigInt.fromI32(1647051214);
 export const TEST_CONTRACT_ADDRESS = randomAddressGenerator.generateRandomAddress();
 export const ONE_ETH_IN_WEI = BigInt.fromString("1000000000000000000");
 
+export const DEFAULT_ORDER_HASH =
+  "0xbc5a2acf703138c9562adf29a4131756ef6fe70f7a03c08cbc8a4fd22d53f1a7";
+export const DEFAULT_ORDER_NONCE = BigInt.fromString("48");
+export const DEFAULT_TAKER = Address.fromString(
+  "0x258a5e28aa40aef3c2c4cdf728b11dd9dd2b8bcd"
+);
+export const DEFAULT_MAKER = Address.fromString(
+  "0x26a6434385cd63a88450ea06e2b2256979400b29"
+);
+export const DEFAULT_STRATEGY = Address.fromString(
+  "0x56244bb70cbd3ea9dc8007399f61dfc065190031"
+);
+export const DEFAULT_CURRENCY = Address.fromString(
+  "0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2"
+);
+export const DEFAULT_COLLECTION = Address.fromString(
+  "0xd8a5d498ab43ed060cb6629b97a19e3e4276dd9f"
+);
+export const DEFAULT_PROJECT_ID = BigInt.fromString("18");
+export const DEFAULT_TOKEN_ID = BigInt.fromString("7019");
+export const DEFAULT_AMOUNT = BigInt.fromString("1");
+export const DEFAULT_PRICE = BigInt.fromString("700000000000000000");
+export const DEFAULT_ZONE = Address.fromString(
+  "0x004C00500000aD104D7DBd00e3ae0A5C00560C00"
+);
 export class ContractValues {
   admin: Address;
   mintWhitelisted: Address[];
@@ -155,13 +180,22 @@ export const DEFAULT_PROJECT_VALUES: DefaultProjectValues = {
 };
 
 // Store population functions
-export const addNewTokenToStore = function(
-  address: Address,
-  tokenId: BigInt
-): void {
-  let token = new Token(generateContractSpecificId(address, tokenId));
+export function addNewContractToStore(): Contract {
+  let contract = new Contract(DEFAULT_COLLECTION.toHexString());
+  contract.save();
 
+  return contract;
+}
+
+export const addNewTokenToStore = function(
+  address: Address = DEFAULT_COLLECTION,
+  tokenId: BigInt = DEFAULT_TOKEN_ID,
+  projectId: BigInt = DEFAULT_PROJECT_ID
+): Token {
+  let token = new Token(generateContractSpecificId(address, tokenId));
+  token.project = generateContractSpecificId(address, projectId);
   token.save();
+  return token;
 };
 
 export const addNewProjectToStore = function(

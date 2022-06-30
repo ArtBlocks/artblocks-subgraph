@@ -29,3 +29,13 @@ export const LR_PRIVATE_SALE_STRATEGY =
 export const TRANSFER_FROM_SELECTOR = "0x23b872dd";
 export const ERC721_SAFE_TRANSFER_FROM_SELECTOR = "0x42842e0e";
 export const ERC155_SAFE_TRANSFER_FROM_SELECTOR = "0xf242432a";
+
+export const OS_V1 = "OS_V1";
+export const OS_V2 = "OS_V2";
+export const LR_V1 = "LR_V1";
+export const OS_SP = "OS_SP";
+
+export const NATIVE = "Native";
+export const ERC20 = "ERC20";
+export const ERC721 = "ERC721";
+export const ERC1155 = "ERC1155";

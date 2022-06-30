@@ -318,6 +318,13 @@ enum SaleType {
   Bundle
 }
 
+enum PaymentType {
+  Native,
+  ERC20,
+  ERC721,
+  ERC1155
+}
+
 enum Exchange {
   "Opensea V1"
   OS_V1,
@@ -325,11 +332,32 @@ enum Exchange {
   OS_V2,
   "LooksRare"
   LR_V1
+  "Opensea Seaport"
+  OS_SP
 }
 
+type Payment @entity {
+  "Payment id formatted: '{SaleId}-{paymentNumber}' (paymentNumber will be 0 for non-Seaport trades)"
+  id: ID!
+
+  "Type of token transferred in this payment"
+  paymentType: PaymentType!
+
+  "The address of the token used for the payment"
+  paymentToken: Bytes!
+
+  "The price of the sale"
+  price: BigInt!
+
+  "The associated sale"
+  sale: Sale!
+
+  "The recipient address"
+  recipient: Bytes!
+}
 
 type Sale @entity {
-  "The sale id formated: tokenId - token.nextSaleId (using first token sold for bundles) for Opensea, orderHash from sale event for Looksrare"
+  "The sale id formated: tokenId - token.nextSaleId (using first token sold for bundles) for Opensea V1/V2, orderHash from sale event for Looksrare and Seaport"
   id: ID!
 
   "The hash of the transaction"
@@ -359,11 +387,8 @@ type Sale @entity {
   "The buyer address"
   buyer: Bytes!
 
-  "The ERC20 token used for the payement"
-  paymentToken: Bytes!
-
-  "The price of the sale"
-  price: BigInt!
+  "List of Payment tokens involved in this sale"
+  payments: [Payment!]! @derivedFrom(field: "sale")
 
   "Private sales are flagged by this boolean"
   isPrivate: Boolean!
