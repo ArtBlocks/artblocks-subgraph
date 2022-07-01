@@ -76,14 +76,14 @@
   ],
   "minterHolderV0Contracts": [
     {
-      "address": "0xA9a7974d92eCD49C4E3F19937eDb9e3173dF1fd6",
-      "startBlock": 7105455
+      "address": "0x717A45024cf098D2931f2634Fe6e53a8E6B2C480",
+      "startBlock": 7148716
     }
   ],
   "minterMerkleV0Contracts": [
     {
-      "address": "0xE14757AC0075898Ad3343e22D828FAaeF2bb7595",
-      "startBlock": 7105457
+      "address": "0x20bF861217fe477862518BBA7d2509c465019707",
+      "startBlock": 7148718
     }
   ]
 }
