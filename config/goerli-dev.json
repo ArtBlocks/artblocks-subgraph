@@ -77,12 +77,14 @@
   "minterHolderV0Contracts": [
     {
       "address": "0x717A45024cf098D2931f2634Fe6e53a8E6B2C480",
+      "name": "Flagship Minter",
       "startBlock": 7148716
     }
   ],
   "minterMerkleV0Contracts": [
     {
       "address": "0xE14757AC0075898Ad3343e22D828FAaeF2bb7595",
+      "name": "Flagship Minter",
       "startBlock": 7105457
     }
   ]
