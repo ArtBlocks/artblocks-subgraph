@@ -74,8 +74,8 @@
   ],
   "minterMerkleV0Contracts": [
     {
-      "address": "0x126C0f64b0380E682a8f8e0059189B5aC12b0eFf",
-      "startBlock": 12499905
+      "address": "0x25170a18d984721f16d525b83537568D4448776B",
+      "startBlock": 12240975
     }
   ]
 }
