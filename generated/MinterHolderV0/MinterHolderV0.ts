@@ -10,16 +10,16 @@ import {
   BigInt
 } from "@graphprotocol/graph-ts";
 
-export class AllowHoldersOfProject extends ethereum.Event {
-  get params(): AllowHoldersOfProject__Params {
-    return new AllowHoldersOfProject__Params(this);
+export class AllowedHoldersOfProjects extends ethereum.Event {
+  get params(): AllowedHoldersOfProjects__Params {
+    return new AllowedHoldersOfProjects__Params(this);
   }
 }
 
-export class AllowHoldersOfProject__Params {
-  _event: AllowHoldersOfProject;
+export class AllowedHoldersOfProjects__Params {
+  _event: AllowedHoldersOfProjects;
 
-  constructor(event: AllowHoldersOfProject) {
+  constructor(event: AllowedHoldersOfProjects) {
     this._event = event;
   }
 
@@ -27,12 +27,12 @@ export class AllowHoldersOfProject__Params {
     return this._event.parameters[0].value.toBigInt();
   }
 
-  get _ownedNFTAddress(): Address {
-    return this._event.parameters[1].value.toAddress();
+  get _ownedNFTAddresses(): Array<Address> {
+    return this._event.parameters[1].value.toAddressArray();
   }
 
-  get _ownedNFTProjectId(): BigInt {
-    return this._event.parameters[2].value.toBigInt();
+  get _ownedNFTProjectIds(): Array<BigInt> {
+    return this._event.parameters[2].value.toBigIntArray();
   }
 }
 
@@ -124,16 +124,16 @@ export class RegisteredNFTAddress__Params {
   }
 }
 
-export class RemovedHoldersOfProject extends ethereum.Event {
-  get params(): RemovedHoldersOfProject__Params {
-    return new RemovedHoldersOfProject__Params(this);
+export class RemovedHoldersOfProjects extends ethereum.Event {
+  get params(): RemovedHoldersOfProjects__Params {
+    return new RemovedHoldersOfProjects__Params(this);
   }
 }
 
-export class RemovedHoldersOfProject__Params {
-  _event: RemovedHoldersOfProject;
+export class RemovedHoldersOfProjects__Params {
+  _event: RemovedHoldersOfProjects;
 
-  constructor(event: RemovedHoldersOfProject) {
+  constructor(event: RemovedHoldersOfProjects) {
     this._event = event;
   }
 
@@ -141,12 +141,12 @@ export class RemovedHoldersOfProject__Params {
     return this._event.parameters[0].value.toBigInt();
   }
 
-  get _ownedNFTAddress(): Address {
-    return this._event.parameters[1].value.toAddress();
+  get _ownedNFTAddresses(): Array<Address> {
+    return this._event.parameters[1].value.toAddressArray();
   }
 
-  get _ownedNFTProjectId(): BigInt {
-    return this._event.parameters[2].value.toBigInt();
+  get _ownedNFTProjectIds(): Array<BigInt> {
+    return this._event.parameters[2].value.toBigIntArray();
   }
 }
 
@@ -504,20 +504,20 @@ export class ConstructorCall__Outputs {
   }
 }
 
-export class AllowHoldersOfProjectCall extends ethereum.Call {
-  get inputs(): AllowHoldersOfProjectCall__Inputs {
-    return new AllowHoldersOfProjectCall__Inputs(this);
+export class AllowHoldersOfProjectsCall extends ethereum.Call {
+  get inputs(): AllowHoldersOfProjectsCall__Inputs {
+    return new AllowHoldersOfProjectsCall__Inputs(this);
   }
 
-  get outputs(): AllowHoldersOfProjectCall__Outputs {
-    return new AllowHoldersOfProjectCall__Outputs(this);
+  get outputs(): AllowHoldersOfProjectsCall__Outputs {
+    return new AllowHoldersOfProjectsCall__Outputs(this);
   }
 }
 
-export class AllowHoldersOfProjectCall__Inputs {
-  _call: AllowHoldersOfProjectCall;
+export class AllowHoldersOfProjectsCall__Inputs {
+  _call: AllowHoldersOfProjectsCall;
 
-  constructor(call: AllowHoldersOfProjectCall) {
+  constructor(call: AllowHoldersOfProjectsCall) {
     this._call = call;
   }
 
@@ -525,19 +525,65 @@ export class AllowHoldersOfProjectCall__Inputs {
     return this._call.inputValues[0].value.toBigInt();
   }
 
-  get _ownedNFTAddress(): Address {
-    return this._call.inputValues[1].value.toAddress();
+  get _ownedNFTAddresses(): Array<Address> {
+    return this._call.inputValues[1].value.toAddressArray();
   }
 
-  get _ownedNFTProjectId(): BigInt {
-    return this._call.inputValues[2].value.toBigInt();
+  get _ownedNFTProjectIds(): Array<BigInt> {
+    return this._call.inputValues[2].value.toBigIntArray();
   }
 }
 
-export class AllowHoldersOfProjectCall__Outputs {
-  _call: AllowHoldersOfProjectCall;
+export class AllowHoldersOfProjectsCall__Outputs {
+  _call: AllowHoldersOfProjectsCall;
 
-  constructor(call: AllowHoldersOfProjectCall) {
+  constructor(call: AllowHoldersOfProjectsCall) {
+    this._call = call;
+  }
+}
+
+export class AllowRemoveHoldersOfProjectsCall extends ethereum.Call {
+  get inputs(): AllowRemoveHoldersOfProjectsCall__Inputs {
+    return new AllowRemoveHoldersOfProjectsCall__Inputs(this);
+  }
+
+  get outputs(): AllowRemoveHoldersOfProjectsCall__Outputs {
+    return new AllowRemoveHoldersOfProjectsCall__Outputs(this);
+  }
+}
+
+export class AllowRemoveHoldersOfProjectsCall__Inputs {
+  _call: AllowRemoveHoldersOfProjectsCall;
+
+  constructor(call: AllowRemoveHoldersOfProjectsCall) {
+    this._call = call;
+  }
+
+  get _projectId(): BigInt {
+    return this._call.inputValues[0].value.toBigInt();
+  }
+
+  get _ownedNFTAddressesAdd(): Array<Address> {
+    return this._call.inputValues[1].value.toAddressArray();
+  }
+
+  get _ownedNFTProjectIdsAdd(): Array<BigInt> {
+    return this._call.inputValues[2].value.toBigIntArray();
+  }
+
+  get _ownedNFTAddressesRemove(): Array<Address> {
+    return this._call.inputValues[3].value.toAddressArray();
+  }
+
+  get _ownedNFTProjectIdsRemove(): Array<BigInt> {
+    return this._call.inputValues[4].value.toBigIntArray();
+  }
+}
+
+export class AllowRemoveHoldersOfProjectsCall__Outputs {
+  _call: AllowRemoveHoldersOfProjectsCall;
+
+  constructor(call: AllowRemoveHoldersOfProjectsCall) {
     this._call = call;
   }
 }
@@ -732,20 +778,20 @@ export class RegisterNFTAddressCall__Outputs {
   }
 }
 
-export class RemoveHoldersOfProjectCall extends ethereum.Call {
-  get inputs(): RemoveHoldersOfProjectCall__Inputs {
-    return new RemoveHoldersOfProjectCall__Inputs(this);
+export class RemoveHoldersOfProjectsCall extends ethereum.Call {
+  get inputs(): RemoveHoldersOfProjectsCall__Inputs {
+    return new RemoveHoldersOfProjectsCall__Inputs(this);
   }
 
-  get outputs(): RemoveHoldersOfProjectCall__Outputs {
-    return new RemoveHoldersOfProjectCall__Outputs(this);
+  get outputs(): RemoveHoldersOfProjectsCall__Outputs {
+    return new RemoveHoldersOfProjectsCall__Outputs(this);
   }
 }
 
-export class RemoveHoldersOfProjectCall__Inputs {
-  _call: RemoveHoldersOfProjectCall;
+export class RemoveHoldersOfProjectsCall__Inputs {
+  _call: RemoveHoldersOfProjectsCall;
 
-  constructor(call: RemoveHoldersOfProjectCall) {
+  constructor(call: RemoveHoldersOfProjectsCall) {
     this._call = call;
   }
 
@@ -753,19 +799,19 @@ export class RemoveHoldersOfProjectCall__Inputs {
     return this._call.inputValues[0].value.toBigInt();
   }
 
-  get _ownedNFTAddress(): Address {
-    return this._call.inputValues[1].value.toAddress();
+  get _ownedNFTAddresses(): Array<Address> {
+    return this._call.inputValues[1].value.toAddressArray();
   }
 
-  get _ownedNFTProjectId(): BigInt {
-    return this._call.inputValues[2].value.toBigInt();
+  get _ownedNFTProjectIds(): Array<BigInt> {
+    return this._call.inputValues[2].value.toBigIntArray();
   }
 }
 
-export class RemoveHoldersOfProjectCall__Outputs {
-  _call: RemoveHoldersOfProjectCall;
+export class RemoveHoldersOfProjectsCall__Outputs {
+  _call: RemoveHoldersOfProjectsCall;
 
-  constructor(call: RemoveHoldersOfProjectCall) {
+  constructor(call: RemoveHoldersOfProjectsCall) {
     this._call = call;
   }
 }
