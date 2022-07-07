@@ -45,7 +45,8 @@ export function createTakerBidEvent(
     mockEvent.logType,
     mockEvent.block,
     mockEvent.transaction,
-    mockEvent.parameters
+    mockEvent.parameters,
+    mockEvent.receipt
   );
   let orderHash = new ethereum.EventParam(
     "orderHash",
@@ -133,7 +134,8 @@ export function createTakerAskEvent(
     mockEvent.logType,
     mockEvent.block,
     mockEvent.transaction,
-    mockEvent.parameters
+    mockEvent.parameters,
+    mockEvent.receipt
   );
   let orderHash = new ethereum.EventParam(
     "orderHash",

@@ -426,23 +426,7 @@ export function handleRemoveProjectLastScript(
   call: RemoveProjectLastScriptCall
 ): void {
   let contract = GenArt721Core.bind(call.to);
-  let project = Project.load(
-    generateContractSpecificId(call.to, call.inputs._projectId)
-  );
-  if (project) {
-    store.remove(
-      "ProjectScript",
-      generateProjectScriptId(
-        project.id,
-        project.scriptCount.minus(BigInt.fromI32(1))
-      )
-    );
-    refreshProjectScript(
-      contract,
-      call.inputs._projectId,
-      call.block.timestamp
-    );
-  }
+  refreshProjectScript(contract, call.inputs._projectId, call.block.timestamp);
 }
 
 export function handleToggleProjectIsActive(
@@ -845,7 +829,21 @@ function refreshProjectScript<T>(
   if (project) {
     let scriptInfo = contract.projectScriptInfo(projectId);
 
+    let prevScriptCount = project.scriptCount.toI32();
     let scriptCount = scriptInfo.value1.toI32();
+
+    // Remove ProjectScripts that no longer exist on chain
+    if (prevScriptCount > scriptCount) {
+      for (let i = scriptCount; i < prevScriptCount; i++) {
+        const projectScript = ProjectScript.load(
+          generateProjectScriptId(project.id, BigInt.fromI32(i))
+        );
+        if (projectScript) {
+          store.remove("ProjectScript", projectScript.id);
+        }
+      }
+    }
+
     let scripts: string[] = [];
     for (let i = 0; i < scriptCount; i++) {
       let script = contract.projectScriptByIndex(projectId, BigInt.fromI32(i));

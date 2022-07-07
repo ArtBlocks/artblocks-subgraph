@@ -438,7 +438,8 @@ export function handleHoldersOfProjectsGeneric<T>(event: T): void {
         event.logType,
         event.block,
         event.transaction,
-        parameters
+        parameters,
+        event.receipt
       );
       handleAddManyBytesValueProjectConfig(newAddEvent);
     } else if (event instanceof RemovedHoldersOfProjects) {
@@ -449,7 +450,8 @@ export function handleHoldersOfProjectsGeneric<T>(event: T): void {
         event.logType,
         event.block,
         event.transaction,
-        parameters
+        parameters,
+        event.receipt
       );
       handleRemoveBytesManyValueProjectConfig(newRemoveEvent);
     }
