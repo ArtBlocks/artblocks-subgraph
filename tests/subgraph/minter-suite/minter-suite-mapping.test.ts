@@ -153,6 +153,7 @@ test("handlePricePerTokenInWeiUpdated should update project minter config priceP
   );
   projectMinterConfig.minter = minterAddress.toHexString();
   projectMinterConfig.project = project.id;
+  projectMinterConfig.extraMinterDetails = "{}";
   projectMinterConfig.basePrice = ONE_ETH_IN_WEI.div(BigInt.fromI32(10));
   projectMinterConfig.priceIsConfigured = false;
   projectMinterConfig.currencyAddress = Address.zero();
@@ -259,6 +260,7 @@ test("handleProjectCurrencyInfoUpdated should update project minter config curre
   );
   projectMinterConfig.minter = minterAddress.toHexString();
   projectMinterConfig.project = project.id;
+  projectMinterConfig.extraMinterDetails = "{}";
   projectMinterConfig.basePrice = ONE_ETH_IN_WEI.div(BigInt.fromI32(10));
   projectMinterConfig.priceIsConfigured = false;
   projectMinterConfig.currencyAddress = Address.zero();
@@ -376,6 +378,7 @@ test("handlePurchaseToDisabledUpdated should update project minter config purcha
   );
   projectMinterConfig.minter = minterAddress.toHexString();
   projectMinterConfig.project = project.id;
+  projectMinterConfig.extraMinterDetails = "{}";
   projectMinterConfig.basePrice = ONE_ETH_IN_WEI.div(BigInt.fromI32(10));
   projectMinterConfig.priceIsConfigured = false;
   projectMinterConfig.currencyAddress = Address.zero();
@@ -515,6 +518,7 @@ test("handleDALinSetAuctionDetails should update project minter config auction d
   );
   projectMinterConfig.minter = minterAddress.toHexString();
   projectMinterConfig.project = project.id;
+  projectMinterConfig.extraMinterDetails = "{}";
   projectMinterConfig.basePrice = BigInt.fromI32(0);
   projectMinterConfig.priceIsConfigured = false;
   projectMinterConfig.currencyAddress = Address.zero();
@@ -620,6 +624,7 @@ test("handleDALinSetAuctionDetails should update project minter config auction d
   );
   projectMinterConfig.minter = minterAddress.toHexString();
   projectMinterConfig.project = project.id;
+  projectMinterConfig.extraMinterDetails = "{}";
   projectMinterConfig.basePrice = BigInt.fromI32(0);
   projectMinterConfig.priceIsConfigured = false;
   projectMinterConfig.currencyAddress = Address.zero();
@@ -760,6 +765,7 @@ test("handleDALinResetAuctionDetails should reset project minter config auction 
   );
   projectMinterConfig.minter = minterAddress.toHexString();
   projectMinterConfig.project = project.id;
+  projectMinterConfig.extraMinterDetails = "{}";
   projectMinterConfig.startTime = CURRENT_BLOCK_TIMESTAMP.plus(
     BigInt.fromI32(100)
   );
@@ -849,6 +855,7 @@ test("handleDALinResetAuctionDetails should reset project minter config auction 
   );
   projectMinterConfig.minter = minterAddress.toHexString();
   projectMinterConfig.project = project.id;
+  projectMinterConfig.extraMinterDetails = "{}";
   projectMinterConfig.startTime = CURRENT_BLOCK_TIMESTAMP.plus(
     BigInt.fromI32(100)
   );
@@ -1077,6 +1084,7 @@ test("handleDAExpSetAuctionDetails should update project minter config auction d
   );
   projectMinterConfig.minter = minterAddress.toHexString();
   projectMinterConfig.project = project.id;
+  projectMinterConfig.extraMinterDetails = "{}";
   projectMinterConfig.basePrice = BigInt.fromI32(0);
   projectMinterConfig.priceIsConfigured = false;
   projectMinterConfig.currencyAddress = Address.zero();
@@ -1182,6 +1190,7 @@ test("handleDAExpSetAuctionDetails should update project minter config auction d
   );
   projectMinterConfig.minter = minterAddress.toHexString();
   projectMinterConfig.project = project.id;
+  projectMinterConfig.extraMinterDetails = "{}";
   projectMinterConfig.basePrice = BigInt.fromI32(0);
   projectMinterConfig.priceIsConfigured = false;
   projectMinterConfig.currencyAddress = Address.zero();
@@ -1322,6 +1331,7 @@ test("handleDAExpResetAuctionDetails should reset project minter config auction 
   );
   projectMinterConfig.minter = minterAddress.toHexString();
   projectMinterConfig.project = project.id;
+  projectMinterConfig.extraMinterDetails = "{}";
   projectMinterConfig.startTime = CURRENT_BLOCK_TIMESTAMP.plus(
     BigInt.fromI32(100)
   );
@@ -1411,6 +1421,7 @@ test("handleDAExpResetAuctionDetails should reset project minter config auction 
   );
   projectMinterConfig.minter = minterAddress.toHexString();
   projectMinterConfig.project = project.id;
+  projectMinterConfig.extraMinterDetails = "{}";
   projectMinterConfig.startTime = CURRENT_BLOCK_TIMESTAMP.plus(
     BigInt.fromI32(100)
   );
@@ -1498,6 +1509,7 @@ test("handleSetValue should set all values to a designated key in extraMinterDet
   );
   projectMinterConfig.minter = minterAddress.toHexString();
   projectMinterConfig.project = project.id;
+  projectMinterConfig.extraMinterDetails = "{}";
   projectMinterConfig.save();
 
   const configValueSetEvent: ConfigValueSetBool = changetype<
@@ -1644,6 +1656,7 @@ test("handleAddManyBigIntValue should add a value to an array at a designated ke
   );
   projectMinterConfig.minter = minterAddress.toHexString();
   projectMinterConfig.project = project.id;
+  projectMinterConfig.extraMinterDetails = "{}";
   projectMinterConfig.save();
 
   const configValueSetEvent: ConfigValueAddedToSetBigInt = changetype<
@@ -1708,6 +1721,7 @@ test("handleAddManyAddressValue should add a value to an array at a designated k
   );
   projectMinterConfig.minter = minterAddress.toHexString();
   projectMinterConfig.project = project.id;
+  projectMinterConfig.extraMinterDetails = "{}";
   projectMinterConfig.save();
 
   const testAddy = randomAddressGenerator.generateRandomAddress();
@@ -1762,6 +1776,7 @@ test("handleAddManyBytesValue should add a value to an array at a designated key
   );
   projectMinterConfig.minter = minterAddress.toHexString();
   projectMinterConfig.project = project.id;
+  projectMinterConfig.extraMinterDetails = "{}";
   projectMinterConfig.save();
 
   const configValueSetEvent: ConfigValueAddedToSetBytes = changetype<
@@ -1995,6 +2010,7 @@ test("handleAllowHoldersOfProjects can add address + project id to extraMinterDe
   );
   projectMinterConfig.minter = minterAddress.toHexString();
   projectMinterConfig.project = project.id;
+  projectMinterConfig.extraMinterDetails = "{}";
   projectMinterConfig.save();
 
   let testAddy: Address = randomAddressGenerator.generateRandomAddress();
@@ -2058,6 +2074,7 @@ test("handleAllowHoldersOfProjects can add multiple address + project id to extr
   );
   projectMinterConfig.minter = minterAddress.toHexString();
   projectMinterConfig.project = project.id;
+  projectMinterConfig.extraMinterDetails = "{}";
   projectMinterConfig.save();
 
   let testAddys: Array<Address> = [
@@ -2238,6 +2255,7 @@ test("handleRegisteredNFTAddress adds the address, as a string to the minter", (
   const minter = new Minter(minterAddress.toHexString());
   minter.coreContract = TEST_CONTRACT_ADDRESS.toHexString();
   minter.type = minterType;
+  minter.extraMinterDetails = "{}";
   minter.save();
 
   const testAddy = randomAddressGenerator.generateRandomAddress();

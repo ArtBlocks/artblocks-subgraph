@@ -696,6 +696,7 @@ test("handleMinterApproved should not add minter to minterAllowlist if the appro
   );
   minterFilter.coreContract = TEST_CONTRACT_ADDRESS.toHexString();
   minterFilter.updatedAt = minterFilterUpdatedAt;
+  minterFilter.minterAllowlist = [];
   minterFilter.save();
 
   const otherMinterFilterAddress = randomAddressGenerator.generateRandomAddress();
@@ -751,6 +752,7 @@ test("handleMinterApproved should add new minter to store", () => {
   );
   minterFilter.coreContract = TEST_CONTRACT_ADDRESS.toHexString();
   minterFilter.updatedAt = minterFilterUpdatedAt;
+  minterFilter.minterAllowlist = [];
   minterFilter.save();
 
   const minterToBeApprovedAddress = randomAddressGenerator.generateRandomAddress();
@@ -814,6 +816,7 @@ test("handleMinterApproved should handle the same minter being approved more tha
   );
   minterFilter.coreContract = TEST_CONTRACT_ADDRESS.toHexString();
   minterFilter.updatedAt = minterFilterUpdatedAt;
+  minterFilter.minterAllowlist = [];
   minterFilter.save();
 
   const minterToBeApprovedAddress = randomAddressGenerator.generateRandomAddress();
@@ -914,6 +917,7 @@ test("handleMinterRevoke should remove minter from MinterFilter's minterAllowlis
   const minterFilterUpdatedAt = CURRENT_BLOCK_TIMESTAMP.minus(
     BigInt.fromI32(10)
   );
+  minterFilter.minterAllowlist = [];
   minterFilter.coreContract = TEST_CONTRACT_ADDRESS.toHexString();
   minterFilter.updatedAt = minterFilterUpdatedAt;
   minterFilter.save();
@@ -994,6 +998,7 @@ test("handleMinterRevoke should handle revoking a minter more than once", () => 
   const minterFilterUpdatedAt = CURRENT_BLOCK_TIMESTAMP.minus(
     BigInt.fromI32(10)
   );
+  minterFilter.minterAllowlist = [];
   minterFilter.coreContract = TEST_CONTRACT_ADDRESS.toHexString();
   minterFilter.updatedAt = minterFilterUpdatedAt;
   minterFilter.save();
