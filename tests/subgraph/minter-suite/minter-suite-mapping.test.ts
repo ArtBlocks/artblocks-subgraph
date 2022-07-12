@@ -1631,6 +1631,44 @@ test("handleSetValue should set all values to a designated key in extraMinterDet
       "," +
       '"bigInt":100,"boolean":true,"bytes":"im bytes"}'
   );
+
+  // If the bytes are not intended to be a human readable string
+  // we should instead convert to their hex string representation
+  const eventValue = randomAddressGenerator.generateRandomAddress();
+  const configValueSetEvent4: ConfigValueSetBytes = changetype<
+    ConfigValueSetBytes
+  >(newMockEvent());
+  configValueSetEvent4.address = minterAddress;
+  configValueSetEvent4.parameters = [
+    new ethereum.EventParam(
+      "_projectId",
+      ethereum.Value.fromUnsignedBigInt(projectId)
+    ),
+    new ethereum.EventParam(
+      "_key",
+      ethereum.Value.fromBytes(Bytes.fromUTF8("bytes"))
+    ),
+    new ethereum.EventParam("_value", ethereum.Value.fromBytes(eventValue))
+  ];
+  configValueSetEvent4.block.timestamp = CURRENT_BLOCK_TIMESTAMP;
+
+  handleSetBytesValue(configValueSetEvent4);
+
+  assert.fieldEquals(
+    PROJECT_MINTER_CONFIGURATION_ENTITY_TYPE,
+    getProjectMinterConfigId(minterAddress.toHexString(), project.id),
+    "extraMinterDetails",
+    '{"address":' +
+      '"' +
+      addressString +
+      '"' +
+      "," +
+      '"bigInt":100,"boolean":true,"bytes":' +
+      '"' +
+      eventValue.toHexString() +
+      '"' +
+      "}"
+  );
 });
 test("handleAddManyBigIntValue should add a value to an array at a designated key extraMinterDetails", () => {
   clearStore();

@@ -237,6 +237,10 @@ function loadOrCreateAndSetProjectMinterConfiguration(
     projectMinterConfig.project = project.id;
     projectMinterConfig.minter = minterAddress.toHexString();
     projectMinterConfig.priceIsConfigured = false;
+    projectMinterConfig.currencySymbol = "ETH";
+    projectMinterConfig.currencyAddress = Address.zero();
+    projectMinterConfig.purchaseToDisabled = false;
+    projectMinterConfig.extraMinterDetails = "{}";
     projectMinterConfig.save();
   }
 

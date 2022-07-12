@@ -49,6 +49,7 @@ import {
 import {
   arrayToJSONValue,
   booleanToString,
+  bytesToJSONValue,
   generateContractSpecificId,
   getMinterDetails,
   getProjectMinterConfigId,
@@ -553,7 +554,7 @@ export function handleSetValueGeneric<T, C>(
   } else if (event instanceof ConfigValueSetAddress) {
     jsonValue = stringToJSONValue(event.params._value.toHexString());
   } else if (event instanceof ConfigValueSetBytes) {
-    jsonValue = stringToJSONValue(event.params._value.toString());
+    jsonValue = bytesToJSONValue(event.params._value);
   }
 
   minterDetails.set(jsonKey, jsonValue);
@@ -966,15 +967,17 @@ function loadMinterProjectAndConfig(
   let projectMinterConfig = ProjectMinterConfiguration.load(
     getProjectMinterConfigId(minter.id, project.id)
   );
-  if (
-    !projectMinterConfig ||
-    projectMinterConfig.minter != minterAddress.toHexString()
-  ) {
+  if (!projectMinterConfig) {
     projectMinterConfig = new ProjectMinterConfiguration(
       getProjectMinterConfigId(minter.id, project.id)
     );
     projectMinterConfig.project = project.id;
     projectMinterConfig.minter = minterAddress.toHexString();
+    projectMinterConfig.priceIsConfigured = false;
+    projectMinterConfig.currencySymbol = "ETH";
+    projectMinterConfig.currencyAddress = Address.zero();
+    projectMinterConfig.purchaseToDisabled = false;
+    projectMinterConfig.extraMinterDetails = "{}";
     projectMinterConfig.save();
   }
 
