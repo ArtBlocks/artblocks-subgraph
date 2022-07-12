@@ -2,7 +2,6 @@ import {
   Address,
   BigInt,
   Bytes,
-  ethereum,
   json,
   JSONValue,
   JSONValueKind,
@@ -75,6 +74,7 @@ export function loadOrCreateMinter(
   minter.coreContract = filteredMinterContract
     .genArt721CoreAddress()
     .toHexString();
+  minter.extraMinterDetails = "{}";
 
   // values assigned during contract deployments
   let minterType = filteredMinterContract.minterType();
@@ -172,6 +172,17 @@ export function stringToJSONValue(value: string): JSONValue {
 }
 export function arrayToJSONValue(value: string): JSONValue {
   return json.fromString("[" + value + "]");
+}
+
+// If byte data is parseable to a valid unicode string then do so
+// otherwise parse the byte data to a hex string
+export function bytesToJSONValue(value: Bytes): JSONValue {
+  // If the bytes cannot be
+  let result = json.try_fromString('["' + value.toString() + '"]');
+  if (result.isError) {
+    result = json.try_fromString('["' + value.toHexString() + '"]');
+  }
+  return result.value.toArray()[0];
 }
 
 export function stringToJSONString(value: string): string {
