@@ -23,7 +23,8 @@ import {
   assertTestContractFields,
   addTestContractToStore,
   TEST_CONTRACT,
-  TRANSFER_ENTITY_TYPE
+  TRANSFER_ENTITY_TYPE,
+  addNewTokenToStore
 } from "../shared-helpers";
 
 import {
@@ -1850,13 +1851,13 @@ test("GenArt721: Can update a project website", () => {
 test("GenArt721: Can handle transfer", () => {
   clearStore();
   const tokenId = BigInt.fromI32(0);
+  const projectId = BigInt.fromI32(0);
   const fullTokenId = generateContractSpecificId(
     TEST_CONTRACT_ADDRESS,
     tokenId
   );
 
-  const token = new Token(fullTokenId);
-  token.save();
+  addNewTokenToStore(TEST_CONTRACT_ADDRESS, tokenId, projectId);
 
   const fromAddress = randomAddressGenerator.generateRandomAddress();
   const toAddress = randomAddressGenerator.generateRandomAddress();

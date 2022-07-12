@@ -71,7 +71,8 @@ export function createOrderFulfilledEvent(
     mockEvent.logType,
     mockEvent.block,
     mockEvent.transaction,
-    mockEvent.parameters
+    mockEvent.parameters,
+    mockEvent.receipt
   );
   let orderHash = new ethereum.EventParam(
     "orderHash",

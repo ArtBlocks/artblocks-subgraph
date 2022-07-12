@@ -230,12 +230,13 @@ function loadOrCreateAndSetProjectMinterConfiguration(
     getProjectMinterConfigId(minterAddress.toHexString(), project.id)
   );
 
-  if (projectMinterConfig == null) {
+  if (!projectMinterConfig) {
     projectMinterConfig = new ProjectMinterConfiguration(
       getProjectMinterConfigId(minterAddress.toHexString(), project.id)
     );
     projectMinterConfig.project = project.id;
     projectMinterConfig.minter = minterAddress.toHexString();
+    projectMinterConfig.priceIsConfigured = false;
     projectMinterConfig.save();
   }
 
