@@ -42,6 +42,7 @@ export function handleIsCanonicalMinterFilter(
   if (!minterFilter) {
     minterFilter = new MinterFilter(event.address.toHexString());
     minterFilter.coreContract = event.params._coreContractAddress.toHexString();
+    minterFilter.minterAllowlist = [];
     minterFilter.updatedAt = event.block.timestamp;
     minterFilter.save();
   }
@@ -264,6 +265,7 @@ function loadOrCreateMinterFilter(
   let minterFilterContract = MinterFilterV0.bind(minterFilterAddress);
   let coreContractAddress = minterFilterContract.genArt721CoreAddress();
   minterFilter.coreContract = coreContractAddress.toHexString();
+  minterFilter.minterAllowlist = [];
   minterFilter.updatedAt = timestamp;
   minterFilter.save();
 
