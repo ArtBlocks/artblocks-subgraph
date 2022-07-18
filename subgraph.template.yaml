@@ -760,6 +760,10 @@ dataSources:
         - name: IFilteredMinterV0
           file: ./abis/IFilteredMinterV0.json
       eventHandlers:
+        - event: PricePerTokenInWeiUpdated(indexed uint256,indexed uint256)
+          handler: handlePricePerTokenInWeiUpdated
+        - event: ProjectCurrencyInfoUpdated(indexed uint256,indexed address,string)
+          handler: handleProjectCurrencyInfoUpdated
         - event: RegisteredNFTAddress(indexed address)
           handler: handleRegisteredNFTAddress
         - event: UnregisteredNFTAddress(indexed address)
@@ -794,6 +798,10 @@ dataSources:
         - name: IFilteredMinterV0
           file: ./abis/IFilteredMinterV0.json
       eventHandlers:
+        - event: PricePerTokenInWeiUpdated(indexed uint256,indexed uint256)
+          handler: handlePricePerTokenInWeiUpdated
+        - event: ProjectCurrencyInfoUpdated(indexed uint256,indexed address,string)
+          handler: handleProjectCurrencyInfoUpdated
         - event: ConfigValueSet(indexed uint256,bytes32,bytes32)
           handler: handleSetBytesValueProjectConfig
         - event: ConfigValueSet(indexed uint256,bytes32,bool)
