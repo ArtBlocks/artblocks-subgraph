@@ -28,3 +28,4 @@ generated/*
 !generated/MinterMerkleV0
 !generated/SeaportExchange
 !generated/WyvernExchange
+!generated/GenArt721Core2EngineFlex

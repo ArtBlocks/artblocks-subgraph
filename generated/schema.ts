@@ -1937,3 +1937,76 @@ export class Transfer extends Entity {
     this.set("from", Value.fromBytes(value));
   }
 }
+
+export class ProjectExternalAssetDependency extends Entity {
+  constructor(id: string) {
+    super();
+    this.set("id", Value.fromString(id));
+  }
+
+  save(): void {
+    let id = this.get("id");
+    assert(
+      id != null,
+      "Cannot save ProjectExternalAssetDependency entity without an ID"
+    );
+    if (id) {
+      assert(
+        id.kind == ValueKind.STRING,
+        `Entities of type ProjectExternalAssetDependency must have an ID of type String but the id '${id.displayData()}' is of type ${id.displayKind()}`
+      );
+      store.set("ProjectExternalAssetDependency", id.toString(), this);
+    }
+  }
+
+  static load(id: string): ProjectExternalAssetDependency | null {
+    return changetype<ProjectExternalAssetDependency | null>(
+      store.get("ProjectExternalAssetDependency", id)
+    );
+  }
+
+  get id(): string {
+    let value = this.get("id");
+    return value!.toString();
+  }
+
+  set id(value: string) {
+    this.set("id", Value.fromString(value));
+  }
+
+  get project(): string {
+    let value = this.get("project");
+    return value!.toString();
+  }
+
+  set project(value: string) {
+    this.set("project", Value.fromString(value));
+  }
+
+  get dependencyType(): string {
+    let value = this.get("dependencyType");
+    return value!.toString();
+  }
+
+  set dependencyType(value: string) {
+    this.set("dependencyType", Value.fromString(value));
+  }
+
+  get cid(): string {
+    let value = this.get("cid");
+    return value!.toString();
+  }
+
+  set cid(value: string) {
+    this.set("cid", Value.fromString(value));
+  }
+
+  get index(): BigInt {
+    let value = this.get("index");
+    return value!.toBigInt();
+  }
+
+  set index(value: BigInt) {
+    this.set("index", Value.fromBigInt(value));
+  }
+}

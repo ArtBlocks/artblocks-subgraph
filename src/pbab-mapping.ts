@@ -45,6 +45,12 @@ import {
 } from "../generated/GenArt721Core2PBAB/GenArt721Core2PBAB";
 
 import {
+  ExternalAssetDependencyUpdated,
+  ExternalAssetDependencyRemoved,
+  GenArt721Core2EngineFlex
+} from "../generated/GenArt721Core2EngineFlex/GenArt721Core2EngineFlex";
+
+import {
   Project,
   Token,
   Transfer as TokenTransfer,
@@ -52,14 +58,16 @@ import {
   AccountProject,
   Contract,
   Whitelisting,
-  ProjectScript
+  ProjectScript,
+  ProjectExternalAssetDependency
 } from "../generated/schema";
 
 import {
   generateAccountProjectId,
   generateWhitelistingId,
   generateContractSpecificId,
-  generateProjectScriptId
+  generateProjectScriptId,
+  generateProjectExternalAssetDependencyId
 } from "./helpers";
 
 /*** EVENT HANDLERS ***/
@@ -175,6 +183,33 @@ export function handleTransfer(event: Transfer): void {
     transfer.token = token.id;
     transfer.save();
   }
+}
+
+export function handleExternalAssetDependencyUpdated(
+  event: ExternalAssetDependencyUpdated
+): void {
+  // load project
+  let project = Project.load(
+    generateContractSpecificId(event.address, event.params._projectId)
+  );
+
+  if (!project) {
+    return;
+  }
+  const contract = GenArt721Core2EngineFlex.bind(event.address);
+
+  const assetEntity = new ProjectExternalAssetDependency(
+    generateProjectExternalAssetDependencyId(
+      project.id,
+      event.params._index.toString()
+    )
+  );
+}
+
+export function handleExternalAssetDependencyRemoved(
+  event: ExternalAssetDependencyRemoved
+): void {
+  // todo: add logic here to update indices after removal
 }
 /*** END EVENT HANDLERS ***/
 

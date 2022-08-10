@@ -14,6 +14,13 @@ import { MinterDALinV1 } from "../generated/MinterDALinV1/MinterDALinV1";
 import { IFilteredMinterV0 } from "../generated/MinterSetPriceV0/IFilteredMinterV0";
 import { Minter, ProjectMinterConfiguration } from "../generated/schema";
 
+export function generateProjectExternalAssetDependencyId(
+  projectId: string,
+  index: string
+): string {
+  return projectId + "-" + index;
+}
+
 export function generateAccountProjectId(
   accountId: string,
   projectId: string

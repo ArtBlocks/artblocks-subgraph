@@ -211,7 +211,7 @@ type Token @entity {
 
   "Lookup table to get the Sale history"
   saleLookupTables: [SaleLookupTable!]! @derivedFrom(field: "token")
-  
+
   "Next available sale id"
   nextSaleId: BigInt!
 }
@@ -314,22 +314,22 @@ type ProjectMinterConfiguration @entity {
 }
 
 enum SaleType {
-  Single,
+  Single
   Bundle
 }
 
 enum PaymentType {
-  Native,
-  ERC20,
-  ERC721,
+  Native
+  ERC20
+  ERC721
   ERC1155
 }
 
 enum Exchange {
   "Opensea V1"
-  OS_V1,
+  OS_V1
   "Opensea V2"
-  OS_V2,
+  OS_V2
   "LooksRare"
   LR_V1
   "Opensea Seaport"
@@ -365,7 +365,7 @@ type Sale @entity {
 
   "The exchange used for this sale"
   exchange: Exchange!
-  
+
   "The sale type (Single | Bundle)"
   saleType: SaleType!
 
@@ -414,16 +414,39 @@ type SaleLookupTable @entity {
   sale: Sale!
 }
 
-type Transfer @entity(immutable: true){
+type Transfer @entity(immutable: true) {
   id: ID!
 
   transactionHash: Bytes!
 
-  token: Token! 
+  token: Token!
 
   createdAt: BigInt!
 
   to: Bytes!
 
   from: Bytes!
+}
+
+enum ProjectExternalAssetDependencyType {
+  "Asset hosted on IPFS"
+  IPFS
+  "Asset hosted on Arweave"
+  ARWEAVE
+}
+type ProjectExternalAssetDependency @entity {
+  "Unique identifier made up of projectId-cid"
+  id: ID!
+
+  "The associated project"
+  project: Project!
+
+  "The dependency type"
+  dependencyType: ProjectExternalAssetDependencyType!
+
+  "The dependency cid"
+  cid: String!
+
+  "The dependency index"
+  index: BigInt!
 }

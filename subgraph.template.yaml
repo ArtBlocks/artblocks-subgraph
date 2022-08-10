@@ -302,6 +302,105 @@ dataSources:
           handler: handleUpdateProjectWebsite
       file: ./src/pbab-mapping.ts
   {{/pbabContracts}}
+  {{#engineFlexContracts}}
+  - kind: ethereum/contract
+    name: 'GenArt721Core2EngineFlex-{{address}}'
+    network: {{network}}
+    source:
+      address: '{{address}}'
+      abi: GenArt721Core2EngineFlex
+      startBlock: {{startBlock}}
+    mapping:
+      kind: ethereum/events
+      apiVersion: 0.0.5
+      language: wasm/assemblyscript
+      entities:
+        - Project
+        - ProjectScript
+        - Token
+        - Contract
+        - Account
+        - AccountProject
+        - Whitelisting
+        - Payment
+        - Sale
+        - SaleLookupTable
+        - ProjectExternalAssetDependency
+      abis:
+        - name: GenArt721Core2EngineFlex
+          file: ./abis/GenArt721Core2EngineFlex.json
+        - name: GenArt721Core2PBAB
+          file: ./abis/GenArt721Core2PBAB.json
+      eventHandlers:
+        - event: Mint(indexed address,indexed uint256,indexed uint256)
+          handler: handleMint
+        - event: Transfer(indexed address,indexed address,indexed uint256)
+          handler: handleTransfer
+        - event: ExternalAssetDependencyUpdated(indexed uint256,indexed uint256)
+          handler: handleExternalAssetDependencyUpdated
+        - event: ExternalAssetDependencyRemoved(indexed uint256,indexed uint256)
+          handler: handleExternalAssetDependencyRemoved
+      callHandlers:
+        - function: updateAdmin(address)
+          handler: handleUpdateAdmin
+        - function: addWhitelisted(address)
+          handler: handleAddWhitelisted
+        - function: removeWhitelisted(address)
+          handler: handleRemoveWhitelisted
+        - function: addMintWhitelisted(address)
+          handler: handleAddMintWhitelisted
+        - function: removeMintWhitelisted(address)
+          handler: handleRemoveMintWhitelisted
+        - function: updateRandomizerAddress(address)
+          handler: handleUpdateRandomizerAddress
+        - function: updateRenderProviderAddress(address)
+          handler: handleUpdateRenderProviderAddress
+        - function: updateRenderProviderPercentage(uint256)
+          handler: handleUpdateRenderProviderPercentage
+        - function: addProject(string,address,uint256)
+          handler: handleAddProject
+        - function: addProjectScript(uint256,string)
+          handler: handleAddProjectScript
+        - function: removeProjectLastScript(uint256)
+          handler: handleRemoveProjectLastScript
+        - function: toggleProjectIsActive(uint256)
+          handler: handleToggleProjectIsActive
+        - function: toggleProjectIsLocked(uint256)
+          handler: handleToggleProjectIsLocked
+        - function: toggleProjectIsPaused(uint256)
+          handler: handleToggleProjectIsPaused
+        - function: updateProjectAdditionalPayeeInfo(uint256,address,uint256)
+          handler: handleUpdateProjectAdditionalPayeeInfo
+        - function: updateProjectArtistAddress(uint256,address)
+          handler: handleUpdateProjectArtistAddress
+        - function: updateProjectArtistName(uint256,string)
+          handler: handleUpdateProjectArtistName
+        - function: updateProjectBaseURI(uint256,string)
+          handler: handleUpdateProjectBaseURI
+        - function: updateProjectCurrencyInfo(uint256,string,address)
+          handler: handleUpdateProjectCurrencyInfo
+        - function: updateProjectDescription(uint256,string)
+          handler: handleUpdateProjectDescription
+        - function: updateProjectIpfsHash(uint256,string)
+          handler: handleUpdateProjectIpfsHash
+        - function: updateProjectLicense(uint256,string)
+          handler: handleUpdateProjectLicense
+        - function: updateProjectMaxInvocations(uint256,uint256)
+          handler: handleUpdateProjectMaxInvocations
+        - function: updateProjectName(uint256,string)
+          handler: handleUpdateProjectName
+        - function: updateProjectPricePerTokenInWei(uint256,uint256)
+          handler: handleUpdateProjectPricePerTokenInWei
+        - function: updateProjectScript(uint256,uint256,string)
+          handler: handleUpdateProjectScript
+        - function: updateProjectScriptJSON(uint256,string)
+          handler: handleUpdateProjectScriptJSON
+        - function: updateProjectSecondaryMarketRoyaltyPercentage(uint256,uint256)
+          handler: handleUpdateProjectSecondaryMarketRoyaltyPercentage
+        - function: updateProjectWebsite(uint256,string)
+          handler: handleUpdateProjectWebsite
+      file: ./src/pbab-mapping.ts
+  {{/engineFlexContracts}}
   {{#genArt721Contracts}}
   - kind: ethereum/contract
     name: GenArt721
