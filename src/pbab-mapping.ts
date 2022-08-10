@@ -188,7 +188,6 @@ export function handleTransfer(event: Transfer): void {
 export function handleExternalAssetDependencyUpdated(
   event: ExternalAssetDependencyUpdated
 ): void {
-  // load project
   let project = Project.load(
     generateContractSpecificId(event.address, event.params._projectId)
   );
@@ -196,7 +195,6 @@ export function handleExternalAssetDependencyUpdated(
   if (!project) {
     return;
   }
-  const contract = GenArt721Core2EngineFlex.bind(event.address);
 
   const assetEntity = new ProjectExternalAssetDependency(
     generateProjectExternalAssetDependencyId(
@@ -204,6 +202,11 @@ export function handleExternalAssetDependencyUpdated(
       event.params._index.toString()
     )
   );
+  assetEntity.cid = event.params._cid;
+  assetEntity.project = project.id;
+  assetEntity.index = event.params._index;
+  assetEntity.dependencyType = event.params._dependencyType;
+  assetEntity.save();
 }
 
 export function handleExternalAssetDependencyRemoved(

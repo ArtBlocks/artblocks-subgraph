@@ -84,6 +84,18 @@
         "internalType": "uint256",
         "name": "_index",
         "type": "uint256"
+      },
+      {
+        "indexed": false,
+        "internalType": "string",
+        "name": "_cid",
+        "type": "string"
+      },
+      {
+        "indexed": false,
+        "internalType": "enum GenArt721CoreV2_PBAB_FLEX.ExternalAssetDependencyType",
+        "name": "_dependencyType",
+        "type": "uint8"
       }
     ],
     "name": "ExternalAssetDependencyRemoved",
@@ -103,6 +115,18 @@
         "internalType": "uint256",
         "name": "_index",
         "type": "uint256"
+      },
+      {
+        "indexed": false,
+        "internalType": "string",
+        "name": "_cid",
+        "type": "string"
+      },
+      {
+        "indexed": false,
+        "internalType": "enum GenArt721CoreV2_PBAB_FLEX.ExternalAssetDependencyType",
+        "name": "_dependencyType",
+        "type": "uint8"
       }
     ],
     "name": "ExternalAssetDependencyUpdated",
@@ -131,6 +155,25 @@
       }
     ],
     "name": "Mint",
+    "type": "event"
+  },
+  {
+    "anonymous": false,
+    "inputs": [
+      {
+        "indexed": true,
+        "internalType": "uint256",
+        "name": "_projectId",
+        "type": "uint256"
+      },
+      {
+        "indexed": false,
+        "internalType": "bool",
+        "name": "_locked",
+        "type": "bool"
+      }
+    ],
+    "name": "ToggleProjectExternalAssetDependenciesLocked",
     "type": "event"
   },
   {

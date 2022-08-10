@@ -82,6 +82,14 @@ export class ExternalAssetDependencyRemoved__Params {
   get _index(): BigInt {
     return this._event.parameters[1].value.toBigInt();
   }
+
+  get _cid(): string {
+    return this._event.parameters[2].value.toString();
+  }
+
+  get _dependencyType(): i32 {
+    return this._event.parameters[3].value.toI32();
+  }
 }
 
 export class ExternalAssetDependencyUpdated extends ethereum.Event {
@@ -103,6 +111,14 @@ export class ExternalAssetDependencyUpdated__Params {
 
   get _index(): BigInt {
     return this._event.parameters[1].value.toBigInt();
+  }
+
+  get _cid(): string {
+    return this._event.parameters[2].value.toString();
+  }
+
+  get _dependencyType(): i32 {
+    return this._event.parameters[3].value.toI32();
   }
 }
 
@@ -129,6 +145,28 @@ export class Mint__Params {
 
   get _projectId(): BigInt {
     return this._event.parameters[2].value.toBigInt();
+  }
+}
+
+export class ToggleProjectExternalAssetDependenciesLocked extends ethereum.Event {
+  get params(): ToggleProjectExternalAssetDependenciesLocked__Params {
+    return new ToggleProjectExternalAssetDependenciesLocked__Params(this);
+  }
+}
+
+export class ToggleProjectExternalAssetDependenciesLocked__Params {
+  _event: ToggleProjectExternalAssetDependenciesLocked;
+
+  constructor(event: ToggleProjectExternalAssetDependenciesLocked) {
+    this._event = event;
+  }
+
+  get _projectId(): BigInt {
+    return this._event.parameters[0].value.toBigInt();
+  }
+
+  get _locked(): boolean {
+    return this._event.parameters[1].value.toBoolean();
   }
 }
 
