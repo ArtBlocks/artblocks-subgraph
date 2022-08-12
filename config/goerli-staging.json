@@ -65,9 +65,9 @@
       "startBlock": 7011002
     },
     {
-      "address": "0x838ac76f8a832607A232737DbA4A5A6d58CD7494",
+      "address": "0x3F0eC993f45Bd738861205A54D798a98A990Cf9a",
       "name": "AB Engine Flex Demo",
-      "startBlock": 7376340
+      "startBlock": 7393532
     }
   ],
   "minterSetPriceV1Contracts": [
@@ -82,9 +82,9 @@
       "startBlock": 7011002
     },
     {
-      "address": "0x1264ad5F5B5D2e63D6eb3C2B5482901D0769B776",
+      "address": "0xdAa6181B65298c43Cd09c97092523142DfA1BD4E",
       "name": "AB Engine Flex Demo",
-      "startBlock": 7376340
+      "startBlock": 7393532
     }
   ],
   "minterSetPriceERC20V1Contracts": [
@@ -99,9 +99,9 @@
       "startBlock": 7011002
     },
     {
-      "address": "0xb0260346e9CdD3682B621C2CB40cdF26e1e82e77",
+      "address": "0x7a685A1B6ecC789b2c44e2fD5Bdaf8A245A45FdE",
       "name": "AB Engine Flex Demo",
-      "startBlock": 7376340
+      "startBlock": 7393532
     }
   ],
   "minterDALinV1Contracts": [
@@ -116,9 +116,9 @@
       "startBlock": 7011002
     },
     {
-      "address": "0x54cae56C2EC8D625f11e3Ef6F742976B5A02b312",
+      "address": "0x60940D24817373e312b44db152e2B352B3B39B4b",
       "name": "AB Engine Flex Demo",
-      "startBlock": 7376340
+      "startBlock": 7393532
     }
   ],
   "minterDAExpV1Contracts": [
@@ -133,16 +133,16 @@
       "startBlock": 7011002
     },
     {
-      "address": "0xfAd510A72f4e8a4263f320bEb3B20e563d1C1772",
+      "address": "0x57b7F0328af59e0320996A108e3FDad80D273644",
       "name": "AB Engine Flex Demo",
-      "startBlock": 7376340
+      "startBlock": 7393532
     }
   ],
   "engineFlexContracts": [
     {
-      "address": "0xa501Abf8Cb2Ed7379686187890a7e496E18122E3",
+      "address": "0xb154cc9ece34ae1983E5F863f4154E6034540595",
       "name": "AB Engine Flex Demo",
-      "startBlock": 7376340
+      "startBlock": 7393532
     }
   ],
   "startBlock": 7011002
