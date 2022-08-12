@@ -231,6 +231,7 @@ export function handleAddProject(call: AddProjectCall): void {
   project.currencyAddress = Address.zero();
   project.currencySymbol = "ETH";
   project.dynamic = dynamic;
+  project.externalAssetDependencyCount = BigInt.fromI32(0);
   project.invocations = invocations;
   project.locked = false;
   project.maxInvocations = maxInvocations;

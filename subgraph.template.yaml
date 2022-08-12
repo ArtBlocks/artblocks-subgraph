@@ -336,9 +336,9 @@ dataSources:
           handler: handleMint
         - event: Transfer(indexed address,indexed address,indexed uint256)
           handler: handleTransfer
-        - event: ExternalAssetDependencyUpdated(indexed uint256,indexed uint256,string,uint8)
+        - event: ExternalAssetDependencyUpdated(indexed uint256,indexed uint256,string,uint8,uint256)
           handler: handleExternalAssetDependencyUpdated
-        - event: ExternalAssetDependencyRemoved(indexed uint256,indexed uint256,string,uint8)
+        - event: ExternalAssetDependencyRemoved(indexed uint256,indexed uint256)
           handler: handleExternalAssetDependencyRemoved
       callHandlers:
         - function: updateAdmin(address)

@@ -84,18 +84,6 @@
         "internalType": "uint256",
         "name": "_index",
         "type": "uint256"
-      },
-      {
-        "indexed": false,
-        "internalType": "string",
-        "name": "_cid",
-        "type": "string"
-      },
-      {
-        "indexed": false,
-        "internalType": "enum GenArt721CoreV2_PBAB_FLEX.ExternalAssetDependencyType",
-        "name": "_dependencyType",
-        "type": "uint8"
       }
     ],
     "name": "ExternalAssetDependencyRemoved",
@@ -127,9 +115,34 @@
         "internalType": "enum GenArt721CoreV2_PBAB_FLEX.ExternalAssetDependencyType",
         "name": "_dependencyType",
         "type": "uint8"
+      },
+      {
+        "indexed": false,
+        "internalType": "uint256",
+        "name": "_externalAssetDependencyCount",
+        "type": "uint256"
       }
     ],
     "name": "ExternalAssetDependencyUpdated",
+    "type": "event"
+  },
+  {
+    "anonymous": false,
+    "inputs": [
+      {
+        "indexed": true,
+        "internalType": "enum GenArt721CoreV2_PBAB_FLEX.ExternalAssetDependencyType",
+        "name": "_dependencyType",
+        "type": "uint8"
+      },
+      {
+        "indexed": false,
+        "internalType": "string",
+        "name": "_gatewayAddress",
+        "type": "string"
+      }
+    ],
+    "name": "GatewayUpdated",
     "type": "event"
   },
   {
@@ -165,15 +178,9 @@
         "internalType": "uint256",
         "name": "_projectId",
         "type": "uint256"
-      },
-      {
-        "indexed": false,
-        "internalType": "bool",
-        "name": "_locked",
-        "type": "bool"
       }
     ],
-    "name": "ToggleProjectExternalAssetDependenciesLocked",
+    "name": "ProjectExternalAssetDependenciesLocked",
     "type": "event"
   },
   {
@@ -478,6 +485,19 @@
   {
     "inputs": [
       {
+        "internalType": "uint256",
+        "name": "_projectId",
+        "type": "uint256"
+      }
+    ],
+    "name": "lockProjectExternalAssetDependencies",
+    "outputs": [],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
         "internalType": "address",
         "name": "_to",
         "type": "address"
@@ -618,6 +638,61 @@
     "inputs": [
       {
         "internalType": "uint256",
+        "name": "_projectId",
+        "type": "uint256"
+      },
+      {
+        "internalType": "uint256",
+        "name": "_index",
+        "type": "uint256"
+      }
+    ],
+    "name": "projectExternalAssetDependencyByIndex",
+    "outputs": [
+      {
+        "components": [
+          {
+            "internalType": "string",
+            "name": "cid",
+            "type": "string"
+          },
+          {
+            "internalType": "enum GenArt721CoreV2_PBAB_FLEX.ExternalAssetDependencyType",
+            "name": "dependencyType",
+            "type": "uint8"
+          }
+        ],
+        "internalType": "struct GenArt721CoreV2_PBAB_FLEX.ExternalAssetDependency",
+        "name": "",
+        "type": "tuple"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "uint256",
+        "name": "_projectId",
+        "type": "uint256"
+      }
+    ],
+    "name": "projectExternalAssetDependencyCount",
+    "outputs": [
+      {
+        "internalType": "uint256",
+        "name": "",
+        "type": "uint256"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "uint256",
         "name": "",
         "type": "uint256"
       }
@@ -704,35 +779,6 @@
         "internalType": "string",
         "name": "",
         "type": "string"
-      }
-    ],
-    "stateMutability": "view",
-    "type": "function"
-  },
-  {
-    "inputs": [
-      {
-        "internalType": "uint256",
-        "name": "",
-        "type": "uint256"
-      },
-      {
-        "internalType": "uint256",
-        "name": "",
-        "type": "uint256"
-      }
-    ],
-    "name": "projectIdToExternalAssetDependencies",
-    "outputs": [
-      {
-        "internalType": "string",
-        "name": "cid",
-        "type": "string"
-      },
-      {
-        "internalType": "enum GenArt721CoreV2_PBAB_FLEX.ExternalAssetDependencyType",
-        "name": "dependencyType",
-        "type": "uint8"
       }
     ],
     "stateMutability": "view",
@@ -1122,19 +1168,6 @@
         "type": "uint256"
       }
     ],
-    "name": "toggleProjectExternalAssetDependenciesAreLocked",
-    "outputs": [],
-    "stateMutability": "nonpayable",
-    "type": "function"
-  },
-  {
-    "inputs": [
-      {
-        "internalType": "uint256",
-        "name": "_projectId",
-        "type": "uint256"
-      }
-    ],
     "name": "toggleProjectIsActive",
     "outputs": [],
     "stateMutability": "nonpayable",
@@ -1164,25 +1197,6 @@
     "name": "toggleProjectIsPaused",
     "outputs": [],
     "stateMutability": "nonpayable",
-    "type": "function"
-  },
-  {
-    "inputs": [
-      {
-        "internalType": "uint256",
-        "name": "index",
-        "type": "uint256"
-      }
-    ],
-    "name": "tokenByIndex",
-    "outputs": [
-      {
-        "internalType": "uint256",
-        "name": "",
-        "type": "uint256"
-      }
-    ],
-    "stateMutability": "view",
     "type": "function"
   },
   {
@@ -1226,30 +1240,6 @@
   {
     "inputs": [
       {
-        "internalType": "address",
-        "name": "owner",
-        "type": "address"
-      },
-      {
-        "internalType": "uint256",
-        "name": "index",
-        "type": "uint256"
-      }
-    ],
-    "name": "tokenOfOwnerByIndex",
-    "outputs": [
-      {
-        "internalType": "uint256",
-        "name": "",
-        "type": "uint256"
-      }
-    ],
-    "stateMutability": "view",
-    "type": "function"
-  },
-  {
-    "inputs": [
-      {
         "internalType": "uint256",
         "name": "_tokenId",
         "type": "uint256"
@@ -1261,19 +1251,6 @@
         "internalType": "string",
         "name": "",
         "type": "string"
-      }
-    ],
-    "stateMutability": "view",
-    "type": "function"
-  },
-  {
-    "inputs": [],
-    "name": "totalSupply",
-    "outputs": [
-      {
-        "internalType": "uint256",
-        "name": "",
-        "type": "uint256"
       }
     ],
     "stateMutability": "view",
@@ -1311,6 +1288,32 @@
       }
     ],
     "name": "updateAdmin",
+    "outputs": [],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "string",
+        "name": "_gateway",
+        "type": "string"
+      }
+    ],
+    "name": "updateArweaveGateway",
+    "outputs": [],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "string",
+        "name": "_gateway",
+        "type": "string"
+      }
+    ],
+    "name": "updateIPFSGateway",
     "outputs": [],
     "stateMutability": "nonpayable",
     "type": "function"

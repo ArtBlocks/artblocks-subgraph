@@ -207,12 +207,64 @@ export function handleExternalAssetDependencyUpdated(
   assetEntity.index = event.params._index;
   assetEntity.dependencyType = event.params._dependencyType;
   assetEntity.save();
+
+  project.externalAssetDependencyCount =
+    event.params._externalAssetDependencyCount;
+  project.updatedAt = event.block.timestamp;
+  project.save();
 }
 
 export function handleExternalAssetDependencyRemoved(
   event: ExternalAssetDependencyRemoved
 ): void {
-  // todo: add logic here to update indices after removal
+  let project = Project.load(
+    generateContractSpecificId(event.address, event.params._projectId)
+  );
+
+  if (!project) {
+    return;
+  }
+
+  let contract = GenArt721Core2EngineFlex.bind(event.address);
+  // Remove last asset entity on the project
+  const lastEntityIndex = project.externalAssetDependencyCount.minus(
+    BigInt.fromI32(1)
+  );
+  const entity = ProjectExternalAssetDependency.load(
+    generateProjectExternalAssetDependencyId(
+      project.id,
+      lastEntityIndex.toString()
+    )
+  );
+  if (entity) {
+    store.remove("ProjectExternalAssetDependency", entity.id);
+  }
+
+  // Refresh project external asset dependencies
+  for (
+    let index = BigInt.fromI32(0);
+    index < lastEntityIndex;
+    index.plus(BigInt.fromI32(1))
+  ) {
+    const assetEntity = new ProjectExternalAssetDependency(
+      generateProjectExternalAssetDependencyId(project.id, index.toString())
+    );
+
+    const contractExternalAsset = contract.projectExternalAssetDependencyByIndex(
+      project.projectId,
+      index
+    );
+
+    assetEntity.cid = contractExternalAsset.cid;
+    assetEntity.project = project.id;
+    assetEntity.index = index;
+    assetEntity.dependencyType = contractExternalAsset.dependencyType;
+    assetEntity.save();
+  }
+
+  project.externalAssetDependencyCount = lastEntityIndex;
+  project.updatedAt = event.block.timestamp;
+  project.save();
 }
 /*** END EVENT HANDLERS ***/
 
@@ -270,6 +322,7 @@ export function handleAddProject(call: AddProjectCall): void {
   project.currencyAddress = currencyAddress;
   project.currencySymbol = currencySymbol;
   project.dynamic = dynamic;
+  project.externalAssetDependencyCount = BigInt.fromI32(0);
   project.invocations = invocations;
   project.locked = false;
   project.maxInvocations = maxInvocations;

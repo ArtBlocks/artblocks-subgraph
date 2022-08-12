@@ -82,14 +82,6 @@ export class ExternalAssetDependencyRemoved__Params {
   get _index(): BigInt {
     return this._event.parameters[1].value.toBigInt();
   }
-
-  get _cid(): string {
-    return this._event.parameters[2].value.toString();
-  }
-
-  get _dependencyType(): i32 {
-    return this._event.parameters[3].value.toI32();
-  }
 }
 
 export class ExternalAssetDependencyUpdated extends ethereum.Event {
@@ -120,6 +112,32 @@ export class ExternalAssetDependencyUpdated__Params {
   get _dependencyType(): i32 {
     return this._event.parameters[3].value.toI32();
   }
+
+  get _externalAssetDependencyCount(): BigInt {
+    return this._event.parameters[4].value.toBigInt();
+  }
+}
+
+export class GatewayUpdated extends ethereum.Event {
+  get params(): GatewayUpdated__Params {
+    return new GatewayUpdated__Params(this);
+  }
+}
+
+export class GatewayUpdated__Params {
+  _event: GatewayUpdated;
+
+  constructor(event: GatewayUpdated) {
+    this._event = event;
+  }
+
+  get _dependencyType(): i32 {
+    return this._event.parameters[0].value.toI32();
+  }
+
+  get _gatewayAddress(): string {
+    return this._event.parameters[1].value.toString();
+  }
 }
 
 export class Mint extends ethereum.Event {
@@ -148,25 +166,21 @@ export class Mint__Params {
   }
 }
 
-export class ToggleProjectExternalAssetDependenciesLocked extends ethereum.Event {
-  get params(): ToggleProjectExternalAssetDependenciesLocked__Params {
-    return new ToggleProjectExternalAssetDependenciesLocked__Params(this);
+export class ProjectExternalAssetDependenciesLocked extends ethereum.Event {
+  get params(): ProjectExternalAssetDependenciesLocked__Params {
+    return new ProjectExternalAssetDependenciesLocked__Params(this);
   }
 }
 
-export class ToggleProjectExternalAssetDependenciesLocked__Params {
-  _event: ToggleProjectExternalAssetDependenciesLocked;
+export class ProjectExternalAssetDependenciesLocked__Params {
+  _event: ProjectExternalAssetDependenciesLocked;
 
-  constructor(event: ToggleProjectExternalAssetDependenciesLocked) {
+  constructor(event: ProjectExternalAssetDependenciesLocked) {
     this._event = event;
   }
 
   get _projectId(): BigInt {
     return this._event.parameters[0].value.toBigInt();
-  }
-
-  get _locked(): boolean {
-    return this._event.parameters[1].value.toBoolean();
   }
 }
 
@@ -292,31 +306,13 @@ export class GenArt721Core2EngineFlex__projectDetailsResult {
   }
 }
 
-export class GenArt721Core2EngineFlex__projectIdToExternalAssetDependenciesResult {
-  value0: string;
-  value1: i32;
-
-  constructor(value0: string, value1: i32) {
-    this.value0 = value0;
-    this.value1 = value1;
+export class GenArt721Core2EngineFlex__projectExternalAssetDependencyByIndexResultValue0Struct extends ethereum.Tuple {
+  get cid(): string {
+    return this[0].toString();
   }
 
-  toMap(): TypedMap<string, ethereum.Value> {
-    let map = new TypedMap<string, ethereum.Value>();
-    map.set("value0", ethereum.Value.fromString(this.value0));
-    map.set(
-      "value1",
-      ethereum.Value.fromUnsignedBigInt(BigInt.fromI32(this.value1))
-    );
-    return map;
-  }
-
-  getCid(): string {
-    return this.value0;
-  }
-
-  getDependencyType(): i32 {
-    return this.value1;
+  get dependencyType(): i32 {
+    return this[1].toI32();
   }
 }
 
@@ -819,6 +815,74 @@ export class GenArt721Core2EngineFlex extends ethereum.SmartContract {
     );
   }
 
+  projectExternalAssetDependencyByIndex(
+    _projectId: BigInt,
+    _index: BigInt
+  ): GenArt721Core2EngineFlex__projectExternalAssetDependencyByIndexResultValue0Struct {
+    let result = super.call(
+      "projectExternalAssetDependencyByIndex",
+      "projectExternalAssetDependencyByIndex(uint256,uint256):((string,uint8))",
+      [
+        ethereum.Value.fromUnsignedBigInt(_projectId),
+        ethereum.Value.fromUnsignedBigInt(_index)
+      ]
+    );
+
+    return changetype<
+      GenArt721Core2EngineFlex__projectExternalAssetDependencyByIndexResultValue0Struct
+    >(result[0].toTuple());
+  }
+
+  try_projectExternalAssetDependencyByIndex(
+    _projectId: BigInt,
+    _index: BigInt
+  ): ethereum.CallResult<
+    GenArt721Core2EngineFlex__projectExternalAssetDependencyByIndexResultValue0Struct
+  > {
+    let result = super.tryCall(
+      "projectExternalAssetDependencyByIndex",
+      "projectExternalAssetDependencyByIndex(uint256,uint256):((string,uint8))",
+      [
+        ethereum.Value.fromUnsignedBigInt(_projectId),
+        ethereum.Value.fromUnsignedBigInt(_index)
+      ]
+    );
+    if (result.reverted) {
+      return new ethereum.CallResult();
+    }
+    let value = result.value;
+    return ethereum.CallResult.fromValue(
+      changetype<
+        GenArt721Core2EngineFlex__projectExternalAssetDependencyByIndexResultValue0Struct
+      >(value[0].toTuple())
+    );
+  }
+
+  projectExternalAssetDependencyCount(_projectId: BigInt): BigInt {
+    let result = super.call(
+      "projectExternalAssetDependencyCount",
+      "projectExternalAssetDependencyCount(uint256):(uint256)",
+      [ethereum.Value.fromUnsignedBigInt(_projectId)]
+    );
+
+    return result[0].toBigInt();
+  }
+
+  try_projectExternalAssetDependencyCount(
+    _projectId: BigInt
+  ): ethereum.CallResult<BigInt> {
+    let result = super.tryCall(
+      "projectExternalAssetDependencyCount",
+      "projectExternalAssetDependencyCount(uint256):(uint256)",
+      [ethereum.Value.fromUnsignedBigInt(_projectId)]
+    );
+    if (result.reverted) {
+      return new ethereum.CallResult();
+    }
+    let value = result.value;
+    return ethereum.CallResult.fromValue(value[0].toBigInt());
+  }
+
   projectIdToAdditionalPayee(param0: BigInt): Address {
     let result = super.call(
       "projectIdToAdditionalPayee",
@@ -934,51 +998,6 @@ export class GenArt721Core2EngineFlex extends ethereum.SmartContract {
     }
     let value = result.value;
     return ethereum.CallResult.fromValue(value[0].toString());
-  }
-
-  projectIdToExternalAssetDependencies(
-    param0: BigInt,
-    param1: BigInt
-  ): GenArt721Core2EngineFlex__projectIdToExternalAssetDependenciesResult {
-    let result = super.call(
-      "projectIdToExternalAssetDependencies",
-      "projectIdToExternalAssetDependencies(uint256,uint256):(string,uint8)",
-      [
-        ethereum.Value.fromUnsignedBigInt(param0),
-        ethereum.Value.fromUnsignedBigInt(param1)
-      ]
-    );
-
-    return new GenArt721Core2EngineFlex__projectIdToExternalAssetDependenciesResult(
-      result[0].toString(),
-      result[1].toI32()
-    );
-  }
-
-  try_projectIdToExternalAssetDependencies(
-    param0: BigInt,
-    param1: BigInt
-  ): ethereum.CallResult<
-    GenArt721Core2EngineFlex__projectIdToExternalAssetDependenciesResult
-  > {
-    let result = super.tryCall(
-      "projectIdToExternalAssetDependencies",
-      "projectIdToExternalAssetDependencies(uint256,uint256):(string,uint8)",
-      [
-        ethereum.Value.fromUnsignedBigInt(param0),
-        ethereum.Value.fromUnsignedBigInt(param1)
-      ]
-    );
-    if (result.reverted) {
-      return new ethereum.CallResult();
-    }
-    let value = result.value;
-    return ethereum.CallResult.fromValue(
-      new GenArt721Core2EngineFlex__projectIdToExternalAssetDependenciesResult(
-        value[0].toString(),
-        value[1].toI32()
-      )
-    );
   }
 
   projectIdToPricePerTokenInWei(param0: BigInt): BigInt {
@@ -1283,27 +1302,6 @@ export class GenArt721Core2EngineFlex extends ethereum.SmartContract {
     return ethereum.CallResult.fromValue(value[0].toString());
   }
 
-  tokenByIndex(index: BigInt): BigInt {
-    let result = super.call("tokenByIndex", "tokenByIndex(uint256):(uint256)", [
-      ethereum.Value.fromUnsignedBigInt(index)
-    ]);
-
-    return result[0].toBigInt();
-  }
-
-  try_tokenByIndex(index: BigInt): ethereum.CallResult<BigInt> {
-    let result = super.tryCall(
-      "tokenByIndex",
-      "tokenByIndex(uint256):(uint256)",
-      [ethereum.Value.fromUnsignedBigInt(index)]
-    );
-    if (result.reverted) {
-      return new ethereum.CallResult();
-    }
-    let value = result.value;
-    return ethereum.CallResult.fromValue(value[0].toBigInt());
-  }
-
   tokenIdToHash(param0: BigInt): Bytes {
     let result = super.call(
       "tokenIdToHash",
@@ -1350,38 +1348,6 @@ export class GenArt721Core2EngineFlex extends ethereum.SmartContract {
     return ethereum.CallResult.fromValue(value[0].toBigInt());
   }
 
-  tokenOfOwnerByIndex(owner: Address, index: BigInt): BigInt {
-    let result = super.call(
-      "tokenOfOwnerByIndex",
-      "tokenOfOwnerByIndex(address,uint256):(uint256)",
-      [
-        ethereum.Value.fromAddress(owner),
-        ethereum.Value.fromUnsignedBigInt(index)
-      ]
-    );
-
-    return result[0].toBigInt();
-  }
-
-  try_tokenOfOwnerByIndex(
-    owner: Address,
-    index: BigInt
-  ): ethereum.CallResult<BigInt> {
-    let result = super.tryCall(
-      "tokenOfOwnerByIndex",
-      "tokenOfOwnerByIndex(address,uint256):(uint256)",
-      [
-        ethereum.Value.fromAddress(owner),
-        ethereum.Value.fromUnsignedBigInt(index)
-      ]
-    );
-    if (result.reverted) {
-      return new ethereum.CallResult();
-    }
-    let value = result.value;
-    return ethereum.CallResult.fromValue(value[0].toBigInt());
-  }
-
   tokenURI(_tokenId: BigInt): string {
     let result = super.call("tokenURI", "tokenURI(uint256):(string)", [
       ethereum.Value.fromUnsignedBigInt(_tokenId)
@@ -1399,21 +1365,6 @@ export class GenArt721Core2EngineFlex extends ethereum.SmartContract {
     }
     let value = result.value;
     return ethereum.CallResult.fromValue(value[0].toString());
-  }
-
-  totalSupply(): BigInt {
-    let result = super.call("totalSupply", "totalSupply():(uint256)", []);
-
-    return result[0].toBigInt();
-  }
-
-  try_totalSupply(): ethereum.CallResult<BigInt> {
-    let result = super.tryCall("totalSupply", "totalSupply():(uint256)", []);
-    if (result.reverted) {
-      return new ethereum.CallResult();
-    }
-    let value = result.value;
-    return ethereum.CallResult.fromValue(value[0].toBigInt());
   }
 }
 
@@ -1655,6 +1606,36 @@ export class ApproveCall__Outputs {
   _call: ApproveCall;
 
   constructor(call: ApproveCall) {
+    this._call = call;
+  }
+}
+
+export class LockProjectExternalAssetDependenciesCall extends ethereum.Call {
+  get inputs(): LockProjectExternalAssetDependenciesCall__Inputs {
+    return new LockProjectExternalAssetDependenciesCall__Inputs(this);
+  }
+
+  get outputs(): LockProjectExternalAssetDependenciesCall__Outputs {
+    return new LockProjectExternalAssetDependenciesCall__Outputs(this);
+  }
+}
+
+export class LockProjectExternalAssetDependenciesCall__Inputs {
+  _call: LockProjectExternalAssetDependenciesCall;
+
+  constructor(call: LockProjectExternalAssetDependenciesCall) {
+    this._call = call;
+  }
+
+  get _projectId(): BigInt {
+    return this._call.inputValues[0].value.toBigInt();
+  }
+}
+
+export class LockProjectExternalAssetDependenciesCall__Outputs {
+  _call: LockProjectExternalAssetDependenciesCall;
+
+  constructor(call: LockProjectExternalAssetDependenciesCall) {
     this._call = call;
   }
 }
@@ -1939,40 +1920,6 @@ export class SetApprovalForAllCall__Outputs {
   }
 }
 
-export class ToggleProjectExternalAssetDependenciesAreLockedCall extends ethereum.Call {
-  get inputs(): ToggleProjectExternalAssetDependenciesAreLockedCall__Inputs {
-    return new ToggleProjectExternalAssetDependenciesAreLockedCall__Inputs(
-      this
-    );
-  }
-
-  get outputs(): ToggleProjectExternalAssetDependenciesAreLockedCall__Outputs {
-    return new ToggleProjectExternalAssetDependenciesAreLockedCall__Outputs(
-      this
-    );
-  }
-}
-
-export class ToggleProjectExternalAssetDependenciesAreLockedCall__Inputs {
-  _call: ToggleProjectExternalAssetDependenciesAreLockedCall;
-
-  constructor(call: ToggleProjectExternalAssetDependenciesAreLockedCall) {
-    this._call = call;
-  }
-
-  get _projectId(): BigInt {
-    return this._call.inputValues[0].value.toBigInt();
-  }
-}
-
-export class ToggleProjectExternalAssetDependenciesAreLockedCall__Outputs {
-  _call: ToggleProjectExternalAssetDependenciesAreLockedCall;
-
-  constructor(call: ToggleProjectExternalAssetDependenciesAreLockedCall) {
-    this._call = call;
-  }
-}
-
 export class ToggleProjectIsActiveCall extends ethereum.Call {
   get inputs(): ToggleProjectIsActiveCall__Inputs {
     return new ToggleProjectIsActiveCall__Inputs(this);
@@ -2127,6 +2074,66 @@ export class UpdateAdminCall__Outputs {
   _call: UpdateAdminCall;
 
   constructor(call: UpdateAdminCall) {
+    this._call = call;
+  }
+}
+
+export class UpdateArweaveGatewayCall extends ethereum.Call {
+  get inputs(): UpdateArweaveGatewayCall__Inputs {
+    return new UpdateArweaveGatewayCall__Inputs(this);
+  }
+
+  get outputs(): UpdateArweaveGatewayCall__Outputs {
+    return new UpdateArweaveGatewayCall__Outputs(this);
+  }
+}
+
+export class UpdateArweaveGatewayCall__Inputs {
+  _call: UpdateArweaveGatewayCall;
+
+  constructor(call: UpdateArweaveGatewayCall) {
+    this._call = call;
+  }
+
+  get _gateway(): string {
+    return this._call.inputValues[0].value.toString();
+  }
+}
+
+export class UpdateArweaveGatewayCall__Outputs {
+  _call: UpdateArweaveGatewayCall;
+
+  constructor(call: UpdateArweaveGatewayCall) {
+    this._call = call;
+  }
+}
+
+export class UpdateIPFSGatewayCall extends ethereum.Call {
+  get inputs(): UpdateIPFSGatewayCall__Inputs {
+    return new UpdateIPFSGatewayCall__Inputs(this);
+  }
+
+  get outputs(): UpdateIPFSGatewayCall__Outputs {
+    return new UpdateIPFSGatewayCall__Outputs(this);
+  }
+}
+
+export class UpdateIPFSGatewayCall__Inputs {
+  _call: UpdateIPFSGatewayCall;
+
+  constructor(call: UpdateIPFSGatewayCall) {
+    this._call = call;
+  }
+
+  get _gateway(): string {
+    return this._call.inputValues[0].value.toString();
+  }
+}
+
+export class UpdateIPFSGatewayCall__Outputs {
+  _call: UpdateIPFSGatewayCall;
+
+  constructor(call: UpdateIPFSGatewayCall) {
     this._call = call;
   }
 }

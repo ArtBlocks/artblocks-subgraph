@@ -246,6 +246,7 @@ export function handleAddProject(call: AddProjectCall): void {
   project.currencySymbol = currencySymbol;
   project.currencyAddress = currencyAddress;
   project.dynamic = dynamic;
+  project.externalAssetDependencyCount = BigInt.fromI32(0);
   project.invocations = invocations;
   project.locked = false;
   project.maxInvocations = maxInvocations;
