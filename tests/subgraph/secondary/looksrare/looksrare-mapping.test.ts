@@ -14,16 +14,19 @@ import {
 import { buildTokenSaleLookupTableId } from "../../../../src/secondary/secondary-helpers";
 import { generateContractSpecificId } from "../../../../src/helpers";
 import { createTakerAskEvent, createTakerBidEvent } from "./looksrareHelpers";
-import { DEFAULT_PRICE, DEFAULT_TAKER } from "../../shared-helpers";
 import {
-  addNewContractToStore,
+  addTestContractToStore,
+  DEFAULT_PRICE,
+  DEFAULT_TAKER
+} from "../../shared-helpers";
+import {
   addNewProjectToStore,
   addNewTokenToStore,
   DEFAULT_CURRENCY
 } from "../../shared-helpers";
 import { LR_V1 } from "../../../../src/constants";
 test("handleTakerBid should create sale if contract and token are in store", () => {
-  addNewContractToStore();
+  addTestContractToStore(BigInt.fromI32(0));
   let token = addNewTokenToStore();
   let takerBidEvent = createTakerBidEvent(false);
 
@@ -82,7 +85,7 @@ test("handleTakerBid should create sale if contract and token are in store", () 
 });
 
 test("handleTakerBid should create sale marked as private if private sale strategy is used", () => {
-  addNewContractToStore();
+  addTestContractToStore(BigInt.fromI32(0));
   addNewTokenToStore();
   let takerBidEvent = createTakerBidEvent(true);
 
@@ -98,7 +101,7 @@ test("handleTakerBid should create sale marked as private if private sale strate
 });
 
 test("handleTakerBid should create sale with seller as maker and buyer as taker", () => {
-  addNewContractToStore();
+  addTestContractToStore(BigInt.fromI32(0));
   addNewTokenToStore();
   let takerBidEvent = createTakerBidEvent(true);
 
@@ -125,7 +128,7 @@ test("handleTakerBid should create sale with seller as maker and buyer as taker"
 });
 
 test("handleTakerBid should create saleLookUpTable if contract and token are in store", () => {
-  addNewContractToStore();
+  addTestContractToStore(BigInt.fromI32(0));
   let token = addNewTokenToStore();
   let takerBidEvent = createTakerBidEvent(false);
 
@@ -168,7 +171,7 @@ test("handleTakerBid should create saleLookUpTable if contract and token are in 
 });
 
 test("handleTakerBid should update saleLookUpTables of token if contract and token are in store", () => {
-  addNewContractToStore();
+  addTestContractToStore(BigInt.fromI32(0));
   let token = addNewTokenToStore();
   let takerBidEvent = createTakerBidEvent(false);
 
@@ -231,7 +234,7 @@ test("handleTakerBid should update saleLookUpTables of token if contract and tok
 });
 
 test("handleTakerBid should update saleLookUpTables of sale if contract and token are in store", () => {
-  addNewContractToStore();
+  addTestContractToStore(BigInt.fromI32(0));
   let token = addNewTokenToStore();
   let takerBidEvent = createTakerBidEvent(false);
 
@@ -298,7 +301,7 @@ test("handleTakerBid should update saleLookUpTables of project if contract and t
     BigInt.fromString("1"),
     BigInt.fromString("1621328821")
   );
-  addNewContractToStore();
+  addTestContractToStore(BigInt.fromI32(0));
   let token = addNewTokenToStore();
   token.project = project.id;
   token.save();
@@ -358,7 +361,7 @@ test("handleTakerBid should update saleLookUpTables of project if contract and t
 });
 
 test("handleTakerBid should not create sale if token is not in store", () => {
-  addNewContractToStore();
+  addTestContractToStore(BigInt.fromI32(0));
   let takerBidEvent = createTakerBidEvent(false);
 
   handleTakerBid(takerBidEvent);
@@ -388,7 +391,7 @@ test("handleTakerBid should not create sale if contract is not in store", () => 
 });
 
 test("handleTakerAsk should create sale if contract and token are in store", () => {
-  addNewContractToStore();
+  addTestContractToStore(BigInt.fromI32(0));
   let token = addNewTokenToStore();
   let TakerAskEvent = createTakerAskEvent(false);
 
@@ -446,7 +449,7 @@ test("handleTakerAsk should create sale if contract and token are in store", () 
 });
 
 test("handleTakerAsk should create sale marked as private if private sale strategy is used", () => {
-  addNewContractToStore();
+  addTestContractToStore(BigInt.fromI32(0));
   addNewTokenToStore();
   let TakerAskEvent = createTakerAskEvent(true);
 
@@ -462,7 +465,7 @@ test("handleTakerAsk should create sale marked as private if private sale strate
 });
 
 test("handleTakerAsk should create sale with seller as taker and buyer as maker", () => {
-  addNewContractToStore();
+  addTestContractToStore(BigInt.fromI32(0));
   addNewTokenToStore();
   let TakerAskEvent = createTakerAskEvent(true);
 
@@ -489,7 +492,7 @@ test("handleTakerAsk should create sale with seller as taker and buyer as maker"
 });
 
 test("handleTakerAsk should create saleLookUpTable if contract and token are in store", () => {
-  addNewContractToStore();
+  addTestContractToStore(BigInt.fromI32(0));
   let token = addNewTokenToStore();
   let TakerAskEvent = createTakerAskEvent(false);
 
@@ -532,7 +535,7 @@ test("handleTakerAsk should create saleLookUpTable if contract and token are in 
 });
 
 test("handleTakerAsk should update saleLookUpTables of token if contract and token are in store", () => {
-  addNewContractToStore();
+  addTestContractToStore(BigInt.fromI32(0));
   let token = addNewTokenToStore();
   let TakerAskEvent = createTakerAskEvent(false);
 
@@ -595,7 +598,7 @@ test("handleTakerAsk should update saleLookUpTables of token if contract and tok
 });
 
 test("handleTakerAsk should update saleLookUpTables of sale if contract and token are in store", () => {
-  addNewContractToStore();
+  addTestContractToStore(BigInt.fromI32(0));
   let token = addNewTokenToStore();
   let TakerAskEvent = createTakerAskEvent(false);
 
@@ -662,7 +665,7 @@ test("handleTakerAsk should update saleLookUpTables of project if contract and t
     BigInt.fromString("1"),
     BigInt.fromString("1621328821")
   );
-  addNewContractToStore();
+  addTestContractToStore(BigInt.fromI32(0));
   let token = addNewTokenToStore();
   token.project = project.id;
   token.save();
@@ -722,7 +725,7 @@ test("handleTakerAsk should update saleLookUpTables of project if contract and t
 });
 
 test("handleTakerAsk should not create sale if token is not in store", () => {
-  addNewContractToStore();
+  addTestContractToStore(BigInt.fromI32(0));
   let TakerAskEvent = createTakerAskEvent(false);
 
   handleTakerAsk(TakerAskEvent);

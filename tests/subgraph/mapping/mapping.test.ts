@@ -806,12 +806,11 @@ test("GenArt721Core: Can add project scripts", () => {
 test("GenArt721Core: Can clear a Token IPFS image uri", () => {
   clearStore();
   const tokenId = BigInt.fromI32(0);
-  const fullTokenId = generateContractSpecificId(
+  const token = addNewTokenToStore(
     TEST_CONTRACT_ADDRESS,
-    tokenId
+    tokenId,
+    BigInt.fromI32(0)
   );
-
-  const token = new Token(fullTokenId);
   token.save();
 
   const tokenUri = "https://token.artblocks.io/" + tokenId.toString();
@@ -829,7 +828,7 @@ test("GenArt721Core: Can clear a Token IPFS image uri", () => {
 
   handleClearTokenIpfsImageUri(call);
 
-  assert.fieldEquals(TOKEN_ENTITY_TYPE, fullTokenId, "uri", tokenUri);
+  assert.fieldEquals(TOKEN_ENTITY_TYPE, token.id, "uri", tokenUri);
 });
 
 // Under the hood this does the exact same thing as the above test
