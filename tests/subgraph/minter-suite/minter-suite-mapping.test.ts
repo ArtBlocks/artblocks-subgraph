@@ -1847,11 +1847,10 @@ test("handleRemoveValue should remove the key/value from extraMinterDetails", ()
     CURRENT_BLOCK_TIMESTAMP.minus(BigInt.fromI32(10))
   );
 
-  const projectMinterConfig = new ProjectMinterConfiguration(
-    getProjectMinterConfigId(minterAddress.toHexString(), project.id)
+  const projectMinterConfig = addNewProjectMinterConfigToStore(
+    project.id,
+    minterAddress
   );
-  projectMinterConfig.minter = minterAddress.toHexString();
-  projectMinterConfig.project = project.id;
   projectMinterConfig.extraMinterDetails =
     '{"addresses": "hi","removeMe": "please"}';
   projectMinterConfig.save();
@@ -1899,11 +1898,10 @@ test("handleRemoveBigIntManyValue should remove the key/value from extraMinterDe
     CURRENT_BLOCK_TIMESTAMP.minus(BigInt.fromI32(10))
   );
 
-  const projectMinterConfig = new ProjectMinterConfiguration(
-    getProjectMinterConfigId(minterAddress.toHexString(), project.id)
+  const projectMinterConfig = addNewProjectMinterConfigToStore(
+    project.id,
+    minterAddress
   );
-  projectMinterConfig.minter = minterAddress.toHexString();
-  projectMinterConfig.project = project.id;
   projectMinterConfig.extraMinterDetails =
     '{"addresses": "hi","removeMe": [100, 200]}';
   projectMinterConfig.save();
@@ -1955,11 +1953,10 @@ test("handleRemoveBytesManyValue should remove the key/value from extraMinterDet
     CURRENT_BLOCK_TIMESTAMP.minus(BigInt.fromI32(10))
   );
 
-  const projectMinterConfig = new ProjectMinterConfiguration(
-    getProjectMinterConfigId(minterAddress.toHexString(), project.id)
+  const projectMinterConfig = addNewProjectMinterConfigToStore(
+    project.id,
+    minterAddress
   );
-  projectMinterConfig.minter = minterAddress.toHexString();
-  projectMinterConfig.project = project.id;
   projectMinterConfig.extraMinterDetails =
     '{"addresses": "hi","removeMe": ["alive", "dead"]}';
   projectMinterConfig.save();
@@ -2139,11 +2136,10 @@ test("handleRemoveHoldersOfProjects can remove address + project id to extraMint
 
   let testAddy = randomAddressGenerator.generateRandomAddress();
 
-  const projectMinterConfig = new ProjectMinterConfiguration(
-    getProjectMinterConfigId(minterAddress.toHexString(), project.id)
+  const projectMinterConfig = addNewProjectMinterConfigToStore(
+    project.id,
+    minterAddress
   );
-  projectMinterConfig.minter = minterAddress.toHexString();
-  projectMinterConfig.project = project.id;
   projectMinterConfig.extraMinterDetails =
     '{"allowlistedAddressAndProjectId":["' +
     testAddy.toHexString() +
@@ -2202,11 +2198,10 @@ test("handleRemoveHoldersOfProjects can remove multiple address + project id to 
     randomAddressGenerator.generateRandomAddress()
   ];
 
-  const projectMinterConfig = new ProjectMinterConfiguration(
-    getProjectMinterConfigId(minterAddress.toHexString(), project.id)
+  const projectMinterConfig = addNewProjectMinterConfigToStore(
+    project.id,
+    minterAddress
   );
-  projectMinterConfig.minter = minterAddress.toHexString();
-  projectMinterConfig.project = project.id;
   projectMinterConfig.extraMinterDetails =
     '{"allowlistedAddressAndProjectId":["' +
     testAddys[0].toHexString() +
@@ -2277,11 +2272,13 @@ test("handleRegisteredNFTAddress adds the address, as a string to the minter", (
 });
 test("handleUnRegisteredNFTAddress removes the address from the minter", () => {
   clearStore();
-  const minterAddress = randomAddressGenerator.generateRandomAddress();
   const minterType = "MinterHolderV0";
-  const minter = new Minter(minterAddress.toHexString());
+  const minter = addNewMinterToStore(minterType);
+  const minterAddress = Address.fromString(minter.id);
+
   minter.coreContract = TEST_CONTRACT_ADDRESS.toHexString();
   minter.type = minterType;
+  minter;
   const testAddy = randomAddressGenerator.generateRandomAddress();
   minter.extraMinterDetails =
     '{"registeredNFTAddresses":' +

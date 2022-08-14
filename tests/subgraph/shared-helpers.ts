@@ -251,6 +251,21 @@ export const addNewProjectToStore = function(
   return project;
 };
 
+export function addNewContractToStore(): Contract {
+  let contract = new Contract(DEFAULT_COLLECTION.toHexString());
+  contract.admin = TEST_CONTRACT.admin;
+  contract.createdAt = CURRENT_BLOCK_TIMESTAMP.minus(BigInt.fromI32(10));
+  contract.nextProjectId = BigInt.fromI32(0);
+  contract.randomizerContract = TEST_CONTRACT.randomizerContract;
+  contract.renderProviderAddress = TEST_CONTRACT.renderProviderAddress;
+  contract.renderProviderPercentage = TEST_CONTRACT.renderProviderPercentage;
+  contract.updatedAt = contract.createdAt;
+  contract.mintWhitelisted = TEST_CONTRACT.mintWhitelisted;
+  contract.save();
+
+  return contract;
+}
+
 export function addTestContractToStore(nextProjectId: BigInt): Contract {
   let contract = new Contract(TEST_CONTRACT_ADDRESS.toHexString());
   contract.admin = TEST_CONTRACT.admin;

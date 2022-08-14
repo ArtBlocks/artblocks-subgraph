@@ -12,7 +12,7 @@ import { buildTokenSaleLookupTableId } from "../../../../src/secondary/secondary
 import {
   addNewProjectToStore,
   addNewTokenToStore,
-  addTestContractToStore,
+  addNewContractToStore,
   DEFAULT_COLLECTION,
   DEFAULT_CURRENCY,
   DEFAULT_MAKER,
@@ -37,7 +37,7 @@ import {
 
 test("handleOrderFulfilled should create sale if contract and token are in store", () => {
   clearStore();
-  addTestContractToStore(BigInt.fromI32(0));
+  addNewContractToStore();
   let token = addNewTokenToStore();
   let orderFulfilledEvent = createOrderFulfilledEvent(false);
   handleOrderFulfilled(orderFulfilledEvent);
@@ -73,7 +73,7 @@ test("handleOrderFulfilled should create sale if contract and token are in store
 
 test("handleOrderFulfilled should create Payment table", () => {
   clearStore();
-  addTestContractToStore(BigInt.fromI32(0));
+  addNewContractToStore();
   let token = addNewTokenToStore();
   let orderFulfilledEvent = createOrderFulfilledEvent(false);
   handleOrderFulfilled(orderFulfilledEvent);
@@ -156,7 +156,7 @@ test("handleOrderFulfilled should create Payment table", () => {
 
 test("handleOrderFulfilled should create Payment table for multiple payments", () => {
   clearStore();
-  addTestContractToStore(BigInt.fromI32(0));
+  addNewContractToStore();
   let token = addNewTokenToStore();
   let orderFulfilledEvent = createOrderFulfilledEvent(false, false, true);
   handleOrderFulfilled(orderFulfilledEvent);
@@ -308,7 +308,7 @@ test("handleOrderFulfilled should create Payment table for multiple payments", (
 
 test("handleOrderFulfilled should create saleLookUpTable if contract and token are in store", () => {
   clearStore();
-  addTestContractToStore(BigInt.fromI32(0));
+  addNewContractToStore();
   let token = addNewTokenToStore();
   let orderFulfilledEvent = createOrderFulfilledEvent(false);
   handleOrderFulfilled(orderFulfilledEvent);
@@ -349,7 +349,7 @@ test("handleOrderFulfilled should create saleLookUpTable if contract and token a
 
 test("handleOrderFulfilled should update saleLookUpTables of token if contract and token are in store", () => {
   clearStore();
-  addTestContractToStore(BigInt.fromI32(0));
+  addNewContractToStore();
   let token = addNewTokenToStore();
   let orderFulfilledEvent = createOrderFulfilledEvent(false);
   handleOrderFulfilled(orderFulfilledEvent);
@@ -410,7 +410,7 @@ test("handleOrderFulfilled should update saleLookUpTables of token if contract a
 
 test("handleOrderFulfilled should update saleLookUpTables of sale if contract and token are in store", () => {
   clearStore();
-  addTestContractToStore(BigInt.fromI32(0));
+  addNewContractToStore();
   let token = addNewTokenToStore();
   let orderFulfilledEvent = createOrderFulfilledEvent(false);
   handleOrderFulfilled(orderFulfilledEvent);
@@ -463,7 +463,7 @@ test("handleOrderFulfilled should update saleLookUpTables of sale if contract an
 
 test("handleOrderFulfilled should update saleLookUpTables of project if contract and token are in store", () => {
   clearStore();
-  addTestContractToStore(BigInt.fromI32(0));
+  addNewContractToStore();
   let randomAddress = Address.fromString(
     "0xd8a5d498ab43ed060cb6629b97a19e3e4276dd9f"
   );
@@ -533,7 +533,7 @@ test("handleOrderFulfilled should update saleLookUpTables of project if contract
 
 test("handleOrderFulfilled should not create sale if token is not in store", () => {
   clearStore();
-  addTestContractToStore(BigInt.fromI32(0));
+  addNewContractToStore();
   let orderFulfilledEvent = createOrderFulfilledEvent(false);
 
   handleOrderFulfilled(orderFulfilledEvent);
@@ -549,7 +549,7 @@ test("handleOrderFulfilled should not create sale if token is not in store", () 
 
 test("Bundle - handleOrderFulfilled should create bundle sale if contract and token are in store", () => {
   clearStore();
-  addTestContractToStore(BigInt.fromI32(0));
+  addNewContractToStore();
   let token1 = addNewTokenToStore(
     DEFAULT_COLLECTION,
     BigInt.fromString("7019")
@@ -597,7 +597,7 @@ test("Bundle - handleOrderFulfilled should create bundle sale if contract and to
 
 test("Bundle - handleOrderFulfilled should create Payment table", () => {
   clearStore();
-  addTestContractToStore(BigInt.fromI32(0));
+  addNewContractToStore();
   let token1 = addNewTokenToStore(
     DEFAULT_COLLECTION,
     BigInt.fromString("7019")
@@ -687,7 +687,7 @@ test("Bundle - handleOrderFulfilled should create Payment table", () => {
 
 test("Bundle - handleOrderFulfilled should create Payment table for multiple payments", () => {
   clearStore();
-  addTestContractToStore(BigInt.fromI32(0));
+  addNewContractToStore();
   let token1 = addNewTokenToStore(
     DEFAULT_COLLECTION,
     BigInt.fromString("7019")
@@ -846,7 +846,7 @@ test("Bundle - handleOrderFulfilled should create Payment table for multiple pay
 
 test("Bundle - handleOrderFulfilled should create saleLookUpTables for bundle if contract and token are in store", () => {
   clearStore();
-  addTestContractToStore(BigInt.fromI32(0));
+  addNewContractToStore();
   let token1 = addNewTokenToStore(
     DEFAULT_COLLECTION,
     BigInt.fromString("7019")
@@ -919,7 +919,7 @@ test("Bundle - handleOrderFulfilled should create saleLookUpTables for bundle if
 
 test("Bundle - handleOrderFulfilled should update saleLookUpTables of tokens if contract and token are in store", () => {
   clearStore();
-  addTestContractToStore(BigInt.fromI32(0));
+  addNewContractToStore();
   let token1 = addNewTokenToStore(
     DEFAULT_COLLECTION,
     BigInt.fromString("7019")
@@ -1025,7 +1025,7 @@ test("Bundle - handleOrderFulfilled should update saleLookUpTables of tokens if 
 
 test("Bundle - handleOrderFulfilled should update saleLookUpTables of bundle sale if contract and token are in store", () => {
   clearStore();
-  addTestContractToStore(BigInt.fromI32(0));
+  addNewContractToStore();
   let token1 = addNewTokenToStore(
     DEFAULT_COLLECTION,
     BigInt.fromString("7019")
@@ -1086,7 +1086,7 @@ test("Bundle - handleOrderFulfilled should update saleLookUpTables of bundle sal
 
 test("Bundle - handleOrderFulfilled should update saleLookUpTables of projects if contract and token are in store", () => {
   clearStore();
-  addTestContractToStore(BigInt.fromI32(0));
+  addNewContractToStore();
   let randomAddress = Address.fromString(
     "0xd8a5d498ab43ed060cb6629b97a19e3e4276dd9f"
   );
@@ -1214,7 +1214,7 @@ test("Bundle - handleOrderFulfilled should update saleLookUpTables of projects i
 
 test("Bundle - handleOrderFulfilled should not create sale if token is not in store", () => {
   clearStore();
-  addTestContractToStore(BigInt.fromI32(0));
+  addNewContractToStore();
   let orderFulfilledEvent = createOrderFulfilledEvent(false, true);
 
   handleOrderFulfilled(orderFulfilledEvent);
