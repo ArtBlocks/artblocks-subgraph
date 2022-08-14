@@ -69,6 +69,7 @@ import {
   generateProjectScriptId,
   generateProjectExternalAssetDependencyId
 } from "./helpers";
+import { FLEX_CONTRACT_EXTERNAL_ASSET_DEP_TYPES } from "./constants";
 
 /*** EVENT HANDLERS ***/
 export function handleMint(event: Mint): void {
@@ -205,7 +206,8 @@ export function handleExternalAssetDependencyUpdated(
   assetEntity.cid = event.params._cid;
   assetEntity.project = project.id;
   assetEntity.index = event.params._index;
-  assetEntity.dependencyType = event.params._dependencyType;
+  assetEntity.dependencyType =
+    FLEX_CONTRACT_EXTERNAL_ASSET_DEP_TYPES[event.params._dependencyType];
   assetEntity.save();
 
   project.externalAssetDependencyCount =
@@ -258,7 +260,10 @@ export function handleExternalAssetDependencyRemoved(
     assetEntity.cid = contractExternalAsset.cid;
     assetEntity.project = project.id;
     assetEntity.index = index;
-    assetEntity.dependencyType = contractExternalAsset.dependencyType;
+    assetEntity.dependencyType =
+      FLEX_CONTRACT_EXTERNAL_ASSET_DEP_TYPES[
+        contractExternalAsset.dependencyType
+      ];
     assetEntity.save();
   }
 

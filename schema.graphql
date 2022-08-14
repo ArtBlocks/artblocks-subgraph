@@ -110,6 +110,8 @@ type Project @entity {
 
   "Lookup table to get the Sale history of the project"
   saleLookupTables: [SaleLookupTable!]! @derivedFrom(field: "project")
+
+  externalAssetDependencies: [ProjectExternalAssetDependency!]! @derivedFrom(field: "project")
 }
 
 type ProjectScript @entity {

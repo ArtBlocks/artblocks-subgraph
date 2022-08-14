@@ -586,6 +586,15 @@ export class Project extends Entity {
   set saleLookupTables(value: Array<string>) {
     this.set("saleLookupTables", Value.fromStringArray(value));
   }
+
+  get externalAssetDependencies(): Array<string> {
+    let value = this.get("externalAssetDependencies");
+    return value!.toStringArray();
+  }
+
+  set externalAssetDependencies(value: Array<string>) {
+    this.set("externalAssetDependencies", Value.fromStringArray(value));
+  }
 }
 
 export class ProjectScript extends Entity {
