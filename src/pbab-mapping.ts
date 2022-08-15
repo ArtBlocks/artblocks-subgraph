@@ -238,6 +238,7 @@ export function handleExternalAssetDependencyRemoved(
       lastEntityIndex.toString()
     )
   );
+
   if (entity) {
     store.remove("ProjectExternalAssetDependency", entity.id);
   }
@@ -246,7 +247,7 @@ export function handleExternalAssetDependencyRemoved(
   for (
     let index = BigInt.fromI32(0);
     index < lastEntityIndex;
-    index.plus(BigInt.fromI32(1))
+    index = index.plus(BigInt.fromI32(1))
   ) {
     const assetEntity = new ProjectExternalAssetDependency(
       generateProjectExternalAssetDependencyId(project.id, index.toString())
