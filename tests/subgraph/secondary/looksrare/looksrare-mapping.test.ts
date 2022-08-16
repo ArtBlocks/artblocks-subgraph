@@ -14,9 +14,12 @@ import {
 import { buildTokenSaleLookupTableId } from "../../../../src/secondary/secondary-helpers";
 import { generateContractSpecificId } from "../../../../src/helpers";
 import { createTakerAskEvent, createTakerBidEvent } from "./looksrareHelpers";
-import { DEFAULT_PRICE, DEFAULT_TAKER } from "../../shared-helpers";
 import {
   addNewContractToStore,
+  DEFAULT_PRICE,
+  DEFAULT_TAKER
+} from "../../shared-helpers";
+import {
   addNewProjectToStore,
   addNewTokenToStore,
   DEFAULT_CURRENCY

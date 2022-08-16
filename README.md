@@ -32,7 +32,7 @@ For mainnet subgraph deployments, we deploy first to the hosted subgraph service
 3. Run `yarn prepare:{NETWORK}`, (e.g. `yarn prepare:mainnet` for mainnet) to generate subgraph manifest (subgraph.yaml)
 4. Manually look over the generated subgraph manifest to make sure it is correct
 5. Run `yarn codegen` to generate contract mappings
-6. Deploy subgraph to subgraph studio `yarn deploy-studio`
+6. Deploy subgraph to subgraph studio `yarn deploy:studio`
 7. Wait for subgraph to sync fully in subgraph studio (~36hrs)
 8. Verify that entities/fields expected to be unchanged match the previous deployment
     - Run the subgraph-comparison.ts script in the artblocks monorepo.  When prompted input the url of the new subgraph deployment.

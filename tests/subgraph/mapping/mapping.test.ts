@@ -27,7 +27,8 @@ import {
   assertTestContractFields,
   addTestContractToStore,
   addNewTokenToStore,
-  TRANSFER_ENTITY_TYPE
+  TRANSFER_ENTITY_TYPE,
+  addNewProjectMinterConfigToStore
 } from "../shared-helpers";
 
 import {
@@ -439,11 +440,13 @@ test("GenArt721Core: Can remove whitelisted minter from contract", () => {
   );
 });
 
-test("GenArt721Core: Removing a whitelisted minter filter should reset all project minter configurations", () => {
+test("GenArt721Core: Removing a whitelisted minter filter should leave existing minter configuration entities", () => {
   clearStore();
   const minterFilterAddress = randomAddressGenerator.generateRandomAddress();
   const minterFilter = new MinterFilter(minterFilterAddress.toHexString());
   minterFilter.coreContract = TEST_CONTRACT_ADDRESS.toHexString();
+  minterFilter.minterAllowlist = [];
+  minterFilter.updatedAt = CURRENT_BLOCK_TIMESTAMP;
   minterFilter.save();
 
   let project0 = addNewProjectToStore(
@@ -454,13 +457,17 @@ test("GenArt721Core: Removing a whitelisted minter filter should reset all proje
     true,
     CURRENT_BLOCK_TIMESTAMP
   );
-  project0.minterConfiguration = project0.id;
-  project0.save();
 
-  const project0MinterConfig = new ProjectMinterConfiguration(project0.id);
   const project0MinterAddress = randomAddressGenerator.generateRandomAddress();
+  const project0MinterConfig = addNewProjectMinterConfigToStore(
+    project0.id,
+    randomAddressGenerator.generateRandomAddress()
+  );
   project0MinterConfig.basePrice = BigInt.fromI64(i64(1e18));
   project0MinterConfig.minter = project0MinterAddress.toHexString();
+
+  project0.minterConfiguration = project0MinterConfig.id;
+  project0.save();
   project0MinterConfig.save();
 
   let project1 = addNewProjectToStore(
@@ -471,8 +478,6 @@ test("GenArt721Core: Removing a whitelisted minter filter should reset all proje
     true,
     CURRENT_BLOCK_TIMESTAMP
   );
-  project1.minterConfiguration = project1.id;
-  project1.save();
 
   const coreContract = changetype<Contract>(
     Contract.load(TEST_CONTRACT_ADDRESS.toHexString())
@@ -481,10 +486,16 @@ test("GenArt721Core: Removing a whitelisted minter filter should reset all proje
   coreContract.minterFilter = minterFilterAddress.toHexString();
   coreContract.save();
 
-  const project1MinterConfig = new ProjectMinterConfiguration(project1.id);
   const project1MinterAddress = randomAddressGenerator.generateRandomAddress();
+  const project1MinterConfig = addNewProjectMinterConfigToStore(
+    project1.id,
+    project1MinterAddress
+  );
   project1MinterConfig.basePrice = BigInt.fromI64(i64(1e18));
   project1MinterConfig.minter = project1MinterAddress.toHexString();
+
+  project1.minterConfiguration = project1MinterConfig.id;
+  project1.save();
   project1MinterConfig.save();
 
   assert.fieldEquals(
@@ -554,12 +565,16 @@ test("GenArt721Core: Removing a whitelisted minter filter should reset all proje
 
   assert.assertNull(project0.minterConfiguration);
   assert.assertNull(project1.minterConfiguration);
-  assert.notInStore(
+  assert.fieldEquals(
     PROJECT_MINTER_CONFIGURATION_ENTITY_TYPE,
+    project0MinterConfig.id,
+    "id",
     project0MinterConfig.id
   );
-  assert.notInStore(
+  assert.fieldEquals(
     PROJECT_MINTER_CONFIGURATION_ENTITY_TYPE,
+    project1MinterConfig.id,
+    "id",
     project1MinterConfig.id
   );
   assert.fieldEquals(
@@ -806,12 +821,11 @@ test("GenArt721Core: Can add project scripts", () => {
 test("GenArt721Core: Can clear a Token IPFS image uri", () => {
   clearStore();
   const tokenId = BigInt.fromI32(0);
-  const fullTokenId = generateContractSpecificId(
+  const token = addNewTokenToStore(
     TEST_CONTRACT_ADDRESS,
-    tokenId
+    tokenId,
+    BigInt.fromI32(0)
   );
-
-  const token = new Token(fullTokenId);
   token.save();
 
   const tokenUri = "https://token.artblocks.io/" + tokenId.toString();
@@ -829,7 +843,7 @@ test("GenArt721Core: Can clear a Token IPFS image uri", () => {
 
   handleClearTokenIpfsImageUri(call);
 
-  assert.fieldEquals(TOKEN_ENTITY_TYPE, fullTokenId, "uri", tokenUri);
+  assert.fieldEquals(TOKEN_ENTITY_TYPE, token.id, "uri", tokenUri);
 });
 
 // Under the hood this does the exact same thing as the above test
@@ -842,9 +856,11 @@ test("GenArt721Core: Can override token dynamic image with IPFS link", () => {
     tokenId
   );
 
-  const token = new Token(fullTokenId);
-  token.uri = "";
-  token.save();
+  const token = addNewTokenToStore(
+    TEST_CONTRACT_ADDRESS,
+    tokenId,
+    BigInt.fromI32(0)
+  );
 
   const ipfsHash = "QmYwAPJzv5CZsnA625s3Xf2nemtYgPpHdWEz79ojWnPbdG";
   const call = changetype<OverrideTokenDynamicImageWithIpfsLinkCall>(
