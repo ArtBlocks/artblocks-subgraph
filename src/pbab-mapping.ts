@@ -69,7 +69,10 @@ import {
   generateProjectScriptId,
   generateProjectExternalAssetDependencyId
 } from "./helpers";
-import { FLEX_CONTRACT_EXTERNAL_ASSET_DEP_TYPES } from "./constants";
+import {
+  FLEX_CONTRACT_EXTERNAL_ASSET_DEP_TYPES,
+  GEN_ART_721_CORE_V2
+} from "./constants";
 
 /*** EVENT HANDLERS ***/
 export function handleMint(event: Mint): void {
@@ -765,6 +768,7 @@ function refreshContract(
   }
 
   contractEntity.admin = admin;
+  contractEntity.type = GEN_ART_721_CORE_V2;
   contractEntity.renderProviderAddress = renderProviderAddress;
   contractEntity.renderProviderPercentage = renderProviderPercentage;
   contractEntity.nextProjectId = nextProjectId;
