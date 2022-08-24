@@ -34,7 +34,7 @@ export const ERC155_SAFE_TRANSFER_FROM_SELECTOR = "0xf242432a";
 export const GEN_ART_721_CORE_V0 = "GenArt721CoreV0";
 export const GEN_ART_721_CORE_V1 = "GenArt721CoreV1";
 export const GEN_ART_721_CORE_V2 = "GenArt721CoreV2";
-// V3 and-on source core type from contract iteself
+// V3 and-on source core type from contract itself
 
 export const OS_V1 = "OS_V1";
 export const OS_V2 = "OS_V2";
