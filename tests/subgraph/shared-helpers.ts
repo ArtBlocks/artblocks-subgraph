@@ -106,6 +106,7 @@ export const DEFAULT_ZONE = Address.fromString(
 );
 export class ContractValues {
   admin: Address;
+  type: string;
   mintWhitelisted: Address[];
   randomizerContract: Address;
   renderProviderAddress: Address;
@@ -113,6 +114,7 @@ export class ContractValues {
 }
 export const TEST_CONTRACT: ContractValues = {
   admin: Address.fromString("0x96dc73c8b5969608c77375f085949744b5177660"),
+  type: "GenArt721CoreV1",
   renderProviderPercentage: BigInt.fromI32(10),
   renderProviderAddress: Address.fromString(
     "0xf7a55108a6e830a809e88e74cbf5f5de9d930153"
@@ -238,6 +240,7 @@ export const addNewProjectToStore = function(
 export function addTestContractToStore(nextProjectId: BigInt): Contract {
   let contract = new Contract(TEST_CONTRACT_ADDRESS.toHexString());
   contract.admin = TEST_CONTRACT.admin;
+  contract.type = TEST_CONTRACT.type;
   contract.createdAt = CURRENT_BLOCK_TIMESTAMP.minus(BigInt.fromI32(10));
   contract.nextProjectId = nextProjectId;
   contract.randomizerContract = TEST_CONTRACT.randomizerContract;

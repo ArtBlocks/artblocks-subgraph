@@ -121,9 +121,23 @@ type ProjectScript @entity {
   script: String!
 }
 
+enum CoreType {
+  "Original Art Blocks flagship core"
+  GenArt721CoreV0
+  "Second Art Blocks flagship core"
+  GenArt721CoreV1
+  "Art Blocks Engine & Partner cores"
+  GenArt721CoreV2
+  "Third Art Blocks flagship core"
+  GenArt721CoreV3
+}
+
 type Contract @entity {
   id: ID!
   admin: Bytes!
+
+  "Core contract type"
+  type: CoreType!
 
   "Address that receives platform fees"
   renderProviderAddress: Bytes!

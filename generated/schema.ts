@@ -696,6 +696,15 @@ export class Contract extends Entity {
     this.set("admin", Value.fromBytes(value));
   }
 
+  get type(): string {
+    let value = this.get("type");
+    return value!.toString();
+  }
+
+  set type(value: string) {
+    this.set("type", Value.fromString(value));
+  }
+
   get renderProviderAddress(): Bytes {
     let value = this.get("renderProviderAddress");
     return value!.toBytes();
