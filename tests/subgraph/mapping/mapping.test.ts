@@ -122,7 +122,7 @@ import {
   handleUpdateProjectScript,
   handleUpdateProjectScriptJSON,
   handleTransfer
-} from "../../../src/mapping";
+} from "../../../src/mapping-v1-core";
 import {
   generateContractSpecificId,
   generateProjectScriptId,

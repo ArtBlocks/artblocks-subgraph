@@ -6,7 +6,7 @@ import {
 import { AddProjectCall } from "../../../generated/GenArt721Core/GenArt721Core";
 import { Project } from "../../../generated/schema";
 import { generateContractSpecificId } from "../../../src/helpers";
-import { handleAddProject } from "../../../src/mapping";
+import { handleAddProject } from "../../../src/mapping-v1-core";
 import {
   CURRENT_BLOCK_TIMESTAMP,
   DEFAULT_PROJECT_VALUES,

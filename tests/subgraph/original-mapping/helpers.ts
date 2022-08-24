@@ -7,7 +7,7 @@ import {
 import { AddProjectCall } from "../../../generated/GenArt721/GenArt721";
 import { Contract } from "../../../generated/schema";
 import { generateContractSpecificId } from "../../../src/helpers";
-import { handleAddProject } from "../../../src/original-mapping";
+import { handleAddProject } from "../../../src/mapping-v0-core";
 import {
   CURRENT_BLOCK_TIMESTAMP,
   RANDOMIZER_ADDRESS,

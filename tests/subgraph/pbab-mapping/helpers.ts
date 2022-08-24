@@ -4,7 +4,7 @@ import {
   newMockCall
 } from "matchstick-as/assembly/index";
 import { AddProjectCall } from "../../../generated/GenArt721Core2PBAB/GenArt721Core2PBAB";
-import { handleAddProject } from "../../../src/pbab-mapping";
+import { handleAddProject } from "../../../src/mapping-v2-core";
 import {
   CURRENT_BLOCK_TIMESTAMP,
   TEST_CONTRACT_ADDRESS,

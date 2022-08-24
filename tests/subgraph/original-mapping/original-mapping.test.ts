@@ -107,7 +107,7 @@ import {
   handleUpdateProjectScript,
   handleUpdateProjectScriptJSON,
   handleTransfer
-} from "../../../src/original-mapping";
+} from "../../../src/mapping-v0-core";
 
 import {
   generateContractSpecificId,
