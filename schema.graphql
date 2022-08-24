@@ -61,7 +61,7 @@ type Project @entity {
   "License for the project"
   license: String
 
-  "For V3 and-on, this field is null, and projects lock 4 weeks after completedAt. Once the project is locked its script may never be updated again."
+  "For V3 and-on, this field is null, and projects lock 4 weeks after `completedAt`. Once the project is locked its script may never be updated again."
   locked: Boolean
 
   "Maximum number of invocations allowed for the project"
@@ -93,10 +93,10 @@ type Project @entity {
   "Extra information about the script and rendering options"
   scriptJSON: String
 
-  "Script type and version (see scriptJSON if null)"
+  "Script type and version (see `scriptJSON` if null)"
   scriptTypeAndVersion: String
 
-  "Aspect ratio of the project (see scriptJSON if null)"
+  "Aspect ratio of the project (see `scriptJSON` if null)"
   aspectRatio: String
 
   "Tokens of the project"
@@ -163,7 +163,7 @@ type ProposedArtistAddressesAndSplits @entity {
 }
 
 enum CoreType {
-  "Original Art Blocks flagship core"
+  "First Art Blocks flagship core"
   GenArt721CoreV0
   "Second Art Blocks flagship core"
   GenArt721CoreV1
