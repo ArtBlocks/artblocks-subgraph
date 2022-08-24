@@ -112,7 +112,7 @@ type Project @entity {
   website: String
 
   "Proposed Artist addresses and payment split percentages"
-  proposedArtistAddressesAndSplits: ProposedArtistAddressAndSplit
+  proposedArtistAddressesAndSplits: ProposedArtistAddressesAndSplits
 
   "Accounts that own tokens of the project"
   owners: [AccountProject!] @derivedFrom(field: "project")
