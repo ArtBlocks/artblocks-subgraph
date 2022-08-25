@@ -1,5 +1,12 @@
 {
   "network": "goerli",
+  "genArt721CoreV3Contracts": [
+    {
+      "address": "0x0000000000000000000000000000000000000000",
+      "name": "Dev Goerli Flagship Core V3 Contract",
+      "startBlock": 7111111
+    }
+  ],
   "genArt721CoreContracts": [
     {
       "address": "0x1Bf03F29c4FEFFFe4eE26704aaA31d85c026aCE6",
