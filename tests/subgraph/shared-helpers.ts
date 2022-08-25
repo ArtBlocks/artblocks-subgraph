@@ -8,15 +8,21 @@ import {
   BigInt,
   ethereum,
   crypto,
-  ByteArray
+  ByteArray,
+  Bytes
 } from "@graphprotocol/graph-ts";
 import {
   Contract,
+  Minter,
   Project,
+  ProjectMinterConfiguration,
   ProposedArtistAddressesAndSplits,
   Token
 } from "../../generated/schema";
-import { generateContractSpecificId } from "../../src/helpers";
+import {
+  generateContractSpecificId,
+  getProjectMinterConfigId
+} from "../../src/helpers";
 
 // Utils
 // The built in assembly script Math.random() function does not work
@@ -112,7 +118,7 @@ export const DEFAULT_ZONE = Address.fromString(
 export class ContractValues {
   admin: Address;
   type: string;
-  mintWhitelisted: Address[];
+  mintWhitelisted: Bytes[];
   randomizerContract: Address;
   renderProviderAddress: Address;
   renderProviderPercentage: BigInt;
@@ -167,6 +173,7 @@ export class DefaultProjectValues {
   useHashString: boolean;
   useIpfs: boolean;
   website: string;
+  externalAssetDependencyCount: BigInt;
 }
 
 // These represent the values that would be returned by a
@@ -201,17 +208,11 @@ export const DEFAULT_PROJECT_VALUES: DefaultProjectValues = {
   aspectRatio: "",
   useHashString: true,
   useIpfs: false,
-  website: ""
+  website: "",
+  externalAssetDependencyCount: BigInt.zero()
 };
 
 // Store population functions
-export function addNewContractToStore(): Contract {
-  let contract = new Contract(DEFAULT_COLLECTION.toHexString());
-  contract.save();
-
-  return contract;
-}
-
 export const addNewTokenToStore = function(
   address: Address = DEFAULT_COLLECTION,
   tokenId: BigInt = DEFAULT_TOKEN_ID,
@@ -219,6 +220,19 @@ export const addNewTokenToStore = function(
 ): Token {
   let token = new Token(generateContractSpecificId(address, tokenId));
   token.project = generateContractSpecificId(address, projectId);
+  token.tokenId = tokenId;
+  token.invocation = tokenId.minus(projectId.div(BigInt.fromI32(ONE_MILLION)));
+  token.hash = Bytes.fromByteArray(
+    crypto.keccak256(Bytes.fromUTF8("token hash"))
+  );
+  token.transactionHash = Bytes.fromByteArray(
+    crypto.keccak256(Bytes.fromUTF8("transaction hash"))
+  );
+  token.nextSaleId = BigInt.fromI32(0);
+  token.owner = randomAddressGenerator.generateRandomAddress().toHexString();
+  token.contract = address.toHexString();
+  token.createdAt = CURRENT_BLOCK_TIMESTAMP;
+  token.updatedAt = CURRENT_BLOCK_TIMESTAMP;
   token.save();
   return token;
 };
@@ -255,10 +269,27 @@ export const addNewProjectToStore = function(
   project.updatedAt = timestamp ? timestamp : CURRENT_BLOCK_TIMESTAMP;
   project.useHashString = DEFAULT_PROJECT_VALUES.useHashString;
   project.useIpfs = DEFAULT_PROJECT_VALUES.useIpfs;
+  project.externalAssetDependencyCount = BigInt.fromI32(0);
 
   project.save();
   return project;
 };
+
+export function addNewContractToStore(): Contract {
+  let contract = new Contract(DEFAULT_COLLECTION.toHexString());
+  contract.admin = TEST_CONTRACT.admin;
+  contract.type = TEST_CONTRACT.type;
+  contract.createdAt = CURRENT_BLOCK_TIMESTAMP.minus(BigInt.fromI32(10));
+  contract.nextProjectId = BigInt.fromI32(0);
+  contract.randomizerContract = TEST_CONTRACT.randomizerContract;
+  contract.renderProviderAddress = TEST_CONTRACT.renderProviderAddress;
+  contract.renderProviderPercentage = TEST_CONTRACT.renderProviderPercentage;
+  contract.updatedAt = contract.createdAt;
+  contract.mintWhitelisted = TEST_CONTRACT.mintWhitelisted;
+  contract.save();
+
+  return contract;
+}
 
 export function addTestContractToStore(nextProjectId: BigInt): Contract {
   let contract = new Contract(TEST_CONTRACT_ADDRESS.toHexString());
@@ -270,10 +301,47 @@ export function addTestContractToStore(nextProjectId: BigInt): Contract {
   contract.renderProviderAddress = TEST_CONTRACT.renderProviderAddress;
   contract.renderProviderPercentage = TEST_CONTRACT.renderProviderPercentage;
   contract.updatedAt = contract.createdAt;
+  contract.mintWhitelisted = TEST_CONTRACT.mintWhitelisted;
   contract.save();
 
   return contract;
 }
+
+export const addNewMinterToStore = (type: string): Minter => {
+  const minterAddress = randomAddressGenerator.generateRandomAddress();
+  const minterType = type;
+  const minter = new Minter(minterAddress.toHexString());
+  minter.coreContract = TEST_CONTRACT_ADDRESS.toHexString();
+  minter.minterFilter = randomAddressGenerator
+    .generateRandomAddress()
+    .toHexString();
+  minter.type = minterType;
+  minter.extraMinterDetails = "{}";
+  minter.updatedAt = CURRENT_BLOCK_TIMESTAMP;
+  minter.save();
+
+  return minter;
+};
+
+export const addNewProjectMinterConfigToStore = (
+  projectId: string,
+  minterAddress: Address
+): ProjectMinterConfiguration => {
+  const projectMinterConfig = new ProjectMinterConfiguration(
+    getProjectMinterConfigId(minterAddress.toHexString(), projectId)
+  );
+  projectMinterConfig.minter = minterAddress.toHexString();
+  projectMinterConfig.project = projectId;
+  projectMinterConfig.priceIsConfigured = false;
+  projectMinterConfig.currencyAddress = Address.zero();
+  projectMinterConfig.currencySymbol = "ETH";
+  projectMinterConfig.purchaseToDisabled = false;
+  projectMinterConfig.extraMinterDetails = "{}";
+
+  projectMinterConfig.save();
+
+  return projectMinterConfig;
+};
 
 // Mocks
 // projectScriptByIndex has the same signature for all versions of
