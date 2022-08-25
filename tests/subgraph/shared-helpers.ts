@@ -173,6 +173,7 @@ export class DefaultProjectValues {
   useHashString: boolean;
   useIpfs: boolean;
   website: string;
+  externalAssetDependencyCount: BigInt;
 }
 
 // These represent the values that would be returned by a
@@ -207,7 +208,8 @@ export const DEFAULT_PROJECT_VALUES: DefaultProjectValues = {
   aspectRatio: "",
   useHashString: true,
   useIpfs: false,
-  website: ""
+  website: "",
+  externalAssetDependencyCount: BigInt.zero()
 };
 
 // Store population functions
@@ -267,6 +269,7 @@ export const addNewProjectToStore = function(
   project.updatedAt = timestamp ? timestamp : CURRENT_BLOCK_TIMESTAMP;
   project.useHashString = DEFAULT_PROJECT_VALUES.useHashString;
   project.useIpfs = DEFAULT_PROJECT_VALUES.useIpfs;
+  project.externalAssetDependencyCount = BigInt.fromI32(0);
 
   project.save();
   return project;
