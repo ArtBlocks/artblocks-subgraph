@@ -10,7 +10,12 @@ import {
   crypto,
   ByteArray
 } from "@graphprotocol/graph-ts";
-import { Contract, Project, Token } from "../../generated/schema";
+import {
+  Contract,
+  Project,
+  ProposedArtistAddressesAndSplits,
+  Token
+} from "../../generated/schema";
 import { generateContractSpecificId } from "../../src/helpers";
 
 // Utils
@@ -111,6 +116,10 @@ export class ContractValues {
   randomizerContract: Address;
   renderProviderAddress: Address;
   renderProviderPercentage: BigInt;
+  renderProviderSecondarySalesAddress: Address | null;
+  renderProviderSecondarySalesBPS: BigInt | null;
+  dependencyRegistry: Address | null;
+  curationRegistry: Address | null;
 }
 export const TEST_CONTRACT: ContractValues = {
   admin: Address.fromString("0x96dc73c8b5969608c77375f085949744b5177660"),
@@ -119,8 +128,12 @@ export const TEST_CONTRACT: ContractValues = {
   renderProviderAddress: Address.fromString(
     "0xf7a55108a6e830a809e88e74cbf5f5de9d930153"
   ),
+  renderProviderSecondarySalesBPS: null,
+  renderProviderSecondarySalesAddress: null,
   mintWhitelisted: [],
-  randomizerContract: RANDOMIZER_ADDRESS
+  randomizerContract: RANDOMIZER_ADDRESS,
+  dependencyRegistry: null,
+  curationRegistry: null
 };
 export const TEST_CONTRACT_CREATED_AT = BigInt.fromI32(1607763598);
 
@@ -129,10 +142,13 @@ export class DefaultProjectValues {
   active: boolean;
   additionalPayeeAddress: Address;
   additionalPayeePercentage: BigInt;
+  additionalPayeeSecondarySalesAddress: Address;
+  additionalPayeeSecondarySalesPercentage: BigInt;
   artistName: string;
   baseIpfsUri: string;
   baseUri: string;
   complete: boolean;
+  completedAt: BigInt | null;
   currencyAddress: Address;
   currencySymbol: string;
   description: string;
@@ -140,15 +156,18 @@ export class DefaultProjectValues {
   invocations: BigInt;
   ipfsHash: string;
   license: string;
-  locked: boolean;
+  locked: boolean | null;
   maxInvocations: BigInt;
   paused: boolean;
   royaltyPercentage: BigInt;
   scriptCount: BigInt;
-  scriptJSON: string;
+  scriptJSON: string | null;
+  scriptTypeAndVersion: string | null;
+  aspectRatio: string | null;
   useHashString: boolean;
   useIpfs: boolean;
   website: string;
+  proposedArtistAddressesAndSplits: ProposedArtistAddressesAndSplits | null;
 }
 
 // These represent the values that would be returned by a
@@ -159,10 +178,13 @@ export const DEFAULT_PROJECT_VALUES: DefaultProjectValues = {
   active: false,
   additionalPayeeAddress: Address.zero(),
   additionalPayeePercentage: BigInt.fromI32(0),
+  additionalPayeeSecondarySalesAddress: Address.zero(),
+  additionalPayeeSecondarySalesPercentage: BigInt.fromI32(0),
   artistName: "",
   baseIpfsUri: "",
   baseUri: "",
   complete: false,
+  completedAt: null,
   currencyAddress: Address.zero(),
   currencySymbol: "ETH",
   description: "",
@@ -176,9 +198,12 @@ export const DEFAULT_PROJECT_VALUES: DefaultProjectValues = {
   royaltyPercentage: BigInt.zero(),
   scriptCount: BigInt.zero(),
   scriptJSON: "",
+  scriptTypeAndVersion: null,
+  aspectRatio: null,
   useHashString: true,
   useIpfs: false,
-  website: ""
+  website: "",
+  proposedArtistAddressesAndSplits: null
 };
 
 // Store population functions
