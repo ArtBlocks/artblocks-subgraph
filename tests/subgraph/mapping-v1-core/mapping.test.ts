@@ -85,7 +85,8 @@ import {
   RemoveMintWhitelistedCall,
   UpdateProjectScriptCall,
   UpdateProjectScriptJSONCall,
-  Transfer
+  Transfer,
+  Mint
 } from "../../../generated/GenArt721Core/GenArt721Core";
 import {
   handleAddProject,
@@ -122,7 +123,8 @@ import {
   handleRemoveMintWhitelisted,
   handleUpdateProjectScript,
   handleUpdateProjectScriptJSON,
-  handleTransfer
+  handleTransfer,
+  handleMint
 } from "../../../src/mapping-v1-core";
 import {
   generateContractSpecificId,
@@ -2239,6 +2241,48 @@ test("GenArt721Core: Can update a project website", () => {
     updateCallBlockTimestamp.toString()
   );
 });
+
+test("GenArt721CoreV1: Can handle Mint", () => {
+  clearStore();
+  const tokenId = BigInt.fromI32(0);
+  const projectId = BigInt.fromI32(0);
+  const fullTokenId = generateContractSpecificId(
+    TEST_CONTRACT_ADDRESS,
+    tokenId
+  );
+
+  const toAddress = randomAddressGenerator.generateRandomAddress();
+
+  const hash = Bytes.fromUTF8("QmYwAPJzv5CZsnA625s3Xf2nemtYgPpHdWEz79ojWnPbdG");
+
+  const logIndex = BigInt.fromI32(0);
+
+  const event: Mint = changetype<Mint>(newMockEvent());
+  event.address = TEST_CONTRACT_ADDRESS;
+  event.transaction.hash = hash;
+  event.logIndex = logIndex;
+  event.parameters = [
+    new ethereum.EventParam("_to", ethereum.Value.fromAddress(toAddress)),
+    new ethereum.EventParam(
+      "_tokenId",
+      ethereum.Value.fromUnsignedBigInt(tokenId)
+    ),
+    new ethereum.EventParam(
+      "_projectId",
+      ethereum.Value.fromUnsignedBigInt(projectId)
+    )
+  ];
+
+  handleMint(event);
+
+  assert.fieldEquals(
+    TOKEN_ENTITY_TYPE,
+    fullTokenId,
+    "owner",
+    toAddress.toHexString()
+  );
+});
+
 test("GenArt721Core: Can handle transfer", () => {
   clearStore();
   const tokenId = BigInt.fromI32(0);
