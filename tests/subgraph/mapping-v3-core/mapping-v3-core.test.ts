@@ -30,7 +30,8 @@ import {
   TRANSFER_ENTITY_TYPE
 } from "../shared-helpers";
 
-import { addNewProjectToStore } from "./helpers";
+// Implement the following import when new add project event handler is implemented:
+// import { addNewProjectToStore } from "./helpers";
 
 import {
   Account,

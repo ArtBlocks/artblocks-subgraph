@@ -6,58 +6,13 @@ import {
 import { AddProjectCall } from "../../../generated/GenArt721CoreV3/GenArt721CoreV3";
 import { Project } from "../../../generated/schema";
 import { generateContractSpecificId } from "../../../src/helpers";
-// import { handleAddProject } from "../../../src/mapping-v3-core";
+
 import {
   CURRENT_BLOCK_TIMESTAMP,
   DEFAULT_PROJECT_VALUES,
   TEST_CONTRACT_ADDRESS,
   TEST_CONTRACT
 } from "../shared-helpers";
-
-// helper mock function to initialize a Project entity in local in-memory store
-export function addNewProjectToStore(
-  projectId: BigInt,
-  projectName: string,
-  artistAddress: Address,
-  pricePerTokenInWei: BigInt,
-  mockCallsWithDefaults: boolean,
-  timestamp: BigInt | null
-): Project {
-  if (mockCallsWithDefaults) {
-    mockProjectDetailsCallWithDefaults(projectId, projectName);
-    mockProjectTokenInfoCallWithDefaults(
-      projectId,
-      artistAddress,
-      pricePerTokenInWei
-    );
-    mockProjectScriptInfoCall(projectId, null);
-  }
-
-  const newProjectCall = changetype<AddProjectCall>(newMockCall());
-  newProjectCall.to = TEST_CONTRACT_ADDRESS;
-  newProjectCall.block.timestamp = CURRENT_BLOCK_TIMESTAMP;
-
-//   newProjectCall.inputValues = [
-//     new ethereum.EventParam(
-//       "projectName",
-//       ethereum.Value.fromString(projectName)
-//     ),
-//     new ethereum.EventParam(
-//       "artistAddress",
-//       ethereum.Value.fromAddress(artistAddress)
-//     ),
-//     new ethereum.EventParam(
-//       "pricePerTokenInWei",
-//       ethereum.Value.fromUnsignedBigInt(pricePerTokenInWei)
-//     )
-//   ];
-
-//   handleAddProject(newProjectCall);
-
-//   return changetype<Project>(
-//     Project.load(generateContractSpecificId(TEST_CONTRACT_ADDRESS, projectId))
-//   );
-// }
 
 // mocks return values for Soldity contract calls in refreshContract() helper function
 export function mockRefreshContractCalls(
