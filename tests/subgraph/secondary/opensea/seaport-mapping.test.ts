@@ -10,9 +10,9 @@ import { Address, BigInt } from "@graphprotocol/graph-ts";
 
 import { buildTokenSaleLookupTableId } from "../../../../src/secondary/secondary-helpers";
 import {
-  addNewContractToStore,
   addNewProjectToStore,
   addNewTokenToStore,
+  addNewContractToStore,
   DEFAULT_COLLECTION,
   DEFAULT_CURRENCY,
   DEFAULT_MAKER,

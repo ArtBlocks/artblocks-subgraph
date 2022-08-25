@@ -571,8 +571,11 @@ test("GenArt721: Can clear a Token IPFS image uri", () => {
     tokenId
   );
 
-  const token = new Token(fullTokenId);
-  token.save();
+  const token = addNewTokenToStore(
+    TEST_CONTRACT_ADDRESS,
+    tokenId,
+    BigInt.fromI32(0)
+  );
 
   const tokenUri = "https://token.artblocks.io/" + tokenId.toString();
   mockTokenURICall(tokenId, tokenUri);
@@ -602,7 +605,11 @@ test("GenArt721: Can override token dynamic image with IPFS link", () => {
     tokenId
   );
 
-  const token = new Token(fullTokenId);
+  const token = addNewTokenToStore(
+    TEST_CONTRACT_ADDRESS,
+    tokenId,
+    BigInt.fromI32(0)
+  );
   token.uri = "";
   token.save();
 
