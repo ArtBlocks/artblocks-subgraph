@@ -35,6 +35,12 @@ export function generateWhitelistingId(
   return contractId + "-" + accountId;
 }
 
+export function generateProjectIdNumberFromTokenIdNumber(
+  tokenId: BigInt
+): BigInt {
+  return tokenId.div(BigInt.fromI32(1000000));
+}
+
 export function generateContractSpecificId(
   contractAddress: Address,
   entityId: BigInt
