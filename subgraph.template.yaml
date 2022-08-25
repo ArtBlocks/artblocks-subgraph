@@ -128,6 +128,7 @@ dataSources:
         - Payment
         - Sale
         - SaleLookupTable
+        - ProposedArtistAddressesAndSplits
       abis:
         - name: GenArt721Core
           file: ./abis/GenArt721Core.json
@@ -230,6 +231,7 @@ dataSources:
         - Payment
         - Sale
         - SaleLookupTable
+        - ProposedArtistAddressesAndSplits
       abis:
         - name: GenArt721Core2
           file: ./abis/GenArt721Core2.json
@@ -336,6 +338,7 @@ dataSources:
         - Payment
         - Sale
         - SaleLookupTable
+        - ProposedArtistAddressesAndSplits
       abis:
         - name: GenArt721Core2PBAB
           file: ./abis/GenArt721Core2PBAB.json
@@ -429,6 +432,7 @@ dataSources:
         - Sale
         - SaleLookupTable
         - ProjectExternalAssetDependency
+        - ProposedArtistAddressesAndSplits
       abis:
         - name: GenArt721Core2EngineFlex
           file: ./abis/GenArt721Core2EngineFlex.json
@@ -527,6 +531,7 @@ dataSources:
         - Payment
         - Sale
         - SaleLookupTable
+        - ProposedArtistAddressesAndSplits
       abis:
         - name: GenArt721
           file: ./abis/GenArt721.json
