@@ -278,6 +278,7 @@ export const addNewProjectToStore = function(
 export function addNewContractToStore(): Contract {
   let contract = new Contract(DEFAULT_COLLECTION.toHexString());
   contract.admin = TEST_CONTRACT.admin;
+  contract.type = TEST_CONTRACT.type;
   contract.createdAt = CURRENT_BLOCK_TIMESTAMP.minus(BigInt.fromI32(10));
   contract.nextProjectId = BigInt.fromI32(0);
   contract.randomizerContract = TEST_CONTRACT.randomizerContract;
