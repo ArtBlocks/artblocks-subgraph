@@ -8,6 +8,8 @@ import {
 } from "matchstick-as/assembly/index";
 import { Minter, ProjectMinterConfiguration } from "../../../generated/schema";
 import {
+  addNewMinterToStore,
+  addNewProjectMinterConfigToStore,
   addNewProjectToStore,
   CURRENT_BLOCK_TIMESTAMP,
   MINTER_ENTITY_TYPE,
@@ -96,12 +98,11 @@ const randomAddressGenerator = new RandomAddressGenerator();
 test("handlePricePerTokenInWeiUpdated should do nothing if project is not in store", () => {
   clearStore();
 
-  const minterAddress = randomAddressGenerator.generateRandomAddress();
-  const minterType = "MinterSetPriceV0";
-  const minter = new Minter(minterAddress.toHexString());
-  minter.coreContract = TEST_CONTRACT_ADDRESS.toHexString();
-  minter.type = minterType;
-  minter.save();
+  const minter = addNewMinterToStore("MinterSetPriceV0");
+  const minterType = minter.type;
+  const minterAddress: Address = changetype<Address>(
+    Address.fromHexString(minter.id)
+  );
 
   const projectId = BigInt.fromI32(0);
   const fullProjectId = generateContractSpecificId(
@@ -131,12 +132,11 @@ test("handlePricePerTokenInWeiUpdated should do nothing if project is not in sto
 test("handlePricePerTokenInWeiUpdated should update project minter config pricePerTokenInWei", () => {
   clearStore();
 
-  const minterAddress = randomAddressGenerator.generateRandomAddress();
-  const minterType = "MinterSetPriceV0";
-  const minter = new Minter(minterAddress.toHexString());
-  minter.coreContract = TEST_CONTRACT_ADDRESS.toHexString();
-  minter.type = minterType;
-  minter.save();
+  const minter = addNewMinterToStore("MinterSetPriceV0");
+  const minterType = minter.type;
+  const minterAddress: Address = changetype<Address>(
+    Address.fromHexString(minter.id)
+  );
 
   const projectId = BigInt.fromI32(0);
   const project = addNewProjectToStore(
@@ -156,6 +156,7 @@ test("handlePricePerTokenInWeiUpdated should update project minter config priceP
   projectMinterConfig.extraMinterDetails = "{}";
   projectMinterConfig.basePrice = ONE_ETH_IN_WEI.div(BigInt.fromI32(10));
   projectMinterConfig.priceIsConfigured = false;
+  projectMinterConfig.purchaseToDisabled = false;
   projectMinterConfig.currencyAddress = Address.zero();
   projectMinterConfig.currencySymbol = "ETH";
   projectMinterConfig.save();
@@ -203,12 +204,11 @@ test("handlePricePerTokenInWeiUpdated should update project minter config priceP
 test("handleProjectCurrencyInfoUpdated should do nothing if project is not in store", () => {
   clearStore();
 
-  const minterAddress = randomAddressGenerator.generateRandomAddress();
   const minterType = "MinterSetPriceERC20V0";
-  const minter = new Minter(minterAddress.toHexString());
-  minter.coreContract = TEST_CONTRACT_ADDRESS.toHexString();
-  minter.type = minterType;
-  minter.save();
+  const minter = addNewMinterToStore(minterType);
+  const minterAddress: Address = changetype<Address>(
+    Address.fromHexString(minter.id)
+  );
 
   const projectId = BigInt.fromI32(0);
   const fullProjectId = generateContractSpecificId(
@@ -238,11 +238,11 @@ test("handleProjectCurrencyInfoUpdated should do nothing if project is not in st
 test("handleProjectCurrencyInfoUpdated should update project minter config currency info", () => {
   clearStore();
 
-  const minterAddress = randomAddressGenerator.generateRandomAddress();
-  const minterType = "MinterSetPriceERC20V0";
-  const minter = new Minter(minterAddress.toHexString());
+  const minter = addNewMinterToStore("MinterSetPriceERC20V0");
+  const minterAddress: Address = changetype<Address>(
+    Address.fromHexString(minter.id)
+  );
   minter.coreContract = TEST_CONTRACT_ADDRESS.toHexString();
-  minter.type = minterType;
   minter.save();
 
   const projectId = BigInt.fromI32(0);
@@ -265,6 +265,7 @@ test("handleProjectCurrencyInfoUpdated should update project minter config curre
   projectMinterConfig.priceIsConfigured = false;
   projectMinterConfig.currencyAddress = Address.zero();
   projectMinterConfig.currencySymbol = "ETH";
+  projectMinterConfig.purchaseToDisabled = false;
   projectMinterConfig.save();
 
   const newCurrencyAddress = randomAddressGenerator.generateRandomAddress();
@@ -317,12 +318,11 @@ test("handleProjectCurrencyInfoUpdated should update project minter config curre
 test("handlePurchaseToDisabledUpdated should do nothing if project is not in store", () => {
   clearStore();
 
-  const minterAddress = randomAddressGenerator.generateRandomAddress();
-  const minterType = "MinterSetPriceV0";
-  const minter = new Minter(minterAddress.toHexString());
-  minter.coreContract = TEST_CONTRACT_ADDRESS.toHexString();
-  minter.type = minterType;
-  minter.save();
+  const minter = addNewMinterToStore("MinterSetPriceV0");
+  const minterAddress: Address = changetype<Address>(
+    Address.fromHexString(minter.id)
+  );
+  const minterType = minter.type;
 
   const projectId = BigInt.fromI32(0);
   const fullProjectId = generateContractSpecificId(
@@ -356,12 +356,13 @@ test("handlePurchaseToDisabledUpdated should do nothing if project is not in sto
 test("handlePurchaseToDisabledUpdated should update project minter config purchaseToDisabled", () => {
   clearStore();
 
-  const minterAddress = randomAddressGenerator.generateRandomAddress();
-  const minterType = "MinterSetPriceV0";
-  const minter = new Minter(minterAddress.toHexString());
-  minter.coreContract = TEST_CONTRACT_ADDRESS.toHexString();
-  minter.type = minterType;
-  minter.save();
+  const minter = addNewMinterToStore("MinterSetPriceV0");
+  const minterAddress: Address = changetype<Address>(
+    Address.fromHexString(minter.id)
+  );
+  const minterType = minter.type;
+
+  addNewMinterToStore("MinterSetPriceV0");
 
   const projectId = BigInt.fromI32(0);
   const project = addNewProjectToStore(
@@ -420,9 +421,10 @@ test("handlePurchaseToDisabledUpdated should update project minter config purcha
 });
 
 test("handleMinimumAuctionLengthSecondsUpdated should update minter with minimumAuctionLengthSeconds", () => {
-  const minterAddress = randomAddressGenerator.generateRandomAddress();
-  const minter = new Minter(minterAddress.toHexString());
-  minter.type = "MinterDALinV0";
+  const minter = addNewMinterToStore("MinterDALinV0");
+  const minterAddress: Address = changetype<Address>(
+    Address.fromHexString(minter.id)
+  );
   minter.minimumAuctionLengthInSeconds = BigInt.fromI32(300);
   minter.updatedAt = CURRENT_BLOCK_TIMESTAMP.minus(BigInt.fromI32(10));
   minter.save();
@@ -461,12 +463,10 @@ test("handleMinimumAuctionLengthSecondsUpdated should update minter with minimum
 test("handleDALinSetAuctionDetails should do nothing if project is not in store", () => {
   clearStore();
 
-  const minterAddress = randomAddressGenerator.generateRandomAddress();
-  const minterType = "MinterDALinV0";
-  const minter = new Minter(minterAddress.toHexString());
-  minter.coreContract = TEST_CONTRACT_ADDRESS.toHexString();
-  minter.type = minterType;
-  minter.save();
+  const minter = addNewMinterToStore("MinterDALinV0");
+  const minterAddress: Address = changetype<Address>(
+    Address.fromHexString(minter.id)
+  );
 
   const projectId = BigInt.fromI32(0);
   const fullProjectId = generateContractSpecificId(
@@ -496,12 +496,10 @@ test("handleDALinSetAuctionDetails should do nothing if project is not in store"
 test("handleDALinSetAuctionDetails should update project minter config auction details", () => {
   clearStore();
 
-  const minterAddress = randomAddressGenerator.generateRandomAddress();
-  const minterType = "MinterDALinV0";
-  const minter = new Minter(minterAddress.toHexString());
-  minter.coreContract = TEST_CONTRACT_ADDRESS.toHexString();
-  minter.type = minterType;
-  minter.save();
+  const minter = addNewMinterToStore("MinterDALinV0");
+  const minterAddress: Address = changetype<Address>(
+    Address.fromHexString(minter.id)
+  );
 
   const projectId = BigInt.fromI32(0);
   const project = addNewProjectToStore(
@@ -602,12 +600,11 @@ test("handleDALinSetAuctionDetails should update project minter config auction d
 test("handleDALinSetAuctionDetails should update project minter config auction details with v1 event", () => {
   clearStore();
 
-  const minterAddress = randomAddressGenerator.generateRandomAddress();
-  const minterType = "MinterDALinV1";
-  const minter = new Minter(minterAddress.toHexString());
-  minter.coreContract = TEST_CONTRACT_ADDRESS.toHexString();
-  minter.type = minterType;
-  minter.save();
+  const minter = addNewMinterToStore("MinterDALinV1");
+  const minterAddress: Address = changetype<Address>(
+    Address.fromHexString(minter.id)
+  );
+  const minterType = minter.type;
 
   const projectId = BigInt.fromI32(0);
   const project = addNewProjectToStore(
@@ -708,12 +705,11 @@ test("handleDALinSetAuctionDetails should update project minter config auction d
 test("handleDALinResetAuctionDetails should do nothing if project is not in store", () => {
   clearStore();
 
-  const minterAddress = randomAddressGenerator.generateRandomAddress();
-  const minterType = "MinterDALinV0";
-  const minter = new Minter(minterAddress.toHexString());
-  minter.coreContract = TEST_CONTRACT_ADDRESS.toHexString();
-  minter.type = minterType;
-  minter.save();
+  const minter = addNewMinterToStore("MinterDALinV0");
+  const minterAddress: Address = changetype<Address>(
+    Address.fromHexString(minter.id)
+  );
+  const minterType = minter.type;
 
   const projectId = BigInt.fromI32(0);
   const fullProjectId = generateContractSpecificId(
@@ -743,12 +739,11 @@ test("handleDALinResetAuctionDetails should do nothing if project is not in stor
 test("handleDALinResetAuctionDetails should reset project minter config auction details", () => {
   clearStore();
 
-  const minterAddress = randomAddressGenerator.generateRandomAddress();
-  const minterType = "MinterDALinV0";
-  const minter = new Minter(minterAddress.toHexString());
-  minter.coreContract = TEST_CONTRACT_ADDRESS.toHexString();
-  minter.type = minterType;
-  minter.save();
+  const minter = addNewMinterToStore("MinterDALinV0");
+  const minterAddress: Address = changetype<Address>(
+    Address.fromHexString(minter.id)
+  );
+  const minterType = minter.type;
 
   const projectId = BigInt.fromI32(0);
   const project = addNewProjectToStore(
@@ -833,12 +828,11 @@ test("handleDALinResetAuctionDetails should reset project minter config auction 
 test("handleDALinResetAuctionDetails should reset project minter config auction details with v1 event", () => {
   clearStore();
 
-  const minterAddress = randomAddressGenerator.generateRandomAddress();
-  const minterType = "MinterDALinV1";
-  const minter = new Minter(minterAddress.toHexString());
-  minter.coreContract = TEST_CONTRACT_ADDRESS.toHexString();
-  minter.type = minterType;
-  minter.save();
+  const minter = addNewMinterToStore("MinterDALinV1");
+  const minterAddress: Address = changetype<Address>(
+    Address.fromHexString(minter.id)
+  );
+  const minterType = minter.type;
 
   const projectId = BigInt.fromI32(0);
   const project = addNewProjectToStore(
@@ -921,9 +915,10 @@ test("handleDALinResetAuctionDetails should reset project minter config auction 
 });
 
 test("handleAuctionHalfLifeRangeSecondsUpdated should update minter half life range", () => {
-  const minterAddress = randomAddressGenerator.generateRandomAddress();
-  const minter = new Minter(minterAddress.toHexString());
-  minter.type = "MinterDAExpV0";
+  const minter = addNewMinterToStore("MinterDAExpV0");
+  const minterAddress: Address = changetype<Address>(
+    Address.fromHexString(minter.id)
+  );
   minter.minimumHalfLifeInSeconds = BigInt.fromI32(300);
   minter.maximumHalfLifeInSeconds = BigInt.fromI32(5000);
   minter.updatedAt = CURRENT_BLOCK_TIMESTAMP.minus(BigInt.fromI32(10));
@@ -973,9 +968,10 @@ test("handleAuctionHalfLifeRangeSecondsUpdated should update minter half life ra
 });
 
 test("handleAuctionHalfLifeRangeSecondsUpdated should update minter half life range with v1 event", () => {
-  const minterAddress = randomAddressGenerator.generateRandomAddress();
-  const minter = new Minter(minterAddress.toHexString());
-  minter.type = "MinterDAExpV1";
+  const minter = addNewMinterToStore("MinterDAExpV1");
+  const minterAddress: Address = changetype<Address>(
+    Address.fromHexString(minter.id)
+  );
   minter.minimumHalfLifeInSeconds = BigInt.fromI32(300);
   minter.maximumHalfLifeInSeconds = BigInt.fromI32(5000);
   minter.updatedAt = CURRENT_BLOCK_TIMESTAMP.minus(BigInt.fromI32(10));
@@ -1027,12 +1023,11 @@ test("handleAuctionHalfLifeRangeSecondsUpdated should update minter half life ra
 test("handleDAExpSetAuctionDetails should do nothing if project is not in store", () => {
   clearStore();
 
-  const minterAddress = randomAddressGenerator.generateRandomAddress();
-  const minterType = "MinterDAExpV0";
-  const minter = new Minter(minterAddress.toHexString());
-  minter.coreContract = TEST_CONTRACT_ADDRESS.toHexString();
-  minter.type = minterType;
-  minter.save();
+  const minter = addNewMinterToStore("MinterDAExpV0");
+  const minterAddress: Address = changetype<Address>(
+    Address.fromHexString(minter.id)
+  );
+  const minterType = minter.type;
 
   const projectId = BigInt.fromI32(0);
   const fullProjectId = generateContractSpecificId(
@@ -1062,12 +1057,11 @@ test("handleDAExpSetAuctionDetails should do nothing if project is not in store"
 test("handleDAExpSetAuctionDetails should update project minter config auction details", () => {
   clearStore();
 
-  const minterAddress = randomAddressGenerator.generateRandomAddress();
-  const minterType = "MinterDALinV0";
-  const minter = new Minter(minterAddress.toHexString());
-  minter.coreContract = TEST_CONTRACT_ADDRESS.toHexString();
-  minter.type = minterType;
-  minter.save();
+  const minter = addNewMinterToStore("MinterDALinV0");
+  const minterAddress: Address = changetype<Address>(
+    Address.fromHexString(minter.id)
+  );
+  const minterType = minter.type;
 
   const projectId = BigInt.fromI32(0);
   const project = addNewProjectToStore(
@@ -1168,12 +1162,11 @@ test("handleDAExpSetAuctionDetails should update project minter config auction d
 test("handleDAExpSetAuctionDetails should update project minter config auction details with v1 event", () => {
   clearStore();
 
-  const minterAddress = randomAddressGenerator.generateRandomAddress();
-  const minterType = "MinterDALinV1";
-  const minter = new Minter(minterAddress.toHexString());
-  minter.coreContract = TEST_CONTRACT_ADDRESS.toHexString();
-  minter.type = minterType;
-  minter.save();
+  const minter = addNewMinterToStore("MinterDALinV1");
+  const minterAddress: Address = changetype<Address>(
+    Address.fromHexString(minter.id)
+  );
+  const minterType = minter.type;
 
   const projectId = BigInt.fromI32(0);
   const project = addNewProjectToStore(
@@ -1274,12 +1267,11 @@ test("handleDAExpSetAuctionDetails should update project minter config auction d
 test("handleDAExpResetAuctionDetails should do nothing if project is not in store", () => {
   clearStore();
 
-  const minterAddress = randomAddressGenerator.generateRandomAddress();
-  const minterType = "MinterDAExpV0";
-  const minter = new Minter(minterAddress.toHexString());
-  minter.coreContract = TEST_CONTRACT_ADDRESS.toHexString();
-  minter.type = minterType;
-  minter.save();
+  const minter = addNewMinterToStore("MinterDAExpV0");
+  const minterAddress: Address = changetype<Address>(
+    Address.fromHexString(minter.id)
+  );
+  const minterType = minter.type;
 
   const projectId = BigInt.fromI32(0);
   const fullProjectId = generateContractSpecificId(
@@ -1309,12 +1301,11 @@ test("handleDAExpResetAuctionDetails should do nothing if project is not in stor
 test("handleDAExpResetAuctionDetails should reset project minter config auction details", () => {
   clearStore();
 
-  const minterAddress = randomAddressGenerator.generateRandomAddress();
-  const minterType = "MinterDAExpV0";
-  const minter = new Minter(minterAddress.toHexString());
-  minter.coreContract = TEST_CONTRACT_ADDRESS.toHexString();
-  minter.type = minterType;
-  minter.save();
+  const minter = addNewMinterToStore("MinterDAExpV0");
+  const minterAddress: Address = changetype<Address>(
+    Address.fromHexString(minter.id)
+  );
+  const minterType = minter.type;
 
   const projectId = BigInt.fromI32(0);
   const project = addNewProjectToStore(
@@ -1399,12 +1390,11 @@ test("handleDAExpResetAuctionDetails should reset project minter config auction 
 test("handleDAExpResetAuctionDetails should reset project minter config auction details with v1 event", () => {
   clearStore();
 
-  const minterAddress = randomAddressGenerator.generateRandomAddress();
-  const minterType = "MinterDAExpV1";
-  const minter = new Minter(minterAddress.toHexString());
-  minter.coreContract = TEST_CONTRACT_ADDRESS.toHexString();
-  minter.type = minterType;
-  minter.save();
+  const minter = addNewMinterToStore("MinterDAExpV1");
+  const minterAddress: Address = changetype<Address>(
+    Address.fromHexString(minter.id)
+  );
+  const minterType = minter.type;
 
   const projectId = BigInt.fromI32(0);
   const project = addNewProjectToStore(
@@ -1487,12 +1477,11 @@ test("handleDAExpResetAuctionDetails should reset project minter config auction 
 });
 test("handleSetValue should set all values to a designated key in extraMinterDetails", () => {
   clearStore();
-  const minterAddress = randomAddressGenerator.generateRandomAddress();
-  const minterType = "MinterHolderV0";
-  const minter = new Minter(minterAddress.toHexString());
-  minter.coreContract = TEST_CONTRACT_ADDRESS.toHexString();
-  minter.type = minterType;
-  minter.save();
+  const minter = addNewMinterToStore("MinterHolderV0");
+  const minterAddress: Address = changetype<Address>(
+    Address.fromHexString(minter.id)
+  );
+  const minterType = minter.type;
 
   const projectId = BigInt.fromI32(0);
   const project = addNewProjectToStore(
@@ -1504,13 +1493,10 @@ test("handleSetValue should set all values to a designated key in extraMinterDet
     CURRENT_BLOCK_TIMESTAMP.minus(BigInt.fromI32(10))
   );
 
-  const projectMinterConfig = new ProjectMinterConfiguration(
-    getProjectMinterConfigId(minterAddress.toHexString(), project.id)
+  const projectMinterConfig = addNewProjectMinterConfigToStore(
+    project.id,
+    minterAddress
   );
-  projectMinterConfig.minter = minterAddress.toHexString();
-  projectMinterConfig.project = project.id;
-  projectMinterConfig.extraMinterDetails = "{}";
-  projectMinterConfig.save();
 
   const configValueSetEvent: ConfigValueSetBool = changetype<
     ConfigValueSetBool
@@ -1672,12 +1658,11 @@ test("handleSetValue should set all values to a designated key in extraMinterDet
 });
 test("handleAddManyBigIntValue should add a value to an array at a designated key extraMinterDetails", () => {
   clearStore();
-  const minterAddress = randomAddressGenerator.generateRandomAddress();
-  const minterType = "MinterHolderV0";
-  const minter = new Minter(minterAddress.toHexString());
-  minter.coreContract = TEST_CONTRACT_ADDRESS.toHexString();
-  minter.type = minterType;
-  minter.save();
+  const minter = addNewMinterToStore("MinterHolderV0");
+  const minterAddress: Address = changetype<Address>(
+    Address.fromHexString(minter.id)
+  );
+  const minterType = minter.type;
 
   const projectId = BigInt.fromI32(0);
   const project = addNewProjectToStore(
@@ -1689,13 +1674,10 @@ test("handleAddManyBigIntValue should add a value to an array at a designated ke
     CURRENT_BLOCK_TIMESTAMP.minus(BigInt.fromI32(10))
   );
 
-  const projectMinterConfig = new ProjectMinterConfiguration(
-    getProjectMinterConfigId(minterAddress.toHexString(), project.id)
+  const projectMinterConfig = addNewProjectMinterConfigToStore(
+    project.id,
+    minterAddress
   );
-  projectMinterConfig.minter = minterAddress.toHexString();
-  projectMinterConfig.project = project.id;
-  projectMinterConfig.extraMinterDetails = "{}";
-  projectMinterConfig.save();
 
   const configValueSetEvent: ConfigValueAddedToSetBigInt = changetype<
     ConfigValueAddedToSetBigInt
@@ -1737,12 +1719,11 @@ test("handleAddManyBigIntValue should add a value to an array at a designated ke
 });
 test("handleAddManyAddressValue should add a value to an array at a designated key extraMinterDetails", () => {
   clearStore();
-  const minterAddress = randomAddressGenerator.generateRandomAddress();
-  const minterType = "MinterHolderV0";
-  const minter = new Minter(minterAddress.toHexString());
-  minter.coreContract = TEST_CONTRACT_ADDRESS.toHexString();
-  minter.type = minterType;
-  minter.save();
+  const minter = addNewMinterToStore("MinterHolderV0");
+  const minterAddress: Address = changetype<Address>(
+    Address.fromHexString(minter.id)
+  );
+  const minterType = minter.type;
 
   const projectId = BigInt.fromI32(0);
   const project = addNewProjectToStore(
@@ -1754,13 +1735,10 @@ test("handleAddManyAddressValue should add a value to an array at a designated k
     CURRENT_BLOCK_TIMESTAMP.minus(BigInt.fromI32(10))
   );
 
-  const projectMinterConfig = new ProjectMinterConfiguration(
-    getProjectMinterConfigId(minterAddress.toHexString(), project.id)
+  const projectMinterConfig = addNewProjectMinterConfigToStore(
+    project.id,
+    minterAddress
   );
-  projectMinterConfig.minter = minterAddress.toHexString();
-  projectMinterConfig.project = project.id;
-  projectMinterConfig.extraMinterDetails = "{}";
-  projectMinterConfig.save();
 
   const testAddy = randomAddressGenerator.generateRandomAddress();
 
@@ -1792,12 +1770,11 @@ test("handleAddManyAddressValue should add a value to an array at a designated k
 });
 test("handleAddManyBytesValue should add a value to an array at a designated key extraMinterDetails", () => {
   clearStore();
-  const minterAddress = randomAddressGenerator.generateRandomAddress();
-  const minterType = "MinterHolderV0";
-  const minter = new Minter(minterAddress.toHexString());
-  minter.coreContract = TEST_CONTRACT_ADDRESS.toHexString();
-  minter.type = minterType;
-  minter.save();
+  const minter = addNewMinterToStore("MinterHolderV0");
+  const minterAddress: Address = changetype<Address>(
+    Address.fromHexString(minter.id)
+  );
+  const minterType = minter.type;
 
   const projectId = BigInt.fromI32(0);
   const project = addNewProjectToStore(
@@ -1809,13 +1786,10 @@ test("handleAddManyBytesValue should add a value to an array at a designated key
     CURRENT_BLOCK_TIMESTAMP.minus(BigInt.fromI32(10))
   );
 
-  const projectMinterConfig = new ProjectMinterConfiguration(
-    getProjectMinterConfigId(minterAddress.toHexString(), project.id)
+  const projectMinterConfig = addNewProjectMinterConfigToStore(
+    project.id,
+    minterAddress
   );
-  projectMinterConfig.minter = minterAddress.toHexString();
-  projectMinterConfig.project = project.id;
-  projectMinterConfig.extraMinterDetails = "{}";
-  projectMinterConfig.save();
 
   const configValueSetEvent: ConfigValueAddedToSetBytes = changetype<
     ConfigValueAddedToSetBytes
@@ -1857,12 +1831,11 @@ test("handleAddManyBytesValue should add a value to an array at a designated key
 });
 test("handleRemoveValue should remove the key/value from extraMinterDetails", () => {
   clearStore();
-  const minterAddress = randomAddressGenerator.generateRandomAddress();
-  const minterType = "MinterHolderV0";
-  const minter = new Minter(minterAddress.toHexString());
-  minter.coreContract = TEST_CONTRACT_ADDRESS.toHexString();
-  minter.type = minterType;
-  minter.save();
+  const minter = addNewMinterToStore("MinterHolderV0");
+  const minterAddress: Address = changetype<Address>(
+    Address.fromHexString(minter.id)
+  );
+  const minterType = minter.type;
 
   const projectId = BigInt.fromI32(0);
   const project = addNewProjectToStore(
@@ -1874,11 +1847,10 @@ test("handleRemoveValue should remove the key/value from extraMinterDetails", ()
     CURRENT_BLOCK_TIMESTAMP.minus(BigInt.fromI32(10))
   );
 
-  const projectMinterConfig = new ProjectMinterConfiguration(
-    getProjectMinterConfigId(minterAddress.toHexString(), project.id)
+  const projectMinterConfig = addNewProjectMinterConfigToStore(
+    project.id,
+    minterAddress
   );
-  projectMinterConfig.minter = minterAddress.toHexString();
-  projectMinterConfig.project = project.id;
   projectMinterConfig.extraMinterDetails =
     '{"addresses": "hi","removeMe": "please"}';
   projectMinterConfig.save();
@@ -1910,12 +1882,11 @@ test("handleRemoveValue should remove the key/value from extraMinterDetails", ()
 });
 test("handleRemoveBigIntManyValue should remove the key/value from extraMinterDetails", () => {
   clearStore();
-  const minterAddress = randomAddressGenerator.generateRandomAddress();
-  const minterType = "MinterHolderV0";
-  const minter = new Minter(minterAddress.toHexString());
-  minter.coreContract = TEST_CONTRACT_ADDRESS.toHexString();
-  minter.type = minterType;
-  minter.save();
+  const minter = addNewMinterToStore("MinterHolderV0");
+  const minterAddress: Address = changetype<Address>(
+    Address.fromHexString(minter.id)
+  );
+  const minterType = minter.type;
 
   const projectId = BigInt.fromI32(0);
   const project = addNewProjectToStore(
@@ -1927,11 +1898,10 @@ test("handleRemoveBigIntManyValue should remove the key/value from extraMinterDe
     CURRENT_BLOCK_TIMESTAMP.minus(BigInt.fromI32(10))
   );
 
-  const projectMinterConfig = new ProjectMinterConfiguration(
-    getProjectMinterConfigId(minterAddress.toHexString(), project.id)
+  const projectMinterConfig = addNewProjectMinterConfigToStore(
+    project.id,
+    minterAddress
   );
-  projectMinterConfig.minter = minterAddress.toHexString();
-  projectMinterConfig.project = project.id;
   projectMinterConfig.extraMinterDetails =
     '{"addresses": "hi","removeMe": [100, 200]}';
   projectMinterConfig.save();
@@ -1967,12 +1937,11 @@ test("handleRemoveBigIntManyValue should remove the key/value from extraMinterDe
 });
 test("handleRemoveBytesManyValue should remove the key/value from extraMinterDetails", () => {
   clearStore();
-  const minterAddress = randomAddressGenerator.generateRandomAddress();
-  const minterType = "MinterHolderV0";
-  const minter = new Minter(minterAddress.toHexString());
-  minter.coreContract = TEST_CONTRACT_ADDRESS.toHexString();
-  minter.type = minterType;
-  minter.save();
+  const minter = addNewMinterToStore("MinterHolderV0");
+  const minterAddress: Address = changetype<Address>(
+    Address.fromHexString(minter.id)
+  );
+  const minterType = minter.type;
 
   const projectId = BigInt.fromI32(0);
   const project = addNewProjectToStore(
@@ -1984,11 +1953,10 @@ test("handleRemoveBytesManyValue should remove the key/value from extraMinterDet
     CURRENT_BLOCK_TIMESTAMP.minus(BigInt.fromI32(10))
   );
 
-  const projectMinterConfig = new ProjectMinterConfiguration(
-    getProjectMinterConfigId(minterAddress.toHexString(), project.id)
+  const projectMinterConfig = addNewProjectMinterConfigToStore(
+    project.id,
+    minterAddress
   );
-  projectMinterConfig.minter = minterAddress.toHexString();
-  projectMinterConfig.project = project.id;
   projectMinterConfig.extraMinterDetails =
     '{"addresses": "hi","removeMe": ["alive", "dead"]}';
   projectMinterConfig.save();
@@ -2026,12 +1994,11 @@ test("handleRemoveBytesManyValue should remove the key/value from extraMinterDet
 
 test("handleAllowHoldersOfProjects can add address + project id to extraMinterDetails", () => {
   clearStore();
-  const minterAddress = randomAddressGenerator.generateRandomAddress();
-  const minterType = "MinterHolderV0";
-  const minter = new Minter(minterAddress.toHexString());
-  minter.coreContract = TEST_CONTRACT_ADDRESS.toHexString();
-  minter.type = minterType;
-  minter.save();
+  const minter = addNewMinterToStore("MinterHolderV0");
+  const minterAddress: Address = changetype<Address>(
+    Address.fromHexString(minter.id)
+  );
+  const minterType = minter.type;
 
   const projectId = BigInt.fromI32(0);
   const project = addNewProjectToStore(
@@ -2043,13 +2010,10 @@ test("handleAllowHoldersOfProjects can add address + project id to extraMinterDe
     CURRENT_BLOCK_TIMESTAMP.minus(BigInt.fromI32(10))
   );
 
-  const projectMinterConfig = new ProjectMinterConfiguration(
-    getProjectMinterConfigId(minterAddress.toHexString(), project.id)
+  const projectMinterConfig = addNewProjectMinterConfigToStore(
+    project.id,
+    minterAddress
   );
-  projectMinterConfig.minter = minterAddress.toHexString();
-  projectMinterConfig.project = project.id;
-  projectMinterConfig.extraMinterDetails = "{}";
-  projectMinterConfig.save();
 
   let testAddy: Address = randomAddressGenerator.generateRandomAddress();
 
@@ -2090,12 +2054,11 @@ test("handleAllowHoldersOfProjects can add address + project id to extraMinterDe
 });
 test("handleAllowHoldersOfProjects can add multiple address + project id to extraMinterDetails", () => {
   clearStore();
-  const minterAddress = randomAddressGenerator.generateRandomAddress();
-  const minterType = "MinterHolderV0";
-  const minter = new Minter(minterAddress.toHexString());
-  minter.coreContract = TEST_CONTRACT_ADDRESS.toHexString();
-  minter.type = minterType;
-  minter.save();
+  const minter = addNewMinterToStore("MinterHolderV0");
+  const minterAddress: Address = changetype<Address>(
+    Address.fromHexString(minter.id)
+  );
+  const minterType = minter.type;
 
   const projectId = BigInt.fromI32(0);
   const project = addNewProjectToStore(
@@ -2107,13 +2070,10 @@ test("handleAllowHoldersOfProjects can add multiple address + project id to extr
     CURRENT_BLOCK_TIMESTAMP.minus(BigInt.fromI32(10))
   );
 
-  const projectMinterConfig = new ProjectMinterConfiguration(
-    getProjectMinterConfigId(minterAddress.toHexString(), project.id)
+  const projectMinterConfig = addNewProjectMinterConfigToStore(
+    project.id,
+    minterAddress
   );
-  projectMinterConfig.minter = minterAddress.toHexString();
-  projectMinterConfig.project = project.id;
-  projectMinterConfig.extraMinterDetails = "{}";
-  projectMinterConfig.save();
 
   let testAddys: Array<Address> = [
     randomAddressGenerator.generateRandomAddress(),
@@ -2158,12 +2118,11 @@ test("handleAllowHoldersOfProjects can add multiple address + project id to extr
 });
 test("handleRemoveHoldersOfProjects can remove address + project id to extraMinterDetails", () => {
   clearStore();
-  const minterAddress = randomAddressGenerator.generateRandomAddress();
-  const minterType = "MinterHolderV0";
-  const minter = new Minter(minterAddress.toHexString());
-  minter.coreContract = TEST_CONTRACT_ADDRESS.toHexString();
-  minter.type = minterType;
-  minter.save();
+  const minter = addNewMinterToStore("MinterHolderV0");
+  const minterAddress: Address = changetype<Address>(
+    Address.fromHexString(minter.id)
+  );
+  const minterType = minter.type;
 
   const projectId = BigInt.fromI32(0);
   const project = addNewProjectToStore(
@@ -2177,11 +2136,10 @@ test("handleRemoveHoldersOfProjects can remove address + project id to extraMint
 
   let testAddy = randomAddressGenerator.generateRandomAddress();
 
-  const projectMinterConfig = new ProjectMinterConfiguration(
-    getProjectMinterConfigId(minterAddress.toHexString(), project.id)
+  const projectMinterConfig = addNewProjectMinterConfigToStore(
+    project.id,
+    minterAddress
   );
-  projectMinterConfig.minter = minterAddress.toHexString();
-  projectMinterConfig.project = project.id;
   projectMinterConfig.extraMinterDetails =
     '{"allowlistedAddressAndProjectId":["' +
     testAddy.toHexString() +
@@ -2219,12 +2177,11 @@ test("handleRemoveHoldersOfProjects can remove address + project id to extraMint
 });
 test("handleRemoveHoldersOfProjects can remove multiple address + project id to extraMinterDetails", () => {
   clearStore();
-  const minterAddress = randomAddressGenerator.generateRandomAddress();
-  const minterType = "MinterHolderV0";
-  const minter = new Minter(minterAddress.toHexString());
-  minter.coreContract = TEST_CONTRACT_ADDRESS.toHexString();
-  minter.type = minterType;
-  minter.save();
+  const minter = addNewMinterToStore("MinterHolderV0");
+  const minterAddress: Address = changetype<Address>(
+    Address.fromHexString(minter.id)
+  );
+  const minterType = minter.type;
 
   const projectId = BigInt.fromI32(0);
   const project = addNewProjectToStore(
@@ -2241,11 +2198,10 @@ test("handleRemoveHoldersOfProjects can remove multiple address + project id to 
     randomAddressGenerator.generateRandomAddress()
   ];
 
-  const projectMinterConfig = new ProjectMinterConfiguration(
-    getProjectMinterConfigId(minterAddress.toHexString(), project.id)
+  const projectMinterConfig = addNewProjectMinterConfigToStore(
+    project.id,
+    minterAddress
   );
-  projectMinterConfig.minter = minterAddress.toHexString();
-  projectMinterConfig.project = project.id;
   projectMinterConfig.extraMinterDetails =
     '{"allowlistedAddressAndProjectId":["' +
     testAddys[0].toHexString() +
@@ -2288,12 +2244,10 @@ test("handleRemoveHoldersOfProjects can remove multiple address + project id to 
 });
 test("handleRegisteredNFTAddress adds the address, as a string to the minter", () => {
   clearStore();
-  const minterAddress = randomAddressGenerator.generateRandomAddress();
-  const minterType = "MinterHolderV0";
-  const minter = new Minter(minterAddress.toHexString());
-  minter.coreContract = TEST_CONTRACT_ADDRESS.toHexString();
-  minter.type = minterType;
-  minter.extraMinterDetails = "{}";
+  const minter = addNewMinterToStore("MinterHolderV0");
+  const minterAddress: Address = changetype<Address>(
+    Address.fromHexString(minter.id)
+  );
   minter.save();
 
   const testAddy = randomAddressGenerator.generateRandomAddress();
@@ -2318,11 +2272,13 @@ test("handleRegisteredNFTAddress adds the address, as a string to the minter", (
 });
 test("handleUnRegisteredNFTAddress removes the address from the minter", () => {
   clearStore();
-  const minterAddress = randomAddressGenerator.generateRandomAddress();
   const minterType = "MinterHolderV0";
-  const minter = new Minter(minterAddress.toHexString());
+  const minter = addNewMinterToStore(minterType);
+  const minterAddress = Address.fromString(minter.id);
+
   minter.coreContract = TEST_CONTRACT_ADDRESS.toHexString();
   minter.type = minterType;
+  minter;
   const testAddy = randomAddressGenerator.generateRandomAddress();
   minter.extraMinterDetails =
     '{"registeredNFTAddresses":' +
