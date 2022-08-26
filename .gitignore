@@ -15,6 +15,7 @@ generated/*
 !generated/GenArt721Core2
 !generated/GenArt721Core2PBAB
 !generated/GenArt721CorePlus
+!generated/GenArt721CoreV3
 !generated/MinterFilterV0
 !generated/MinterDAExpV0
 !generated/MinterDALinV0
