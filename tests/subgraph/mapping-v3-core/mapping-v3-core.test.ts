@@ -27,11 +27,12 @@ import {
   assertTestContractFields,
   addTestContractToStore,
   addNewTokenToStore,
-  TRANSFER_ENTITY_TYPE
+  addNewContractToStore,
+  TRANSFER_ENTITY_TYPE,
+  DEFAULT_COLLECTION
 } from "../shared-helpers";
 
-// Implement the following import when new add project event handler is implemented:
-// import { addNewProjectToStore } from "./helpers";
+import { mockRefreshContractCalls } from "./helpers";
 
 import {
   Account,
@@ -43,11 +44,8 @@ import {
   Token,
   Whitelisting
 } from "../../../generated/schema";
-import {
-  Mint,
-  Transfer
-} from "../../../generated/GenArt721CoreV3/GenArt721CoreV3";
-import { handleMint, handleTransfer } from "../../../src/mapping-v3-core";
+import { Mint, Transfer } from "../../../generated/GenArt721Core/GenArt721Core";
+import { handleMint, handleTransfer } from "../../../src/mapping-v1-core";
 import {
   generateContractSpecificId,
   generateProjectScriptId,
@@ -55,6 +53,50 @@ import {
 } from "../../../src/helpers";
 
 const randomAddressGenerator = new RandomAddressGenerator();
+
+test("GenArt721CoreV3: Can handle Mint", () => {
+  clearStore();
+  const tokenId = BigInt.fromI32(0);
+  const projectId = BigInt.fromI32(0);
+  const fullTokenId = generateContractSpecificId(
+    TEST_CONTRACT_ADDRESS,
+    tokenId
+  );
+
+  // addNewTokenToStore(TEST_CONTRACT_ADDRESS, tokenId, projectId);
+
+  // const fromAddress = randomAddressGenerator.generateRandomAddress();
+  const toAddress = randomAddressGenerator.generateRandomAddress();
+
+  const hash = Bytes.fromUTF8("QmYwAPJzv5CZsnA625s3Xf2nemtYgPpHdWEz79ojWnPbdG");
+
+  const logIndex = BigInt.fromI32(0);
+
+  const event: Mint = changetype<Mint>(newMockEvent());
+  event.address = TEST_CONTRACT_ADDRESS;
+  event.transaction.hash = hash;
+  event.logIndex = logIndex;
+  event.parameters = [
+    new ethereum.EventParam("_to", ethereum.Value.fromAddress(toAddress)),
+    new ethereum.EventParam(
+      "_tokenId",
+      ethereum.Value.fromUnsignedBigInt(tokenId)
+    ),
+    new ethereum.EventParam(
+      "_projectId",
+      ethereum.Value.fromUnsignedBigInt(tokenId)
+    )
+  ];
+
+  handleMint(event);
+
+  assert.fieldEquals(
+    TOKEN_ENTITY_TYPE,
+    fullTokenId,
+    "owner",
+    toAddress.toHexString()
+  );
+});
 
 test("GenArt721CoreV3: Can handle transfer", () => {
   clearStore();
@@ -116,4 +158,4 @@ test("GenArt721CoreV3: Can handle transfer", () => {
 });
 
 // export handlers for test coverage https://github.com/LimeChain/demo-subgraph#test-coverage
-export { handleMint };
+export { handleMint, handleTransfer };
