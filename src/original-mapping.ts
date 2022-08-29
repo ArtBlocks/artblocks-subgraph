@@ -68,6 +68,7 @@ import {
   generateContractSpecificId
 } from "./helpers";
 import { generateProjectScriptId } from "./helpers";
+import { GEN_ART_721_CORE_V0 } from "./constants";
 
 /*** EVENT HANDLERS ***/
 export function handleMint(event: Mint): void {
@@ -643,6 +644,7 @@ function refreshContract(contract: GenArt721, timestamp: BigInt): Contract {
     contractEntity.mintWhitelisted = [];
   }
   contractEntity.admin = admin;
+  contractEntity.type = GEN_ART_721_CORE_V0;
   contractEntity.renderProviderAddress = artblocksAddress;
   contractEntity.renderProviderPercentage = artblocksPercentage;
   contractEntity.nextProjectId = nextProjectId;

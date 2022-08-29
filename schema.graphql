@@ -8,11 +8,17 @@ type Project @entity {
   "Determines if the project should be visible to the public"
   active: Boolean!
 
-  "Address to split sales with the artist"
+  "Address to split primary sales with the artist"
   additionalPayee: Bytes
 
-  "Percentage of sales that goes to additional payee"
+  "Percentage of artist's share of primary sales that goes to additional payee"
   additionalPayeePercentage: BigInt
+
+  "Address to split Secondary sales with the artist"
+  additionalPayeeSecondarySalesAddress: Bytes
+
+  "Percentage of artist's share of secondary sales that goes to additional payee"
+  additionalPayeeSecondarySalesPercentage: BigInt
 
   "Artist that created the project"
   artist: Account!
@@ -28,6 +34,9 @@ type Project @entity {
 
   "A project is complete when it has reached its maximum invocations"
   complete: Boolean!
+
+  "Timestamp at which a project was completed"
+  completedAt: BigInt
 
   "Curated, playground, factory. A project with no curation status is considered factory"
   curationStatus: String
@@ -52,8 +61,8 @@ type Project @entity {
   "License for the project"
   license: String
 
-  "Once the project is locked its script may never be updated again"
-  locked: Boolean!
+  "For V3 and-on, this field is null, and projects lock 4 weeks after `completedAt`. Once the project is locked its script may never be updated again."
+  locked: Boolean
 
   "Maximum number of invocations allowed for the project"
   maxInvocations: BigInt!
@@ -84,6 +93,12 @@ type Project @entity {
   "Extra information about the script and rendering options"
   scriptJSON: String
 
+  "Script type and version (see `scriptJSON` if null)"
+  scriptTypeAndVersion: String
+
+  "Aspect ratio of the project (see `scriptJSON` if null)"
+  aspectRatio: String
+
   "Tokens of the project"
   tokens: [Token!] @derivedFrom(field: "project")
 
@@ -95,6 +110,9 @@ type Project @entity {
 
   "Artist or project website"
   website: String
+
+  "Proposed Artist addresses and payment split percentages"
+  proposedArtistAddressesAndSplits: ProposedArtistAddressesAndSplits
 
   "Accounts that own tokens of the project"
   owners: [AccountProject!] @derivedFrom(field: "project")
@@ -121,21 +139,70 @@ type ProjectScript @entity {
   script: String!
 }
 
+type ProposedArtistAddressesAndSplits @entity {
+  "Unique identifier made up of contract address and project id"
+  id: ID!
+
+  "Proposed artist address"
+  artistAddress: Bytes!
+
+  "Proposed artist additional payee address for primary sales"
+  additionalPayeePrimarySalesAddress: Bytes!
+
+  "Proposed artist additional payee percentage for primary sales"
+  additionalPayeePrimarySalesPercentage: BigInt!
+
+  "Proposed artist additional payee address for secondary sales"
+  additionalPayeeSecondarySalesAddress: Bytes!
+
+  "Proposed artist additional payee percentage for secondary sales"
+  additionalPayeeSecondarySalesPercentage: BigInt!
+
+  "Project associated with this proposed artist addresses and splits"
+  project: Project!
+}
+
+enum CoreType {
+  "First Art Blocks flagship core"
+  GenArt721CoreV0
+  "Second Art Blocks flagship core"
+  GenArt721CoreV1
+  "Art Blocks Engine & Partner cores"
+  GenArt721CoreV2
+  "Third Art Blocks flagship core"
+  GenArt721CoreV3
+}
+
 type Contract @entity {
   id: ID!
   admin: Bytes!
 
-  "Address that receives platform fees"
+  "Core contract type"
+  type: CoreType!
+
+  "Address that receives primary sales platform fees"
   renderProviderAddress: Bytes!
 
-  "Percentage of sales the platform takes"
+  "Percentage of primary sales allocated to the platform"
   renderProviderPercentage: BigInt!
+
+  "Address that receives secondary sales platform royalties (null for pre-V3 contracts, check Royalty Registry)"
+  renderProviderSecondarySalesAddress: Bytes
+
+  "Basis points of secondary sales allocated to the platform (null for pre-V3 contracts, check Royalty Registry)"
+  renderProviderSecondarySalesBPS: BigInt
 
   "List of contracts that are allowed to mint"
   mintWhitelisted: [Bytes!]!
 
   "Randomizer contract used to generate token hashes"
   randomizerContract: Bytes
+
+  "Curation registry contract address"
+  curationRegistry: Bytes
+
+  "Dependency registry contract address"
+  dependencyRegistry: Bytes
 
   nextProjectId: BigInt!
 

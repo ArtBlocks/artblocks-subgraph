@@ -16,6 +16,7 @@ import {
   Minter,
   Project,
   ProjectMinterConfiguration,
+  ProposedArtistAddressesAndSplits,
   Token
 } from "../../generated/schema";
 import {
@@ -116,19 +117,29 @@ export const DEFAULT_ZONE = Address.fromString(
 );
 export class ContractValues {
   admin: Address;
+  type: string;
   mintWhitelisted: Bytes[];
   randomizerContract: Address;
   renderProviderAddress: Address;
   renderProviderPercentage: BigInt;
+  renderProviderSecondarySalesAddress: Address;
+  renderProviderSecondarySalesBPS: BigInt;
+  dependencyRegistry: Address;
+  curationRegistry: Address;
 }
 export const TEST_CONTRACT: ContractValues = {
   admin: Address.fromString("0x96dc73c8b5969608c77375f085949744b5177660"),
+  type: "GenArt721CoreV1",
   renderProviderPercentage: BigInt.fromI32(10),
   renderProviderAddress: Address.fromString(
     "0xf7a55108a6e830a809e88e74cbf5f5de9d930153"
   ),
+  renderProviderSecondarySalesAddress: Address.zero(),
+  renderProviderSecondarySalesBPS: BigInt.fromI32(10),
   mintWhitelisted: [],
-  randomizerContract: RANDOMIZER_ADDRESS
+  randomizerContract: RANDOMIZER_ADDRESS,
+  dependencyRegistry: Address.zero(),
+  curationRegistry: Address.zero()
 };
 export const TEST_CONTRACT_CREATED_AT = BigInt.fromI32(1607763598);
 
@@ -137,10 +148,13 @@ export class DefaultProjectValues {
   active: boolean;
   additionalPayeeAddress: Address;
   additionalPayeePercentage: BigInt;
+  additionalPayeeSecondarySalesAddress: Address;
+  additionalPayeeSecondarySalesPercentage: BigInt;
   artistName: string;
   baseIpfsUri: string;
   baseUri: string;
   complete: boolean;
+  completedAt: BigInt;
   currencyAddress: Address;
   currencySymbol: string;
   description: string;
@@ -154,6 +168,8 @@ export class DefaultProjectValues {
   royaltyPercentage: BigInt;
   scriptCount: BigInt;
   scriptJSON: string;
+  scriptTypeAndVersion: string;
+  aspectRatio: string;
   useHashString: boolean;
   useIpfs: boolean;
   website: string;
@@ -168,10 +184,13 @@ export const DEFAULT_PROJECT_VALUES: DefaultProjectValues = {
   active: false,
   additionalPayeeAddress: Address.zero(),
   additionalPayeePercentage: BigInt.fromI32(0),
+  additionalPayeeSecondarySalesAddress: Address.zero(),
+  additionalPayeeSecondarySalesPercentage: BigInt.fromI32(0),
   artistName: "",
   baseIpfsUri: "",
   baseUri: "",
   complete: false,
+  completedAt: BigInt.fromI32(0),
   currencyAddress: Address.zero(),
   currencySymbol: "ETH",
   description: "",
@@ -185,6 +204,8 @@ export const DEFAULT_PROJECT_VALUES: DefaultProjectValues = {
   royaltyPercentage: BigInt.zero(),
   scriptCount: BigInt.zero(),
   scriptJSON: "",
+  scriptTypeAndVersion: "",
+  aspectRatio: "",
   useHashString: true,
   useIpfs: false,
   website: "",
@@ -257,6 +278,7 @@ export const addNewProjectToStore = function(
 export function addNewContractToStore(): Contract {
   let contract = new Contract(DEFAULT_COLLECTION.toHexString());
   contract.admin = TEST_CONTRACT.admin;
+  contract.type = TEST_CONTRACT.type;
   contract.createdAt = CURRENT_BLOCK_TIMESTAMP.minus(BigInt.fromI32(10));
   contract.nextProjectId = BigInt.fromI32(0);
   contract.randomizerContract = TEST_CONTRACT.randomizerContract;
@@ -272,6 +294,7 @@ export function addNewContractToStore(): Contract {
 export function addTestContractToStore(nextProjectId: BigInt): Contract {
   let contract = new Contract(TEST_CONTRACT_ADDRESS.toHexString());
   contract.admin = TEST_CONTRACT.admin;
+  contract.type = TEST_CONTRACT.type;
   contract.createdAt = CURRENT_BLOCK_TIMESTAMP.minus(BigInt.fromI32(10));
   contract.nextProjectId = nextProjectId;
   contract.randomizerContract = TEST_CONTRACT.randomizerContract;
