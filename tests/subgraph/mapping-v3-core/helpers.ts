@@ -3,16 +3,70 @@ import {
   createMockedFunction,
   newMockCall
 } from "matchstick-as/assembly/index";
-import { AddProjectCall } from "../../../generated/GenArt721CoreV3/GenArt721CoreV3";
+
+// use legacy V1 call handler as helper to easily add projects to the store
+// TODO - this can be updated once V3 event handler for addProject is implemented
+import { AddProjectCall } from "../../../generated/GenArt721Core/GenArt721Core";
+import { handleAddProject } from "../../../src/mapping-v1-core";
+
+// schema imports
 import { Project } from "../../../generated/schema";
+
+// helper src imports
 import { generateContractSpecificId } from "../../../src/helpers";
 
+// shared exports across all tests
 import {
   CURRENT_BLOCK_TIMESTAMP,
   DEFAULT_PROJECT_VALUES,
   TEST_CONTRACT_ADDRESS,
   TEST_CONTRACT
 } from "../shared-helpers";
+
+// helper mock function to initialize a Project entity in local in-memory store
+export function addNewProjectToStore(
+  projectId: BigInt,
+  projectName: string,
+  artistAddress: Address,
+  pricePerTokenInWei: BigInt,
+  mockCallsWithDefaults: boolean,
+  timestamp: BigInt | null
+): Project {
+  if (mockCallsWithDefaults) {
+    mockProjectDetailsCallWithDefaults(projectId, projectName);
+    mockProjectTokenInfoCallWithDefaults(
+      projectId,
+      artistAddress,
+      pricePerTokenInWei
+    );
+    mockProjectScriptInfoCall(projectId, null);
+  }
+
+  const newProjectCall = changetype<AddProjectCall>(newMockCall());
+  newProjectCall.to = TEST_CONTRACT_ADDRESS;
+  newProjectCall.block.timestamp = CURRENT_BLOCK_TIMESTAMP;
+
+  newProjectCall.inputValues = [
+    new ethereum.EventParam(
+      "projectName",
+      ethereum.Value.fromString(projectName)
+    ),
+    new ethereum.EventParam(
+      "artistAddress",
+      ethereum.Value.fromAddress(artistAddress)
+    ),
+    new ethereum.EventParam(
+      "pricePerTokenInWei",
+      ethereum.Value.fromUnsignedBigInt(pricePerTokenInWei)
+    )
+  ];
+
+  handleAddProject(newProjectCall);
+
+  return changetype<Project>(
+    Project.load(generateContractSpecificId(TEST_CONTRACT_ADDRESS, projectId))
+  );
+}
 
 // mocks return values for Soldity contract calls in refreshContract() helper function
 export function mockRefreshContractCalls(

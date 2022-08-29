@@ -19,10 +19,12 @@ import {
   CURRENT_BLOCK_TIMESTAMP,
   RandomAddressGenerator,
   mockProjectScriptByIndex,
+  mockTokenIdToHash,
   PROJECT_MINTER_CONFIGURATION_ENTITY_TYPE,
   TEST_CONTRACT_ADDRESS,
   TEST_CONTRACT_CREATED_AT,
   TEST_CONTRACT,
+  TEST_TOKEN_HASH,
   assertNewProjectFields,
   assertTestContractFields,
   addTestContractToStore,
@@ -32,7 +34,7 @@ import {
   DEFAULT_COLLECTION
 } from "../shared-helpers";
 
-import { mockRefreshContractCalls } from "./helpers";
+import { mockRefreshContractCalls, addNewProjectToStore } from "./helpers";
 
 import {
   Account,
@@ -44,8 +46,11 @@ import {
   Token,
   Whitelisting
 } from "../../../generated/schema";
-import { Mint, Transfer } from "../../../generated/GenArt721Core/GenArt721Core";
-import { handleMint, handleTransfer } from "../../../src/mapping-v1-core";
+import {
+  Mint,
+  Transfer
+} from "../../../generated/GenArt721CoreV3/GenArt721CoreV3";
+import { handleMint, handleTransfer } from "../../../src/mapping-v3-core";
 import {
   generateContractSpecificId,
   generateProjectScriptId,
@@ -56,16 +61,35 @@ const randomAddressGenerator = new RandomAddressGenerator();
 
 test("GenArt721CoreV3: Can handle Mint", () => {
   clearStore();
-  const tokenId = BigInt.fromI32(0);
-  const projectId = BigInt.fromI32(0);
+  // add contract to store
+  const projectId = BigInt.fromI32(1);
+  const tokenId = BigInt.fromI32(1000001);
+  addTestContractToStore(projectId);
+  mockTokenIdToHash(TEST_CONTRACT_ADDRESS, tokenId, TEST_TOKEN_HASH);
+  // add project to store
+  const fullProjectId = generateContractSpecificId(
+    TEST_CONTRACT_ADDRESS,
+    projectId
+  );
+  const artistAddress = randomAddressGenerator.generateRandomAddress();
+  const projectName = "Test Project";
+  const pricePerTokenInWei = BigInt.fromI64(i64(1e18));
+
+  addNewProjectToStore(
+    projectId,
+    projectName,
+    artistAddress,
+    pricePerTokenInWei,
+    true,
+    CURRENT_BLOCK_TIMESTAMP
+  );
+
+  // handle mint
   const fullTokenId = generateContractSpecificId(
     TEST_CONTRACT_ADDRESS,
     tokenId
   );
 
-  // addNewTokenToStore(TEST_CONTRACT_ADDRESS, tokenId, projectId);
-
-  // const fromAddress = randomAddressGenerator.generateRandomAddress();
   const toAddress = randomAddressGenerator.generateRandomAddress();
 
   const hash = Bytes.fromUTF8("QmYwAPJzv5CZsnA625s3Xf2nemtYgPpHdWEz79ojWnPbdG");
@@ -80,10 +104,6 @@ test("GenArt721CoreV3: Can handle Mint", () => {
     new ethereum.EventParam("_to", ethereum.Value.fromAddress(toAddress)),
     new ethereum.EventParam(
       "_tokenId",
-      ethereum.Value.fromUnsignedBigInt(tokenId)
-    ),
-    new ethereum.EventParam(
-      "_projectId",
       ethereum.Value.fromUnsignedBigInt(tokenId)
     )
   ];

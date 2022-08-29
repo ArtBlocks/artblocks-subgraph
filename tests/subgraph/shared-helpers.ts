@@ -88,6 +88,9 @@ export const ONE_MILLION = 1000000;
 export const RANDOMIZER_ADDRESS = randomAddressGenerator.generateRandomAddress();
 export const CURRENT_BLOCK_TIMESTAMP = BigInt.fromI32(1647051214);
 export const TEST_CONTRACT_ADDRESS = randomAddressGenerator.generateRandomAddress();
+export const TEST_TOKEN_HASH = Bytes.fromByteArray(
+  crypto.keccak256(Bytes.fromUTF8("token hash"))
+);
 export const ONE_ETH_IN_WEI = BigInt.fromString("1000000000000000000");
 
 export const DEFAULT_ORDER_HASH =
@@ -363,6 +366,25 @@ export const mockProjectScriptByIndex = function(
   )
     .withArgs(projectScriptByIndexInputs)
     .returns([ethereum.Value.fromString(script ? script : "")]);
+};
+
+// tokenIdToHash has the same signature for all versions of
+// the GenArt contract so this mock can be shared between all versions.
+export const mockTokenIdToHash = function(
+  contractAddress: Address,
+  tokenId: BigInt,
+  hash: Bytes
+): void {
+  let tokenIdToHashInputs: Array<ethereum.Value> = [
+    ethereum.Value.fromUnsignedBigInt(tokenId)
+  ];
+  createMockedFunction(
+    contractAddress,
+    "tokenIdToHash",
+    "tokenIdToHash(uint256):(bytes32)"
+  )
+    .withArgs(tokenIdToHashInputs)
+    .returns([ethereum.Value.fromBytes(hash)]);
 };
 
 // Asserts

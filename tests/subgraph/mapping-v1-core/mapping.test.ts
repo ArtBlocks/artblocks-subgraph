@@ -19,10 +19,12 @@ import {
   CURRENT_BLOCK_TIMESTAMP,
   RandomAddressGenerator,
   mockProjectScriptByIndex,
+  mockTokenIdToHash,
   PROJECT_MINTER_CONFIGURATION_ENTITY_TYPE,
   TEST_CONTRACT_ADDRESS,
   TEST_CONTRACT_CREATED_AT,
   TEST_CONTRACT,
+  TEST_TOKEN_HASH,
   assertNewProjectFields,
   assertTestContractFields,
   addTestContractToStore,
@@ -2244,8 +2246,30 @@ test("GenArt721Core: Can update a project website", () => {
 
 test("GenArt721CoreV1: Can handle Mint", () => {
   clearStore();
-  const tokenId = BigInt.fromI32(0);
-  const projectId = BigInt.fromI32(0);
+  // add contract to store
+  const projectId = BigInt.fromI32(1);
+  const tokenId = BigInt.fromI32(1000001);
+  addTestContractToStore(projectId);
+  mockTokenIdToHash(TEST_CONTRACT_ADDRESS, tokenId, TEST_TOKEN_HASH);
+  // add project to store
+  const fullProjectId = generateContractSpecificId(
+    TEST_CONTRACT_ADDRESS,
+    projectId
+  );
+  const artistAddress = randomAddressGenerator.generateRandomAddress();
+  const projectName = "Test Project";
+  const pricePerTokenInWei = BigInt.fromI64(i64(1e18));
+
+  addNewProjectToStore(
+    projectId,
+    projectName,
+    artistAddress,
+    pricePerTokenInWei,
+    true,
+    CURRENT_BLOCK_TIMESTAMP
+  );
+
+  // handle mint
   const fullTokenId = generateContractSpecificId(
     TEST_CONTRACT_ADDRESS,
     tokenId
@@ -2344,6 +2368,8 @@ test("GenArt721Core: Can handle transfer", () => {
 
 // export handlers for test coverage https://github.com/LimeChain/demo-subgraph#test-coverage
 export {
+  handleTransfer,
+  handleMint,
   handleAddProject,
   handleAddWhitelisted,
   handleRemoveWhitelisted,
