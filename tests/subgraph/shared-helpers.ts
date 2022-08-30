@@ -146,7 +146,7 @@ export const TEST_CONTRACT: ContractValues = {
   renderProviderSecondarySalesAddress: Address.fromString(
     "0xf4c61bd7b43e89f072fe1ef4e063fcf07f94565c"
   ),
-  renderProviderSecondarySalesBPS: BigInt.fromI32(10),
+  renderProviderSecondarySalesBPS: BigInt.fromI32(250),
   mintWhitelisted: [],
   minterContract: Address.zero(),
   randomizerContract: RANDOMIZER_ADDRESS,
@@ -314,6 +314,10 @@ export function addTestContractToStore(nextProjectId: BigInt): Contract {
   contract.randomizerContract = TEST_CONTRACT.randomizerContract;
   contract.renderProviderAddress = TEST_CONTRACT.renderProviderAddress;
   contract.renderProviderPercentage = TEST_CONTRACT.renderProviderPercentage;
+  contract.renderProviderSecondarySalesAddress =
+    TEST_CONTRACT.renderProviderSecondarySalesAddress;
+  contract.renderProviderSecondarySalesBPS =
+    TEST_CONTRACT.renderProviderSecondarySalesBPS;
   contract.updatedAt = contract.createdAt;
   contract.mintWhitelisted = TEST_CONTRACT.mintWhitelisted;
   contract.newProjectsForbidden = false;
