@@ -48,9 +48,14 @@ import {
 } from "../../../generated/schema";
 import {
   Mint,
-  Transfer
+  Transfer,
+  PlatformUpdated
 } from "../../../generated/GenArt721CoreV3/GenArt721CoreV3";
-import { handleMint, handleTransfer } from "../../../src/mapping-v3-core";
+import {
+  handleMint,
+  handleTransfer,
+  handlePlatformUpdated
+} from "../../../src/mapping-v3-core";
 import {
   generateContractSpecificId,
   generateProjectScriptId,
@@ -175,6 +180,25 @@ test("GenArt721CoreV3: Can handle transfer", () => {
     "token",
     fullTokenId
   );
+});
+
+test("GenArt721CoreV3: Can handle PlatformUpdated/nextProjectId", () => {
+  clearStore();
+  const hash = Bytes.fromUTF8("QmYwAPJzv5CZsnA625s3Xf2nemtYgPpHdWEz79ojWnPbdG");
+  const logIndex = BigInt.fromI32(0);
+
+  const event: PlatformUpdated = changetype<PlatformUpdated>(newMockEvent());
+  event.address = TEST_CONTRACT_ADDRESS;
+  event.transaction.hash = hash;
+  event.logIndex = logIndex;
+  event.parameters = [
+    new ethereum.EventParam(
+      "_field",
+      ethereum.Value.fromBytes(Bytes.fromUTF8("nextProjectId"))
+    )
+  ];
+  handlePlatformUpdated(event);
+  // TODO - require that the nextProjectId is updated
 });
 
 // export handlers for test coverage https://github.com/LimeChain/demo-subgraph#test-coverage

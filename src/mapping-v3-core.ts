@@ -8,12 +8,13 @@ import {
   Address,
   ByteArray
 } from "@graphprotocol/graph-ts";
-import { logStore } from "matchstick-as";
+import { logStore, log as logTest } from "matchstick-as";
 
 import {
   GenArt721CoreV3,
   Mint,
-  Transfer
+  Transfer,
+  PlatformUpdated
 } from "../generated/GenArt721CoreV3/GenArt721CoreV3";
 
 import {
@@ -37,6 +38,8 @@ import {
   generateContractSpecificId,
   generateProjectScriptId
 } from "./helpers";
+
+import { handlePlatformUpdatedNextProjectId } from "./helpers-platform-updated";
 
 /*** EVENT HANDLERS ***/
 export function handleMint(event: Mint): void {
@@ -152,6 +155,19 @@ export function handleTransfer(event: Transfer): void {
     transfer.from = event.params.from;
     transfer.token = token.id;
     transfer.save();
+  }
+}
+
+// Handle platform updates
+// This is a generic event that can be used to update a number of different
+// contract state variables.
+export function handlePlatformUpdated(event: PlatformUpdated): void {
+  const field: string = event.params._field.toString();
+  logTest.debug("Platform updated field: {}", [field]);
+  if (field == "nextProjectId") {
+    handlePlatformUpdatedNextProjectId(event);
+  } else {
+    log.warning("Unrecognized platform update field: {}", [field]);
   }
 }
 /*** END EVENT HANDLERS ***/
