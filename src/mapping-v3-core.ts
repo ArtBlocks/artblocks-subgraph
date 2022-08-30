@@ -199,7 +199,7 @@ function refreshContract<T>(contract: T, timestamp: BigInt): Contract | null {
   contractEntity.nextProjectId = contract.nextProjectId();
   contractEntity.randomizerContract = contract.randomizerContract();
   let _minterContract = contract.minterContract();
-  if (_minterContract.toHexString() != NULL_ADDRESS) {
+  if (_minterContract != Address.zero()) {
     contractEntity.mintWhitelisted = [_minterContract];
   } else {
     contractEntity.mintWhitelisted = [];
