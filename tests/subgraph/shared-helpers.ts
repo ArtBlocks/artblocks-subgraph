@@ -289,6 +289,7 @@ export function addNewContractToStore(): Contract {
   contract.renderProviderPercentage = TEST_CONTRACT.renderProviderPercentage;
   contract.updatedAt = contract.createdAt;
   contract.mintWhitelisted = TEST_CONTRACT.mintWhitelisted;
+  contract.newProjectsForbidden = false;
   contract.save();
 
   return contract;
@@ -305,6 +306,7 @@ export function addTestContractToStore(nextProjectId: BigInt): Contract {
   contract.renderProviderPercentage = TEST_CONTRACT.renderProviderPercentage;
   contract.updatedAt = contract.createdAt;
   contract.mintWhitelisted = TEST_CONTRACT.mintWhitelisted;
+  contract.newProjectsForbidden = false;
   contract.save();
 
   return contract;
