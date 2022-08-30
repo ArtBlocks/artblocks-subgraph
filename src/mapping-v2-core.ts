@@ -765,6 +765,7 @@ function refreshContract(
     contractEntity = new Contract(contract._address.toHexString());
     contractEntity.createdAt = timestamp;
     contractEntity.mintWhitelisted = [];
+    contractEntity.newProjectsForbidden = false;
   }
 
   contractEntity.admin = admin;

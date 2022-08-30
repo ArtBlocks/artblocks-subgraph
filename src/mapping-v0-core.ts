@@ -642,6 +642,7 @@ function refreshContract(contract: GenArt721, timestamp: BigInt): Contract {
     contractEntity = new Contract(contract._address.toHexString());
     contractEntity.createdAt = timestamp;
     contractEntity.mintWhitelisted = [];
+    contractEntity.newProjectsForbidden = false;
   }
   contractEntity.admin = admin;
   contractEntity.type = GEN_ART_721_CORE_V0;

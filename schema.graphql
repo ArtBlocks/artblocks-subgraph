@@ -221,6 +221,9 @@ type Contract @entity {
 
   "Associated minter filter (if applicable)"
   minterFilter: MinterFilter
+
+  "New projects forbidden (null for pre-V3 contracts"
+  newProjectsForbidden: Boolean!
 }
 
 type Whitelisting @entity {

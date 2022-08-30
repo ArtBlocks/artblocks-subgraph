@@ -1122,6 +1122,15 @@ export class Contract extends Entity {
       this.set("minterFilter", Value.fromString(<string>value));
     }
   }
+
+  get newProjectsForbidden(): boolean {
+    let value = this.get("newProjectsForbidden");
+    return value!.toBoolean();
+  }
+
+  set newProjectsForbidden(value: boolean) {
+    this.set("newProjectsForbidden", Value.fromBoolean(value));
+  }
 }
 
 export class Whitelisting extends Entity {
