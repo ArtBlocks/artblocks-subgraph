@@ -20,6 +20,7 @@ import {
   RandomAddressGenerator,
   mockProjectScriptByIndex,
   mockTokenIdToHash,
+  mockNextProjectId,
   PROJECT_MINTER_CONFIGURATION_ENTITY_TYPE,
   TEST_CONTRACT_ADDRESS,
   TEST_CONTRACT_CREATED_AT,
@@ -183,22 +184,39 @@ test("GenArt721CoreV3: Can handle transfer", () => {
 });
 
 test("GenArt721CoreV3: Can handle PlatformUpdated/nextProjectId", () => {
-  clearStore();
-  const hash = Bytes.fromUTF8("QmYwAPJzv5CZsnA625s3Xf2nemtYgPpHdWEz79ojWnPbdG");
-  const logIndex = BigInt.fromI32(0);
+  // test for nextProjectId of 0 and 1
+  for (let i = 0; i < 2; i++) {
+    clearStore();
+    // add new contract to store
+    const projectId = BigInt.fromI32(i);
+    addTestContractToStore(projectId);
+    mockNextProjectId(TEST_CONTRACT_ADDRESS, BigInt.fromI32(i));
 
-  const event: PlatformUpdated = changetype<PlatformUpdated>(newMockEvent());
-  event.address = TEST_CONTRACT_ADDRESS;
-  event.transaction.hash = hash;
-  event.logIndex = logIndex;
-  event.parameters = [
-    new ethereum.EventParam(
-      "_field",
-      ethereum.Value.fromBytes(Bytes.fromUTF8("nextProjectId"))
-    )
-  ];
-  handlePlatformUpdated(event);
-  // TODO - require that the nextProjectId is updated
+    // create event
+    const hash = Bytes.fromUTF8(
+      "QmYwAPJzv5CZsnA625s3Xf2nemtYgPpHdWEz79ojWnPbdG"
+    );
+    const logIndex = BigInt.fromI32(0);
+    const event: PlatformUpdated = changetype<PlatformUpdated>(newMockEvent());
+    event.address = TEST_CONTRACT_ADDRESS;
+    event.transaction.hash = hash;
+    event.logIndex = logIndex;
+    event.parameters = [
+      new ethereum.EventParam(
+        "_field",
+        ethereum.Value.fromBytes(Bytes.fromUTF8("nextProjectId"))
+      )
+    ];
+    // handle event
+    handlePlatformUpdated(event);
+    // assertions
+    assert.fieldEquals(
+      CONTRACT_ENTITY_TYPE,
+      TEST_CONTRACT_ADDRESS.toHexString(),
+      "nextProjectId",
+      i.toString()
+    );
+  }
 });
 
 // export handlers for test coverage https://github.com/LimeChain/demo-subgraph#test-coverage

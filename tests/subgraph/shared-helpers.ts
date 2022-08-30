@@ -387,6 +387,22 @@ export const mockTokenIdToHash = function(
     .returns([ethereum.Value.fromBytes(hash)]);
 };
 
+// nextProjectId has the same signature for all versions of
+// the GenArt contract so this mock can be shared between all versions.
+export const mockNextProjectId = function(
+  contractAddress: Address,
+  nextProjectId_: BigInt
+): void {
+  let inputs: Array<ethereum.Value> = [];
+  createMockedFunction(
+    contractAddress,
+    "nextProjectId",
+    "nextProjectId():(uint256)"
+  )
+    .withArgs(inputs)
+    .returns([ethereum.Value.fromUnsignedBigInt(nextProjectId_)]);
+};
+
 // Asserts
 export function assertNewProjectFields(
   contractAddress: Address,
