@@ -92,6 +92,9 @@ export const TEST_CONTRACT_ADDRESS = randomAddressGenerator.generateRandomAddres
 export const TEST_TOKEN_HASH = Bytes.fromByteArray(
   crypto.keccak256(Bytes.fromUTF8("token hash"))
 );
+export const TEST_TX_HASH = Bytes.fromByteArray(
+  crypto.keccak256(Bytes.fromUTF8("tx hash"))
+);
 export const ONE_ETH_IN_WEI = BigInt.fromString("1000000000000000000");
 
 export const DEFAULT_ORDER_HASH =

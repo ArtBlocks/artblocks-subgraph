@@ -5,6 +5,7 @@ import {
   newMockCall,
   log,
   logStore,
+  createMockedFunction,
   newMockEvent
 } from "matchstick-as/assembly/index";
 import { BigInt, Bytes, ethereum, store, Value } from "@graphprotocol/graph-ts";
@@ -25,6 +26,7 @@ import {
   TEST_CONTRACT_CREATED_AT,
   TEST_CONTRACT,
   TEST_TOKEN_HASH,
+  TEST_TX_HASH,
   assertNewProjectFields,
   assertTestContractFields,
   addTestContractToStore,
@@ -97,14 +99,10 @@ test("GenArt721CoreV3: Can handle Mint", () => {
 
   const toAddress = randomAddressGenerator.generateRandomAddress();
 
-  const hash = Bytes.fromUTF8("QmYwAPJzv5CZsnA625s3Xf2nemtYgPpHdWEz79ojWnPbdG");
-
-  const logIndex = BigInt.fromI32(0);
-
   const event: Mint = changetype<Mint>(newMockEvent());
   event.address = TEST_CONTRACT_ADDRESS;
-  event.transaction.hash = hash;
-  event.logIndex = logIndex;
+  event.transaction.hash = TEST_TX_HASH;
+  event.logIndex = BigInt.fromI32(0);
   event.parameters = [
     new ethereum.EventParam("_to", ethereum.Value.fromAddress(toAddress)),
     new ethereum.EventParam(
@@ -137,13 +135,10 @@ test("GenArt721CoreV3: Can handle transfer", () => {
   const fromAddress = randomAddressGenerator.generateRandomAddress();
   const toAddress = randomAddressGenerator.generateRandomAddress();
 
-  const hash = Bytes.fromUTF8("QmYwAPJzv5CZsnA625s3Xf2nemtYgPpHdWEz79ojWnPbdG");
-
   const logIndex = BigInt.fromI32(0);
-
   const event: Transfer = changetype<Transfer>(newMockEvent());
   event.address = TEST_CONTRACT_ADDRESS;
-  event.transaction.hash = hash;
+  event.transaction.hash = TEST_TX_HASH;
   event.logIndex = logIndex;
   event.parameters = [
     new ethereum.EventParam("from", ethereum.Value.fromAddress(fromAddress)),
@@ -164,25 +159,25 @@ test("GenArt721CoreV3: Can handle transfer", () => {
   );
   assert.fieldEquals(
     TRANSFER_ENTITY_TYPE,
-    hash.toHex() + "-" + logIndex.toString(),
+    TEST_TX_HASH.toHex() + "-" + logIndex.toString(),
     "to",
     toAddress.toHexString()
   );
   assert.fieldEquals(
     TRANSFER_ENTITY_TYPE,
-    hash.toHex() + "-" + logIndex.toString(),
+    TEST_TX_HASH.toHex() + "-" + logIndex.toString(),
     "from",
     fromAddress.toHexString()
   );
   assert.fieldEquals(
     TRANSFER_ENTITY_TYPE,
-    hash.toHex() + "-" + logIndex.toString(),
+    TEST_TX_HASH.toHex() + "-" + logIndex.toString(),
     "token",
     fullTokenId
   );
 });
 
-test("GenArt721CoreV3: Can handle PlatformUpdated/nextProjectId", () => {
+test("GenArt721CoreV3: Handles PlatformUpdated::nextProjectId", () => {
   // test for nextProjectId of 0 and 1
   for (let i = 0; i < 2; i++) {
     clearStore();
@@ -191,15 +186,10 @@ test("GenArt721CoreV3: Can handle PlatformUpdated/nextProjectId", () => {
     addTestContractToStore(projectId);
     mockRefreshContractCalls(BigInt.fromI32(i), null);
 
-    // create event
-    const hash = Bytes.fromUTF8(
-      "QmYwAPJzv5CZsnA625s3Xf2nemtYgPpHdWEz79ojWnPbdG"
-    );
-    const logIndex = BigInt.fromI32(0);
     const event: PlatformUpdated = changetype<PlatformUpdated>(newMockEvent());
     event.address = TEST_CONTRACT_ADDRESS;
-    event.transaction.hash = hash;
-    event.logIndex = logIndex;
+    event.transaction.hash = TEST_TX_HASH;
+    event.logIndex = BigInt.fromI32(0);
     event.parameters = [
       new ethereum.EventParam(
         "_field",
@@ -216,6 +206,60 @@ test("GenArt721CoreV3: Can handle PlatformUpdated/nextProjectId", () => {
       i.toString()
     );
   }
+});
+
+test("GenArt721CoreV3: Handles PlatformUpdated::newProjectsForbidden - default value", () => {
+  // default value is false
+  clearStore();
+  // add new contract to store
+  const projectId = BigInt.fromI32(0);
+  addTestContractToStore(projectId);
+  mockRefreshContractCalls(BigInt.fromI32(0), null);
+
+  // default value should be false
+  assert.fieldEquals(
+    CONTRACT_ENTITY_TYPE,
+    TEST_CONTRACT_ADDRESS.toHexString(),
+    "newProjectsForbidden",
+    false.toString()
+  );
+});
+
+test("GenArt721CoreV3: Handles PlatformUpdated::newProjectsForbidden - changed value", () => {
+  clearStore();
+  // add new contract to store
+  const projectId = BigInt.fromI32(0);
+  addTestContractToStore(projectId);
+  mockRefreshContractCalls(BigInt.fromI32(0), null);
+
+  // update mock function return value to true
+  createMockedFunction(
+    TEST_CONTRACT_ADDRESS,
+    "newProjectsForbidden",
+    "newProjectsForbidden():(bool)"
+  ).returns([ethereum.Value.fromBoolean(true)]);
+
+  // create event
+  const event: PlatformUpdated = changetype<PlatformUpdated>(newMockEvent());
+  event.address = TEST_CONTRACT_ADDRESS;
+  event.transaction.hash = TEST_TX_HASH;
+  event.logIndex = BigInt.fromI32(0);
+  event.parameters = [
+    new ethereum.EventParam(
+      "_field",
+      ethereum.Value.fromBytes(Bytes.fromUTF8("newProjectsForbidden"))
+    )
+  ];
+  // handle event
+  handlePlatformUpdated(event);
+
+  // value in store should be updated to true
+  assert.fieldEquals(
+    CONTRACT_ENTITY_TYPE,
+    TEST_CONTRACT_ADDRESS.toHexString(),
+    "newProjectsForbidden",
+    true.toString()
+  );
 });
 
 // export handlers for test coverage https://github.com/LimeChain/demo-subgraph#test-coverage
