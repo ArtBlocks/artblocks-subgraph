@@ -23,6 +23,7 @@ import {
   generateContractSpecificId,
   getProjectMinterConfigId
 } from "../../src/helpers";
+import { NULL_ADDRESS } from "../../src/constants";
 
 // Utils
 // The built in assembly script Math.random() function does not work
@@ -123,12 +124,14 @@ export class ContractValues {
   type: string;
   mintWhitelisted: Bytes[];
   randomizerContract: Address;
+  minterContract: Address;
   renderProviderAddress: Address;
   renderProviderPercentage: BigInt;
   renderProviderSecondarySalesAddress: Address;
   renderProviderSecondarySalesBPS: BigInt;
   dependencyRegistry: Address;
   curationRegistry: Address;
+  newProjectsForbidden: boolean;
 }
 export const TEST_CONTRACT: ContractValues = {
   admin: Address.fromString("0x96dc73c8b5969608c77375f085949744b5177660"),
@@ -137,12 +140,16 @@ export const TEST_CONTRACT: ContractValues = {
   renderProviderAddress: Address.fromString(
     "0xf7a55108a6e830a809e88e74cbf5f5de9d930153"
   ),
-  renderProviderSecondarySalesAddress: Address.zero(),
+  renderProviderSecondarySalesAddress: Address.fromString(
+    "0xf4c61bd7b43e89f072fe1ef4e063fcf07f94565c"
+  ),
   renderProviderSecondarySalesBPS: BigInt.fromI32(10),
   mintWhitelisted: [],
+  minterContract: Address.zero(),
   randomizerContract: RANDOMIZER_ADDRESS,
   dependencyRegistry: Address.zero(),
-  curationRegistry: Address.zero()
+  curationRegistry: Address.zero(),
+  newProjectsForbidden: false
 };
 export const TEST_CONTRACT_CREATED_AT = BigInt.fromI32(1607763598);
 
@@ -387,22 +394,6 @@ export const mockTokenIdToHash = function(
   )
     .withArgs(tokenIdToHashInputs)
     .returns([ethereum.Value.fromBytes(hash)]);
-};
-
-// nextProjectId has the same signature for all versions of
-// the GenArt contract so this mock can be shared between all versions.
-export const mockNextProjectId = function(
-  contractAddress: Address,
-  nextProjectId_: BigInt
-): void {
-  let inputs: Array<ethereum.Value> = [];
-  createMockedFunction(
-    contractAddress,
-    "nextProjectId",
-    "nextProjectId():(uint256)"
-  )
-    .withArgs(inputs)
-    .returns([ethereum.Value.fromUnsignedBigInt(nextProjectId_)]);
 };
 
 // Asserts

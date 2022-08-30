@@ -20,7 +20,6 @@ import {
   RandomAddressGenerator,
   mockProjectScriptByIndex,
   mockTokenIdToHash,
-  mockNextProjectId,
   PROJECT_MINTER_CONFIGURATION_ENTITY_TYPE,
   TEST_CONTRACT_ADDRESS,
   TEST_CONTRACT_CREATED_AT,
@@ -190,7 +189,7 @@ test("GenArt721CoreV3: Can handle PlatformUpdated/nextProjectId", () => {
     // add new contract to store
     const projectId = BigInt.fromI32(i);
     addTestContractToStore(projectId);
-    mockNextProjectId(TEST_CONTRACT_ADDRESS, BigInt.fromI32(i));
+    mockRefreshContractCalls(BigInt.fromI32(i), null);
 
     // create event
     const hash = Bytes.fromUTF8(
