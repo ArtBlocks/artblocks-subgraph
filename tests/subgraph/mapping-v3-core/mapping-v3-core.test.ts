@@ -262,5 +262,91 @@ test("GenArt721CoreV3: Handles PlatformUpdated::newProjectsForbidden - changed v
   );
 });
 
+test("GenArt721CoreV3: Handles PlatformUpdated::nextProjectId", () => {
+  // test for nextProjectId of 0 and 1
+  for (let i = 0; i < 2; i++) {
+    clearStore();
+    // add new contract to store
+    const projectId = BigInt.fromI32(i);
+    addTestContractToStore(projectId);
+    mockRefreshContractCalls(BigInt.fromI32(i), null);
+
+    const event: PlatformUpdated = changetype<PlatformUpdated>(newMockEvent());
+    event.address = TEST_CONTRACT_ADDRESS;
+    event.transaction.hash = TEST_TX_HASH;
+    event.logIndex = BigInt.fromI32(0);
+    event.parameters = [
+      new ethereum.EventParam(
+        "_field",
+        ethereum.Value.fromBytes(Bytes.fromUTF8("nextProjectId"))
+      )
+    ];
+    // handle event
+    handlePlatformUpdated(event);
+    // assertions
+    assert.fieldEquals(
+      CONTRACT_ENTITY_TYPE,
+      TEST_CONTRACT_ADDRESS.toHexString(),
+      "nextProjectId",
+      i.toString()
+    );
+  }
+});
+
+test("GenArt721CoreV3: Handles PlatformUpdated::artblocksPrimarySalesAddress - default value", () => {
+  // default value is false
+  clearStore();
+  // add new contract to store
+  const projectId = BigInt.fromI32(0);
+  addTestContractToStore(projectId);
+  mockRefreshContractCalls(BigInt.fromI32(0), null);
+
+  // default value should be false
+  assert.fieldEquals(
+    CONTRACT_ENTITY_TYPE,
+    TEST_CONTRACT_ADDRESS.toHexString(),
+    "renderProviderAddress",
+    TEST_CONTRACT.renderProviderAddress.toHexString()
+  );
+});
+
+test("GenArt721CoreV3: Handles PlatformUpdated::artblocksPrimarySalesAddress - changed value", () => {
+  clearStore();
+  // add new contract to store
+  const projectId = BigInt.fromI32(0);
+  addTestContractToStore(projectId);
+  mockRefreshContractCalls(BigInt.fromI32(0), null);
+
+  // update mock function return value
+  const newAddress = randomAddressGenerator.generateRandomAddress();
+  createMockedFunction(
+    TEST_CONTRACT_ADDRESS,
+    "artblocksPrimarySalesAddress",
+    "artblocksPrimarySalesAddress():(address)"
+  ).returns([ethereum.Value.fromAddress(newAddress)]);
+
+  // create event
+  const event: PlatformUpdated = changetype<PlatformUpdated>(newMockEvent());
+  event.address = TEST_CONTRACT_ADDRESS;
+  event.transaction.hash = TEST_TX_HASH;
+  event.logIndex = BigInt.fromI32(0);
+  event.parameters = [
+    new ethereum.EventParam(
+      "_field",
+      ethereum.Value.fromBytes(Bytes.fromUTF8("artblocksPrimarySalesAddress"))
+    )
+  ];
+  // handle event
+  handlePlatformUpdated(event);
+
+  // value in store should be updated
+  assert.fieldEquals(
+    CONTRACT_ENTITY_TYPE,
+    TEST_CONTRACT_ADDRESS.toHexString(),
+    "renderProviderAddress",
+    newAddress.toHexString()
+  );
+});
+
 // export handlers for test coverage https://github.com/LimeChain/demo-subgraph#test-coverage
 export { handleMint, handleTransfer };
