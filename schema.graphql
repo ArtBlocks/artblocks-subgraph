@@ -222,7 +222,7 @@ type Contract @entity {
   "Associated minter filter (if applicable)"
   minterFilter: MinterFilter
 
-  "New projects forbidden (null for pre-V3 contracts"
+  "New projects forbidden (can only be true on V3+ contracts)"
   newProjectsForbidden: Boolean!
 }
 

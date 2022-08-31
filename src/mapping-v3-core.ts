@@ -8,7 +8,7 @@ import {
   Address,
   ByteArray
 } from "@graphprotocol/graph-ts";
-import { logStore, log as logTest } from "matchstick-as";
+import { logStore } from "matchstick-as";
 
 import {
   GenArt721CoreV3,
@@ -30,8 +30,6 @@ import {
   ProjectMinterConfiguration,
   ProposedArtistAddressesAndSplits
 } from "../generated/schema";
-
-import { NULL_ADDRESS } from "./constants";
 
 import {
   generateAccountProjectId,
@@ -190,7 +188,7 @@ function refreshContract<T>(contract: T, timestamp: BigInt): Contract | null {
     contractEntity.newProjectsForbidden = false;
   }
 
-  contractEntity.admin = contract.admin(); // could also use .owner() here;
+  contractEntity.admin = contract.admin();
   contractEntity.type = contract.coreType();
   contractEntity.renderProviderAddress = contract.artblocksPrimarySalesAddress();
   contractEntity.renderProviderPercentage = contract.artblocksPrimarySalesPercentage();

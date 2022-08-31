@@ -23,7 +23,6 @@ import {
   generateContractSpecificId,
   getProjectMinterConfigId
 } from "../../src/helpers";
-import { NULL_ADDRESS } from "../../src/constants";
 
 // Utils
 // The built in assembly script Math.random() function does not work
