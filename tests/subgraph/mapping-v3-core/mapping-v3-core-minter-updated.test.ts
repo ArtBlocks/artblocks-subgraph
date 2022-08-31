@@ -115,6 +115,64 @@ test("GenArt721CoreV3/MinterUpdated: should handle setting minter to zero addres
   assert.entityCount(MINTER_FILTER_ENTITY_TYPE, 0);
 });
 
+test("GenArt721CoreV3/MinterUpdated: should list invalid MinterFilter with different core contract as minter, but null MinterFilter", () => {
+  clearStore();
+  const startingProjectId = BigInt.fromI32(100);
+  mockRefreshContractCalls(startingProjectId, null);
+  mockMinterUpdatedCallsNoPreconfiguredProjects(startingProjectId);
+  const updateCallBlockTimestamp = CURRENT_BLOCK_TIMESTAMP.plus(
+    BigInt.fromI32(10)
+  );
+  // override mock to return different core contract on the minter filter
+  const differentCoreAddress = randomAddressGenerator.generateRandomAddress();
+  createMockedFunction(
+    TEST_MINTER_FILTER_ADDRESS,
+    "genArt721CoreAddress",
+    "genArt721CoreAddress():(address)"
+  ).returns([ethereum.Value.fromAddress(differentCoreAddress)]);
+
+  const event: MinterUpdated = changetype<MinterUpdated>(newMockEvent());
+  event.address = TEST_CONTRACT_ADDRESS;
+  event.transaction.hash = TEST_TX_HASH;
+  event.logIndex = BigInt.fromI32(0);
+  event.parameters = [
+    new ethereum.EventParam(
+      "_currentMinter",
+      ethereum.Value.fromAddress(TEST_MINTER_FILTER_ADDRESS)
+    )
+  ];
+  event.block.timestamp = updateCallBlockTimestamp;
+  // handle event (should log warning warning, but not error)
+  handleMinterUpdated(event);
+  // assertions
+  // core's minterFilter be null because the minter filter had different core contract
+  assert.fieldEquals(
+    CONTRACT_ENTITY_TYPE,
+    TEST_CONTRACT_ADDRESS.toHexString(),
+    "minterFilter",
+    "null"
+  );
+  // core should still have the minter filter in its mintWhitelisted list (because it is technically approved to mint)
+  assert.fieldEquals(
+    CONTRACT_ENTITY_TYPE,
+    TEST_CONTRACT_ADDRESS.toHexString(),
+    "mintWhitelisted",
+    "[".concat(TEST_MINTER_FILTER_ADDRESS.toHexString()).concat("]")
+  );
+  assert.fieldEquals(
+    CONTRACT_ENTITY_TYPE,
+    TEST_CONTRACT_ADDRESS.toHexString(),
+    "updatedAt",
+    updateCallBlockTimestamp.toString()
+  );
+  assert.fieldEquals(
+    MINTER_FILTER_ENTITY_TYPE,
+    TEST_MINTER_FILTER_ADDRESS.toHexString(),
+    "coreContract",
+    differentCoreAddress.toHexString()
+  );
+});
+
 test("GenArt721CoreV3/MinterUpdated: should create Contract and/or MinterFilter entities when not yet created, associate them", () => {
   clearStore();
   const startingProjectId = BigInt.fromI32(100);
