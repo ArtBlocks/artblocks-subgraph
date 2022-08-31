@@ -170,9 +170,9 @@ export function handlePlatformUpdated(event: PlatformUpdated): void {
 }
 
 // Handle minter updated
-// This is an event emitted only when a V1 contract's minter is updated.
+// This is an event emitted when a V3 contract's minter is updated.
 // @dev for V3, only one minter at a time is allowed, so this event can be
-// assumed to indicate removal of any existing minter.
+// interpreted as also indicating removal of an existing minter.
 // @dev it can be assumed that the minter on V3 is a MinterFilter contract that
 // conforms to IMinterFilterV0, unless the minter address is the zero address.
 export function handleMinterUpdated(event: MinterUpdated): void {
@@ -208,15 +208,15 @@ export function handleMinterUpdated(event: MinterUpdated): void {
       // if the minter filter's core contract is not the contract that emitted
       // the event, then we should null the core contract entity's minterFilter
       // field (since invalid minter filter), keep mintWhitelisted as the
-      // new address (because the new minter could mint) and warn because this
-      // is an unintended state.
+      // new address (technically the new minter could mint) and warn because
+      // this is an unintended state.
       contractEntity.minterFilter = null;
       log.warning(
         "[WARN] Invalid minter filter at address {} set on core contract {} - minter filter's core contract is not the contract that emitted the event.",
         [newMinterFilterAddress, contractEntity.id]
       );
     } else {
-      // update contract entity with new valid MinterFilter address
+      // update contract entity with new valid MinterFilter ID
       contractEntity.minterFilter = newMinterFilterAddress;
       // load or create MinterFilter entity
       let minterFilter = MinterFilter.load(newMinterFilterAddress);
