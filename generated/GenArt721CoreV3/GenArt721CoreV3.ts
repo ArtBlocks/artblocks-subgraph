@@ -381,19 +381,22 @@ export class GenArt721CoreV3__projectArtistPaymentInfoResult {
   value2: BigInt;
   value3: Address;
   value4: BigInt;
+  value5: BigInt;
 
   constructor(
     value0: Address,
     value1: Address,
     value2: BigInt,
     value3: Address,
-    value4: BigInt
+    value4: BigInt,
+    value5: BigInt
   ) {
     this.value0 = value0;
     this.value1 = value1;
     this.value2 = value2;
     this.value3 = value3;
     this.value4 = value4;
+    this.value5 = value5;
   }
 
   toMap(): TypedMap<string, ethereum.Value> {
@@ -403,6 +406,7 @@ export class GenArt721CoreV3__projectArtistPaymentInfoResult {
     map.set("value2", ethereum.Value.fromUnsignedBigInt(this.value2));
     map.set("value3", ethereum.Value.fromAddress(this.value3));
     map.set("value4", ethereum.Value.fromUnsignedBigInt(this.value4));
+    map.set("value5", ethereum.Value.fromUnsignedBigInt(this.value5));
     return map;
   }
 
@@ -424,6 +428,10 @@ export class GenArt721CoreV3__projectArtistPaymentInfoResult {
 
   getAdditionalPayeeSecondarySalesPercentage(): BigInt {
     return this.value4;
+  }
+
+  getSecondaryMarketRoyaltyPercentage(): BigInt {
+    return this.value5;
   }
 }
 
@@ -931,6 +939,25 @@ export class GenArt721CoreV3 extends ethereum.SmartContract {
     return ethereum.CallResult.fromValue(value[0].toString());
   }
 
+  defaultBaseURI(): string {
+    let result = super.call("defaultBaseURI", "defaultBaseURI():(string)", []);
+
+    return result[0].toString();
+  }
+
+  try_defaultBaseURI(): ethereum.CallResult<string> {
+    let result = super.tryCall(
+      "defaultBaseURI",
+      "defaultBaseURI():(string)",
+      []
+    );
+    if (result.reverted) {
+      return new ethereum.CallResult();
+    }
+    let value = result.value;
+    return ethereum.CallResult.fromValue(value[0].toString());
+  }
+
   getApproved(tokenId: BigInt): Address {
     let result = super.call("getApproved", "getApproved(uint256):(address)", [
       ethereum.Value.fromUnsignedBigInt(tokenId)
@@ -1318,7 +1345,7 @@ export class GenArt721CoreV3 extends ethereum.SmartContract {
   ): GenArt721CoreV3__projectArtistPaymentInfoResult {
     let result = super.call(
       "projectArtistPaymentInfo",
-      "projectArtistPaymentInfo(uint256):(address,address,uint256,address,uint256)",
+      "projectArtistPaymentInfo(uint256):(address,address,uint256,address,uint256,uint256)",
       [ethereum.Value.fromUnsignedBigInt(_projectId)]
     );
 
@@ -1327,7 +1354,8 @@ export class GenArt721CoreV3 extends ethereum.SmartContract {
       result[1].toAddress(),
       result[2].toBigInt(),
       result[3].toAddress(),
-      result[4].toBigInt()
+      result[4].toBigInt(),
+      result[5].toBigInt()
     );
   }
 
@@ -1336,7 +1364,7 @@ export class GenArt721CoreV3 extends ethereum.SmartContract {
   ): ethereum.CallResult<GenArt721CoreV3__projectArtistPaymentInfoResult> {
     let result = super.tryCall(
       "projectArtistPaymentInfo",
-      "projectArtistPaymentInfo(uint256):(address,address,uint256,address,uint256)",
+      "projectArtistPaymentInfo(uint256):(address,address,uint256,address,uint256,uint256)",
       [ethereum.Value.fromUnsignedBigInt(_projectId)]
     );
     if (result.reverted) {
@@ -1349,7 +1377,8 @@ export class GenArt721CoreV3 extends ethereum.SmartContract {
         value[1].toAddress(),
         value[2].toBigInt(),
         value[3].toAddress(),
-        value[4].toBigInt()
+        value[4].toBigInt(),
+        value[5].toBigInt()
       )
     );
   }
@@ -1726,6 +1755,29 @@ export class GenArt721CoreV3 extends ethereum.SmartContract {
     }
     let value = result.value;
     return ethereum.CallResult.fromValue(value[0].toAddress());
+  }
+
+  startingProjectId(): BigInt {
+    let result = super.call(
+      "startingProjectId",
+      "startingProjectId():(uint256)",
+      []
+    );
+
+    return result[0].toBigInt();
+  }
+
+  try_startingProjectId(): ethereum.CallResult<BigInt> {
+    let result = super.tryCall(
+      "startingProjectId",
+      "startingProjectId():(uint256)",
+      []
+    );
+    if (result.reverted) {
+      return new ethereum.CallResult();
+    }
+    let value = result.value;
+    return ethereum.CallResult.fromValue(value[0].toBigInt());
   }
 
   supportsInterface(interfaceId: Bytes): boolean {
@@ -2698,6 +2750,36 @@ export class UpdateArtblocksSecondarySalesBPSCall__Outputs {
   _call: UpdateArtblocksSecondarySalesBPSCall;
 
   constructor(call: UpdateArtblocksSecondarySalesBPSCall) {
+    this._call = call;
+  }
+}
+
+export class UpdateDefaultBaseURICall extends ethereum.Call {
+  get inputs(): UpdateDefaultBaseURICall__Inputs {
+    return new UpdateDefaultBaseURICall__Inputs(this);
+  }
+
+  get outputs(): UpdateDefaultBaseURICall__Outputs {
+    return new UpdateDefaultBaseURICall__Outputs(this);
+  }
+}
+
+export class UpdateDefaultBaseURICall__Inputs {
+  _call: UpdateDefaultBaseURICall;
+
+  constructor(call: UpdateDefaultBaseURICall) {
+    this._call = call;
+  }
+
+  get _defaultBaseURI(): string {
+    return this._call.inputValues[0].value.toString();
+  }
+}
+
+export class UpdateDefaultBaseURICall__Outputs {
+  _call: UpdateDefaultBaseURICall;
+
+  constructor(call: UpdateDefaultBaseURICall) {
     this._call = call;
   }
 }
