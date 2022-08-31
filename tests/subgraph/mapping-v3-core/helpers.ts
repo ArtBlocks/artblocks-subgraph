@@ -347,3 +347,36 @@ export function mockProjectScriptInfoCall(
     .withArgs([ethereum.Value.fromUnsignedBigInt(projectId)])
     .returns(projectScriptInfoReturnArray);
 }
+
+export function mockMintersCoreContract(
+  minterAddress: Address,
+  coreContract: Address
+): void {
+  createMockedFunction(
+    minterAddress,
+    "genArt721CoreAddress",
+    "genArt721CoreAddress():(address)"
+  ).returns([ethereum.Value.fromAddress(coreContract)]);
+}
+
+export function mockMintersMinterFilterAddress(
+  minterAddress: Address,
+  minterFilterAddress: Address
+): void {
+  createMockedFunction(
+    minterAddress,
+    "minterFilterAddress",
+    "minterFilterAddress():(address)"
+  ).returns([ethereum.Value.fromAddress(minterFilterAddress)]);
+}
+
+export function mockMintersMinterType(
+  minterAddress: Address,
+  minterType: string
+): void {
+  createMockedFunction(
+    minterAddress,
+    "minterType",
+    "minterType():(string)"
+  ).returns([ethereum.Value.fromString(minterType)]);
+}
