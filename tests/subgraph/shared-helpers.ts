@@ -87,6 +87,7 @@ export const MINTER_ENTITY_TYPE = "Minter";
 export const ONE_MILLION = 1000000;
 export const RANDOMIZER_ADDRESS = randomAddressGenerator.generateRandomAddress();
 export const IPFS_CID = "QmQCqjqxVXZQ6vXNmZvF7FjyZkCXKXMykCyyPQQrZ6m7W";
+export const IPFS_CID2 = "QmQCqjqxVXZQ6vXNmZvF7FjyZkCXKXMykCyyPQQrZ6m7W2";
 export const CURRENT_BLOCK_TIMESTAMP = BigInt.fromI32(1647051214);
 export const TEST_CONTRACT_ADDRESS = randomAddressGenerator.generateRandomAddress();
 export const ONE_ETH_IN_WEI = BigInt.fromString("1000000000000000000");

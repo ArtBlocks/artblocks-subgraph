@@ -191,30 +191,22 @@ export function handleTransfer(event: Transfer): void {
 export function handleExternalAssetDependencyUpdated(
   event: ExternalAssetDependencyUpdated
 ): void {
-  logger.info("{}", [event.address.toHexString()]);
   let project = Project.load(
     generateContractSpecificId(event.address, event.params._projectId)
   );
-  logger.info("{}", [event.params._projectId.toString()]);
 
   if (!project) {
     return;
   }
-  logger.info("{}", [generateProjectExternalAssetDependencyId(
-    project.id,
-    event.params._index.toString()
-  )]);
+
   const assetEntity = new ProjectExternalAssetDependency(
     generateProjectExternalAssetDependencyId(
       project.id,
       event.params._index.toString()
     )
   );
-  logger.info("hiiiiiiyo2 {}", [event.params._cid]);
   assetEntity.cid = event.params._cid;
-  logger.info("hiiiiii2.5 {}", [event.params._index.toString()]);
   assetEntity.project = project.id;
-  logger.info("hiiiiii2 {}", [event.params._index.toString()]);
   assetEntity.index = event.params._index;
   assetEntity.dependencyType =
     FLEX_CONTRACT_EXTERNAL_ASSET_DEP_TYPES[event.params._dependencyType];
@@ -224,8 +216,6 @@ export function handleExternalAssetDependencyUpdated(
     event.params._externalAssetDependencyCount;
   project.updatedAt = event.block.timestamp;
   project.save();
-  logger.info("hiiiiii3", []);
-
 }
 
 export function handleExternalAssetDependencyRemoved(
