@@ -568,5 +568,115 @@ test("GenArt721CoreV3: Handles PlatformUpdated::dependencyRegistryAddress - chan
   );
 });
 
+test("GenArt721CoreV3: Handles PlatformUpdated::artblocksPrimaryPercentage - default value", () => {
+  // default value is false
+  clearStore();
+  // add new contract to store
+  const projectId = BigInt.fromI32(0);
+  addTestContractToStore(projectId);
+  mockRefreshContractCalls(BigInt.fromI32(0), null);
+
+  // default value should be false
+  assert.fieldEquals(
+    CONTRACT_ENTITY_TYPE,
+    TEST_CONTRACT_ADDRESS.toHexString(),
+    "renderProviderPercentage",
+    TEST_CONTRACT.renderProviderPercentage.toString()
+  );
+});
+
+test("GenArt721CoreV3: Handles PlatformUpdated::artblocksPrimaryPercentage - changed value", () => {
+  clearStore();
+  // add new contract to store
+  const projectId = BigInt.fromI32(0);
+  addTestContractToStore(projectId);
+  mockRefreshContractCalls(BigInt.fromI32(0), null);
+
+  // update mock function return value
+  const newValue = BigInt.fromI32(13);
+  createMockedFunction(
+    TEST_CONTRACT_ADDRESS,
+    "artblocksPrimarySalesPercentage",
+    "artblocksPrimarySalesPercentage():(uint256)"
+  ).returns([ethereum.Value.fromUnsignedBigInt(newValue)]);
+
+  // create event
+  const event: PlatformUpdated = changetype<PlatformUpdated>(newMockEvent());
+  event.address = TEST_CONTRACT_ADDRESS;
+  event.transaction.hash = TEST_TX_HASH;
+  event.logIndex = BigInt.fromI32(0);
+  event.parameters = [
+    new ethereum.EventParam(
+      "_field",
+      ethereum.Value.fromBytes(Bytes.fromUTF8("artblocksPrimaryPercentage"))
+    )
+  ];
+  // handle event
+  handlePlatformUpdated(event);
+
+  // value in store should be updated
+  assert.fieldEquals(
+    CONTRACT_ENTITY_TYPE,
+    TEST_CONTRACT_ADDRESS.toHexString(),
+    "renderProviderPercentage",
+    newValue.toString()
+  );
+});
+
+test("GenArt721CoreV3: Handles PlatformUpdated::artblocksSecondaryBPS - default value", () => {
+  // default value is false
+  clearStore();
+  // add new contract to store
+  const projectId = BigInt.fromI32(0);
+  addTestContractToStore(projectId);
+  mockRefreshContractCalls(BigInt.fromI32(0), null);
+
+  // default value should be false
+  assert.fieldEquals(
+    CONTRACT_ENTITY_TYPE,
+    TEST_CONTRACT_ADDRESS.toHexString(),
+    "renderProviderSecondarySalesBPS",
+    TEST_CONTRACT.renderProviderSecondarySalesBPS.toString()
+  );
+});
+
+test("GenArt721CoreV3: Handles PlatformUpdated::artblocksSecondaryBPS - changed value", () => {
+  clearStore();
+  // add new contract to store
+  const projectId = BigInt.fromI32(0);
+  addTestContractToStore(projectId);
+  mockRefreshContractCalls(BigInt.fromI32(0), null);
+
+  // update mock function return value
+  const newValue = BigInt.fromI32(250);
+  createMockedFunction(
+    TEST_CONTRACT_ADDRESS,
+    "artblocksSecondarySalesBPS",
+    "artblocksSecondarySalesBPS():(uint256)"
+  ).returns([ethereum.Value.fromUnsignedBigInt(newValue)]);
+
+  // create event
+  const event: PlatformUpdated = changetype<PlatformUpdated>(newMockEvent());
+  event.address = TEST_CONTRACT_ADDRESS;
+  event.transaction.hash = TEST_TX_HASH;
+  event.logIndex = BigInt.fromI32(0);
+  event.parameters = [
+    new ethereum.EventParam(
+      "_field",
+      ethereum.Value.fromBytes(Bytes.fromUTF8("artblocksSecondaryBPS"))
+    )
+  ];
+  // handle event
+  handlePlatformUpdated(event);
+
+  // value in store should be updated
+  assert.fieldEquals(
+    CONTRACT_ENTITY_TYPE,
+    TEST_CONTRACT_ADDRESS.toHexString(),
+    "renderProviderSecondarySalesBPS",
+    newValue.toString()
+  );
+});
+
 // export handlers for test coverage https://github.com/LimeChain/demo-subgraph#test-coverage
 export { handleMint, handleTransfer, handlePlatformUpdated };
