@@ -1,6 +1,6 @@
 {
   "name": "artblocks-subgraph",
-  "license": "UNLICENSED",
+  "license": "LGPL-3.0-only",
   "scripts": {
     "codegen": "graph codegen",
     "build": "graph build",
