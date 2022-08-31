@@ -8,7 +8,14 @@ import {
   createMockedFunction,
   newMockEvent
 } from "matchstick-as/assembly/index";
-import { BigInt, Bytes, ethereum, store, Value } from "@graphprotocol/graph-ts";
+import {
+  BigInt,
+  Bytes,
+  ethereum,
+  store,
+  Value,
+  Address
+} from "@graphprotocol/graph-ts";
 import {
   ACCOUNT_ENTITY_TYPE,
   PROJECT_ENTITY_TYPE,
@@ -64,7 +71,42 @@ import {
 
 const randomAddressGenerator = new RandomAddressGenerator();
 
-test("GenArt721CoreV3/MinterUpdated: should create Contract and/or MinterFilter entities when not yet created", () => {
+test("GenArt721CoreV3/MinterUpdated: should handle setting minter to zero address", () => {
+  clearStore();
+  const startingProjectId = BigInt.fromI32(100);
+  mockRefreshContractCalls(startingProjectId, null);
+  mockMinterUpdatedCallsNoPreconfiguredProjects(startingProjectId);
+
+  const event: MinterUpdated = changetype<MinterUpdated>(newMockEvent());
+  event.address = TEST_CONTRACT_ADDRESS;
+  event.transaction.hash = TEST_TX_HASH;
+  event.logIndex = BigInt.fromI32(0);
+  event.parameters = [
+    new ethereum.EventParam(
+      "_currentMinter",
+      ethereum.Value.fromAddress(Address.zero())
+    )
+  ];
+  // handle event
+  handleMinterUpdated(event);
+  // assertions
+  assert.fieldEquals(
+    CONTRACT_ENTITY_TYPE,
+    TEST_CONTRACT_ADDRESS.toHexString(),
+    "minterFilter",
+    "null"
+  );
+  assert.fieldEquals(
+    CONTRACT_ENTITY_TYPE,
+    TEST_CONTRACT_ADDRESS.toHexString(),
+    "mintWhitelisted",
+    "[]"
+  );
+  assert.notInStore(MINTER_FILTER_ENTITY_TYPE, Address.zero().toHexString());
+  assert.entityCount(MINTER_FILTER_ENTITY_TYPE, 0);
+});
+
+test("GenArt721CoreV3/MinterUpdated: should create Contract and/or MinterFilter entities when not yet created, associate them", () => {
   clearStore();
   const startingProjectId = BigInt.fromI32(100);
   mockRefreshContractCalls(startingProjectId, null);
