@@ -34,6 +34,8 @@ dataSources:
           handler: handleMint
         - event: Transfer(indexed address,indexed address,indexed uint256)
           handler: handleTransfer
+        - event: ProjectUpdated(indexed uint256,indexed bytes32)
+          handler: handleProjectUpdated
         ## Follow-on PR: Add remaining V3 call handlers
       file: ./src/mapping-v3-core.ts
   {{/genArt721CoreV3Contracts}}
