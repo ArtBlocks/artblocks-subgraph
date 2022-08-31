@@ -195,13 +195,12 @@ export function handleMinterUpdated(event: MinterUpdated): void {
     // we can assume the minter is a MinterFilter contract.
     contractEntity.mintWhitelisted = [event.params._currentMinter];
     let minterFilterContract = MinterFilterV0.bind(event.params._currentMinter);
-    // create minter filter entity if doesn't exist
+    // create and save minter filter entity if doesn't exist
     loadOrCreateMinterFilter(minterFilterContract, event.block.timestamp);
     // check that the MinterFilter's core contract is the contract that emitted
     // the event.
-    let minterFilterContractCoreAddress = minterFilterContract.genArt721CoreAddress();
     if (
-      minterFilterContractCoreAddress.toHexString() !=
+      minterFilterContract.genArt721CoreAddress().toHexString() !=
       event.address.toHexString()
     ) {
       // if the minter filter's core contract is not the contract that emitted

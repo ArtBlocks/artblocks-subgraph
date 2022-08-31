@@ -2,48 +2,22 @@ import {
   assert,
   clearStore,
   test,
-  newMockCall,
-  log,
-  logStore,
   createMockedFunction,
   newMockEvent
 } from "matchstick-as/assembly/index";
+import { BigInt, ethereum, Address } from "@graphprotocol/graph-ts";
 import {
-  BigInt,
-  Bytes,
-  ethereum,
-  store,
-  Value,
-  Address
-} from "@graphprotocol/graph-ts";
-import {
-  ACCOUNT_ENTITY_TYPE,
   PROJECT_ENTITY_TYPE,
   CONTRACT_ENTITY_TYPE,
-  WHITELISTING_ENTITY_TYPE,
-  PROJECT_SCRIPT_ENTITY_TYPE,
-  TOKEN_ENTITY_TYPE,
   MINTER_ENTITY_TYPE,
-  DEFAULT_PROJECT_VALUES,
   CURRENT_BLOCK_TIMESTAMP,
   RandomAddressGenerator,
-  mockProjectScriptByIndex,
-  mockTokenIdToHash,
   PROJECT_MINTER_CONFIGURATION_ENTITY_TYPE,
   TEST_CONTRACT_ADDRESS,
-  TEST_CONTRACT_CREATED_AT,
-  TEST_CONTRACT,
-  TEST_TOKEN_HASH,
   TEST_TX_HASH,
   TEST_MINTER_FILTER_ADDRESS,
-  assertNewProjectFields,
-  assertTestContractFields,
   addTestContractToStore,
-  addNewTokenToStore,
-  addNewContractToStore,
   addNewProjectToStore,
-  TRANSFER_ENTITY_TYPE,
-  DEFAULT_COLLECTION,
   MINTER_FILTER_ENTITY_TYPE,
   ONE_ETH_IN_WEI,
   booleanToString
@@ -59,24 +33,10 @@ import {
 
 import { mockGetProjectAndMinterInfoAt } from "../minter-suite/helpers";
 
-import {
-  Account,
-  Contract,
-  MinterFilter,
-  Project,
-  ProjectMinterConfiguration,
-  ProjectScript,
-  Token,
-  Whitelisting
-} from "../../../generated/schema";
+import { ProjectMinterConfiguration } from "../../../generated/schema";
 import { MinterUpdated } from "../../../generated/GenArt721CoreV3/GenArt721CoreV3";
 import { handleMinterUpdated } from "../../../src/mapping-v3-core";
-import {
-  generateContractSpecificId,
-  generateProjectScriptId,
-  generateWhitelistingId,
-  getProjectMinterConfigId
-} from "../../../src/helpers";
+import { getProjectMinterConfigId } from "../../../src/helpers";
 
 const randomAddressGenerator = new RandomAddressGenerator();
 
