@@ -179,9 +179,6 @@ export function handleMinterUpdated(event: MinterUpdated): void {
   let contract = GenArt721CoreV3.bind(event.address);
 
   let contractEntity = loadOrCreateContract(contract, event.block.timestamp);
-  if (contractEntity == null) {
-    return;
-  }
 
   // Clear the minter config for all projects on core contract when a new
   // minter filter is set
@@ -218,44 +215,12 @@ export function handleMinterUpdated(event: MinterUpdated): void {
     } else {
       // update contract entity with new valid MinterFilter ID
       contractEntity.minterFilter = newMinterFilterAddress;
-      // load or create MinterFilter entity
-      let minterFilter = MinterFilter.load(newMinterFilterAddress);
-      if (!minterFilter) {
-        minterFilter = new MinterFilter(newMinterFilterAddress);
-        minterFilter.coreContract = minterFilterContractCoreAddress.toHexString();
-        // if this is the first time we have seen this minter filter, we can
-        // assume the minter allowlist is empty If it was not empty, we would
-        // have seen it when the minter filter was allowlisting a minter.
-        minterFilter.minterAllowlist = [];
-        minterFilter.updatedAt = event.block.timestamp;
-        minterFilter.save();
-      }
-
       // Check the new minter filter for any pre-allowlisted minters and update Projects accordingly
-      let numProjectsWithMinters = minterFilterContract.getNumProjectsWithMinters();
-      for (
-        let i = BigInt.fromI32(0);
-        i.lt(numProjectsWithMinters);
-        i = i.plus(BigInt.fromI32(1))
-      ) {
-        let projectAndMinterInfo = minterFilterContract.getProjectAndMinterInfoAt(
-          i
-        );
-        let projectId = projectAndMinterInfo.value0;
-        let minterAddress = projectAndMinterInfo.value1;
-
-        let project = Project.load(
-          generateContractSpecificId(event.address, projectId)
-        );
-
-        if (project) {
-          loadOrCreateAndSetProjectMinterConfiguration(
-            project,
-            minterAddress,
-            event.block.timestamp
-          );
-        }
-      }
+      populateAllExistingMinterConfigurations(
+        minterFilterContract,
+        contract,
+        event.block.timestamp
+      );
     }
   }
 
@@ -271,16 +236,10 @@ export function handleMinterUpdated(event: MinterUpdated): void {
 /** HELPERS ***/
 
 // loads or creates a contract entity and returns it.
-// returns null if contract is not a GenArt721CoreV3 contract.
-// @dev assumes contract is a GenArt721CoreV3 contract
-function loadOrCreateContract<T>(
-  contract: T,
+function loadOrCreateContract(
+  contract: GenArt721CoreV3,
   timestamp: BigInt
-): Contract | null {
-  if (!(contract instanceof GenArt721CoreV3)) {
-    return null;
-  }
-
+): Contract {
   let contractEntity = Contract.load(contract._address.toHexString());
   if (!contractEntity) {
     contractEntity = new Contract(contract._address.toHexString());
@@ -291,20 +250,46 @@ function loadOrCreateContract<T>(
   return contractEntity;
 }
 
+// loads or creates a MinterFilter entity and returns it.
+function loadOrCreateMinterFilter(
+  minterFilterContract: MinterFilterV0,
+  timestamp: BigInt
+): MinterFilter {
+  // load or create MinterFilter entity
+  let minterFilter = MinterFilter.load(
+    minterFilterContract._address.toHexString()
+  );
+  if (!minterFilter) {
+    minterFilter = new MinterFilter(
+      minterFilterContract._address.toHexString()
+    );
+    minterFilter.coreContract = minterFilterContract
+      .genArt721CoreAddress()
+      .toHexString();
+    // if this is the first time we have seen this minter filter, we can
+    // assume the minter allowlist is empty If it was not empty, we would
+    // have seen it when the minter filter was allowlisting a minter.
+    minterFilter.minterAllowlist = [];
+    minterFilter.updatedAt = timestamp;
+    minterFilter.save();
+  }
+  return minterFilter;
+}
+
 // Refresh contract entity state. Creates new contract in store if one does not
 // already exist. Expected to handle any update that emits a `PlatformUpdated`
 // event.
 // @dev Warning - this does not handle updates where the contract's
 // minterFilter is updated. For that, see handleUpdateMinterFilter.
-function refreshContract<T>(contract: T, timestamp: BigInt): Contract | null {
+function refreshContract(
+  contract: GenArt721CoreV3,
+  timestamp: BigInt
+): Contract | null {
   if (!(contract instanceof GenArt721CoreV3)) {
     return null;
   }
 
   let contractEntity = loadOrCreateContract(contract, timestamp);
-  if (contractEntity == null) {
-    return null;
-  }
 
   contractEntity.admin = contract.admin();
   contractEntity.type = contract.coreType();
@@ -332,15 +317,11 @@ function refreshContract<T>(contract: T, timestamp: BigInt): Contract | null {
 }
 
 // Clear all minter configurations for all of a V3 core contract's projects
-function clearAllMinterConfigurations<T>(contract: T, timestamp: BigInt): void {
-  if (!(contract instanceof GenArt721CoreV3)) {
-    return;
-  }
-
+function clearAllMinterConfigurations(
+  contract: GenArt721CoreV3,
+  timestamp: BigInt
+): void {
   let contractEntity = loadOrCreateContract(contract, timestamp);
-  if (contractEntity == null) {
-    return;
-  }
 
   let startingProjectId = contract.startingProjectId().toI32();
   let nextProjectId = contractEntity.nextProjectId.toI32();
@@ -358,23 +339,39 @@ function clearAllMinterConfigurations<T>(contract: T, timestamp: BigInt): void {
       project.save();
     }
   }
+}
 
-  // let startingProjectId = contract.startingProjectId().toI32();
-  // let nextProjectId = contract.nextProjectId.toI32();
-  // for (
-  //   let i = startingProjectId;
-  //   i < nextProjectId;
-  //   i = i.plus(BigInt.fromI32(1))
-  // ) {
-  //   let fullProjectId = contract.id + "-" + i.toString();
-  //   let project = Project.load(fullProjectId);
+// Populate all project minter configurations from a given minter filter
+function populateAllExistingMinterConfigurations(
+  minterFilterContract: MinterFilterV0,
+  contract: GenArt721CoreV3,
+  timestamp: BigInt
+): void {
+  // Check the new minter filter for any pre-allowlisted minters and update Projects accordingly
+  let numProjectsWithMinters = minterFilterContract.getNumProjectsWithMinters();
+  for (
+    let i = BigInt.fromI32(0);
+    i.lt(numProjectsWithMinters);
+    i = i.plus(BigInt.fromI32(1))
+  ) {
+    let projectAndMinterInfo = minterFilterContract.getProjectAndMinterInfoAt(
+      i
+    );
+    let projectId = projectAndMinterInfo.value0;
+    let minterAddress = projectAndMinterInfo.value1;
 
-  //   if (project) {
-  //     project.minterConfiguration = null;
-  //     project.updatedAt = timestamp;
-  //     project.save();
-  //   }
-  // }
+    let project = Project.load(
+      generateContractSpecificId(contract._address, projectId)
+    );
+
+    if (project) {
+      loadOrCreateAndSetProjectMinterConfiguration(
+        project,
+        minterAddress,
+        timestamp
+      );
+    }
+  }
 }
 
 /** END HELPERS ***/
