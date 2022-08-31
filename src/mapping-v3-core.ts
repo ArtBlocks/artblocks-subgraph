@@ -327,7 +327,7 @@ function createProject(
   contract: GenArt721CoreV3,
   projectId: BigInt,
   timestamp: BigInt
-) {
+): Project | null {
   const contractAddress = contract._address.toHexString();
   let contractEntity = Contract.load(contractAddress);
   if (!contractEntity) {
@@ -350,7 +350,7 @@ function createProject(
       contractAddress,
       projectId.toString()
     ]);
-    return;
+    return null;
   }
 
   let name = projectDetails.value.getProjectName();
@@ -397,6 +397,7 @@ function createProject(
   project.useIpfs = false;
 
   project.save();
+  return project;
 }
 
 function refreshProjectScript(
