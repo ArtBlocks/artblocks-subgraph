@@ -215,7 +215,7 @@ export function handleMinterUpdated(event: MinterUpdated): void {
     } else {
       // update contract entity with new valid MinterFilter ID
       contractEntity.minterFilter = newMinterFilterAddress;
-      // Check the new minter filter for any pre-allowlisted minters and update Projects accordingly
+      // sync all pre-set projectMinterConfigurations
       populateAllExistingMinterConfigurations(
         minterFilterContract,
         contract,
@@ -280,7 +280,7 @@ function loadOrCreateMinterFilter(
 // already exist. Expected to handle any update that emits a `PlatformUpdated`
 // event.
 // @dev Warning - this does not handle updates where the contract's
-// minterFilter is updated. For that, see handleUpdateMinterFilter.
+// minterFilter is updated. For that, see handleMinterUpdated.
 function refreshContract(
   contract: GenArt721CoreV3,
   timestamp: BigInt
