@@ -111,6 +111,9 @@ test("GenArt721CoreV3/MinterUpdated: should create Contract and/or MinterFilter 
   const startingProjectId = BigInt.fromI32(100);
   mockRefreshContractCalls(startingProjectId, null);
   mockMinterUpdatedCallsNoPreconfiguredProjects(startingProjectId);
+  const updateCallBlockTimestamp = CURRENT_BLOCK_TIMESTAMP.plus(
+    BigInt.fromI32(10)
+  );
 
   const event: MinterUpdated = changetype<MinterUpdated>(newMockEvent());
   event.address = TEST_CONTRACT_ADDRESS;
@@ -122,6 +125,7 @@ test("GenArt721CoreV3/MinterUpdated: should create Contract and/or MinterFilter 
       ethereum.Value.fromAddress(TEST_MINTER_FILTER_ADDRESS)
     )
   ];
+  event.block.timestamp = updateCallBlockTimestamp;
   // handle event
   handleMinterUpdated(event);
   // assertions
@@ -136,6 +140,12 @@ test("GenArt721CoreV3/MinterUpdated: should create Contract and/or MinterFilter 
     TEST_CONTRACT_ADDRESS.toHexString(),
     "mintWhitelisted",
     "[".concat(TEST_MINTER_FILTER_ADDRESS.toHexString()).concat("]")
+  );
+  assert.fieldEquals(
+    CONTRACT_ENTITY_TYPE,
+    TEST_CONTRACT_ADDRESS.toHexString(),
+    "updatedAt",
+    updateCallBlockTimestamp.toString()
   );
   assert.fieldEquals(
     MINTER_FILTER_ENTITY_TYPE,
