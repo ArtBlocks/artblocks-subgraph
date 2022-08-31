@@ -285,10 +285,6 @@ function refreshContract(
   contract: GenArt721CoreV3,
   timestamp: BigInt
 ): Contract | null {
-  if (!(contract instanceof GenArt721CoreV3)) {
-    return null;
-  }
-
   let contractEntity = loadOrCreateContract(contract, timestamp);
 
   contractEntity.admin = contract.admin();
