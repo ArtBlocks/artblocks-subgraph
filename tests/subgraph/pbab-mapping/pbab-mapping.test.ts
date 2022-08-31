@@ -3,7 +3,7 @@ import {
   clearStore,
   test,
   newMockCall,
-  newMockEvent
+  newMockEvent,
 } from "matchstick-as/assembly/index";
 import { BigInt, Bytes, ethereum } from "@graphprotocol/graph-ts";
 import {
@@ -24,7 +24,9 @@ import {
   TEST_CONTRACT,
   TOKEN_ENTITY_TYPE,
   TRANSFER_ENTITY_TYPE,
-  addNewTokenToStore
+  addNewTokenToStore,
+  IPFS_CID,
+  PROJECT_EXTERNAL_ASSET_DEPENDENCY_ENTITY_TYPE
 } from "../shared-helpers";
 
 import {
@@ -73,6 +75,14 @@ import {
   UpdateProjectScriptJSONCall,
   Transfer
 } from "../../../generated/GenArt721Core2PBAB/GenArt721Core2PBAB";
+
+import {
+  ExternalAssetDependencyUpdated,
+  ExternalAssetDependencyRemoved,
+  GatewayUpdated,
+  GenArt721Core2EngineFlex
+} from "../../../generated/GenArt721Core2EngineFlex/GenArt721Core2EngineFlex";
+
 import {
   handleAddProject,
   handleAddWhitelisted,
@@ -102,7 +112,10 @@ import {
   handleRemoveMintWhitelisted,
   handleUpdateProjectScript,
   handleUpdateProjectScriptJSON,
-  handleTransfer
+  handleTransfer,
+  handleExternalAssetDependencyUpdated,
+  handleExternalAssetDependencyRemoved,
+  handleGatewayUpdated
 } from "../../../src/pbab-mapping";
 import {
   generateContractSpecificId,
@@ -1265,7 +1278,7 @@ test("GenArt721Core2PBAB: Can update a projects IPFS Hash", () => {
     true,
     CURRENT_BLOCK_TIMESTAMP
   );
-  const ipfsHash = "QmYwAPJzv5CZsnA625s3Xf2nemtYgPpHdWEz79ojWnPbdG";
+  const ipfsHash = IPFS_CID;
 
   const updateCallBlockTimestamp = CURRENT_BLOCK_TIMESTAMP.plus(
     BigInt.fromI32(10)
@@ -1783,6 +1796,7 @@ test("GenArt721Core2PBAB: Can update a project website", () => {
     updateCallBlockTimestamp.toString()
   );
 });
+
 test("GenArt721Core2PBAB: Can handle transfer", () => {
   clearStore();
   const tokenId = BigInt.fromI32(0);
@@ -1841,6 +1855,69 @@ test("GenArt721Core2PBAB: Can handle transfer", () => {
     fullTokenId
   );
 });
+
+test("GenArt721Core2EngineFlex: Can add/update a project external asset dependency", () => {
+  clearStore();
+  // Add project to store
+  const projectId = BigInt.fromI32(0);
+  const fullProjectId = generateContractSpecificId(
+    TEST_CONTRACT_ADDRESS,
+    projectId
+  );
+  addNewProjectToStore(
+    projectId,
+    "Test Project",
+    randomAddressGenerator.generateRandomAddress(),
+    BigInt.fromI64(i64(1e18)),
+    true,
+    CURRENT_BLOCK_TIMESTAMP.minus(BigInt.fromI32(100))
+  );
+
+  const event: ExternalAssetDependencyUpdated = changetype<ExternalAssetDependencyUpdated>(newMockEvent());
+  event.address = TEST_CONTRACT_ADDRESS;
+  event.block.timestamp = CURRENT_BLOCK_TIMESTAMP;
+
+  const _index0 = BigInt.zero();
+  const _dependencyType0 = BigInt.zero();
+  const _externalAssetDependencyCount0 = BigInt.fromI32(1);
+  
+  assert.fieldEquals(
+    PROJECT_ENTITY_TYPE,
+    fullProjectId,
+    "externalAssetDependencyCount",
+    BigInt.fromI32(0).toString()
+  );
+
+  event.parameters = [
+    new ethereum.EventParam("_projectId", ethereum.Value.fromUnsignedBigInt(projectId)),
+    new ethereum.EventParam("_index", ethereum.Value.fromUnsignedBigInt(_index0)),
+    new ethereum.EventParam("_cid", ethereum.Value.fromString(IPFS_CID)),
+    new ethereum.EventParam("_dependencyType", ethereum.Value.fromUnsignedBigInt(_dependencyType0)),
+    new ethereum.EventParam("_externalAssetDependencyCount", ethereum.Value.fromUnsignedBigInt(_externalAssetDependencyCount0))
+  ];
+
+  handleExternalAssetDependencyUpdated(event);
+  
+  assert.fieldEquals(
+    PROJECT_ENTITY_TYPE,
+    fullProjectId,
+    "externalAssetDependencyCount",
+    BigInt.fromI32(1).toString()
+  );
+  assert.fieldEquals(
+    PROJECT_EXTERNAL_ASSET_DEPENDENCY_ENTITY_TYPE,
+    fullProjectId + '-' + _index0.toString(),
+    "cid",
+    IPFS_CID
+  );
+});
+
+// test("GenArt721Core2EngineFlex: Can remove a project external asset dependency", () => {
+// });
+
+// test("GenArt721Core2EngineFlex: Can update a contract preferred IPFS/ARWEAVE gateway", () => {
+// });
+
 
 export {
   handleAddProject,

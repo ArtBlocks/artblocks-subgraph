@@ -4,7 +4,7 @@
   "scripts": {
     "codegen": "graph codegen",
     "build": "graph build",
-    "test": "graph test -r",
+    "test": "graph test",
     "coverage": "graph test -- -c",
     "deploy:mainnet-hosted": "yarn prepare:mainnet && graph deploy --product hosted-service --ac --node https://api.thegraph.com/deploy/ --ipfs https://api.thegraph.com/ipfs/ ArtBlocks/art-blocks",
     "deploy:mainnet-with-secondary-hosted": "yarn prepare:mainnet-with-secondary && graph deploy --product hosted-service --ac --node https://api.thegraph.com/deploy/ --ipfs https://api.thegraph.com/ipfs/ ArtBlocks/art-blocks-with-secondary",

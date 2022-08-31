@@ -154,6 +154,10 @@ type Contract @entity {
 
   "Associated minter filter (if applicable)"
   minterFilter: MinterFilter
+
+  preferredIPFSGateway: String
+
+  preferredArweaveGateway: String
 }
 
 type Whitelisting @entity {
@@ -440,7 +444,7 @@ enum ProjectExternalAssetDependencyType {
   ARWEAVE
 }
 type ProjectExternalAssetDependency @entity {
-  "Unique identifier made up of projectId-cid"
+  "Unique identifier made up of projectId-index"
   id: ID!
 
   "The associated project"
