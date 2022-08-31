@@ -103,7 +103,7 @@ dataSources:
           handler: handleUpdateProjectSecondaryMarketRoyaltyPercentage
         - function: updateProjectWebsite(uint256,string)
           handler: handleUpdateProjectWebsite
-      file: ./src/mapping.ts
+      file: ./src/mapping-v1-core.ts
   {{/genArt721CoreContracts}}
   {{#genArt721Core2Contracts}}
   - kind: ethereum/contract
@@ -210,7 +210,7 @@ dataSources:
           handler: handleUpdateProjectSecondaryMarketRoyaltyPercentage
         - function: updateProjectWebsite(uint256,string)
           handler: handleUpdateProjectWebsite
-      file: ./src/mapping.ts
+      file: ./src/mapping-v1-core.ts
   {{/genArt721Core2Contracts}}
   {{#pbabContracts}}
   - kind: ethereum/contract
@@ -303,7 +303,7 @@ dataSources:
           handler: handleUpdateProjectSecondaryMarketRoyaltyPercentage
         - function: updateProjectWebsite(uint256,string)
           handler: handleUpdateProjectWebsite
-      file: ./src/pbab-mapping.ts
+      file: ./src/mapping-v2-core.ts
   {{/pbabContracts}}
   {{#engineFlexContracts}}
   - kind: ethereum/contract
@@ -403,7 +403,7 @@ dataSources:
           handler: handleUpdateProjectSecondaryMarketRoyaltyPercentage
         - function: updateProjectWebsite(uint256,string)
           handler: handleUpdateProjectWebsite
-      file: ./src/pbab-mapping.ts
+      file: ./src/mapping-v2-core.ts
   {{/engineFlexContracts}}
   {{#genArt721Contracts}}
   - kind: ethereum/contract
@@ -500,7 +500,7 @@ dataSources:
           handler: handleUpdateProjectSecondaryMarketRoyaltyPercentage
         - function: updateProjectWebsite(uint256,string)
           handler: handleUpdateProjectWebsite
-      file: ./src/original-mapping.ts
+      file: ./src/mapping-v0-core.ts
   {{/genArt721Contracts}}
   {{#minterFilterV0Contracts}}
   - kind: ethereum/contract

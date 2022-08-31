@@ -103,7 +103,7 @@ import {
   handleUpdateProjectScript,
   handleUpdateProjectScriptJSON,
   handleTransfer
-} from "../../../src/pbab-mapping";
+} from "../../../src/mapping-v2-core";
 import {
   generateContractSpecificId,
   generateProjectScriptId,

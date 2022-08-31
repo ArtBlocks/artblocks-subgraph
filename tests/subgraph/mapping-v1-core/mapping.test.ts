@@ -3,9 +3,11 @@ import {
   clearStore,
   test,
   newMockCall,
+  log,
+  logStore,
   newMockEvent
 } from "matchstick-as/assembly/index";
-import { BigInt, Bytes, ethereum } from "@graphprotocol/graph-ts";
+import { BigInt, Bytes, ethereum, store, Value } from "@graphprotocol/graph-ts";
 import {
   ACCOUNT_ENTITY_TYPE,
   PROJECT_ENTITY_TYPE,
@@ -17,14 +19,16 @@ import {
   CURRENT_BLOCK_TIMESTAMP,
   RandomAddressGenerator,
   mockProjectScriptByIndex,
+  PROJECT_MINTER_CONFIGURATION_ENTITY_TYPE,
   TEST_CONTRACT_ADDRESS,
   TEST_CONTRACT_CREATED_AT,
+  TEST_CONTRACT,
   assertNewProjectFields,
   assertTestContractFields,
   addTestContractToStore,
-  TEST_CONTRACT,
+  addNewTokenToStore,
   TRANSFER_ENTITY_TYPE,
-  addNewTokenToStore
+  addNewProjectMinterConfigToStore
 } from "../shared-helpers";
 
 import {
@@ -39,7 +43,9 @@ import {
 import {
   Account,
   Contract,
+  MinterFilter,
   Project,
+  ProjectMinterConfiguration,
   ProjectScript,
   Token,
   Whitelisting
@@ -48,6 +54,8 @@ import {
   AddProjectCall,
   AddWhitelistedCall,
   RemoveWhitelistedCall,
+  AddMintWhitelistedCall,
+  UpdateRandomizerAddressCall,
   UpdateArtblocksAddressCall,
   UpdateArtblocksPercentageCall,
   AddProjectScriptCall,
@@ -58,12 +66,14 @@ import {
   ToggleProjectIsDynamicCall,
   ToggleProjectIsLockedCall,
   ToggleProjectIsPausedCall,
+  ToggleProjectUseHashStringCall,
   ToggleProjectUseIpfsForStaticCall,
   UpdateProjectAdditionalPayeeInfoCall,
   UpdateProjectArtistAddressCall,
   UpdateProjectArtistNameCall,
   UpdateProjectBaseIpfsURICall,
   UpdateProjectBaseURICall,
+  UpdateProjectCurrencyInfoCall,
   UpdateProjectDescriptionCall,
   UpdateProjectIpfsHashCall,
   UpdateProjectLicenseCall,
@@ -72,14 +82,17 @@ import {
   UpdateProjectPricePerTokenInWeiCall,
   UpdateProjectWebsiteCall,
   UpdateProjectSecondaryMarketRoyaltyPercentageCall,
+  RemoveMintWhitelistedCall,
   UpdateProjectScriptCall,
   UpdateProjectScriptJSONCall,
   Transfer
-} from "../../../generated/GenArt721/GenArt721";
+} from "../../../generated/GenArt721Core/GenArt721Core";
 import {
   handleAddProject,
   handleAddWhitelisted,
   handleRemoveWhitelisted,
+  handleAddMintWhitelisted,
+  handleUpdateRandomizerAddress,
   handleUpdateArtblocksAddress,
   handleUpdateArtblocksPercentage,
   handleAddProjectScript,
@@ -90,12 +103,14 @@ import {
   handleToggleProjectIsDynamic,
   handleToggleProjectIsLocked,
   handleToggleProjectIsPaused,
+  handleToggleProjectUseHashString,
   handleToggleProjectUseIpfsForStatic,
   handleUpdateProjectAdditionalPayeeInfo,
   handleUpdateProjectArtistAddress,
   handleUpdateProjectArtistName,
   handleUpdateProjectBaseIpfsURI,
   handleUpdateProjectBaseURI,
+  handleUpdateProjectCurrencyInfo,
   handleUpdateProjectDescription,
   handleUpdateProjectIpfsHash,
   handleUpdateProjectLicense,
@@ -104,11 +119,11 @@ import {
   handleUpdateProjectPricePerTokenInWei,
   handleUpdateProjectWebsite,
   handleUpdateProjectSecondaryMarketRoyaltyPercentage,
+  handleRemoveMintWhitelisted,
   handleUpdateProjectScript,
   handleUpdateProjectScriptJSON,
   handleTransfer
-} from "../../../src/original-mapping";
-
+} from "../../../src/mapping-v1-core";
 import {
   generateContractSpecificId,
   generateProjectScriptId,
@@ -117,7 +132,7 @@ import {
 
 const randomAddressGenerator = new RandomAddressGenerator();
 
-test("GenArt721: Can add a new project when its contract has not yet been indexed", () => {
+test("GenArt721Core: Can add a new project when its contract has not yet been indexed", () => {
   clearStore();
   // When no contract entity exists yet we figure out the
   // project id of the project being added by
@@ -200,7 +215,7 @@ test("GenArt721: Can add a new project when its contract has not yet been indexe
   );
 });
 
-test("GenArt721: Can add a new project when its contract has been indexed", () => {
+test("GenArt721Core: Can add a new project when its contract has been indexed", () => {
   clearStore();
   const nextProjectId = BigInt.fromI32(1);
 
@@ -278,7 +293,7 @@ test("GenArt721: Can add a new project when its contract has been indexed", () =
   );
 });
 
-test("GenArt721: Can add whitelisting to a contract that has not yet been indexed", () => {
+test("GenArt721Core: Can add whitelisting to a contract that has not yet been indexed", () => {
   clearStore();
   const call = changetype<AddWhitelistedCall>(newMockCall());
   call.to = TEST_CONTRACT_ADDRESS;
@@ -323,7 +338,7 @@ test("GenArt721: Can add whitelisting to a contract that has not yet been indexe
   );
 });
 
-test("GenArt721: Can remove whitelisting", () => {
+test("GenArt721Core: Can remove whitelisting", () => {
   clearStore();
   // Populate store with an existing whitelisting
   addTestContractToStore(BigInt.fromI32(1));
@@ -368,7 +383,247 @@ test("GenArt721: Can remove whitelisting", () => {
   assert.notInStore(WHITELISTING_ENTITY_TYPE, whitelistingId);
 });
 
-test("GenArt721: Can update render provider address", () => {
+test("GenArt721Core: Can add a new whitelisted minter to contract", () => {
+  clearStore();
+  const call = changetype<AddMintWhitelistedCall>(newMockCall());
+  const minterAddress = randomAddressGenerator.generateRandomAddress();
+
+  call.to = TEST_CONTRACT_ADDRESS;
+  call.block.timestamp = CURRENT_BLOCK_TIMESTAMP;
+  call.inputValues = [
+    new ethereum.EventParam(
+      "_address",
+      ethereum.Value.fromAddress(minterAddress)
+    )
+  ];
+
+  mockRefreshContractCalls(BigInt.fromI32(1), new Map<string, string>());
+
+  handleAddMintWhitelisted(call);
+
+  assert.fieldEquals(
+    CONTRACT_ENTITY_TYPE,
+    TEST_CONTRACT_ADDRESS.toHexString(),
+    "mintWhitelisted",
+    "[" + minterAddress.toHexString() + "]"
+  );
+});
+
+test("GenArt721Core: Can remove whitelisted minter from contract", () => {
+  clearStore();
+  const minterAddress = randomAddressGenerator.generateRandomAddress();
+  const minterAddressToBeRemoved = randomAddressGenerator.generateRandomAddress();
+
+  const contract = addTestContractToStore(BigInt.fromI32(1));
+  contract.mintWhitelisted = [minterAddress, minterAddressToBeRemoved];
+  contract.save();
+
+  const removeWhitelistCall = changetype<RemoveMintWhitelistedCall>(
+    newMockCall()
+  );
+  removeWhitelistCall.to = TEST_CONTRACT_ADDRESS;
+  removeWhitelistCall.block.timestamp = CURRENT_BLOCK_TIMESTAMP;
+  removeWhitelistCall.inputValues = [
+    new ethereum.EventParam(
+      "_address",
+      ethereum.Value.fromAddress(minterAddressToBeRemoved)
+    )
+  ];
+
+  handleRemoveMintWhitelisted(removeWhitelistCall);
+
+  assert.fieldEquals(
+    CONTRACT_ENTITY_TYPE,
+    TEST_CONTRACT_ADDRESS.toHexString(),
+    "mintWhitelisted",
+    "[" + minterAddress.toHexString() + "]"
+  );
+});
+
+test("GenArt721Core: Removing a whitelisted minter filter should leave existing minter configuration entities", () => {
+  clearStore();
+  const minterFilterAddress = randomAddressGenerator.generateRandomAddress();
+  const minterFilter = new MinterFilter(minterFilterAddress.toHexString());
+  minterFilter.coreContract = TEST_CONTRACT_ADDRESS.toHexString();
+  minterFilter.minterAllowlist = [];
+  minterFilter.updatedAt = CURRENT_BLOCK_TIMESTAMP;
+  minterFilter.save();
+
+  let project0 = addNewProjectToStore(
+    BigInt.fromI32(0),
+    "project 0",
+    randomAddressGenerator.generateRandomAddress(),
+    BigInt.fromI64(i64(1e18)),
+    true,
+    CURRENT_BLOCK_TIMESTAMP
+  );
+
+  const project0MinterAddress = randomAddressGenerator.generateRandomAddress();
+  const project0MinterConfig = addNewProjectMinterConfigToStore(
+    project0.id,
+    randomAddressGenerator.generateRandomAddress()
+  );
+  project0MinterConfig.basePrice = BigInt.fromI64(i64(1e18));
+  project0MinterConfig.minter = project0MinterAddress.toHexString();
+
+  project0.minterConfiguration = project0MinterConfig.id;
+  project0.save();
+  project0MinterConfig.save();
+
+  let project1 = addNewProjectToStore(
+    BigInt.fromI32(1),
+    "project 1",
+    randomAddressGenerator.generateRandomAddress(),
+    BigInt.fromI64(i64(1e18)),
+    true,
+    CURRENT_BLOCK_TIMESTAMP
+  );
+
+  const coreContract = changetype<Contract>(
+    Contract.load(TEST_CONTRACT_ADDRESS.toHexString())
+  );
+  coreContract.mintWhitelisted = [minterFilterAddress];
+  coreContract.minterFilter = minterFilterAddress.toHexString();
+  coreContract.save();
+
+  const project1MinterAddress = randomAddressGenerator.generateRandomAddress();
+  const project1MinterConfig = addNewProjectMinterConfigToStore(
+    project1.id,
+    project1MinterAddress
+  );
+  project1MinterConfig.basePrice = BigInt.fromI64(i64(1e18));
+  project1MinterConfig.minter = project1MinterAddress.toHexString();
+
+  project1.minterConfiguration = project1MinterConfig.id;
+  project1.save();
+  project1MinterConfig.save();
+
+  assert.fieldEquals(
+    CONTRACT_ENTITY_TYPE,
+    TEST_CONTRACT_ADDRESS.toHexString(),
+    "nextProjectId",
+    "2"
+  );
+
+  assert.fieldEquals(
+    PROJECT_ENTITY_TYPE,
+    project0.id,
+    "minterConfiguration",
+    project0MinterConfig.id
+  );
+
+  assert.fieldEquals(
+    PROJECT_MINTER_CONFIGURATION_ENTITY_TYPE,
+    project0MinterConfig.id,
+    "id",
+    project0MinterConfig.id
+  );
+
+  assert.fieldEquals(
+    PROJECT_ENTITY_TYPE,
+    project0.id,
+    "minterConfiguration",
+    project0MinterConfig.id
+  );
+
+  // This is just to check that the minter config entity exists
+  assert.fieldEquals(
+    PROJECT_MINTER_CONFIGURATION_ENTITY_TYPE,
+    project1MinterConfig.id,
+    "id",
+    project1MinterConfig.id
+  );
+
+  const updateCallBlockTimestamp = CURRENT_BLOCK_TIMESTAMP.plus(
+    BigInt.fromI32(10)
+  );
+
+  const removeWhitelistCall = changetype<RemoveMintWhitelistedCall>(
+    newMockCall()
+  );
+  removeWhitelistCall.to = TEST_CONTRACT_ADDRESS;
+  removeWhitelistCall.block.timestamp = updateCallBlockTimestamp;
+  removeWhitelistCall.inputValues = [
+    new ethereum.EventParam(
+      "_address",
+      ethereum.Value.fromAddress(minterFilterAddress)
+    )
+  ];
+
+  mockRefreshContractCalls(BigInt.fromI32(2), null);
+  handleRemoveMintWhitelisted(removeWhitelistCall);
+
+  assert.fieldEquals(
+    CONTRACT_ENTITY_TYPE,
+    TEST_CONTRACT_ADDRESS.toHexString(),
+    "mintWhitelisted",
+    "[]"
+  );
+
+  project0 = changetype<Project>(Project.load(project0.id));
+  project1 = changetype<Project>(Project.load(project1.id));
+
+  assert.assertNull(project0.minterConfiguration);
+  assert.assertNull(project1.minterConfiguration);
+  assert.fieldEquals(
+    PROJECT_MINTER_CONFIGURATION_ENTITY_TYPE,
+    project0MinterConfig.id,
+    "id",
+    project0MinterConfig.id
+  );
+  assert.fieldEquals(
+    PROJECT_MINTER_CONFIGURATION_ENTITY_TYPE,
+    project1MinterConfig.id,
+    "id",
+    project1MinterConfig.id
+  );
+  assert.fieldEquals(
+    PROJECT_ENTITY_TYPE,
+    project0.id,
+    "updatedAt",
+    updateCallBlockTimestamp.toString()
+  );
+  assert.fieldEquals(
+    PROJECT_ENTITY_TYPE,
+    project0.id,
+    "updatedAt",
+    updateCallBlockTimestamp.toString()
+  );
+  assert.fieldEquals(
+    CONTRACT_ENTITY_TYPE,
+    TEST_CONTRACT_ADDRESS.toHexString(),
+    "updatedAt",
+    updateCallBlockTimestamp.toString()
+  );
+});
+
+test("GenArt721Core: Can update randomizer address", () => {
+  clearStore();
+  assert.notInStore(CONTRACT_ENTITY_TYPE, TEST_CONTRACT_ADDRESS.toHexString());
+
+  mockRefreshContractCalls(BigInt.fromI32(1), new Map<string, string>());
+
+  const call = changetype<UpdateRandomizerAddressCall>(newMockCall());
+  call.to = TEST_CONTRACT_ADDRESS;
+  call.block.timestamp = CURRENT_BLOCK_TIMESTAMP;
+  call.inputValues = [
+    new ethereum.EventParam(
+      "_address",
+      ethereum.Value.fromAddress(TEST_CONTRACT.randomizerContract)
+    )
+  ];
+
+  handleUpdateRandomizerAddress(call);
+
+  assert.fieldEquals(
+    CONTRACT_ENTITY_TYPE,
+    TEST_CONTRACT_ADDRESS.toHexString(),
+    "randomizerContract",
+    TEST_CONTRACT.randomizerContract.toHexString()
+  );
+});
+
+test("GenArt721Core: Can update render provider address", () => {
   clearStore();
   assert.notInStore(CONTRACT_ENTITY_TYPE, TEST_CONTRACT_ADDRESS.toHexString());
 
@@ -394,7 +649,7 @@ test("GenArt721: Can update render provider address", () => {
   );
 });
 
-test("GenArt721: Can update render provider percentage", () => {
+test("GenArt721Core: Can update render provider percentage", () => {
   clearStore();
   const call = changetype<UpdateArtblocksPercentageCall>(newMockCall());
 
@@ -419,7 +674,7 @@ test("GenArt721: Can update render provider percentage", () => {
   );
 });
 
-test("GenArt721: Can add project scripts", () => {
+test("GenArt721Core: Can add project scripts", () => {
   clearStore();
   // Add project to store
   const projectId = BigInt.fromI32(0);
@@ -563,19 +818,15 @@ test("GenArt721: Can add project scripts", () => {
   );
 });
 
-test("GenArt721: Can clear a Token IPFS image uri", () => {
+test("GenArt721Core: Can clear a Token IPFS image uri", () => {
   clearStore();
   const tokenId = BigInt.fromI32(0);
-  const fullTokenId = generateContractSpecificId(
-    TEST_CONTRACT_ADDRESS,
-    tokenId
-  );
-
   const token = addNewTokenToStore(
     TEST_CONTRACT_ADDRESS,
     tokenId,
     BigInt.fromI32(0)
   );
+  token.save();
 
   const tokenUri = "https://token.artblocks.io/" + tokenId.toString();
   mockTokenURICall(tokenId, tokenUri);
@@ -592,12 +843,12 @@ test("GenArt721: Can clear a Token IPFS image uri", () => {
 
   handleClearTokenIpfsImageUri(call);
 
-  assert.fieldEquals(TOKEN_ENTITY_TYPE, fullTokenId, "uri", tokenUri);
+  assert.fieldEquals(TOKEN_ENTITY_TYPE, token.id, "uri", tokenUri);
 });
 
 // Under the hood this does the exact same thing as the above test
 // and just relies on the contract to get ther proper token URI
-test("GenArt721: Can override token dynamic image with IPFS link", () => {
+test("GenArt721Core: Can override token dynamic image with IPFS link", () => {
   clearStore();
   const tokenId = BigInt.fromI32(0);
   const fullTokenId = generateContractSpecificId(
@@ -610,8 +861,6 @@ test("GenArt721: Can override token dynamic image with IPFS link", () => {
     tokenId,
     BigInt.fromI32(0)
   );
-  token.uri = "";
-  token.save();
 
   const ipfsHash = "QmYwAPJzv5CZsnA625s3Xf2nemtYgPpHdWEz79ojWnPbdG";
   const call = changetype<OverrideTokenDynamicImageWithIpfsLinkCall>(
@@ -633,7 +882,7 @@ test("GenArt721: Can override token dynamic image with IPFS link", () => {
   assert.fieldEquals(TOKEN_ENTITY_TYPE, fullTokenId, "uri", ipfsHash);
 });
 
-test("GenArt721: Can remove a project's last script", () => {
+test("GenArt721Core: Can remove a project's last script", () => {
   clearStore();
   const projectId = BigInt.fromI32(0);
   const fullProjectId = generateContractSpecificId(
@@ -715,7 +964,7 @@ test("GenArt721: Can remove a project's last script", () => {
   );
 });
 
-test("GenArt721: Can toggle if a project is active", () => {
+test("GenArt721Core: Can toggle if a project is active", () => {
   clearStore();
   const projectId = BigInt.fromI32(0);
   const fullProjectId = generateContractSpecificId(
@@ -767,7 +1016,7 @@ test("GenArt721: Can toggle if a project is active", () => {
   );
 });
 
-test("GenArt721: Can toggle if a project is dynamic", () => {
+test("GenArt721Core: Can toggle if a project is dynamic", () => {
   clearStore();
   const projectId = BigInt.fromI32(0);
   const fullProjectId = generateContractSpecificId(
@@ -825,7 +1074,7 @@ test("GenArt721: Can toggle if a project is dynamic", () => {
   );
 });
 
-test("GenArt721: Can toggle if a project is locked", () => {
+test("GenArt721Core: Can toggle if a project is locked", () => {
   clearStore();
   const projectId = BigInt.fromI32(0);
   const fullProjectId = generateContractSpecificId(
@@ -871,7 +1120,7 @@ test("GenArt721: Can toggle if a project is locked", () => {
   );
 });
 
-test("GenArt721: Can toggle if a project is paused", () => {
+test("GenArt721Core: Can toggle if a project is paused", () => {
   clearStore();
   const projectId = BigInt.fromI32(0);
   const fullProjectId = generateContractSpecificId(
@@ -917,7 +1166,63 @@ test("GenArt721: Can toggle if a project is paused", () => {
   );
 });
 
-test("GenArt721: Can toggle if a project uses Ipfs", () => {
+test("GenArt721Core: Can toggle a project uses a hash string", () => {
+  clearStore();
+  const projectId = BigInt.fromI32(0);
+  const fullProjectId = generateContractSpecificId(
+    TEST_CONTRACT_ADDRESS,
+    projectId
+  );
+  const artistAddress = randomAddressGenerator.generateRandomAddress();
+  const projectName = "Test Project";
+  const pricePerTokenInWei = BigInt.fromI64(i64(1e18));
+
+  addNewProjectToStore(
+    projectId,
+    projectName,
+    artistAddress,
+    pricePerTokenInWei,
+    true,
+    CURRENT_BLOCK_TIMESTAMP
+  );
+
+  assert.fieldEquals(
+    PROJECT_ENTITY_TYPE,
+    fullProjectId,
+    "useHashString",
+    "true"
+  );
+
+  const updateCallBlockTimestamp = CURRENT_BLOCK_TIMESTAMP.plus(
+    BigInt.fromI32(10)
+  );
+  const call = changetype<ToggleProjectUseHashStringCall>(newMockCall());
+  call.to = TEST_CONTRACT_ADDRESS;
+  call.block.timestamp = updateCallBlockTimestamp;
+  call.inputValues = [
+    new ethereum.EventParam(
+      "_projectId",
+      ethereum.Value.fromUnsignedBigInt(projectId)
+    )
+  ];
+
+  handleToggleProjectUseHashString(call);
+
+  assert.fieldEquals(
+    PROJECT_ENTITY_TYPE,
+    fullProjectId,
+    "useHashString",
+    "false"
+  );
+  assert.fieldEquals(
+    PROJECT_ENTITY_TYPE,
+    fullProjectId,
+    "updatedAt",
+    updateCallBlockTimestamp.toString()
+  );
+});
+
+test("GenArt721Core: Can toggle if a project uses Ipfs", () => {
   clearStore();
   const projectId = BigInt.fromI32(0);
   const fullProjectId = generateContractSpecificId(
@@ -963,7 +1268,7 @@ test("GenArt721: Can toggle if a project uses Ipfs", () => {
   );
 });
 
-test("GenArt721: Can update a projects additional payee info", () => {
+test("GenArt721Core: Can update a projects additional payee info", () => {
   clearStore();
   const projectId = BigInt.fromI32(0);
   const fullProjectId = generateContractSpecificId(
@@ -1032,7 +1337,7 @@ test("GenArt721: Can update a projects additional payee info", () => {
   );
 });
 
-test("GenArt721: Can update a projects artist address", () => {
+test("GenArt721Core: Can update a projects artist address", () => {
   clearStore();
   const projectId = BigInt.fromI32(0);
   const fullProjectId = generateContractSpecificId(
@@ -1100,7 +1405,7 @@ test("GenArt721: Can update a projects artist address", () => {
   );
 });
 
-test("GenArt721: Can update a projects artist name", () => {
+test("GenArt721Core: Can update a projects artist name", () => {
   clearStore();
   const projectId = BigInt.fromI32(0);
   const fullProjectId = generateContractSpecificId(
@@ -1158,7 +1463,7 @@ test("GenArt721: Can update a projects artist name", () => {
   );
 });
 
-test("GenArt721: Can update a projects base Ipfs URI", () => {
+test("GenArt721Core: Can update a projects base Ipfs URI", () => {
   clearStore();
   const projectId = BigInt.fromI32(0);
   const fullProjectId = generateContractSpecificId(
@@ -1213,7 +1518,7 @@ test("GenArt721: Can update a projects base Ipfs URI", () => {
   );
 });
 
-test("GenArt721: Can update a project's base URI", () => {
+test("GenArt721Core: Can update a project's base URI", () => {
   clearStore();
   const projectId = BigInt.fromI32(0);
   const fullProjectId = generateContractSpecificId(
@@ -1263,7 +1568,86 @@ test("GenArt721: Can update a project's base URI", () => {
   );
 });
 
-test("GenArt721: Can update a projects description", () => {
+test("GenArt721Core: Can update a projects currency info", () => {
+  clearStore();
+  const projectId = BigInt.fromI32(0);
+  const fullProjectId = generateContractSpecificId(
+    TEST_CONTRACT_ADDRESS,
+    projectId
+  );
+  const artistAddress = randomAddressGenerator.generateRandomAddress();
+  const projectName = "Test Project";
+  const pricePerTokenInWei = BigInt.fromI64(i64(1e18));
+
+  addNewProjectToStore(
+    projectId,
+    projectName,
+    artistAddress,
+    pricePerTokenInWei,
+    true,
+    CURRENT_BLOCK_TIMESTAMP
+  );
+
+  const updateCallBlockTimestamp = CURRENT_BLOCK_TIMESTAMP.plus(
+    BigInt.fromI32(10)
+  );
+  const currencySymbol = "DAI";
+  const currencyAddress = randomAddressGenerator.generateRandomAddress();
+
+  const call = changetype<UpdateProjectCurrencyInfoCall>(newMockCall());
+  call.to = TEST_CONTRACT_ADDRESS;
+  call.block.timestamp = updateCallBlockTimestamp;
+  call.inputValues = [
+    new ethereum.EventParam(
+      "_projectId",
+      ethereum.Value.fromUnsignedBigInt(projectId)
+    ),
+    new ethereum.EventParam(
+      "_currencySymbol",
+      ethereum.Value.fromString(currencySymbol)
+    ),
+    new ethereum.EventParam(
+      "_currencyAddress",
+      ethereum.Value.fromAddress(currencyAddress)
+    )
+  ];
+
+  assert.fieldEquals(
+    PROJECT_ENTITY_TYPE,
+    fullProjectId,
+    "currencySymbol",
+    DEFAULT_PROJECT_VALUES.currencySymbol
+  );
+  assert.fieldEquals(
+    PROJECT_ENTITY_TYPE,
+    fullProjectId,
+    "currencyAddress",
+    DEFAULT_PROJECT_VALUES.currencyAddress.toHexString()
+  );
+
+  handleUpdateProjectCurrencyInfo(call);
+
+  assert.fieldEquals(
+    PROJECT_ENTITY_TYPE,
+    fullProjectId,
+    "currencySymbol",
+    currencySymbol
+  );
+  assert.fieldEquals(
+    PROJECT_ENTITY_TYPE,
+    fullProjectId,
+    "currencyAddress",
+    currencyAddress.toHexString()
+  );
+  assert.fieldEquals(
+    PROJECT_ENTITY_TYPE,
+    fullProjectId,
+    "updatedAt",
+    updateCallBlockTimestamp.toString()
+  );
+});
+
+test("GenArt721Core: Can update a projects description", () => {
   clearStore();
   const projectId = BigInt.fromI32(0);
   const fullProjectId = generateContractSpecificId(
@@ -1318,7 +1702,7 @@ test("GenArt721: Can update a projects description", () => {
   );
 });
 
-test("GenArt721: Can update a projects IPFS Hash", () => {
+test("GenArt721Core: Can update a projects IPFS Hash", () => {
   clearStore();
   const projectId = BigInt.fromI32(0);
   const fullProjectId = generateContractSpecificId(
@@ -1365,7 +1749,7 @@ test("GenArt721: Can update a projects IPFS Hash", () => {
   );
 });
 
-test("GenArt721: Can update a project license", () => {
+test("GenArt721Core: Can update a project license", () => {
   clearStore();
   const projectId = BigInt.fromI32(0);
   const fullProjectId = generateContractSpecificId(
@@ -1420,7 +1804,7 @@ test("GenArt721: Can update a project license", () => {
   );
 });
 
-test("GenArt721: Can update a project max invocations", () => {
+test("GenArt721Core: Can update a project max invocations", () => {
   clearStore();
   const projectId = BigInt.fromI32(0);
   const fullProjectId = generateContractSpecificId(
@@ -1485,7 +1869,7 @@ test("GenArt721: Can update a project max invocations", () => {
   );
 });
 
-test("GenArt721: Can update a project name", () => {
+test("GenArt721Core: Can update a project name", () => {
   clearStore();
   const projectId = BigInt.fromI32(0);
   const fullProjectId = generateContractSpecificId(
@@ -1542,7 +1926,7 @@ test("GenArt721: Can update a project name", () => {
   );
 });
 
-test("GenArt721: Can update a project price per token in wei", () => {
+test("GenArt721Core: Can update a project price per token in wei", () => {
   clearStore();
   const projectId = BigInt.fromI32(0);
   const fullProjectId = generateContractSpecificId(
@@ -1604,7 +1988,7 @@ test("GenArt721: Can update a project price per token in wei", () => {
   );
 });
 
-test("GenArt721: Can update a project script", () => {
+test("GenArt721Core: Can update a project script", () => {
   clearStore();
   const projectId = BigInt.fromI32(0);
   const fullProjectId = generateContractSpecificId(
@@ -1693,7 +2077,7 @@ test("GenArt721: Can update a project script", () => {
   );
 });
 
-test("GenArt721: Can handleUpdateProjectScriptJSON", () => {
+test("GenArt721Core: Can handleUpdateProjectScriptJSON", () => {
   clearStore();
   const projectId = BigInt.fromI32(0);
   const fullProjectId = generateContractSpecificId(
@@ -1749,7 +2133,7 @@ test("GenArt721: Can handleUpdateProjectScriptJSON", () => {
   );
 });
 
-test("GenArt721: Can update project secondary market royalties", () => {
+test("GenArt721Core: Can update project secondary market royalties", () => {
   clearStore();
   const projectId = BigInt.fromI32(0);
   const fullProjectId = generateContractSpecificId(
@@ -1806,7 +2190,7 @@ test("GenArt721: Can update project secondary market royalties", () => {
   );
 });
 
-test("GenArt721: Can update a project website", () => {
+test("GenArt721Core: Can update a project website", () => {
   clearStore();
   const projectId = BigInt.fromI32(0);
   const fullProjectId = generateContractSpecificId(
@@ -1855,7 +2239,7 @@ test("GenArt721: Can update a project website", () => {
     updateCallBlockTimestamp.toString()
   );
 });
-test("GenArt721: Can handle transfer", () => {
+test("GenArt721Core: Can handle transfer", () => {
   clearStore();
   const tokenId = BigInt.fromI32(0);
   const projectId = BigInt.fromI32(0);
@@ -1913,10 +2297,14 @@ test("GenArt721: Can handle transfer", () => {
     fullTokenId
   );
 });
+
+// export handlers for test coverage https://github.com/LimeChain/demo-subgraph#test-coverage
 export {
   handleAddProject,
   handleAddWhitelisted,
   handleRemoveWhitelisted,
+  handleAddMintWhitelisted,
+  handleUpdateRandomizerAddress,
   handleUpdateArtblocksAddress,
   handleUpdateArtblocksPercentage,
   handleAddProjectScript,
@@ -1927,12 +2315,14 @@ export {
   handleToggleProjectIsDynamic,
   handleToggleProjectIsLocked,
   handleToggleProjectIsPaused,
+  handleToggleProjectUseHashString,
   handleToggleProjectUseIpfsForStatic,
   handleUpdateProjectAdditionalPayeeInfo,
   handleUpdateProjectArtistAddress,
   handleUpdateProjectArtistName,
   handleUpdateProjectBaseIpfsURI,
   handleUpdateProjectBaseURI,
+  handleUpdateProjectCurrencyInfo,
   handleUpdateProjectDescription,
   handleUpdateProjectIpfsHash,
   handleUpdateProjectLicense,
@@ -1941,6 +2331,7 @@ export {
   handleUpdateProjectPricePerTokenInWei,
   handleUpdateProjectWebsite,
   handleUpdateProjectSecondaryMarketRoyaltyPercentage,
+  handleRemoveMintWhitelisted,
   handleUpdateProjectScript,
   handleUpdateProjectScriptJSON
 };
