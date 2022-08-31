@@ -318,6 +318,8 @@ export function addTestContractToStore(nextProjectId: BigInt): Contract {
     TEST_CONTRACT.renderProviderSecondarySalesAddress;
   contract.renderProviderSecondarySalesBPS =
     TEST_CONTRACT.renderProviderSecondarySalesBPS;
+  contract.curationRegistry = TEST_CONTRACT.curationRegistry;
+  contract.dependencyRegistry = TEST_CONTRACT.dependencyRegistry;
   contract.updatedAt = contract.createdAt;
   contract.mintWhitelisted = TEST_CONTRACT.mintWhitelisted;
   contract.newProjectsForbidden = false;
