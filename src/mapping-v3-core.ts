@@ -194,9 +194,11 @@ export function handleMinterUpdated(event: MinterUpdated): void {
   } else {
     // we can assume the minter is a MinterFilter contract.
     contractEntity.mintWhitelisted = [event.params._currentMinter];
+    let minterFilterContract = MinterFilterV0.bind(event.params._currentMinter);
+    // create minter filter entity if doesn't exist
+    loadOrCreateMinterFilter(minterFilterContract, event.block.timestamp);
     // check that the MinterFilter's core contract is the contract that emitted
     // the event.
-    let minterFilterContract = MinterFilterV0.bind(event.params._currentMinter);
     let minterFilterContractCoreAddress = minterFilterContract.genArt721CoreAddress();
     if (
       minterFilterContractCoreAddress.toHexString() !=
@@ -242,10 +244,7 @@ function loadOrCreateContract(
 ): Contract {
   let contractEntity = Contract.load(contract._address.toHexString());
   if (!contractEntity) {
-    contractEntity = new Contract(contract._address.toHexString());
-    contractEntity.createdAt = timestamp;
-    contractEntity.mintWhitelisted = [];
-    contractEntity.newProjectsForbidden = false;
+    contractEntity = refreshContract(contract, timestamp);
   }
   return contractEntity;
 }
@@ -269,6 +268,7 @@ function loadOrCreateMinterFilter(
     // if this is the first time we have seen this minter filter, we can
     // assume the minter allowlist is empty If it was not empty, we would
     // have seen it when the minter filter was allowlisting a minter.
+    // @dev this assumes the minter filter is in subgraph's config
     minterFilter.minterAllowlist = [];
     minterFilter.updatedAt = timestamp;
     minterFilter.save();
@@ -284,9 +284,15 @@ function loadOrCreateMinterFilter(
 function refreshContract(
   contract: GenArt721CoreV3,
   timestamp: BigInt
-): Contract | null {
-  let contractEntity = loadOrCreateContract(contract, timestamp);
-
+): Contract {
+  let contractEntity = Contract.load(contract._address.toHexString());
+  if (!contractEntity) {
+    contractEntity = new Contract(contract._address.toHexString());
+    contractEntity.createdAt = timestamp;
+    contractEntity.mintWhitelisted = [];
+    contractEntity.newProjectsForbidden = false;
+    contractEntity.nextProjectId = contract.nextProjectId();
+  }
   contractEntity.admin = contract.admin();
   contractEntity.type = contract.coreType();
   contractEntity.renderProviderAddress = contract.artblocksPrimarySalesAddress();
@@ -321,11 +327,7 @@ function clearAllMinterConfigurations(
 
   let startingProjectId = contract.startingProjectId().toI32();
   let nextProjectId = contractEntity.nextProjectId.toI32();
-  for (
-    let i = startingProjectId;
-    i < nextProjectId;
-    i = i.plus(BigInt.fromI32(1))
-  ) {
+  for (let i = startingProjectId; i < nextProjectId; i++) {
     let fullProjectId = contractEntity.id + "-" + i.toString();
     let project = Project.load(fullProjectId);
 

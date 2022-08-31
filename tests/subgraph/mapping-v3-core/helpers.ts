@@ -20,7 +20,8 @@ import {
   CURRENT_BLOCK_TIMESTAMP,
   DEFAULT_PROJECT_VALUES,
   TEST_CONTRACT_ADDRESS,
-  TEST_CONTRACT
+  TEST_CONTRACT,
+  TEST_MINTER_FILTER_ADDRESS
 } from "../shared-helpers";
 
 // helper mock function to initialize a Project entity in local in-memory store
@@ -154,6 +155,29 @@ export function mockRefreshContractCalls(
     "artblocksDependencyRegistryAddress",
     "artblocksDependencyRegistryAddress():(address)"
   ).returns([ethereum.Value.fromAddress(TEST_CONTRACT.dependencyRegistry)]);
+}
+
+// mocks return values for Soldity contract calls in handleMinterUpdated() function
+export function mockMinterUpdatedCallsNoPreconfiguredProjects(
+  startingProjectId: BigInt
+): void {
+  createMockedFunction(
+    TEST_CONTRACT_ADDRESS,
+    "startingProjectId",
+    "startingProjectId():(uint256)"
+  ).returns([ethereum.Value.fromUnsignedBigInt(startingProjectId)]);
+
+  createMockedFunction(
+    TEST_MINTER_FILTER_ADDRESS,
+    "genArt721CoreAddress",
+    "genArt721CoreAddress():(address)"
+  ).returns([ethereum.Value.fromAddress(TEST_CONTRACT_ADDRESS)]);
+
+  createMockedFunction(
+    TEST_MINTER_FILTER_ADDRESS,
+    "getNumProjectsWithMinters",
+    "getNumProjectsWithMinters():(uint256)"
+  ).returns([ethereum.Value.fromI32(0)]);
 }
 
 export function mockProjectDetailsCallWithDefaults(

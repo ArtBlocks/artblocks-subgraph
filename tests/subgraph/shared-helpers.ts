@@ -94,6 +94,7 @@ export const TEST_TOKEN_HASH = Bytes.fromByteArray(
 export const TEST_TX_HASH = Bytes.fromByteArray(
   crypto.keccak256(Bytes.fromUTF8("tx hash"))
 );
+export const TEST_MINTER_FILTER_ADDRESS = randomAddressGenerator.generateRandomAddress();
 export const ONE_ETH_IN_WEI = BigInt.fromString("1000000000000000000");
 
 export const DEFAULT_ORDER_HASH =
