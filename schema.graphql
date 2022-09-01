@@ -160,6 +160,8 @@ type ProposedArtistAddressesAndSplits @entity {
 
   "Project associated with this proposed artist addresses and splits"
   project: Project!
+  
+  createdAt: BigInt!
 }
 
 enum CoreType {
