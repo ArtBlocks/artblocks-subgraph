@@ -8,7 +8,14 @@ import {
   createMockedFunction,
   newMockEvent
 } from "matchstick-as/assembly/index";
-import { BigInt, Bytes, ethereum, store, Value } from "@graphprotocol/graph-ts";
+import {
+  BigInt,
+  Bytes,
+  ethereum,
+  crypto,
+  store,
+  Value
+} from "@graphprotocol/graph-ts";
 import {
   ACCOUNT_ENTITY_TYPE,
   PROJECT_ENTITY_TYPE,
@@ -181,6 +188,183 @@ test("GenArt721CoreV3/ProposedAddressesAndSplits: should handle new artist propo
     fullProjectId,
     "createdAt",
     updatedEventBlockTimestamp.toString()
+  );
+});
+
+test("GenArt721CoreV3/ProposedAddressesAndSplits: should overwrite new artist proposals", () => {
+  clearStore();
+  // add project to store
+  const projectId = BigInt.fromI32(1);
+  const artistAddress = randomAddressGenerator.generateRandomAddress();
+  const projectName = "Test Project";
+  const pricePerTokenInWei = BigInt.fromI64(i64(1e18));
+
+  mockRefreshContractCalls(BigInt.fromI32(2), null);
+
+  addNewProjectToStore(
+    projectId,
+    projectName,
+    artistAddress,
+    pricePerTokenInWei,
+    true,
+    CURRENT_BLOCK_TIMESTAMP
+  );
+
+  const fullProjectId = generateContractSpecificId(
+    TEST_CONTRACT_ADDRESS,
+    projectId
+  );
+
+  // handle artist proposal
+  const newArtistAddress = randomAddressGenerator.generateRandomAddress();
+  const additionalPayeePrimarySalesAddress = randomAddressGenerator.generateRandomAddress();
+  const additionalPayeePrimarySalesPercentage = BigInt.fromI32(10);
+  const additionalPayeeSecondarySalesAddress = randomAddressGenerator.generateRandomAddress();
+  const additionalPayeeSecondarySalesPercentage = BigInt.fromI32(49);
+
+  const updatedEventBlockTimestamp = CURRENT_BLOCK_TIMESTAMP.plus(
+    BigInt.fromI32(10)
+  );
+
+  const event: ProposedArtistAddressesAndSplits = changetype<
+    ProposedArtistAddressesAndSplits
+  >(newMockEvent());
+  event.address = TEST_CONTRACT_ADDRESS;
+  event.transaction.hash = TEST_TX_HASH;
+  event.logIndex = BigInt.fromI32(0);
+  event.parameters = [
+    new ethereum.EventParam(
+      "_projectId",
+      ethereum.Value.fromUnsignedBigInt(projectId)
+    ),
+    new ethereum.EventParam(
+      "_artistAddress",
+      ethereum.Value.fromAddress(newArtistAddress)
+    ),
+    new ethereum.EventParam(
+      "_additionalPayeePrimarySales",
+      ethereum.Value.fromAddress(additionalPayeePrimarySalesAddress)
+    ),
+    new ethereum.EventParam(
+      "_additionalPayeePrimarySalesPercentage",
+      ethereum.Value.fromUnsignedBigInt(additionalPayeePrimarySalesPercentage)
+    ),
+    new ethereum.EventParam(
+      "_additionalPayeeSecondarySales",
+      ethereum.Value.fromAddress(additionalPayeeSecondarySalesAddress)
+    ),
+    new ethereum.EventParam(
+      "_additionalPayeeSecondarySalesPercentage",
+      ethereum.Value.fromUnsignedBigInt(additionalPayeeSecondarySalesPercentage)
+    )
+  ];
+  event.block.timestamp = updatedEventBlockTimestamp;
+
+  handleProposedArtistAddressesAndSplits(event);
+
+  // handle another artist proposal, overwriting previous one
+  const newNewArtistAddress = randomAddressGenerator.generateRandomAddress();
+  const newAdditionalPayeePrimarySalesAddress = randomAddressGenerator.generateRandomAddress();
+  const newAdditionalPayeePrimarySalesPercentage = BigInt.fromI32(10);
+  const newAdditionalPayeeSecondarySalesAddress = randomAddressGenerator.generateRandomAddress();
+  const newAdditionalPayeeSecondarySalesPercentage = BigInt.fromI32(49);
+
+  const newUpdatedEventBlockTimestamp = updatedEventBlockTimestamp.plus(
+    BigInt.fromI32(10)
+  );
+
+  const newEvent: ProposedArtistAddressesAndSplits = changetype<
+    ProposedArtistAddressesAndSplits
+  >(newMockEvent());
+  newEvent.address = TEST_CONTRACT_ADDRESS;
+  newEvent.transaction.hash = Bytes.fromByteArray(
+    crypto.keccak256(Bytes.fromUTF8("new tx hash"))
+  );
+  newEvent.logIndex = BigInt.fromI32(0);
+  newEvent.parameters = [
+    new ethereum.EventParam(
+      "_projectId",
+      ethereum.Value.fromUnsignedBigInt(projectId)
+    ),
+    new ethereum.EventParam(
+      "_artistAddress",
+      ethereum.Value.fromAddress(newNewArtistAddress)
+    ),
+    new ethereum.EventParam(
+      "_additionalPayeePrimarySales",
+      ethereum.Value.fromAddress(newAdditionalPayeePrimarySalesAddress)
+    ),
+    new ethereum.EventParam(
+      "_additionalPayeePrimarySalesPercentage",
+      ethereum.Value.fromUnsignedBigInt(
+        newAdditionalPayeePrimarySalesPercentage
+      )
+    ),
+    new ethereum.EventParam(
+      "_additionalPayeeSecondarySales",
+      ethereum.Value.fromAddress(newAdditionalPayeeSecondarySalesAddress)
+    ),
+    new ethereum.EventParam(
+      "_additionalPayeeSecondarySalesPercentage",
+      ethereum.Value.fromUnsignedBigInt(
+        newAdditionalPayeeSecondarySalesPercentage
+      )
+    )
+  ];
+  newEvent.block.timestamp = newUpdatedEventBlockTimestamp;
+
+  handleProposedArtistAddressesAndSplits(newEvent);
+
+  // assert that the previous proposal is not in store
+  assert.entityCount("ProposedArtistAddressesAndSplits", 1);
+  // assert that the new proposal is stored
+  assert.fieldEquals(
+    "ProposedArtistAddressesAndSplits",
+    fullProjectId,
+    "id",
+    fullProjectId
+  );
+  assert.fieldEquals(
+    "ProposedArtistAddressesAndSplits",
+    fullProjectId,
+    "project",
+    fullProjectId
+  );
+  assert.fieldEquals(
+    "ProposedArtistAddressesAndSplits",
+    fullProjectId,
+    "artistAddress",
+    newNewArtistAddress.toHexString()
+  );
+  assert.fieldEquals(
+    "ProposedArtistAddressesAndSplits",
+    fullProjectId,
+    "additionalPayeePrimarySalesAddress",
+    newAdditionalPayeePrimarySalesAddress.toHexString()
+  );
+  assert.fieldEquals(
+    "ProposedArtistAddressesAndSplits",
+    fullProjectId,
+    "additionalPayeePrimarySalesPercentage",
+    newAdditionalPayeePrimarySalesPercentage.toString()
+  );
+  assert.fieldEquals(
+    "ProposedArtistAddressesAndSplits",
+    fullProjectId,
+    "additionalPayeeSecondarySalesAddress",
+    newAdditionalPayeeSecondarySalesAddress.toHexString()
+  );
+  assert.fieldEquals(
+    "ProposedArtistAddressesAndSplits",
+    fullProjectId,
+    "additionalPayeeSecondarySalesPercentage",
+    newAdditionalPayeeSecondarySalesPercentage.toString()
+  );
+  assert.fieldEquals(
+    "ProposedArtistAddressesAndSplits",
+    fullProjectId,
+    "createdAt",
+    newUpdatedEventBlockTimestamp.toString()
   );
 });
 
