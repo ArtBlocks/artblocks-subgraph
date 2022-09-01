@@ -288,11 +288,11 @@ export function handleAcceptedArtistAddressesAndSplits(
   event: AcceptedArtistAddressesAndSplits
 ): void {
   // load associated project entity
-  const newEntityId = generateContractSpecificId(
+  const entityId = generateContractSpecificId(
     event.address,
     event.params._projectId
   );
-  const project = Project.load(newEntityId);
+  const project = Project.load(entityId);
   if (!project) {
     return;
   }
@@ -303,18 +303,18 @@ export function handleAcceptedArtistAddressesAndSplits(
     // we don't expect this state to be possible, so we should log a warning
     log.warning(
       "[WARN] No proposed artist addresses and splits found on project {}.",
-      [newEntityId]
+      [entityId]
     );
     return;
   }
   const proposedArtistAddressesAndSplits = ProposedArtistAddressesAndSplits.load(
-    newEntityId
+    entityId
   );
   if (!proposedArtistAddressesAndSplits) {
     // we dont expect this state to be possible, so we should log a warning
     log.warning(
       "[WARN] No proposed artist addresses and splits found with id {}.",
-      [newEntityId]
+      [entityId]
     );
     return;
   }
@@ -328,11 +328,12 @@ export function handleAcceptedArtistAddressesAndSplits(
     proposedArtistAddressesAndSplits.additionalPayeeSecondarySalesAddress;
   project.additionalPayeeSecondarySalesPercentage =
     proposedArtistAddressesAndSplits.additionalPayeeSecondarySalesPercentage;
-  // keep the proposed artist addresses and splits entity because it still
-  // exists on the blockchain, and admin could still "accept" it again (even
-  // though it wouldn't change anything)
+  // clear the existing proposed artist addresses and splits
+  project.proposedArtistAddressesAndSplits = null;
   project.updatedAt = event.block.timestamp;
   project.save();
+  // remove the existing proposed artist addresses and splits entity from store
+  store.remove("ProposedArtistAddressesAndSplits", entityId);
 }
 
 /*** END EVENT HANDLERS ***/
