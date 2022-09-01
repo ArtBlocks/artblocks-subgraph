@@ -15,7 +15,9 @@ import {
   Mint,
   Transfer,
   PlatformUpdated,
-  MinterUpdated
+  MinterUpdated,
+  ProposedArtistAddressesAndSplits as ProposedArtistAddressesAndSplitsEvent,
+  AcceptedArtistAddressesAndSplits
 } from "../generated/GenArt721CoreV3/GenArt721CoreV3";
 
 import { MinterFilterV0 } from "../generated/MinterFilterV0/MinterFilterV0";
@@ -228,6 +230,109 @@ export function handleMinterUpdated(event: MinterUpdated): void {
   // update contract entity and save
   contractEntity.updatedAt = event.block.timestamp;
   contractEntity.save();
+}
+
+// Handle artist proposed address and splits updates
+// This is an event indicating that the artist has proposed a new set of
+// addresses and splits for a project.
+export function handleProposedArtistAddressesAndSplits(
+  event: ProposedArtistAddressesAndSplitsEvent
+): void {
+  // load associated project entity
+  const newEntityId = generateContractSpecificId(
+    event.address,
+    event.params._projectId
+  );
+  const project = Project.load(newEntityId);
+  if (!project) {
+    return;
+  }
+  // remove any existing proposed artist addresses and splits
+  const existingProposedArtistAddressesAndSplitsId =
+    project.proposedArtistAddressesAndSplits;
+  if (existingProposedArtistAddressesAndSplitsId !== null) {
+    project.proposedArtistAddressesAndSplits = null;
+    store.remove(
+      "ProposedArtistAddressesAndSplits",
+      existingProposedArtistAddressesAndSplitsId
+    );
+  }
+  // create new proposed artist addresses and splits entity
+  const proposedArtistAddressesAndSplits = new ProposedArtistAddressesAndSplits(
+    newEntityId
+  );
+  // populate new entity with event params
+  proposedArtistAddressesAndSplits.artistAddress = event.params._artistAddress;
+  proposedArtistAddressesAndSplits.additionalPayeePrimarySalesAddress =
+    event.params._additionalPayeePrimarySales;
+  proposedArtistAddressesAndSplits.additionalPayeePrimarySalesPercentage =
+    event.params._additionalPayeePrimarySalesPercentage;
+  proposedArtistAddressesAndSplits.additionalPayeeSecondarySalesAddress =
+    event.params._additionalPayeeSecondarySales;
+  proposedArtistAddressesAndSplits.additionalPayeeSecondarySalesPercentage =
+    event.params._additionalPayeeSecondarySalesPercentage;
+  proposedArtistAddressesAndSplits.createdAt = event.block.timestamp;
+  proposedArtistAddressesAndSplits.project = project.id;
+  // save new entity to store
+  proposedArtistAddressesAndSplits.createdAt = event.block.timestamp;
+  proposedArtistAddressesAndSplits.save();
+  // set the project's proposedArtistAddressesAndSplits field to the new entity
+  project.proposedArtistAddressesAndSplits =
+    proposedArtistAddressesAndSplits.id;
+  project.updatedAt = event.block.timestamp;
+  project.save();
+}
+
+// Handle admin accepting the currently proposed artist address and splits.
+export function handleAcceptedArtistAddressesAndSplits(
+  event: AcceptedArtistAddressesAndSplits
+): void {
+  // load associated project entity
+  const newEntityId = generateContractSpecificId(
+    event.address,
+    event.params._projectId
+  );
+  const project = Project.load(newEntityId);
+  if (!project) {
+    return;
+  }
+  // load the existing proposed artist addresses and splits
+  const existingProposedArtistAddressesAndSplitsId =
+    project.proposedArtistAddressesAndSplits;
+  if (existingProposedArtistAddressesAndSplitsId === null) {
+    // we don't expect this state to be possible, so we should log a warning
+    log.warning(
+      "[WARN] No proposed artist addresses and splits found on project {}.",
+      [newEntityId]
+    );
+    return;
+  }
+  const proposedArtistAddressesAndSplits = ProposedArtistAddressesAndSplits.load(
+    newEntityId
+  );
+  if (!proposedArtistAddressesAndSplits) {
+    // we dont expect this state to be possible, so we should log a warning
+    log.warning(
+      "[WARN] No proposed artist addresses and splits found with id {}.",
+      [newEntityId]
+    );
+    return;
+  }
+  // update project entity with new artist addresses and splits
+  project.artistAddress = proposedArtistAddressesAndSplits.artistAddress;
+  project.additionalPayee =
+    proposedArtistAddressesAndSplits.additionalPayeePrimarySalesAddress;
+  project.additionalPayeePercentage =
+    proposedArtistAddressesAndSplits.additionalPayeePrimarySalesPercentage;
+  project.additionalPayeeSecondarySalesAddress =
+    proposedArtistAddressesAndSplits.additionalPayeeSecondarySalesAddress;
+  project.additionalPayeeSecondarySalesPercentage =
+    proposedArtistAddressesAndSplits.additionalPayeeSecondarySalesPercentage;
+  // keep the proposed artist addresses and splits entity because it still
+  // exists on the blockchain, and admin could still "accept" it again (even
+  // though it wouldn't change anything)
+  project.updatedAt = event.block.timestamp;
+  project.save();
 }
 
 /*** END EVENT HANDLERS ***/
