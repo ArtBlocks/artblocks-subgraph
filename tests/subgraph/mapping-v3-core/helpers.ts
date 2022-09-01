@@ -92,10 +92,28 @@ export function mockRefreshContractCalls(
     "artblocksPrimarySalesAddress():(address)"
   ).returns([ethereum.Value.fromAddress(TEST_CONTRACT.renderProviderAddress)]);
 
+  // Note: not used in V3 sync, but good to add backwards-compatible mock here
+  //for the backwards-compatible V3 external function
+  createMockedFunction(
+    TEST_CONTRACT_ADDRESS,
+    "artblocksAddress",
+    "artblocksAddress():(address)"
+  ).returns([ethereum.Value.fromAddress(TEST_CONTRACT.renderProviderAddress)]);
+
   createMockedFunction(
     TEST_CONTRACT_ADDRESS,
     "artblocksPrimarySalesPercentage",
     "artblocksPrimarySalesPercentage():(uint256)"
+  ).returns([
+    ethereum.Value.fromUnsignedBigInt(TEST_CONTRACT.renderProviderPercentage)
+  ]);
+
+  // Note: not used in V3 sync, but good to add backwards-compatible mock here
+  //for the backwards-compatible V3 external function
+  createMockedFunction(
+    TEST_CONTRACT_ADDRESS,
+    "artblocksPercentage",
+    "artblocksPercentage():(uint256)"
   ).returns([
     ethereum.Value.fromUnsignedBigInt(TEST_CONTRACT.renderProviderPercentage)
   ]);
