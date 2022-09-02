@@ -161,6 +161,7 @@ export class DefaultProjectValues {
   useIpfs: boolean;
   website: string;
   externalAssetDependencyCount: BigInt;
+  externalAssetDependenciesLocked: boolean;
 }
 
 // These represent the values that would be returned by a
@@ -191,7 +192,8 @@ export const DEFAULT_PROJECT_VALUES: DefaultProjectValues = {
   useHashString: true,
   useIpfs: false,
   website: "",
-  externalAssetDependencyCount: BigInt.zero()
+  externalAssetDependencyCount: BigInt.zero(),
+  externalAssetDependenciesLocked: false
 };
 
 // Store population functions
@@ -252,7 +254,8 @@ export const addNewProjectToStore = function(
   project.useHashString = DEFAULT_PROJECT_VALUES.useHashString;
   project.useIpfs = DEFAULT_PROJECT_VALUES.useIpfs;
   project.externalAssetDependencyCount = BigInt.fromI32(0);
-
+  project.externalAssetDependenciesLocked = false;
+  
   project.save();
   return project;
 };
