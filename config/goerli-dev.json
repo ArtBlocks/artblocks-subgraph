@@ -123,7 +123,7 @@
       "startBlock": 7148716
     }
   ],
-  "minterHolderV2Contracts": [
+  "minterHolderV1Contracts": [
     {
       "address": "0x0000000000000000000000000000000000000000",
       "name": "Flagship Minter for V3 core",
@@ -137,7 +137,7 @@
       "startBlock": 7105457
     }
   ],
-  "minterMerkleV2Contracts": [
+  "minterMerkleV1Contracts": [
     {
       "address": "0x0000000000000000000000000000000000000000",
       "name": "Flagship Minter for V3 core",
