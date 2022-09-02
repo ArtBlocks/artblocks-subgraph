@@ -3,12 +3,16 @@ import { logStore } from "matchstick-as";
 
 import {
   MinterFilterV0,
-  IsCanonicalMinterFilter,
+  IsCanonicalMinterFilter
+} from "../generated/MinterFilterV0/MinterFilterV0";
+
+import {
+  IMinterFilterV0,
   MinterApproved,
   MinterRevoked,
   ProjectMinterRegistered,
   ProjectMinterRemoved
-} from "../generated/MinterFilterV0/MinterFilterV0";
+} from "../generated/MinterFilterV0/IMinterFilterV0";
 
 import {
   Project,
@@ -24,6 +28,8 @@ import {
   loadOrCreateMinter
 } from "./helpers";
 
+// @dev - This event is ONLY emitted from a MinterFilterV0 contract, so we can
+// safely bind directly to a MinterFilterV0 contract in this handler.
 export function handleIsCanonicalMinterFilter(
   event: IsCanonicalMinterFilter
 ): void {
@@ -252,6 +258,9 @@ export function loadOrCreateAndSetProjectMinterConfiguration(
   return projectMinterConfig;
 }
 
+// Helper function to load or create a minter filter.
+// Assumes that the minterAllowlist is empty when initializing a new minter
+// filter.
 function loadOrCreateMinterFilter(
   minterFilterAddress: Address,
   timestamp: BigInt
@@ -262,7 +271,7 @@ function loadOrCreateMinterFilter(
   }
 
   minterFilter = new MinterFilter(minterFilterAddress.toHexString());
-  let minterFilterContract = MinterFilterV0.bind(minterFilterAddress);
+  let minterFilterContract = IMinterFilterV0.bind(minterFilterAddress);
   let coreContractAddress = minterFilterContract.genArt721CoreAddress();
   minterFilter.coreContract = coreContractAddress.toHexString();
   minterFilter.minterAllowlist = [];
