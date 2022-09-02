@@ -352,9 +352,7 @@ export function handleAcceptedArtistAddressesAndSplits(
 export function handleOwnershipTransferred(event: OwnershipTransferred): void {
   let contract = GenArt721CoreV3.bind(event.address);
   let contractEntity = loadOrCreateContract(contract, event.block.timestamp);
-  // update the contract entity with the new admin address from the event, as
-  // opposed to the value at the end of the block, which could be the current
-  // value if we just created a new contract entity and synced it.
+  // update the contract entity with the new admin address from the event
   contractEntity.admin = event.params.newOwner;
   contractEntity.updatedAt = event.block.timestamp;
   contractEntity.save();
