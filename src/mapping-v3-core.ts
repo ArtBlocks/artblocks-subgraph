@@ -185,11 +185,10 @@ export function handlePlatformUpdated(event: PlatformUpdated): void {
 // event.
 // @dev Warning - this does not handle updates where the contract's
 // minterFilter is updated. For that, see handleUpdateMinterFilter.
-function refreshContract<T>(contract: T, timestamp: BigInt): Contract | null {
-  if (!(contract instanceof GenArt721CoreV3)) {
-    return null;
-  }
-
+function refreshContract(
+  contract: GenArt721CoreV3,
+  timestamp: BigInt
+): Contract | null {
   let contractEntity = Contract.load(contract._address.toHexString());
   if (!contractEntity) {
     contractEntity = new Contract(contract._address.toHexString());
