@@ -38,6 +38,10 @@ dataSources:
           handler: handlePlatformUpdated
         - event: MinterUpdated(indexed address)
           handler: handleMinterUpdated
+        - event: ProposedArtistAddressesAndSplits(indexed uint256,address,address,uint256,address,uint256)
+          handler: handleProposedArtistAddressesAndSplits
+        - event: AcceptedArtistAddressesAndSplits(indexed uint256)
+          handler: handleAcceptedArtistAddressesAndSplits
       file: ./src/mapping-v3-core.ts
   {{/genArt721CoreV3Contracts}}
   {{#genArt721CoreContracts}}
