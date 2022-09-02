@@ -989,13 +989,13 @@ dataSources:
         - event: ProjectCurrencyInfoUpdated(indexed uint256,indexed address,string)
           handler: handleProjectCurrencyInfoUpdated
         - event: RegisteredNFTAddress(indexed address)
-          handler: handleRegisteredNFTAddress
+          handler: handleRegisteredNFTAddressV0
         - event: UnregisteredNFTAddress(indexed address)
-          handler: handleUnregisteredNFTAddress
+          handler: handleUnregisteredNFTAddressV0
         - event: AllowedHoldersOfProjects(indexed uint256,address[],uint256[])
-          handler: handleAllowHoldersOfProjects
+          handler: handleAllowHoldersOfProjectsV0
         - event: RemovedHoldersOfProjects(indexed uint256,address[],uint256[])
-          handler: handleRemoveHoldersOfProjects
+          handler: handleRemoveHoldersOfProjectsV0
       file: ./src/minter-suite-mapping.ts
   {{/minterHolderV0Contracts}}
   {{#minterMerkleV0Contracts}}
@@ -1198,13 +1198,13 @@ dataSources:
         - event: ProjectCurrencyInfoUpdated(indexed uint256,indexed address,string)
           handler: handleProjectCurrencyInfoUpdated
         - event: RegisteredNFTAddress(indexed address)
-          handler: handleRegisteredNFTAddress
+          handler: handleRegisteredNFTAddressV1
         - event: UnregisteredNFTAddress(indexed address)
-          handler: handleUnregisteredNFTAddress
+          handler: handleUnregisteredNFTAddressV1
         - event: AllowedHoldersOfProjects(indexed uint256,address[],uint256[])
-          handler: handleAllowHoldersOfProjects
+          handler: handleAllowHoldersOfProjectsV1
         - event: RemovedHoldersOfProjects(indexed uint256,address[],uint256[])
-          handler: handleRemoveHoldersOfProjects
+          handler: handleRemoveHoldersOfProjectsV1
       file: ./src/minter-suite-mapping.ts
   {{/minterHolderV1Contracts}}
   {{#minterMerkleV1Contracts}}
