@@ -30,13 +30,14 @@ import {
   assertNewProjectFields,
   assertTestContractFields,
   addTestContractToStore,
+  addNewProjectToStore,
   addNewTokenToStore,
   addNewContractToStore,
   TRANSFER_ENTITY_TYPE,
   DEFAULT_COLLECTION
 } from "../shared-helpers";
 
-import { mockRefreshContractCalls, addNewProjectToStore } from "./helpers";
+import { mockRefreshContractCalls } from "./helpers";
 
 import {
   Account,
@@ -83,11 +84,11 @@ test("GenArt721CoreV3: Can handle Mint", () => {
   const pricePerTokenInWei = BigInt.fromI64(i64(1e18));
 
   addNewProjectToStore(
+    TEST_CONTRACT_ADDRESS,
     projectId,
     projectName,
     artistAddress,
     pricePerTokenInWei,
-    true,
     CURRENT_BLOCK_TIMESTAMP
   );
 

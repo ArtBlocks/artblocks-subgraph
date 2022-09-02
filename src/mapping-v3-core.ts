@@ -45,6 +45,13 @@ import {
   generateProjectScriptId
 } from "./helpers";
 
+/**
+ * @dev Warning - All parameters pulled directly from contracts will return the
+ * state at the end of the block that the transaction was included in. When
+ * possible, use event parameters or entity fields from the store, which will
+ * reflect the state at the time of the event.
+ */
+
 /*** EVENT HANDLERS ***/
 export function handleMint(event: Mint): void {
   let contract = GenArt721CoreV3.bind(event.address);
@@ -59,6 +66,9 @@ export function handleMint(event: Mint): void {
 
   let project = Project.load(projectId);
   if (project) {
+    // @dev use invocations from entity in store. This will reflect the state
+    // at the time of the event, not the end of the block, which is required
+    // because many invocations often occur in a single block.
     let invocation = project.invocations;
 
     token.tokenId = event.params._tokenId;
