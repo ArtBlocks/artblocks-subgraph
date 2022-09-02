@@ -200,6 +200,9 @@ test("GenArt721CoreV3: Handles OwnershipTransferred to new address and zero addr
     const projectId = BigInt.fromI32(i);
     addTestContractToStore(projectId);
 
+    const updatedEventBlockTimestamp = CURRENT_BLOCK_TIMESTAMP.plus(
+      BigInt.fromI32(10)
+    );
     const event: OwnershipTransferred = changetype<OwnershipTransferred>(
       newMockEvent()
     );
@@ -216,6 +219,7 @@ test("GenArt721CoreV3: Handles OwnershipTransferred to new address and zero addr
         ethereum.Value.fromAddress(newOwnerAddress)
       )
     ];
+    event.block.timestamp = updatedEventBlockTimestamp;
     // handle event
     handleOwnershipTransferred(event);
     // assertions
@@ -224,6 +228,12 @@ test("GenArt721CoreV3: Handles OwnershipTransferred to new address and zero addr
       TEST_CONTRACT_ADDRESS.toHexString(),
       "admin",
       newOwnerAddress.toHexString()
+    );
+    assert.fieldEquals(
+      CONTRACT_ENTITY_TYPE,
+      TEST_CONTRACT_ADDRESS.toHexString(),
+      "updatedAt",
+      updatedEventBlockTimestamp.toString()
     );
   }
 });
