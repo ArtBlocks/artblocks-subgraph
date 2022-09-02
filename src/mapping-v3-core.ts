@@ -188,7 +188,7 @@ export function handlePlatformUpdated(event: PlatformUpdated): void {
 function refreshContract(
   contract: GenArt721CoreV3,
   timestamp: BigInt
-): Contract | null {
+): Contract {
   let contractEntity = Contract.load(contract._address.toHexString());
   if (!contractEntity) {
     contractEntity = new Contract(contract._address.toHexString());
