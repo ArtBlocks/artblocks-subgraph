@@ -23,56 +23,13 @@ import {
   generateContractSpecificId,
   getProjectMinterConfigId
 } from "../../../src/helpers";
+// import events from generated minter-suite
+// interfaces
 import {
   PricePerTokenInWeiUpdated,
   ProjectCurrencyInfoUpdated,
   PurchaseToDisabledUpdated
 } from "../../../generated/MinterSetPriceV0/IFilteredMinterV0";
-import {
-  SetAuctionDetails as DALinV0SetAuctionDetails,
-  ResetAuctionDetails as DALinV0ResetAuctionDetails,
-  MinimumAuctionLengthSecondsUpdated
-} from "../../../generated/MinterDALinV0/MinterDALinV0";
-import {
-  SetAuctionDetails as DALinV1SetAuctionDetails,
-  ResetAuctionDetails as DALinV1ResetAuctionDetails,
-  MinimumAuctionLengthSecondsUpdated as DALinV1MinimumAuctionLengthSecondsUpdated
-} from "../../../generated/MinterDALinV1/MinterDALinV1";
-import {
-  handleAddManyAddressValueProjectConfig as handleAddManyAddressValue,
-  handleAddManyBigIntValueProjectConfig as handleAddManyBigIntValue,
-  handleAddManyBytesValueProjectConfig as handleAddManyBytesValue,
-  handleAllowHoldersOfProjects,
-  handleAuctionHalfLifeRangeSecondsUpdated,
-  handleDAExpResetAuctionDetails,
-  handleDAExpSetAuctionDetails,
-  handleDALinResetAuctionDetails,
-  handleDALinSetAuctionDetails,
-  handleMinimumAuctionLengthSecondsUpdated,
-  handlePricePerTokenInWeiUpdated,
-  handleProjectCurrencyInfoUpdated,
-  handlePurchaseToDisabledUpdated,
-  handleRegisteredNFTAddress,
-  handleRemoveBigIntManyValueProjectConfig as handleRemoveBigIntManyValue,
-  handleRemoveBytesManyValueProjectConfig as handleRemoveBytesManyValue,
-  handleRemoveHoldersOfProjects,
-  handleRemoveValueProjectConfig as handleRemoveValue,
-  handleSetAddressValueProjectConfig as handleSetAddressValue,
-  handleSetBigIntValueProjectConfig as handleSetBigIntValue,
-  handleSetBooleanValueProjectConfig as handleSetBooleanValue,
-  handleSetBytesValueProjectConfig as handleSetBytesValue,
-  handleUnregisteredNFTAddress
-} from "../../../src/minter-suite-mapping";
-import {
-  AuctionHalfLifeRangeSecondsUpdated,
-  SetAuctionDetails as DAExpV0SetAuctionDetails,
-  ResetAuctionDetails as DAExpV0ResetAuctionDetails
-} from "../../../generated/MinterDAExpV0/MinterDAExpV0";
-import {
-  AuctionHalfLifeRangeSecondsUpdated as AuctionHalfLifeRangeSecondsUpdatedV1,
-  SetAuctionDetails as DAExpV1SetAuctionDetails,
-  ResetAuctionDetails as DAExpV1ResetAuctionDetails
-} from "../../../generated/MinterDAExpV1/MinterDAExpV1";
 import {
   ConfigKeyRemoved,
   ConfigValueAddedToSet as ConfigValueAddedToSetBigInt,
@@ -86,12 +43,79 @@ import {
   ConfigValueSet2 as ConfigValueSetAddress,
   ConfigValueSet3 as ConfigValueSetBytes
 } from "../../../generated/MinterFilterV0/IFilteredMinterV1";
+// events not part of interfaces
 import {
-  AllowedHoldersOfProjects,
-  RemovedHoldersOfProjects,
-  RegisteredNFTAddress,
-  UnregisteredNFTAddress
+  SetAuctionDetails as DALinV0SetAuctionDetails,
+  ResetAuctionDetails as DALinV0ResetAuctionDetails,
+  MinimumAuctionLengthSecondsUpdated
+} from "../../../generated/MinterDALinV0/MinterDALinV0";
+import {
+  SetAuctionDetails as DALinV1SetAuctionDetails,
+  ResetAuctionDetails as DALinV1ResetAuctionDetails,
+  MinimumAuctionLengthSecondsUpdated as DALinV1MinimumAuctionLengthSecondsUpdated
+} from "../../../generated/MinterDALinV1/MinterDALinV1";
+import {
+  SetAuctionDetails as DALinV2SetAuctionDetails,
+  ResetAuctionDetails as DALinV2ResetAuctionDetails,
+  MinimumAuctionLengthSecondsUpdated as DALinV2MinimumAuctionLengthSecondsUpdated
+} from "../../../generated/MinterDALinV2/MinterDALinV2";
+import {
+  AuctionHalfLifeRangeSecondsUpdated,
+  SetAuctionDetails as DAExpV0SetAuctionDetails,
+  ResetAuctionDetails as DAExpV0ResetAuctionDetails
+} from "../../../generated/MinterDAExpV0/MinterDAExpV0";
+import {
+  AuctionHalfLifeRangeSecondsUpdated as AuctionHalfLifeRangeSecondsUpdatedV1,
+  SetAuctionDetails as DAExpV1SetAuctionDetails,
+  ResetAuctionDetails as DAExpV1ResetAuctionDetails
+} from "../../../generated/MinterDAExpV1/MinterDAExpV1";
+import {
+  AuctionHalfLifeRangeSecondsUpdated as AuctionHalfLifeRangeSecondsUpdatedV2,
+  SetAuctionDetails as DAExpV2SetAuctionDetails,
+  ResetAuctionDetails as DAExpV2ResetAuctionDetails
+} from "../../../generated/MinterDAExpV2/MinterDAExpV2";
+import {
+  AllowedHoldersOfProjects as HolderV0AllowedHoldersOfProjects,
+  RemovedHoldersOfProjects as HolderV0RemovedHoldersOfProjects,
+  RegisteredNFTAddress as HolderV0RegisteredNFTAddress,
+  UnregisteredNFTAddress as HolderV0UnregisteredNFTAddress
 } from "../../../generated/MinterHolderV0/MinterHolderV0";
+import {
+  AllowedHoldersOfProjects as HolderV1AllowedHoldersOfProjects,
+  RemovedHoldersOfProjects as HolderV1RemovedHoldersOfProjects,
+  RegisteredNFTAddress as HolderV1RegisteredNFTAddress,
+  UnregisteredNFTAddress as HolderV1UnregisteredNFTAddress
+} from "../../../generated/MinterHolderV1/MinterHolderV1";
+// import handlers from minter-suite-mapping
+import {
+  handleAddManyAddressValueProjectConfig as handleAddManyAddressValue,
+  handleAddManyBigIntValueProjectConfig as handleAddManyBigIntValue,
+  handleAddManyBytesValueProjectConfig as handleAddManyBytesValue,
+  handleAllowHoldersOfProjectsV0,
+  handleAllowHoldersOfProjectsV1,
+  handleAuctionHalfLifeRangeSecondsUpdated,
+  handleDAExpResetAuctionDetails,
+  handleDAExpSetAuctionDetails,
+  handleDALinResetAuctionDetails,
+  handleDALinSetAuctionDetails,
+  handleMinimumAuctionLengthSecondsUpdated,
+  handlePricePerTokenInWeiUpdated,
+  handleProjectCurrencyInfoUpdated,
+  handlePurchaseToDisabledUpdated,
+  handleRegisteredNFTAddressV0,
+  handleRegisteredNFTAddressV1,
+  handleRemoveBigIntManyValueProjectConfig as handleRemoveBigIntManyValue,
+  handleRemoveBytesManyValueProjectConfig as handleRemoveBytesManyValue,
+  handleRemoveHoldersOfProjectsV0,
+  handleRemoveHoldersOfProjectsV1,
+  handleRemoveValueProjectConfig as handleRemoveValue,
+  handleSetAddressValueProjectConfig as handleSetAddressValue,
+  handleSetBigIntValueProjectConfig as handleSetBigIntValue,
+  handleSetBooleanValueProjectConfig as handleSetBooleanValue,
+  handleSetBytesValueProjectConfig as handleSetBytesValue,
+  handleUnregisteredNFTAddressV0,
+  handleUnregisteredNFTAddressV1
+} from "../../../src/minter-suite-mapping";
 
 const randomAddressGenerator = new RandomAddressGenerator();
 
@@ -1992,7 +2016,7 @@ test("handleRemoveBytesManyValue should remove the key/value from extraMinterDet
   );
 });
 
-test("handleAllowHoldersOfProjects can add address + project id to extraMinterDetails", () => {
+test("handleAllowHoldersOfProjectsV0 can add address + project id to extraMinterDetails", () => {
   clearStore();
   const minter = addNewMinterToStore("MinterHolderV0");
   const minterAddress: Address = changetype<Address>(
@@ -2017,8 +2041,8 @@ test("handleAllowHoldersOfProjects can add address + project id to extraMinterDe
 
   let testAddy: Address = randomAddressGenerator.generateRandomAddress();
 
-  const allowHoldersEvent: AllowedHoldersOfProjects = changetype<
-    AllowedHoldersOfProjects
+  const allowHoldersEvent: HolderV0AllowedHoldersOfProjects = changetype<
+    HolderV0AllowedHoldersOfProjects
   >(newMockEvent());
   allowHoldersEvent.address = minterAddress;
   allowHoldersEvent.parameters = [
@@ -2037,7 +2061,7 @@ test("handleAllowHoldersOfProjects can add address + project id to extraMinterDe
   ];
   allowHoldersEvent.block.timestamp = CURRENT_BLOCK_TIMESTAMP;
 
-  handleAllowHoldersOfProjects(allowHoldersEvent);
+  handleAllowHoldersOfProjectsV0(allowHoldersEvent);
 
   assert.fieldEquals(
     PROJECT_MINTER_CONFIGURATION_ENTITY_TYPE,
@@ -2052,7 +2076,7 @@ test("handleAllowHoldersOfProjects can add address + project id to extraMinterDe
       "]}"
   );
 });
-test("handleAllowHoldersOfProjects can add multiple address + project id to extraMinterDetails", () => {
+test("handleAllowHoldersOfProjectsV0 can add multiple address + project id to extraMinterDetails", () => {
   clearStore();
   const minter = addNewMinterToStore("MinterHolderV0");
   const minterAddress: Address = changetype<Address>(
@@ -2080,8 +2104,8 @@ test("handleAllowHoldersOfProjects can add multiple address + project id to extr
     randomAddressGenerator.generateRandomAddress()
   ];
 
-  const allowHoldersEvent: AllowedHoldersOfProjects = changetype<
-    AllowedHoldersOfProjects
+  const allowHoldersEvent: HolderV0AllowedHoldersOfProjects = changetype<
+    HolderV0AllowedHoldersOfProjects
   >(newMockEvent());
   allowHoldersEvent.address = minterAddress;
   allowHoldersEvent.parameters = [
@@ -2103,7 +2127,7 @@ test("handleAllowHoldersOfProjects can add multiple address + project id to extr
   ];
   allowHoldersEvent.block.timestamp = CURRENT_BLOCK_TIMESTAMP;
 
-  handleAllowHoldersOfProjects(allowHoldersEvent);
+  handleAllowHoldersOfProjectsV0(allowHoldersEvent);
 
   assert.fieldEquals(
     PROJECT_MINTER_CONFIGURATION_ENTITY_TYPE,
@@ -2116,7 +2140,7 @@ test("handleAllowHoldersOfProjects can add multiple address + project id to extr
       '-17"]}'
   );
 });
-test("handleRemoveHoldersOfProjects can remove address + project id to extraMinterDetails", () => {
+test("handleRemoveHoldersOfProjectsV0 can remove address + project id to extraMinterDetails", () => {
   clearStore();
   const minter = addNewMinterToStore("MinterHolderV0");
   const minterAddress: Address = changetype<Address>(
@@ -2146,8 +2170,8 @@ test("handleRemoveHoldersOfProjects can remove address + project id to extraMint
     '-1","dontremove-0"]}';
   projectMinterConfig.save();
 
-  const removeHoldersEvent: RemovedHoldersOfProjects = changetype<
-    RemovedHoldersOfProjects
+  const removeHoldersEvent: HolderV0RemovedHoldersOfProjects = changetype<
+    HolderV0RemovedHoldersOfProjects
   >(newMockEvent());
   removeHoldersEvent.address = minterAddress;
   removeHoldersEvent.parameters = [
@@ -2166,7 +2190,7 @@ test("handleRemoveHoldersOfProjects can remove address + project id to extraMint
   ];
   removeHoldersEvent.block.timestamp = CURRENT_BLOCK_TIMESTAMP;
 
-  handleRemoveHoldersOfProjects(removeHoldersEvent);
+  handleRemoveHoldersOfProjectsV0(removeHoldersEvent);
 
   assert.fieldEquals(
     PROJECT_MINTER_CONFIGURATION_ENTITY_TYPE,
@@ -2175,7 +2199,7 @@ test("handleRemoveHoldersOfProjects can remove address + project id to extraMint
     '{"allowlistedAddressAndProjectId":["dontremove-0"]}'
   );
 });
-test("handleRemoveHoldersOfProjects can remove multiple address + project id to extraMinterDetails", () => {
+test("handleRemoveHoldersOfProjects V0 can remove multiple address + project id to extraMinterDetails", () => {
   clearStore();
   const minter = addNewMinterToStore("MinterHolderV0");
   const minterAddress: Address = changetype<Address>(
@@ -2210,8 +2234,8 @@ test("handleRemoveHoldersOfProjects can remove multiple address + project id to 
     '-17","dontremove-0"]}';
   projectMinterConfig.save();
 
-  const removeHoldersEvent: RemovedHoldersOfProjects = changetype<
-    RemovedHoldersOfProjects
+  const removeHoldersEvent: HolderV0RemovedHoldersOfProjects = changetype<
+    HolderV0RemovedHoldersOfProjects
   >(newMockEvent());
   removeHoldersEvent.address = minterAddress;
   removeHoldersEvent.parameters = [
@@ -2233,7 +2257,7 @@ test("handleRemoveHoldersOfProjects can remove multiple address + project id to 
   ];
   removeHoldersEvent.block.timestamp = CURRENT_BLOCK_TIMESTAMP;
 
-  handleRemoveHoldersOfProjects(removeHoldersEvent);
+  handleRemoveHoldersOfProjectsV0(removeHoldersEvent);
 
   assert.fieldEquals(
     PROJECT_MINTER_CONFIGURATION_ENTITY_TYPE,
@@ -2242,7 +2266,7 @@ test("handleRemoveHoldersOfProjects can remove multiple address + project id to 
     '{"allowlistedAddressAndProjectId":["dontremove-0"]}'
   );
 });
-test("handleRegisteredNFTAddress adds the address, as a string to the minter", () => {
+test("handleRegisteredNFTAddress V0 adds the address, as a string to the minter", () => {
   clearStore();
   const minter = addNewMinterToStore("MinterHolderV0");
   const minterAddress: Address = changetype<Address>(
@@ -2252,8 +2276,8 @@ test("handleRegisteredNFTAddress adds the address, as a string to the minter", (
 
   const testAddy = randomAddressGenerator.generateRandomAddress();
 
-  const registerNFTAddressEvent: RegisteredNFTAddress = changetype<
-    RegisteredNFTAddress
+  const registerNFTAddressEvent: HolderV0RegisteredNFTAddress = changetype<
+    HolderV0RegisteredNFTAddress
   >(newMockEvent());
   registerNFTAddressEvent.address = minterAddress;
   registerNFTAddressEvent.parameters = [
@@ -2261,7 +2285,7 @@ test("handleRegisteredNFTAddress adds the address, as a string to the minter", (
   ];
   registerNFTAddressEvent.block.timestamp = CURRENT_BLOCK_TIMESTAMP;
 
-  handleRegisteredNFTAddress(registerNFTAddressEvent);
+  handleRegisteredNFTAddressV0(registerNFTAddressEvent);
 
   assert.fieldEquals(
     MINTER_ENTITY_TYPE,
@@ -2270,7 +2294,7 @@ test("handleRegisteredNFTAddress adds the address, as a string to the minter", (
     '{"registeredNFTAddresses":[' + '"' + testAddy.toHexString() + '"' + "]}"
   );
 });
-test("handleUnRegisteredNFTAddress removes the address from the minter", () => {
+test("handleUnRegisteredNFTAddress V0 removes the address from the minter", () => {
   clearStore();
   const minterType = "MinterHolderV0";
   const minter = addNewMinterToStore(minterType);
@@ -2293,8 +2317,8 @@ test("handleUnRegisteredNFTAddress removes the address from the minter", () => {
     "]}";
   minter.save();
 
-  const unregisterNFTAddressEvent: UnregisteredNFTAddress = changetype<
-    UnregisteredNFTAddress
+  const unregisterNFTAddressEvent: HolderV0UnregisteredNFTAddress = changetype<
+    HolderV0UnregisteredNFTAddress
   >(newMockEvent());
   unregisterNFTAddressEvent.address = minterAddress;
   unregisterNFTAddressEvent.parameters = [
@@ -2302,7 +2326,7 @@ test("handleUnRegisteredNFTAddress removes the address from the minter", () => {
   ];
   unregisterNFTAddressEvent.block.timestamp = CURRENT_BLOCK_TIMESTAMP;
 
-  handleUnregisteredNFTAddress(unregisterNFTAddressEvent);
+  handleUnregisteredNFTAddressV0(unregisterNFTAddressEvent);
 
   assert.fieldEquals(
     MINTER_ENTITY_TYPE,
