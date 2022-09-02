@@ -42,6 +42,8 @@ dataSources:
           handler: handleProposedArtistAddressesAndSplits
         - event: AcceptedArtistAddressesAndSplits(indexed uint256)
           handler: handleAcceptedArtistAddressesAndSplits
+        - event: OwnershipTransferred(indexed address,indexed address)
+          handler: handleOwnershipTransferred
       file: ./src/mapping-v3-core.ts
   {{/genArt721CoreV3Contracts}}
   {{#genArt721CoreContracts}}
