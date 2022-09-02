@@ -8,7 +8,14 @@ import {
   createMockedFunction,
   newMockEvent
 } from "matchstick-as/assembly/index";
-import { BigInt, Bytes, ethereum, store, Value } from "@graphprotocol/graph-ts";
+import {
+  BigInt,
+  Bytes,
+  ethereum,
+  store,
+  Value,
+  Address
+} from "@graphprotocol/graph-ts";
 import {
   ACCOUNT_ENTITY_TYPE,
   PROJECT_ENTITY_TYPE,
@@ -52,12 +59,14 @@ import {
 import {
   Mint,
   Transfer,
-  PlatformUpdated
+  PlatformUpdated,
+  OwnershipTransferred
 } from "../../../generated/GenArt721CoreV3/GenArt721CoreV3";
 import {
   handleMint,
   handleTransfer,
-  handlePlatformUpdated
+  handlePlatformUpdated,
+  handleOwnershipTransferred
 } from "../../../src/mapping-v3-core";
 import {
   generateContractSpecificId,
@@ -176,6 +185,47 @@ test("GenArt721CoreV3: Can handle transfer", () => {
     "token",
     fullTokenId
   );
+});
+
+test("GenArt721CoreV3: Handles OwnershipTransferred to new address and zero address", () => {
+  const newOwners = [
+    randomAddressGenerator.generateRandomAddress(),
+    Address.zero()
+  ];
+  // test for nextProjectId of 0 and 1
+  for (let i = 0; i < newOwners.length; i++) {
+    clearStore();
+    const newOwnerAddress = newOwners[i];
+    // add new contract to store
+    const projectId = BigInt.fromI32(i);
+    addTestContractToStore(projectId);
+
+    const event: OwnershipTransferred = changetype<OwnershipTransferred>(
+      newMockEvent()
+    );
+    event.address = TEST_CONTRACT_ADDRESS;
+    event.transaction.hash = TEST_TX_HASH;
+    event.logIndex = BigInt.fromI32(0);
+    event.parameters = [
+      new ethereum.EventParam(
+        "previousOwner",
+        ethereum.Value.fromAddress(TEST_CONTRACT_ADDRESS)
+      ),
+      new ethereum.EventParam(
+        "newOwner",
+        ethereum.Value.fromAddress(newOwnerAddress)
+      )
+    ];
+    // handle event
+    handleOwnershipTransferred(event);
+    // assertions
+    assert.fieldEquals(
+      CONTRACT_ENTITY_TYPE,
+      TEST_CONTRACT_ADDRESS.toHexString(),
+      "admin",
+      newOwnerAddress.toHexString()
+    );
+  }
 });
 
 test("GenArt721CoreV3: Handles PlatformUpdated::nextProjectId", () => {
