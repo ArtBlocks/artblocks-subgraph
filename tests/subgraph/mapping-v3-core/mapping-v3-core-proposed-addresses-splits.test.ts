@@ -37,13 +37,14 @@ import {
   assertNewProjectFields,
   assertTestContractFields,
   addTestContractToStore,
+  addNewProjectToStore,
   addNewTokenToStore,
   addNewContractToStore,
   TRANSFER_ENTITY_TYPE,
   DEFAULT_COLLECTION
 } from "../shared-helpers";
 
-import { mockRefreshContractCalls, addNewProjectToStore } from "./helpers";
+import { mockRefreshContractCalls } from "./helpers";
 
 import {
   Account,
@@ -81,11 +82,11 @@ test("GenArt721CoreV3/ProposedAddressesAndSplits: should handle new artist propo
   mockRefreshContractCalls(BigInt.fromI32(2), null);
 
   addNewProjectToStore(
+    TEST_CONTRACT_ADDRESS,
     projectId,
     projectName,
     artistAddress,
     pricePerTokenInWei,
-    true,
     CURRENT_BLOCK_TIMESTAMP
   );
 
@@ -202,11 +203,11 @@ test("GenArt721CoreV3/ProposedAddressesAndSplits: should overwrite new artist pr
   mockRefreshContractCalls(BigInt.fromI32(2), null);
 
   addNewProjectToStore(
+    TEST_CONTRACT_ADDRESS,
     projectId,
     projectName,
     artistAddress,
     pricePerTokenInWei,
-    true,
     CURRENT_BLOCK_TIMESTAMP
   );
 
@@ -379,11 +380,11 @@ test("GenArt721CoreV3/AcceptedArtistAddressesAndSplits: should update Project, a
   mockRefreshContractCalls(BigInt.fromI32(2), null);
 
   addNewProjectToStore(
+    TEST_CONTRACT_ADDRESS,
     projectId,
     projectName,
     artistAddress,
     pricePerTokenInWei,
-    true,
     CURRENT_BLOCK_TIMESTAMP
   );
 
