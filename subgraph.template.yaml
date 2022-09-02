@@ -342,6 +342,8 @@ dataSources:
           handler: handleExternalAssetDependencyRemoved
         - event: GatewayUpdated(indexed uint8,string)
           handler: handleGatewayUpdated
+        - event: ProjectExternalAssetDependenciesLocked(indexed uint256)
+          handler: handleProjectExternalAssetDependenciesLocked
       callHandlers:
         - function: updateAdmin(address)
           handler: handleUpdateAdmin

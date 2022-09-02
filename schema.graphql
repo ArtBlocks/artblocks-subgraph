@@ -81,6 +81,9 @@ type Project @entity {
   "The number of external asset dependencies stored on-chain"
   externalAssetDependencyCount: BigInt!
 
+  "Once the project's external asset dependencies are locked they may never be modified again"
+  externalAssetDependenciesLocked: Boolean!
+
   "Extra information about the script and rendering options"
   scriptJSON: String
 

@@ -414,6 +414,15 @@ export class Project extends Entity {
     this.set("externalAssetDependencyCount", Value.fromBigInt(value));
   }
 
+  get externalAssetDependenciesLocked(): boolean {
+    let value = this.get("externalAssetDependenciesLocked");
+    return value!.toBoolean();
+  }
+
+  set externalAssetDependenciesLocked(value: boolean) {
+    this.set("externalAssetDependenciesLocked", Value.fromBoolean(value));
+  }
+
   get scriptJSON(): string | null {
     let value = this.get("scriptJSON");
     if (!value || value.kind == ValueKind.NULL) {

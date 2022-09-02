@@ -49,6 +49,7 @@ import {
   ExternalAssetDependencyUpdated,
   ExternalAssetDependencyRemoved,
   GatewayUpdated,
+  ProjectExternalAssetDependenciesLocked,
   GenArt721Core2EngineFlex
 } from "../generated/GenArt721Core2EngineFlex/GenArt721Core2EngineFlex";
 
@@ -290,6 +291,20 @@ export function handleGatewayUpdated(event: GatewayUpdated): void {
   contractEntity.save();
 }
 
+export function handleProjectExternalAssetDependenciesLocked(event: ProjectExternalAssetDependenciesLocked): void {
+  let project = Project.load(
+    generateContractSpecificId(event.address, event.params._projectId)
+  );
+
+  if (!project) {
+    return;
+  }
+
+  project.externalAssetDependenciesLocked = true; 
+  project.updatedAt = event.block.timestamp;
+  project.save();
+}
+
 /*** END EVENT HANDLERS ***/
 
 /*** CALL HANDLERS  (Mainnet and Ropsten Only) ***/
@@ -347,6 +362,7 @@ export function handleAddProject(call: AddProjectCall): void {
   project.currencySymbol = currencySymbol;
   project.dynamic = dynamic;
   project.externalAssetDependencyCount = BigInt.fromI32(0);
+  project.externalAssetDependenciesLocked = false;
   project.invocations = invocations;
   project.locked = false;
   project.maxInvocations = maxInvocations;
