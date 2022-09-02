@@ -19,10 +19,12 @@ import {
   CURRENT_BLOCK_TIMESTAMP,
   RandomAddressGenerator,
   mockProjectScriptByIndex,
+  mockTokenIdToHash,
   PROJECT_MINTER_CONFIGURATION_ENTITY_TYPE,
   TEST_CONTRACT_ADDRESS,
   TEST_CONTRACT_CREATED_AT,
   TEST_CONTRACT,
+  TEST_TOKEN_HASH,
   assertNewProjectFields,
   assertTestContractFields,
   addTestContractToStore,
@@ -85,7 +87,8 @@ import {
   RemoveMintWhitelistedCall,
   UpdateProjectScriptCall,
   UpdateProjectScriptJSONCall,
-  Transfer
+  Transfer,
+  Mint
 } from "../../../generated/GenArt721Core/GenArt721Core";
 import {
   handleAddProject,
@@ -122,7 +125,8 @@ import {
   handleRemoveMintWhitelisted,
   handleUpdateProjectScript,
   handleUpdateProjectScriptJSON,
-  handleTransfer
+  handleTransfer,
+  handleMint
 } from "../../../src/mapping-v1-core";
 import {
   generateContractSpecificId,
@@ -2239,6 +2243,70 @@ test("GenArt721Core: Can update a project website", () => {
     updateCallBlockTimestamp.toString()
   );
 });
+
+test("GenArt721CoreV1: Can handle Mint", () => {
+  clearStore();
+  // add contract to store
+  const projectId = BigInt.fromI32(1);
+  const tokenId = BigInt.fromI32(1000001);
+  addTestContractToStore(projectId);
+  mockTokenIdToHash(TEST_CONTRACT_ADDRESS, tokenId, TEST_TOKEN_HASH);
+  // add project to store
+  const fullProjectId = generateContractSpecificId(
+    TEST_CONTRACT_ADDRESS,
+    projectId
+  );
+  const artistAddress = randomAddressGenerator.generateRandomAddress();
+  const projectName = "Test Project";
+  const pricePerTokenInWei = BigInt.fromI64(i64(1e18));
+
+  addNewProjectToStore(
+    projectId,
+    projectName,
+    artistAddress,
+    pricePerTokenInWei,
+    true,
+    CURRENT_BLOCK_TIMESTAMP
+  );
+
+  // handle mint
+  const fullTokenId = generateContractSpecificId(
+    TEST_CONTRACT_ADDRESS,
+    tokenId
+  );
+
+  const toAddress = randomAddressGenerator.generateRandomAddress();
+
+  const hash = Bytes.fromUTF8("QmYwAPJzv5CZsnA625s3Xf2nemtYgPpHdWEz79ojWnPbdG");
+
+  const logIndex = BigInt.fromI32(0);
+
+  const event: Mint = changetype<Mint>(newMockEvent());
+  event.address = TEST_CONTRACT_ADDRESS;
+  event.transaction.hash = hash;
+  event.logIndex = logIndex;
+  event.parameters = [
+    new ethereum.EventParam("_to", ethereum.Value.fromAddress(toAddress)),
+    new ethereum.EventParam(
+      "_tokenId",
+      ethereum.Value.fromUnsignedBigInt(tokenId)
+    ),
+    new ethereum.EventParam(
+      "_projectId",
+      ethereum.Value.fromUnsignedBigInt(projectId)
+    )
+  ];
+
+  handleMint(event);
+
+  assert.fieldEquals(
+    TOKEN_ENTITY_TYPE,
+    fullTokenId,
+    "owner",
+    toAddress.toHexString()
+  );
+});
+
 test("GenArt721Core: Can handle transfer", () => {
   clearStore();
   const tokenId = BigInt.fromI32(0);
@@ -2300,6 +2368,8 @@ test("GenArt721Core: Can handle transfer", () => {
 
 // export handlers for test coverage https://github.com/LimeChain/demo-subgraph#test-coverage
 export {
+  handleTransfer,
+  handleMint,
   handleAddProject,
   handleAddWhitelisted,
   handleRemoveWhitelisted,

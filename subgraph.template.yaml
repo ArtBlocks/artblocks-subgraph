@@ -2,6 +2,41 @@ specVersion: 0.0.2
 schema:
   file: ./schema.graphql
 dataSources:
+  {{#genArt721CoreV3Contracts}}
+  - kind: ethereum/contract
+    name: 'GenArt721CoreV3-{{address}}'
+    network: {{network}}
+    source:
+      address: '{{address}}'
+      abi: GenArt721CoreV3
+      startBlock: {{startBlock}}
+    mapping:
+      kind: ethereum/events
+      apiVersion: 0.0.5
+      language: wasm/assemblyscript
+      entities:
+        - Project
+        - ProjectScript
+        - Token
+        - Contract
+        - Account
+        - AccountProject
+        - Whitelisting
+        - Payment
+        - Sale
+        - SaleLookupTable
+        - ProposedArtistAddressesAndSplits
+      abis:
+        - name: GenArt721CoreV3
+          file: ./abis/GenArt721CoreV3.json
+      eventHandlers:
+        - event: Mint(indexed address,indexed uint256)
+          handler: handleMint
+        - event: Transfer(indexed address,indexed address,indexed uint256)
+          handler: handleTransfer
+        ## Follow-on PR: Add remaining V3 call handlers
+      file: ./src/mapping-v3-core.ts
+  {{/genArt721CoreV3Contracts}}
   {{#genArt721CoreContracts}}
   - kind: ethereum/contract
     name: 'GenArt721Core-{{address}}'
@@ -1038,3 +1073,4 @@ dataSources:
           handler: handleOrderFulfilled
       file: ./src/secondary/opensea/os-seaport-mapping.ts
   {{/openSeaSeaport}}
+
