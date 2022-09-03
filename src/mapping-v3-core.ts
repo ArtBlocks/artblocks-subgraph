@@ -141,23 +141,24 @@ export function handleTransfer(event: Transfer): void {
   }
 }
 
-const FIELD_PROJECT_ACTIVE = "active";
-const FIELD_PROJECT_ARTIST_ADDRESS = "artistAddress";
-const FIELD_PROJECT_ARTIST_NAME = "artistName";
-const FIELD_PROJECT_ASPECT_RATIO = "aspectRatio";
-const FIELD_PROJECT_BASE_URI = "baseURI";
-const FIELD_PROJECT_COMPLETED = "completed";
-const FIELD_PROJECT_CREATED = "created";
-const FIELD_PROJECT_DESCRIPTION = "description";
-const FIELD_PROJECT_IPFS_HASH = "ipfsHash";
-const FIELD_PROJECT_LICENSE = "license";
-const FIELD_PROJECT_MAX_INVOCATIONS = "maxInvocations";
-const FIELD_PROJECT_NAME = "name";
-const FIELD_PROJECT_PAUSED = "paused";
-const FIELD_PROJECT_SCRIPT = "script";
-const FIELD_PROJECT_SCRIPT_TYPE = "scriptType";
-const FIELD_PROJECT_SECONDARY_MARKET_ROYALTY_PERCENTAGE = "royaltyPercentage";
-const FIELD_PROJECT_WEBSITE = "website";
+export const FIELD_PROJECT_ACTIVE = "active";
+export const FIELD_PROJECT_ARTIST_ADDRESS = "artistAddress";
+export const FIELD_PROJECT_ARTIST_NAME = "artistName";
+export const FIELD_PROJECT_ASPECT_RATIO = "aspectRatio";
+export const FIELD_PROJECT_BASE_URI = "baseURI";
+export const FIELD_PROJECT_COMPLETED = "completed";
+export const FIELD_PROJECT_CREATED = "created";
+export const FIELD_PROJECT_DESCRIPTION = "description";
+export const FIELD_PROJECT_IPFS_HASH = "ipfsHash";
+export const FIELD_PROJECT_LICENSE = "license";
+export const FIELD_PROJECT_MAX_INVOCATIONS = "maxInvocations";
+export const FIELD_PROJECT_NAME = "name";
+export const FIELD_PROJECT_PAUSED = "paused";
+export const FIELD_PROJECT_SCRIPT = "script";
+export const FIELD_PROJECT_SCRIPT_TYPE = "scriptType";
+export const FIELD_PROJECT_SECONDARY_MARKET_ROYALTY_PERCENTAGE =
+  "royaltyPercentage";
+export const FIELD_PROJECT_WEBSITE = "website";
 
 export function handleProjectUpdated(event: ProjectUpdated): void {
   let contract = GenArt721CoreV3.bind(event.address);
@@ -208,7 +209,6 @@ export function handleProjectUpdated(event: ProjectUpdated): void {
     // Note this event is only ever fired when a project is completed
     // and that a project cannot become incomplete after it has been completed
     handleProjectCompleted(project, timestamp);
-  } else if (update == FIELD_PROJECT_CREATED) {
   } else if (update == FIELD_PROJECT_SCRIPT) {
     refreshProjectScript(contract, project, timestamp);
   } else if (update == FIELD_PROJECT_SECONDARY_MARKET_ROYALTY_PERCENTAGE) {
@@ -330,9 +330,15 @@ function createProject(
 ): Project | null {
   const contractAddress = contract._address.toHexString();
   let contractEntity = Contract.load(contractAddress);
+  // Starting with v3, the contract entity should always exists
+  // before a project is created because the constructor emits
+  // an event that should cause the contract entity to be created.
   if (!contractEntity) {
-    // Create the contract entity
-    // Will use refreshContract function implemented by Ryley once completed
+    log.warning("Contract not found for project: {}-{}", [
+      contractAddress,
+      projectId.toString()
+    ]);
+    return null;
   }
 
   const projectDetails = contract.try_projectDetails(projectId);
@@ -354,7 +360,7 @@ function createProject(
   }
 
   let name = projectDetails.value.getProjectName();
-  let dynamic = true;
+  let artistName = projectDetails.value.getArtist();
 
   let artistAddress = projectArtistAddress.value;
   let artist = new Account(artistAddress.toHexString());
@@ -375,14 +381,14 @@ function createProject(
   );
 
   project.active = false;
-  project.artist = artist.id;
+  project.artist = artistName;
   project.artistAddress = artistAddress;
   project.complete = false;
   project.contract = contractAddress;
   project.createdAt = timestamp;
   project.currencyAddress = currencyAddress;
   project.currencySymbol = currencySymbol;
-  project.dynamic = dynamic;
+  project.dynamic = true;
   project.externalAssetDependencyCount = BigInt.fromI32(0);
   project.invocations = invocations;
   project.locked = false;

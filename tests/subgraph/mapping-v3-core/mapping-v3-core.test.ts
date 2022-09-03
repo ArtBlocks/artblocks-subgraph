@@ -5,9 +5,19 @@ import {
   newMockCall,
   log,
   logStore,
-  newMockEvent
+  newMockEvent,
+  describe,
+  beforeEach,
+  createMockedFunction
 } from "matchstick-as/assembly/index";
-import { BigInt, Bytes, ethereum, store, Value } from "@graphprotocol/graph-ts";
+import {
+  Address,
+  BigInt,
+  Bytes,
+  ethereum,
+  store,
+  Value
+} from "@graphprotocol/graph-ts";
 import {
   ACCOUNT_ENTITY_TYPE,
   PROJECT_ENTITY_TYPE,
@@ -31,7 +41,9 @@ import {
   addNewTokenToStore,
   addNewContractToStore,
   TRANSFER_ENTITY_TYPE,
-  DEFAULT_COLLECTION
+  DEFAULT_COLLECTION,
+  ONE_MILLION,
+  booleanToString
 } from "../shared-helpers";
 
 import { mockRefreshContractCalls, addNewProjectToStore } from "./helpers";
@@ -48,9 +60,15 @@ import {
 } from "../../../generated/schema";
 import {
   Mint,
+  ProjectUpdated,
   Transfer
 } from "../../../generated/GenArt721CoreV3/GenArt721CoreV3";
-import { handleMint, handleTransfer } from "../../../src/mapping-v3-core";
+import {
+  FIELD_PROJECT_CREATED,
+  handleMint,
+  handleProjectUpdated,
+  handleTransfer
+} from "../../../src/mapping-v3-core";
 import {
   generateContractSpecificId,
   generateProjectScriptId,
@@ -175,6 +193,323 @@ test("GenArt721CoreV3: Can handle transfer", () => {
     "token",
     fullTokenId
   );
+});
+
+describe("GenArt721CoreV3: handleProjectUpdated", () => {
+  describe("create", () => {
+    beforeEach(() => {
+      clearStore();
+      addTestContractToStore(BigInt.fromI32(0));
+    });
+
+    test("should do nothing if the contract does not already exist", () => {
+      // Extra clearStore for this test since we don't want the contract to exist here
+      clearStore();
+      const projectId = BigInt.fromI32(0);
+
+      const event: ProjectUpdated = changetype<ProjectUpdated>(newMockEvent());
+      event.address = TEST_CONTRACT_ADDRESS;
+      event.parameters = [
+        new ethereum.EventParam(
+          "_projectId",
+          ethereum.Value.fromUnsignedBigInt(projectId)
+        ),
+        new ethereum.EventParam(
+          "_update",
+          ethereum.Value.fromBytes(Bytes.fromUTF8(FIELD_PROJECT_CREATED))
+        )
+      ];
+
+      handleProjectUpdated(event);
+
+      assert.notInStore(CONTRACT_ENTITY_TYPE, TEST_CONTRACT_ADDRESS.toHex());
+      assert.notInStore(
+        PROJECT_ENTITY_TYPE,
+        generateContractSpecificId(TEST_CONTRACT_ADDRESS, projectId)
+      );
+    });
+
+    test("should do nothing if request for project info reverts", () => {
+      const projectId = BigInt.fromI32(0);
+
+      const event: ProjectUpdated = changetype<ProjectUpdated>(newMockEvent());
+      event.address = TEST_CONTRACT_ADDRESS;
+      event.parameters = [
+        new ethereum.EventParam(
+          "_projectId",
+          ethereum.Value.fromUnsignedBigInt(projectId)
+        ),
+        new ethereum.EventParam(
+          "_update",
+          ethereum.Value.fromBytes(Bytes.fromUTF8(FIELD_PROJECT_CREATED))
+        )
+      ];
+
+      // mock projectDetails
+      createMockedFunction(
+        TEST_CONTRACT_ADDRESS,
+        "projectDetails",
+        "projectDetails(uint256):(string,string,string,string,string)"
+      )
+        .withArgs([ethereum.Value.fromUnsignedBigInt(projectId)])
+        .returns([
+          ethereum.Value.fromString("test"),
+          ethereum.Value.fromString("test"),
+          ethereum.Value.fromString("test"),
+          ethereum.Value.fromString("test"),
+          ethereum.Value.fromString("test")
+        ]);
+      // mock projectScriptDetails
+      createMockedFunction(
+        TEST_CONTRACT_ADDRESS,
+        "projectScriptDetails",
+        "projectScriptDetails(uint256):(string,string,string,uint256)"
+      )
+        .withArgs([ethereum.Value.fromUnsignedBigInt(projectId)])
+        .returns([
+          ethereum.Value.fromString("test"),
+          ethereum.Value.fromString("test"),
+          ethereum.Value.fromString("test"),
+          ethereum.Value.fromUnsignedBigInt(BigInt.fromI32(0))
+        ]);
+      // mock projectStateData
+      createMockedFunction(
+        TEST_CONTRACT_ADDRESS,
+        "projectStateData",
+        "projectStateData(uint256):(uint256,uint256,bool,bool,bool)"
+      )
+        .withArgs([ethereum.Value.fromUnsignedBigInt(projectId)])
+        .returns([
+          ethereum.Value.fromUnsignedBigInt(BigInt.fromI32(0)),
+          ethereum.Value.fromUnsignedBigInt(BigInt.fromI32(ONE_MILLION)),
+          ethereum.Value.fromBoolean(false),
+          ethereum.Value.fromBoolean(true),
+          ethereum.Value.fromBoolean(false)
+        ]);
+      // // mock projectIdToArtistAddress
+      createMockedFunction(
+        TEST_CONTRACT_ADDRESS,
+        "projectIdToArtistAddress",
+        "projectIdToArtistAddress(uint256):(address)"
+      )
+        .withArgs([ethereum.Value.fromUnsignedBigInt(projectId)])
+        .reverts();
+
+      handleProjectUpdated(event);
+
+      assert.notInStore(
+        PROJECT_ENTITY_TYPE,
+        generateContractSpecificId(TEST_CONTRACT_ADDRESS, projectId)
+      );
+    });
+
+    test("should create a project entity", () => {
+      const projectId = BigInt.fromI32(0);
+      const artistAddress = randomAddressGenerator.generateRandomAddress();
+      const projectName = "Test Project";
+      const artistName = "";
+      const invocations = BigInt.fromI32(0);
+      const maxInvocations = BigInt.fromI32(ONE_MILLION);
+      const paused = true;
+      const scriptCount = BigInt.fromI32(0);
+
+      const event: ProjectUpdated = changetype<ProjectUpdated>(newMockEvent());
+      event.address = TEST_CONTRACT_ADDRESS;
+      event.block.timestamp = CURRENT_BLOCK_TIMESTAMP;
+      event.parameters = [
+        new ethereum.EventParam(
+          "_projectId",
+          ethereum.Value.fromUnsignedBigInt(projectId)
+        ),
+        new ethereum.EventParam(
+          "_update",
+          ethereum.Value.fromBytes(Bytes.fromUTF8(FIELD_PROJECT_CREATED))
+        )
+      ];
+
+      // mock projectDetails
+      createMockedFunction(
+        TEST_CONTRACT_ADDRESS,
+        "projectDetails",
+        "projectDetails(uint256):(string,string,string,string,string)"
+      )
+        .withArgs([ethereum.Value.fromUnsignedBigInt(projectId)])
+        .returns([
+          ethereum.Value.fromString(projectName),
+          ethereum.Value.fromString(artistName),
+          ethereum.Value.fromString(""),
+          ethereum.Value.fromString(""),
+          ethereum.Value.fromString("")
+        ]);
+      // mock projectScriptDetails
+      createMockedFunction(
+        TEST_CONTRACT_ADDRESS,
+        "projectScriptDetails",
+        "projectScriptDetails(uint256):(string,string,string,uint256)"
+      )
+        .withArgs([ethereum.Value.fromUnsignedBigInt(projectId)])
+        .returns([
+          ethereum.Value.fromString(""),
+          ethereum.Value.fromString(""),
+          ethereum.Value.fromString(""),
+          ethereum.Value.fromUnsignedBigInt(scriptCount)
+        ]);
+      // mock projectStateData
+      createMockedFunction(
+        TEST_CONTRACT_ADDRESS,
+        "projectStateData",
+        "projectStateData(uint256):(uint256,uint256,bool,bool,bool)"
+      )
+        .withArgs([ethereum.Value.fromUnsignedBigInt(projectId)])
+        .returns([
+          ethereum.Value.fromUnsignedBigInt(invocations),
+          ethereum.Value.fromUnsignedBigInt(maxInvocations),
+          ethereum.Value.fromBoolean(false),
+          ethereum.Value.fromBoolean(paused),
+          ethereum.Value.fromBoolean(false)
+        ]);
+      // // mock projectIdToArtistAddress
+      createMockedFunction(
+        TEST_CONTRACT_ADDRESS,
+        "projectIdToArtistAddress",
+        "projectIdToArtistAddress(uint256):(address)"
+      )
+        .withArgs([ethereum.Value.fromUnsignedBigInt(projectId)])
+        .returns([ethereum.Value.fromAddress(artistAddress)]);
+
+      handleProjectUpdated(event);
+
+      // Artist entity
+      assert.fieldEquals(
+        ACCOUNT_ENTITY_TYPE,
+        artistAddress.toHexString(),
+        "id",
+        artistAddress.toHexString()
+      );
+
+      // Project fields
+      assert.fieldEquals(
+        PROJECT_ENTITY_TYPE,
+        generateContractSpecificId(TEST_CONTRACT_ADDRESS, projectId),
+        "active",
+        booleanToString(false)
+      );
+      assert.fieldEquals(
+        PROJECT_ENTITY_TYPE,
+        generateContractSpecificId(TEST_CONTRACT_ADDRESS, projectId),
+        "artist",
+        artistName
+      );
+      assert.fieldEquals(
+        PROJECT_ENTITY_TYPE,
+        generateContractSpecificId(TEST_CONTRACT_ADDRESS, projectId),
+        "artistAddress",
+        artistAddress.toHexString()
+      );
+      assert.fieldEquals(
+        PROJECT_ENTITY_TYPE,
+        generateContractSpecificId(TEST_CONTRACT_ADDRESS, projectId),
+        "complete",
+        "false"
+      );
+      assert.fieldEquals(
+        PROJECT_ENTITY_TYPE,
+        generateContractSpecificId(TEST_CONTRACT_ADDRESS, projectId),
+        "contract",
+        TEST_CONTRACT_ADDRESS.toHexString()
+      );
+      assert.fieldEquals(
+        PROJECT_ENTITY_TYPE,
+        generateContractSpecificId(TEST_CONTRACT_ADDRESS, projectId),
+        "createdAt",
+        CURRENT_BLOCK_TIMESTAMP.toString()
+      );
+      assert.fieldEquals(
+        PROJECT_ENTITY_TYPE,
+        generateContractSpecificId(TEST_CONTRACT_ADDRESS, projectId),
+        "currencyAddress",
+        Address.zero().toHexString()
+      );
+      assert.fieldEquals(
+        PROJECT_ENTITY_TYPE,
+        generateContractSpecificId(TEST_CONTRACT_ADDRESS, projectId),
+        "currencySymbol",
+        "ETH"
+      );
+      assert.fieldEquals(
+        PROJECT_ENTITY_TYPE,
+        generateContractSpecificId(TEST_CONTRACT_ADDRESS, projectId),
+        "dynamic",
+        "true"
+      );
+      assert.fieldEquals(
+        PROJECT_ENTITY_TYPE,
+        generateContractSpecificId(TEST_CONTRACT_ADDRESS, projectId),
+        "externalAssetDependencyCount",
+        "0"
+      );
+      assert.fieldEquals(
+        PROJECT_ENTITY_TYPE,
+        generateContractSpecificId(TEST_CONTRACT_ADDRESS, projectId),
+        "invocations",
+        invocations.toString()
+      );
+      assert.fieldEquals(
+        PROJECT_ENTITY_TYPE,
+        generateContractSpecificId(TEST_CONTRACT_ADDRESS, projectId),
+        "locked",
+        "false"
+      );
+      assert.fieldEquals(
+        PROJECT_ENTITY_TYPE,
+        generateContractSpecificId(TEST_CONTRACT_ADDRESS, projectId),
+        "maxInvocations",
+        maxInvocations.toString()
+      );
+      assert.fieldEquals(
+        PROJECT_ENTITY_TYPE,
+        generateContractSpecificId(TEST_CONTRACT_ADDRESS, projectId),
+        "name",
+        projectName
+      );
+      assert.fieldEquals(
+        PROJECT_ENTITY_TYPE,
+        generateContractSpecificId(TEST_CONTRACT_ADDRESS, projectId),
+        "paused",
+        booleanToString(paused)
+      );
+      assert.fieldEquals(
+        PROJECT_ENTITY_TYPE,
+        generateContractSpecificId(TEST_CONTRACT_ADDRESS, projectId),
+        "scriptCount",
+        scriptCount.toString()
+      );
+      assert.fieldEquals(
+        PROJECT_ENTITY_TYPE,
+        generateContractSpecificId(TEST_CONTRACT_ADDRESS, projectId),
+        "updatedAt",
+        CURRENT_BLOCK_TIMESTAMP.toString()
+      );
+      assert.fieldEquals(
+        PROJECT_ENTITY_TYPE,
+        generateContractSpecificId(TEST_CONTRACT_ADDRESS, projectId),
+        "useHashString",
+        "true"
+      );
+      assert.fieldEquals(
+        PROJECT_ENTITY_TYPE,
+        generateContractSpecificId(TEST_CONTRACT_ADDRESS, projectId),
+        "useIpfs",
+        "false"
+      );
+    });
+  });
+
+  // beforeEach(() => {
+  //   clearStore();
+  //   addTestContractToStore(BigInt.fromI32(0));
+  //   addNewProjectToStore(
+  // });
 });
 
 // export handlers for test coverage https://github.com/LimeChain/demo-subgraph#test-coverage
