@@ -36,7 +36,8 @@ dataSources:
           handler: handleTransfer
         - event: ProjectUpdated(indexed uint256,indexed bytes32)
           handler: handleProjectUpdated
-        ## Follow-on PR: Add remaining V3 call handlers
+        - event: PlatformUpdated(indexed bytes32)
+          handler: handlePlatformUpdated
       file: ./src/mapping-v3-core.ts
   {{/genArt721CoreV3Contracts}}
   {{#genArt721CoreContracts}}

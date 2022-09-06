@@ -49,16 +49,42 @@ export function mockRefreshContractCalls(
 
   createMockedFunction(
     TEST_CONTRACT_ADDRESS,
-    "artblocksAddress",
-    "artblocksAddress():(address)"
+    "coreType",
+    "coreType():(string)"
+  ).returns([ethereum.Value.fromString("GenArt721CoreV3")]);
+
+  createMockedFunction(
+    TEST_CONTRACT_ADDRESS,
+    "artblocksPrimarySalesAddress",
+    "artblocksPrimarySalesAddress():(address)"
   ).returns([ethereum.Value.fromAddress(TEST_CONTRACT.renderProviderAddress)]);
 
   createMockedFunction(
     TEST_CONTRACT_ADDRESS,
-    "artblocksPercentage",
-    "artblocksPercentage():(uint256)"
+    "artblocksPrimarySalesPercentage",
+    "artblocksPrimarySalesPercentage():(uint256)"
   ).returns([
     ethereum.Value.fromUnsignedBigInt(TEST_CONTRACT.renderProviderPercentage)
+  ]);
+
+  createMockedFunction(
+    TEST_CONTRACT_ADDRESS,
+    "artblocksSecondarySalesAddress",
+    "artblocksSecondarySalesAddress():(address)"
+  ).returns([
+    ethereum.Value.fromAddress(
+      TEST_CONTRACT.renderProviderSecondarySalesAddress
+    )
+  ]);
+
+  createMockedFunction(
+    TEST_CONTRACT_ADDRESS,
+    "artblocksSecondarySalesBPS",
+    "artblocksSecondarySalesBPS():(uint256)"
+  ).returns([
+    ethereum.Value.fromUnsignedBigInt(
+      TEST_CONTRACT.renderProviderSecondarySalesBPS
+    )
   ]);
 
   createMockedFunction(
@@ -72,6 +98,30 @@ export function mockRefreshContractCalls(
     "randomizerContract",
     "randomizerContract():(address)"
   ).returns([ethereum.Value.fromAddress(TEST_CONTRACT.randomizerContract)]);
+
+  createMockedFunction(
+    TEST_CONTRACT_ADDRESS,
+    "minterContract",
+    "minterContract():(address)"
+  ).returns([ethereum.Value.fromAddress(TEST_CONTRACT.minterContract)]);
+
+  createMockedFunction(
+    TEST_CONTRACT_ADDRESS,
+    "newProjectsForbidden",
+    "newProjectsForbidden():(bool)"
+  ).returns([ethereum.Value.fromBoolean(TEST_CONTRACT.newProjectsForbidden)]);
+
+  createMockedFunction(
+    TEST_CONTRACT_ADDRESS,
+    "artblocksCurationRegistryAddress",
+    "artblocksCurationRegistryAddress():(address)"
+  ).returns([ethereum.Value.fromAddress(TEST_CONTRACT.curationRegistry)]);
+
+  createMockedFunction(
+    TEST_CONTRACT_ADDRESS,
+    "artblocksDependencyRegistryAddress",
+    "artblocksDependencyRegistryAddress():(address)"
+  ).returns([ethereum.Value.fromAddress(TEST_CONTRACT.dependencyRegistry)]);
 }
 
 export function mockTokenURICall(tokenId: BigInt, tokenURI: string): void {

@@ -4,7 +4,8 @@ import {
   GenArt721CoreV3,
   Mint,
   ProjectUpdated,
-  Transfer
+  Transfer,
+  PlatformUpdated
 } from "../generated/GenArt721CoreV3/GenArt721CoreV3";
 
 import {
@@ -476,10 +477,60 @@ function refreshProjectScript(
 }
 /*** END PROJECT UPDATED FUNCTIONS ***/
 
+// Handle platform updates
+// This is a generic event that can be used to update a number of different
+// contract state variables. All of the expected `_field` values are handled in
+// the `refreshContract` helper function.
+export function handlePlatformUpdated(event: PlatformUpdated): void {
+  let contract = GenArt721CoreV3.bind(event.address);
+  refreshContract(contract, event.block.timestamp);
+}
 /*** END EVENT HANDLERS ***/
 
 /*** NO CALL HANDLERS  ***/
 
 /** HELPERS ***/
+
+// Refresh contract entity state. Creates new contract in store if one does not
+// already exist. Expected to handle any update that emits a `PlatformUpdated`
+// event.
+// @dev Warning - this does not handle updates where the contract's
+// minterFilter is updated. For that, see handleUpdateMinterFilter.
+function refreshContract(
+  contract: GenArt721CoreV3,
+  timestamp: BigInt
+): Contract {
+  let contractEntity = Contract.load(contract._address.toHexString());
+  if (!contractEntity) {
+    contractEntity = new Contract(contract._address.toHexString());
+    contractEntity.createdAt = timestamp;
+    contractEntity.mintWhitelisted = [];
+    contractEntity.newProjectsForbidden = false;
+  }
+
+  contractEntity.admin = contract.admin();
+  contractEntity.type = contract.coreType();
+  contractEntity.renderProviderAddress = contract.artblocksPrimarySalesAddress();
+  contractEntity.renderProviderPercentage = contract.artblocksPrimarySalesPercentage();
+  contractEntity.renderProviderSecondarySalesAddress = contract.artblocksSecondarySalesAddress();
+  contractEntity.renderProviderSecondarySalesBPS = contract.artblocksSecondarySalesBPS();
+  contractEntity.nextProjectId = contract.nextProjectId();
+  contractEntity.randomizerContract = contract.randomizerContract();
+  let _minterContract = contract.minterContract();
+  if (_minterContract != Address.zero()) {
+    contractEntity.mintWhitelisted = [_minterContract];
+  } else {
+    contractEntity.mintWhitelisted = [];
+  }
+  contractEntity.newProjectsForbidden = contract.newProjectsForbidden();
+  contractEntity.curationRegistry = contract.artblocksCurationRegistryAddress();
+  contractEntity.dependencyRegistry = contract.artblocksDependencyRegistryAddress();
+
+  contractEntity.updatedAt = timestamp;
+
+  contractEntity.save();
+
+  return contractEntity as Contract;
+}
 
 /** END HELPERS ***/
