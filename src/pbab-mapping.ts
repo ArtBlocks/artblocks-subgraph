@@ -295,6 +295,7 @@ export function handleGatewayUpdated(event: GatewayUpdated): void {
   } else {
     contractEntity.preferredArweaveGateway = event.params._gatewayAddress;
   }
+  contractEntity.updatedAt = event.block.timestamp;
   contractEntity.save();
 }
 
