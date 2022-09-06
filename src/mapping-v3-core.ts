@@ -24,8 +24,6 @@ import {
   generateProjectScriptId
 } from "./helpers";
 
-import { log as testLog } from "matchstick-as";
-
 /**
  * @dev Warning - All parameters pulled directly from contracts will return the
  * state at the end of the block that the transaction was included in. When
@@ -173,6 +171,7 @@ export const FIELD_PROJECT_SECONDARY_MARKET_ROYALTY_PERCENTAGE =
 export const FIELD_PROJECT_WEBSITE = "website";
 
 export function handleProjectUpdated(event: ProjectUpdated): void {
+  log.info("handleProjectUpdated", []);
   let contract = GenArt721CoreV3.bind(event.address);
   const update = event.params._update.toString();
   const timestamp = event.block.timestamp;
@@ -232,11 +231,12 @@ export function handleProjectUpdated(event: ProjectUpdated): void {
       timestamp
     );
   } else {
+    log.warning("Unexpected update field for project {}", [project.id]);
   }
 }
 
 /*** PROJECT UPDATED FUNCTIONS ***/
-export function handleProjectStateDataUpdated(
+function handleProjectStateDataUpdated(
   contract: GenArt721CoreV3,
   project: Project,
   timestamp: BigInt
@@ -251,7 +251,7 @@ export function handleProjectStateDataUpdated(
   }
 }
 
-export function handleProjectArtistAddressUpdated(
+function handleProjectArtistAddressUpdated(
   contract: GenArt721CoreV3,
   project: Project,
   timestamp: BigInt
@@ -266,7 +266,7 @@ export function handleProjectArtistAddressUpdated(
   }
 }
 
-export function handleProjectDetailsUpdated(
+function handleProjectDetailsUpdated(
   contract: GenArt721CoreV3,
   project: Project,
   timestamp: BigInt
@@ -283,7 +283,7 @@ export function handleProjectDetailsUpdated(
   }
 }
 
-export function handleProjectScriptDetailsUpdated(
+function handleProjectScriptDetailsUpdated(
   contract: GenArt721CoreV3,
   project: Project,
   timestamp: BigInt
@@ -300,7 +300,7 @@ export function handleProjectScriptDetailsUpdated(
   }
 }
 
-export function handleProjectBaseURIUpdated(
+function handleProjectBaseURIUpdated(
   contract: GenArt721CoreV3,
   project: Project,
   timestamp: BigInt
@@ -313,16 +313,14 @@ export function handleProjectBaseURIUpdated(
   }
 }
 
-export function handleProjectCompleted(
-  project: Project,
-  timestamp: BigInt
-): void {
+function handleProjectCompleted(project: Project, timestamp: BigInt): void {
   project.complete = true;
   project.completedAt = timestamp;
   project.updatedAt = timestamp;
+  project.save();
 }
 
-export function handleProjectSecondaryMarketRoyaltyPercentageUpdated(
+function handleProjectSecondaryMarketRoyaltyPercentageUpdated(
   contract: GenArt721CoreV3,
   project: Project,
   timestamp: BigInt
@@ -395,7 +393,7 @@ function createProject(
   );
 
   project.active = false;
-  project.artist = artistName;
+  project.artist = artist.id;
   project.artistAddress = artistAddress;
   project.complete = false;
   project.contract = contractAddress;

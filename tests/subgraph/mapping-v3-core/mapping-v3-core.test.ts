@@ -2,69 +2,45 @@ import {
   assert,
   clearStore,
   test,
-  newMockCall,
-  log,
-  logStore,
   newMockEvent,
   describe,
   beforeEach,
-  createMockedFunction,
-  mockFunction
+  createMockedFunction
 } from "matchstick-as/assembly/index";
 import {
   Address,
   BigInt,
   Bytes,
   ethereum,
-  store,
-  Value
+  store
 } from "@graphprotocol/graph-ts";
 import {
   ACCOUNT_ENTITY_TYPE,
   PROJECT_ENTITY_TYPE,
   CONTRACT_ENTITY_TYPE,
-  WHITELISTING_ENTITY_TYPE,
   PROJECT_SCRIPT_ENTITY_TYPE,
   TOKEN_ENTITY_TYPE,
-  DEFAULT_PROJECT_VALUES,
   CURRENT_BLOCK_TIMESTAMP,
   RandomAddressGenerator,
   mockProjectScriptByIndex,
   mockTokenIdToHash,
-  PROJECT_MINTER_CONFIGURATION_ENTITY_TYPE,
   TEST_CONTRACT_ADDRESS,
-  TEST_CONTRACT_CREATED_AT,
-  TEST_CONTRACT,
   TEST_TOKEN_HASH,
-  assertNewProjectFields,
-  assertTestContractFields,
   addTestContractToStore,
   addNewProjectToStore,
   addNewTokenToStore,
-  addNewContractToStore,
   TRANSFER_ENTITY_TYPE,
-  DEFAULT_COLLECTION,
   ONE_MILLION,
-  booleanToString,
-  addNewProjectToStore
+  booleanToString
 } from "../shared-helpers";
-
 import {
   mockProjectScriptDetailsCall,
   mockProjectStateDataCall,
-  mockRefreshContractCalls
+  testProjectDetailsUpdated,
+  testProjectScriptDetailsUpdated,
+  testProjectStateDataUpdated
 } from "./helpers";
-
-import {
-  Account,
-  Contract,
-  MinterFilter,
-  Project,
-  ProjectMinterConfiguration,
-  ProjectScript,
-  Token,
-  Whitelisting
-} from "../../../generated/schema";
+import { Project } from "../../../generated/schema";
 import {
   Mint,
   ProjectUpdated,
@@ -73,20 +49,28 @@ import {
 import {
   FIELD_PROJECT_ACTIVE,
   FIELD_PROJECT_ARTIST_ADDRESS,
+  FIELD_PROJECT_ARTIST_NAME,
   FIELD_PROJECT_ASPECT_RATIO,
+  FIELD_PROJECT_BASE_URI,
+  FIELD_PROJECT_COMPLETED,
   FIELD_PROJECT_CREATED,
+  FIELD_PROJECT_DESCRIPTION,
   FIELD_PROJECT_IPFS_HASH,
+  FIELD_PROJECT_LICENSE,
   FIELD_PROJECT_MAX_INVOCATIONS,
+  FIELD_PROJECT_NAME,
   FIELD_PROJECT_PAUSED,
+  FIELD_PROJECT_SCRIPT,
   FIELD_PROJECT_SCRIPT_TYPE,
+  FIELD_PROJECT_SECONDARY_MARKET_ROYALTY_PERCENTAGE,
+  FIELD_PROJECT_WEBSITE,
   handleMint,
   handleProjectUpdated,
   handleTransfer
 } from "../../../src/mapping-v3-core";
 import {
   generateContractSpecificId,
-  generateProjectScriptId,
-  generateWhitelistingId
+  generateProjectScriptId
 } from "../../../src/helpers";
 
 const randomAddressGenerator = new RandomAddressGenerator();
@@ -321,7 +305,6 @@ describe("GenArt721CoreV3: handleProjectUpdated", () => {
       const projectId = BigInt.fromI32(0);
       const artistAddress = randomAddressGenerator.generateRandomAddress();
       const projectName = "Test Project";
-      const artistName = "";
       const invocations = BigInt.fromI32(0);
       const maxInvocations = BigInt.fromI32(ONE_MILLION);
       const paused = true;
@@ -350,7 +333,7 @@ describe("GenArt721CoreV3: handleProjectUpdated", () => {
         .withArgs([ethereum.Value.fromUnsignedBigInt(projectId)])
         .returns([
           ethereum.Value.fromString(projectName),
-          ethereum.Value.fromString(artistName),
+          ethereum.Value.fromString(""),
           ethereum.Value.fromString(""),
           ethereum.Value.fromString(""),
           ethereum.Value.fromString("")
@@ -407,12 +390,6 @@ describe("GenArt721CoreV3: handleProjectUpdated", () => {
         generateContractSpecificId(TEST_CONTRACT_ADDRESS, projectId),
         "active",
         booleanToString(false)
-      );
-      assert.fieldEquals(
-        PROJECT_ENTITY_TYPE,
-        generateContractSpecificId(TEST_CONTRACT_ADDRESS, projectId),
-        "artist",
-        artistName
       );
       assert.fieldEquals(
         PROJECT_ENTITY_TYPE,
@@ -573,13 +550,29 @@ describe("GenArt721CoreV3: handleProjectUpdated", () => {
       assert.notInStore("Project", fullProjectId);
     });
 
-    test("should update active", () => {
+    describe("projectStateDataUpdated", () => {
+      test("should update active", () => {
+        testProjectStateDataUpdated(FIELD_PROJECT_ACTIVE, "true");
+      });
+
+      test("should update maxInvocations", () => {
+        testProjectStateDataUpdated(FIELD_PROJECT_MAX_INVOCATIONS, "100");
+      });
+
+      test("should update paused", () => {
+        testProjectStateDataUpdated(FIELD_PROJECT_PAUSED, "false");
+      });
+    });
+
+    test("should update artist address", () => {
       const projectId = BigInt.fromI32(0);
       const fullProjectId = generateContractSpecificId(
         TEST_CONTRACT_ADDRESS,
         projectId
       );
-      const active = true;
+      const project: Project = changetype<Project>(Project.load(fullProjectId));
+      const oldArtistAddress = project.artistAddress;
+      const newArtistAddress = randomAddressGenerator.generateRandomAddress();
 
       const event: ProjectUpdated = changetype<ProjectUpdated>(newMockEvent());
       event.address = TEST_CONTRACT_ADDRESS;
@@ -591,22 +584,156 @@ describe("GenArt721CoreV3: handleProjectUpdated", () => {
         ),
         new ethereum.EventParam(
           "_update",
-          ethereum.Value.fromBytes(Bytes.fromUTF8(FIELD_PROJECT_ACTIVE))
+          ethereum.Value.fromBytes(Bytes.fromUTF8(FIELD_PROJECT_ARTIST_ADDRESS))
         )
       ];
 
-      const projectStateDataCallReturnOverrides = new Map<string, string>();
-      projectStateDataCallReturnOverrides.set(
-        "active",
-        booleanToString(active)
-      );
-      mockProjectStateDataCall(projectId, projectStateDataCallReturnOverrides);
+      createMockedFunction(
+        TEST_CONTRACT_ADDRESS,
+        "projectIdToArtistAddress",
+        "projectIdToArtistAddress(uint256):(address)"
+      )
+        .withArgs([ethereum.Value.fromUnsignedBigInt(projectId)])
+        .returns([ethereum.Value.fromAddress(newArtistAddress)]);
+
+      assert.assertTrue(oldArtistAddress.notEqual(newArtistAddress));
+
+      handleProjectUpdated(event);
 
       assert.fieldEquals(
         PROJECT_ENTITY_TYPE,
         fullProjectId,
-        "active",
-        booleanToString(false)
+        "artistAddress",
+        newArtistAddress.toHexString()
+      );
+
+      assert.fieldEquals(
+        PROJECT_ENTITY_TYPE,
+        fullProjectId,
+        "updatedAt",
+        CURRENT_BLOCK_TIMESTAMP.toString()
+      );
+    });
+
+    describe("projectDetailsUpdated", () => {
+      test("should update artist name", () => {
+        testProjectDetailsUpdated(FIELD_PROJECT_ARTIST_NAME, "New Artist Name");
+      });
+
+      test("should update description", () => {
+        testProjectDetailsUpdated(FIELD_PROJECT_DESCRIPTION, "New Description");
+      });
+
+      test("should update license", () => {
+        testProjectDetailsUpdated(FIELD_PROJECT_LICENSE, "New License");
+      });
+
+      test("should update name", () => {
+        testProjectDetailsUpdated(FIELD_PROJECT_NAME, "New Name");
+      });
+
+      test("should update website", () => {
+        testProjectDetailsUpdated(FIELD_PROJECT_WEBSITE, "New Website");
+      });
+    });
+
+    describe("projectScriptDetailsUpdated", () => {
+      test("should update aspectRatio", () => {
+        testProjectScriptDetailsUpdated(FIELD_PROJECT_ASPECT_RATIO, "1.5");
+      });
+
+      test("should update ipfsHash", () => {
+        testProjectScriptDetailsUpdated(
+          FIELD_PROJECT_IPFS_HASH,
+          "New IPFS Hash"
+        );
+      });
+
+      test("should update scriptTypeAndVersion", () => {
+        testProjectScriptDetailsUpdated(
+          FIELD_PROJECT_SCRIPT_TYPE,
+          "p5js@1.0.0"
+        );
+      });
+    });
+
+    test("should update baseUri", () => {
+      const projectId = BigInt.fromI32(0);
+      const fullProjectId = generateContractSpecificId(
+        TEST_CONTRACT_ADDRESS,
+        projectId
+      );
+      const project: Project = changetype<Project>(Project.load(fullProjectId));
+      const oldBaseUri = project.baseUri;
+      const newBaseUri = "New Base URI";
+
+      const event: ProjectUpdated = changetype<ProjectUpdated>(newMockEvent());
+      event.address = TEST_CONTRACT_ADDRESS;
+      event.block.timestamp = CURRENT_BLOCK_TIMESTAMP;
+      event.parameters = [
+        new ethereum.EventParam(
+          "_projectId",
+          ethereum.Value.fromUnsignedBigInt(projectId)
+        ),
+        new ethereum.EventParam(
+          "_update",
+          ethereum.Value.fromBytes(Bytes.fromUTF8(FIELD_PROJECT_BASE_URI))
+        )
+      ];
+
+      createMockedFunction(
+        TEST_CONTRACT_ADDRESS,
+        "projectURIInfo",
+        "projectURIInfo(uint256):(string)"
+      )
+        .withArgs([ethereum.Value.fromUnsignedBigInt(projectId)])
+        .returns([ethereum.Value.fromString(newBaseUri)]);
+
+      assert.assertTrue(oldBaseUri != newBaseUri);
+
+      handleProjectUpdated(event);
+
+      assert.fieldEquals(
+        PROJECT_ENTITY_TYPE,
+        fullProjectId,
+        "baseUri",
+        newBaseUri
+      );
+
+      assert.fieldEquals(
+        PROJECT_ENTITY_TYPE,
+        fullProjectId,
+        "updatedAt",
+        CURRENT_BLOCK_TIMESTAMP.toString()
+      );
+    });
+
+    test("should update complete and completedAt", () => {
+      const projectId = BigInt.fromI32(0);
+      const fullProjectId = generateContractSpecificId(
+        TEST_CONTRACT_ADDRESS,
+        projectId
+      );
+
+      const event: ProjectUpdated = changetype<ProjectUpdated>(newMockEvent());
+      event.address = TEST_CONTRACT_ADDRESS;
+      event.block.timestamp = CURRENT_BLOCK_TIMESTAMP;
+      event.parameters = [
+        new ethereum.EventParam(
+          "_projectId",
+          ethereum.Value.fromUnsignedBigInt(projectId)
+        ),
+        new ethereum.EventParam(
+          "_update",
+          ethereum.Value.fromBytes(Bytes.fromUTF8(FIELD_PROJECT_COMPLETED))
+        )
+      ];
+
+      assert.fieldEquals(
+        PROJECT_ENTITY_TYPE,
+        fullProjectId,
+        "complete",
+        "false"
       );
 
       handleProjectUpdated(event);
@@ -614,18 +741,330 @@ describe("GenArt721CoreV3: handleProjectUpdated", () => {
       assert.fieldEquals(
         PROJECT_ENTITY_TYPE,
         fullProjectId,
-        "active",
-        booleanToString(active)
+        "complete",
+        "true"
+      );
+
+      assert.fieldEquals(
+        PROJECT_ENTITY_TYPE,
+        fullProjectId,
+        "completedAt",
+        CURRENT_BLOCK_TIMESTAMP.toString()
+      );
+
+      assert.fieldEquals(
+        PROJECT_ENTITY_TYPE,
+        fullProjectId,
+        "updatedAt",
+        CURRENT_BLOCK_TIMESTAMP.toString()
       );
     });
 
-    test("should update maxInvocations", () => {
+    test("should add, update and remove script", () => {
       const projectId = BigInt.fromI32(0);
       const fullProjectId = generateContractSpecificId(
         TEST_CONTRACT_ADDRESS,
         projectId
       );
-      const maxInvocations = BigInt.fromI32(100);
+      const project = changetype<Project>(Project.load(fullProjectId));
+
+      // Add script 0
+      const script0Id = generateProjectScriptId(
+        fullProjectId,
+        BigInt.fromI32(0)
+      );
+      const script0 = "Script 0";
+
+      const event0: ProjectUpdated = changetype<ProjectUpdated>(newMockEvent());
+      event0.address = TEST_CONTRACT_ADDRESS;
+      event0.block.timestamp = CURRENT_BLOCK_TIMESTAMP;
+      event0.parameters = [
+        new ethereum.EventParam(
+          "_projectId",
+          ethereum.Value.fromUnsignedBigInt(projectId)
+        ),
+        new ethereum.EventParam(
+          "_update",
+          ethereum.Value.fromBytes(Bytes.fromUTF8(FIELD_PROJECT_SCRIPT))
+        )
+      ];
+
+      const projectScriptDetailsCall0ReturnOverrides = new Map<
+        string,
+        string
+      >();
+      projectScriptDetailsCall0ReturnOverrides.set("scriptCount", "1");
+
+      mockProjectScriptDetailsCall(
+        projectId,
+        projectScriptDetailsCall0ReturnOverrides
+      );
+
+      mockProjectScriptByIndex(
+        TEST_CONTRACT_ADDRESS,
+        projectId,
+        BigInt.fromI32(0),
+        script0
+      );
+
+      assert.notInStore(PROJECT_SCRIPT_ENTITY_TYPE, script0Id);
+
+      handleProjectUpdated(event0);
+
+      assert.fieldEquals(
+        PROJECT_SCRIPT_ENTITY_TYPE,
+        script0Id,
+        "script",
+        script0
+      );
+
+      assert.fieldEquals(PROJECT_ENTITY_TYPE, fullProjectId, "script", script0);
+
+      assert.fieldEquals(
+        PROJECT_ENTITY_TYPE,
+        fullProjectId,
+        "updatedAt",
+        event0.block.timestamp.toString()
+      );
+
+      assert.fieldEquals(
+        PROJECT_ENTITY_TYPE,
+        fullProjectId,
+        "scriptUpdatedAt",
+        event0.block.timestamp.toString()
+      );
+
+      assert.fieldEquals(
+        PROJECT_ENTITY_TYPE,
+        fullProjectId,
+        "scriptCount",
+        "1"
+      );
+
+      // Add script 1
+      const script1Id = generateProjectScriptId(
+        fullProjectId,
+        BigInt.fromI32(1)
+      );
+      const script1 = "Script 1";
+
+      const event1: ProjectUpdated = changetype<ProjectUpdated>(newMockEvent());
+      event1.address = TEST_CONTRACT_ADDRESS;
+      event1.block.timestamp = CURRENT_BLOCK_TIMESTAMP.plus(BigInt.fromI32(1));
+      event1.parameters = [
+        new ethereum.EventParam(
+          "_projectId",
+          ethereum.Value.fromUnsignedBigInt(projectId)
+        ),
+        new ethereum.EventParam(
+          "_update",
+          ethereum.Value.fromBytes(Bytes.fromUTF8(FIELD_PROJECT_SCRIPT))
+        )
+      ];
+
+      const projectScriptDetailsCall1ReturnOverrides = new Map<
+        string,
+        string
+      >();
+      projectScriptDetailsCall1ReturnOverrides.set("scriptCount", "2");
+
+      mockProjectScriptDetailsCall(
+        projectId,
+        projectScriptDetailsCall1ReturnOverrides
+      );
+
+      mockProjectScriptByIndex(
+        TEST_CONTRACT_ADDRESS,
+        projectId,
+        BigInt.fromI32(1),
+        script1
+      );
+
+      assert.notInStore(PROJECT_SCRIPT_ENTITY_TYPE, script1Id);
+
+      handleProjectUpdated(event1);
+
+      assert.fieldEquals(
+        PROJECT_SCRIPT_ENTITY_TYPE,
+        script1Id,
+        "script",
+        script1
+      );
+
+      assert.fieldEquals(
+        PROJECT_ENTITY_TYPE,
+        fullProjectId,
+        "script",
+        script0 + script1
+      );
+
+      assert.fieldEquals(
+        PROJECT_ENTITY_TYPE,
+        fullProjectId,
+        "updatedAt",
+        event1.block.timestamp.toString()
+      );
+
+      assert.fieldEquals(
+        PROJECT_ENTITY_TYPE,
+        fullProjectId,
+        "scriptUpdatedAt",
+        event1.block.timestamp.toString()
+      );
+
+      assert.fieldEquals(
+        PROJECT_ENTITY_TYPE,
+        fullProjectId,
+        "scriptCount",
+        "2"
+      );
+
+      // Update script 0
+      const script0Updated = "Script 1 Updated";
+      const event2: ProjectUpdated = changetype<ProjectUpdated>(newMockEvent());
+      event2.address = TEST_CONTRACT_ADDRESS;
+      event2.block.timestamp = CURRENT_BLOCK_TIMESTAMP.plus(BigInt.fromI32(2));
+      event2.parameters = [
+        new ethereum.EventParam(
+          "_projectId",
+          ethereum.Value.fromUnsignedBigInt(projectId)
+        ),
+        new ethereum.EventParam(
+          "_update",
+          ethereum.Value.fromBytes(Bytes.fromUTF8(FIELD_PROJECT_SCRIPT))
+        )
+      ];
+
+      const projectScriptDetailsCall2ReturnOverrides = new Map<
+        string,
+        string
+      >();
+      projectScriptDetailsCall2ReturnOverrides.set("scriptCount", "2");
+
+      mockProjectScriptDetailsCall(
+        projectId,
+        projectScriptDetailsCall2ReturnOverrides
+      );
+
+      mockProjectScriptByIndex(
+        TEST_CONTRACT_ADDRESS,
+        projectId,
+        BigInt.fromI32(0),
+        script0Updated
+      );
+
+      handleProjectUpdated(event2);
+
+      assert.fieldEquals(
+        PROJECT_SCRIPT_ENTITY_TYPE,
+        script0Id,
+        "script",
+        script0Updated
+      );
+
+      assert.fieldEquals(
+        PROJECT_ENTITY_TYPE,
+        fullProjectId,
+        "script",
+        script0Updated + script1
+      );
+
+      assert.fieldEquals(
+        PROJECT_ENTITY_TYPE,
+        fullProjectId,
+        "updatedAt",
+        event2.block.timestamp.toString()
+      );
+
+      assert.fieldEquals(
+        PROJECT_ENTITY_TYPE,
+        fullProjectId,
+        "scriptUpdatedAt",
+        event2.block.timestamp.toString()
+      );
+
+      assert.fieldEquals(
+        PROJECT_ENTITY_TYPE,
+        fullProjectId,
+        "scriptCount",
+        "2"
+      );
+
+      // Remove script 1
+      const event3: ProjectUpdated = changetype<ProjectUpdated>(newMockEvent());
+      event3.address = TEST_CONTRACT_ADDRESS;
+      event3.block.timestamp = CURRENT_BLOCK_TIMESTAMP.plus(BigInt.fromI32(3));
+      event3.parameters = [
+        new ethereum.EventParam(
+          "_projectId",
+          ethereum.Value.fromUnsignedBigInt(projectId)
+        ),
+        new ethereum.EventParam(
+          "_update",
+          ethereum.Value.fromBytes(Bytes.fromUTF8(FIELD_PROJECT_SCRIPT))
+        )
+      ];
+
+      const projectScriptDetailsCall3ReturnOverrides = new Map<
+        string,
+        string
+      >();
+      projectScriptDetailsCall3ReturnOverrides.set("scriptCount", "1");
+
+      mockProjectScriptDetailsCall(
+        projectId,
+        projectScriptDetailsCall3ReturnOverrides
+      );
+
+      handleProjectUpdated(event3);
+
+      assert.notInStore(PROJECT_SCRIPT_ENTITY_TYPE, script1Id);
+
+      assert.fieldEquals(
+        PROJECT_SCRIPT_ENTITY_TYPE,
+        script0Id,
+        "script",
+        script0Updated
+      );
+
+      assert.fieldEquals(
+        PROJECT_ENTITY_TYPE,
+        fullProjectId,
+        "script",
+        script0Updated
+      );
+
+      assert.fieldEquals(
+        PROJECT_ENTITY_TYPE,
+        fullProjectId,
+        "updatedAt",
+        event3.block.timestamp.toString()
+      );
+
+      assert.fieldEquals(
+        PROJECT_ENTITY_TYPE,
+        fullProjectId,
+        "scriptUpdatedAt",
+        event3.block.timestamp.toString()
+      );
+
+      assert.fieldEquals(
+        PROJECT_ENTITY_TYPE,
+        fullProjectId,
+        "scriptCount",
+        "1"
+      );
+    });
+
+    test("should update royaltyPercentage", () => {
+      const projectId = BigInt.fromI32(0);
+      const fullProjectId = generateContractSpecificId(
+        TEST_CONTRACT_ADDRESS,
+        projectId
+      );
+      const project: Project = changetype<Project>(Project.load(fullProjectId));
+      const oldRoyaltyPercentage = project.royaltyPercentage;
+      const newRoyaltyPercentage = BigInt.fromI32(10);
 
       const event: ProjectUpdated = changetype<ProjectUpdated>(newMockEvent());
       event.address = TEST_CONTRACT_ADDRESS;
@@ -638,74 +1077,23 @@ describe("GenArt721CoreV3: handleProjectUpdated", () => {
         new ethereum.EventParam(
           "_update",
           ethereum.Value.fromBytes(
-            Bytes.fromUTF8(FIELD_PROJECT_MAX_INVOCATIONS)
+            Bytes.fromUTF8(FIELD_PROJECT_SECONDARY_MARKET_ROYALTY_PERCENTAGE)
           )
         )
       ];
 
-      const projectStateDataCallReturnOverrides = new Map<string, string>();
-      projectStateDataCallReturnOverrides.set(
-        "maxInvocations",
-        maxInvocations.toString()
-      );
-
-      mockProjectStateDataCall(projectId, projectStateDataCallReturnOverrides);
+      createMockedFunction(
+        TEST_CONTRACT_ADDRESS,
+        "projectIdToSecondaryMarketRoyaltyPercentage",
+        "projectIdToSecondaryMarketRoyaltyPercentage(uint256):(uint256)"
+      )
+        .withArgs([ethereum.Value.fromUnsignedBigInt(projectId)])
+        .returns([ethereum.Value.fromUnsignedBigInt(newRoyaltyPercentage)]);
 
       assert.assertTrue(
-        maxInvocations.notEqual(DEFAULT_PROJECT_VALUES.maxInvocations)
-      );
-
-      assert.fieldEquals(
-        PROJECT_ENTITY_TYPE,
-        fullProjectId,
-        "maxInvocations",
-        DEFAULT_PROJECT_VALUES.maxInvocations.toString()
-      );
-
-      handleProjectUpdated(event);
-
-      assert.fieldEquals(
-        PROJECT_ENTITY_TYPE,
-        fullProjectId,
-        "maxInvocations",
-        maxInvocations.toString()
-      );
-    });
-
-    test("should update paused", () => {
-      const projectId = BigInt.fromI32(0);
-      const fullProjectId = generateContractSpecificId(
-        TEST_CONTRACT_ADDRESS,
-        projectId
-      );
-      const paused = false;
-
-      const event: ProjectUpdated = changetype<ProjectUpdated>(newMockEvent());
-      event.address = TEST_CONTRACT_ADDRESS;
-      event.block.timestamp = CURRENT_BLOCK_TIMESTAMP;
-      event.parameters = [
-        new ethereum.EventParam(
-          "_projectId",
-          ethereum.Value.fromUnsignedBigInt(projectId)
-        ),
-        new ethereum.EventParam(
-          "_update",
-          ethereum.Value.fromBytes(Bytes.fromUTF8(FIELD_PROJECT_PAUSED))
+        newRoyaltyPercentage.notEqual(
+          oldRoyaltyPercentage ? oldRoyaltyPercentage : BigInt.fromI32(0)
         )
-      ];
-
-      const projectStateDataCallReturnOverrides = new Map<string, string>();
-      projectStateDataCallReturnOverrides.set(
-        "paused",
-        booleanToString(paused)
-      );
-      mockProjectStateDataCall(projectId, projectStateDataCallReturnOverrides);
-
-      assert.fieldEquals(
-        PROJECT_ENTITY_TYPE,
-        fullProjectId,
-        "paused",
-        booleanToString(!paused)
       );
 
       handleProjectUpdated(event);
@@ -713,8 +1101,8 @@ describe("GenArt721CoreV3: handleProjectUpdated", () => {
       assert.fieldEquals(
         PROJECT_ENTITY_TYPE,
         fullProjectId,
-        "paused",
-        booleanToString(paused)
+        "royaltyPercentage",
+        newRoyaltyPercentage.toString()
       );
 
       assert.fieldEquals(
@@ -725,201 +1113,7 @@ describe("GenArt721CoreV3: handleProjectUpdated", () => {
       );
     });
   });
-
-  test("should update artist address", () => {
-    const projectId = BigInt.fromI32(0);
-    const fullProjectId = generateContractSpecificId(
-      TEST_CONTRACT_ADDRESS,
-      projectId
-    );
-    const project: Project = changetype<Project>(Project.load(fullProjectId));
-    const oldArtistAddress = project.artistAddress;
-    const newArtistAddress = randomAddressGenerator.generateRandomAddress();
-
-    const event: ProjectUpdated = changetype<ProjectUpdated>(newMockEvent());
-    event.address = TEST_CONTRACT_ADDRESS;
-    event.block.timestamp = CURRENT_BLOCK_TIMESTAMP;
-    event.parameters = [
-      new ethereum.EventParam(
-        "_projectId",
-        ethereum.Value.fromUnsignedBigInt(projectId)
-      ),
-      new ethereum.EventParam(
-        "_update",
-        ethereum.Value.fromBytes(Bytes.fromUTF8(FIELD_PROJECT_ARTIST_ADDRESS))
-      )
-    ];
-
-    createMockedFunction(
-      TEST_CONTRACT_ADDRESS,
-      "projectIdToArtistAddress",
-      "projectIdToArtistAddress(uint256):(address)"
-    )
-      .withArgs([ethereum.Value.fromUnsignedBigInt(projectId)])
-      .returns([ethereum.Value.fromAddress(newArtistAddress)]);
-
-    assert.assertTrue(oldArtistAddress.notEqual(newArtistAddress));
-
-    handleProjectUpdated(event);
-
-    assert.fieldEquals(
-      PROJECT_ENTITY_TYPE,
-      fullProjectId,
-      "artistAddress",
-      newArtistAddress.toHexString()
-    );
-  });
-
-  test("should update aspectRatio", () => {
-    const projectId = BigInt.fromI32(0);
-    const fullProjectId = generateContractSpecificId(
-      TEST_CONTRACT_ADDRESS,
-      projectId
-    );
-    const project: Project = changetype<Project>(Project.load(fullProjectId));
-    const aspectRatio = "1.77";
-
-    const event: ProjectUpdated = changetype<ProjectUpdated>(newMockEvent());
-    event.address = TEST_CONTRACT_ADDRESS;
-    event.block.timestamp = CURRENT_BLOCK_TIMESTAMP;
-    event.parameters = [
-      new ethereum.EventParam(
-        "_projectId",
-        ethereum.Value.fromUnsignedBigInt(projectId)
-      ),
-      new ethereum.EventParam(
-        "_update",
-        ethereum.Value.fromBytes(Bytes.fromUTF8(FIELD_PROJECT_ASPECT_RATIO))
-      )
-    ];
-
-    const projectScriptDetailsCallReturnOverrides = new Map<string, string>();
-    projectScriptDetailsCallReturnOverrides.set("aspectRatio", aspectRatio);
-    mockProjectScriptDetailsCall(
-      projectId,
-      projectScriptDetailsCallReturnOverrides
-    );
-
-    assert.assertNull(project.aspectRatio);
-
-    handleProjectUpdated(event);
-
-    assert.fieldEquals(
-      PROJECT_ENTITY_TYPE,
-      fullProjectId,
-      "aspectRatio",
-      aspectRatio
-    );
-
-    assert.fieldEquals(
-      PROJECT_ENTITY_TYPE,
-      fullProjectId,
-      "updatedAt",
-      CURRENT_BLOCK_TIMESTAMP.toString()
-    );
-  });
-
-  test("should update ipfsHash", () => {
-    const projectId = BigInt.fromI32(0);
-    const fullProjectId = generateContractSpecificId(
-      TEST_CONTRACT_ADDRESS,
-      projectId
-    );
-    const project: Project = changetype<Project>(Project.load(fullProjectId));
-    const ipfsHash = "test hash";
-
-    const event: ProjectUpdated = changetype<ProjectUpdated>(newMockEvent());
-    event.address = TEST_CONTRACT_ADDRESS;
-    event.block.timestamp = CURRENT_BLOCK_TIMESTAMP;
-    event.parameters = [
-      new ethereum.EventParam(
-        "_projectId",
-        ethereum.Value.fromUnsignedBigInt(projectId)
-      ),
-      new ethereum.EventParam(
-        "_update",
-        ethereum.Value.fromBytes(Bytes.fromUTF8(FIELD_PROJECT_IPFS_HASH))
-      )
-    ];
-
-    const projectScriptDetailsCallReturnOverrides = new Map<string, string>();
-    projectScriptDetailsCallReturnOverrides.set("ipfsHash", ipfsHash);
-    mockProjectScriptDetailsCall(
-      projectId,
-      projectScriptDetailsCallReturnOverrides
-    );
-
-    assert.assertNull(project.ipfsHash);
-
-    handleProjectUpdated(event);
-
-    assert.fieldEquals(
-      PROJECT_ENTITY_TYPE,
-      fullProjectId,
-      "ipfsHash",
-      ipfsHash
-    );
-
-    assert.fieldEquals(
-      PROJECT_ENTITY_TYPE,
-      fullProjectId,
-      "updatedAt",
-      CURRENT_BLOCK_TIMESTAMP.toString()
-    );
-  });
-
-  test("should update scriptTypeAndVersion", () => {
-    const projectId = BigInt.fromI32(0);
-    const fullProjectId = generateContractSpecificId(
-      TEST_CONTRACT_ADDRESS,
-      projectId
-    );
-    const project: Project = changetype<Project>(Project.load(fullProjectId));
-    const scriptTypeAndVersion = "p5js@1.0.0";
-
-    const event: ProjectUpdated = changetype<ProjectUpdated>(newMockEvent());
-    event.address = TEST_CONTRACT_ADDRESS;
-    event.block.timestamp = CURRENT_BLOCK_TIMESTAMP;
-    event.parameters = [
-      new ethereum.EventParam(
-        "_projectId",
-        ethereum.Value.fromUnsignedBigInt(projectId)
-      ),
-      new ethereum.EventParam(
-        "_update",
-        ethereum.Value.fromBytes(Bytes.fromUTF8(FIELD_PROJECT_SCRIPT_TYPE))
-      )
-    ];
-
-    const projectScriptDetailsCallReturnOverrides = new Map<string, string>();
-    projectScriptDetailsCallReturnOverrides.set(
-      "scriptTypeAndVersion",
-      scriptTypeAndVersion
-    );
-    mockProjectScriptDetailsCall(
-      projectId,
-      projectScriptDetailsCallReturnOverrides
-    );
-
-    assert.assertNull(project.scriptTypeAndVersion);
-
-    handleProjectUpdated(event);
-
-    assert.fieldEquals(
-      PROJECT_ENTITY_TYPE,
-      fullProjectId,
-      "scriptTypeAndVersion",
-      scriptTypeAndVersion
-    );
-
-    assert.fieldEquals(
-      PROJECT_ENTITY_TYPE,
-      fullProjectId,
-      "updatedAt",
-      CURRENT_BLOCK_TIMESTAMP.toString()
-    );
-  });
 });
 
 // export handlers for test coverage https://github.com/LimeChain/demo-subgraph#test-coverage
-export { handleMint, handleTransfer };
+export { handleMint, handleTransfer, handleProjectUpdated };
