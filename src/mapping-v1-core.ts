@@ -789,6 +789,7 @@ function refreshContract<T>(contract: T, timestamp: BigInt): Contract | null {
     contractEntity = new Contract(contract._address.toHexString());
     contractEntity.createdAt = timestamp;
     contractEntity.mintWhitelisted = [];
+    contractEntity.newProjectsForbidden = false;
   }
 
   contractEntity.admin = admin;

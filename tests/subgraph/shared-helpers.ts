@@ -91,6 +91,9 @@ export const TEST_CONTRACT_ADDRESS = randomAddressGenerator.generateRandomAddres
 export const TEST_TOKEN_HASH = Bytes.fromByteArray(
   crypto.keccak256(Bytes.fromUTF8("token hash"))
 );
+export const TEST_TX_HASH = Bytes.fromByteArray(
+  crypto.keccak256(Bytes.fromUTF8("tx hash"))
+);
 export const ONE_ETH_IN_WEI = BigInt.fromString("1000000000000000000");
 
 export const DEFAULT_ORDER_HASH =
@@ -123,12 +126,14 @@ export class ContractValues {
   type: string;
   mintWhitelisted: Bytes[];
   randomizerContract: Address;
+  minterContract: Address;
   renderProviderAddress: Address;
   renderProviderPercentage: BigInt;
   renderProviderSecondarySalesAddress: Address;
   renderProviderSecondarySalesBPS: BigInt;
   dependencyRegistry: Address;
   curationRegistry: Address;
+  newProjectsForbidden: boolean;
 }
 export const TEST_CONTRACT: ContractValues = {
   admin: Address.fromString("0x96dc73c8b5969608c77375f085949744b5177660"),
@@ -137,12 +142,16 @@ export const TEST_CONTRACT: ContractValues = {
   renderProviderAddress: Address.fromString(
     "0xf7a55108a6e830a809e88e74cbf5f5de9d930153"
   ),
-  renderProviderSecondarySalesAddress: Address.zero(),
-  renderProviderSecondarySalesBPS: BigInt.fromI32(10),
+  renderProviderSecondarySalesAddress: Address.fromString(
+    "0xf4c61bd7b43e89f072fe1ef4e063fcf07f94565c"
+  ),
+  renderProviderSecondarySalesBPS: BigInt.fromI32(250),
   mintWhitelisted: [],
+  minterContract: Address.zero(),
   randomizerContract: RANDOMIZER_ADDRESS,
   dependencyRegistry: Address.zero(),
-  curationRegistry: Address.zero()
+  curationRegistry: Address.zero(),
+  newProjectsForbidden: false
 };
 export const TEST_CONTRACT_CREATED_AT = BigInt.fromI32(1607763598);
 
@@ -289,6 +298,7 @@ export function addNewContractToStore(): Contract {
   contract.renderProviderPercentage = TEST_CONTRACT.renderProviderPercentage;
   contract.updatedAt = contract.createdAt;
   contract.mintWhitelisted = TEST_CONTRACT.mintWhitelisted;
+  contract.newProjectsForbidden = false;
   contract.save();
 
   return contract;
@@ -303,8 +313,15 @@ export function addTestContractToStore(nextProjectId: BigInt): Contract {
   contract.randomizerContract = TEST_CONTRACT.randomizerContract;
   contract.renderProviderAddress = TEST_CONTRACT.renderProviderAddress;
   contract.renderProviderPercentage = TEST_CONTRACT.renderProviderPercentage;
+  contract.renderProviderSecondarySalesAddress =
+    TEST_CONTRACT.renderProviderSecondarySalesAddress;
+  contract.renderProviderSecondarySalesBPS =
+    TEST_CONTRACT.renderProviderSecondarySalesBPS;
+  contract.curationRegistry = TEST_CONTRACT.curationRegistry;
+  contract.dependencyRegistry = TEST_CONTRACT.dependencyRegistry;
   contract.updatedAt = contract.createdAt;
   contract.mintWhitelisted = TEST_CONTRACT.mintWhitelisted;
+  contract.newProjectsForbidden = false;
   contract.save();
 
   return contract;
