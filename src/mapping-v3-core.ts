@@ -24,6 +24,8 @@ import {
   generateProjectScriptId
 } from "./helpers";
 
+import { log as testLog } from "matchstick-as";
+
 /**
  * @dev Warning - All parameters pulled directly from contracts will return the
  * state at the end of the block that the transaction was included in. When
@@ -174,13 +176,15 @@ export function handleProjectUpdated(event: ProjectUpdated): void {
   let contract = GenArt721CoreV3.bind(event.address);
   const update = event.params._update.toString();
   const timestamp = event.block.timestamp;
+  const projectId = event.params._projectId;
+  const fullProjectId = generateContractSpecificId(event.address, projectId);
 
   if (update == FIELD_PROJECT_CREATED) {
     createProject(contract, event.params._projectId, timestamp);
     return;
   }
 
-  const project = Project.load(event.params._projectId.toString());
+  const project = Project.load(fullProjectId);
 
   if (!project) {
     log.warning("Project not found for update: {}-{}", [
@@ -273,8 +277,8 @@ export function handleProjectDetailsUpdated(
     project.description = projectDetails.value.getDescription();
     project.name = projectDetails.value.getProjectName();
     project.website = projectDetails.value.getWebsite();
-    project.updatedAt = timestamp;
     project.license = projectDetails.value.getLicense();
+    project.updatedAt = timestamp;
     project.save();
   }
 }
