@@ -47,7 +47,7 @@ import {
 import {
   SetAuctionDetails as DALinV0SetAuctionDetails,
   ResetAuctionDetails as DALinV0ResetAuctionDetails,
-  MinimumAuctionLengthSecondsUpdated
+  MinimumAuctionLengthSecondsUpdated as DALinV0MinimumAuctionLengthSecondsUpdated
 } from "../../../generated/MinterDALinV0/MinterDALinV0";
 import {
   SetAuctionDetails as DALinV1SetAuctionDetails,
@@ -93,12 +93,16 @@ import {
   handleAddManyBytesValueProjectConfig as handleAddManyBytesValue,
   handleAllowHoldersOfProjectsV0,
   handleAllowHoldersOfProjectsV1,
-  handleAuctionHalfLifeRangeSecondsUpdated,
+  handleAuctionHalfLifeRangeSecondsUpdatedV0,
+  handleAuctionHalfLifeRangeSecondsUpdatedV1,
+  handleAuctionHalfLifeRangeSecondsUpdatedV2,
   handleDAExpResetAuctionDetails,
   handleDAExpSetAuctionDetails,
   handleDALinResetAuctionDetails,
   handleDALinSetAuctionDetails,
-  handleMinimumAuctionLengthSecondsUpdated,
+  handleMinimumAuctionLengthSecondsUpdatedV0,
+  handleMinimumAuctionLengthSecondsUpdatedV1,
+  handleMinimumAuctionLengthSecondsUpdatedV2,
   handlePricePerTokenInWeiUpdated,
   handleProjectCurrencyInfoUpdated,
   handlePurchaseToDisabledUpdated,
@@ -445,43 +449,59 @@ test("handlePurchaseToDisabledUpdated should update project minter config purcha
 });
 
 test("handleMinimumAuctionLengthSecondsUpdated should update minter with minimumAuctionLengthSeconds", () => {
-  const minter = addNewMinterToStore("MinterDALinV0");
-  const minterAddress: Address = changetype<Address>(
-    Address.fromHexString(minter.id)
-  );
-  minter.minimumAuctionLengthInSeconds = BigInt.fromI32(300);
-  minter.updatedAt = CURRENT_BLOCK_TIMESTAMP.minus(BigInt.fromI32(10));
-  minter.save();
-
-  const newMinimumAuctionLengthSeconds = BigInt.fromI32(600);
-  const minimumAuctionLengthInSecondsUpdatedEvent: MinimumAuctionLengthSecondsUpdated = changetype<
-    MinimumAuctionLengthSecondsUpdated
-  >(newMockEvent());
-  minimumAuctionLengthInSecondsUpdatedEvent.address = minterAddress;
-  minimumAuctionLengthInSecondsUpdatedEvent.parameters = [
-    new ethereum.EventParam(
-      "_minimumAuctionLengthInSeconds",
-      ethereum.Value.fromUnsignedBigInt(newMinimumAuctionLengthSeconds)
-    )
+  let mintersToTest: string[] = [
+    "MinterDALinV0",
+    "MinterDALinV1",
+    "MinterDALinV2"
   ];
-  minimumAuctionLengthInSecondsUpdatedEvent.block.timestamp = CURRENT_BLOCK_TIMESTAMP;
+  for (let i = 0; i < mintersToTest.length; i++) {
+    clearStore();
+    const minter = addNewMinterToStore(mintersToTest[i]);
+    const minterAddress: Address = changetype<Address>(
+      Address.fromHexString(minter.id)
+    );
+    minter.minimumAuctionLengthInSeconds = BigInt.fromI32(300);
+    minter.updatedAt = CURRENT_BLOCK_TIMESTAMP.minus(BigInt.fromI32(10));
+    minter.save();
 
-  handleMinimumAuctionLengthSecondsUpdated(
-    minimumAuctionLengthInSecondsUpdatedEvent
-  );
+    const newMinimumAuctionLengthSeconds = BigInt.fromI32(600);
+    const event = newMockEvent();
+    event.address = minterAddress;
+    event.parameters = [
+      new ethereum.EventParam(
+        "_minimumAuctionLengthInSeconds",
+        ethereum.Value.fromUnsignedBigInt(newMinimumAuctionLengthSeconds)
+      )
+    ];
+    event.block.timestamp = CURRENT_BLOCK_TIMESTAMP;
 
-  assert.fieldEquals(
-    MINTER_ENTITY_TYPE,
-    minterAddress.toHexString(),
-    "minimumAuctionLengthInSeconds",
-    newMinimumAuctionLengthSeconds.toString()
-  );
-  assert.fieldEquals(
-    MINTER_ENTITY_TYPE,
-    minterAddress.toHexString(),
-    "updatedAt",
-    CURRENT_BLOCK_TIMESTAMP.toString()
-  );
+    if (mintersToTest[i] == "MinterDALinV0") {
+      handleMinimumAuctionLengthSecondsUpdatedV0(
+        changetype<DALinV0MinimumAuctionLengthSecondsUpdated>(event)
+      );
+    } else if (mintersToTest[i] == "MinterDALinV1") {
+      handleMinimumAuctionLengthSecondsUpdatedV1(
+        changetype<DALinV1MinimumAuctionLengthSecondsUpdated>(event)
+      );
+    } else {
+      handleMinimumAuctionLengthSecondsUpdatedV2(
+        changetype<DALinV2MinimumAuctionLengthSecondsUpdated>(event)
+      );
+    }
+
+    assert.fieldEquals(
+      MINTER_ENTITY_TYPE,
+      minterAddress.toHexString(),
+      "minimumAuctionLengthInSeconds",
+      newMinimumAuctionLengthSeconds.toString()
+    );
+    assert.fieldEquals(
+      MINTER_ENTITY_TYPE,
+      minterAddress.toHexString(),
+      "updatedAt",
+      CURRENT_BLOCK_TIMESTAMP.toString()
+    );
+  }
 });
 
 test("handleDALinSetAuctionDetails should do nothing if project is not in store", () => {
@@ -939,109 +959,75 @@ test("handleDALinResetAuctionDetails should reset project minter config auction 
 });
 
 test("handleAuctionHalfLifeRangeSecondsUpdated should update minter half life range", () => {
-  const minter = addNewMinterToStore("MinterDAExpV0");
-  const minterAddress: Address = changetype<Address>(
-    Address.fromHexString(minter.id)
-  );
-  minter.minimumHalfLifeInSeconds = BigInt.fromI32(300);
-  minter.maximumHalfLifeInSeconds = BigInt.fromI32(5000);
-  minter.updatedAt = CURRENT_BLOCK_TIMESTAMP.minus(BigInt.fromI32(10));
-  minter.save();
-
-  const newMinimumHalfLifeInSeconds = BigInt.fromI32(600);
-  const newMaximumHalfLifeInSeconds = BigInt.fromI32(1200);
-  const auctionHalfLifeRangeSecondsUpdatedEvent: AuctionHalfLifeRangeSecondsUpdated = changetype<
-    AuctionHalfLifeRangeSecondsUpdated
-  >(newMockEvent());
-  auctionHalfLifeRangeSecondsUpdatedEvent.address = minterAddress;
-  auctionHalfLifeRangeSecondsUpdatedEvent.parameters = [
-    new ethereum.EventParam(
-      "_minimumPriceDecayHalfLifeSeconds",
-      ethereum.Value.fromUnsignedBigInt(newMinimumHalfLifeInSeconds)
-    ),
-    new ethereum.EventParam(
-      "_maximumPriceDecayHalfLifeSeconds",
-      ethereum.Value.fromUnsignedBigInt(newMaximumHalfLifeInSeconds)
-    )
+  let mintersToTest: string[] = [
+    "MinterDAExpV0",
+    "MinterDAExpV1",
+    "MinterDAExpV2"
   ];
-  auctionHalfLifeRangeSecondsUpdatedEvent.block.timestamp = CURRENT_BLOCK_TIMESTAMP;
+  for (let i = 0; i < mintersToTest.length; i++) {
+    clearStore();
+    const minter = addNewMinterToStore(mintersToTest[i]);
+    const minterAddress: Address = changetype<Address>(
+      Address.fromHexString(minter.id)
+    );
+    minter.minimumHalfLifeInSeconds = BigInt.fromI32(300);
+    minter.maximumHalfLifeInSeconds = BigInt.fromI32(5000);
+    minter.updatedAt = CURRENT_BLOCK_TIMESTAMP.minus(BigInt.fromI32(10));
+    minter.save();
 
-  handleAuctionHalfLifeRangeSecondsUpdated(
-    auctionHalfLifeRangeSecondsUpdatedEvent
-  );
+    const newMinimumHalfLifeInSeconds = BigInt.fromI32(600);
+    const newMaximumHalfLifeInSeconds = BigInt.fromI32(1200);
+    let event = newMockEvent();
+    const auctionHalfLifeRangeSecondsUpdatedEvent: AuctionHalfLifeRangeSecondsUpdated = changetype<
+      AuctionHalfLifeRangeSecondsUpdated
+    >(newMockEvent());
+    event.address = minterAddress;
+    event.parameters = [
+      new ethereum.EventParam(
+        "_minimumPriceDecayHalfLifeSeconds",
+        ethereum.Value.fromUnsignedBigInt(newMinimumHalfLifeInSeconds)
+      ),
+      new ethereum.EventParam(
+        "_maximumPriceDecayHalfLifeSeconds",
+        ethereum.Value.fromUnsignedBigInt(newMaximumHalfLifeInSeconds)
+      )
+    ];
+    event.block.timestamp = CURRENT_BLOCK_TIMESTAMP;
 
-  assert.fieldEquals(
-    MINTER_ENTITY_TYPE,
-    minterAddress.toHexString(),
-    "minimumHalfLifeInSeconds",
-    newMinimumHalfLifeInSeconds.toString()
-  );
-  assert.fieldEquals(
-    MINTER_ENTITY_TYPE,
-    minterAddress.toHexString(),
-    "maximumHalfLifeInSeconds",
-    newMaximumHalfLifeInSeconds.toString()
-  );
+    if (mintersToTest[i] === "MinterDAExpV0") {
+      handleAuctionHalfLifeRangeSecondsUpdatedV0(
+        changetype<AuctionHalfLifeRangeSecondsUpdated>(event)
+      );
+    } else if (mintersToTest[i] === "MinterDAExpV1") {
+      handleAuctionHalfLifeRangeSecondsUpdatedV1(
+        changetype<AuctionHalfLifeRangeSecondsUpdatedV1>(event)
+      );
+    } else {
+      handleAuctionHalfLifeRangeSecondsUpdatedV2(
+        changetype<AuctionHalfLifeRangeSecondsUpdatedV2>(event)
+      );
+    }
 
-  assert.fieldEquals(
-    MINTER_ENTITY_TYPE,
-    minterAddress.toHexString(),
-    "updatedAt",
-    CURRENT_BLOCK_TIMESTAMP.toString()
-  );
-});
+    assert.fieldEquals(
+      MINTER_ENTITY_TYPE,
+      minterAddress.toHexString(),
+      "minimumHalfLifeInSeconds",
+      newMinimumHalfLifeInSeconds.toString()
+    );
+    assert.fieldEquals(
+      MINTER_ENTITY_TYPE,
+      minterAddress.toHexString(),
+      "maximumHalfLifeInSeconds",
+      newMaximumHalfLifeInSeconds.toString()
+    );
 
-test("handleAuctionHalfLifeRangeSecondsUpdated should update minter half life range with v1 event", () => {
-  const minter = addNewMinterToStore("MinterDAExpV1");
-  const minterAddress: Address = changetype<Address>(
-    Address.fromHexString(minter.id)
-  );
-  minter.minimumHalfLifeInSeconds = BigInt.fromI32(300);
-  minter.maximumHalfLifeInSeconds = BigInt.fromI32(5000);
-  minter.updatedAt = CURRENT_BLOCK_TIMESTAMP.minus(BigInt.fromI32(10));
-  minter.save();
-
-  const newMinimumHalfLifeInSeconds = BigInt.fromI32(600);
-  const newMaximumHalfLifeInSeconds = BigInt.fromI32(1200);
-  const auctionHalfLifeRangeSecondsUpdatedEvent: AuctionHalfLifeRangeSecondsUpdatedV1 = changetype<
-    AuctionHalfLifeRangeSecondsUpdatedV1
-  >(newMockEvent());
-  auctionHalfLifeRangeSecondsUpdatedEvent.address = minterAddress;
-  auctionHalfLifeRangeSecondsUpdatedEvent.parameters = [
-    new ethereum.EventParam(
-      "_minimumPriceDecayHalfLifeSeconds",
-      ethereum.Value.fromUnsignedBigInt(newMinimumHalfLifeInSeconds)
-    ),
-    new ethereum.EventParam(
-      "_maximumPriceDecayHalfLifeSeconds",
-      ethereum.Value.fromUnsignedBigInt(newMaximumHalfLifeInSeconds)
-    )
-  ];
-  auctionHalfLifeRangeSecondsUpdatedEvent.block.timestamp = CURRENT_BLOCK_TIMESTAMP;
-
-  handleAuctionHalfLifeRangeSecondsUpdated(
-    auctionHalfLifeRangeSecondsUpdatedEvent
-  );
-
-  assert.fieldEquals(
-    MINTER_ENTITY_TYPE,
-    minterAddress.toHexString(),
-    "minimumHalfLifeInSeconds",
-    newMinimumHalfLifeInSeconds.toString()
-  );
-  assert.fieldEquals(
-    MINTER_ENTITY_TYPE,
-    minterAddress.toHexString(),
-    "maximumHalfLifeInSeconds",
-    newMaximumHalfLifeInSeconds.toString()
-  );
-
-  assert.fieldEquals(
-    MINTER_ENTITY_TYPE,
-    minterAddress.toHexString(),
-    "updatedAt",
-    CURRENT_BLOCK_TIMESTAMP.toString()
-  );
+    assert.fieldEquals(
+      MINTER_ENTITY_TYPE,
+      minterAddress.toHexString(),
+      "updatedAt",
+      CURRENT_BLOCK_TIMESTAMP.toString()
+    );
+  }
 });
 
 test("handleDAExpSetAuctionDetails should do nothing if project is not in store", () => {
@@ -2016,65 +2002,72 @@ test("handleRemoveBytesManyValue should remove the key/value from extraMinterDet
   );
 });
 
-test("handleAllowHoldersOfProjectsV0 can add address + project id to extraMinterDetails", () => {
-  clearStore();
-  const minter = addNewMinterToStore("MinterHolderV0");
-  const minterAddress: Address = changetype<Address>(
-    Address.fromHexString(minter.id)
-  );
-  const minterType = minter.type;
+test("handleAllowHoldersOfProjects, V1 can add address + project id to extraMinterDetails", () => {
+  let mintersToTest: string[] = ["MinterHolderV0", "MinterHolderV1"];
+  for (let i = 0; i < mintersToTest.length; i++) {
+    clearStore();
+    const minter = addNewMinterToStore(mintersToTest[i]);
+    const minterAddress: Address = changetype<Address>(
+      Address.fromHexString(minter.id)
+    );
+    const projectId = BigInt.fromI32(0);
+    const project = addNewProjectToStore(
+      TEST_CONTRACT_ADDRESS,
+      projectId,
+      "project 0",
+      randomAddressGenerator.generateRandomAddress(),
+      BigInt.fromI32(0),
+      CURRENT_BLOCK_TIMESTAMP.minus(BigInt.fromI32(10))
+    );
 
-  const projectId = BigInt.fromI32(0);
-  const project = addNewProjectToStore(
-    TEST_CONTRACT_ADDRESS,
-    projectId,
-    "project 0",
-    randomAddressGenerator.generateRandomAddress(),
-    BigInt.fromI32(0),
-    CURRENT_BLOCK_TIMESTAMP.minus(BigInt.fromI32(10))
-  );
+    const projectMinterConfig = addNewProjectMinterConfigToStore(
+      project.id,
+      minterAddress
+    );
 
-  const projectMinterConfig = addNewProjectMinterConfigToStore(
-    project.id,
-    minterAddress
-  );
+    let testAddy: Address = randomAddressGenerator.generateRandomAddress();
 
-  let testAddy: Address = randomAddressGenerator.generateRandomAddress();
+    let event: ethereum.Event = newMockEvent();
+    event.address = minterAddress;
+    event.parameters = [
+      new ethereum.EventParam(
+        "_projectId",
+        ethereum.Value.fromUnsignedBigInt(projectId)
+      ),
+      new ethereum.EventParam(
+        "_ownedNFTAddresses",
+        ethereum.Value.fromAddressArray([testAddy])
+      ),
+      new ethereum.EventParam(
+        "_ownedNFTProjectIds",
+        ethereum.Value.fromUnsignedBigIntArray([BigInt.fromI32(1)])
+      )
+    ];
+    event.block.timestamp = CURRENT_BLOCK_TIMESTAMP;
 
-  const allowHoldersEvent: HolderV0AllowedHoldersOfProjects = changetype<
-    HolderV0AllowedHoldersOfProjects
-  >(newMockEvent());
-  allowHoldersEvent.address = minterAddress;
-  allowHoldersEvent.parameters = [
-    new ethereum.EventParam(
-      "_projectId",
-      ethereum.Value.fromUnsignedBigInt(projectId)
-    ),
-    new ethereum.EventParam(
-      "_ownedNFTAddresses",
-      ethereum.Value.fromAddressArray([testAddy])
-    ),
-    new ethereum.EventParam(
-      "_ownedNFTProjectIds",
-      ethereum.Value.fromUnsignedBigIntArray([BigInt.fromI32(1)])
-    )
-  ];
-  allowHoldersEvent.block.timestamp = CURRENT_BLOCK_TIMESTAMP;
+    if (mintersToTest[i] == "MinterHolderV0") {
+      handleAllowHoldersOfProjectsV0(
+        changetype<HolderV0AllowedHoldersOfProjects>(event)
+      );
+    } else {
+      handleAllowHoldersOfProjectsV1(
+        changetype<HolderV1AllowedHoldersOfProjects>(event)
+      );
+    }
 
-  handleAllowHoldersOfProjectsV0(allowHoldersEvent);
-
-  assert.fieldEquals(
-    PROJECT_MINTER_CONFIGURATION_ENTITY_TYPE,
-    getProjectMinterConfigId(minterAddress.toHexString(), project.id),
-    "extraMinterDetails",
-    '{"allowlistedAddressAndProjectId":[' +
-      '"' +
-      testAddy.toHexString() +
-      "-" +
-      "1" +
-      '"' +
-      "]}"
-  );
+    assert.fieldEquals(
+      PROJECT_MINTER_CONFIGURATION_ENTITY_TYPE,
+      getProjectMinterConfigId(minterAddress.toHexString(), project.id),
+      "extraMinterDetails",
+      '{"allowlistedAddressAndProjectId":[' +
+        '"' +
+        testAddy.toHexString() +
+        "-" +
+        "1" +
+        '"' +
+        "]}"
+    );
+  }
 });
 test("handleAllowHoldersOfProjectsV0 can add multiple address + project id to extraMinterDetails", () => {
   clearStore();
