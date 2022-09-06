@@ -197,6 +197,7 @@ export function handleExternalAssetDependencyUpdated(
   );
 
   if (!project) {
+    log.warning("Project not found for ExternalAssetDependencyUpdated event", []);
     return;
   }
 
@@ -219,6 +220,10 @@ export function handleExternalAssetDependencyUpdated(
   project.save();
 }
 
+/**
+ * Based on the way external asset dependency removal is implement on the contract
+ * we can always assume that the last index is the one being removed.
+ */
 export function handleExternalAssetDependencyRemoved(
   event: ExternalAssetDependencyRemoved
 ): void {
@@ -227,6 +232,7 @@ export function handleExternalAssetDependencyRemoved(
   );
 
   if (!project) {
+    log.warning("Project not found for ExternalAssetDependencyRemoved event", []);
     return;
   }
 
@@ -280,6 +286,7 @@ export function handleGatewayUpdated(event: GatewayUpdated): void {
   let contractEntity = Contract.load(event.address.toHexString());
   
   if (!contractEntity) {
+    log.warning("Contract not found for GatewayUpdated event", []);
     return;
   }
   const dependencyType = FLEX_CONTRACT_EXTERNAL_ASSET_DEP_TYPES[event.params._dependencyType];
@@ -297,6 +304,7 @@ export function handleProjectExternalAssetDependenciesLocked(event: ProjectExter
   );
 
   if (!project) {
+    log.warning("Project not found for ProjectExternalAssetDependenciesLocked event", []);
     return;
   }
 
