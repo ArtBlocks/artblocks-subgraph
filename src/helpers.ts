@@ -7,6 +7,7 @@ import {
   JSONValueKind,
   TypedMap
 } from "@graphprotocol/graph-ts";
+import { log } from "matchstick-as";
 import { MinterDAExpV0 } from "../generated/MinterDAExpV0/MinterDAExpV0";
 import { MinterDAExpV1 } from "../generated/MinterDAExpV1/MinterDAExpV1";
 import { MinterDALinV0 } from "../generated/MinterDALinV0/MinterDALinV0";
@@ -191,9 +192,13 @@ export function arrayToJSONValue(value: string): JSONValue {
 // otherwise parse the byte data to a hex string
 export function bytesToJSONValue(value: Bytes): JSONValue {
   // If the bytes cannot be
+  log.debug('bytesToJSONValue, hex: "{}"', [value.toHexString()]);
   let result = json.try_fromString('["' + value.toString() + '"]');
   if (result.isError) {
+    log.debug('was error, so should use hex: "{}"', [value.toHexString()]);
     result = json.try_fromString('["' + value.toHexString() + '"]');
+  } else {
+    log.debug('was ok, so should use string: "{}"', [value.toString()]);
   }
   return result.value.toArray()[0];
 }
