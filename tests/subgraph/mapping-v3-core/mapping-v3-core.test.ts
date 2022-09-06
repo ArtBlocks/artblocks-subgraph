@@ -34,14 +34,16 @@ import {
   addNewTokenToStore,
   TRANSFER_ENTITY_TYPE,
   ONE_MILLION,
-  booleanToString
+  booleanToString,
+  TEST_CONTRACT
 } from "../shared-helpers";
 import {
   mockProjectScriptDetailsCall,
   mockProjectStateDataCall,
   testProjectDetailsUpdated,
   testProjectScriptDetailsUpdated,
-  testProjectStateDataUpdated
+  testProjectStateDataUpdated,
+  mockRefreshContractCalls
 } from "./helpers";
 import { Project } from "../../../generated/schema";
 import {
@@ -70,6 +72,7 @@ import {
   FIELD_PROJECT_WEBSITE,
   handleMint,
   handleProjectUpdated,
+  handlePlatformUpdated,
   handleTransfer
 } from "../../../src/mapping-v3-core";
 import {
