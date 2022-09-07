@@ -34,6 +34,8 @@ dataSources:
           handler: handleMint
         - event: Transfer(indexed address,indexed address,indexed uint256)
           handler: handleTransfer
+        - event: ProjectUpdated(indexed uint256,indexed bytes32)
+          handler: handleProjectUpdated
         - event: PlatformUpdated(indexed bytes32)
           handler: handlePlatformUpdated
         - event: MinterUpdated(indexed address)
