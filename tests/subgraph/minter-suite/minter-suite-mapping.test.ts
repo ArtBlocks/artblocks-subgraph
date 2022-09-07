@@ -5,7 +5,8 @@ import {
   test,
   newMockEvent,
   logStore,
-  log
+  log,
+  describe
 } from "matchstick-as/assembly/index";
 import { Minter, ProjectMinterConfiguration } from "../../../generated/schema";
 import {
@@ -126,1164 +127,931 @@ import {
 
 const randomAddressGenerator = new RandomAddressGenerator();
 
-test("handlePricePerTokenInWeiUpdated should do nothing if project is not in store", () => {
-  clearStore();
-
-  const minter = addNewMinterToStore("MinterSetPriceV0");
-  const minterType = minter.type;
-  const minterAddress: Address = changetype<Address>(
-    Address.fromHexString(minter.id)
-  );
-
-  const projectId = BigInt.fromI32(0);
-  const fullProjectId = generateContractSpecificId(
-    TEST_CONTRACT_ADDRESS,
-    projectId
-  );
-
-  const pricePerTokenInWeiUpdatedEvent: PricePerTokenInWeiUpdated = changetype<
-    PricePerTokenInWeiUpdated
-  >(newMockEvent());
-  pricePerTokenInWeiUpdatedEvent.address = minterAddress;
-  pricePerTokenInWeiUpdatedEvent.parameters = [
-    new ethereum.EventParam(
-      "_projectId",
-      ethereum.Value.fromUnsignedBigInt(projectId)
-    )
-  ];
-  pricePerTokenInWeiUpdatedEvent.block.timestamp = CURRENT_BLOCK_TIMESTAMP;
-
-  assert.notInStore(PROJECT_ENTITY_TYPE, fullProjectId);
-
-  handlePricePerTokenInWeiUpdated(pricePerTokenInWeiUpdatedEvent);
-
-  assert.notInStore(PROJECT_MINTER_CONFIGURATION_ENTITY_TYPE, fullProjectId);
-});
-
-test("handlePricePerTokenInWeiUpdated should update project minter config pricePerTokenInWei", () => {
-  clearStore();
-
-  const minter = addNewMinterToStore("MinterSetPriceV0");
-  const minterType = minter.type;
-  const minterAddress: Address = changetype<Address>(
-    Address.fromHexString(minter.id)
-  );
-
-  const projectId = BigInt.fromI32(0);
-  const project = addNewProjectToStore(
-    TEST_CONTRACT_ADDRESS,
-    projectId,
-    "project 0",
-    randomAddressGenerator.generateRandomAddress(),
-    ONE_ETH_IN_WEI.div(BigInt.fromI32(10)),
-    CURRENT_BLOCK_TIMESTAMP.minus(BigInt.fromI32(10))
-  );
-
-  const projectMinterConfig = new ProjectMinterConfiguration(
-    getProjectMinterConfigId(minterAddress.toHexString(), project.id)
-  );
-  projectMinterConfig.minter = minterAddress.toHexString();
-  projectMinterConfig.project = project.id;
-  projectMinterConfig.extraMinterDetails = "{}";
-  projectMinterConfig.basePrice = ONE_ETH_IN_WEI.div(BigInt.fromI32(10));
-  projectMinterConfig.priceIsConfigured = false;
-  projectMinterConfig.purchaseToDisabled = false;
-  projectMinterConfig.currencyAddress = Address.zero();
-  projectMinterConfig.currencySymbol = "ETH";
-  projectMinterConfig.save();
-
-  const newPricePerTokenInWei = ONE_ETH_IN_WEI.div(BigInt.fromI32(5));
-  const pricePerTokenInWeiUpdatedEvent: PricePerTokenInWeiUpdated = changetype<
-    PricePerTokenInWeiUpdated
-  >(newMockEvent());
-  pricePerTokenInWeiUpdatedEvent.address = minterAddress;
-  pricePerTokenInWeiUpdatedEvent.parameters = [
-    new ethereum.EventParam(
-      "_projectId",
-      ethereum.Value.fromUnsignedBigInt(projectId)
-    ),
-    new ethereum.EventParam(
-      "_pricePerTokenInWei",
-      ethereum.Value.fromUnsignedBigInt(newPricePerTokenInWei)
-    )
-  ];
-  pricePerTokenInWeiUpdatedEvent.block.timestamp = CURRENT_BLOCK_TIMESTAMP;
-
-  handlePricePerTokenInWeiUpdated(pricePerTokenInWeiUpdatedEvent);
-
-  assert.fieldEquals(
-    PROJECT_MINTER_CONFIGURATION_ENTITY_TYPE,
-    getProjectMinterConfigId(minterAddress.toHexString(), project.id),
-    "basePrice",
-    newPricePerTokenInWei.toString()
-  );
-  assert.fieldEquals(
-    PROJECT_MINTER_CONFIGURATION_ENTITY_TYPE,
-    getProjectMinterConfigId(minterAddress.toHexString(), project.id),
-    "priceIsConfigured",
-    "true"
-  );
-
-  assert.fieldEquals(
-    PROJECT_ENTITY_TYPE,
-    project.id,
-    "updatedAt",
-    CURRENT_BLOCK_TIMESTAMP.toString()
-  );
-});
-
-test("handleProjectCurrencyInfoUpdated should do nothing if project is not in store", () => {
-  clearStore();
-
-  const minterType = "MinterSetPriceERC20V0";
-  const minter = addNewMinterToStore(minterType);
-  const minterAddress: Address = changetype<Address>(
-    Address.fromHexString(minter.id)
-  );
-
-  const projectId = BigInt.fromI32(0);
-  const fullProjectId = generateContractSpecificId(
-    TEST_CONTRACT_ADDRESS,
-    projectId
-  );
-
-  const projectCurrencyInfoUpdatedEvent: ProjectCurrencyInfoUpdated = changetype<
-    ProjectCurrencyInfoUpdated
-  >(newMockEvent());
-  projectCurrencyInfoUpdatedEvent.address = minterAddress;
-  projectCurrencyInfoUpdatedEvent.parameters = [
-    new ethereum.EventParam(
-      "_projectId",
-      ethereum.Value.fromUnsignedBigInt(projectId)
-    )
-  ];
-  projectCurrencyInfoUpdatedEvent.block.timestamp = CURRENT_BLOCK_TIMESTAMP;
-
-  assert.notInStore(PROJECT_ENTITY_TYPE, fullProjectId);
-
-  handleProjectCurrencyInfoUpdated(projectCurrencyInfoUpdatedEvent);
-
-  assert.notInStore(PROJECT_MINTER_CONFIGURATION_ENTITY_TYPE, fullProjectId);
-});
-
-test("handleProjectCurrencyInfoUpdated should update project minter config currency info", () => {
-  clearStore();
-
-  const minter = addNewMinterToStore("MinterSetPriceERC20V0");
-  const minterAddress: Address = changetype<Address>(
-    Address.fromHexString(minter.id)
-  );
-  minter.coreContract = TEST_CONTRACT_ADDRESS.toHexString();
-  minter.save();
-
-  const projectId = BigInt.fromI32(0);
-  const project = addNewProjectToStore(
-    TEST_CONTRACT_ADDRESS,
-    projectId,
-    "project 0",
-    randomAddressGenerator.generateRandomAddress(),
-    ONE_ETH_IN_WEI.div(BigInt.fromI32(10)),
-    CURRENT_BLOCK_TIMESTAMP.minus(BigInt.fromI32(10))
-  );
-
-  const projectMinterConfig = new ProjectMinterConfiguration(
-    getProjectMinterConfigId(minterAddress.toHexString(), project.id)
-  );
-  projectMinterConfig.minter = minterAddress.toHexString();
-  projectMinterConfig.project = project.id;
-  projectMinterConfig.extraMinterDetails = "{}";
-  projectMinterConfig.basePrice = ONE_ETH_IN_WEI.div(BigInt.fromI32(10));
-  projectMinterConfig.priceIsConfigured = false;
-  projectMinterConfig.currencyAddress = Address.zero();
-  projectMinterConfig.currencySymbol = "ETH";
-  projectMinterConfig.purchaseToDisabled = false;
-  projectMinterConfig.save();
-
-  const newCurrencyAddress = randomAddressGenerator.generateRandomAddress();
-  const newCurrencySymbol = "DAI";
-  const projectCurrencyInfoUpdatedEvent: ProjectCurrencyInfoUpdated = changetype<
-    ProjectCurrencyInfoUpdated
-  >(newMockEvent());
-  projectCurrencyInfoUpdatedEvent.address = minterAddress;
-  projectCurrencyInfoUpdatedEvent.parameters = [
-    new ethereum.EventParam(
-      "_projectId",
-      ethereum.Value.fromUnsignedBigInt(projectId)
-    ),
-    new ethereum.EventParam(
-      "_currencyAddress",
-      ethereum.Value.fromAddress(newCurrencyAddress)
-    ),
-    new ethereum.EventParam(
-      "_currencySymbol",
-      ethereum.Value.fromString(newCurrencySymbol)
-    )
-  ];
-  projectCurrencyInfoUpdatedEvent.block.timestamp = CURRENT_BLOCK_TIMESTAMP;
-
-  assert.assertTrue(newCurrencyAddress != projectMinterConfig.currencyAddress);
-
-  handleProjectCurrencyInfoUpdated(projectCurrencyInfoUpdatedEvent);
-
-  assert.fieldEquals(
-    PROJECT_MINTER_CONFIGURATION_ENTITY_TYPE,
-    getProjectMinterConfigId(minterAddress.toHexString(), project.id),
-    "currencyAddress",
-    newCurrencyAddress.toHexString()
-  );
-  assert.fieldEquals(
-    PROJECT_MINTER_CONFIGURATION_ENTITY_TYPE,
-    getProjectMinterConfigId(minterAddress.toHexString(), project.id),
-    "currencySymbol",
-    newCurrencySymbol
-  );
-
-  assert.fieldEquals(
-    PROJECT_ENTITY_TYPE,
-    project.id,
-    "updatedAt",
-    CURRENT_BLOCK_TIMESTAMP.toString()
-  );
-});
-
-test("handlePurchaseToDisabledUpdated should do nothing if project is not in store", () => {
-  clearStore();
-
-  const minter = addNewMinterToStore("MinterSetPriceV0");
-  const minterAddress: Address = changetype<Address>(
-    Address.fromHexString(minter.id)
-  );
-  const minterType = minter.type;
-
-  const projectId = BigInt.fromI32(0);
-  const fullProjectId = generateContractSpecificId(
-    TEST_CONTRACT_ADDRESS,
-    projectId
-  );
-
-  const purchaseToDisabledUpdatedEvent: PurchaseToDisabledUpdated = changetype<
-    PurchaseToDisabledUpdated
-  >(newMockEvent());
-  purchaseToDisabledUpdatedEvent.address = minterAddress;
-  purchaseToDisabledUpdatedEvent.parameters = [
-    new ethereum.EventParam(
-      "_projectId",
-      ethereum.Value.fromUnsignedBigInt(projectId)
-    ),
-    new ethereum.EventParam(
-      "_purchaseToDisabled",
-      ethereum.Value.fromBoolean(true)
-    )
-  ];
-  purchaseToDisabledUpdatedEvent.block.timestamp = CURRENT_BLOCK_TIMESTAMP;
-
-  assert.notInStore(PROJECT_ENTITY_TYPE, fullProjectId);
-
-  handlePurchaseToDisabledUpdated(purchaseToDisabledUpdatedEvent);
-
-  assert.notInStore(PROJECT_MINTER_CONFIGURATION_ENTITY_TYPE, fullProjectId);
-});
-
-test("handlePurchaseToDisabledUpdated should update project minter config purchaseToDisabled", () => {
-  clearStore();
-
-  const minter = addNewMinterToStore("MinterSetPriceV0");
-  const minterAddress: Address = changetype<Address>(
-    Address.fromHexString(minter.id)
-  );
-  const minterType = minter.type;
-
-  addNewMinterToStore("MinterSetPriceV0");
-
-  const projectId = BigInt.fromI32(0);
-  const project = addNewProjectToStore(
-    TEST_CONTRACT_ADDRESS,
-    projectId,
-    "project 0",
-    randomAddressGenerator.generateRandomAddress(),
-    ONE_ETH_IN_WEI.div(BigInt.fromI32(10)),
-    CURRENT_BLOCK_TIMESTAMP.minus(BigInt.fromI32(10))
-  );
-
-  const projectMinterConfig = new ProjectMinterConfiguration(
-    getProjectMinterConfigId(minterAddress.toHexString(), project.id)
-  );
-  projectMinterConfig.minter = minterAddress.toHexString();
-  projectMinterConfig.project = project.id;
-  projectMinterConfig.extraMinterDetails = "{}";
-  projectMinterConfig.basePrice = ONE_ETH_IN_WEI.div(BigInt.fromI32(10));
-  projectMinterConfig.priceIsConfigured = false;
-  projectMinterConfig.currencyAddress = Address.zero();
-  projectMinterConfig.currencySymbol = "ETH";
-  projectMinterConfig.purchaseToDisabled = false;
-  projectMinterConfig.save();
-
-  const purchaseToDisabledUpdatedEvent: PurchaseToDisabledUpdated = changetype<
-    PurchaseToDisabledUpdated
-  >(newMockEvent());
-  purchaseToDisabledUpdatedEvent.address = minterAddress;
-  purchaseToDisabledUpdatedEvent.parameters = [
-    new ethereum.EventParam(
-      "_projectId",
-      ethereum.Value.fromUnsignedBigInt(projectId)
-    ),
-    new ethereum.EventParam(
-      "_purchaseToDisabled",
-      ethereum.Value.fromBoolean(true)
-    )
-  ];
-  purchaseToDisabledUpdatedEvent.block.timestamp = CURRENT_BLOCK_TIMESTAMP;
-
-  handlePurchaseToDisabledUpdated(purchaseToDisabledUpdatedEvent);
-
-  assert.fieldEquals(
-    PROJECT_MINTER_CONFIGURATION_ENTITY_TYPE,
-    getProjectMinterConfigId(minterAddress.toHexString(), project.id),
-    "purchaseToDisabled",
-    "true"
-  );
-
-  assert.fieldEquals(
-    PROJECT_ENTITY_TYPE,
-    project.id,
-    "updatedAt",
-    CURRENT_BLOCK_TIMESTAMP.toString()
-  );
-});
-
-test("handleMinimumAuctionLengthSecondsUpdated should update minter with minimumAuctionLengthSeconds", () => {
-  let mintersToTest: string[] = [
-    "MinterDALinV0",
-    "MinterDALinV1",
-    "MinterDALinV2"
-  ];
-  for (let i = 0; i < mintersToTest.length; i++) {
+describe("handlePricePerTokenInWeiUpdated", () => {
+  test("handlePricePerTokenInWeiUpdated should do nothing if project is not in store", () => {
     clearStore();
-    const minter = addNewMinterToStore(mintersToTest[i]);
+
+    const minter = addNewMinterToStore("MinterSetPriceV0");
+    const minterType = minter.type;
     const minterAddress: Address = changetype<Address>(
       Address.fromHexString(minter.id)
     );
-    minter.minimumAuctionLengthInSeconds = BigInt.fromI32(300);
-    minter.updatedAt = CURRENT_BLOCK_TIMESTAMP.minus(BigInt.fromI32(10));
-    minter.save();
 
-    const newMinimumAuctionLengthSeconds = BigInt.fromI32(600);
-    const event = newMockEvent();
-    event.address = minterAddress;
-    event.parameters = [
+    const projectId = BigInt.fromI32(0);
+    const fullProjectId = generateContractSpecificId(
+      TEST_CONTRACT_ADDRESS,
+      projectId
+    );
+
+    const pricePerTokenInWeiUpdatedEvent: PricePerTokenInWeiUpdated = changetype<
+      PricePerTokenInWeiUpdated
+    >(newMockEvent());
+    pricePerTokenInWeiUpdatedEvent.address = minterAddress;
+    pricePerTokenInWeiUpdatedEvent.parameters = [
       new ethereum.EventParam(
-        "_minimumAuctionLengthInSeconds",
-        ethereum.Value.fromUnsignedBigInt(newMinimumAuctionLengthSeconds)
+        "_projectId",
+        ethereum.Value.fromUnsignedBigInt(projectId)
       )
     ];
-    event.block.timestamp = CURRENT_BLOCK_TIMESTAMP;
+    pricePerTokenInWeiUpdatedEvent.block.timestamp = CURRENT_BLOCK_TIMESTAMP;
 
-    if (mintersToTest[i] == "MinterDALinV0") {
-      handleMinimumAuctionLengthSecondsUpdatedV0(
-        changetype<DALinV0MinimumAuctionLengthSecondsUpdated>(event)
-      );
-    } else if (mintersToTest[i] == "MinterDALinV1") {
-      handleMinimumAuctionLengthSecondsUpdatedV1(
-        changetype<DALinV1MinimumAuctionLengthSecondsUpdated>(event)
-      );
-    } else {
-      handleMinimumAuctionLengthSecondsUpdatedV2(
-        changetype<DALinV2MinimumAuctionLengthSecondsUpdated>(event)
-      );
-    }
+    assert.notInStore(PROJECT_ENTITY_TYPE, fullProjectId);
 
-    assert.fieldEquals(
-      MINTER_ENTITY_TYPE,
-      minterAddress.toHexString(),
-      "minimumAuctionLengthInSeconds",
-      newMinimumAuctionLengthSeconds.toString()
-    );
-    assert.fieldEquals(
-      MINTER_ENTITY_TYPE,
-      minterAddress.toHexString(),
-      "updatedAt",
-      CURRENT_BLOCK_TIMESTAMP.toString()
-    );
-  }
-});
+    handlePricePerTokenInWeiUpdated(pricePerTokenInWeiUpdatedEvent);
 
-test("handleDALinSetAuctionDetails should do nothing if project is not in store", () => {
-  clearStore();
+    assert.notInStore(PROJECT_MINTER_CONFIGURATION_ENTITY_TYPE, fullProjectId);
+  });
 
-  const minter = addNewMinterToStore("MinterDALinV0");
-  const minterAddress: Address = changetype<Address>(
-    Address.fromHexString(minter.id)
-  );
-
-  const projectId = BigInt.fromI32(0);
-  const fullProjectId = generateContractSpecificId(
-    TEST_CONTRACT_ADDRESS,
-    projectId
-  );
-
-  const daLinV0SetAuctionDetailsEvent: DALinV0SetAuctionDetails = changetype<
-    DALinV0SetAuctionDetails
-  >(newMockEvent());
-  daLinV0SetAuctionDetailsEvent.address = minterAddress;
-  daLinV0SetAuctionDetailsEvent.parameters = [
-    new ethereum.EventParam(
-      "_projectId",
-      ethereum.Value.fromUnsignedBigInt(projectId)
-    )
-  ];
-  daLinV0SetAuctionDetailsEvent.block.timestamp = CURRENT_BLOCK_TIMESTAMP;
-
-  assert.notInStore(PROJECT_ENTITY_TYPE, fullProjectId);
-
-  handleDALinSetAuctionDetails(daLinV0SetAuctionDetailsEvent);
-
-  assert.notInStore(PROJECT_MINTER_CONFIGURATION_ENTITY_TYPE, fullProjectId);
-});
-
-test("handleDALinSetAuctionDetails should update project minter config auction details", () => {
-  clearStore();
-
-  const minter = addNewMinterToStore("MinterDALinV0");
-  const minterAddress: Address = changetype<Address>(
-    Address.fromHexString(minter.id)
-  );
-
-  const projectId = BigInt.fromI32(0);
-  const project = addNewProjectToStore(
-    TEST_CONTRACT_ADDRESS,
-    projectId,
-    "project 0",
-    randomAddressGenerator.generateRandomAddress(),
-    BigInt.fromI32(0),
-    CURRENT_BLOCK_TIMESTAMP.minus(BigInt.fromI32(10))
-  );
-
-  const projectMinterConfig = new ProjectMinterConfiguration(
-    getProjectMinterConfigId(minterAddress.toHexString(), project.id)
-  );
-  projectMinterConfig.minter = minterAddress.toHexString();
-  projectMinterConfig.project = project.id;
-  projectMinterConfig.extraMinterDetails = "{}";
-  projectMinterConfig.basePrice = BigInt.fromI32(0);
-  projectMinterConfig.priceIsConfigured = false;
-  projectMinterConfig.currencyAddress = Address.zero();
-  projectMinterConfig.currencySymbol = "ETH";
-  projectMinterConfig.purchaseToDisabled = false;
-  projectMinterConfig.save();
-
-  const basePrice = ONE_ETH_IN_WEI.div(BigInt.fromI32(10));
-  const startPrice = ONE_ETH_IN_WEI;
-  const startTime = CURRENT_BLOCK_TIMESTAMP.plus(BigInt.fromI32(100));
-  const endTime = CURRENT_BLOCK_TIMESTAMP.plus(BigInt.fromI32(200));
-  const setAuctionDetailsEvent: DALinV0SetAuctionDetails = changetype<
-    DALinV0SetAuctionDetails
-  >(newMockEvent());
-  setAuctionDetailsEvent.address = minterAddress;
-  setAuctionDetailsEvent.parameters = [
-    new ethereum.EventParam(
-      "_projectId",
-      ethereum.Value.fromUnsignedBigInt(projectId)
-    ),
-    new ethereum.EventParam(
-      "_auctionTimestampStart",
-      ethereum.Value.fromUnsignedBigInt(startTime)
-    ),
-    new ethereum.EventParam(
-      "_auctionTimestampEnd",
-      ethereum.Value.fromUnsignedBigInt(endTime)
-    ),
-    new ethereum.EventParam(
-      "_startPrice",
-      ethereum.Value.fromUnsignedBigInt(startPrice)
-    ),
-    new ethereum.EventParam(
-      "_basePrice",
-      ethereum.Value.fromUnsignedBigInt(basePrice)
-    )
-  ];
-  setAuctionDetailsEvent.block.timestamp = CURRENT_BLOCK_TIMESTAMP;
-
-  handleDALinSetAuctionDetails(setAuctionDetailsEvent);
-
-  assert.fieldEquals(
-    PROJECT_MINTER_CONFIGURATION_ENTITY_TYPE,
-    getProjectMinterConfigId(minterAddress.toHexString(), project.id),
-    "basePrice",
-    basePrice.toString()
-  );
-  assert.fieldEquals(
-    PROJECT_MINTER_CONFIGURATION_ENTITY_TYPE,
-    getProjectMinterConfigId(minterAddress.toHexString(), project.id),
-    "startPrice",
-    startPrice.toString()
-  );
-  assert.fieldEquals(
-    PROJECT_MINTER_CONFIGURATION_ENTITY_TYPE,
-    getProjectMinterConfigId(minterAddress.toHexString(), project.id),
-    "startTime",
-    startTime.toString()
-  );
-  assert.fieldEquals(
-    PROJECT_MINTER_CONFIGURATION_ENTITY_TYPE,
-    getProjectMinterConfigId(minterAddress.toHexString(), project.id),
-    "endTime",
-    endTime.toString()
-  );
-  assert.fieldEquals(
-    PROJECT_MINTER_CONFIGURATION_ENTITY_TYPE,
-    getProjectMinterConfigId(minterAddress.toHexString(), project.id),
-    "priceIsConfigured",
-    "true"
-  );
-
-  assert.fieldEquals(
-    PROJECT_ENTITY_TYPE,
-    project.id,
-    "updatedAt",
-    CURRENT_BLOCK_TIMESTAMP.toString()
-  );
-});
-
-test("handleDALinSetAuctionDetails should update project minter config auction details with v1 event", () => {
-  clearStore();
-
-  const minter = addNewMinterToStore("MinterDALinV1");
-  const minterAddress: Address = changetype<Address>(
-    Address.fromHexString(minter.id)
-  );
-  const minterType = minter.type;
-
-  const projectId = BigInt.fromI32(0);
-  const project = addNewProjectToStore(
-    TEST_CONTRACT_ADDRESS,
-    projectId,
-    "project 0",
-    randomAddressGenerator.generateRandomAddress(),
-    BigInt.fromI32(0),
-    CURRENT_BLOCK_TIMESTAMP.minus(BigInt.fromI32(10))
-  );
-
-  const projectMinterConfig = new ProjectMinterConfiguration(
-    getProjectMinterConfigId(minterAddress.toHexString(), project.id)
-  );
-  projectMinterConfig.minter = minterAddress.toHexString();
-  projectMinterConfig.project = project.id;
-  projectMinterConfig.extraMinterDetails = "{}";
-  projectMinterConfig.basePrice = BigInt.fromI32(0);
-  projectMinterConfig.priceIsConfigured = false;
-  projectMinterConfig.currencyAddress = Address.zero();
-  projectMinterConfig.currencySymbol = "ETH";
-  projectMinterConfig.purchaseToDisabled = false;
-  projectMinterConfig.save();
-
-  const basePrice = ONE_ETH_IN_WEI.div(BigInt.fromI32(10));
-  const startPrice = ONE_ETH_IN_WEI;
-  const startTime = CURRENT_BLOCK_TIMESTAMP.plus(BigInt.fromI32(100));
-  const endTime = CURRENT_BLOCK_TIMESTAMP.plus(BigInt.fromI32(200));
-  const setAuctionDetailsEvent: DALinV1SetAuctionDetails = changetype<
-    DALinV1SetAuctionDetails
-  >(newMockEvent());
-  setAuctionDetailsEvent.address = minterAddress;
-  setAuctionDetailsEvent.parameters = [
-    new ethereum.EventParam(
-      "_projectId",
-      ethereum.Value.fromUnsignedBigInt(projectId)
-    ),
-    new ethereum.EventParam(
-      "_auctionTimestampStart",
-      ethereum.Value.fromUnsignedBigInt(startTime)
-    ),
-    new ethereum.EventParam(
-      "_auctionTimestampEnd",
-      ethereum.Value.fromUnsignedBigInt(endTime)
-    ),
-    new ethereum.EventParam(
-      "_startPrice",
-      ethereum.Value.fromUnsignedBigInt(startPrice)
-    ),
-    new ethereum.EventParam(
-      "_basePrice",
-      ethereum.Value.fromUnsignedBigInt(basePrice)
-    )
-  ];
-  setAuctionDetailsEvent.block.timestamp = CURRENT_BLOCK_TIMESTAMP;
-
-  handleDALinSetAuctionDetails(setAuctionDetailsEvent);
-
-  assert.fieldEquals(
-    PROJECT_MINTER_CONFIGURATION_ENTITY_TYPE,
-    getProjectMinterConfigId(minterAddress.toHexString(), project.id),
-    "basePrice",
-    basePrice.toString()
-  );
-  assert.fieldEquals(
-    PROJECT_MINTER_CONFIGURATION_ENTITY_TYPE,
-    getProjectMinterConfigId(minterAddress.toHexString(), project.id),
-    "startPrice",
-    startPrice.toString()
-  );
-  assert.fieldEquals(
-    PROJECT_MINTER_CONFIGURATION_ENTITY_TYPE,
-    getProjectMinterConfigId(minterAddress.toHexString(), project.id),
-    "startTime",
-    startTime.toString()
-  );
-  assert.fieldEquals(
-    PROJECT_MINTER_CONFIGURATION_ENTITY_TYPE,
-    getProjectMinterConfigId(minterAddress.toHexString(), project.id),
-    "endTime",
-    endTime.toString()
-  );
-  assert.fieldEquals(
-    PROJECT_MINTER_CONFIGURATION_ENTITY_TYPE,
-    getProjectMinterConfigId(minterAddress.toHexString(), project.id),
-    "priceIsConfigured",
-    "true"
-  );
-
-  assert.fieldEquals(
-    PROJECT_ENTITY_TYPE,
-    project.id,
-    "updatedAt",
-    CURRENT_BLOCK_TIMESTAMP.toString()
-  );
-});
-
-test("handleDALinResetAuctionDetails should do nothing if project is not in store", () => {
-  clearStore();
-  const minter = addNewMinterToStore("MinterDALinV0");
-  const minterAddress: Address = changetype<Address>(
-    Address.fromHexString(minter.id)
-  );
-  const minterType = minter.type;
-
-  const projectId = BigInt.fromI32(0);
-  const fullProjectId = generateContractSpecificId(
-    TEST_CONTRACT_ADDRESS,
-    projectId
-  );
-
-  const daLinV0ResetAuctionDetailsEvent: DALinV0ResetAuctionDetails = changetype<
-    DALinV0ResetAuctionDetails
-  >(newMockEvent());
-  daLinV0ResetAuctionDetailsEvent.address = minterAddress;
-  daLinV0ResetAuctionDetailsEvent.parameters = [
-    new ethereum.EventParam(
-      "_projectId",
-      ethereum.Value.fromUnsignedBigInt(projectId)
-    )
-  ];
-  daLinV0ResetAuctionDetailsEvent.block.timestamp = CURRENT_BLOCK_TIMESTAMP;
-
-  assert.notInStore(PROJECT_ENTITY_TYPE, fullProjectId);
-
-  handleDALinResetAuctionDetails(daLinV0ResetAuctionDetailsEvent);
-
-  assert.notInStore(PROJECT_MINTER_CONFIGURATION_ENTITY_TYPE, fullProjectId);
-});
-
-test("handleDALinResetAuctionDetails should reset project minter config auction details", () => {
-  clearStore();
-
-  const minter = addNewMinterToStore("MinterDALinV0");
-  const minterAddress: Address = changetype<Address>(
-    Address.fromHexString(minter.id)
-  );
-  const minterType = minter.type;
-
-  const projectId = BigInt.fromI32(0);
-  const project = addNewProjectToStore(
-    TEST_CONTRACT_ADDRESS,
-    projectId,
-    "project 0",
-    randomAddressGenerator.generateRandomAddress(),
-    BigInt.fromI32(0),
-    CURRENT_BLOCK_TIMESTAMP.minus(BigInt.fromI32(10))
-  );
-
-  const projectMinterConfig = new ProjectMinterConfiguration(
-    getProjectMinterConfigId(minterAddress.toHexString(), project.id)
-  );
-  projectMinterConfig.minter = minterAddress.toHexString();
-  projectMinterConfig.project = project.id;
-  projectMinterConfig.extraMinterDetails = "{}";
-  projectMinterConfig.startTime = CURRENT_BLOCK_TIMESTAMP.plus(
-    BigInt.fromI32(100)
-  );
-  projectMinterConfig.endTime = CURRENT_BLOCK_TIMESTAMP.plus(
-    BigInt.fromI32(200)
-  );
-  projectMinterConfig.startPrice = ONE_ETH_IN_WEI;
-  projectMinterConfig.basePrice = ONE_ETH_IN_WEI.div(BigInt.fromI32(10));
-  projectMinterConfig.priceIsConfigured = true;
-  projectMinterConfig.currencyAddress = Address.zero();
-  projectMinterConfig.currencySymbol = "ETH";
-  projectMinterConfig.purchaseToDisabled = false;
-  projectMinterConfig.save();
-
-  const resetAuctionDetailsEvent: DALinV0ResetAuctionDetails = changetype<
-    DALinV0ResetAuctionDetails
-  >(newMockEvent());
-  resetAuctionDetailsEvent.address = minterAddress;
-  resetAuctionDetailsEvent.parameters = [
-    new ethereum.EventParam(
-      "_projectId",
-      ethereum.Value.fromUnsignedBigInt(projectId)
-    )
-  ];
-  resetAuctionDetailsEvent.block.timestamp = CURRENT_BLOCK_TIMESTAMP;
-
-  handleDALinResetAuctionDetails(resetAuctionDetailsEvent);
-
-  const updatedProjectMinterConfig: ProjectMinterConfiguration = changetype<
-    ProjectMinterConfiguration
-  >(ProjectMinterConfiguration.load(projectMinterConfig.id));
-
-  assert.assertTrue(updatedProjectMinterConfig.basePrice === null);
-  assert.assertTrue(updatedProjectMinterConfig.startPrice === null);
-  assert.assertTrue(updatedProjectMinterConfig.startTime === null);
-  assert.assertTrue(updatedProjectMinterConfig.endTime === null);
-
-  assert.fieldEquals(
-    PROJECT_MINTER_CONFIGURATION_ENTITY_TYPE,
-    getProjectMinterConfigId(minterAddress.toHexString(), project.id),
-    "minter",
-    minterAddress.toHexString()
-  );
-  assert.fieldEquals(
-    PROJECT_MINTER_CONFIGURATION_ENTITY_TYPE,
-    getProjectMinterConfigId(minterAddress.toHexString(), project.id),
-    "priceIsConfigured",
-    "false"
-  );
-  assert.fieldEquals(
-    PROJECT_MINTER_CONFIGURATION_ENTITY_TYPE,
-    getProjectMinterConfigId(minterAddress.toHexString(), project.id),
-    "project",
-    project.id
-  );
-
-  assert.fieldEquals(
-    PROJECT_ENTITY_TYPE,
-    project.id,
-    "updatedAt",
-    CURRENT_BLOCK_TIMESTAMP.toString()
-  );
-});
-
-test("handleDALinResetAuctionDetails should reset project minter config auction details with v1 event", () => {
-  clearStore();
-
-  const minter = addNewMinterToStore("MinterDALinV1");
-  const minterAddress: Address = changetype<Address>(
-    Address.fromHexString(minter.id)
-  );
-  const minterType = minter.type;
-
-  const projectId = BigInt.fromI32(0);
-  const project = addNewProjectToStore(
-    TEST_CONTRACT_ADDRESS,
-    projectId,
-    "project 0",
-    randomAddressGenerator.generateRandomAddress(),
-    BigInt.fromI32(0),
-    CURRENT_BLOCK_TIMESTAMP.minus(BigInt.fromI32(10))
-  );
-
-  const projectMinterConfig = new ProjectMinterConfiguration(
-    getProjectMinterConfigId(minterAddress.toHexString(), project.id)
-  );
-  projectMinterConfig.minter = minterAddress.toHexString();
-  projectMinterConfig.project = project.id;
-  projectMinterConfig.extraMinterDetails = "{}";
-  projectMinterConfig.startTime = CURRENT_BLOCK_TIMESTAMP.plus(
-    BigInt.fromI32(100)
-  );
-  projectMinterConfig.endTime = CURRENT_BLOCK_TIMESTAMP.plus(
-    BigInt.fromI32(200)
-  );
-  projectMinterConfig.startPrice = ONE_ETH_IN_WEI;
-  projectMinterConfig.basePrice = ONE_ETH_IN_WEI.div(BigInt.fromI32(10));
-  projectMinterConfig.priceIsConfigured = true;
-  projectMinterConfig.currencyAddress = Address.zero();
-  projectMinterConfig.currencySymbol = "ETH";
-  projectMinterConfig.purchaseToDisabled = false;
-  projectMinterConfig.save();
-
-  const resetAuctionDetailsEvent: DALinV1ResetAuctionDetails = changetype<
-    DALinV1ResetAuctionDetails
-  >(newMockEvent());
-  resetAuctionDetailsEvent.address = minterAddress;
-  resetAuctionDetailsEvent.parameters = [
-    new ethereum.EventParam(
-      "_projectId",
-      ethereum.Value.fromUnsignedBigInt(projectId)
-    )
-  ];
-  resetAuctionDetailsEvent.block.timestamp = CURRENT_BLOCK_TIMESTAMP;
-
-  handleDALinResetAuctionDetails(resetAuctionDetailsEvent);
-
-  const updatedProjectMinterConfig: ProjectMinterConfiguration = changetype<
-    ProjectMinterConfiguration
-  >(ProjectMinterConfiguration.load(projectMinterConfig.id));
-
-  assert.assertTrue(updatedProjectMinterConfig.basePrice === null);
-  assert.assertTrue(updatedProjectMinterConfig.startPrice === null);
-  assert.assertTrue(updatedProjectMinterConfig.startTime === null);
-  assert.assertTrue(updatedProjectMinterConfig.endTime === null);
-
-  assert.fieldEquals(
-    PROJECT_MINTER_CONFIGURATION_ENTITY_TYPE,
-    getProjectMinterConfigId(minterAddress.toHexString(), project.id),
-    "minter",
-    minterAddress.toHexString()
-  );
-  assert.fieldEquals(
-    PROJECT_MINTER_CONFIGURATION_ENTITY_TYPE,
-    getProjectMinterConfigId(minterAddress.toHexString(), project.id),
-    "priceIsConfigured",
-    "false"
-  );
-  assert.fieldEquals(
-    PROJECT_MINTER_CONFIGURATION_ENTITY_TYPE,
-    getProjectMinterConfigId(minterAddress.toHexString(), project.id),
-    "project",
-    project.id
-  );
-
-  assert.fieldEquals(
-    PROJECT_ENTITY_TYPE,
-    project.id,
-    "updatedAt",
-    CURRENT_BLOCK_TIMESTAMP.toString()
-  );
-});
-
-test("handleAuctionHalfLifeRangeSecondsUpdated should update minter half life range", () => {
-  let mintersToTest: string[] = [
-    "MinterDAExpV0",
-    "MinterDAExpV1",
-    "MinterDAExpV2"
-  ];
-  for (let i = 0; i < mintersToTest.length; i++) {
+  test("should update project minter config pricePerTokenInWei", () => {
     clearStore();
-    const minter = addNewMinterToStore(mintersToTest[i]);
+
+    const minter = addNewMinterToStore("MinterSetPriceV0");
+    const minterType = minter.type;
     const minterAddress: Address = changetype<Address>(
       Address.fromHexString(minter.id)
     );
-    minter.minimumHalfLifeInSeconds = BigInt.fromI32(300);
-    minter.maximumHalfLifeInSeconds = BigInt.fromI32(5000);
-    minter.updatedAt = CURRENT_BLOCK_TIMESTAMP.minus(BigInt.fromI32(10));
-    minter.save();
 
-    const newMinimumHalfLifeInSeconds = BigInt.fromI32(600);
-    const newMaximumHalfLifeInSeconds = BigInt.fromI32(1200);
-    let event = newMockEvent();
-    const auctionHalfLifeRangeSecondsUpdatedEvent: AuctionHalfLifeRangeSecondsUpdated = changetype<
-      AuctionHalfLifeRangeSecondsUpdated
+    const projectId = BigInt.fromI32(0);
+    const project = addNewProjectToStore(
+      TEST_CONTRACT_ADDRESS,
+      projectId,
+      "project 0",
+      randomAddressGenerator.generateRandomAddress(),
+      ONE_ETH_IN_WEI.div(BigInt.fromI32(10)),
+      CURRENT_BLOCK_TIMESTAMP.minus(BigInt.fromI32(10))
+    );
+
+    const projectMinterConfig = new ProjectMinterConfiguration(
+      getProjectMinterConfigId(minterAddress.toHexString(), project.id)
+    );
+    projectMinterConfig.minter = minterAddress.toHexString();
+    projectMinterConfig.project = project.id;
+    projectMinterConfig.extraMinterDetails = "{}";
+    projectMinterConfig.basePrice = ONE_ETH_IN_WEI.div(BigInt.fromI32(10));
+    projectMinterConfig.priceIsConfigured = false;
+    projectMinterConfig.purchaseToDisabled = false;
+    projectMinterConfig.currencyAddress = Address.zero();
+    projectMinterConfig.currencySymbol = "ETH";
+    projectMinterConfig.save();
+
+    const newPricePerTokenInWei = ONE_ETH_IN_WEI.div(BigInt.fromI32(5));
+    const pricePerTokenInWeiUpdatedEvent: PricePerTokenInWeiUpdated = changetype<
+      PricePerTokenInWeiUpdated
     >(newMockEvent());
-    event.address = minterAddress;
-    event.parameters = [
+    pricePerTokenInWeiUpdatedEvent.address = minterAddress;
+    pricePerTokenInWeiUpdatedEvent.parameters = [
       new ethereum.EventParam(
-        "_minimumPriceDecayHalfLifeSeconds",
-        ethereum.Value.fromUnsignedBigInt(newMinimumHalfLifeInSeconds)
+        "_projectId",
+        ethereum.Value.fromUnsignedBigInt(projectId)
       ),
       new ethereum.EventParam(
-        "_maximumPriceDecayHalfLifeSeconds",
-        ethereum.Value.fromUnsignedBigInt(newMaximumHalfLifeInSeconds)
+        "_pricePerTokenInWei",
+        ethereum.Value.fromUnsignedBigInt(newPricePerTokenInWei)
       )
     ];
-    event.block.timestamp = CURRENT_BLOCK_TIMESTAMP;
+    pricePerTokenInWeiUpdatedEvent.block.timestamp = CURRENT_BLOCK_TIMESTAMP;
 
-    if (mintersToTest[i] === "MinterDAExpV0") {
-      handleAuctionHalfLifeRangeSecondsUpdatedV0(
-        changetype<AuctionHalfLifeRangeSecondsUpdated>(event)
-      );
-    } else if (mintersToTest[i] === "MinterDAExpV1") {
-      handleAuctionHalfLifeRangeSecondsUpdatedV1(
-        changetype<AuctionHalfLifeRangeSecondsUpdatedV1>(event)
-      );
-    } else {
-      handleAuctionHalfLifeRangeSecondsUpdatedV2(
-        changetype<AuctionHalfLifeRangeSecondsUpdatedV2>(event)
-      );
-    }
+    handlePricePerTokenInWeiUpdated(pricePerTokenInWeiUpdatedEvent);
 
     assert.fieldEquals(
-      MINTER_ENTITY_TYPE,
-      minterAddress.toHexString(),
-      "minimumHalfLifeInSeconds",
-      newMinimumHalfLifeInSeconds.toString()
+      PROJECT_MINTER_CONFIGURATION_ENTITY_TYPE,
+      getProjectMinterConfigId(minterAddress.toHexString(), project.id),
+      "basePrice",
+      newPricePerTokenInWei.toString()
     );
     assert.fieldEquals(
-      MINTER_ENTITY_TYPE,
-      minterAddress.toHexString(),
-      "maximumHalfLifeInSeconds",
-      newMaximumHalfLifeInSeconds.toString()
+      PROJECT_MINTER_CONFIGURATION_ENTITY_TYPE,
+      getProjectMinterConfigId(minterAddress.toHexString(), project.id),
+      "priceIsConfigured",
+      "true"
     );
 
     assert.fieldEquals(
-      MINTER_ENTITY_TYPE,
-      minterAddress.toHexString(),
+      PROJECT_ENTITY_TYPE,
+      project.id,
       "updatedAt",
       CURRENT_BLOCK_TIMESTAMP.toString()
     );
-  }
+  });
 });
 
-test("handleDAExpSetAuctionDetails should do nothing if project is not in store", () => {
-  clearStore();
-  const minter = addNewMinterToStore("MinterDAExpV0");
-  const minterAddress: Address = changetype<Address>(
-    Address.fromHexString(minter.id)
-  );
-  const minterType = minter.type;
-
-  const projectId = BigInt.fromI32(0);
-  const fullProjectId = generateContractSpecificId(
-    TEST_CONTRACT_ADDRESS,
-    projectId
-  );
-
-  const daExpV0SetAuctionDetailsEvent: DAExpV0SetAuctionDetails = changetype<
-    DAExpV0SetAuctionDetails
-  >(newMockEvent());
-  daExpV0SetAuctionDetailsEvent.address = minterAddress;
-  daExpV0SetAuctionDetailsEvent.parameters = [
-    new ethereum.EventParam(
-      "_projectId",
-      ethereum.Value.fromUnsignedBigInt(projectId)
-    )
-  ];
-  daExpV0SetAuctionDetailsEvent.block.timestamp = CURRENT_BLOCK_TIMESTAMP;
-
-  assert.notInStore(PROJECT_ENTITY_TYPE, fullProjectId);
-
-  handleDAExpSetAuctionDetails(daExpV0SetAuctionDetailsEvent);
-
-  assert.notInStore(PROJECT_MINTER_CONFIGURATION_ENTITY_TYPE, fullProjectId);
-});
-
-test("handleDAExpSetAuctionDetails should update project minter config auction details", () => {
-  clearStore();
-
-  const minter = addNewMinterToStore("MinterDALinV0");
-  const minterAddress: Address = changetype<Address>(
-    Address.fromHexString(minter.id)
-  );
-  const minterType = minter.type;
-
-  const projectId = BigInt.fromI32(0);
-  const project = addNewProjectToStore(
-    TEST_CONTRACT_ADDRESS,
-    projectId,
-    "project 0",
-    randomAddressGenerator.generateRandomAddress(),
-    BigInt.fromI32(0),
-    CURRENT_BLOCK_TIMESTAMP.minus(BigInt.fromI32(10))
-  );
-
-  const projectMinterConfig = new ProjectMinterConfiguration(
-    getProjectMinterConfigId(minterAddress.toHexString(), project.id)
-  );
-  projectMinterConfig.minter = minterAddress.toHexString();
-  projectMinterConfig.project = project.id;
-  projectMinterConfig.extraMinterDetails = "{}";
-  projectMinterConfig.basePrice = BigInt.fromI32(0);
-  projectMinterConfig.priceIsConfigured = false;
-  projectMinterConfig.currencyAddress = Address.zero();
-  projectMinterConfig.currencySymbol = "ETH";
-  projectMinterConfig.purchaseToDisabled = false;
-  projectMinterConfig.save();
-
-  const basePrice = ONE_ETH_IN_WEI.div(BigInt.fromI32(10));
-  const startPrice = ONE_ETH_IN_WEI;
-  const startTime = CURRENT_BLOCK_TIMESTAMP.plus(BigInt.fromI32(100));
-  const halfLifeSeconds = BigInt.fromI32(400);
-  const setAuctionDetailsEvent: DAExpV0SetAuctionDetails = changetype<
-    DAExpV0SetAuctionDetails
-  >(newMockEvent());
-  setAuctionDetailsEvent.address = minterAddress;
-  setAuctionDetailsEvent.parameters = [
-    new ethereum.EventParam(
-      "_projectId",
-      ethereum.Value.fromUnsignedBigInt(projectId)
-    ),
-    new ethereum.EventParam(
-      "_auctionTimestampStart",
-      ethereum.Value.fromUnsignedBigInt(startTime)
-    ),
-    new ethereum.EventParam(
-      "_priceDecayHalfLifeSeconds",
-      ethereum.Value.fromUnsignedBigInt(halfLifeSeconds)
-    ),
-    new ethereum.EventParam(
-      "_startPrice",
-      ethereum.Value.fromUnsignedBigInt(startPrice)
-    ),
-    new ethereum.EventParam(
-      "_basePrice",
-      ethereum.Value.fromUnsignedBigInt(basePrice)
-    )
-  ];
-  setAuctionDetailsEvent.block.timestamp = CURRENT_BLOCK_TIMESTAMP;
-
-  handleDAExpSetAuctionDetails(setAuctionDetailsEvent);
-
-  assert.fieldEquals(
-    PROJECT_MINTER_CONFIGURATION_ENTITY_TYPE,
-    getProjectMinterConfigId(minterAddress.toHexString(), project.id),
-    "basePrice",
-    basePrice.toString()
-  );
-  assert.fieldEquals(
-    PROJECT_MINTER_CONFIGURATION_ENTITY_TYPE,
-    getProjectMinterConfigId(minterAddress.toHexString(), project.id),
-    "startPrice",
-    startPrice.toString()
-  );
-  assert.fieldEquals(
-    PROJECT_MINTER_CONFIGURATION_ENTITY_TYPE,
-    getProjectMinterConfigId(minterAddress.toHexString(), project.id),
-    "startTime",
-    startTime.toString()
-  );
-  assert.fieldEquals(
-    PROJECT_MINTER_CONFIGURATION_ENTITY_TYPE,
-    getProjectMinterConfigId(minterAddress.toHexString(), project.id),
-    "halfLifeSeconds",
-    halfLifeSeconds.toString()
-  );
-  assert.fieldEquals(
-    PROJECT_MINTER_CONFIGURATION_ENTITY_TYPE,
-    getProjectMinterConfigId(minterAddress.toHexString(), project.id),
-    "priceIsConfigured",
-    "true"
-  );
-
-  assert.fieldEquals(
-    PROJECT_ENTITY_TYPE,
-    project.id,
-    "updatedAt",
-    CURRENT_BLOCK_TIMESTAMP.toString()
-  );
-});
-
-test("handleDAExpSetAuctionDetails should update project minter config auction details with v1 event", () => {
-  clearStore();
-
-  const minter = addNewMinterToStore("MinterDALinV1");
-  const minterAddress: Address = changetype<Address>(
-    Address.fromHexString(minter.id)
-  );
-  const minterType = minter.type;
-
-  const projectId = BigInt.fromI32(0);
-  const project = addNewProjectToStore(
-    TEST_CONTRACT_ADDRESS,
-    projectId,
-    "project 0",
-    randomAddressGenerator.generateRandomAddress(),
-    BigInt.fromI32(0),
-    CURRENT_BLOCK_TIMESTAMP.minus(BigInt.fromI32(10))
-  );
-
-  const projectMinterConfig = new ProjectMinterConfiguration(
-    getProjectMinterConfigId(minterAddress.toHexString(), project.id)
-  );
-  projectMinterConfig.minter = minterAddress.toHexString();
-  projectMinterConfig.project = project.id;
-  projectMinterConfig.extraMinterDetails = "{}";
-  projectMinterConfig.basePrice = BigInt.fromI32(0);
-  projectMinterConfig.priceIsConfigured = false;
-  projectMinterConfig.currencyAddress = Address.zero();
-  projectMinterConfig.currencySymbol = "ETH";
-  projectMinterConfig.purchaseToDisabled = false;
-  projectMinterConfig.save();
-
-  const basePrice = ONE_ETH_IN_WEI.div(BigInt.fromI32(10));
-  const startPrice = ONE_ETH_IN_WEI;
-  const startTime = CURRENT_BLOCK_TIMESTAMP.plus(BigInt.fromI32(100));
-  const halfLifeSeconds = BigInt.fromI32(400);
-  const setAuctionDetailsEvent: DAExpV1SetAuctionDetails = changetype<
-    DAExpV1SetAuctionDetails
-  >(newMockEvent());
-  setAuctionDetailsEvent.address = minterAddress;
-  setAuctionDetailsEvent.parameters = [
-    new ethereum.EventParam(
-      "_projectId",
-      ethereum.Value.fromUnsignedBigInt(projectId)
-    ),
-    new ethereum.EventParam(
-      "_auctionTimestampStart",
-      ethereum.Value.fromUnsignedBigInt(startTime)
-    ),
-    new ethereum.EventParam(
-      "_priceDecayHalfLifeSeconds",
-      ethereum.Value.fromUnsignedBigInt(halfLifeSeconds)
-    ),
-    new ethereum.EventParam(
-      "_startPrice",
-      ethereum.Value.fromUnsignedBigInt(startPrice)
-    ),
-    new ethereum.EventParam(
-      "_basePrice",
-      ethereum.Value.fromUnsignedBigInt(basePrice)
-    )
-  ];
-  setAuctionDetailsEvent.block.timestamp = CURRENT_BLOCK_TIMESTAMP;
-
-  handleDAExpSetAuctionDetails(setAuctionDetailsEvent);
-
-  assert.fieldEquals(
-    PROJECT_MINTER_CONFIGURATION_ENTITY_TYPE,
-    getProjectMinterConfigId(minterAddress.toHexString(), project.id),
-    "basePrice",
-    basePrice.toString()
-  );
-  assert.fieldEquals(
-    PROJECT_MINTER_CONFIGURATION_ENTITY_TYPE,
-    getProjectMinterConfigId(minterAddress.toHexString(), project.id),
-    "startPrice",
-    startPrice.toString()
-  );
-  assert.fieldEquals(
-    PROJECT_MINTER_CONFIGURATION_ENTITY_TYPE,
-    getProjectMinterConfigId(minterAddress.toHexString(), project.id),
-    "startTime",
-    startTime.toString()
-  );
-  assert.fieldEquals(
-    PROJECT_MINTER_CONFIGURATION_ENTITY_TYPE,
-    getProjectMinterConfigId(minterAddress.toHexString(), project.id),
-    "halfLifeSeconds",
-    halfLifeSeconds.toString()
-  );
-  assert.fieldEquals(
-    PROJECT_MINTER_CONFIGURATION_ENTITY_TYPE,
-    getProjectMinterConfigId(minterAddress.toHexString(), project.id),
-    "priceIsConfigured",
-    "true"
-  );
-
-  assert.fieldEquals(
-    PROJECT_ENTITY_TYPE,
-    project.id,
-    "updatedAt",
-    CURRENT_BLOCK_TIMESTAMP.toString()
-  );
-});
-
-test("handleDAExpResetAuctionDetails should do nothing if project is not in store", () => {
-  let mintersToTest: string[] = [
-    "MinterDAExpV0",
-    "MinterDAExpV1",
-    "MinterDAExpV2"
-  ];
-  for (let i = 0; i < mintersToTest.length; i++) {
+describe("handleProjectCurrencyInfoUpdated", () => {
+  test("should do nothing if project is not in store", () => {
     clearStore();
 
+    const minterType = "MinterSetPriceERC20V0";
+    const minter = addNewMinterToStore(minterType);
+    const minterAddress: Address = changetype<Address>(
+      Address.fromHexString(minter.id)
+    );
+
+    const projectId = BigInt.fromI32(0);
+    const fullProjectId = generateContractSpecificId(
+      TEST_CONTRACT_ADDRESS,
+      projectId
+    );
+
+    const projectCurrencyInfoUpdatedEvent: ProjectCurrencyInfoUpdated = changetype<
+      ProjectCurrencyInfoUpdated
+    >(newMockEvent());
+    projectCurrencyInfoUpdatedEvent.address = minterAddress;
+    projectCurrencyInfoUpdatedEvent.parameters = [
+      new ethereum.EventParam(
+        "_projectId",
+        ethereum.Value.fromUnsignedBigInt(projectId)
+      )
+    ];
+    projectCurrencyInfoUpdatedEvent.block.timestamp = CURRENT_BLOCK_TIMESTAMP;
+
+    assert.notInStore(PROJECT_ENTITY_TYPE, fullProjectId);
+
+    handleProjectCurrencyInfoUpdated(projectCurrencyInfoUpdatedEvent);
+
+    assert.notInStore(PROJECT_MINTER_CONFIGURATION_ENTITY_TYPE, fullProjectId);
+  });
+
+  test("should update project minter config currency info", () => {
+    clearStore();
+
+    const minter = addNewMinterToStore("MinterSetPriceERC20V0");
+    const minterAddress: Address = changetype<Address>(
+      Address.fromHexString(minter.id)
+    );
+    minter.coreContract = TEST_CONTRACT_ADDRESS.toHexString();
+    minter.save();
+
+    const projectId = BigInt.fromI32(0);
+    const project = addNewProjectToStore(
+      TEST_CONTRACT_ADDRESS,
+      projectId,
+      "project 0",
+      randomAddressGenerator.generateRandomAddress(),
+      ONE_ETH_IN_WEI.div(BigInt.fromI32(10)),
+      CURRENT_BLOCK_TIMESTAMP.minus(BigInt.fromI32(10))
+    );
+
+    const projectMinterConfig = new ProjectMinterConfiguration(
+      getProjectMinterConfigId(minterAddress.toHexString(), project.id)
+    );
+    projectMinterConfig.minter = minterAddress.toHexString();
+    projectMinterConfig.project = project.id;
+    projectMinterConfig.extraMinterDetails = "{}";
+    projectMinterConfig.basePrice = ONE_ETH_IN_WEI.div(BigInt.fromI32(10));
+    projectMinterConfig.priceIsConfigured = false;
+    projectMinterConfig.currencyAddress = Address.zero();
+    projectMinterConfig.currencySymbol = "ETH";
+    projectMinterConfig.purchaseToDisabled = false;
+    projectMinterConfig.save();
+
+    const newCurrencyAddress = randomAddressGenerator.generateRandomAddress();
+    const newCurrencySymbol = "DAI";
+    const projectCurrencyInfoUpdatedEvent: ProjectCurrencyInfoUpdated = changetype<
+      ProjectCurrencyInfoUpdated
+    >(newMockEvent());
+    projectCurrencyInfoUpdatedEvent.address = minterAddress;
+    projectCurrencyInfoUpdatedEvent.parameters = [
+      new ethereum.EventParam(
+        "_projectId",
+        ethereum.Value.fromUnsignedBigInt(projectId)
+      ),
+      new ethereum.EventParam(
+        "_currencyAddress",
+        ethereum.Value.fromAddress(newCurrencyAddress)
+      ),
+      new ethereum.EventParam(
+        "_currencySymbol",
+        ethereum.Value.fromString(newCurrencySymbol)
+      )
+    ];
+    projectCurrencyInfoUpdatedEvent.block.timestamp = CURRENT_BLOCK_TIMESTAMP;
+
+    assert.assertTrue(
+      newCurrencyAddress != projectMinterConfig.currencyAddress
+    );
+
+    handleProjectCurrencyInfoUpdated(projectCurrencyInfoUpdatedEvent);
+
+    assert.fieldEquals(
+      PROJECT_MINTER_CONFIGURATION_ENTITY_TYPE,
+      getProjectMinterConfigId(minterAddress.toHexString(), project.id),
+      "currencyAddress",
+      newCurrencyAddress.toHexString()
+    );
+    assert.fieldEquals(
+      PROJECT_MINTER_CONFIGURATION_ENTITY_TYPE,
+      getProjectMinterConfigId(minterAddress.toHexString(), project.id),
+      "currencySymbol",
+      newCurrencySymbol
+    );
+
+    assert.fieldEquals(
+      PROJECT_ENTITY_TYPE,
+      project.id,
+      "updatedAt",
+      CURRENT_BLOCK_TIMESTAMP.toString()
+    );
+  });
+});
+
+describe("handlePurchaseToDisabledUpdated", () => {
+  test("should do nothing if project is not in store", () => {
+    clearStore();
+
+    const minter = addNewMinterToStore("MinterSetPriceV0");
+    const minterAddress: Address = changetype<Address>(
+      Address.fromHexString(minter.id)
+    );
+    const minterType = minter.type;
+
+    const projectId = BigInt.fromI32(0);
+    const fullProjectId = generateContractSpecificId(
+      TEST_CONTRACT_ADDRESS,
+      projectId
+    );
+
+    const purchaseToDisabledUpdatedEvent: PurchaseToDisabledUpdated = changetype<
+      PurchaseToDisabledUpdated
+    >(newMockEvent());
+    purchaseToDisabledUpdatedEvent.address = minterAddress;
+    purchaseToDisabledUpdatedEvent.parameters = [
+      new ethereum.EventParam(
+        "_projectId",
+        ethereum.Value.fromUnsignedBigInt(projectId)
+      ),
+      new ethereum.EventParam(
+        "_purchaseToDisabled",
+        ethereum.Value.fromBoolean(true)
+      )
+    ];
+    purchaseToDisabledUpdatedEvent.block.timestamp = CURRENT_BLOCK_TIMESTAMP;
+
+    assert.notInStore(PROJECT_ENTITY_TYPE, fullProjectId);
+
+    handlePurchaseToDisabledUpdated(purchaseToDisabledUpdatedEvent);
+
+    assert.notInStore(PROJECT_MINTER_CONFIGURATION_ENTITY_TYPE, fullProjectId);
+  });
+
+  test("should update project minter config purchaseToDisabled", () => {
+    clearStore();
+
+    const minter = addNewMinterToStore("MinterSetPriceV0");
+    const minterAddress: Address = changetype<Address>(
+      Address.fromHexString(minter.id)
+    );
+    const minterType = minter.type;
+
+    addNewMinterToStore("MinterSetPriceV0");
+
+    const projectId = BigInt.fromI32(0);
+    const project = addNewProjectToStore(
+      TEST_CONTRACT_ADDRESS,
+      projectId,
+      "project 0",
+      randomAddressGenerator.generateRandomAddress(),
+      ONE_ETH_IN_WEI.div(BigInt.fromI32(10)),
+      CURRENT_BLOCK_TIMESTAMP.minus(BigInt.fromI32(10))
+    );
+
+    const projectMinterConfig = new ProjectMinterConfiguration(
+      getProjectMinterConfigId(minterAddress.toHexString(), project.id)
+    );
+    projectMinterConfig.minter = minterAddress.toHexString();
+    projectMinterConfig.project = project.id;
+    projectMinterConfig.extraMinterDetails = "{}";
+    projectMinterConfig.basePrice = ONE_ETH_IN_WEI.div(BigInt.fromI32(10));
+    projectMinterConfig.priceIsConfigured = false;
+    projectMinterConfig.currencyAddress = Address.zero();
+    projectMinterConfig.currencySymbol = "ETH";
+    projectMinterConfig.purchaseToDisabled = false;
+    projectMinterConfig.save();
+
+    const purchaseToDisabledUpdatedEvent: PurchaseToDisabledUpdated = changetype<
+      PurchaseToDisabledUpdated
+    >(newMockEvent());
+    purchaseToDisabledUpdatedEvent.address = minterAddress;
+    purchaseToDisabledUpdatedEvent.parameters = [
+      new ethereum.EventParam(
+        "_projectId",
+        ethereum.Value.fromUnsignedBigInt(projectId)
+      ),
+      new ethereum.EventParam(
+        "_purchaseToDisabled",
+        ethereum.Value.fromBoolean(true)
+      )
+    ];
+    purchaseToDisabledUpdatedEvent.block.timestamp = CURRENT_BLOCK_TIMESTAMP;
+
+    handlePurchaseToDisabledUpdated(purchaseToDisabledUpdatedEvent);
+
+    assert.fieldEquals(
+      PROJECT_MINTER_CONFIGURATION_ENTITY_TYPE,
+      getProjectMinterConfigId(minterAddress.toHexString(), project.id),
+      "purchaseToDisabled",
+      "true"
+    );
+
+    assert.fieldEquals(
+      PROJECT_ENTITY_TYPE,
+      project.id,
+      "updatedAt",
+      CURRENT_BLOCK_TIMESTAMP.toString()
+    );
+  });
+});
+
+describe("handleMinimumAuctionLengthSecondsUpdated", () => {
+  test("should update minter with minimumAuctionLengthSeconds", () => {
+    let mintersToTest: string[] = [
+      "MinterDALinV0",
+      "MinterDALinV1",
+      "MinterDALinV2"
+    ];
+    for (let i = 0; i < mintersToTest.length; i++) {
+      clearStore();
+      const minter = addNewMinterToStore(mintersToTest[i]);
+      const minterAddress: Address = changetype<Address>(
+        Address.fromHexString(minter.id)
+      );
+      minter.minimumAuctionLengthInSeconds = BigInt.fromI32(300);
+      minter.updatedAt = CURRENT_BLOCK_TIMESTAMP.minus(BigInt.fromI32(10));
+      minter.save();
+
+      const newMinimumAuctionLengthSeconds = BigInt.fromI32(600);
+      const event = newMockEvent();
+      event.address = minterAddress;
+      event.parameters = [
+        new ethereum.EventParam(
+          "_minimumAuctionLengthInSeconds",
+          ethereum.Value.fromUnsignedBigInt(newMinimumAuctionLengthSeconds)
+        )
+      ];
+      event.block.timestamp = CURRENT_BLOCK_TIMESTAMP;
+
+      if (mintersToTest[i] == "MinterDALinV0") {
+        handleMinimumAuctionLengthSecondsUpdatedV0(
+          changetype<DALinV0MinimumAuctionLengthSecondsUpdated>(event)
+        );
+      } else if (mintersToTest[i] == "MinterDALinV1") {
+        handleMinimumAuctionLengthSecondsUpdatedV1(
+          changetype<DALinV1MinimumAuctionLengthSecondsUpdated>(event)
+        );
+      } else {
+        handleMinimumAuctionLengthSecondsUpdatedV2(
+          changetype<DALinV2MinimumAuctionLengthSecondsUpdated>(event)
+        );
+      }
+
+      assert.fieldEquals(
+        MINTER_ENTITY_TYPE,
+        minterAddress.toHexString(),
+        "minimumAuctionLengthInSeconds",
+        newMinimumAuctionLengthSeconds.toString()
+      );
+      assert.fieldEquals(
+        MINTER_ENTITY_TYPE,
+        minterAddress.toHexString(),
+        "updatedAt",
+        CURRENT_BLOCK_TIMESTAMP.toString()
+      );
+    }
+  });
+});
+
+describe("handleDALinSetAuctionDetails", () => {
+  test("handleDALinSetAuctionDetails should do nothing if project is not in store", () => {
+    clearStore();
+
+    const minter = addNewMinterToStore("MinterDALinV0");
+    const minterAddress: Address = changetype<Address>(
+      Address.fromHexString(minter.id)
+    );
+
+    const projectId = BigInt.fromI32(0);
+    const fullProjectId = generateContractSpecificId(
+      TEST_CONTRACT_ADDRESS,
+      projectId
+    );
+
+    const daLinV0SetAuctionDetailsEvent: DALinV0SetAuctionDetails = changetype<
+      DALinV0SetAuctionDetails
+    >(newMockEvent());
+    daLinV0SetAuctionDetailsEvent.address = minterAddress;
+    daLinV0SetAuctionDetailsEvent.parameters = [
+      new ethereum.EventParam(
+        "_projectId",
+        ethereum.Value.fromUnsignedBigInt(projectId)
+      )
+    ];
+    daLinV0SetAuctionDetailsEvent.block.timestamp = CURRENT_BLOCK_TIMESTAMP;
+
+    assert.notInStore(PROJECT_ENTITY_TYPE, fullProjectId);
+
+    handleDALinSetAuctionDetails(daLinV0SetAuctionDetailsEvent);
+
+    assert.notInStore(PROJECT_MINTER_CONFIGURATION_ENTITY_TYPE, fullProjectId);
+  });
+
+  test("should update project minter config auction details", () => {
+    clearStore();
+
+    const minter = addNewMinterToStore("MinterDALinV0");
+    const minterAddress: Address = changetype<Address>(
+      Address.fromHexString(minter.id)
+    );
+
+    const projectId = BigInt.fromI32(0);
+    const project = addNewProjectToStore(
+      TEST_CONTRACT_ADDRESS,
+      projectId,
+      "project 0",
+      randomAddressGenerator.generateRandomAddress(),
+      BigInt.fromI32(0),
+      CURRENT_BLOCK_TIMESTAMP.minus(BigInt.fromI32(10))
+    );
+
+    const projectMinterConfig = new ProjectMinterConfiguration(
+      getProjectMinterConfigId(minterAddress.toHexString(), project.id)
+    );
+    projectMinterConfig.minter = minterAddress.toHexString();
+    projectMinterConfig.project = project.id;
+    projectMinterConfig.extraMinterDetails = "{}";
+    projectMinterConfig.basePrice = BigInt.fromI32(0);
+    projectMinterConfig.priceIsConfigured = false;
+    projectMinterConfig.currencyAddress = Address.zero();
+    projectMinterConfig.currencySymbol = "ETH";
+    projectMinterConfig.purchaseToDisabled = false;
+    projectMinterConfig.save();
+
+    const basePrice = ONE_ETH_IN_WEI.div(BigInt.fromI32(10));
+    const startPrice = ONE_ETH_IN_WEI;
+    const startTime = CURRENT_BLOCK_TIMESTAMP.plus(BigInt.fromI32(100));
+    const endTime = CURRENT_BLOCK_TIMESTAMP.plus(BigInt.fromI32(200));
+    const setAuctionDetailsEvent: DALinV0SetAuctionDetails = changetype<
+      DALinV0SetAuctionDetails
+    >(newMockEvent());
+    setAuctionDetailsEvent.address = minterAddress;
+    setAuctionDetailsEvent.parameters = [
+      new ethereum.EventParam(
+        "_projectId",
+        ethereum.Value.fromUnsignedBigInt(projectId)
+      ),
+      new ethereum.EventParam(
+        "_auctionTimestampStart",
+        ethereum.Value.fromUnsignedBigInt(startTime)
+      ),
+      new ethereum.EventParam(
+        "_auctionTimestampEnd",
+        ethereum.Value.fromUnsignedBigInt(endTime)
+      ),
+      new ethereum.EventParam(
+        "_startPrice",
+        ethereum.Value.fromUnsignedBigInt(startPrice)
+      ),
+      new ethereum.EventParam(
+        "_basePrice",
+        ethereum.Value.fromUnsignedBigInt(basePrice)
+      )
+    ];
+    setAuctionDetailsEvent.block.timestamp = CURRENT_BLOCK_TIMESTAMP;
+
+    handleDALinSetAuctionDetails(setAuctionDetailsEvent);
+
+    assert.fieldEquals(
+      PROJECT_MINTER_CONFIGURATION_ENTITY_TYPE,
+      getProjectMinterConfigId(minterAddress.toHexString(), project.id),
+      "basePrice",
+      basePrice.toString()
+    );
+    assert.fieldEquals(
+      PROJECT_MINTER_CONFIGURATION_ENTITY_TYPE,
+      getProjectMinterConfigId(minterAddress.toHexString(), project.id),
+      "startPrice",
+      startPrice.toString()
+    );
+    assert.fieldEquals(
+      PROJECT_MINTER_CONFIGURATION_ENTITY_TYPE,
+      getProjectMinterConfigId(minterAddress.toHexString(), project.id),
+      "startTime",
+      startTime.toString()
+    );
+    assert.fieldEquals(
+      PROJECT_MINTER_CONFIGURATION_ENTITY_TYPE,
+      getProjectMinterConfigId(minterAddress.toHexString(), project.id),
+      "endTime",
+      endTime.toString()
+    );
+    assert.fieldEquals(
+      PROJECT_MINTER_CONFIGURATION_ENTITY_TYPE,
+      getProjectMinterConfigId(minterAddress.toHexString(), project.id),
+      "priceIsConfigured",
+      "true"
+    );
+
+    assert.fieldEquals(
+      PROJECT_ENTITY_TYPE,
+      project.id,
+      "updatedAt",
+      CURRENT_BLOCK_TIMESTAMP.toString()
+    );
+  });
+
+  test("should update project minter config auction details with v1 event", () => {
+    clearStore();
+
+    const minter = addNewMinterToStore("MinterDALinV1");
+    const minterAddress: Address = changetype<Address>(
+      Address.fromHexString(minter.id)
+    );
+    const minterType = minter.type;
+
+    const projectId = BigInt.fromI32(0);
+    const project = addNewProjectToStore(
+      TEST_CONTRACT_ADDRESS,
+      projectId,
+      "project 0",
+      randomAddressGenerator.generateRandomAddress(),
+      BigInt.fromI32(0),
+      CURRENT_BLOCK_TIMESTAMP.minus(BigInt.fromI32(10))
+    );
+
+    const projectMinterConfig = new ProjectMinterConfiguration(
+      getProjectMinterConfigId(minterAddress.toHexString(), project.id)
+    );
+    projectMinterConfig.minter = minterAddress.toHexString();
+    projectMinterConfig.project = project.id;
+    projectMinterConfig.extraMinterDetails = "{}";
+    projectMinterConfig.basePrice = BigInt.fromI32(0);
+    projectMinterConfig.priceIsConfigured = false;
+    projectMinterConfig.currencyAddress = Address.zero();
+    projectMinterConfig.currencySymbol = "ETH";
+    projectMinterConfig.purchaseToDisabled = false;
+    projectMinterConfig.save();
+
+    const basePrice = ONE_ETH_IN_WEI.div(BigInt.fromI32(10));
+    const startPrice = ONE_ETH_IN_WEI;
+    const startTime = CURRENT_BLOCK_TIMESTAMP.plus(BigInt.fromI32(100));
+    const endTime = CURRENT_BLOCK_TIMESTAMP.plus(BigInt.fromI32(200));
+    const setAuctionDetailsEvent: DALinV1SetAuctionDetails = changetype<
+      DALinV1SetAuctionDetails
+    >(newMockEvent());
+    setAuctionDetailsEvent.address = minterAddress;
+    setAuctionDetailsEvent.parameters = [
+      new ethereum.EventParam(
+        "_projectId",
+        ethereum.Value.fromUnsignedBigInt(projectId)
+      ),
+      new ethereum.EventParam(
+        "_auctionTimestampStart",
+        ethereum.Value.fromUnsignedBigInt(startTime)
+      ),
+      new ethereum.EventParam(
+        "_auctionTimestampEnd",
+        ethereum.Value.fromUnsignedBigInt(endTime)
+      ),
+      new ethereum.EventParam(
+        "_startPrice",
+        ethereum.Value.fromUnsignedBigInt(startPrice)
+      ),
+      new ethereum.EventParam(
+        "_basePrice",
+        ethereum.Value.fromUnsignedBigInt(basePrice)
+      )
+    ];
+    setAuctionDetailsEvent.block.timestamp = CURRENT_BLOCK_TIMESTAMP;
+
+    handleDALinSetAuctionDetails(setAuctionDetailsEvent);
+
+    assert.fieldEquals(
+      PROJECT_MINTER_CONFIGURATION_ENTITY_TYPE,
+      getProjectMinterConfigId(minterAddress.toHexString(), project.id),
+      "basePrice",
+      basePrice.toString()
+    );
+    assert.fieldEquals(
+      PROJECT_MINTER_CONFIGURATION_ENTITY_TYPE,
+      getProjectMinterConfigId(minterAddress.toHexString(), project.id),
+      "startPrice",
+      startPrice.toString()
+    );
+    assert.fieldEquals(
+      PROJECT_MINTER_CONFIGURATION_ENTITY_TYPE,
+      getProjectMinterConfigId(minterAddress.toHexString(), project.id),
+      "startTime",
+      startTime.toString()
+    );
+    assert.fieldEquals(
+      PROJECT_MINTER_CONFIGURATION_ENTITY_TYPE,
+      getProjectMinterConfigId(minterAddress.toHexString(), project.id),
+      "endTime",
+      endTime.toString()
+    );
+    assert.fieldEquals(
+      PROJECT_MINTER_CONFIGURATION_ENTITY_TYPE,
+      getProjectMinterConfigId(minterAddress.toHexString(), project.id),
+      "priceIsConfigured",
+      "true"
+    );
+
+    assert.fieldEquals(
+      PROJECT_ENTITY_TYPE,
+      project.id,
+      "updatedAt",
+      CURRENT_BLOCK_TIMESTAMP.toString()
+    );
+  });
+});
+
+describe("handleDALinResetAuctionDetails", () => {
+  test("should do nothing if project is not in store", () => {
+    clearStore();
+    const minter = addNewMinterToStore("MinterDALinV0");
+    const minterAddress: Address = changetype<Address>(
+      Address.fromHexString(minter.id)
+    );
+    const minterType = minter.type;
+
+    const projectId = BigInt.fromI32(0);
+    const fullProjectId = generateContractSpecificId(
+      TEST_CONTRACT_ADDRESS,
+      projectId
+    );
+
+    const daLinV0ResetAuctionDetailsEvent: DALinV0ResetAuctionDetails = changetype<
+      DALinV0ResetAuctionDetails
+    >(newMockEvent());
+    daLinV0ResetAuctionDetailsEvent.address = minterAddress;
+    daLinV0ResetAuctionDetailsEvent.parameters = [
+      new ethereum.EventParam(
+        "_projectId",
+        ethereum.Value.fromUnsignedBigInt(projectId)
+      )
+    ];
+    daLinV0ResetAuctionDetailsEvent.block.timestamp = CURRENT_BLOCK_TIMESTAMP;
+
+    assert.notInStore(PROJECT_ENTITY_TYPE, fullProjectId);
+
+    handleDALinResetAuctionDetails(daLinV0ResetAuctionDetailsEvent);
+
+    assert.notInStore(PROJECT_MINTER_CONFIGURATION_ENTITY_TYPE, fullProjectId);
+  });
+
+  test("should reset project minter config auction details", () => {
+    clearStore();
+
+    const minter = addNewMinterToStore("MinterDALinV0");
+    const minterAddress: Address = changetype<Address>(
+      Address.fromHexString(minter.id)
+    );
+    const minterType = minter.type;
+
+    const projectId = BigInt.fromI32(0);
+    const project = addNewProjectToStore(
+      TEST_CONTRACT_ADDRESS,
+      projectId,
+      "project 0",
+      randomAddressGenerator.generateRandomAddress(),
+      BigInt.fromI32(0),
+      CURRENT_BLOCK_TIMESTAMP.minus(BigInt.fromI32(10))
+    );
+
+    const projectMinterConfig = new ProjectMinterConfiguration(
+      getProjectMinterConfigId(minterAddress.toHexString(), project.id)
+    );
+    projectMinterConfig.minter = minterAddress.toHexString();
+    projectMinterConfig.project = project.id;
+    projectMinterConfig.extraMinterDetails = "{}";
+    projectMinterConfig.startTime = CURRENT_BLOCK_TIMESTAMP.plus(
+      BigInt.fromI32(100)
+    );
+    projectMinterConfig.endTime = CURRENT_BLOCK_TIMESTAMP.plus(
+      BigInt.fromI32(200)
+    );
+    projectMinterConfig.startPrice = ONE_ETH_IN_WEI;
+    projectMinterConfig.basePrice = ONE_ETH_IN_WEI.div(BigInt.fromI32(10));
+    projectMinterConfig.priceIsConfigured = true;
+    projectMinterConfig.currencyAddress = Address.zero();
+    projectMinterConfig.currencySymbol = "ETH";
+    projectMinterConfig.purchaseToDisabled = false;
+    projectMinterConfig.save();
+
+    const resetAuctionDetailsEvent: DALinV0ResetAuctionDetails = changetype<
+      DALinV0ResetAuctionDetails
+    >(newMockEvent());
+    resetAuctionDetailsEvent.address = minterAddress;
+    resetAuctionDetailsEvent.parameters = [
+      new ethereum.EventParam(
+        "_projectId",
+        ethereum.Value.fromUnsignedBigInt(projectId)
+      )
+    ];
+    resetAuctionDetailsEvent.block.timestamp = CURRENT_BLOCK_TIMESTAMP;
+
+    handleDALinResetAuctionDetails(resetAuctionDetailsEvent);
+
+    const updatedProjectMinterConfig: ProjectMinterConfiguration = changetype<
+      ProjectMinterConfiguration
+    >(ProjectMinterConfiguration.load(projectMinterConfig.id));
+
+    assert.assertTrue(updatedProjectMinterConfig.basePrice === null);
+    assert.assertTrue(updatedProjectMinterConfig.startPrice === null);
+    assert.assertTrue(updatedProjectMinterConfig.startTime === null);
+    assert.assertTrue(updatedProjectMinterConfig.endTime === null);
+
+    assert.fieldEquals(
+      PROJECT_MINTER_CONFIGURATION_ENTITY_TYPE,
+      getProjectMinterConfigId(minterAddress.toHexString(), project.id),
+      "minter",
+      minterAddress.toHexString()
+    );
+    assert.fieldEquals(
+      PROJECT_MINTER_CONFIGURATION_ENTITY_TYPE,
+      getProjectMinterConfigId(minterAddress.toHexString(), project.id),
+      "priceIsConfigured",
+      "false"
+    );
+    assert.fieldEquals(
+      PROJECT_MINTER_CONFIGURATION_ENTITY_TYPE,
+      getProjectMinterConfigId(minterAddress.toHexString(), project.id),
+      "project",
+      project.id
+    );
+
+    assert.fieldEquals(
+      PROJECT_ENTITY_TYPE,
+      project.id,
+      "updatedAt",
+      CURRENT_BLOCK_TIMESTAMP.toString()
+    );
+  });
+
+  test("should reset project minter config auction details with v1 event", () => {
+    clearStore();
+
+    const minter = addNewMinterToStore("MinterDALinV1");
+    const minterAddress: Address = changetype<Address>(
+      Address.fromHexString(minter.id)
+    );
+    const minterType = minter.type;
+
+    const projectId = BigInt.fromI32(0);
+    const project = addNewProjectToStore(
+      TEST_CONTRACT_ADDRESS,
+      projectId,
+      "project 0",
+      randomAddressGenerator.generateRandomAddress(),
+      BigInt.fromI32(0),
+      CURRENT_BLOCK_TIMESTAMP.minus(BigInt.fromI32(10))
+    );
+
+    const projectMinterConfig = new ProjectMinterConfiguration(
+      getProjectMinterConfigId(minterAddress.toHexString(), project.id)
+    );
+    projectMinterConfig.minter = minterAddress.toHexString();
+    projectMinterConfig.project = project.id;
+    projectMinterConfig.extraMinterDetails = "{}";
+    projectMinterConfig.startTime = CURRENT_BLOCK_TIMESTAMP.plus(
+      BigInt.fromI32(100)
+    );
+    projectMinterConfig.endTime = CURRENT_BLOCK_TIMESTAMP.plus(
+      BigInt.fromI32(200)
+    );
+    projectMinterConfig.startPrice = ONE_ETH_IN_WEI;
+    projectMinterConfig.basePrice = ONE_ETH_IN_WEI.div(BigInt.fromI32(10));
+    projectMinterConfig.priceIsConfigured = true;
+    projectMinterConfig.currencyAddress = Address.zero();
+    projectMinterConfig.currencySymbol = "ETH";
+    projectMinterConfig.purchaseToDisabled = false;
+    projectMinterConfig.save();
+
+    const resetAuctionDetailsEvent: DALinV1ResetAuctionDetails = changetype<
+      DALinV1ResetAuctionDetails
+    >(newMockEvent());
+    resetAuctionDetailsEvent.address = minterAddress;
+    resetAuctionDetailsEvent.parameters = [
+      new ethereum.EventParam(
+        "_projectId",
+        ethereum.Value.fromUnsignedBigInt(projectId)
+      )
+    ];
+    resetAuctionDetailsEvent.block.timestamp = CURRENT_BLOCK_TIMESTAMP;
+
+    handleDALinResetAuctionDetails(resetAuctionDetailsEvent);
+
+    const updatedProjectMinterConfig: ProjectMinterConfiguration = changetype<
+      ProjectMinterConfiguration
+    >(ProjectMinterConfiguration.load(projectMinterConfig.id));
+
+    assert.assertTrue(updatedProjectMinterConfig.basePrice === null);
+    assert.assertTrue(updatedProjectMinterConfig.startPrice === null);
+    assert.assertTrue(updatedProjectMinterConfig.startTime === null);
+    assert.assertTrue(updatedProjectMinterConfig.endTime === null);
+
+    assert.fieldEquals(
+      PROJECT_MINTER_CONFIGURATION_ENTITY_TYPE,
+      getProjectMinterConfigId(minterAddress.toHexString(), project.id),
+      "minter",
+      minterAddress.toHexString()
+    );
+    assert.fieldEquals(
+      PROJECT_MINTER_CONFIGURATION_ENTITY_TYPE,
+      getProjectMinterConfigId(minterAddress.toHexString(), project.id),
+      "priceIsConfigured",
+      "false"
+    );
+    assert.fieldEquals(
+      PROJECT_MINTER_CONFIGURATION_ENTITY_TYPE,
+      getProjectMinterConfigId(minterAddress.toHexString(), project.id),
+      "project",
+      project.id
+    );
+
+    assert.fieldEquals(
+      PROJECT_ENTITY_TYPE,
+      project.id,
+      "updatedAt",
+      CURRENT_BLOCK_TIMESTAMP.toString()
+    );
+  });
+});
+
+describe("handleAuctionHalfLifeRangeSecondsUpdated", () => {
+  test("should update minter half life range", () => {
+    let mintersToTest: string[] = [
+      "MinterDAExpV0",
+      "MinterDAExpV1",
+      "MinterDAExpV2"
+    ];
+    for (let i = 0; i < mintersToTest.length; i++) {
+      clearStore();
+      const minter = addNewMinterToStore(mintersToTest[i]);
+      const minterAddress: Address = changetype<Address>(
+        Address.fromHexString(minter.id)
+      );
+      minter.minimumHalfLifeInSeconds = BigInt.fromI32(300);
+      minter.maximumHalfLifeInSeconds = BigInt.fromI32(5000);
+      minter.updatedAt = CURRENT_BLOCK_TIMESTAMP.minus(BigInt.fromI32(10));
+      minter.save();
+
+      const newMinimumHalfLifeInSeconds = BigInt.fromI32(600);
+      const newMaximumHalfLifeInSeconds = BigInt.fromI32(1200);
+      let event = newMockEvent();
+      const auctionHalfLifeRangeSecondsUpdatedEvent: AuctionHalfLifeRangeSecondsUpdated = changetype<
+        AuctionHalfLifeRangeSecondsUpdated
+      >(newMockEvent());
+      event.address = minterAddress;
+      event.parameters = [
+        new ethereum.EventParam(
+          "_minimumPriceDecayHalfLifeSeconds",
+          ethereum.Value.fromUnsignedBigInt(newMinimumHalfLifeInSeconds)
+        ),
+        new ethereum.EventParam(
+          "_maximumPriceDecayHalfLifeSeconds",
+          ethereum.Value.fromUnsignedBigInt(newMaximumHalfLifeInSeconds)
+        )
+      ];
+      event.block.timestamp = CURRENT_BLOCK_TIMESTAMP;
+
+      if (mintersToTest[i] === "MinterDAExpV0") {
+        handleAuctionHalfLifeRangeSecondsUpdatedV0(
+          changetype<AuctionHalfLifeRangeSecondsUpdated>(event)
+        );
+      } else if (mintersToTest[i] === "MinterDAExpV1") {
+        handleAuctionHalfLifeRangeSecondsUpdatedV1(
+          changetype<AuctionHalfLifeRangeSecondsUpdatedV1>(event)
+        );
+      } else {
+        handleAuctionHalfLifeRangeSecondsUpdatedV2(
+          changetype<AuctionHalfLifeRangeSecondsUpdatedV2>(event)
+        );
+      }
+
+      assert.fieldEquals(
+        MINTER_ENTITY_TYPE,
+        minterAddress.toHexString(),
+        "minimumHalfLifeInSeconds",
+        newMinimumHalfLifeInSeconds.toString()
+      );
+      assert.fieldEquals(
+        MINTER_ENTITY_TYPE,
+        minterAddress.toHexString(),
+        "maximumHalfLifeInSeconds",
+        newMaximumHalfLifeInSeconds.toString()
+      );
+
+      assert.fieldEquals(
+        MINTER_ENTITY_TYPE,
+        minterAddress.toHexString(),
+        "updatedAt",
+        CURRENT_BLOCK_TIMESTAMP.toString()
+      );
+    }
+  });
+});
+
+describe("handleDAExpSetAuctionDetails", () => {
+  test("should do nothing if project is not in store", () => {
+    clearStore();
     const minter = addNewMinterToStore("MinterDAExpV0");
     const minterAddress: Address = changetype<Address>(
       Address.fromHexString(minter.id)
@@ -1296,49 +1064,29 @@ test("handleDAExpResetAuctionDetails should do nothing if project is not in stor
       projectId
     );
 
-    const event = newMockEvent();
-    const daExpV0ResetAuctionDetailsEvent: DAExpV0ResetAuctionDetails = changetype<
-      DAExpV0ResetAuctionDetails
+    const daExpV0SetAuctionDetailsEvent: DAExpV0SetAuctionDetails = changetype<
+      DAExpV0SetAuctionDetails
     >(newMockEvent());
-    event.address = minterAddress;
-    event.parameters = [
+    daExpV0SetAuctionDetailsEvent.address = minterAddress;
+    daExpV0SetAuctionDetailsEvent.parameters = [
       new ethereum.EventParam(
         "_projectId",
         ethereum.Value.fromUnsignedBigInt(projectId)
       )
     ];
-    event.block.timestamp = CURRENT_BLOCK_TIMESTAMP;
+    daExpV0SetAuctionDetailsEvent.block.timestamp = CURRENT_BLOCK_TIMESTAMP;
 
     assert.notInStore(PROJECT_ENTITY_TYPE, fullProjectId);
 
-    if (minterType == "MinterDAExpV0") {
-      handleDAExpV0ResetAuctionDetails(
-        changetype<DAExpV0ResetAuctionDetails>(event)
-      );
-    } else if (minterType == "MinterDAExpV1") {
-      handleDAExpV1ResetAuctionDetails(
-        changetype<DAExpV1ResetAuctionDetails>(event)
-      );
-    } else {
-      handleDAExpV2ResetAuctionDetails(
-        changetype<DAExpV2ResetAuctionDetails>(event)
-      );
-    }
+    handleDAExpSetAuctionDetails(daExpV0SetAuctionDetailsEvent);
 
     assert.notInStore(PROJECT_MINTER_CONFIGURATION_ENTITY_TYPE, fullProjectId);
-  }
-});
+  });
 
-test("handleDAExpResetAuctionDetails should reset project minter config auction details", () => {
-  let mintersToTest: string[] = [
-    "MinterDAExpV0",
-    "MinterDAExpV1",
-    "MinterDAExpV2"
-  ];
-  for (let i = 0; i < mintersToTest.length; i++) {
+  test("should update project minter config auction details", () => {
     clearStore();
 
-    const minter = addNewMinterToStore("MinterDAExpV0");
+    const minter = addNewMinterToStore("MinterDALinV0");
     const minterAddress: Address = changetype<Address>(
       Address.fromHexString(minter.id)
     );
@@ -1360,70 +1108,76 @@ test("handleDAExpResetAuctionDetails should reset project minter config auction 
     projectMinterConfig.minter = minterAddress.toHexString();
     projectMinterConfig.project = project.id;
     projectMinterConfig.extraMinterDetails = "{}";
-    projectMinterConfig.startTime = CURRENT_BLOCK_TIMESTAMP.plus(
-      BigInt.fromI32(100)
-    );
-    projectMinterConfig.halfLifeSeconds = CURRENT_BLOCK_TIMESTAMP.plus(
-      BigInt.fromI32(300)
-    );
-    projectMinterConfig.startPrice = ONE_ETH_IN_WEI;
-    projectMinterConfig.basePrice = ONE_ETH_IN_WEI.div(BigInt.fromI32(10));
-    projectMinterConfig.priceIsConfigured = true;
+    projectMinterConfig.basePrice = BigInt.fromI32(0);
+    projectMinterConfig.priceIsConfigured = false;
     projectMinterConfig.currencyAddress = Address.zero();
     projectMinterConfig.currencySymbol = "ETH";
     projectMinterConfig.purchaseToDisabled = false;
     projectMinterConfig.save();
 
-    const event = newMockEvent();
-    event.address = minterAddress;
-    event.parameters = [
+    const basePrice = ONE_ETH_IN_WEI.div(BigInt.fromI32(10));
+    const startPrice = ONE_ETH_IN_WEI;
+    const startTime = CURRENT_BLOCK_TIMESTAMP.plus(BigInt.fromI32(100));
+    const halfLifeSeconds = BigInt.fromI32(400);
+    const setAuctionDetailsEvent: DAExpV0SetAuctionDetails = changetype<
+      DAExpV0SetAuctionDetails
+    >(newMockEvent());
+    setAuctionDetailsEvent.address = minterAddress;
+    setAuctionDetailsEvent.parameters = [
       new ethereum.EventParam(
         "_projectId",
         ethereum.Value.fromUnsignedBigInt(projectId)
+      ),
+      new ethereum.EventParam(
+        "_auctionTimestampStart",
+        ethereum.Value.fromUnsignedBigInt(startTime)
+      ),
+      new ethereum.EventParam(
+        "_priceDecayHalfLifeSeconds",
+        ethereum.Value.fromUnsignedBigInt(halfLifeSeconds)
+      ),
+      new ethereum.EventParam(
+        "_startPrice",
+        ethereum.Value.fromUnsignedBigInt(startPrice)
+      ),
+      new ethereum.EventParam(
+        "_basePrice",
+        ethereum.Value.fromUnsignedBigInt(basePrice)
       )
     ];
-    event.block.timestamp = CURRENT_BLOCK_TIMESTAMP;
+    setAuctionDetailsEvent.block.timestamp = CURRENT_BLOCK_TIMESTAMP;
 
-    if (minterType == "MinterDAExpV0") {
-      handleDAExpV0ResetAuctionDetails(
-        changetype<DAExpV0ResetAuctionDetails>(event)
-      );
-    } else if (minterType == "MinterDAExpV1") {
-      handleDAExpV1ResetAuctionDetails(
-        changetype<DAExpV1ResetAuctionDetails>(event)
-      );
-    } else {
-      handleDAExpV2ResetAuctionDetails(
-        changetype<DAExpV2ResetAuctionDetails>(event)
-      );
-    }
-
-    const updatedProjectMinterConfig: ProjectMinterConfiguration = changetype<
-      ProjectMinterConfiguration
-    >(ProjectMinterConfiguration.load(projectMinterConfig.id));
-
-    assert.assertTrue(updatedProjectMinterConfig.basePrice === null);
-    assert.assertTrue(updatedProjectMinterConfig.startPrice === null);
-    assert.assertTrue(updatedProjectMinterConfig.startTime === null);
-    assert.assertTrue(updatedProjectMinterConfig.halfLifeSeconds === null);
+    handleDAExpSetAuctionDetails(setAuctionDetailsEvent);
 
     assert.fieldEquals(
       PROJECT_MINTER_CONFIGURATION_ENTITY_TYPE,
       getProjectMinterConfigId(minterAddress.toHexString(), project.id),
-      "minter",
-      minterAddress.toHexString()
+      "basePrice",
+      basePrice.toString()
+    );
+    assert.fieldEquals(
+      PROJECT_MINTER_CONFIGURATION_ENTITY_TYPE,
+      getProjectMinterConfigId(minterAddress.toHexString(), project.id),
+      "startPrice",
+      startPrice.toString()
+    );
+    assert.fieldEquals(
+      PROJECT_MINTER_CONFIGURATION_ENTITY_TYPE,
+      getProjectMinterConfigId(minterAddress.toHexString(), project.id),
+      "startTime",
+      startTime.toString()
+    );
+    assert.fieldEquals(
+      PROJECT_MINTER_CONFIGURATION_ENTITY_TYPE,
+      getProjectMinterConfigId(minterAddress.toHexString(), project.id),
+      "halfLifeSeconds",
+      halfLifeSeconds.toString()
     );
     assert.fieldEquals(
       PROJECT_MINTER_CONFIGURATION_ENTITY_TYPE,
       getProjectMinterConfigId(minterAddress.toHexString(), project.id),
       "priceIsConfigured",
-      "false"
-    );
-    assert.fieldEquals(
-      PROJECT_MINTER_CONFIGURATION_ENTITY_TYPE,
-      getProjectMinterConfigId(minterAddress.toHexString(), project.id),
-      "project",
-      project.id
+      "true"
     );
 
     assert.fieldEquals(
@@ -1432,19 +1186,12 @@ test("handleDAExpResetAuctionDetails should reset project minter config auction 
       "updatedAt",
       CURRENT_BLOCK_TIMESTAMP.toString()
     );
-  }
-});
+  });
 
-test("handleDAExpResetAuctionDetails should reset project minter config auction details with v1 event", () => {
-  let mintersToTest: string[] = [
-    "MinterDAExpV0",
-    "MinterDAExpV1",
-    "MinterDAExpV2"
-  ];
-  for (let i = 0; i < mintersToTest.length; i++) {
+  test("should update project minter config auction details with v1 event", () => {
     clearStore();
 
-    const minter = addNewMinterToStore("MinterDAExpV1");
+    const minter = addNewMinterToStore("MinterDALinV1");
     const minterAddress: Address = changetype<Address>(
       Address.fromHexString(minter.id)
     );
@@ -1466,70 +1213,76 @@ test("handleDAExpResetAuctionDetails should reset project minter config auction 
     projectMinterConfig.minter = minterAddress.toHexString();
     projectMinterConfig.project = project.id;
     projectMinterConfig.extraMinterDetails = "{}";
-    projectMinterConfig.startTime = CURRENT_BLOCK_TIMESTAMP.plus(
-      BigInt.fromI32(100)
-    );
-    projectMinterConfig.halfLifeSeconds = CURRENT_BLOCK_TIMESTAMP.plus(
-      BigInt.fromI32(300)
-    );
-    projectMinterConfig.startPrice = ONE_ETH_IN_WEI;
-    projectMinterConfig.basePrice = ONE_ETH_IN_WEI.div(BigInt.fromI32(10));
-    projectMinterConfig.priceIsConfigured = true;
+    projectMinterConfig.basePrice = BigInt.fromI32(0);
+    projectMinterConfig.priceIsConfigured = false;
     projectMinterConfig.currencyAddress = Address.zero();
     projectMinterConfig.currencySymbol = "ETH";
     projectMinterConfig.purchaseToDisabled = false;
     projectMinterConfig.save();
 
-    const event = newMockEvent();
-    event.address = minterAddress;
-    event.parameters = [
+    const basePrice = ONE_ETH_IN_WEI.div(BigInt.fromI32(10));
+    const startPrice = ONE_ETH_IN_WEI;
+    const startTime = CURRENT_BLOCK_TIMESTAMP.plus(BigInt.fromI32(100));
+    const halfLifeSeconds = BigInt.fromI32(400);
+    const setAuctionDetailsEvent: DAExpV1SetAuctionDetails = changetype<
+      DAExpV1SetAuctionDetails
+    >(newMockEvent());
+    setAuctionDetailsEvent.address = minterAddress;
+    setAuctionDetailsEvent.parameters = [
       new ethereum.EventParam(
         "_projectId",
         ethereum.Value.fromUnsignedBigInt(projectId)
+      ),
+      new ethereum.EventParam(
+        "_auctionTimestampStart",
+        ethereum.Value.fromUnsignedBigInt(startTime)
+      ),
+      new ethereum.EventParam(
+        "_priceDecayHalfLifeSeconds",
+        ethereum.Value.fromUnsignedBigInt(halfLifeSeconds)
+      ),
+      new ethereum.EventParam(
+        "_startPrice",
+        ethereum.Value.fromUnsignedBigInt(startPrice)
+      ),
+      new ethereum.EventParam(
+        "_basePrice",
+        ethereum.Value.fromUnsignedBigInt(basePrice)
       )
     ];
-    event.block.timestamp = CURRENT_BLOCK_TIMESTAMP;
+    setAuctionDetailsEvent.block.timestamp = CURRENT_BLOCK_TIMESTAMP;
 
-    if (minterType == "MinterDAExpV0") {
-      handleDAExpV0ResetAuctionDetails(
-        changetype<DAExpV0ResetAuctionDetails>(event)
-      );
-    } else if (minterType == "MinterDAExpV1") {
-      handleDAExpV1ResetAuctionDetails(
-        changetype<DAExpV1ResetAuctionDetails>(event)
-      );
-    } else {
-      handleDAExpV2ResetAuctionDetails(
-        changetype<DAExpV2ResetAuctionDetails>(event)
-      );
-    }
-
-    const updatedProjectMinterConfig: ProjectMinterConfiguration = changetype<
-      ProjectMinterConfiguration
-    >(ProjectMinterConfiguration.load(projectMinterConfig.id));
-
-    assert.assertTrue(updatedProjectMinterConfig.basePrice === null);
-    assert.assertTrue(updatedProjectMinterConfig.startPrice === null);
-    assert.assertTrue(updatedProjectMinterConfig.startTime === null);
-    assert.assertTrue(updatedProjectMinterConfig.halfLifeSeconds === null);
+    handleDAExpSetAuctionDetails(setAuctionDetailsEvent);
 
     assert.fieldEquals(
       PROJECT_MINTER_CONFIGURATION_ENTITY_TYPE,
       getProjectMinterConfigId(minterAddress.toHexString(), project.id),
-      "minter",
-      minterAddress.toHexString()
+      "basePrice",
+      basePrice.toString()
+    );
+    assert.fieldEquals(
+      PROJECT_MINTER_CONFIGURATION_ENTITY_TYPE,
+      getProjectMinterConfigId(minterAddress.toHexString(), project.id),
+      "startPrice",
+      startPrice.toString()
+    );
+    assert.fieldEquals(
+      PROJECT_MINTER_CONFIGURATION_ENTITY_TYPE,
+      getProjectMinterConfigId(minterAddress.toHexString(), project.id),
+      "startTime",
+      startTime.toString()
+    );
+    assert.fieldEquals(
+      PROJECT_MINTER_CONFIGURATION_ENTITY_TYPE,
+      getProjectMinterConfigId(minterAddress.toHexString(), project.id),
+      "halfLifeSeconds",
+      halfLifeSeconds.toString()
     );
     assert.fieldEquals(
       PROJECT_MINTER_CONFIGURATION_ENTITY_TYPE,
       getProjectMinterConfigId(minterAddress.toHexString(), project.id),
       "priceIsConfigured",
-      "false"
-    );
-    assert.fieldEquals(
-      PROJECT_MINTER_CONFIGURATION_ENTITY_TYPE,
-      getProjectMinterConfigId(minterAddress.toHexString(), project.id),
-      "project",
-      project.id
+      "true"
     );
 
     assert.fieldEquals(
@@ -1538,8 +1291,280 @@ test("handleDAExpResetAuctionDetails should reset project minter config auction 
       "updatedAt",
       CURRENT_BLOCK_TIMESTAMP.toString()
     );
-  }
+  });
 });
+
+describe("handleDAExpResetAuctionDetails", () => {
+  test("should do nothing if project is not in store", () => {
+    let mintersToTest: string[] = [
+      "MinterDAExpV0",
+      "MinterDAExpV1",
+      "MinterDAExpV2"
+    ];
+    for (let i = 0; i < mintersToTest.length; i++) {
+      clearStore();
+
+      const minter = addNewMinterToStore("MinterDAExpV0");
+      const minterAddress: Address = changetype<Address>(
+        Address.fromHexString(minter.id)
+      );
+      const minterType = minter.type;
+
+      const projectId = BigInt.fromI32(0);
+      const fullProjectId = generateContractSpecificId(
+        TEST_CONTRACT_ADDRESS,
+        projectId
+      );
+
+      const event = newMockEvent();
+      const daExpV0ResetAuctionDetailsEvent: DAExpV0ResetAuctionDetails = changetype<
+        DAExpV0ResetAuctionDetails
+      >(newMockEvent());
+      event.address = minterAddress;
+      event.parameters = [
+        new ethereum.EventParam(
+          "_projectId",
+          ethereum.Value.fromUnsignedBigInt(projectId)
+        )
+      ];
+      event.block.timestamp = CURRENT_BLOCK_TIMESTAMP;
+
+      assert.notInStore(PROJECT_ENTITY_TYPE, fullProjectId);
+
+      if (minterType == "MinterDAExpV0") {
+        handleDAExpV0ResetAuctionDetails(
+          changetype<DAExpV0ResetAuctionDetails>(event)
+        );
+      } else if (minterType == "MinterDAExpV1") {
+        handleDAExpV1ResetAuctionDetails(
+          changetype<DAExpV1ResetAuctionDetails>(event)
+        );
+      } else {
+        handleDAExpV2ResetAuctionDetails(
+          changetype<DAExpV2ResetAuctionDetails>(event)
+        );
+      }
+
+      assert.notInStore(
+        PROJECT_MINTER_CONFIGURATION_ENTITY_TYPE,
+        fullProjectId
+      );
+    }
+  });
+
+  test("should reset project minter config auction details", () => {
+    let mintersToTest: string[] = [
+      "MinterDAExpV0",
+      "MinterDAExpV1",
+      "MinterDAExpV2"
+    ];
+    for (let i = 0; i < mintersToTest.length; i++) {
+      clearStore();
+
+      const minter = addNewMinterToStore("MinterDAExpV0");
+      const minterAddress: Address = changetype<Address>(
+        Address.fromHexString(minter.id)
+      );
+      const minterType = minter.type;
+
+      const projectId = BigInt.fromI32(0);
+      const project = addNewProjectToStore(
+        TEST_CONTRACT_ADDRESS,
+        projectId,
+        "project 0",
+        randomAddressGenerator.generateRandomAddress(),
+        BigInt.fromI32(0),
+        CURRENT_BLOCK_TIMESTAMP.minus(BigInt.fromI32(10))
+      );
+
+      const projectMinterConfig = new ProjectMinterConfiguration(
+        getProjectMinterConfigId(minterAddress.toHexString(), project.id)
+      );
+      projectMinterConfig.minter = minterAddress.toHexString();
+      projectMinterConfig.project = project.id;
+      projectMinterConfig.extraMinterDetails = "{}";
+      projectMinterConfig.startTime = CURRENT_BLOCK_TIMESTAMP.plus(
+        BigInt.fromI32(100)
+      );
+      projectMinterConfig.halfLifeSeconds = CURRENT_BLOCK_TIMESTAMP.plus(
+        BigInt.fromI32(300)
+      );
+      projectMinterConfig.startPrice = ONE_ETH_IN_WEI;
+      projectMinterConfig.basePrice = ONE_ETH_IN_WEI.div(BigInt.fromI32(10));
+      projectMinterConfig.priceIsConfigured = true;
+      projectMinterConfig.currencyAddress = Address.zero();
+      projectMinterConfig.currencySymbol = "ETH";
+      projectMinterConfig.purchaseToDisabled = false;
+      projectMinterConfig.save();
+
+      const event = newMockEvent();
+      event.address = minterAddress;
+      event.parameters = [
+        new ethereum.EventParam(
+          "_projectId",
+          ethereum.Value.fromUnsignedBigInt(projectId)
+        )
+      ];
+      event.block.timestamp = CURRENT_BLOCK_TIMESTAMP;
+
+      if (minterType == "MinterDAExpV0") {
+        handleDAExpV0ResetAuctionDetails(
+          changetype<DAExpV0ResetAuctionDetails>(event)
+        );
+      } else if (minterType == "MinterDAExpV1") {
+        handleDAExpV1ResetAuctionDetails(
+          changetype<DAExpV1ResetAuctionDetails>(event)
+        );
+      } else {
+        handleDAExpV2ResetAuctionDetails(
+          changetype<DAExpV2ResetAuctionDetails>(event)
+        );
+      }
+
+      const updatedProjectMinterConfig: ProjectMinterConfiguration = changetype<
+        ProjectMinterConfiguration
+      >(ProjectMinterConfiguration.load(projectMinterConfig.id));
+
+      assert.assertTrue(updatedProjectMinterConfig.basePrice === null);
+      assert.assertTrue(updatedProjectMinterConfig.startPrice === null);
+      assert.assertTrue(updatedProjectMinterConfig.startTime === null);
+      assert.assertTrue(updatedProjectMinterConfig.halfLifeSeconds === null);
+
+      assert.fieldEquals(
+        PROJECT_MINTER_CONFIGURATION_ENTITY_TYPE,
+        getProjectMinterConfigId(minterAddress.toHexString(), project.id),
+        "minter",
+        minterAddress.toHexString()
+      );
+      assert.fieldEquals(
+        PROJECT_MINTER_CONFIGURATION_ENTITY_TYPE,
+        getProjectMinterConfigId(minterAddress.toHexString(), project.id),
+        "priceIsConfigured",
+        "false"
+      );
+      assert.fieldEquals(
+        PROJECT_MINTER_CONFIGURATION_ENTITY_TYPE,
+        getProjectMinterConfigId(minterAddress.toHexString(), project.id),
+        "project",
+        project.id
+      );
+
+      assert.fieldEquals(
+        PROJECT_ENTITY_TYPE,
+        project.id,
+        "updatedAt",
+        CURRENT_BLOCK_TIMESTAMP.toString()
+      );
+    }
+  });
+
+  test("should reset project minter config auction details with v1 event", () => {
+    let mintersToTest: string[] = [
+      "MinterDAExpV0",
+      "MinterDAExpV1",
+      "MinterDAExpV2"
+    ];
+    for (let i = 0; i < mintersToTest.length; i++) {
+      clearStore();
+
+      const minter = addNewMinterToStore("MinterDAExpV1");
+      const minterAddress: Address = changetype<Address>(
+        Address.fromHexString(minter.id)
+      );
+      const minterType = minter.type;
+
+      const projectId = BigInt.fromI32(0);
+      const project = addNewProjectToStore(
+        TEST_CONTRACT_ADDRESS,
+        projectId,
+        "project 0",
+        randomAddressGenerator.generateRandomAddress(),
+        BigInt.fromI32(0),
+        CURRENT_BLOCK_TIMESTAMP.minus(BigInt.fromI32(10))
+      );
+
+      const projectMinterConfig = new ProjectMinterConfiguration(
+        getProjectMinterConfigId(minterAddress.toHexString(), project.id)
+      );
+      projectMinterConfig.minter = minterAddress.toHexString();
+      projectMinterConfig.project = project.id;
+      projectMinterConfig.extraMinterDetails = "{}";
+      projectMinterConfig.startTime = CURRENT_BLOCK_TIMESTAMP.plus(
+        BigInt.fromI32(100)
+      );
+      projectMinterConfig.halfLifeSeconds = CURRENT_BLOCK_TIMESTAMP.plus(
+        BigInt.fromI32(300)
+      );
+      projectMinterConfig.startPrice = ONE_ETH_IN_WEI;
+      projectMinterConfig.basePrice = ONE_ETH_IN_WEI.div(BigInt.fromI32(10));
+      projectMinterConfig.priceIsConfigured = true;
+      projectMinterConfig.currencyAddress = Address.zero();
+      projectMinterConfig.currencySymbol = "ETH";
+      projectMinterConfig.purchaseToDisabled = false;
+      projectMinterConfig.save();
+
+      const event = newMockEvent();
+      event.address = minterAddress;
+      event.parameters = [
+        new ethereum.EventParam(
+          "_projectId",
+          ethereum.Value.fromUnsignedBigInt(projectId)
+        )
+      ];
+      event.block.timestamp = CURRENT_BLOCK_TIMESTAMP;
+
+      if (minterType == "MinterDAExpV0") {
+        handleDAExpV0ResetAuctionDetails(
+          changetype<DAExpV0ResetAuctionDetails>(event)
+        );
+      } else if (minterType == "MinterDAExpV1") {
+        handleDAExpV1ResetAuctionDetails(
+          changetype<DAExpV1ResetAuctionDetails>(event)
+        );
+      } else {
+        handleDAExpV2ResetAuctionDetails(
+          changetype<DAExpV2ResetAuctionDetails>(event)
+        );
+      }
+
+      const updatedProjectMinterConfig: ProjectMinterConfiguration = changetype<
+        ProjectMinterConfiguration
+      >(ProjectMinterConfiguration.load(projectMinterConfig.id));
+
+      assert.assertTrue(updatedProjectMinterConfig.basePrice === null);
+      assert.assertTrue(updatedProjectMinterConfig.startPrice === null);
+      assert.assertTrue(updatedProjectMinterConfig.startTime === null);
+      assert.assertTrue(updatedProjectMinterConfig.halfLifeSeconds === null);
+
+      assert.fieldEquals(
+        PROJECT_MINTER_CONFIGURATION_ENTITY_TYPE,
+        getProjectMinterConfigId(minterAddress.toHexString(), project.id),
+        "minter",
+        minterAddress.toHexString()
+      );
+      assert.fieldEquals(
+        PROJECT_MINTER_CONFIGURATION_ENTITY_TYPE,
+        getProjectMinterConfigId(minterAddress.toHexString(), project.id),
+        "priceIsConfigured",
+        "false"
+      );
+      assert.fieldEquals(
+        PROJECT_MINTER_CONFIGURATION_ENTITY_TYPE,
+        getProjectMinterConfigId(minterAddress.toHexString(), project.id),
+        "project",
+        project.id
+      );
+
+      assert.fieldEquals(
+        PROJECT_ENTITY_TYPE,
+        project.id,
+        "updatedAt",
+        CURRENT_BLOCK_TIMESTAMP.toString()
+      );
+    }
+  });
+});
+
 test("handleSetValue should set all values to a designated key in extraMinterDetails", () => {
   clearStore();
   const minter = addNewMinterToStore("MinterHolderV0");
@@ -1725,6 +1750,7 @@ test("handleSetValue should set all values to a designated key in extraMinterDet
       "}"
   );
 });
+
 test("handleAddManyBigIntValue should add a value to an array at a designated key extraMinterDetails", () => {
   clearStore();
   const minter = addNewMinterToStore("MinterHolderV0");
@@ -1786,6 +1812,7 @@ test("handleAddManyBigIntValue should add a value to an array at a designated ke
     '{"array":[100,100]}'
   );
 });
+
 test("handleAddManyAddressValue should add a value to an array at a designated key extraMinterDetails", () => {
   clearStore();
   const minter = addNewMinterToStore("MinterHolderV0");
@@ -1837,6 +1864,7 @@ test("handleAddManyAddressValue should add a value to an array at a designated k
     '{"array":[' + '"' + testAddy.toHexString() + '"' + "]}"
   );
 });
+
 test("handleAddManyBytesValue should add a value to an array at a designated key extraMinterDetails", () => {
   clearStore();
   const minter = addNewMinterToStore("MinterHolderV0");
@@ -1898,6 +1926,7 @@ test("handleAddManyBytesValue should add a value to an array at a designated key
     '{"array":["im bytes","im bytes"]}'
   );
 });
+
 test("handleRemoveValue should remove the key/value from extraMinterDetails", () => {
   clearStore();
   const minter = addNewMinterToStore("MinterHolderV0");
@@ -1949,6 +1978,7 @@ test("handleRemoveValue should remove the key/value from extraMinterDetails", ()
     '{"addresses":"hi"}'
   );
 });
+
 test("handleRemoveBigIntManyValue should remove the key/value from extraMinterDetails", () => {
   clearStore();
   const minter = addNewMinterToStore("MinterHolderV0");
@@ -2004,6 +2034,7 @@ test("handleRemoveBigIntManyValue should remove the key/value from extraMinterDe
     '{"addresses":"hi","removeMe":[200]}'
   );
 });
+
 test("handleRemoveBytesManyValue should remove the key/value from extraMinterDetails", () => {
   clearStore();
   const minter = addNewMinterToStore("MinterHolderV0");
@@ -2128,6 +2159,7 @@ test("handleAllowHoldersOfProjects, V1 can add address + project id to extraMint
     );
   }
 });
+
 test("handleAllowHoldersOfProjectsV0 can add multiple address + project id to extraMinterDetails", () => {
   clearStore();
   const minter = addNewMinterToStore("MinterHolderV0");
@@ -2192,6 +2224,7 @@ test("handleAllowHoldersOfProjectsV0 can add multiple address + project id to ex
       '-17"]}'
   );
 });
+
 test("handleRemoveHoldersOfProjectsV0 can remove address + project id to extraMinterDetails", () => {
   clearStore();
   const minter = addNewMinterToStore("MinterHolderV0");
@@ -2251,6 +2284,7 @@ test("handleRemoveHoldersOfProjectsV0 can remove address + project id to extraMi
     '{"allowlistedAddressAndProjectId":["dontremove-0"]}'
   );
 });
+
 test("handleRemoveHoldersOfProjects V0 can remove multiple address + project id to extraMinterDetails", () => {
   clearStore();
   const minter = addNewMinterToStore("MinterHolderV0");
@@ -2318,6 +2352,7 @@ test("handleRemoveHoldersOfProjects V0 can remove multiple address + project id 
     '{"allowlistedAddressAndProjectId":["dontremove-0"]}'
   );
 });
+
 test("handleRegisteredNFTAddress V0 adds the address, as a string to the minter", () => {
   clearStore();
   const minter = addNewMinterToStore("MinterHolderV0");
@@ -2346,6 +2381,7 @@ test("handleRegisteredNFTAddress V0 adds the address, as a string to the minter"
     '{"registeredNFTAddresses":[' + '"' + testAddy.toHexString() + '"' + "]}"
   );
 });
+
 test("handleUnRegisteredNFTAddress V0 removes the address from the minter", () => {
   clearStore();
   const minterType = "MinterHolderV0";
