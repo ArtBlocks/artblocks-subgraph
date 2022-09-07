@@ -1620,7 +1620,11 @@ test("handleSetValue should set all values to a designated key in extraMinterDet
 
   // If the bytes are not intended to be a human readable string
   // we should instead convert to their hex string representation
-  const eventValue = randomAddressGenerator.generateRandomAddress();
+  // Always use the following hex string because valid WTF-8 but not valid
+  // UTF-8, which is a somewhat common edge-case when dealing with bytes
+  let eventValue = Bytes.fromHexString(
+    "0x57e32bd396b7c3337dd6b4a672e6d99b47865e56"
+  );
   const configValueSetEvent4: ConfigValueSetBytes = changetype<
     ConfigValueSetBytes
   >(newMockEvent());
