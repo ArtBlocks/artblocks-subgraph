@@ -7,7 +7,6 @@ import {
   JSONValueKind,
   TypedMap
 } from "@graphprotocol/graph-ts";
-import { log } from "matchstick-as";
 import { MinterDAExpV0 } from "../generated/MinterDAExpV0/MinterDAExpV0";
 import { MinterDAExpV1 } from "../generated/MinterDAExpV1/MinterDAExpV1";
 import { MinterDALinV0 } from "../generated/MinterDALinV0/MinterDALinV0";
