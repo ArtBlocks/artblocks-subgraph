@@ -177,10 +177,21 @@ export function arrayToJSONValue(value: string): JSONValue {
 // If byte data is parseable to a valid unicode string then do so
 // otherwise parse the byte data to a hex string
 export function bytesToJSONValue(value: Bytes): JSONValue {
-  // If the bytes cannot be
-  let result = json.try_fromString('["' + value.toString() + '"]');
-  if (result.isError) {
-    result = json.try_fromString('["' + value.toHexString() + '"]');
+  // fallback - assume the data is a hex string (always valid)
+  let result = json.try_fromString('["' + value.toHexString() + '"]');
+  // If the bytes can be parsed as a string, then losslessly re-encoded into
+  // UTF-8 bytes, then consider a valid UTF-8 encoded string and store
+  // string value in json.
+  // note: Bytes.toString() uses WTF-8 encoding as opposed to UTF-8.  Solidity
+  // encodes UTF-8 strings, so safe assume any string data are UTF-8 encoded.
+  let stringValue: string = value.toString();
+  let reEncodedBytesValue: Bytes = Bytes.fromUTF8(stringValue);
+  if (reEncodedBytesValue.toHexString() == value.toHexString()) {
+    // if the bytes are the same then the string was valid UTF-8
+    let potentialResult = json.try_fromString('["' + stringValue + '"]');
+    if (potentialResult.isOk) {
+      result = potentialResult;
+    }
   }
   return result.value.toArray()[0];
 }
