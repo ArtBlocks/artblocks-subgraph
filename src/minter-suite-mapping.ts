@@ -170,24 +170,6 @@ export function handlePurchaseToDisabledUpdated(
 }
 
 // MinterDALin events
-export function handleMinimumAuctionLengthSecondsUpdatedV0(
-  event: MinimumAuctionLengthSecondsUpdatedV0
-): void {
-  handleMinimumAuctionLengthSecondsUpdated(event);
-}
-
-export function handleMinimumAuctionLengthSecondsUpdatedV1(
-  event: MinimumAuctionLengthSecondsUpdatedV1
-): void {
-  handleMinimumAuctionLengthSecondsUpdated(event);
-}
-
-export function handleMinimumAuctionLengthSecondsUpdatedV2(
-  event: MinimumAuctionLengthSecondsUpdatedV2
-): void {
-  handleMinimumAuctionLengthSecondsUpdated(event);
-}
-
 export function handleMinimumAuctionLengthSecondsUpdated<T>(event: T): void {
   if (
     !(
@@ -205,24 +187,6 @@ export function handleMinimumAuctionLengthSecondsUpdated<T>(event: T): void {
     event.params._minimumAuctionLengthSeconds;
   minter.updatedAt = event.block.timestamp;
   minter.save();
-}
-
-export function handleDALinV0SetAuctionDetails(
-  event: DALinV0SetAuctionDetails
-): void {
-  handleDALinSetAuctionDetails(event);
-}
-
-export function handleDALinV1SetAuctionDetails(
-  event: DALinV1SetAuctionDetails
-): void {
-  handleDALinSetAuctionDetails(event);
-}
-
-export function handleDALinV2SetAuctionDetails(
-  event: DALinV2SetAuctionDetails
-): void {
-  handleDALinSetAuctionDetails(event);
 }
 
 export function handleDALinSetAuctionDetails<T>(event: T): void {
@@ -257,24 +221,6 @@ export function handleDALinSetAuctionDetails<T>(event: T): void {
     project.updatedAt = event.block.timestamp;
     project.save();
   }
-}
-
-export function handleDALinV0ResetAuctionDetails(
-  event: DALinV0ResetAuctionDetails
-): void {
-  handleDALinResetAuctionDetails(event);
-}
-
-export function handleDALinV1ResetAuctionDetails(
-  event: DALinV1ResetAuctionDetails
-): void {
-  handleDALinResetAuctionDetails(event);
-}
-
-export function handleDALinV2ResetAuctionDetails(
-  event: DALinV2ResetAuctionDetails
-): void {
-  handleDALinResetAuctionDetails(event);
 }
 
 export function handleDALinResetAuctionDetails<T>(event: T): void {
@@ -312,24 +258,6 @@ export function handleDALinResetAuctionDetails<T>(event: T): void {
 }
 
 // MinterDAExp events
-export function handleAuctionHalfLifeRangeSecondsUpdatedV0(
-  event: AuctionHalfLifeRangeSecondsUpdatedV0
-): void {
-  handleAuctionHalfLifeRangeSecondsUpdated(event);
-}
-
-export function handleAuctionHalfLifeRangeSecondsUpdatedV1(
-  event: AuctionHalfLifeRangeSecondsUpdatedV1
-): void {
-  handleAuctionHalfLifeRangeSecondsUpdated(event);
-}
-
-export function handleAuctionHalfLifeRangeSecondsUpdatedV2(
-  event: AuctionHalfLifeRangeSecondsUpdatedV2
-): void {
-  handleAuctionHalfLifeRangeSecondsUpdated(event);
-}
-
 export function handleAuctionHalfLifeRangeSecondsUpdated<T>(event: T): void {
   if (
     !(
@@ -350,24 +278,6 @@ export function handleAuctionHalfLifeRangeSecondsUpdated<T>(event: T): void {
 
   minter.updatedAt = event.block.timestamp;
   minter.save();
-}
-
-export function handleDAExpV0SetAuctionDetails(
-  event: DAExpV0SetAuctionDetails
-): void {
-  handleDAExpSetAuctionDetails(event);
-}
-
-export function handleDAExpV1SetAuctionDetails(
-  event: DAExpV1SetAuctionDetails
-): void {
-  handleDAExpSetAuctionDetails(event);
-}
-
-export function handleDAExpV2SetAuctionDetails(
-  event: DAExpV2SetAuctionDetails
-): void {
-  handleDAExpSetAuctionDetails(event);
 }
 
 export function handleDAExpSetAuctionDetails<T>(event: T): void {
@@ -403,24 +313,6 @@ export function handleDAExpSetAuctionDetails<T>(event: T): void {
     project.updatedAt = event.block.timestamp;
     project.save();
   }
-}
-
-export function handleDAExpV0ResetAuctionDetails(
-  event: DAExpV0ResetAuctionDetails
-): void {
-  handleDAExpResetAuctionDetails(event);
-}
-
-export function handleDAExpV1ResetAuctionDetails(
-  event: DAExpV1ResetAuctionDetails
-): void {
-  handleDAExpResetAuctionDetails(event);
-}
-
-export function handleDAExpV2ResetAuctionDetails(
-  event: DAExpV2ResetAuctionDetails
-): void {
-  handleDAExpResetAuctionDetails(event);
 }
 
 export function handleDAExpResetAuctionDetails<T>(event: T): void {
@@ -527,30 +419,6 @@ export function handleHoldersOfProjectsGeneric<T>(event: T): void {
   }
 }
 
-export function handleAllowHoldersOfProjectsV0(
-  event: MinterHolderV0AllowedHoldersOfProjects
-): void {
-  handleHoldersOfProjectsGeneric(event);
-}
-
-export function handleAllowHoldersOfProjectsV1(
-  event: MinterHolderV1AllowedHoldersOfProjects
-): void {
-  handleHoldersOfProjectsGeneric(event);
-}
-
-export function handleRemoveHoldersOfProjectsV0(
-  event: MinterHolderV0RemovedHoldersOfProjects
-): void {
-  handleHoldersOfProjectsGeneric(event);
-}
-
-export function handleRemoveHoldersOfProjectsV1(
-  event: MinterHolderV1RemovedHoldersOfProjects
-): void {
-  handleHoldersOfProjectsGeneric(event);
-}
-
 export function handleRegistrationNFTAddresses<T>(event: T): void {
   if (
     !(
@@ -588,28 +456,6 @@ export function handleRegistrationNFTAddresses<T>(event: T): void {
   ) {
     handleRemoveAddressManyValueMinterConfig(genericEvent);
   }
-}
-export function handleRegisteredNFTAddressV0(
-  event: MinterHolderV0RegisteredNFTAddress
-): void {
-  handleRegistrationNFTAddresses(event);
-}
-export function handleRegisteredNFTAddressV1(
-  event: MinterHolderV1RegisteredNFTAddress
-): void {
-  handleRegistrationNFTAddresses(event);
-}
-
-export function handleUnregisteredNFTAddressV0(
-  event: MinterHolderV0UnregisteredNFTAddress
-): void {
-  handleRegistrationNFTAddresses(event);
-}
-
-export function handleUnregisteredNFTAddressV1(
-  event: MinterHolderV1UnregisteredNFTAddress
-): void {
-  handleRegistrationNFTAddresses(event);
 }
 
 // Generic Handlers

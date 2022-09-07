@@ -772,7 +772,7 @@ dataSources:
           file: ./abis/IFilteredMinterV0.json
       eventHandlers:
         - event: MinimumAuctionLengthSecondsUpdated(uint256)
-          handler: handleMinimumAuctionLengthSecondsUpdatedV0
+          handler: handleMinimumAuctionLengthSecondsUpdated
         - event: PricePerTokenInWeiUpdated(indexed uint256,indexed uint256)
           handler: handlePricePerTokenInWeiUpdated
         - event: ProjectCurrencyInfoUpdated(indexed uint256,indexed address,string)
@@ -780,9 +780,9 @@ dataSources:
         - event: PurchaseToDisabledUpdated(indexed uint256,bool)
           handler: handlePurchaseToDisabledUpdated
         - event: ResetAuctionDetails(indexed uint256)
-          handler: handleDALinV0ResetAuctionDetails
+          handler: handleDALinResetAuctionDetails
         - event: SetAuctionDetails(indexed uint256,uint256,uint256,uint256,uint256)
-          handler: handleDALinV0SetAuctionDetails
+          handler: handleDALinSetAuctionDetails
       file: ./src/minter-suite-mapping.ts
   {{/minterDALinV0Contracts}}
   {{#minterDAExpV0Contracts}}
@@ -810,7 +810,7 @@ dataSources:
           file: ./abis/IFilteredMinterV0.json
       eventHandlers:
         - event: AuctionHalfLifeRangeSecondsUpdated(uint256,uint256)
-          handler: handleAuctionHalfLifeRangeSecondsUpdatedV0
+          handler: handleAuctionHalfLifeRangeSecondsUpdated
         - event: PricePerTokenInWeiUpdated(indexed uint256,indexed uint256)
           handler: handlePricePerTokenInWeiUpdated
         - event: ProjectCurrencyInfoUpdated(indexed uint256,indexed address,string)
@@ -818,9 +818,9 @@ dataSources:
         - event: PurchaseToDisabledUpdated(indexed uint256,bool)
           handler: handlePurchaseToDisabledUpdated
         - event: ResetAuctionDetails(indexed uint256)
-          handler: handleDAExpV0ResetAuctionDetails
+          handler: handleDAExpResetAuctionDetails
         - event: SetAuctionDetails(indexed uint256,uint256,uint256,uint256,uint256)
-          handler: handleDAExpV0SetAuctionDetails
+          handler: handleDAExpSetAuctionDetails
       file: ./src/minter-suite-mapping.ts
   {{/minterDAExpV0Contracts}}
   {{#minterSetPriceERC20V1Contracts}}
@@ -913,15 +913,15 @@ dataSources:
           file: ./abis/IFilteredMinterV0.json
       eventHandlers:
         - event: MinimumAuctionLengthSecondsUpdated(uint256)
-          handler: handleMinimumAuctionLengthSecondsUpdatedV1
+          handler: handleMinimumAuctionLengthSecondsUpdated
         - event: PricePerTokenInWeiUpdated(indexed uint256,indexed uint256)
           handler: handlePricePerTokenInWeiUpdated
         - event: ProjectCurrencyInfoUpdated(indexed uint256,indexed address,string)
           handler: handleProjectCurrencyInfoUpdated
         - event: ResetAuctionDetails(indexed uint256)
-          handler: handleDALinV1ResetAuctionDetails
+          handler: handleDALinResetAuctionDetails
         - event: SetAuctionDetails(indexed uint256,uint256,uint256,uint256,uint256)
-          handler: handleDALinV1SetAuctionDetails
+          handler: handleDALinSetAuctionDetails
       file: ./src/minter-suite-mapping.ts
   {{/minterDALinV1Contracts}}
   {{#minterDAExpV1Contracts}}
@@ -949,15 +949,15 @@ dataSources:
           file: ./abis/IFilteredMinterV0.json
       eventHandlers:
         - event: AuctionHalfLifeRangeSecondsUpdated(uint256,uint256)
-          handler: handleAuctionHalfLifeRangeSecondsUpdatedV1
+          handler: handleAuctionHalfLifeRangeSecondsUpdated
         - event: PricePerTokenInWeiUpdated(indexed uint256,indexed uint256)
           handler: handlePricePerTokenInWeiUpdated
         - event: ProjectCurrencyInfoUpdated(indexed uint256,indexed address,string)
           handler: handleProjectCurrencyInfoUpdated
         - event: ResetAuctionDetails(indexed uint256)
-          handler: handleDAExpV1ResetAuctionDetails
+          handler: handleDAExpResetAuctionDetails
         - event: SetAuctionDetails(indexed uint256,uint256,uint256,uint256,uint256)
-          handler: handleDAExpV1SetAuctionDetails
+          handler: handleDAExpSetAuctionDetails
       file: ./src/minter-suite-mapping.ts
   {{/minterDAExpV1Contracts}}
   {{#minterHolderV0Contracts}}
@@ -989,13 +989,13 @@ dataSources:
         - event: ProjectCurrencyInfoUpdated(indexed uint256,indexed address,string)
           handler: handleProjectCurrencyInfoUpdated
         - event: RegisteredNFTAddress(indexed address)
-          handler: handleRegisteredNFTAddressV0
+          handler: handleRegistrationNFTAddresses
         - event: UnregisteredNFTAddress(indexed address)
-          handler: handleUnregisteredNFTAddressV0
+          handler: handleRegistrationNFTAddresses
         - event: AllowedHoldersOfProjects(indexed uint256,address[],uint256[])
-          handler: handleAllowHoldersOfProjectsV0
+          handler: handleHoldersOfProjectsGeneric
         - event: RemovedHoldersOfProjects(indexed uint256,address[],uint256[])
-          handler: handleRemoveHoldersOfProjectsV0
+          handler: handleHoldersOfProjectsGeneric
       file: ./src/minter-suite-mapping.ts
   {{/minterHolderV0Contracts}}
   {{#minterMerkleV0Contracts}}
@@ -1122,15 +1122,15 @@ dataSources:
           file: ./abis/IFilteredMinterV0.json
       eventHandlers:
         - event: MinimumAuctionLengthSecondsUpdated(uint256)
-          handler: handleMinimumAuctionLengthSecondsUpdatedV2
+          handler: handleMinimumAuctionLengthSecondsUpdated
         - event: PricePerTokenInWeiUpdated(indexed uint256,indexed uint256)
           handler: handlePricePerTokenInWeiUpdated
         - event: ProjectCurrencyInfoUpdated(indexed uint256,indexed address,string)
           handler: handleProjectCurrencyInfoUpdated
         - event: ResetAuctionDetails(indexed uint256)
-          handler: handleDALin2ResetAuctionDetails
+          handler: handleDALinResetAuctionDetails
         - event: SetAuctionDetails(indexed uint256,uint256,uint256,uint256,uint256)
-          handler: handleDALinV2SetAuctionDetails
+          handler: handleDALinSetAuctionDetails
       file: ./src/minter-suite-mapping.ts
   {{/minterDALinV2Contracts}}
   {{#minterDAExpV2Contracts}}
@@ -1158,15 +1158,15 @@ dataSources:
           file: ./abis/IFilteredMinterV0.json
       eventHandlers:
         - event: AuctionHalfLifeRangeSecondsUpdated(uint256,uint256)
-          handler: handleAuctionHalfLifeRangeSecondsUpdatedV2
+          handler: handleAuctionHalfLifeRangeSecondsUpdated
         - event: PricePerTokenInWeiUpdated(indexed uint256,indexed uint256)
           handler: handlePricePerTokenInWeiUpdated
         - event: ProjectCurrencyInfoUpdated(indexed uint256,indexed address,string)
           handler: handleProjectCurrencyInfoUpdated
         - event: ResetAuctionDetails(indexed uint256)
-          handler: handleDAExpV2ResetAuctionDetails
+          handler: handleDAExpResetAuctionDetails
         - event: SetAuctionDetails(indexed uint256,uint256,uint256,uint256,uint256)
-          handler: handleDAExpV2SetAuctionDetails
+          handler: handleDAExpSetAuctionDetails
       file: ./src/minter-suite-mapping.ts
   {{/minterDAExpV2Contracts}}
   {{#minterHolderV1Contracts}}
@@ -1198,13 +1198,13 @@ dataSources:
         - event: ProjectCurrencyInfoUpdated(indexed uint256,indexed address,string)
           handler: handleProjectCurrencyInfoUpdated
         - event: RegisteredNFTAddress(indexed address)
-          handler: handleRegisteredNFTAddressV1
+          handler: handleRegistrationNFTAddresses
         - event: UnregisteredNFTAddress(indexed address)
-          handler: handleUnregisteredNFTAddressV1
+          handler: handleRegistrationNFTAddresses
         - event: AllowedHoldersOfProjects(indexed uint256,address[],uint256[])
-          handler: handleAllowHoldersOfProjectsV1
+          handler: handleHoldersOfProjectsGeneric
         - event: RemovedHoldersOfProjects(indexed uint256,address[],uint256[])
-          handler: handleRemoveHoldersOfProjectsV1
+          handler: handleHoldersOfProjectsGeneric
       file: ./src/minter-suite-mapping.ts
   {{/minterHolderV1Contracts}}
   {{#minterMerkleV1Contracts}}

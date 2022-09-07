@@ -91,42 +91,24 @@ import {
   handleAddManyAddressValueProjectConfig as handleAddManyAddressValue,
   handleAddManyBigIntValueProjectConfig as handleAddManyBigIntValue,
   handleAddManyBytesValueProjectConfig as handleAddManyBytesValue,
-  handleAllowHoldersOfProjectsV0,
-  handleAllowHoldersOfProjectsV1,
-  handleAuctionHalfLifeRangeSecondsUpdatedV0,
-  handleAuctionHalfLifeRangeSecondsUpdatedV1,
-  handleAuctionHalfLifeRangeSecondsUpdatedV2,
-  handleDAExpV0ResetAuctionDetails,
-  handleDAExpV1ResetAuctionDetails,
-  handleDAExpV2ResetAuctionDetails,
-  handleDAExpV0SetAuctionDetails,
-  handleDAExpV1SetAuctionDetails,
-  handleDAExpV2SetAuctionDetails,
-  handleDALinV0ResetAuctionDetails,
-  handleDALinV1ResetAuctionDetails,
-  handleDALinV2ResetAuctionDetails,
-  handleDALinV0SetAuctionDetails,
-  handleDALinV1SetAuctionDetails,
-  handleDALinV2SetAuctionDetails,
-  handleMinimumAuctionLengthSecondsUpdatedV0,
-  handleMinimumAuctionLengthSecondsUpdatedV1,
-  handleMinimumAuctionLengthSecondsUpdatedV2,
+  handleHoldersOfProjectsGeneric,
+  handleAuctionHalfLifeRangeSecondsUpdated,
+  handleDAExpResetAuctionDetails,
+  handleDAExpSetAuctionDetails,
+  handleDALinResetAuctionDetails,
+  handleDALinSetAuctionDetails,
+  handleMinimumAuctionLengthSecondsUpdated,
   handlePricePerTokenInWeiUpdated,
   handleProjectCurrencyInfoUpdated,
   handlePurchaseToDisabledUpdated,
-  handleRegisteredNFTAddressV0,
-  handleRegisteredNFTAddressV1,
+  handleRegistrationNFTAddresses,
   handleRemoveBigIntManyValueProjectConfig as handleRemoveBigIntManyValue,
   handleRemoveBytesManyValueProjectConfig as handleRemoveBytesManyValue,
-  handleRemoveHoldersOfProjectsV0,
-  handleRemoveHoldersOfProjectsV1,
   handleRemoveValueProjectConfig as handleRemoveValue,
   handleSetAddressValueProjectConfig as handleSetAddressValue,
   handleSetBigIntValueProjectConfig as handleSetBigIntValue,
   handleSetBooleanValueProjectConfig as handleSetBooleanValue,
-  handleSetBytesValueProjectConfig as handleSetBytesValue,
-  handleUnregisteredNFTAddressV0,
-  handleUnregisteredNFTAddressV1
+  handleSetBytesValueProjectConfig as handleSetBytesValue
 } from "../../../src/minter-suite-mapping";
 
 const randomAddressGenerator = new RandomAddressGenerator();
@@ -501,15 +483,15 @@ describe("MinterDALin-related tests", () => {
         event.block.timestamp = CURRENT_BLOCK_TIMESTAMP;
 
         if (minterType == "MinterDALinV0") {
-          handleMinimumAuctionLengthSecondsUpdatedV0(
+          handleMinimumAuctionLengthSecondsUpdated(
             changetype<DALinV0MinimumAuctionLengthSecondsUpdated>(event)
           );
         } else if (minterType == "MinterDALinV1") {
-          handleMinimumAuctionLengthSecondsUpdatedV1(
+          handleMinimumAuctionLengthSecondsUpdated(
             changetype<DALinV1MinimumAuctionLengthSecondsUpdated>(event)
           );
         } else {
-          handleMinimumAuctionLengthSecondsUpdatedV2(
+          handleMinimumAuctionLengthSecondsUpdated(
             changetype<DALinV2MinimumAuctionLengthSecondsUpdated>(event)
           );
         }
@@ -563,15 +545,15 @@ describe("MinterDALin-related tests", () => {
         assert.notInStore(PROJECT_ENTITY_TYPE, fullProjectId);
 
         if (minterType == "MinterDALinV0") {
-          handleDALinV0SetAuctionDetails(
+          handleDALinSetAuctionDetails(
             changetype<DALinV0SetAuctionDetails>(event)
           );
         } else if (minterType == "MinterDALinV1") {
-          handleDALinV1SetAuctionDetails(
+          handleDALinSetAuctionDetails(
             changetype<DALinV1SetAuctionDetails>(event)
           );
         } else {
-          handleDALinV2SetAuctionDetails(
+          handleDALinSetAuctionDetails(
             changetype<DALinV2SetAuctionDetails>(event)
           );
         }
@@ -647,15 +629,15 @@ describe("MinterDALin-related tests", () => {
         event.block.timestamp = CURRENT_BLOCK_TIMESTAMP;
 
         if (minterType == "MinterDALinV0") {
-          handleDALinV0SetAuctionDetails(
+          handleDALinSetAuctionDetails(
             changetype<DALinV0SetAuctionDetails>(event)
           );
         } else if (minterType == "MinterDALinV1") {
-          handleDALinV1SetAuctionDetails(
+          handleDALinSetAuctionDetails(
             changetype<DALinV1SetAuctionDetails>(event)
           );
         } else {
-          handleDALinV2SetAuctionDetails(
+          handleDALinSetAuctionDetails(
             changetype<DALinV2SetAuctionDetails>(event)
           );
         }
@@ -729,15 +711,15 @@ describe("MinterDALin-related tests", () => {
           assert.notInStore(PROJECT_ENTITY_TYPE, fullProjectId);
 
           if (minterType == "MinterDALinV0") {
-            handleDALinV0ResetAuctionDetails(
+            handleDALinResetAuctionDetails(
               changetype<DALinV0ResetAuctionDetails>(event)
             );
           } else if (minterType == "MinterDALinV1") {
-            handleDALinV1ResetAuctionDetails(
+            handleDALinResetAuctionDetails(
               changetype<DALinV1ResetAuctionDetails>(event)
             );
           } else {
-            handleDALinV2ResetAuctionDetails(
+            handleDALinResetAuctionDetails(
               changetype<DALinV2ResetAuctionDetails>(event)
             );
           }
@@ -802,15 +784,15 @@ describe("MinterDALin-related tests", () => {
           event.block.timestamp = CURRENT_BLOCK_TIMESTAMP;
 
           if (minterType == "MinterDALinV0") {
-            handleDALinV0ResetAuctionDetails(
+            handleDALinResetAuctionDetails(
               changetype<DALinV0ResetAuctionDetails>(event)
             );
           } else if (minterType == "MinterDALinV1") {
-            handleDALinV1ResetAuctionDetails(
+            handleDALinResetAuctionDetails(
               changetype<DALinV1ResetAuctionDetails>(event)
             );
           } else {
-            handleDALinV2ResetAuctionDetails(
+            handleDALinResetAuctionDetails(
               changetype<DALinV2ResetAuctionDetails>(event)
             );
           }
@@ -889,15 +871,15 @@ describe("MinterDALin-related tests", () => {
           event.block.timestamp = CURRENT_BLOCK_TIMESTAMP;
 
           if (minterType === "MinterDAExpV0") {
-            handleAuctionHalfLifeRangeSecondsUpdatedV0(
+            handleAuctionHalfLifeRangeSecondsUpdated(
               changetype<AuctionHalfLifeRangeSecondsUpdated>(event)
             );
           } else if (minterType === "MinterDAExpV1") {
-            handleAuctionHalfLifeRangeSecondsUpdatedV1(
+            handleAuctionHalfLifeRangeSecondsUpdated(
               changetype<AuctionHalfLifeRangeSecondsUpdatedV1>(event)
             );
           } else {
-            handleAuctionHalfLifeRangeSecondsUpdatedV2(
+            handleAuctionHalfLifeRangeSecondsUpdated(
               changetype<AuctionHalfLifeRangeSecondsUpdatedV2>(event)
             );
           }
@@ -954,15 +936,15 @@ describe("MinterDALin-related tests", () => {
           assert.notInStore(PROJECT_ENTITY_TYPE, fullProjectId);
 
           if (minterType === "MinterDAExpV0") {
-            handleDAExpV0SetAuctionDetails(
+            handleDAExpSetAuctionDetails(
               changetype<DAExpV0SetAuctionDetails>(event)
             );
           } else if (minterType === "MinterDAExpV1") {
-            handleDAExpV1SetAuctionDetails(
+            handleDAExpSetAuctionDetails(
               changetype<DAExpV1SetAuctionDetails>(event)
             );
           } else {
-            handleDAExpV2SetAuctionDetails(
+            handleDAExpSetAuctionDetails(
               changetype<DAExpV2SetAuctionDetails>(event)
             );
           }
@@ -1038,15 +1020,15 @@ describe("MinterDALin-related tests", () => {
           event.block.timestamp = CURRENT_BLOCK_TIMESTAMP;
 
           if (minterType === "MinterDAExpV0") {
-            handleDAExpV0SetAuctionDetails(
+            handleDAExpSetAuctionDetails(
               changetype<DAExpV0SetAuctionDetails>(event)
             );
           } else if (minterType === "MinterDAExpV1") {
-            handleDAExpV1SetAuctionDetails(
+            handleDAExpSetAuctionDetails(
               changetype<DAExpV1SetAuctionDetails>(event)
             );
           } else {
-            handleDAExpV2SetAuctionDetails(
+            handleDAExpSetAuctionDetails(
               changetype<DAExpV2SetAuctionDetails>(event)
             );
           }
@@ -1155,15 +1137,15 @@ describe("MinterDALin-related tests", () => {
           event.block.timestamp = CURRENT_BLOCK_TIMESTAMP;
 
           if (minterType === "MinterDAExpV0") {
-            handleDAExpV0SetAuctionDetails(
+            handleDAExpSetAuctionDetails(
               changetype<DAExpV0SetAuctionDetails>(event)
             );
           } else if (minterType === "MinterDAExpV1") {
-            handleDAExpV1SetAuctionDetails(
+            handleDAExpSetAuctionDetails(
               changetype<DAExpV1SetAuctionDetails>(event)
             );
           } else {
-            handleDAExpV2SetAuctionDetails(
+            handleDAExpSetAuctionDetails(
               changetype<DAExpV2SetAuctionDetails>(event)
             );
           }
@@ -1239,15 +1221,15 @@ describe("MinterDALin-related tests", () => {
           assert.notInStore(PROJECT_ENTITY_TYPE, fullProjectId);
 
           if (minterType == "MinterDAExpV0") {
-            handleDAExpV0ResetAuctionDetails(
+            handleDAExpResetAuctionDetails(
               changetype<DAExpV0ResetAuctionDetails>(event)
             );
           } else if (minterType == "MinterDAExpV1") {
-            handleDAExpV1ResetAuctionDetails(
+            handleDAExpResetAuctionDetails(
               changetype<DAExpV1ResetAuctionDetails>(event)
             );
           } else {
-            handleDAExpV2ResetAuctionDetails(
+            handleDAExpResetAuctionDetails(
               changetype<DAExpV2ResetAuctionDetails>(event)
             );
           }
@@ -1312,15 +1294,15 @@ describe("MinterDALin-related tests", () => {
           event.block.timestamp = CURRENT_BLOCK_TIMESTAMP;
 
           if (minterType == "MinterDAExpV0") {
-            handleDAExpV0ResetAuctionDetails(
+            handleDAExpResetAuctionDetails(
               changetype<DAExpV0ResetAuctionDetails>(event)
             );
           } else if (minterType == "MinterDAExpV1") {
-            handleDAExpV1ResetAuctionDetails(
+            handleDAExpResetAuctionDetails(
               changetype<DAExpV1ResetAuctionDetails>(event)
             );
           } else {
-            handleDAExpV2ResetAuctionDetails(
+            handleDAExpResetAuctionDetails(
               changetype<DAExpV2ResetAuctionDetails>(event)
             );
           }
@@ -1417,15 +1399,15 @@ describe("MinterDALin-related tests", () => {
           event.block.timestamp = CURRENT_BLOCK_TIMESTAMP;
 
           if (minterType == "MinterDAExpV0") {
-            handleDAExpV0ResetAuctionDetails(
+            handleDAExpResetAuctionDetails(
               changetype<DAExpV0ResetAuctionDetails>(event)
             );
           } else if (minterType == "MinterDAExpV1") {
-            handleDAExpV1ResetAuctionDetails(
+            handleDAExpResetAuctionDetails(
               changetype<DAExpV1ResetAuctionDetails>(event)
             );
           } else {
-            handleDAExpV2ResetAuctionDetails(
+            handleDAExpResetAuctionDetails(
               changetype<DAExpV2ResetAuctionDetails>(event)
             );
           }
@@ -2050,11 +2032,11 @@ describe("MinterHolder-specific tests", () => {
       event.block.timestamp = CURRENT_BLOCK_TIMESTAMP;
 
       if (minterType == "MinterHolderV0") {
-        handleAllowHoldersOfProjectsV0(
+        handleHoldersOfProjectsGeneric(
           changetype<HolderV0AllowedHoldersOfProjects>(event)
         );
       } else {
-        handleAllowHoldersOfProjectsV1(
+        handleHoldersOfProjectsGeneric(
           changetype<HolderV1AllowedHoldersOfProjects>(event)
         );
       }
@@ -2125,11 +2107,11 @@ describe("MinterHolder-specific tests", () => {
       event.block.timestamp = CURRENT_BLOCK_TIMESTAMP;
 
       if (minterType == "MinterHolderV0") {
-        handleAllowHoldersOfProjectsV0(
+        handleHoldersOfProjectsGeneric(
           changetype<HolderV0AllowedHoldersOfProjects>(event)
         );
       } else {
-        handleAllowHoldersOfProjectsV1(
+        handleHoldersOfProjectsGeneric(
           changetype<HolderV1AllowedHoldersOfProjects>(event)
         );
       }
@@ -2197,11 +2179,11 @@ describe("MinterHolder-specific tests", () => {
       event.block.timestamp = CURRENT_BLOCK_TIMESTAMP;
 
       if (minterType == "MinterHolderV0") {
-        handleRemoveHoldersOfProjectsV0(
+        handleHoldersOfProjectsGeneric(
           changetype<HolderV0RemovedHoldersOfProjects>(event)
         );
       } else {
-        handleRemoveHoldersOfProjectsV1(
+        handleHoldersOfProjectsGeneric(
           changetype<HolderV1RemovedHoldersOfProjects>(event)
         );
       }
@@ -2273,11 +2255,11 @@ describe("MinterHolder-specific tests", () => {
       event.block.timestamp = CURRENT_BLOCK_TIMESTAMP;
 
       if (minterType == "MinterHolderV0") {
-        handleRemoveHoldersOfProjectsV0(
+        handleHoldersOfProjectsGeneric(
           changetype<HolderV0RemovedHoldersOfProjects>(event)
         );
       } else {
-        handleRemoveHoldersOfProjectsV1(
+        handleHoldersOfProjectsGeneric(
           changetype<HolderV1RemovedHoldersOfProjects>(event)
         );
       }
@@ -2314,11 +2296,11 @@ describe("MinterHolder-specific tests", () => {
       event.block.timestamp = CURRENT_BLOCK_TIMESTAMP;
 
       if (minterType == "MinterHolderV0") {
-        handleRegisteredNFTAddressV0(
+        handleRegistrationNFTAddresses(
           changetype<HolderV0RegisteredNFTAddress>(event)
         );
       } else {
-        handleRegisteredNFTAddressV1(
+        handleRegistrationNFTAddresses(
           changetype<HolderV1RegisteredNFTAddress>(event)
         );
       }
@@ -2371,11 +2353,11 @@ describe("MinterHolder-specific tests", () => {
       event.block.timestamp = CURRENT_BLOCK_TIMESTAMP;
 
       if (minterType == "MinterHolderV0") {
-        handleUnregisteredNFTAddressV0(
+        handleRegistrationNFTAddresses(
           changetype<HolderV0UnregisteredNFTAddress>(event)
         );
       } else {
-        handleUnregisteredNFTAddressV1(
+        handleRegistrationNFTAddresses(
           changetype<HolderV1UnregisteredNFTAddress>(event)
         );
       }
