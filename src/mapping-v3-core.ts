@@ -19,7 +19,8 @@ import {
   Account,
   AccountProject,
   ProjectScript,
-  Contract
+  Contract,
+  MinterFilter
 } from "../generated/schema";
 
 import {
