@@ -74,7 +74,7 @@ import {
   handleMint,
   handleTransfer,
   handlePlatformUpdated,
-  handleOwnershipTransferred
+  handleOwnershipTransferred,
   handleProjectUpdated
 } from "../../../src/mapping-v3-core";
 import {
