@@ -1824,13 +1824,36 @@ test("handleAddManyBytesValue should add a value to an array at a designated key
     '{"array":["im bytes"]}'
   );
 
-  handleAddManyBytesValue(configValueSetEvent);
+  // add another value, this time with bytes that should format to hex string
+  const configValueSetEvent2: ConfigValueAddedToSetBytes = changetype<
+    ConfigValueAddedToSetBytes
+  >(newMockEvent());
+  // Always use the following hex string because valid WTF-8 but not valid
+  // UTF-8, which is a somewhat common edge-case when dealing with bytes
+  let eventValue = Bytes.fromHexString(
+    "0x57e32bd396b7c3337dd6b4a672e6d99b47865e56"
+  );
+  configValueSetEvent2.address = minterAddress;
+  configValueSetEvent2.parameters = [
+    new ethereum.EventParam(
+      "_projectId",
+      ethereum.Value.fromUnsignedBigInt(projectId)
+    ),
+    new ethereum.EventParam(
+      "_key",
+      ethereum.Value.fromBytes(Bytes.fromUTF8("array"))
+    ),
+    new ethereum.EventParam("_value", ethereum.Value.fromBytes(eventValue))
+  ];
+  configValueSetEvent2.block.timestamp = CURRENT_BLOCK_TIMESTAMP;
+
+  handleAddManyBytesValue(configValueSetEvent2);
 
   assert.fieldEquals(
     PROJECT_MINTER_CONFIGURATION_ENTITY_TYPE,
     getProjectMinterConfigId(minterAddress.toHexString(), project.id),
     "extraMinterDetails",
-    '{"array":["im bytes","im bytes"]}'
+    '{"array":["im bytes","0x57e32bd396b7c3337dd6b4a672e6d99b47865e56"]}'
   );
 });
 test("handleRemoveValue should remove the key/value from extraMinterDetails", () => {
