@@ -22,7 +22,8 @@ import {
   AccountProject,
   ProjectScript,
   Contract,
-  MinterFilter
+  MinterFilter,
+  ProposedArtistAddressesAndSplits
 } from "../generated/schema";
 
 import {
