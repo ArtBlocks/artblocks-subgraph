@@ -78,6 +78,7 @@ export function handleMint(event: Mint): void {
     project.invocations = invocation.plus(BigInt.fromI32(1));
     if (project.invocations == project.maxInvocations) {
       project.complete = true;
+      project.completedAt = event.block.timestamp;
       project.updatedAt = event.block.timestamp;
     }
     project.save();
