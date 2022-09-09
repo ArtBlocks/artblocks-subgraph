@@ -72,7 +72,8 @@ import {
   generateAccountProjectId,
   generateWhitelistingId,
   generateContractSpecificId,
-  generateProjectScriptId
+  generateProjectScriptId,
+  tokenIdToInvocation
 } from "./helpers";
 
 /*** EVENT HANDLERS ***/
@@ -89,7 +90,10 @@ export function handleMint(event: Mint): void {
 
   let project = Project.load(projectId);
   if (project) {
-    let invocation = project.invocations;
+    let invocation = tokenIdToInvocation(
+      event.params._tokenId,
+      event.params._projectId
+    );
 
     token.tokenId = event.params._tokenId;
     token.contract = event.address.toHexString();

@@ -13,6 +13,7 @@ import { MinterDALinV0 } from "../generated/MinterDALinV0/MinterDALinV0";
 import { MinterDALinV1 } from "../generated/MinterDALinV1/MinterDALinV1";
 import { IFilteredMinterV0 } from "../generated/MinterSetPriceV0/IFilteredMinterV0";
 import { Minter, ProjectMinterConfiguration } from "../generated/schema";
+import { ONE_MILLION } from "./constants";
 
 export function generateAccountProjectId(
   accountId: string,
@@ -187,4 +188,11 @@ export function bytesToJSONValue(value: Bytes): JSONValue {
 
 export function stringToJSONString(value: string): string {
   return '"' + value + '"';
+}
+
+export function tokenIdToInvocation(
+  tokenId: BigInt,
+  projectId: BigInt
+): BigInt {
+  return tokenId.minus(projectId.times(ONE_MILLION));
 }

@@ -1,3 +1,5 @@
+import { BigInt } from "@graphprotocol/graph-ts";
+
 export const NULL_ADDRESS = "0x0000000000000000000000000000000000000000";
 
 export const ARTBLOCKS_PLATFORM_ID = "ArtBlocks";
@@ -39,3 +41,5 @@ export const NATIVE = "Native";
 export const ERC20 = "ERC20";
 export const ERC721 = "ERC721";
 export const ERC1155 = "ERC1155";
+
+export const ONE_MILLION = BigInt.fromI32(1000000);
