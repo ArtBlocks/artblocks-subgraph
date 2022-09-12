@@ -38,6 +38,8 @@ dataSources:
           handler: handleProjectUpdated
         - event: PlatformUpdated(indexed bytes32)
           handler: handlePlatformUpdated
+        - event: MinterUpdated(indexed address)
+          handler: handleMinterUpdated
       file: ./src/mapping-v3-core.ts
   {{/genArt721CoreV3Contracts}}
   {{#genArt721CoreContracts}}

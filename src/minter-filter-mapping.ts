@@ -219,7 +219,7 @@ export function handleProjectMinterRemoved(event: ProjectMinterRemoved): void {
   }
 }
 
-function loadOrCreateAndSetProjectMinterConfiguration(
+export function loadOrCreateAndSetProjectMinterConfiguration(
   project: Project,
   minterAddress: Address,
   timestamp: BigInt

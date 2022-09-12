@@ -17,6 +17,7 @@ import {
   DEFAULT_PROJECT_VALUES,
   TEST_CONTRACT_ADDRESS,
   TEST_CONTRACT,
+  TEST_MINTER_FILTER_ADDRESS,
   PROJECT_ENTITY_TYPE,
   booleanToString
 } from "../shared-helpers";
@@ -122,6 +123,29 @@ export function mockRefreshContractCalls(
     "artblocksDependencyRegistryAddress",
     "artblocksDependencyRegistryAddress():(address)"
   ).returns([ethereum.Value.fromAddress(TEST_CONTRACT.dependencyRegistry)]);
+}
+
+// mocks return values for Soldity contract calls in handleMinterUpdated() function
+export function mockMinterUpdatedCallsNoPreconfiguredProjects(
+  startingProjectId: BigInt
+): void {
+  createMockedFunction(
+    TEST_CONTRACT_ADDRESS,
+    "startingProjectId",
+    "startingProjectId():(uint256)"
+  ).returns([ethereum.Value.fromUnsignedBigInt(startingProjectId)]);
+
+  createMockedFunction(
+    TEST_MINTER_FILTER_ADDRESS,
+    "genArt721CoreAddress",
+    "genArt721CoreAddress():(address)"
+  ).returns([ethereum.Value.fromAddress(TEST_CONTRACT_ADDRESS)]);
+
+  createMockedFunction(
+    TEST_MINTER_FILTER_ADDRESS,
+    "getNumProjectsWithMinters",
+    "getNumProjectsWithMinters():(uint256)"
+  ).returns([ethereum.Value.fromI32(0)]);
 }
 
 export function mockTokenURICall(tokenId: BigInt, tokenURI: string): void {
@@ -489,4 +513,37 @@ export function testProjectScriptDetailsUpdated(
     "updatedAt",
     CURRENT_BLOCK_TIMESTAMP.toString()
   );
+}
+
+export function mockMintersCoreContract(
+  minterAddress: Address,
+  coreContract: Address
+): void {
+  createMockedFunction(
+    minterAddress,
+    "genArt721CoreAddress",
+    "genArt721CoreAddress():(address)"
+  ).returns([ethereum.Value.fromAddress(coreContract)]);
+}
+
+export function mockMintersMinterFilterAddress(
+  minterAddress: Address,
+  minterFilterAddress: Address
+): void {
+  createMockedFunction(
+    minterAddress,
+    "minterFilterAddress",
+    "minterFilterAddress():(address)"
+  ).returns([ethereum.Value.fromAddress(minterFilterAddress)]);
+}
+
+export function mockMintersMinterType(
+  minterAddress: Address,
+  minterType: string
+): void {
+  createMockedFunction(
+    minterAddress,
+    "minterType",
+    "minterType():(string)"
+  ).returns([ethereum.Value.fromString(minterType)]);
 }
