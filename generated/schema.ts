@@ -859,6 +859,15 @@ export class ProposedArtistAddressesAndSplits extends Entity {
   set project(value: string) {
     this.set("project", Value.fromString(value));
   }
+
+  get createdAt(): BigInt {
+    let value = this.get("createdAt");
+    return value!.toBigInt();
+  }
+
+  set createdAt(value: BigInt) {
+    this.set("createdAt", Value.fromBigInt(value));
+  }
 }
 
 export class Contract extends Entity {

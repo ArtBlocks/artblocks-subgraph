@@ -6,7 +6,9 @@ import {
   ProjectUpdated,
   Transfer,
   PlatformUpdated,
-  MinterUpdated
+  MinterUpdated,
+  ProposedArtistAddressesAndSplits as ProposedArtistAddressesAndSplitsEvent,
+  AcceptedArtistAddressesAndSplits
 } from "../generated/GenArt721CoreV3/GenArt721CoreV3";
 
 import { MinterFilterV0 } from "../generated/MinterFilterV0/MinterFilterV0";
@@ -20,7 +22,8 @@ import {
   AccountProject,
   ProjectScript,
   Contract,
-  MinterFilter
+  MinterFilter,
+  ProposedArtistAddressesAndSplits
 } from "../generated/schema";
 
 import {
@@ -550,6 +553,101 @@ export function handleMinterUpdated(event: MinterUpdated): void {
   // update contract entity and save
   contractEntity.updatedAt = event.block.timestamp;
   contractEntity.save();
+}
+
+// Handle artist proposed address and splits updates
+// This is an event indicating that the artist has proposed a new set of
+// addresses and splits for a project.
+export function handleProposedArtistAddressesAndSplits(
+  event: ProposedArtistAddressesAndSplitsEvent
+): void {
+  // load associated project entity
+  const newEntityId = generateContractSpecificId(
+    event.address,
+    event.params._projectId
+  );
+  const project = Project.load(newEntityId);
+  if (!project) {
+    return;
+  }
+  // create new proposed artist addresses and splits entity
+  // note: any existing proposal entity will be overwritten, which is intended
+  // all fields will be populated.
+  const proposedArtistAddressesAndSplits = new ProposedArtistAddressesAndSplits(
+    newEntityId
+  );
+  // populate new entity with event params
+  proposedArtistAddressesAndSplits.artistAddress = event.params._artistAddress;
+  proposedArtistAddressesAndSplits.additionalPayeePrimarySalesAddress =
+    event.params._additionalPayeePrimarySales;
+  proposedArtistAddressesAndSplits.additionalPayeePrimarySalesPercentage =
+    event.params._additionalPayeePrimarySalesPercentage;
+  proposedArtistAddressesAndSplits.additionalPayeeSecondarySalesAddress =
+    event.params._additionalPayeeSecondarySales;
+  proposedArtistAddressesAndSplits.additionalPayeeSecondarySalesPercentage =
+    event.params._additionalPayeeSecondarySalesPercentage;
+  proposedArtistAddressesAndSplits.project = project.id;
+  // save new entity to store
+  proposedArtistAddressesAndSplits.createdAt = event.block.timestamp;
+  proposedArtistAddressesAndSplits.save();
+  // set the project's proposedArtistAddressesAndSplits field to the new entity
+  project.proposedArtistAddressesAndSplits =
+    proposedArtistAddressesAndSplits.id;
+  project.updatedAt = event.block.timestamp;
+  project.save();
+}
+
+// Handle admin accepting the currently proposed artist address and splits.
+export function handleAcceptedArtistAddressesAndSplits(
+  event: AcceptedArtistAddressesAndSplits
+): void {
+  // load associated project entity
+  const entityId = generateContractSpecificId(
+    event.address,
+    event.params._projectId
+  );
+  const project = Project.load(entityId);
+  if (!project) {
+    return;
+  }
+  // load the existing proposed artist addresses and splits
+  const existingProposedArtistAddressesAndSplitsId =
+    project.proposedArtistAddressesAndSplits;
+  if (existingProposedArtistAddressesAndSplitsId === null) {
+    // we don't expect this state to be possible, so we should log a warning
+    log.warning(
+      "[WARN] No proposed artist addresses and splits found on project {}.",
+      [entityId]
+    );
+    return;
+  }
+  const proposedArtistAddressesAndSplits = ProposedArtistAddressesAndSplits.load(
+    entityId
+  );
+  if (!proposedArtistAddressesAndSplits) {
+    // we dont expect this state to be possible, so we should log a warning
+    log.warning(
+      "[WARN] No proposed artist addresses and splits found with id {}.",
+      [entityId]
+    );
+    return;
+  }
+  // update project entity with new artist addresses and splits
+  project.artistAddress = proposedArtistAddressesAndSplits.artistAddress;
+  project.additionalPayee =
+    proposedArtistAddressesAndSplits.additionalPayeePrimarySalesAddress;
+  project.additionalPayeePercentage =
+    proposedArtistAddressesAndSplits.additionalPayeePrimarySalesPercentage;
+  project.additionalPayeeSecondarySalesAddress =
+    proposedArtistAddressesAndSplits.additionalPayeeSecondarySalesAddress;
+  project.additionalPayeeSecondarySalesPercentage =
+    proposedArtistAddressesAndSplits.additionalPayeeSecondarySalesPercentage;
+  // clear the existing proposed artist addresses and splits
+  project.proposedArtistAddressesAndSplits = null;
+  project.updatedAt = event.block.timestamp;
+  project.save();
+  // remove the existing proposed artist addresses and splits entity from store
+  store.remove("ProposedArtistAddressesAndSplits", entityId);
 }
 
 /*** END EVENT HANDLERS ***/
