@@ -1711,6 +1711,61 @@ test("handleAddManyBigIntValue should add a value to an array at a designated ke
     "extraMinterDetails",
     '{"array":[100]}'
   );
+  configValueSetEvent.parameters[2] = new ethereum.EventParam(
+    "_value",
+    ethereum.Value.fromSignedBigInt(BigInt.fromI32(200))
+  );
+  handleAddManyBigIntValue(configValueSetEvent);
+
+  assert.fieldEquals(
+    PROJECT_MINTER_CONFIGURATION_ENTITY_TYPE,
+    getProjectMinterConfigId(minterAddress.toHexString(), project.id),
+    "extraMinterDetails",
+    '{"array":[100,200]}'
+  );
+});
+test("handleAddManyBigIntValue should add a single value to an array at a designated key extraMinterDetails, when duplicate of same value is added", () => {
+  clearStore();
+  const minter = addNewMinterToStore("MinterHolderV0");
+  const minterAddress: Address = changetype<Address>(
+    Address.fromHexString(minter.id)
+  );
+  const minterType = minter.type;
+
+  const projectId = BigInt.fromI32(0);
+  const project = addNewProjectToStore(
+    TEST_CONTRACT_ADDRESS,
+    projectId,
+    "project 0",
+    randomAddressGenerator.generateRandomAddress(),
+    BigInt.fromI32(0),
+    CURRENT_BLOCK_TIMESTAMP.minus(BigInt.fromI32(10))
+  );
+
+  const projectMinterConfig = addNewProjectMinterConfigToStore(
+    project.id,
+    minterAddress
+  );
+
+  const configValueSetEvent: ConfigValueAddedToSetBigInt = changetype<
+    ConfigValueAddedToSetBigInt
+  >(newMockEvent());
+  configValueSetEvent.address = minterAddress;
+  configValueSetEvent.parameters = [
+    new ethereum.EventParam(
+      "_projectId",
+      ethereum.Value.fromUnsignedBigInt(projectId)
+    ),
+    new ethereum.EventParam(
+      "_key",
+      ethereum.Value.fromBytes(Bytes.fromUTF8("array"))
+    ),
+    new ethereum.EventParam(
+      "_value",
+      ethereum.Value.fromSignedBigInt(BigInt.fromI32(100))
+    )
+  ];
+  configValueSetEvent.block.timestamp = CURRENT_BLOCK_TIMESTAMP;
 
   handleAddManyBigIntValue(configValueSetEvent);
 
@@ -1718,7 +1773,16 @@ test("handleAddManyBigIntValue should add a value to an array at a designated ke
     PROJECT_MINTER_CONFIGURATION_ENTITY_TYPE,
     getProjectMinterConfigId(minterAddress.toHexString(), project.id),
     "extraMinterDetails",
-    '{"array":[100,100]}'
+    '{"array":[100]}'
+  );
+
+  handleAddManyBigIntValue(configValueSetEvent);
+
+  assert.fieldEquals(
+    PROJECT_MINTER_CONFIGURATION_ENTITY_TYPE,
+    getProjectMinterConfigId(minterAddress.toHexString(), project.id),
+    "extraMinterDetails",
+    '{"array":[100]}'
   );
 });
 test("handleAddManyAddressValue should add a value to an array at a designated key extraMinterDetails", () => {
