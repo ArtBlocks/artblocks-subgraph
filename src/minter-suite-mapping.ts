@@ -727,7 +727,8 @@ export function handleAddManyValueGeneric<T, C>(
     ) {
       stringVal = event.params._value.toHexString();
     } else {
-      stringVal = event.params._value.toString();
+      // for Bytes, use method to determine if string or hexString
+      stringVal = bytesToJSONValue(event.params._value).toString();
     }
     arr.push(stringToJSONString(stringVal));
     newValue = arrayToJSONValue(arr.toString());
