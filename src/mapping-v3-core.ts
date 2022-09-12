@@ -594,7 +594,6 @@ export function handleProposedArtistAddressesAndSplits(
     event.params._additionalPayeeSecondarySales;
   proposedArtistAddressesAndSplits.additionalPayeeSecondarySalesPercentage =
     event.params._additionalPayeeSecondarySalesPercentage;
-  proposedArtistAddressesAndSplits.createdAt = event.block.timestamp;
   proposedArtistAddressesAndSplits.project = project.id;
   // save new entity to store
   proposedArtistAddressesAndSplits.createdAt = event.block.timestamp;
