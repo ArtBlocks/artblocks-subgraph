@@ -570,17 +570,9 @@ export function handleProposedArtistAddressesAndSplits(
   if (!project) {
     return;
   }
-  // remove any existing proposed artist addresses and splits
-  const existingProposedArtistAddressesAndSplitsId =
-    project.proposedArtistAddressesAndSplits;
-  if (existingProposedArtistAddressesAndSplitsId !== null) {
-    project.proposedArtistAddressesAndSplits = null;
-    store.remove(
-      "ProposedArtistAddressesAndSplits",
-      existingProposedArtistAddressesAndSplitsId
-    );
-  }
   // create new proposed artist addresses and splits entity
+  // note: any existing proposal entity will be overwritten, which is intended
+  // all fields will be populated.
   const proposedArtistAddressesAndSplits = new ProposedArtistAddressesAndSplits(
     newEntityId
   );
