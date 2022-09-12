@@ -8,7 +8,8 @@ import {
   PlatformUpdated,
   MinterUpdated,
   ProposedArtistAddressesAndSplits as ProposedArtistAddressesAndSplitsEvent,
-  AcceptedArtistAddressesAndSplits
+  AcceptedArtistAddressesAndSplits,
+  OwnershipTransferred
 } from "../generated/GenArt721CoreV3/GenArt721CoreV3";
 
 import { MinterFilterV0 } from "../generated/MinterFilterV0/MinterFilterV0";
@@ -648,6 +649,17 @@ export function handleAcceptedArtistAddressesAndSplits(
   project.save();
   // remove the existing proposed artist addresses and splits entity from store
   store.remove("ProposedArtistAddressesAndSplits", entityId);
+}
+
+// Handle OwnershipTransferred event, emitted by the Ownable contract.
+// This event is updated whenever an admin address is changed.
+export function handleOwnershipTransferred(event: OwnershipTransferred): void {
+  let contract = GenArt721CoreV3.bind(event.address);
+  let contractEntity = loadOrCreateContract(contract, event.block.timestamp);
+  // update the contract entity with the new admin address from the event
+  contractEntity.admin = event.params.newOwner;
+  contractEntity.updatedAt = event.block.timestamp;
+  contractEntity.save();
 }
 
 /*** END EVENT HANDLERS ***/

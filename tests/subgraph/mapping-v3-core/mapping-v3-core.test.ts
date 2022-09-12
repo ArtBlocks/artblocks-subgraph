@@ -8,11 +8,11 @@ import {
   createMockedFunction
 } from "matchstick-as/assembly/index";
 import {
-  Address,
   BigInt,
   Bytes,
   ethereum,
-  store
+  store,
+  Address
 } from "@graphprotocol/graph-ts";
 import {
   ACCOUNT_ENTITY_TYPE,
@@ -50,7 +50,8 @@ import {
   Mint,
   ProjectUpdated,
   Transfer,
-  PlatformUpdated
+  PlatformUpdated,
+  OwnershipTransferred
 } from "../../../generated/GenArt721CoreV3/GenArt721CoreV3";
 import {
   FIELD_PROJECT_ACTIVE,
@@ -71,9 +72,10 @@ import {
   FIELD_PROJECT_SECONDARY_MARKET_ROYALTY_PERCENTAGE,
   FIELD_PROJECT_WEBSITE,
   handleMint,
-  handleProjectUpdated,
+  handleTransfer,
   handlePlatformUpdated,
-  handleTransfer
+  handleOwnershipTransferred,
+  handleProjectUpdated
 } from "../../../src/mapping-v3-core";
 import {
   generateContractSpecificId,
@@ -191,6 +193,136 @@ test("GenArt721CoreV3: Can handle transfer", () => {
     "token",
     fullTokenId
   );
+});
+
+test("GenArt721CoreV3: Handles OwnershipTransferred to new address and zero address, when Contract not in store", () => {
+  const newOwners = [
+    randomAddressGenerator.generateRandomAddress(),
+    Address.zero()
+  ];
+  // test for nextProjectId of 0 and 1
+  for (let i = 0; i < newOwners.length; i++) {
+    clearStore();
+    const newOwnerAddress = newOwners[i];
+    // add new contract to store
+    const projectId = BigInt.fromI32(101);
+    // specifically do not add new contract to store, because this event is
+    // emitted by the V3 constructor, and we expect item may not be in store.
+    // DO add mock contract calls, because we expect the contract to be called
+    // during initial contract setup.
+    mockRefreshContractCalls(projectId, null);
+
+    const updatedEventBlockTimestamp = CURRENT_BLOCK_TIMESTAMP.plus(
+      BigInt.fromI32(10)
+    );
+    const event: OwnershipTransferred = changetype<OwnershipTransferred>(
+      newMockEvent()
+    );
+    event.address = TEST_CONTRACT_ADDRESS;
+    event.transaction.hash = TEST_TX_HASH;
+    event.logIndex = BigInt.fromI32(0);
+    event.parameters = [
+      new ethereum.EventParam(
+        "previousOwner",
+        ethereum.Value.fromAddress(TEST_CONTRACT_ADDRESS)
+      ),
+      new ethereum.EventParam(
+        "newOwner",
+        ethereum.Value.fromAddress(newOwnerAddress)
+      )
+    ];
+    event.block.timestamp = updatedEventBlockTimestamp;
+    // handle event
+    handleOwnershipTransferred(event);
+    // assertions
+    assert.fieldEquals(
+      CONTRACT_ENTITY_TYPE,
+      TEST_CONTRACT_ADDRESS.toHexString(),
+      "admin",
+      newOwnerAddress.toHexString()
+    );
+    assert.fieldEquals(
+      CONTRACT_ENTITY_TYPE,
+      TEST_CONTRACT_ADDRESS.toHexString(),
+      "updatedAt",
+      updatedEventBlockTimestamp.toString()
+    );
+    // should also initialize the Contract entity with expected values from
+    // mock functions. spot check a few here
+    assert.fieldEquals(
+      CONTRACT_ENTITY_TYPE,
+      TEST_CONTRACT_ADDRESS.toHexString(),
+      "renderProviderAddress",
+      TEST_CONTRACT.renderProviderAddress.toHexString()
+    );
+    assert.fieldEquals(
+      CONTRACT_ENTITY_TYPE,
+      TEST_CONTRACT_ADDRESS.toHexString(),
+      "randomizerContract",
+      TEST_CONTRACT.randomizerContract.toHexString()
+    );
+    assert.fieldEquals(
+      CONTRACT_ENTITY_TYPE,
+      TEST_CONTRACT_ADDRESS.toHexString(),
+      "nextProjectId",
+      projectId.toString()
+    );
+  }
+});
+
+test("GenArt721CoreV3: Handles OwnershipTransferred to new address and zero address, when already in store", () => {
+  const newOwners = [
+    randomAddressGenerator.generateRandomAddress(),
+    Address.zero()
+  ];
+  // test for nextProjectId of 0 and 1
+  for (let i = 0; i < newOwners.length; i++) {
+    clearStore();
+    const newOwnerAddress = newOwners[i];
+    // add new contract to store
+    const projectId = BigInt.fromI32(101);
+    // specifically do add new contract to store, because sometimes we do
+    // expect contract entity to be in store.
+    addTestContractToStore(projectId);
+    // also add mock contract calls, because that will always be available.
+    mockRefreshContractCalls(projectId, null);
+
+    const updatedEventBlockTimestamp = CURRENT_BLOCK_TIMESTAMP.plus(
+      BigInt.fromI32(10)
+    );
+    const event: OwnershipTransferred = changetype<OwnershipTransferred>(
+      newMockEvent()
+    );
+    event.address = TEST_CONTRACT_ADDRESS;
+    event.transaction.hash = TEST_TX_HASH;
+    event.logIndex = BigInt.fromI32(0);
+    event.parameters = [
+      new ethereum.EventParam(
+        "previousOwner",
+        ethereum.Value.fromAddress(TEST_CONTRACT_ADDRESS)
+      ),
+      new ethereum.EventParam(
+        "newOwner",
+        ethereum.Value.fromAddress(newOwnerAddress)
+      )
+    ];
+    event.block.timestamp = updatedEventBlockTimestamp;
+    // handle event
+    handleOwnershipTransferred(event);
+    // assertions
+    assert.fieldEquals(
+      CONTRACT_ENTITY_TYPE,
+      TEST_CONTRACT_ADDRESS.toHexString(),
+      "admin",
+      newOwnerAddress.toHexString()
+    );
+    assert.fieldEquals(
+      CONTRACT_ENTITY_TYPE,
+      TEST_CONTRACT_ADDRESS.toHexString(),
+      "updatedAt",
+      updatedEventBlockTimestamp.toString()
+    );
+  }
 });
 
 test("GenArt721CoreV3: Handles PlatformUpdated::nextProjectId", () => {
