@@ -654,7 +654,10 @@ export function handleAddManyValueGeneric<T, C>(
     if (val) {
       arr = val.toArray().map<BigInt>((v: JSONValue) => v.toBigInt());
     }
-    arr.push(event.params._value);
+    // only add if it doesn't exist, so we act like a Set
+    if (!arr.includes(event.params._value)) {
+      arr.push(event.params._value);
+    }
     newValue = arrayToJSONValue(arr.toString());
   } else if (
     event instanceof ConfigValueAddedToSetAddress ||
@@ -677,7 +680,10 @@ export function handleAddManyValueGeneric<T, C>(
       // for Bytes, use method to determine if string or hexString
       stringVal = bytesToJSONValue(event.params._value).toString();
     }
-    arr.push(stringToJSONString(stringVal));
+    // only add if it doesn't exist, so we act like a Set
+    if (!arr.includes(stringVal)) {
+      arr.push(stringToJSONString(stringVal));
+    }
     newValue = arrayToJSONValue(arr.toString());
   }
 
