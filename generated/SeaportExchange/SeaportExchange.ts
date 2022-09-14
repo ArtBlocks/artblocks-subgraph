@@ -392,6 +392,22 @@ export class SeaportExchange__getOrderStatusResult {
     map.set("value3", ethereum.Value.fromUnsignedBigInt(this.value3));
     return map;
   }
+
+  getIsValidated(): boolean {
+    return this.value0;
+  }
+
+  getIsCancelled(): boolean {
+    return this.value1;
+  }
+
+  getTotalFilled(): BigInt {
+    return this.value2;
+  }
+
+  getTotalSize(): BigInt {
+    return this.value3;
+  }
 }
 
 export class SeaportExchange__informationResult {
@@ -411,6 +427,18 @@ export class SeaportExchange__informationResult {
     map.set("value1", ethereum.Value.fromFixedBytes(this.value1));
     map.set("value2", ethereum.Value.fromAddress(this.value2));
     return map;
+  }
+
+  getVersion(): string {
+    return this.value0;
+  }
+
+  getDomainSeparator(): Bytes {
+    return this.value1;
+  }
+
+  getConduitController(): Address {
+    return this.value2;
   }
 }
 

@@ -7,13 +7,15 @@ import {
   createMockedFunction,
   logStore
 } from "matchstick-as/assembly/index";
+// IsCanonicalMinterFilter only emitted by MinterFilterV0
+import { IsCanonicalMinterFilter } from "../../../generated/MinterFilterV0/MinterFilterV0";
+// IMinterFilterV0 is the interface for MinterFilterV0 and MinterFilterV1
 import {
-  IsCanonicalMinterFilter,
   MinterApproved,
   MinterRevoked,
   ProjectMinterRegistered,
   ProjectMinterRemoved
-} from "../../../generated/MinterFilterV0/MinterFilterV0";
+} from "../../../generated/MinterFilterV0/IMinterFilterV0";
 import {
   Minter,
   MinterFilter,

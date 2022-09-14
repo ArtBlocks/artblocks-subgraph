@@ -74,6 +74,7 @@ import {
   generateContractSpecificId,
   generateProjectScriptId
 } from "./helpers";
+import { GEN_ART_721_CORE_V1 } from "./constants";
 
 /*** EVENT HANDLERS ***/
 export function handleMint(event: Mint): void {
@@ -106,6 +107,7 @@ export function handleMint(event: Mint): void {
     project.invocations = invocation.plus(BigInt.fromI32(1));
     if (project.invocations == project.maxInvocations) {
       project.complete = true;
+      project.completedAt = event.block.timestamp;
       project.updatedAt = event.block.timestamp;
     }
     project.save();
@@ -246,6 +248,7 @@ export function handleAddProject(call: AddProjectCall): void {
   project.currencySymbol = currencySymbol;
   project.currencyAddress = currencyAddress;
   project.dynamic = dynamic;
+  project.externalAssetDependencyCount = BigInt.fromI32(0);
   project.invocations = invocations;
   project.locked = false;
   project.maxInvocations = maxInvocations;
@@ -657,6 +660,7 @@ export function handleUpdateProjectMaxInvocations(
   if (project) {
     project.maxInvocations = call.inputs._maxInvocations;
     project.complete = project.invocations.ge(project.maxInvocations);
+    project.completedAt = project.complete ? call.block.timestamp : null;
     project.updatedAt = call.block.timestamp;
     project.save();
   } else {
@@ -787,9 +791,11 @@ function refreshContract<T>(contract: T, timestamp: BigInt): Contract | null {
     contractEntity = new Contract(contract._address.toHexString());
     contractEntity.createdAt = timestamp;
     contractEntity.mintWhitelisted = [];
+    contractEntity.newProjectsForbidden = false;
   }
 
   contractEntity.admin = admin;
+  contractEntity.type = GEN_ART_721_CORE_V1;
   contractEntity.renderProviderAddress = artblocksAddress;
   contractEntity.renderProviderPercentage = artblocksPercentage;
   contractEntity.nextProjectId = nextProjectId;

@@ -1,5 +1,6 @@
 {
   "network": "goerli",
+  "genArt721CoreV3Contracts": [],
   "genArt721CoreContracts": [
     {
       "address": "0xDa62f67BE7194775A75BE91CBF9FEeDcC5776D4b",
@@ -67,6 +68,11 @@
       "address": "0x8aD21E9eebfDa9Af4D4384C747b74723E29FBB51",
       "name": "Art Blocks x Pace",
       "startBlock": 7011002
+    },
+    {
+      "address": "0x60c8DbC88A2BA176C99A53571bb1CfCdB946786F",
+      "name": "AB Engine Flex Demo",
+      "startBlock": 7410621
     }
   ],
   "minterSetPriceV1Contracts": [
@@ -79,6 +85,11 @@
       "address": "0x3851b8f754E77f07e0a08425d280c1B4fe4e3363",
       "name": "Art Blocks x Pace",
       "startBlock": 7011002
+    },
+    {
+      "address": "0x6016f9360D178792A45DC69d937673382573f7c1",
+      "name": "AB Engine Flex Demo",
+      "startBlock": 7410621
     }
   ],
   "minterSetPriceERC20V1Contracts": [
@@ -91,6 +102,11 @@
       "address": "0x5749E012767FDA174389d77Adc032e3e880b166c",
       "name": "Art Blocks x Pace",
       "startBlock": 7011002
+    },
+    {
+      "address": "0x58dc1cAcFD5A5Ae0180e813b800cb7Bc9Bcb0c41",
+      "name": "AB Engine Flex Demo",
+      "startBlock": 7410621
     }
   ],
   "minterDALinV1Contracts": [
@@ -103,6 +119,11 @@
       "address": "0xd125111461557f2d8A52848f55Ac4651d2426f88",
       "name": "Art Blocks x Pace",
       "startBlock": 7011002
+    },
+    {
+      "address": "0xCc97f86dF835F6bFE8A425d85DEc7314Cc1C951d",
+      "name": "AB Engine Flex Demo",
+      "startBlock": 7410621
     }
   ],
   "minterDAExpV1Contracts": [
@@ -115,6 +136,18 @@
       "address": "0xf4015573db8f9E80206296e53a32E20B87Ab1578",
       "name": "Art Blocks x Pace",
       "startBlock": 7011002
+    },
+    {
+      "address": "0xF011F938221e6D983733894e0Ca23b937467aa01",
+      "name": "AB Engine Flex Demo",
+      "startBlock": 7410621
+    }
+  ],
+  "engineFlexContracts": [
+    {
+      "address": "0x1f2904e50742c43949a912abCC3794F3052a40F7",
+      "name": "AB Engine Flex Demo",
+      "startBlock": 7410621
     }
   ],
   "startBlock": 7011002

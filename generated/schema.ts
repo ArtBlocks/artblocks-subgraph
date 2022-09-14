@@ -94,6 +94,46 @@ export class Project extends Entity {
     }
   }
 
+  get additionalPayeeSecondarySalesAddress(): Bytes | null {
+    let value = this.get("additionalPayeeSecondarySalesAddress");
+    if (!value || value.kind == ValueKind.NULL) {
+      return null;
+    } else {
+      return value.toBytes();
+    }
+  }
+
+  set additionalPayeeSecondarySalesAddress(value: Bytes | null) {
+    if (!value) {
+      this.unset("additionalPayeeSecondarySalesAddress");
+    } else {
+      this.set(
+        "additionalPayeeSecondarySalesAddress",
+        Value.fromBytes(<Bytes>value)
+      );
+    }
+  }
+
+  get additionalPayeeSecondarySalesPercentage(): BigInt | null {
+    let value = this.get("additionalPayeeSecondarySalesPercentage");
+    if (!value || value.kind == ValueKind.NULL) {
+      return null;
+    } else {
+      return value.toBigInt();
+    }
+  }
+
+  set additionalPayeeSecondarySalesPercentage(value: BigInt | null) {
+    if (!value) {
+      this.unset("additionalPayeeSecondarySalesPercentage");
+    } else {
+      this.set(
+        "additionalPayeeSecondarySalesPercentage",
+        Value.fromBigInt(<BigInt>value)
+      );
+    }
+  }
+
   get artist(): string {
     let value = this.get("artist");
     return value!.toString();
@@ -170,6 +210,23 @@ export class Project extends Entity {
 
   set complete(value: boolean) {
     this.set("complete", Value.fromBoolean(value));
+  }
+
+  get completedAt(): BigInt | null {
+    let value = this.get("completedAt");
+    if (!value || value.kind == ValueKind.NULL) {
+      return null;
+    } else {
+      return value.toBigInt();
+    }
+  }
+
+  set completedAt(value: BigInt | null) {
+    if (!value) {
+      this.unset("completedAt");
+    } else {
+      this.set("completedAt", Value.fromBigInt(<BigInt>value));
+    }
   }
 
   get curationStatus(): string | null {
@@ -405,6 +462,15 @@ export class Project extends Entity {
     this.set("scriptCount", Value.fromBigInt(value));
   }
 
+  get externalAssetDependencyCount(): BigInt {
+    let value = this.get("externalAssetDependencyCount");
+    return value!.toBigInt();
+  }
+
+  set externalAssetDependencyCount(value: BigInt) {
+    this.set("externalAssetDependencyCount", Value.fromBigInt(value));
+  }
+
   get scriptJSON(): string | null {
     let value = this.get("scriptJSON");
     if (!value || value.kind == ValueKind.NULL) {
@@ -419,6 +485,40 @@ export class Project extends Entity {
       this.unset("scriptJSON");
     } else {
       this.set("scriptJSON", Value.fromString(<string>value));
+    }
+  }
+
+  get scriptTypeAndVersion(): string | null {
+    let value = this.get("scriptTypeAndVersion");
+    if (!value || value.kind == ValueKind.NULL) {
+      return null;
+    } else {
+      return value.toString();
+    }
+  }
+
+  set scriptTypeAndVersion(value: string | null) {
+    if (!value) {
+      this.unset("scriptTypeAndVersion");
+    } else {
+      this.set("scriptTypeAndVersion", Value.fromString(<string>value));
+    }
+  }
+
+  get aspectRatio(): string | null {
+    let value = this.get("aspectRatio");
+    if (!value || value.kind == ValueKind.NULL) {
+      return null;
+    } else {
+      return value.toString();
+    }
+  }
+
+  set aspectRatio(value: string | null) {
+    if (!value) {
+      this.unset("aspectRatio");
+    } else {
+      this.set("aspectRatio", Value.fromString(<string>value));
     }
   }
 
@@ -471,6 +571,26 @@ export class Project extends Entity {
       this.unset("website");
     } else {
       this.set("website", Value.fromString(<string>value));
+    }
+  }
+
+  get proposedArtistAddressesAndSplits(): string | null {
+    let value = this.get("proposedArtistAddressesAndSplits");
+    if (!value || value.kind == ValueKind.NULL) {
+      return null;
+    } else {
+      return value.toString();
+    }
+  }
+
+  set proposedArtistAddressesAndSplits(value: string | null) {
+    if (!value) {
+      this.unset("proposedArtistAddressesAndSplits");
+    } else {
+      this.set(
+        "proposedArtistAddressesAndSplits",
+        Value.fromString(<string>value)
+      );
     }
   }
 
@@ -577,6 +697,15 @@ export class Project extends Entity {
   set saleLookupTables(value: Array<string>) {
     this.set("saleLookupTables", Value.fromStringArray(value));
   }
+
+  get externalAssetDependencies(): Array<string> {
+    let value = this.get("externalAssetDependencies");
+    return value!.toStringArray();
+  }
+
+  set externalAssetDependencies(value: Array<string>) {
+    this.set("externalAssetDependencies", Value.fromStringArray(value));
+  }
 }
 
 export class ProjectScript extends Entity {
@@ -638,6 +767,109 @@ export class ProjectScript extends Entity {
   }
 }
 
+export class ProposedArtistAddressesAndSplits extends Entity {
+  constructor(id: string) {
+    super();
+    this.set("id", Value.fromString(id));
+  }
+
+  save(): void {
+    let id = this.get("id");
+    assert(
+      id != null,
+      "Cannot save ProposedArtistAddressesAndSplits entity without an ID"
+    );
+    if (id) {
+      assert(
+        id.kind == ValueKind.STRING,
+        `Entities of type ProposedArtistAddressesAndSplits must have an ID of type String but the id '${id.displayData()}' is of type ${id.displayKind()}`
+      );
+      store.set("ProposedArtistAddressesAndSplits", id.toString(), this);
+    }
+  }
+
+  static load(id: string): ProposedArtistAddressesAndSplits | null {
+    return changetype<ProposedArtistAddressesAndSplits | null>(
+      store.get("ProposedArtistAddressesAndSplits", id)
+    );
+  }
+
+  get id(): string {
+    let value = this.get("id");
+    return value!.toString();
+  }
+
+  set id(value: string) {
+    this.set("id", Value.fromString(value));
+  }
+
+  get artistAddress(): Bytes {
+    let value = this.get("artistAddress");
+    return value!.toBytes();
+  }
+
+  set artistAddress(value: Bytes) {
+    this.set("artistAddress", Value.fromBytes(value));
+  }
+
+  get additionalPayeePrimarySalesAddress(): Bytes {
+    let value = this.get("additionalPayeePrimarySalesAddress");
+    return value!.toBytes();
+  }
+
+  set additionalPayeePrimarySalesAddress(value: Bytes) {
+    this.set("additionalPayeePrimarySalesAddress", Value.fromBytes(value));
+  }
+
+  get additionalPayeePrimarySalesPercentage(): BigInt {
+    let value = this.get("additionalPayeePrimarySalesPercentage");
+    return value!.toBigInt();
+  }
+
+  set additionalPayeePrimarySalesPercentage(value: BigInt) {
+    this.set("additionalPayeePrimarySalesPercentage", Value.fromBigInt(value));
+  }
+
+  get additionalPayeeSecondarySalesAddress(): Bytes {
+    let value = this.get("additionalPayeeSecondarySalesAddress");
+    return value!.toBytes();
+  }
+
+  set additionalPayeeSecondarySalesAddress(value: Bytes) {
+    this.set("additionalPayeeSecondarySalesAddress", Value.fromBytes(value));
+  }
+
+  get additionalPayeeSecondarySalesPercentage(): BigInt {
+    let value = this.get("additionalPayeeSecondarySalesPercentage");
+    return value!.toBigInt();
+  }
+
+  set additionalPayeeSecondarySalesPercentage(value: BigInt) {
+    this.set(
+      "additionalPayeeSecondarySalesPercentage",
+      Value.fromBigInt(value)
+    );
+  }
+
+  get project(): string {
+    let value = this.get("project");
+    return value!.toString();
+  }
+
+  set project(value: string) {
+    this.set("project", Value.fromString(value));
+  }
+
+  get createdAt(): BigInt {
+    let value = this.get("createdAt");
+    return value!.toBigInt();
+  }
+
+  set createdAt(value: BigInt) {
+    this.set("createdAt", Value.fromBigInt(value));
+  }
+}
+
 export class Contract extends Entity {
   constructor(id: string) {
     super();
@@ -678,6 +910,15 @@ export class Contract extends Entity {
     this.set("admin", Value.fromBytes(value));
   }
 
+  get type(): string {
+    let value = this.get("type");
+    return value!.toString();
+  }
+
+  set type(value: string) {
+    this.set("type", Value.fromString(value));
+  }
+
   get renderProviderAddress(): Bytes {
     let value = this.get("renderProviderAddress");
     return value!.toBytes();
@@ -694,6 +935,46 @@ export class Contract extends Entity {
 
   set renderProviderPercentage(value: BigInt) {
     this.set("renderProviderPercentage", Value.fromBigInt(value));
+  }
+
+  get renderProviderSecondarySalesAddress(): Bytes | null {
+    let value = this.get("renderProviderSecondarySalesAddress");
+    if (!value || value.kind == ValueKind.NULL) {
+      return null;
+    } else {
+      return value.toBytes();
+    }
+  }
+
+  set renderProviderSecondarySalesAddress(value: Bytes | null) {
+    if (!value) {
+      this.unset("renderProviderSecondarySalesAddress");
+    } else {
+      this.set(
+        "renderProviderSecondarySalesAddress",
+        Value.fromBytes(<Bytes>value)
+      );
+    }
+  }
+
+  get renderProviderSecondarySalesBPS(): BigInt | null {
+    let value = this.get("renderProviderSecondarySalesBPS");
+    if (!value || value.kind == ValueKind.NULL) {
+      return null;
+    } else {
+      return value.toBigInt();
+    }
+  }
+
+  set renderProviderSecondarySalesBPS(value: BigInt | null) {
+    if (!value) {
+      this.unset("renderProviderSecondarySalesBPS");
+    } else {
+      this.set(
+        "renderProviderSecondarySalesBPS",
+        Value.fromBigInt(<BigInt>value)
+      );
+    }
   }
 
   get mintWhitelisted(): Array<Bytes> {
@@ -719,6 +1000,40 @@ export class Contract extends Entity {
       this.unset("randomizerContract");
     } else {
       this.set("randomizerContract", Value.fromBytes(<Bytes>value));
+    }
+  }
+
+  get curationRegistry(): Bytes | null {
+    let value = this.get("curationRegistry");
+    if (!value || value.kind == ValueKind.NULL) {
+      return null;
+    } else {
+      return value.toBytes();
+    }
+  }
+
+  set curationRegistry(value: Bytes | null) {
+    if (!value) {
+      this.unset("curationRegistry");
+    } else {
+      this.set("curationRegistry", Value.fromBytes(<Bytes>value));
+    }
+  }
+
+  get dependencyRegistry(): Bytes | null {
+    let value = this.get("dependencyRegistry");
+    if (!value || value.kind == ValueKind.NULL) {
+      return null;
+    } else {
+      return value.toBytes();
+    }
+  }
+
+  set dependencyRegistry(value: Bytes | null) {
+    if (!value) {
+      this.unset("dependencyRegistry");
+    } else {
+      this.set("dependencyRegistry", Value.fromBytes(<Bytes>value));
     }
   }
 
@@ -815,6 +1130,15 @@ export class Contract extends Entity {
     } else {
       this.set("minterFilter", Value.fromString(<string>value));
     }
+  }
+
+  get newProjectsForbidden(): boolean {
+    let value = this.get("newProjectsForbidden");
+    return value!.toBoolean();
+  }
+
+  set newProjectsForbidden(value: boolean) {
+    this.set("newProjectsForbidden", Value.fromBoolean(value));
   }
 }
 
@@ -1935,5 +2259,78 @@ export class Transfer extends Entity {
 
   set from(value: Bytes) {
     this.set("from", Value.fromBytes(value));
+  }
+}
+
+export class ProjectExternalAssetDependency extends Entity {
+  constructor(id: string) {
+    super();
+    this.set("id", Value.fromString(id));
+  }
+
+  save(): void {
+    let id = this.get("id");
+    assert(
+      id != null,
+      "Cannot save ProjectExternalAssetDependency entity without an ID"
+    );
+    if (id) {
+      assert(
+        id.kind == ValueKind.STRING,
+        `Entities of type ProjectExternalAssetDependency must have an ID of type String but the id '${id.displayData()}' is of type ${id.displayKind()}`
+      );
+      store.set("ProjectExternalAssetDependency", id.toString(), this);
+    }
+  }
+
+  static load(id: string): ProjectExternalAssetDependency | null {
+    return changetype<ProjectExternalAssetDependency | null>(
+      store.get("ProjectExternalAssetDependency", id)
+    );
+  }
+
+  get id(): string {
+    let value = this.get("id");
+    return value!.toString();
+  }
+
+  set id(value: string) {
+    this.set("id", Value.fromString(value));
+  }
+
+  get project(): string {
+    let value = this.get("project");
+    return value!.toString();
+  }
+
+  set project(value: string) {
+    this.set("project", Value.fromString(value));
+  }
+
+  get dependencyType(): string {
+    let value = this.get("dependencyType");
+    return value!.toString();
+  }
+
+  set dependencyType(value: string) {
+    this.set("dependencyType", Value.fromString(value));
+  }
+
+  get cid(): string {
+    let value = this.get("cid");
+    return value!.toString();
+  }
+
+  set cid(value: string) {
+    this.set("cid", Value.fromString(value));
+  }
+
+  get index(): BigInt {
+    let value = this.get("index");
+    return value!.toBigInt();
+  }
+
+  set index(value: BigInt) {
+    this.set("index", Value.fromBigInt(value));
   }
 }

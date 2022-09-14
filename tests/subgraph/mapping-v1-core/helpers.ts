@@ -1,21 +1,15 @@
 import { Address, BigInt, ethereum } from "@graphprotocol/graph-ts";
 import {
-  assert,
   createMockedFunction,
   newMockCall
 } from "matchstick-as/assembly/index";
-import { AddProjectCall } from "../../../generated/GenArt721/GenArt721";
-import { Contract } from "../../../generated/schema";
+import { AddProjectCall } from "../../../generated/GenArt721Core/GenArt721Core";
+import { Project } from "../../../generated/schema";
 import { generateContractSpecificId } from "../../../src/helpers";
-import { handleAddProject } from "../../../src/original-mapping";
+import { handleAddProject } from "../../../src/mapping-v1-core";
 import {
   CURRENT_BLOCK_TIMESTAMP,
-  RANDOMIZER_ADDRESS,
-  ContractValues,
   DEFAULT_PROJECT_VALUES,
-  PROJECT_ENTITY_TYPE,
-  booleanToString,
-  CONTRACT_ENTITY_TYPE,
   TEST_CONTRACT_ADDRESS,
   TEST_CONTRACT
 } from "../shared-helpers";
@@ -28,7 +22,7 @@ export function addNewProjectToStore(
   pricePerTokenInWei: BigInt,
   mockCallsWithDefaults: boolean,
   timestamp: BigInt | null
-): void {
+): Project {
   if (mockCallsWithDefaults) {
     mockProjectDetailsCallWithDefaults(projectId, projectName);
     mockProjectTokenInfoCallWithDefaults(
@@ -59,6 +53,10 @@ export function addNewProjectToStore(
   ];
 
   handleAddProject(newProjectCall);
+
+  return changetype<Project>(
+    Project.load(generateContractSpecificId(TEST_CONTRACT_ADDRESS, projectId))
+  );
 }
 
 // mocks return values for Soldity contract calls in refreshContract() helper function
@@ -153,6 +151,8 @@ export function mockProjectTokenInfoCallWithDefaults(
     null,
     false,
     null,
+    null,
+    null,
     null
   );
 }
@@ -165,7 +165,9 @@ export function mockProjectTokenInfoCall(
   maxInvocations: BigInt | null,
   active: boolean,
   additionalPayeeAddress: Address | null,
-  additionalPayeePercentage: BigInt | null
+  additionalPayeePercentage: BigInt | null,
+  currencySymbol: string | null,
+  currencyAddress: Address | null
 ): void {
   let projectTokenInfoReturnArray: Array<ethereum.Value> = [
     ethereum.Value.fromAddress(artistAddress), // artistAddress
@@ -186,13 +188,19 @@ export function mockProjectTokenInfoCall(
       additionalPayeePercentage
         ? additionalPayeePercentage
         : DEFAULT_PROJECT_VALUES.additionalPayeePercentage
-    ) // additionalPayeePercentage
+    ), // additionalPayeePercentage
+    ethereum.Value.fromString(
+      currencySymbol ? currencySymbol : DEFAULT_PROJECT_VALUES.currencySymbol
+    ), // currencySymbol
+    ethereum.Value.fromAddress(
+      currencyAddress ? currencyAddress : DEFAULT_PROJECT_VALUES.currencyAddress
+    ) // currencyAddress
   ];
 
   createMockedFunction(
     TEST_CONTRACT_ADDRESS,
     "projectTokenInfo",
-    "projectTokenInfo(uint256):(address,uint256,uint256,uint256,bool,address,uint256)"
+    "projectTokenInfo(uint256):(address,uint256,uint256,uint256,bool,address,uint256,string,address)"
   )
     .withArgs([ethereum.Value.fromUnsignedBigInt(projectId)])
     .returns(projectTokenInfoReturnArray);
@@ -225,7 +233,12 @@ export function mockProjectScriptInfoCall(
           )
         : DEFAULT_PROJECT_VALUES.scriptCount
     ), // scriptCount
-    ethereum.Value.fromUnsignedBigInt(BigInt.fromI32(1)), // hashes
+    ethereum.Value.fromBoolean(
+      overrides && overrides.has("useHashString")
+        ? changetype<Map<String, string>>(overrides).get("useHashString") ===
+            "true"
+        : DEFAULT_PROJECT_VALUES.useHashString
+    ), // useHashString
     ethereum.Value.fromString(
       overrides && overrides.has("ipfsHash")
         ? changetype<Map<String, string>>(overrides).get("ipfsHash")
@@ -246,7 +259,7 @@ export function mockProjectScriptInfoCall(
   createMockedFunction(
     TEST_CONTRACT_ADDRESS,
     "projectScriptInfo",
-    "projectScriptInfo(uint256):(string,uint256,uint256,string,bool,bool)"
+    "projectScriptInfo(uint256):(string,uint256,bool,string,bool,bool)"
   )
     .withArgs([ethereum.Value.fromUnsignedBigInt(projectId)])
     .returns(projectScriptInfoReturnArray);
