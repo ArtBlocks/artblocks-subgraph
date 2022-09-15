@@ -490,22 +490,19 @@ export class GenArt721CoreV3__projectDetailsResult {
 export class GenArt721CoreV3__projectScriptDetailsResult {
   value0: string;
   value1: string;
-  value2: string;
-  value3: BigInt;
+  value2: BigInt;
 
-  constructor(value0: string, value1: string, value2: string, value3: BigInt) {
+  constructor(value0: string, value1: string, value2: BigInt) {
     this.value0 = value0;
     this.value1 = value1;
     this.value2 = value2;
-    this.value3 = value3;
   }
 
   toMap(): TypedMap<string, ethereum.Value> {
     let map = new TypedMap<string, ethereum.Value>();
     map.set("value0", ethereum.Value.fromString(this.value0));
     map.set("value1", ethereum.Value.fromString(this.value1));
-    map.set("value2", ethereum.Value.fromString(this.value2));
-    map.set("value3", ethereum.Value.fromUnsignedBigInt(this.value3));
+    map.set("value2", ethereum.Value.fromUnsignedBigInt(this.value2));
     return map;
   }
 
@@ -517,12 +514,8 @@ export class GenArt721CoreV3__projectScriptDetailsResult {
     return this.value1;
   }
 
-  getIpfsHash(): string {
-    return this.value2;
-  }
-
   getScriptCount(): BigInt {
-    return this.value3;
+    return this.value2;
   }
 }
 
@@ -1611,15 +1604,14 @@ export class GenArt721CoreV3 extends ethereum.SmartContract {
   ): GenArt721CoreV3__projectScriptDetailsResult {
     let result = super.call(
       "projectScriptDetails",
-      "projectScriptDetails(uint256):(string,string,string,uint256)",
+      "projectScriptDetails(uint256):(string,string,uint256)",
       [ethereum.Value.fromUnsignedBigInt(_projectId)]
     );
 
     return new GenArt721CoreV3__projectScriptDetailsResult(
       result[0].toString(),
       result[1].toString(),
-      result[2].toString(),
-      result[3].toBigInt()
+      result[2].toBigInt()
     );
   }
 
@@ -1628,7 +1620,7 @@ export class GenArt721CoreV3 extends ethereum.SmartContract {
   ): ethereum.CallResult<GenArt721CoreV3__projectScriptDetailsResult> {
     let result = super.tryCall(
       "projectScriptDetails",
-      "projectScriptDetails(uint256):(string,string,string,uint256)",
+      "projectScriptDetails(uint256):(string,string,uint256)",
       [ethereum.Value.fromUnsignedBigInt(_projectId)]
     );
     if (result.reverted) {
@@ -1639,8 +1631,7 @@ export class GenArt721CoreV3 extends ethereum.SmartContract {
       new GenArt721CoreV3__projectScriptDetailsResult(
         value[0].toString(),
         value[1].toString(),
-        value[2].toString(),
-        value[3].toBigInt()
+        value[2].toBigInt()
       )
     );
   }
@@ -2980,40 +2971,6 @@ export class UpdateProjectDescriptionCall__Outputs {
   _call: UpdateProjectDescriptionCall;
 
   constructor(call: UpdateProjectDescriptionCall) {
-    this._call = call;
-  }
-}
-
-export class UpdateProjectIpfsHashCall extends ethereum.Call {
-  get inputs(): UpdateProjectIpfsHashCall__Inputs {
-    return new UpdateProjectIpfsHashCall__Inputs(this);
-  }
-
-  get outputs(): UpdateProjectIpfsHashCall__Outputs {
-    return new UpdateProjectIpfsHashCall__Outputs(this);
-  }
-}
-
-export class UpdateProjectIpfsHashCall__Inputs {
-  _call: UpdateProjectIpfsHashCall;
-
-  constructor(call: UpdateProjectIpfsHashCall) {
-    this._call = call;
-  }
-
-  get _projectId(): BigInt {
-    return this._call.inputValues[0].value.toBigInt();
-  }
-
-  get _ipfsHash(): string {
-    return this._call.inputValues[1].value.toString();
-  }
-}
-
-export class UpdateProjectIpfsHashCall__Outputs {
-  _call: UpdateProjectIpfsHashCall;
-
-  constructor(call: UpdateProjectIpfsHashCall) {
     this._call = call;
   }
 }

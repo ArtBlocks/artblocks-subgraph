@@ -62,7 +62,6 @@ import {
   FIELD_PROJECT_COMPLETED,
   FIELD_PROJECT_CREATED,
   FIELD_PROJECT_DESCRIPTION,
-  FIELD_PROJECT_IPFS_HASH,
   FIELD_PROJECT_LICENSE,
   FIELD_PROJECT_MAX_INVOCATIONS,
   FIELD_PROJECT_NAME,
@@ -894,11 +893,10 @@ describe("GenArt721CoreV3: handleProjectUpdated", () => {
       createMockedFunction(
         TEST_CONTRACT_ADDRESS,
         "projectScriptDetails",
-        "projectScriptDetails(uint256):(string,string,string,uint256)"
+        "projectScriptDetails(uint256):(string,string,uint256)"
       )
         .withArgs([ethereum.Value.fromUnsignedBigInt(projectId)])
         .returns([
-          ethereum.Value.fromString("test"),
           ethereum.Value.fromString("test"),
           ethereum.Value.fromString("test"),
           ethereum.Value.fromUnsignedBigInt(BigInt.fromI32(0))
@@ -975,11 +973,10 @@ describe("GenArt721CoreV3: handleProjectUpdated", () => {
       createMockedFunction(
         TEST_CONTRACT_ADDRESS,
         "projectScriptDetails",
-        "projectScriptDetails(uint256):(string,string,string,uint256)"
+        "projectScriptDetails(uint256):(string,string,uint256)"
       )
         .withArgs([ethereum.Value.fromUnsignedBigInt(projectId)])
         .returns([
-          ethereum.Value.fromString(""),
           ethereum.Value.fromString(""),
           ethereum.Value.fromString(""),
           ethereum.Value.fromUnsignedBigInt(scriptCount)
@@ -1273,13 +1270,6 @@ describe("GenArt721CoreV3: handleProjectUpdated", () => {
     describe("projectScriptDetailsUpdated", () => {
       test("should update aspectRatio", () => {
         testProjectScriptDetailsUpdated(FIELD_PROJECT_ASPECT_RATIO, "1.5");
-      });
-
-      test("should update ipfsHash", () => {
-        testProjectScriptDetailsUpdated(
-          FIELD_PROJECT_IPFS_HASH,
-          "New IPFS Hash"
-        );
       });
 
       test("should update scriptTypeAndVersion", () => {
