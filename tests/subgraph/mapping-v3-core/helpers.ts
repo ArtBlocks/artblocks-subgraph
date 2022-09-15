@@ -1,4 +1,4 @@
-import { Address, BigInt, Bytes, ethereum, log } from "@graphprotocol/graph-ts";
+import { Address, BigInt, Bytes, ethereum } from "@graphprotocol/graph-ts";
 import {
   assert,
   createMockedFunction,
@@ -463,9 +463,6 @@ export function testProjectScriptDetailsUpdated(
     FIELD_PROJECT_SCRIPT_TYPE
   ];
 
-  log.debug("testProjectScriptDetailsUpdated starting with update field {}", [
-    updateField
-  ]);
   if (!validFieldNames.includes(updateField)) {
     throw new Error("Invalid update field");
   }
@@ -510,9 +507,8 @@ export function testProjectScriptDetailsUpdated(
 
   assert.assertTrue(oldFieldValue != newValue);
 
-  log.debug("handler starting", []);
   handleProjectUpdated(event);
-  log.debug("handler finished", []);
+
   assert.fieldEquals(
     PROJECT_ENTITY_TYPE,
     fullProjectId,
