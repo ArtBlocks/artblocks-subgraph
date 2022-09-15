@@ -35,7 +35,8 @@ import {
   TRANSFER_ENTITY_TYPE,
   ONE_MILLION,
   booleanToString,
-  TEST_CONTRACT
+  TEST_CONTRACT,
+  TEST_SUPER_ADMIN_ADDRESS
 } from "../shared-helpers";
 import {
   mockProjectScriptDetailsCall,
@@ -53,6 +54,7 @@ import {
   PlatformUpdated,
   OwnershipTransferred
 } from "../../../generated/GenArt721CoreV3/GenArt721CoreV3";
+import { SuperAdminTransferred } from "../../../generated/AdminACLV0/IAdminACLV0";
 import {
   FIELD_PROJECT_ACTIVE,
   FIELD_PROJECT_ARTIST_ADDRESS,
@@ -70,6 +72,7 @@ import {
   FIELD_PROJECT_SCRIPT_TYPE,
   FIELD_PROJECT_SECONDARY_MARKET_ROYALTY_PERCENTAGE,
   FIELD_PROJECT_WEBSITE,
+  handleIAdminACLV0SuperAdminTransferred,
   handleMint,
   handleTransfer,
   handlePlatformUpdated,
@@ -906,6 +909,62 @@ test("GenArt721CoreV3: Handles PlatformUpdated::artblocksSecondaryBPS - changed 
     "renderProviderSecondarySalesBPS",
     newValue.toString()
   );
+});
+
+describe("GenARt721CoreV3: handleIAdminACLV0SuperAdminTransferred", () => {
+  test("should update core when super admin is transferred", () => {
+    clearStore();
+    // add new contract to store
+    const projectId = BigInt.fromI32(0);
+    addTestContractToStore(projectId);
+    mockRefreshContractCalls(BigInt.fromI32(0), null);
+    // mock AdminACLV0 superAdmin
+    const newOwnerSuperAdmin = randomAddressGenerator.generateRandomAddress();
+    createMockedFunction(
+      TEST_CONTRACT.admin,
+      "superAdmin",
+      "superAdmin():(address)"
+    ).returns([ethereum.Value.fromAddress(newOwnerSuperAdmin)]);
+    // create event
+    const event: SuperAdminTransferred = changetype<SuperAdminTransferred>(
+      newMockEvent()
+    );
+    event.address = TEST_CONTRACT.admin;
+    event.parameters = [
+      new ethereum.EventParam(
+        "previousSuperAdmin",
+        ethereum.Value.fromAddress(TEST_SUPER_ADMIN_ADDRESS)
+      ),
+      new ethereum.EventParam(
+        "newSuperAdmin",
+        ethereum.Value.fromAddress(newOwnerSuperAdmin)
+      ),
+      new ethereum.EventParam(
+        "_upgenArt721CoreAddressesToUpdatedate",
+        ethereum.Value.fromAddressArray([TEST_CONTRACT_ADDRESS])
+      )
+    ];
+    // handle event
+    handleIAdminACLV0SuperAdminTransferred(event);
+    // assertions
+    assert.fieldEquals(
+      CONTRACT_ENTITY_TYPE,
+      TEST_CONTRACT_ADDRESS.toHexString(),
+      "admin",
+      newOwnerSuperAdmin.toHexString()
+    );
+    assert.fieldEquals(
+      CONTRACT_ENTITY_TYPE,
+      TEST_CONTRACT_ADDRESS.toHexString(),
+      "whitelisted",
+      "[" +
+        generateWhitelistingId(
+          TEST_CONTRACT_ADDRESS.toHexString(),
+          newOwnerSuperAdmin.toHexString()
+        ) +
+        "]"
+    );
+  });
 });
 
 describe("GenArt721CoreV3: handleProjectUpdated", () => {
