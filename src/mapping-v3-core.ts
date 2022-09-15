@@ -170,7 +170,6 @@ export const FIELD_PROJECT_BASE_URI = "baseURI";
 export const FIELD_PROJECT_COMPLETED = "completed";
 export const FIELD_PROJECT_CREATED = "created";
 export const FIELD_PROJECT_DESCRIPTION = "description";
-export const FIELD_PROJECT_IPFS_HASH = "ipfsHash";
 export const FIELD_PROJECT_LICENSE = "license";
 export const FIELD_PROJECT_MAX_INVOCATIONS = "maxInvocations";
 export const FIELD_PROJECT_NAME = "name";
@@ -223,7 +222,6 @@ export function handleProjectUpdated(event: ProjectUpdated): void {
     handleProjectDetailsUpdated(contract, project, timestamp);
   } else if (
     update == FIELD_PROJECT_ASPECT_RATIO ||
-    update == FIELD_PROJECT_IPFS_HASH ||
     update == FIELD_PROJECT_SCRIPT_TYPE
   ) {
     handleProjectScriptDetailsUpdated(contract, project, timestamp);
@@ -304,7 +302,6 @@ function handleProjectScriptDetailsUpdated(
   );
   if (!projectScriptDetails.reverted) {
     project.aspectRatio = projectScriptDetails.value.getAspectRatio();
-    project.ipfsHash = projectScriptDetails.value.getIpfsHash();
     project.scriptTypeAndVersion = projectScriptDetails.value.getScriptTypeAndVersion();
     project.updatedAt = timestamp;
     project.save();

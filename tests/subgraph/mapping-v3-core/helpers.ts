@@ -26,7 +26,6 @@ import {
   FIELD_PROJECT_ARTIST_NAME,
   FIELD_PROJECT_ASPECT_RATIO,
   FIELD_PROJECT_DESCRIPTION,
-  FIELD_PROJECT_IPFS_HASH,
   FIELD_PROJECT_LICENSE,
   FIELD_PROJECT_MAX_INVOCATIONS,
   FIELD_PROJECT_NAME,
@@ -229,11 +228,6 @@ export function mockProjectScriptDetailsCall(
         ? changetype<Map<string, string>>(overrides).get("aspectRatio")
         : DEFAULT_PROJECT_VALUES.aspectRatio
     ), // aspectRatio
-    ethereum.Value.fromString(
-      overrides && overrides.has("ipfsHash")
-        ? changetype<Map<string, string>>(overrides).get("ipfsHash")
-        : DEFAULT_PROJECT_VALUES.ipfsHash
-    ), // ipfsHash
     ethereum.Value.fromUnsignedBigInt(
       overrides && overrides.has("scriptCount")
         ? BigInt.fromString(
@@ -246,7 +240,7 @@ export function mockProjectScriptDetailsCall(
   createMockedFunction(
     TEST_CONTRACT_ADDRESS,
     "projectScriptDetails",
-    "projectScriptDetails(uint256):(string,string,string,uint256)"
+    "projectScriptDetails(uint256):(string,string,uint256)"
   )
     .withArgs([ethereum.Value.fromUnsignedBigInt(projectId)])
     .returns(projectScriptDetailsReturnArray);
@@ -453,7 +447,7 @@ export function testProjectStateDataUpdated(
 }
 
 /**
- * @param  {string} updateField - The update field on the event. Can be "aspectRatio", "ipfsHash", "scriptType"
+ * @param  {string} updateField - The update field on the event. Can be "aspectRatio", "scriptType"
  * @param  {string} newValue - The new value for the update to be returned by the mocked function
  * @returns void
  * This function should only be used in "GenArt721CoreV3: handleProjectUpdated" > "updated" > "projectScriptDetailsUpdated"
@@ -466,7 +460,6 @@ export function testProjectScriptDetailsUpdated(
 ): void {
   const validFieldNames = [
     FIELD_PROJECT_ASPECT_RATIO,
-    FIELD_PROJECT_IPFS_HASH,
     FIELD_PROJECT_SCRIPT_TYPE
   ];
 
@@ -483,8 +476,6 @@ export function testProjectScriptDetailsUpdated(
   let oldFieldValue: string | null = null;
   if (updateField == FIELD_PROJECT_ASPECT_RATIO) {
     oldFieldValue = project.aspectRatio;
-  } else if (updateField == FIELD_PROJECT_IPFS_HASH) {
-    oldFieldValue = project.ipfsHash;
   } else if (updateField == FIELD_PROJECT_SCRIPT_TYPE) {
     oldFieldValue = project.scriptTypeAndVersion;
   }
