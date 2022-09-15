@@ -67,7 +67,8 @@ import {
   generateWhitelistingId,
   generateContractSpecificId,
   generateProjectScriptId,
-  generateProjectExternalAssetDependencyId
+  generateProjectExternalAssetDependencyId,
+  addWhitelisting
 } from "./helpers";
 import {
   FLEX_CONTRACT_EXTERNAL_ASSET_DEP_TYPES,
@@ -361,19 +362,6 @@ export function handleAddWhitelisted(call: AddWhitelistedCall): void {
   let contractEntity = refreshContract(contract, call.block.timestamp);
 
   addWhitelisting(contractEntity.id, call.inputs._address.toHexString());
-}
-
-function addWhitelisting(contractId: string, accountId: string): void {
-  let account = new Account(accountId);
-  account.save();
-
-  let whitelisting = new Whitelisting(
-    generateWhitelistingId(contractId, account.id)
-  );
-  whitelisting.account = account.id;
-  whitelisting.contract = contractId;
-
-  whitelisting.save();
 }
 
 export function handleRemoveWhitelisted(call: RemoveWhitelistedCall): void {

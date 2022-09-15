@@ -88,6 +88,7 @@ export const ONE_MILLION = 1000000;
 export const RANDOMIZER_ADDRESS = randomAddressGenerator.generateRandomAddress();
 export const CURRENT_BLOCK_TIMESTAMP = BigInt.fromI32(1647051214);
 export const TEST_CONTRACT_ADDRESS = randomAddressGenerator.generateRandomAddress();
+export const TEST_SUPER_ADMIN_ADDRESS = randomAddressGenerator.generateRandomAddress();
 export const TEST_TOKEN_HASH = Bytes.fromByteArray(
   crypto.keccak256(Bytes.fromUTF8("token hash"))
 );

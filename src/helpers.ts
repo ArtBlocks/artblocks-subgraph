@@ -12,7 +12,12 @@ import { MinterDAExpV1 } from "../generated/MinterDAExpV1/MinterDAExpV1";
 import { MinterDALinV0 } from "../generated/MinterDALinV0/MinterDALinV0";
 import { MinterDALinV1 } from "../generated/MinterDALinV1/MinterDALinV1";
 import { IFilteredMinterV0 } from "../generated/MinterSetPriceV0/IFilteredMinterV0";
-import { Minter, ProjectMinterConfiguration } from "../generated/schema";
+import {
+  Minter,
+  ProjectMinterConfiguration,
+  Account,
+  Whitelisting
+} from "../generated/schema";
 
 export function generateProjectExternalAssetDependencyId(
   projectId: string,
@@ -46,6 +51,21 @@ export function generateContractSpecificId(
   entityId: BigInt
 ): string {
   return contractAddress.toHexString() + "-" + entityId.toString();
+}
+
+// returns new whitelisting id
+export function addWhitelisting(contractId: string, accountId: string): string {
+  let account = new Account(accountId);
+  account.save();
+
+  let whitelisting = new Whitelisting(
+    generateWhitelistingId(contractId, account.id)
+  );
+  whitelisting.account = account.id;
+  whitelisting.contract = contractId;
+
+  whitelisting.save();
+  return whitelisting.id;
 }
 
 export function generateProjectScriptId(
