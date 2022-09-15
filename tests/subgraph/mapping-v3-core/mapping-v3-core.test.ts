@@ -78,7 +78,8 @@ import {
 } from "../../../src/mapping-v3-core";
 import {
   generateContractSpecificId,
-  generateProjectScriptId
+  generateProjectScriptId,
+  generateWhitelistingId
 } from "../../../src/helpers";
 
 const randomAddressGenerator = new RandomAddressGenerator();
@@ -196,13 +197,14 @@ test("GenArt721CoreV3: Can handle transfer", () => {
 
 test("GenArt721CoreV3: Handles OwnershipTransferred to new address and zero address, when Contract not in store", () => {
   const newOwners = [
-    randomAddressGenerator.generateRandomAddress(),
-    Address.zero()
+    Address.zero(),
+    randomAddressGenerator.generateRandomAddress()
   ];
   // test for nextProjectId of 0 and 1
   for (let i = 0; i < newOwners.length; i++) {
     clearStore();
     const newOwnerAddress = newOwners[i];
+    const newOwnerSuperAdmin = randomAddressGenerator.generateRandomAddress();
     // add new contract to store
     const projectId = BigInt.fromI32(101);
     // specifically do not add new contract to store, because this event is
@@ -210,6 +212,20 @@ test("GenArt721CoreV3: Handles OwnershipTransferred to new address and zero addr
     // DO add mock contract calls, because we expect the contract to be called
     // during initial contract setup.
     mockRefreshContractCalls(projectId, null);
+    // overwrite mock function to return the new admin
+    createMockedFunction(
+      TEST_CONTRACT_ADDRESS,
+      "admin",
+      "admin():(address)"
+    ).returns([ethereum.Value.fromAddress(newOwnerAddress)]);
+    // if transferred to new adminACLV0, then mock the adminACLV0 contract
+    if (newOwnerAddress != Address.zero()) {
+      createMockedFunction(
+        newOwnerAddress,
+        "superAdmin",
+        "superAdmin():(address)"
+      ).returns([ethereum.Value.fromAddress(newOwnerSuperAdmin)]);
+    }
 
     const updatedEventBlockTimestamp = CURRENT_BLOCK_TIMESTAMP.plus(
       BigInt.fromI32(10)
@@ -234,12 +250,38 @@ test("GenArt721CoreV3: Handles OwnershipTransferred to new address and zero addr
     // handle event
     handleOwnershipTransferred(event);
     // assertions
-    assert.fieldEquals(
-      CONTRACT_ENTITY_TYPE,
-      TEST_CONTRACT_ADDRESS.toHexString(),
-      "admin",
-      newOwnerAddress.toHexString()
-    );
+    if (newOwnerAddress != Address.zero()) {
+      assert.fieldEquals(
+        CONTRACT_ENTITY_TYPE,
+        TEST_CONTRACT_ADDRESS.toHexString(),
+        "admin",
+        newOwnerSuperAdmin.toHexString()
+      );
+      assert.fieldEquals(
+        CONTRACT_ENTITY_TYPE,
+        TEST_CONTRACT_ADDRESS.toHexString(),
+        "whitelisted",
+        "[" +
+          generateWhitelistingId(
+            TEST_CONTRACT_ADDRESS.toHexString(),
+            newOwnerSuperAdmin.toHexString()
+          ) +
+          "]"
+      );
+    } else {
+      assert.fieldEquals(
+        CONTRACT_ENTITY_TYPE,
+        TEST_CONTRACT_ADDRESS.toHexString(),
+        "admin",
+        Address.zero().toHexString()
+      );
+      assert.fieldEquals(
+        CONTRACT_ENTITY_TYPE,
+        TEST_CONTRACT_ADDRESS.toHexString(),
+        "whitelisted",
+        "[]"
+      );
+    }
     assert.fieldEquals(
       CONTRACT_ENTITY_TYPE,
       TEST_CONTRACT_ADDRESS.toHexString(),
@@ -278,6 +320,7 @@ test("GenArt721CoreV3: Handles OwnershipTransferred to new address and zero addr
   for (let i = 0; i < newOwners.length; i++) {
     clearStore();
     const newOwnerAddress = newOwners[i];
+    const newOwnerSuperAdmin = randomAddressGenerator.generateRandomAddress();
     // add new contract to store
     const projectId = BigInt.fromI32(101);
     // specifically do add new contract to store, because sometimes we do
@@ -285,6 +328,20 @@ test("GenArt721CoreV3: Handles OwnershipTransferred to new address and zero addr
     addTestContractToStore(projectId);
     // also add mock contract calls, because that will always be available.
     mockRefreshContractCalls(projectId, null);
+    // overwrite mock function to return the new admin
+    createMockedFunction(
+      TEST_CONTRACT_ADDRESS,
+      "admin",
+      "admin():(address)"
+    ).returns([ethereum.Value.fromAddress(newOwnerAddress)]);
+    // if transferred to new adminACLV0, then mock the adminACLV0 contract
+    if (newOwnerAddress != Address.zero()) {
+      createMockedFunction(
+        newOwnerAddress,
+        "superAdmin",
+        "superAdmin():(address)"
+      ).returns([ethereum.Value.fromAddress(newOwnerSuperAdmin)]);
+    }
 
     const updatedEventBlockTimestamp = CURRENT_BLOCK_TIMESTAMP.plus(
       BigInt.fromI32(10)
@@ -309,12 +366,38 @@ test("GenArt721CoreV3: Handles OwnershipTransferred to new address and zero addr
     // handle event
     handleOwnershipTransferred(event);
     // assertions
-    assert.fieldEquals(
-      CONTRACT_ENTITY_TYPE,
-      TEST_CONTRACT_ADDRESS.toHexString(),
-      "admin",
-      newOwnerAddress.toHexString()
-    );
+    if (newOwnerAddress != Address.zero()) {
+      assert.fieldEquals(
+        CONTRACT_ENTITY_TYPE,
+        TEST_CONTRACT_ADDRESS.toHexString(),
+        "admin",
+        newOwnerSuperAdmin.toHexString()
+      );
+      assert.fieldEquals(
+        CONTRACT_ENTITY_TYPE,
+        TEST_CONTRACT_ADDRESS.toHexString(),
+        "whitelisted",
+        "[" +
+          generateWhitelistingId(
+            TEST_CONTRACT_ADDRESS.toHexString(),
+            newOwnerSuperAdmin.toHexString()
+          ) +
+          "]"
+      );
+    } else {
+      assert.fieldEquals(
+        CONTRACT_ENTITY_TYPE,
+        TEST_CONTRACT_ADDRESS.toHexString(),
+        "admin",
+        Address.zero().toHexString()
+      );
+      assert.fieldEquals(
+        CONTRACT_ENTITY_TYPE,
+        TEST_CONTRACT_ADDRESS.toHexString(),
+        "whitelisted",
+        "[]"
+      );
+    }
     assert.fieldEquals(
       CONTRACT_ENTITY_TYPE,
       TEST_CONTRACT_ADDRESS.toHexString(),
