@@ -1243,6 +1243,31 @@ dataSources:
           handler: handleSetBooleanValueProjectConfig
       file: ./src/minter-suite-mapping.ts
   {{/minterMerkleV1Contracts}}
+  {{#adminACLV0Contracts}}
+  - kind: ethereum/contract
+    name: 'AdminACLV0-{{address}}'
+    network: {{network}}
+    source:
+      address: '{{address}}'
+      abi: AdminACLV0
+      startBlock: {{startBlock}}
+    mapping:
+      kind: ethereum/events
+      apiVersion: 0.0.5
+      language: wasm/assemblyscript
+      entities:
+        - Project
+        - Contract
+      abis:
+        - name: AdminACLV0
+          file: ./abis/AdminACLV0.json
+        - name: IAdminACLV0
+          file: ./abis/IAdminACLV0.json
+      eventHandlers:
+        - event: SuperAdminTransferred(indexed address,indexed address,address[])
+          handler: handleIAdminACLV0SuperAdminTransferred
+      file: ./src/mapping-v3-core.ts
+  {{/adminACLV0Contracts}}
   {{#openSeaContractV1}}
   - kind: ethereum/contract
     name: WyvernExchange
