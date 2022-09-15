@@ -524,20 +524,23 @@ export class GenArt721CoreV3__projectStateDataResult {
   value1: BigInt;
   value2: boolean;
   value3: boolean;
-  value4: boolean;
+  value4: BigInt;
+  value5: boolean;
 
   constructor(
     value0: BigInt,
     value1: BigInt,
     value2: boolean,
     value3: boolean,
-    value4: boolean
+    value4: BigInt,
+    value5: boolean
   ) {
     this.value0 = value0;
     this.value1 = value1;
     this.value2 = value2;
     this.value3 = value3;
     this.value4 = value4;
+    this.value5 = value5;
   }
 
   toMap(): TypedMap<string, ethereum.Value> {
@@ -546,7 +549,8 @@ export class GenArt721CoreV3__projectStateDataResult {
     map.set("value1", ethereum.Value.fromUnsignedBigInt(this.value1));
     map.set("value2", ethereum.Value.fromBoolean(this.value2));
     map.set("value3", ethereum.Value.fromBoolean(this.value3));
-    map.set("value4", ethereum.Value.fromBoolean(this.value4));
+    map.set("value4", ethereum.Value.fromUnsignedBigInt(this.value4));
+    map.set("value5", ethereum.Value.fromBoolean(this.value5));
     return map;
   }
 
@@ -566,8 +570,12 @@ export class GenArt721CoreV3__projectStateDataResult {
     return this.value3;
   }
 
-  getLocked(): boolean {
+  getCompletedTimestamp(): BigInt {
     return this.value4;
+  }
+
+  getLocked(): boolean {
+    return this.value5;
   }
 }
 
@@ -1641,7 +1649,7 @@ export class GenArt721CoreV3 extends ethereum.SmartContract {
   ): GenArt721CoreV3__projectStateDataResult {
     let result = super.call(
       "projectStateData",
-      "projectStateData(uint256):(uint256,uint256,bool,bool,bool)",
+      "projectStateData(uint256):(uint256,uint256,bool,bool,uint256,bool)",
       [ethereum.Value.fromUnsignedBigInt(_projectId)]
     );
 
@@ -1650,7 +1658,8 @@ export class GenArt721CoreV3 extends ethereum.SmartContract {
       result[1].toBigInt(),
       result[2].toBoolean(),
       result[3].toBoolean(),
-      result[4].toBoolean()
+      result[4].toBigInt(),
+      result[5].toBoolean()
     );
   }
 
@@ -1659,7 +1668,7 @@ export class GenArt721CoreV3 extends ethereum.SmartContract {
   ): ethereum.CallResult<GenArt721CoreV3__projectStateDataResult> {
     let result = super.tryCall(
       "projectStateData",
-      "projectStateData(uint256):(uint256,uint256,bool,bool,bool)",
+      "projectStateData(uint256):(uint256,uint256,bool,bool,uint256,bool)",
       [ethereum.Value.fromUnsignedBigInt(_projectId)]
     );
     if (result.reverted) {
@@ -1672,7 +1681,8 @@ export class GenArt721CoreV3 extends ethereum.SmartContract {
         value[1].toBigInt(),
         value[2].toBoolean(),
         value[3].toBoolean(),
-        value[4].toBoolean()
+        value[4].toBigInt(),
+        value[5].toBoolean()
       )
     );
   }
