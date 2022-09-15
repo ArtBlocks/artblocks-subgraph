@@ -905,7 +905,7 @@ describe("GenArt721CoreV3: handleProjectUpdated", () => {
       createMockedFunction(
         TEST_CONTRACT_ADDRESS,
         "projectStateData",
-        "projectStateData(uint256):(uint256,uint256,bool,bool,bool)"
+        "projectStateData(uint256):(uint256,uint256,bool,bool,uint256,bool)"
       )
         .withArgs([ethereum.Value.fromUnsignedBigInt(projectId)])
         .returns([
@@ -913,6 +913,7 @@ describe("GenArt721CoreV3: handleProjectUpdated", () => {
           ethereum.Value.fromUnsignedBigInt(BigInt.fromI32(ONE_MILLION)),
           ethereum.Value.fromBoolean(false),
           ethereum.Value.fromBoolean(true),
+          ethereum.Value.fromUnsignedBigInt(BigInt.fromI32(0)),
           ethereum.Value.fromBoolean(false)
         ]);
       // // mock projectIdToArtistAddress
@@ -985,7 +986,7 @@ describe("GenArt721CoreV3: handleProjectUpdated", () => {
       createMockedFunction(
         TEST_CONTRACT_ADDRESS,
         "projectStateData",
-        "projectStateData(uint256):(uint256,uint256,bool,bool,bool)"
+        "projectStateData(uint256):(uint256,uint256,bool,bool,uint256,bool)"
       )
         .withArgs([ethereum.Value.fromUnsignedBigInt(projectId)])
         .returns([
@@ -993,6 +994,7 @@ describe("GenArt721CoreV3: handleProjectUpdated", () => {
           ethereum.Value.fromUnsignedBigInt(maxInvocations),
           ethereum.Value.fromBoolean(false),
           ethereum.Value.fromBoolean(paused),
+          ethereum.Value.fromUnsignedBigInt(BigInt.fromI32(0)),
           ethereum.Value.fromBoolean(false)
         ]);
       // // mock projectIdToArtistAddress

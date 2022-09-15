@@ -178,6 +178,7 @@ export class DefaultProjectValues {
   locked: boolean;
   maxInvocations: BigInt;
   paused: boolean;
+  completedTimestamp: BigInt;
   royaltyPercentage: BigInt;
   scriptCount: BigInt;
   scriptJSON: string;
@@ -214,6 +215,7 @@ export const DEFAULT_PROJECT_VALUES: DefaultProjectValues = {
   locked: false,
   maxInvocations: BigInt.fromI32(ONE_MILLION),
   paused: true,
+  completedTimestamp: BigInt.fromI32(0),
   royaltyPercentage: BigInt.zero(),
   scriptCount: BigInt.zero(),
   scriptJSON: "",

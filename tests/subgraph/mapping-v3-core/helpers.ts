@@ -275,6 +275,13 @@ export function mockProjectStateDataCall(
         ? changetype<Map<string, string>>(overrides).get("paused") == "true"
         : DEFAULT_PROJECT_VALUES.paused
     ), // paused
+    ethereum.Value.fromUnsignedBigInt(
+      overrides && overrides.has("completedTimestamp")
+        ? BigInt.fromString(
+            changetype<Map<string, string>>(overrides).get("completedTimestamp")
+          )
+        : DEFAULT_PROJECT_VALUES.completedTimestamp
+    ), // completedTimestamp
     ethereum.Value.fromBoolean(
       overrides && overrides.has("locked")
         ? changetype<Map<string, string>>(overrides).get("locked") == "true"
@@ -285,7 +292,7 @@ export function mockProjectStateDataCall(
   createMockedFunction(
     TEST_CONTRACT_ADDRESS,
     "projectStateData",
-    "projectStateData(uint256):(uint256,uint256,bool,bool,bool)"
+    "projectStateData(uint256):(uint256,uint256,bool,bool,uint256,bool)"
   )
     .withArgs([ethereum.Value.fromUnsignedBigInt(projectId)])
     .returns(projectStateDataReturnArray);
