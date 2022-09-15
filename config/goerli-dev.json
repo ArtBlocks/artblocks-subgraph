@@ -2,7 +2,7 @@
   "network": "goerli",
   "genArt721CoreV3Contracts": [
     {
-      "address": "0x0000000000000000000000000000000000000000",
+      "address": "0xF396C180bb2f92EE28535D23F5224A5b9425ceca",
       "name": "Dev Goerli Flagship Core V3 Contract",
       "startBlock": 7111111
     }
@@ -35,7 +35,7 @@
   ],
   "minterFilterV1Contracts": [
     {
-      "address": "0x0000000000000000000000000000000000000000",
+      "address": "0x7EcFFfc1A3Eb7Ce76D4b29Df3e5098D2D921D367",
       "name": "Flagship Minter Filter for V3 core",
       "startBlock": 7010933
     }
@@ -54,7 +54,7 @@
   ],
   "minterSetPriceV2Contracts": [
     {
-      "address": "0x0000000000000000000000000000000000000000",
+      "address": "0x3A23Ae9EB73C14Ff2A83a0bBe1028A690006e0cc",
       "name": "Flagship Minter for V3 core",
       "startBlock": 7010933
     }
@@ -73,7 +73,7 @@
   ],
   "minterSetPriceERC20V2Contracts": [
     {
-      "address": "0x0000000000000000000000000000000000000000",
+      "address": "0x004E1cdb723869f6c65086f1d5cED55Cd9BA1971",
       "name": "Flagship Minter for V3 core",
       "startBlock": 7010933
     }
@@ -92,7 +92,7 @@
   ],
   "minterDALinV2Contracts": [
     {
-      "address": "0x0000000000000000000000000000000000000000",
+      "address": "0x73873eAAf65338256E31b1e612AC74D09492B5B8",
       "name": "Flagship Minter for V3 core",
       "startBlock": 7010933
     }
@@ -111,7 +111,7 @@
   ],
   "minterDAExpV2Contracts": [
     {
-      "address": "0x0000000000000000000000000000000000000000",
+      "address": "0xBced47092b6c1a9Ee24aFeC871E782aA44587001",
       "name": "Flagship Minter for V3 core",
       "startBlock": 7010933
     }
@@ -125,7 +125,7 @@
   ],
   "minterHolderV1Contracts": [
     {
-      "address": "0x0000000000000000000000000000000000000000",
+      "address": "0x82Df93Cd9Cd9178C8F442FB766fe3402916Fe567",
       "name": "Flagship Minter for V3 core",
       "startBlock": 7148716
     }
@@ -139,7 +139,7 @@
   ],
   "minterMerkleV1Contracts": [
     {
-      "address": "0x0000000000000000000000000000000000000000",
+      "address": "0xcd1AA5C612731108267D22b77745207D9728Edf8",
       "name": "Flagship Minter for V3 core",
       "startBlock": 7105457
     }
