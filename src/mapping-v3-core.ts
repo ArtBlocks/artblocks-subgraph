@@ -1,4 +1,4 @@
-import { BigInt, store, log, Address } from "@graphprotocol/graph-ts";
+import { BigInt, store, log, Address, Bytes } from "@graphprotocol/graph-ts";
 
 import {
   GenArt721CoreV3,
@@ -11,6 +11,11 @@ import {
   AcceptedArtistAddressesAndSplits,
   OwnershipTransferred
 } from "../generated/GenArt721CoreV3/GenArt721CoreV3";
+
+import {
+  IAdminACLV0,
+  SuperAdminTransferred
+} from "../generated/AdminACLV0/IAdminACLV0";
 
 import { MinterFilterV0 } from "../generated/MinterFilterV0/MinterFilterV0";
 import { loadOrCreateAndSetProjectMinterConfiguration } from "./minter-filter-mapping";
@@ -31,8 +36,11 @@ import {
   generateAccountProjectId,
   generateProjectIdNumberFromTokenIdNumber,
   generateContractSpecificId,
-  generateProjectScriptId
+  generateProjectScriptId,
+  addWhitelisting
 } from "./helpers";
+
+import { NULL_ADDRESS } from "./constants";
 
 /**
  * @dev Warning - All parameters pulled directly from contracts will return the
@@ -42,6 +50,23 @@ import {
  */
 
 /*** EVENT HANDLERS ***/
+export function handleIAdminACLV0SuperAdminTransferred(
+  event: SuperAdminTransferred
+): void {
+  // attempt to update any of the contract entities flagged in the event
+  let contractAddresses: Array<Address> =
+    event.params.genArt721CoreAddressesToUpdate;
+  for (let i = 0; i < contractAddresses.length; i++) {
+    let contractAddress: Address = contractAddresses[i];
+    let contractEntity = Contract.load(contractAddress.toHexString());
+    if (contractEntity) {
+      // refresh the contract entity to pick up the new super admin
+      let contract = GenArt721CoreV3.bind(contractAddress);
+      refreshContract(contract, event.block.timestamp);
+    }
+  }
+}
+
 export function handleMint(event: Mint): void {
   let contract = GenArt721CoreV3.bind(event.address);
 
@@ -653,11 +678,8 @@ export function handleAcceptedArtistAddressesAndSplits(
 // This event is updated whenever an admin address is changed.
 export function handleOwnershipTransferred(event: OwnershipTransferred): void {
   let contract = GenArt721CoreV3.bind(event.address);
-  let contractEntity = loadOrCreateContract(contract, event.block.timestamp);
-  // update the contract entity with the new admin address from the event
-  contractEntity.admin = event.params.newOwner;
-  contractEntity.updatedAt = event.block.timestamp;
-  contractEntity.save();
+  // refresh the contract to get the latest admin address
+  refreshContract(contract, event.block.timestamp);
 }
 
 /*** END EVENT HANDLERS ***/
@@ -722,7 +744,20 @@ function refreshContract(
     contractEntity.newProjectsForbidden = false;
     contractEntity.nextProjectId = contract.nextProjectId();
   }
-  contractEntity.admin = contract.admin();
+  let _admin = contract.admin();
+  if (_admin.toHexString() == NULL_ADDRESS) {
+    contractEntity.admin = Bytes.fromHexString(NULL_ADDRESS);
+    contractEntity.whitelisted = [];
+  } else {
+    let adminACLContract = IAdminACLV0.bind(_admin);
+    let superAdminAddress = adminACLContract.superAdmin();
+    contractEntity.admin = superAdminAddress;
+    let whitelisting = addWhitelisting(
+      contractEntity.id,
+      superAdminAddress.toHexString()
+    );
+    contractEntity.whitelisted = [whitelisting.id];
+  }
   contractEntity.type = contract.coreType();
   contractEntity.renderProviderAddress = contract.artblocksPrimarySalesAddress();
   contractEntity.renderProviderPercentage = contract.artblocksPrimarySalesPercentage();

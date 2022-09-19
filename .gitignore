@@ -10,6 +10,7 @@ generated/*
 
 # Track generic contract generated code
 !generated/schema.ts
+!generated/AdminACLV0
 !generated/GenArt721
 !generated/GenArt721Core
 !generated/GenArt721Core2

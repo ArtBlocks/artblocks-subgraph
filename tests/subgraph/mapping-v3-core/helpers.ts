@@ -18,6 +18,7 @@ import {
   TEST_CONTRACT_ADDRESS,
   TEST_CONTRACT,
   TEST_MINTER_FILTER_ADDRESS,
+  TEST_SUPER_ADMIN_ADDRESS,
   PROJECT_ENTITY_TYPE,
   booleanToString
 } from "../shared-helpers";
@@ -46,6 +47,12 @@ export function mockRefreshContractCalls(
     "admin",
     "admin():(address)"
   ).returns([ethereum.Value.fromAddress(TEST_CONTRACT.admin)]);
+
+  createMockedFunction(
+    TEST_CONTRACT.admin,
+    "superAdmin",
+    "superAdmin():(address)"
+  ).returns([ethereum.Value.fromAddress(TEST_SUPER_ADMIN_ADDRESS)]);
 
   createMockedFunction(
     TEST_CONTRACT_ADDRESS,

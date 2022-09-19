@@ -143,5 +143,12 @@
       "name": "Flagship Minter for V3 core",
       "startBlock": 7105457
     }
+  ],
+  "adminACLV0Contracts": [
+    {
+      "address": "0x4Cbf3805011f0f4d4daeDa710b2215fBF37288Ad",
+      "name": "Initial Admin ACL V0 for V3 core (deprecated)",
+      "startBlock": 7105457
+    }
   ]
 }
