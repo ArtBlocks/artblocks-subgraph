@@ -911,7 +911,7 @@ test("GenArt721CoreV3: Handles PlatformUpdated::artblocksSecondaryBPS - changed 
   );
 });
 
-describe("GenARt721CoreV3: handleIAdminACLV0SuperAdminTransferred", () => {
+describe("GenArt721CoreV3: handleIAdminACLV0SuperAdminTransferred", () => {
   test("should update core when super admin is transferred", () => {
     clearStore();
     // add new contract to store
