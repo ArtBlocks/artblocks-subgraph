@@ -29,6 +29,8 @@ dataSources:
       abis:
         - name: GenArt721CoreV3
           file: ./abis/GenArt721CoreV3.json
+        - name: IAdminACLV0
+          file: ./abis/IAdminACLV0.json
       eventHandlers:
         - event: Mint(indexed address,indexed uint256)
           handler: handleMint
@@ -1263,6 +1265,8 @@ dataSources:
           file: ./abis/AdminACLV0.json
         - name: IAdminACLV0
           file: ./abis/IAdminACLV0.json
+        - name: GenArt721CoreV3
+          file: ./abis/GenArt721CoreV3.json
       eventHandlers:
         - event: SuperAdminTransferred(indexed address,indexed address,address[])
           handler: handleIAdminACLV0SuperAdminTransferred
