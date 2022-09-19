@@ -752,11 +752,11 @@ function refreshContract(
     let adminACLContract = IAdminACLV0.bind(_admin);
     let superAdminAddress = adminACLContract.superAdmin();
     contractEntity.admin = superAdminAddress;
-    let whitelistingId = addWhitelisting(
+    let whitelisting = addWhitelisting(
       contractEntity.id,
       superAdminAddress.toHexString()
     );
-    contractEntity.whitelisted = [whitelistingId];
+    contractEntity.whitelisted = [whitelisting.id];
   }
   contractEntity.type = contract.coreType();
   contractEntity.renderProviderAddress = contract.artblocksPrimarySalesAddress();

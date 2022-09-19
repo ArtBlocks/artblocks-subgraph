@@ -54,7 +54,10 @@ export function generateContractSpecificId(
 }
 
 // returns new whitelisting id
-export function addWhitelisting(contractId: string, accountId: string): string {
+export function addWhitelisting(
+  contractId: string,
+  accountId: string
+): Whitelisting {
   let account = new Account(accountId);
   account.save();
 
@@ -65,7 +68,7 @@ export function addWhitelisting(contractId: string, accountId: string): string {
   whitelisting.contract = contractId;
 
   whitelisting.save();
-  return whitelisting.id;
+  return whitelisting;
 }
 
 export function generateProjectScriptId(
