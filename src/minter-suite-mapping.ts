@@ -24,22 +24,34 @@ import {
 } from "../generated/MinterDALinV0/MinterDALinV0";
 
 import {
-  AuctionHalfLifeRangeSecondsUpdated as AuctionHalfLifeRangeSecondsUpdatedV0,
-  ResetAuctionDetails as DAExpV0ResetAuctionDetails,
-  SetAuctionDetails as DAExpV0SetAuctionDetails
-} from "../generated/MinterDAExpV0/MinterDAExpV0";
-
-import {
   MinimumAuctionLengthSecondsUpdated as MinimumAuctionLengthSecondsUpdatedV1,
   ResetAuctionDetails as DALinV1ResetAuctionDetails,
   SetAuctionDetails as DALinV1SetAuctionDetails
 } from "../generated/MinterDALinV1/MinterDALinV1";
 
 import {
+  MinimumAuctionLengthSecondsUpdated as MinimumAuctionLengthSecondsUpdatedV2,
+  ResetAuctionDetails as DALinV2ResetAuctionDetails,
+  SetAuctionDetails as DALinV2SetAuctionDetails
+} from "../generated/MinterDALinV2/MinterDALinV2";
+
+import {
+  AuctionHalfLifeRangeSecondsUpdated as AuctionHalfLifeRangeSecondsUpdatedV0,
+  ResetAuctionDetails as DAExpV0ResetAuctionDetails,
+  SetAuctionDetails as DAExpV0SetAuctionDetails
+} from "../generated/MinterDAExpV0/MinterDAExpV0";
+
+import {
   AuctionHalfLifeRangeSecondsUpdated as AuctionHalfLifeRangeSecondsUpdatedV1,
   ResetAuctionDetails as DAExpV1ResetAuctionDetails,
   SetAuctionDetails as DAExpV1SetAuctionDetails
 } from "../generated/MinterDAExpV1/MinterDAExpV1";
+
+import {
+  AuctionHalfLifeRangeSecondsUpdated as AuctionHalfLifeRangeSecondsUpdatedV2,
+  ResetAuctionDetails as DAExpV2ResetAuctionDetails,
+  SetAuctionDetails as DAExpV2SetAuctionDetails
+} from "../generated/MinterDAExpV2/MinterDAExpV2";
 
 import {
   Minter,
@@ -72,11 +84,17 @@ import {
   ConfigValueSet3 as ConfigValueSetBytes
 } from "../generated/MinterFilterV0/IFilteredMinterV1";
 import {
-  AllowedHoldersOfProjects,
-  RegisteredNFTAddress,
-  UnregisteredNFTAddress,
-  RemovedHoldersOfProjects
+  AllowedHoldersOfProjects as MinterHolderV0AllowedHoldersOfProjects,
+  RegisteredNFTAddress as MinterHolderV0RegisteredNFTAddress,
+  UnregisteredNFTAddress as MinterHolderV0UnregisteredNFTAddress,
+  RemovedHoldersOfProjects as MinterHolderV0RemovedHoldersOfProjects
 } from "../generated/MinterHolderV0/MinterHolderV0";
+import {
+  AllowedHoldersOfProjects as MinterHolderV1AllowedHoldersOfProjects,
+  RegisteredNFTAddress as MinterHolderV1RegisteredNFTAddress,
+  UnregisteredNFTAddress as MinterHolderV1UnregisteredNFTAddress,
+  RemovedHoldersOfProjects as MinterHolderV1RemovedHoldersOfProjects
+} from "../generated/MinterHolderV1/MinterHolderV1";
 import { MinterConfigSetAddressEvent } from "./util-types";
 
 // IFilteredMinterV0 events
@@ -152,23 +170,12 @@ export function handlePurchaseToDisabledUpdated(
 }
 
 // MinterDALin events
-export function handleMinimumAuctionLengthSecondsUpdatedV0(
-  event: MinimumAuctionLengthSecondsUpdatedV0
-): void {
-  handleMinimumAuctionLengthSecondsUpdated(event);
-}
-
-export function handleMinimumAuctionLengthSecondsUpdatedV1(
-  event: MinimumAuctionLengthSecondsUpdatedV1
-): void {
-  handleMinimumAuctionLengthSecondsUpdated(event);
-}
-
 export function handleMinimumAuctionLengthSecondsUpdated<T>(event: T): void {
   if (
     !(
       event instanceof MinimumAuctionLengthSecondsUpdatedV0 ||
-      event instanceof MinimumAuctionLengthSecondsUpdatedV1
+      event instanceof MinimumAuctionLengthSecondsUpdatedV1 ||
+      event instanceof MinimumAuctionLengthSecondsUpdatedV2
     )
   ) {
     return;
@@ -182,23 +189,12 @@ export function handleMinimumAuctionLengthSecondsUpdated<T>(event: T): void {
   minter.save();
 }
 
-export function handleDALinV0SetAuctionDetails(
-  event: DALinV0SetAuctionDetails
-): void {
-  handleDALinSetAuctionDetails(event);
-}
-
-export function handleDALinV1SetAuctionDetails(
-  event: DALinV1SetAuctionDetails
-): void {
-  handleDALinSetAuctionDetails(event);
-}
-
 export function handleDALinSetAuctionDetails<T>(event: T): void {
   if (
     !(
       event instanceof DALinV0SetAuctionDetails ||
-      event instanceof DALinV1SetAuctionDetails
+      event instanceof DALinV1SetAuctionDetails ||
+      event instanceof DALinV2SetAuctionDetails
     )
   ) {
     return;
@@ -227,23 +223,12 @@ export function handleDALinSetAuctionDetails<T>(event: T): void {
   }
 }
 
-export function handleDALinV0ResetAuctionDetails(
-  event: DALinV0ResetAuctionDetails
-): void {
-  handleDALinResetAuctionDetails(event);
-}
-
-export function handleDALinV1ResetAuctionDetails(
-  event: DALinV1ResetAuctionDetails
-): void {
-  handleDALinResetAuctionDetails(event);
-}
-
 export function handleDALinResetAuctionDetails<T>(event: T): void {
   if (
     !(
       event instanceof DALinV0ResetAuctionDetails ||
-      event instanceof DALinV1ResetAuctionDetails
+      event instanceof DALinV1ResetAuctionDetails ||
+      event instanceof DALinV2ResetAuctionDetails
     )
   ) {
     return;
@@ -273,23 +258,12 @@ export function handleDALinResetAuctionDetails<T>(event: T): void {
 }
 
 // MinterDAExp events
-export function handleAuctionHalfLifeRangeSecondsUpdatedV0(
-  event: AuctionHalfLifeRangeSecondsUpdatedV0
-): void {
-  handleAuctionHalfLifeRangeSecondsUpdated(event);
-}
-
-export function handleAuctionHalfLifeRangeSecondsUpdatedV1(
-  event: AuctionHalfLifeRangeSecondsUpdatedV1
-): void {
-  handleAuctionHalfLifeRangeSecondsUpdated(event);
-}
-
 export function handleAuctionHalfLifeRangeSecondsUpdated<T>(event: T): void {
   if (
     !(
       event instanceof AuctionHalfLifeRangeSecondsUpdatedV0 ||
-      event instanceof AuctionHalfLifeRangeSecondsUpdatedV1
+      event instanceof AuctionHalfLifeRangeSecondsUpdatedV1 ||
+      event instanceof AuctionHalfLifeRangeSecondsUpdatedV2
     )
   ) {
     return;
@@ -306,23 +280,12 @@ export function handleAuctionHalfLifeRangeSecondsUpdated<T>(event: T): void {
   minter.save();
 }
 
-export function handleDAExpV0SetAuctionDetails(
-  event: DAExpV0SetAuctionDetails
-): void {
-  handleDAExpSetAuctionDetails(event);
-}
-
-export function handleDAExpV1SetAuctionDetails(
-  event: DAExpV1SetAuctionDetails
-): void {
-  handleDAExpSetAuctionDetails(event);
-}
-
 export function handleDAExpSetAuctionDetails<T>(event: T): void {
   if (
     !(
       event instanceof DAExpV0SetAuctionDetails ||
-      event instanceof DAExpV1SetAuctionDetails
+      event instanceof DAExpV1SetAuctionDetails ||
+      event instanceof DAExpV2SetAuctionDetails
     )
   ) {
     return;
@@ -352,23 +315,12 @@ export function handleDAExpSetAuctionDetails<T>(event: T): void {
   }
 }
 
-export function handleDAExpV0ResetAuctionDetails(
-  event: DAExpV0ResetAuctionDetails
-): void {
-  handleDAExpResetAuctionDetails(event);
-}
-
-export function handleDAExpV1ResetAuctionDetails(
-  event: DAExpV1ResetAuctionDetails
-): void {
-  handleDAExpResetAuctionDetails(event);
-}
-
 export function handleDAExpResetAuctionDetails<T>(event: T): void {
   if (
     !(
       event instanceof DAExpV0ResetAuctionDetails ||
-      event instanceof DAExpV1ResetAuctionDetails
+      event instanceof DAExpV1ResetAuctionDetails ||
+      event instanceof DAExpV2ResetAuctionDetails
     )
   ) {
     return;
@@ -402,8 +354,10 @@ export function handleDAExpResetAuctionDetails<T>(event: T): void {
 export function handleHoldersOfProjectsGeneric<T>(event: T): void {
   if (
     !(
-      event instanceof AllowedHoldersOfProjects ||
-      event instanceof RemovedHoldersOfProjects
+      event instanceof MinterHolderV0AllowedHoldersOfProjects ||
+      event instanceof MinterHolderV0RemovedHoldersOfProjects ||
+      event instanceof MinterHolderV1AllowedHoldersOfProjects ||
+      event instanceof MinterHolderV1RemovedHoldersOfProjects
     )
   ) {
     return;
@@ -431,7 +385,10 @@ export function handleHoldersOfProjectsGeneric<T>(event: T): void {
         ethereum.Value.fromBytes(bytesValueCombined)
       )
     ];
-    if (event instanceof AllowedHoldersOfProjects) {
+    if (
+      event instanceof MinterHolderV0AllowedHoldersOfProjects ||
+      event instanceof MinterHolderV1AllowedHoldersOfProjects
+    ) {
       newAddEvent = new ConfigValueAddedToSetBytes(
         event.address,
         event.logIndex,
@@ -443,7 +400,10 @@ export function handleHoldersOfProjectsGeneric<T>(event: T): void {
         event.receipt
       );
       handleAddManyBytesValueProjectConfig(newAddEvent);
-    } else if (event instanceof RemovedHoldersOfProjects) {
+    } else if (
+      event instanceof MinterHolderV0RemovedHoldersOfProjects ||
+      event instanceof MinterHolderV1RemovedHoldersOfProjects
+    ) {
       newRemoveEvent = new ConfigValueRemovedFromSetBytes(
         event.address,
         event.logIndex,
@@ -459,23 +419,13 @@ export function handleHoldersOfProjectsGeneric<T>(event: T): void {
   }
 }
 
-export function handleAllowHoldersOfProjects(
-  event: AllowedHoldersOfProjects
-): void {
-  handleHoldersOfProjectsGeneric(event);
-}
-
-export function handleRemoveHoldersOfProjects(
-  event: RemovedHoldersOfProjects
-): void {
-  handleHoldersOfProjectsGeneric(event);
-}
-
 export function handleRegistrationNFTAddresses<T>(event: T): void {
   if (
     !(
-      event instanceof RegisteredNFTAddress ||
-      event instanceof UnregisteredNFTAddress
+      event instanceof MinterHolderV0RegisteredNFTAddress ||
+      event instanceof MinterHolderV1RegisteredNFTAddress ||
+      event instanceof MinterHolderV0UnregisteredNFTAddress ||
+      event instanceof MinterHolderV1UnregisteredNFTAddress
     )
   ) {
     return;
@@ -495,20 +445,17 @@ export function handleRegistrationNFTAddresses<T>(event: T): void {
     )
   ];
 
-  if (event instanceof RegisteredNFTAddress) {
+  if (
+    event instanceof MinterHolderV0RegisteredNFTAddress ||
+    event instanceof MinterHolderV1RegisteredNFTAddress
+  ) {
     handleAddManyAddressValueMinterConfig(genericEvent);
-  } else if (event instanceof UnregisteredNFTAddress) {
+  } else if (
+    event instanceof MinterHolderV0UnregisteredNFTAddress ||
+    event instanceof MinterHolderV1UnregisteredNFTAddress
+  ) {
     handleRemoveAddressManyValueMinterConfig(genericEvent);
   }
-}
-export function handleRegisteredNFTAddress(event: RegisteredNFTAddress): void {
-  handleRegistrationNFTAddresses(event);
-}
-
-export function handleUnregisteredNFTAddress(
-  event: UnregisteredNFTAddress
-): void {
-  handleRegistrationNFTAddresses(event);
 }
 
 // Generic Handlers
@@ -707,7 +654,10 @@ export function handleAddManyValueGeneric<T, C>(
     if (val) {
       arr = val.toArray().map<BigInt>((v: JSONValue) => v.toBigInt());
     }
-    arr.push(event.params._value);
+    // only add if it doesn't exist, so we act like a Set
+    if (!arr.includes(event.params._value)) {
+      arr.push(event.params._value);
+    }
     newValue = arrayToJSONValue(arr.toString());
   } else if (
     event instanceof ConfigValueAddedToSetAddress ||
@@ -727,9 +677,13 @@ export function handleAddManyValueGeneric<T, C>(
     ) {
       stringVal = event.params._value.toHexString();
     } else {
-      stringVal = event.params._value.toString();
+      // for Bytes, use method to determine if string or hexString
+      stringVal = bytesToJSONValue(event.params._value).toString();
     }
-    arr.push(stringToJSONString(stringVal));
+    // only add if it doesn't exist, so we act like a Set
+    if (!arr.includes(stringVal)) {
+      arr.push(stringToJSONString(stringVal));
+    }
     newValue = arrayToJSONValue(arr.toString());
   }
 

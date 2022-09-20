@@ -3,7 +3,8 @@ import {
   clearStore,
   test,
   newMockCall,
-  newMockEvent
+  newMockEvent,
+  createMockedFunction,
 } from "matchstick-as/assembly/index";
 import { BigInt, Bytes, ethereum } from "@graphprotocol/graph-ts";
 import {
@@ -12,7 +13,6 @@ import {
   CONTRACT_ENTITY_TYPE,
   WHITELISTING_ENTITY_TYPE,
   PROJECT_SCRIPT_ENTITY_TYPE,
-  TOKEN_ENTITY_TYPE,
   DEFAULT_PROJECT_VALUES,
   CURRENT_BLOCK_TIMESTAMP,
   RandomAddressGenerator,
@@ -23,8 +23,12 @@ import {
   assertTestContractFields,
   addTestContractToStore,
   TEST_CONTRACT,
+  TOKEN_ENTITY_TYPE,
   TRANSFER_ENTITY_TYPE,
-  addNewTokenToStore
+  addNewTokenToStore,
+  IPFS_CID,
+  PROJECT_EXTERNAL_ASSET_DEPENDENCY_ENTITY_TYPE,
+  IPFS_CID2
 } from "../shared-helpers";
 
 import {
@@ -32,38 +36,35 @@ import {
   mockProjectScriptInfoCall,
   mockProjectTokenInfoCallWithDefaults,
   mockProjectDetailsCallWithDefaults,
-  addNewProjectToStore,
-  mockTokenURICall
+  addNewProjectToStore
 } from "./helpers";
 
 import {
   Account,
-  Contract,
   Project,
   ProjectScript,
   Token,
+  Contract,
   Whitelisting
 } from "../../../generated/schema";
 import {
   AddProjectCall,
   AddWhitelistedCall,
   RemoveWhitelistedCall,
-  UpdateArtblocksAddressCall,
-  UpdateArtblocksPercentageCall,
+  AddMintWhitelistedCall,
+  UpdateRandomizerAddressCall,
+  UpdateRenderProviderAddressCall,
+  UpdateRenderProviderPercentageCall,
   AddProjectScriptCall,
-  ClearTokenIpfsImageUriCall,
-  OverrideTokenDynamicImageWithIpfsLinkCall,
   RemoveProjectLastScriptCall,
   ToggleProjectIsActiveCall,
-  ToggleProjectIsDynamicCall,
   ToggleProjectIsLockedCall,
   ToggleProjectIsPausedCall,
-  ToggleProjectUseIpfsForStaticCall,
   UpdateProjectAdditionalPayeeInfoCall,
   UpdateProjectArtistAddressCall,
   UpdateProjectArtistNameCall,
-  UpdateProjectBaseIpfsURICall,
   UpdateProjectBaseURICall,
+  UpdateProjectCurrencyInfoCall,
   UpdateProjectDescriptionCall,
   UpdateProjectIpfsHashCall,
   UpdateProjectLicenseCall,
@@ -72,30 +73,38 @@ import {
   UpdateProjectPricePerTokenInWeiCall,
   UpdateProjectWebsiteCall,
   UpdateProjectSecondaryMarketRoyaltyPercentageCall,
+  RemoveMintWhitelistedCall,
   UpdateProjectScriptCall,
   UpdateProjectScriptJSONCall,
   Transfer
-} from "../../../generated/GenArt721/GenArt721";
+} from "../../../generated/GenArt721Core2PBAB/GenArt721Core2PBAB";
+
+import {
+  ExternalAssetDependencyUpdated,
+  ExternalAssetDependencyRemoved,
+  GatewayUpdated,
+  ProjectExternalAssetDependenciesLocked,
+  GenArt721Core2EngineFlex
+} from "../../../generated/GenArt721Core2EngineFlex/GenArt721Core2EngineFlex";
+
 import {
   handleAddProject,
   handleAddWhitelisted,
   handleRemoveWhitelisted,
-  handleUpdateArtblocksAddress,
-  handleUpdateArtblocksPercentage,
+  handleAddMintWhitelisted,
+  handleUpdateRandomizerAddress,
+  handleUpdateRenderProviderAddress,
+  handleUpdateRenderProviderPercentage,
   handleAddProjectScript,
-  handleClearTokenIpfsImageUri,
-  handleOverrideTokenDynamicImageWithIpfsLink,
   handleRemoveProjectLastScript,
   handleToggleProjectIsActive,
-  handleToggleProjectIsDynamic,
   handleToggleProjectIsLocked,
   handleToggleProjectIsPaused,
-  handleToggleProjectUseIpfsForStatic,
   handleUpdateProjectAdditionalPayeeInfo,
   handleUpdateProjectArtistAddress,
   handleUpdateProjectArtistName,
-  handleUpdateProjectBaseIpfsURI,
   handleUpdateProjectBaseURI,
+  handleUpdateProjectCurrencyInfo,
   handleUpdateProjectDescription,
   handleUpdateProjectIpfsHash,
   handleUpdateProjectLicense,
@@ -104,20 +113,26 @@ import {
   handleUpdateProjectPricePerTokenInWei,
   handleUpdateProjectWebsite,
   handleUpdateProjectSecondaryMarketRoyaltyPercentage,
+  handleRemoveMintWhitelisted,
   handleUpdateProjectScript,
   handleUpdateProjectScriptJSON,
+  handleExternalAssetDependencyUpdated,
+  handleExternalAssetDependencyRemoved,
+  handleGatewayUpdated,
+  handleProjectExternalAssetDependenciesLocked,
   handleTransfer
-} from "../../../src/original-mapping";
-
+} from "../../../src/mapping-v2-core";
 import {
   generateContractSpecificId,
   generateProjectScriptId,
   generateWhitelistingId
 } from "../../../src/helpers";
 
+import { FLEX_CONTRACT_EXTERNAL_ASSET_DEP_TYPES } from "../../../src/constants";
+
 const randomAddressGenerator = new RandomAddressGenerator();
 
-test("GenArt721: Can add a new project when its contract has not yet been indexed", () => {
+test("GenArt721Core2PBAB: Can add a new project when its contract has not yet been indexed", () => {
   clearStore();
   // When no contract entity exists yet we figure out the
   // project id of the project being added by
@@ -200,7 +215,7 @@ test("GenArt721: Can add a new project when its contract has not yet been indexe
   );
 });
 
-test("GenArt721: Can add a new project when its contract has been indexed", () => {
+test("GenArt721Core2PBAB: Can add a new project when its contract has been indexed", () => {
   clearStore();
   const nextProjectId = BigInt.fromI32(1);
 
@@ -278,7 +293,7 @@ test("GenArt721: Can add a new project when its contract has been indexed", () =
   );
 });
 
-test("GenArt721: Can add whitelisting to a contract that has not yet been indexed", () => {
+test("GenArt721Core2PBAB: Can add whitelisting to a contract that has not yet been indexed", () => {
   clearStore();
   const call = changetype<AddWhitelistedCall>(newMockCall());
   call.to = TEST_CONTRACT_ADDRESS;
@@ -323,7 +338,7 @@ test("GenArt721: Can add whitelisting to a contract that has not yet been indexe
   );
 });
 
-test("GenArt721: Can remove whitelisting", () => {
+test("GenArt721Core2PBAB: Can remove whitelisting", () => {
   clearStore();
   // Populate store with an existing whitelisting
   addTestContractToStore(BigInt.fromI32(1));
@@ -368,13 +383,96 @@ test("GenArt721: Can remove whitelisting", () => {
   assert.notInStore(WHITELISTING_ENTITY_TYPE, whitelistingId);
 });
 
-test("GenArt721: Can update render provider address", () => {
+test("GenArt721Core2PBAB: Can add a new whitelisted minter to contract", () => {
+  clearStore();
+  const call = changetype<AddMintWhitelistedCall>(newMockCall());
+  const minterAddress = randomAddressGenerator.generateRandomAddress();
+
+  call.to = TEST_CONTRACT_ADDRESS;
+  call.block.timestamp = CURRENT_BLOCK_TIMESTAMP;
+  call.inputValues = [
+    new ethereum.EventParam(
+      "_address",
+      ethereum.Value.fromAddress(minterAddress)
+    )
+  ];
+
+  mockRefreshContractCalls(BigInt.fromI32(1), new Map<string, string>());
+
+  handleAddMintWhitelisted(call);
+
+  assert.fieldEquals(
+    CONTRACT_ENTITY_TYPE,
+    TEST_CONTRACT_ADDRESS.toHexString(),
+    "mintWhitelisted",
+    "[" + minterAddress.toHexString() + "]"
+  );
+});
+
+test("GenArt721Core2PBAB: Can remove whitelisted minter from contract", () => {
+  clearStore();
+  const minterAddress = randomAddressGenerator.generateRandomAddress();
+  const minterAddressToBeRemoved = randomAddressGenerator.generateRandomAddress();
+
+  const contract = addTestContractToStore(BigInt.fromI32(1));
+  contract.mintWhitelisted = [minterAddress, minterAddressToBeRemoved];
+  contract.save();
+
+  const removeWhitelistCall = changetype<RemoveMintWhitelistedCall>(
+    newMockCall()
+  );
+  removeWhitelistCall.to = TEST_CONTRACT_ADDRESS;
+  removeWhitelistCall.block.timestamp = CURRENT_BLOCK_TIMESTAMP;
+  removeWhitelistCall.inputValues = [
+    new ethereum.EventParam(
+      "_address",
+      ethereum.Value.fromAddress(minterAddressToBeRemoved)
+    )
+  ];
+
+  handleRemoveMintWhitelisted(removeWhitelistCall);
+
+  assert.fieldEquals(
+    CONTRACT_ENTITY_TYPE,
+    TEST_CONTRACT_ADDRESS.toHexString(),
+    "mintWhitelisted",
+    "[" + minterAddress.toHexString() + "]"
+  );
+});
+
+test("GenArt721Core2PBAB: Can update randomizer address", () => {
   clearStore();
   assert.notInStore(CONTRACT_ENTITY_TYPE, TEST_CONTRACT_ADDRESS.toHexString());
 
   mockRefreshContractCalls(BigInt.fromI32(1), new Map<string, string>());
 
-  const call = changetype<UpdateArtblocksAddressCall>(newMockCall());
+  const call = changetype<UpdateRandomizerAddressCall>(newMockCall());
+  call.to = TEST_CONTRACT_ADDRESS;
+  call.block.timestamp = CURRENT_BLOCK_TIMESTAMP;
+  call.inputValues = [
+    new ethereum.EventParam(
+      "_address",
+      ethereum.Value.fromAddress(TEST_CONTRACT.randomizerContract)
+    )
+  ];
+
+  handleUpdateRandomizerAddress(call);
+
+  assert.fieldEquals(
+    CONTRACT_ENTITY_TYPE,
+    TEST_CONTRACT_ADDRESS.toHexString(),
+    "randomizerContract",
+    TEST_CONTRACT.randomizerContract.toHexString()
+  );
+});
+
+test("GenArt721Core2PBAB: Can update render provider address", () => {
+  clearStore();
+  assert.notInStore(CONTRACT_ENTITY_TYPE, TEST_CONTRACT_ADDRESS.toHexString());
+
+  mockRefreshContractCalls(BigInt.fromI32(1), new Map<string, string>());
+
+  const call = changetype<UpdateRenderProviderAddressCall>(newMockCall());
   call.to = TEST_CONTRACT_ADDRESS;
   call.block.timestamp = CURRENT_BLOCK_TIMESTAMP;
   call.inputValues = [
@@ -384,7 +482,7 @@ test("GenArt721: Can update render provider address", () => {
     )
   ];
 
-  handleUpdateArtblocksAddress(call);
+  handleUpdateRenderProviderAddress(call);
 
   assert.fieldEquals(
     CONTRACT_ENTITY_TYPE,
@@ -394,9 +492,9 @@ test("GenArt721: Can update render provider address", () => {
   );
 });
 
-test("GenArt721: Can update render provider percentage", () => {
+test("GenArt721Core2PBAB: Can update render provider percentage", () => {
   clearStore();
-  const call = changetype<UpdateArtblocksPercentageCall>(newMockCall());
+  const call = changetype<UpdateRenderProviderPercentageCall>(newMockCall());
 
   call.to = TEST_CONTRACT_ADDRESS;
   call.block.timestamp = CURRENT_BLOCK_TIMESTAMP;
@@ -409,7 +507,7 @@ test("GenArt721: Can update render provider percentage", () => {
 
   mockRefreshContractCalls(BigInt.fromI32(1), new Map<string, string>());
 
-  handleUpdateArtblocksPercentage(call);
+  handleUpdateRenderProviderPercentage(call);
 
   assert.fieldEquals(
     CONTRACT_ENTITY_TYPE,
@@ -419,7 +517,7 @@ test("GenArt721: Can update render provider percentage", () => {
   );
 });
 
-test("GenArt721: Can add project scripts", () => {
+test("GenArt721Core2PBAB: Can add project scripts", () => {
   clearStore();
   // Add project to store
   const projectId = BigInt.fromI32(0);
@@ -563,77 +661,7 @@ test("GenArt721: Can add project scripts", () => {
   );
 });
 
-test("GenArt721: Can clear a Token IPFS image uri", () => {
-  clearStore();
-  const tokenId = BigInt.fromI32(0);
-  const fullTokenId = generateContractSpecificId(
-    TEST_CONTRACT_ADDRESS,
-    tokenId
-  );
-
-  const token = addNewTokenToStore(
-    TEST_CONTRACT_ADDRESS,
-    tokenId,
-    BigInt.fromI32(0)
-  );
-
-  const tokenUri = "https://token.artblocks.io/" + tokenId.toString();
-  mockTokenURICall(tokenId, tokenUri);
-
-  const call = changetype<ClearTokenIpfsImageUriCall>(newMockCall());
-  call.to = TEST_CONTRACT_ADDRESS;
-  call.block.timestamp = CURRENT_BLOCK_TIMESTAMP;
-  call.inputValues = [
-    new ethereum.EventParam(
-      "_tokenId",
-      ethereum.Value.fromUnsignedBigInt(tokenId)
-    )
-  ];
-
-  handleClearTokenIpfsImageUri(call);
-
-  assert.fieldEquals(TOKEN_ENTITY_TYPE, fullTokenId, "uri", tokenUri);
-});
-
-// Under the hood this does the exact same thing as the above test
-// and just relies on the contract to get ther proper token URI
-test("GenArt721: Can override token dynamic image with IPFS link", () => {
-  clearStore();
-  const tokenId = BigInt.fromI32(0);
-  const fullTokenId = generateContractSpecificId(
-    TEST_CONTRACT_ADDRESS,
-    tokenId
-  );
-
-  const token = addNewTokenToStore(
-    TEST_CONTRACT_ADDRESS,
-    tokenId,
-    BigInt.fromI32(0)
-  );
-  token.uri = "";
-  token.save();
-
-  const ipfsHash = "QmYwAPJzv5CZsnA625s3Xf2nemtYgPpHdWEz79ojWnPbdG";
-  const call = changetype<OverrideTokenDynamicImageWithIpfsLinkCall>(
-    newMockCall()
-  );
-  call.to = TEST_CONTRACT_ADDRESS;
-  call.block.timestamp = CURRENT_BLOCK_TIMESTAMP;
-  call.inputValues = [
-    new ethereum.EventParam(
-      "_tokenId",
-      ethereum.Value.fromUnsignedBigInt(tokenId)
-    ),
-    new ethereum.EventParam("_ipfsHash", ethereum.Value.fromString(ipfsHash))
-  ];
-  mockTokenURICall(tokenId, ipfsHash);
-
-  handleOverrideTokenDynamicImageWithIpfsLink(call);
-
-  assert.fieldEquals(TOKEN_ENTITY_TYPE, fullTokenId, "uri", ipfsHash);
-});
-
-test("GenArt721: Can remove a project's last script", () => {
+test("GenArt721Core2PBAB: Can remove a project's last script", () => {
   clearStore();
   const projectId = BigInt.fromI32(0);
   const fullProjectId = generateContractSpecificId(
@@ -715,7 +743,7 @@ test("GenArt721: Can remove a project's last script", () => {
   );
 });
 
-test("GenArt721: Can toggle if a project is active", () => {
+test("GenArt721Core2PBAB: Can toggle if a project is active", () => {
   clearStore();
   const projectId = BigInt.fromI32(0);
   const fullProjectId = generateContractSpecificId(
@@ -767,65 +795,7 @@ test("GenArt721: Can toggle if a project is active", () => {
   );
 });
 
-test("GenArt721: Can toggle if a project is dynamic", () => {
-  clearStore();
-  const projectId = BigInt.fromI32(0);
-  const fullProjectId = generateContractSpecificId(
-    TEST_CONTRACT_ADDRESS,
-    projectId
-  );
-  const artistAddress = randomAddressGenerator.generateRandomAddress();
-  const projectName = "Test Project";
-  const pricePerTokenInWei = BigInt.fromI64(i64(1e18));
-
-  addNewProjectToStore(
-    projectId,
-    projectName,
-    artistAddress,
-    pricePerTokenInWei,
-    true,
-    CURRENT_BLOCK_TIMESTAMP
-  );
-
-  assert.fieldEquals(PROJECT_ENTITY_TYPE, fullProjectId, "dynamic", "true");
-  assert.fieldEquals(
-    PROJECT_ENTITY_TYPE,
-    fullProjectId,
-    "useHashString",
-    "true"
-  );
-
-  const updateCallBlockTimestamp = CURRENT_BLOCK_TIMESTAMP.plus(
-    BigInt.fromI32(10)
-  );
-  const call = changetype<ToggleProjectIsDynamicCall>(newMockCall());
-  call.to = TEST_CONTRACT_ADDRESS;
-  call.block.timestamp = updateCallBlockTimestamp;
-  call.inputValues = [
-    new ethereum.EventParam(
-      "_projectId",
-      ethereum.Value.fromUnsignedBigInt(projectId)
-    )
-  ];
-
-  handleToggleProjectIsDynamic(call);
-
-  assert.fieldEquals(PROJECT_ENTITY_TYPE, fullProjectId, "dynamic", "false");
-  assert.fieldEquals(
-    PROJECT_ENTITY_TYPE,
-    fullProjectId,
-    "useHashString",
-    "false"
-  );
-  assert.fieldEquals(
-    PROJECT_ENTITY_TYPE,
-    fullProjectId,
-    "updatedAt",
-    updateCallBlockTimestamp.toString()
-  );
-});
-
-test("GenArt721: Can toggle if a project is locked", () => {
+test("GenArt721Core2PBAB: Can toggle if a project is locked", () => {
   clearStore();
   const projectId = BigInt.fromI32(0);
   const fullProjectId = generateContractSpecificId(
@@ -871,7 +841,7 @@ test("GenArt721: Can toggle if a project is locked", () => {
   );
 });
 
-test("GenArt721: Can toggle if a project is paused", () => {
+test("GenArt721Core2PBAB: Can toggle if a project is paused", () => {
   clearStore();
   const projectId = BigInt.fromI32(0);
   const fullProjectId = generateContractSpecificId(
@@ -917,53 +887,7 @@ test("GenArt721: Can toggle if a project is paused", () => {
   );
 });
 
-test("GenArt721: Can toggle if a project uses Ipfs", () => {
-  clearStore();
-  const projectId = BigInt.fromI32(0);
-  const fullProjectId = generateContractSpecificId(
-    TEST_CONTRACT_ADDRESS,
-    projectId
-  );
-  const artistAddress = randomAddressGenerator.generateRandomAddress();
-  const projectName = "Test Project";
-  const pricePerTokenInWei = BigInt.fromI64(i64(1e18));
-
-  addNewProjectToStore(
-    projectId,
-    projectName,
-    artistAddress,
-    pricePerTokenInWei,
-    true,
-    CURRENT_BLOCK_TIMESTAMP
-  );
-
-  assert.fieldEquals(PROJECT_ENTITY_TYPE, fullProjectId, "useIpfs", "false");
-
-  const updateCallBlockTimestamp = CURRENT_BLOCK_TIMESTAMP.plus(
-    BigInt.fromI32(10)
-  );
-  const call = changetype<ToggleProjectUseIpfsForStaticCall>(newMockCall());
-  call.to = TEST_CONTRACT_ADDRESS;
-  call.block.timestamp = updateCallBlockTimestamp;
-  call.inputValues = [
-    new ethereum.EventParam(
-      "_projectId",
-      ethereum.Value.fromUnsignedBigInt(projectId)
-    )
-  ];
-
-  handleToggleProjectUseIpfsForStatic(call);
-
-  assert.fieldEquals(PROJECT_ENTITY_TYPE, fullProjectId, "useIpfs", "true");
-  assert.fieldEquals(
-    PROJECT_ENTITY_TYPE,
-    fullProjectId,
-    "updatedAt",
-    updateCallBlockTimestamp.toString()
-  );
-});
-
-test("GenArt721: Can update a projects additional payee info", () => {
+test("GenArt721Core2PBAB: Can update a projects additional payee info", () => {
   clearStore();
   const projectId = BigInt.fromI32(0);
   const fullProjectId = generateContractSpecificId(
@@ -1032,7 +956,7 @@ test("GenArt721: Can update a projects additional payee info", () => {
   );
 });
 
-test("GenArt721: Can update a projects artist address", () => {
+test("GenArt721Core2PBAB: Can update a projects artist address", () => {
   clearStore();
   const projectId = BigInt.fromI32(0);
   const fullProjectId = generateContractSpecificId(
@@ -1100,7 +1024,7 @@ test("GenArt721: Can update a projects artist address", () => {
   );
 });
 
-test("GenArt721: Can update a projects artist name", () => {
+test("GenArt721Core2PBAB: Can update a projects artist name", () => {
   clearStore();
   const projectId = BigInt.fromI32(0);
   const fullProjectId = generateContractSpecificId(
@@ -1158,62 +1082,7 @@ test("GenArt721: Can update a projects artist name", () => {
   );
 });
 
-test("GenArt721: Can update a projects base Ipfs URI", () => {
-  clearStore();
-  const projectId = BigInt.fromI32(0);
-  const fullProjectId = generateContractSpecificId(
-    TEST_CONTRACT_ADDRESS,
-    projectId
-  );
-  const artistAddress = randomAddressGenerator.generateRandomAddress();
-  const projectName = "Test Project";
-  const pricePerTokenInWei = BigInt.fromI64(i64(1e18));
-
-  addNewProjectToStore(
-    projectId,
-    projectName,
-    artistAddress,
-    pricePerTokenInWei,
-    true,
-    CURRENT_BLOCK_TIMESTAMP
-  );
-
-  const ipfsHash = "QmYwAPJzv5CZsnA625s3Xf2nemtYgPpHdWEz79ojWnPbdG";
-  const updateCallBlockTimestamp = CURRENT_BLOCK_TIMESTAMP.plus(
-    BigInt.fromI32(10)
-  );
-
-  const call = changetype<UpdateProjectBaseIpfsURICall>(newMockCall());
-  call.to = TEST_CONTRACT_ADDRESS;
-  call.block.timestamp = updateCallBlockTimestamp;
-  call.inputValues = [
-    new ethereum.EventParam(
-      "_projectId",
-      ethereum.Value.fromUnsignedBigInt(projectId)
-    ),
-    new ethereum.EventParam(
-      "_projectBaseIpfsURI",
-      ethereum.Value.fromString(ipfsHash)
-    )
-  ];
-
-  handleUpdateProjectBaseIpfsURI(call);
-
-  assert.fieldEquals(
-    PROJECT_ENTITY_TYPE,
-    fullProjectId,
-    "baseIpfsUri",
-    ipfsHash
-  );
-  assert.fieldEquals(
-    PROJECT_ENTITY_TYPE,
-    fullProjectId,
-    "updatedAt",
-    updateCallBlockTimestamp.toString()
-  );
-});
-
-test("GenArt721: Can update a project's base URI", () => {
+test("GenArt721Core2PBAB: Can update a project's base URI", () => {
   clearStore();
   const projectId = BigInt.fromI32(0);
   const fullProjectId = generateContractSpecificId(
@@ -1263,7 +1132,86 @@ test("GenArt721: Can update a project's base URI", () => {
   );
 });
 
-test("GenArt721: Can update a projects description", () => {
+test("GenArt721Core2PBAB: Can update a projects currency info", () => {
+  clearStore();
+  const projectId = BigInt.fromI32(0);
+  const fullProjectId = generateContractSpecificId(
+    TEST_CONTRACT_ADDRESS,
+    projectId
+  );
+  const artistAddress = randomAddressGenerator.generateRandomAddress();
+  const projectName = "Test Project";
+  const pricePerTokenInWei = BigInt.fromI64(i64(1e18));
+
+  addNewProjectToStore(
+    projectId,
+    projectName,
+    artistAddress,
+    pricePerTokenInWei,
+    true,
+    CURRENT_BLOCK_TIMESTAMP
+  );
+
+  const updateCallBlockTimestamp = CURRENT_BLOCK_TIMESTAMP.plus(
+    BigInt.fromI32(10)
+  );
+  const currencySymbol = "DAI";
+  const currencyAddress = randomAddressGenerator.generateRandomAddress();
+
+  const call = changetype<UpdateProjectCurrencyInfoCall>(newMockCall());
+  call.to = TEST_CONTRACT_ADDRESS;
+  call.block.timestamp = updateCallBlockTimestamp;
+  call.inputValues = [
+    new ethereum.EventParam(
+      "_projectId",
+      ethereum.Value.fromUnsignedBigInt(projectId)
+    ),
+    new ethereum.EventParam(
+      "_currencySymbol",
+      ethereum.Value.fromString(currencySymbol)
+    ),
+    new ethereum.EventParam(
+      "_currencyAddress",
+      ethereum.Value.fromAddress(currencyAddress)
+    )
+  ];
+
+  assert.fieldEquals(
+    PROJECT_ENTITY_TYPE,
+    fullProjectId,
+    "currencySymbol",
+    DEFAULT_PROJECT_VALUES.currencySymbol
+  );
+  assert.fieldEquals(
+    PROJECT_ENTITY_TYPE,
+    fullProjectId,
+    "currencyAddress",
+    DEFAULT_PROJECT_VALUES.currencyAddress.toHexString()
+  );
+
+  handleUpdateProjectCurrencyInfo(call);
+
+  assert.fieldEquals(
+    PROJECT_ENTITY_TYPE,
+    fullProjectId,
+    "currencySymbol",
+    currencySymbol
+  );
+  assert.fieldEquals(
+    PROJECT_ENTITY_TYPE,
+    fullProjectId,
+    "currencyAddress",
+    currencyAddress.toHexString()
+  );
+  assert.fieldEquals(
+    PROJECT_ENTITY_TYPE,
+    fullProjectId,
+    "updatedAt",
+    updateCallBlockTimestamp.toString()
+  );
+});
+
+test("GenArt721Core2PBAB: Can update a projects description", () => {
   clearStore();
   const projectId = BigInt.fromI32(0);
   const fullProjectId = generateContractSpecificId(
@@ -1318,7 +1266,7 @@ test("GenArt721: Can update a projects description", () => {
   );
 });
 
-test("GenArt721: Can update a projects IPFS Hash", () => {
+test("GenArt721Core2PBAB: Can update a projects IPFS Hash", () => {
   clearStore();
   const projectId = BigInt.fromI32(0);
   const fullProjectId = generateContractSpecificId(
@@ -1337,7 +1285,7 @@ test("GenArt721: Can update a projects IPFS Hash", () => {
     true,
     CURRENT_BLOCK_TIMESTAMP
   );
-  const ipfsHash = "QmYwAPJzv5CZsnA625s3Xf2nemtYgPpHdWEz79ojWnPbdG";
+  const ipfsHash = IPFS_CID;
 
   const updateCallBlockTimestamp = CURRENT_BLOCK_TIMESTAMP.plus(
     BigInt.fromI32(10)
@@ -1365,7 +1313,7 @@ test("GenArt721: Can update a projects IPFS Hash", () => {
   );
 });
 
-test("GenArt721: Can update a project license", () => {
+test("GenArt721Core2PBAB: Can update a project license", () => {
   clearStore();
   const projectId = BigInt.fromI32(0);
   const fullProjectId = generateContractSpecificId(
@@ -1420,7 +1368,7 @@ test("GenArt721: Can update a project license", () => {
   );
 });
 
-test("GenArt721: Can update a project max invocations", () => {
+test("GenArt721Core2PBAB: Can update a project max invocations", () => {
   clearStore();
   const projectId = BigInt.fromI32(0);
   const fullProjectId = generateContractSpecificId(
@@ -1485,7 +1433,7 @@ test("GenArt721: Can update a project max invocations", () => {
   );
 });
 
-test("GenArt721: Can update a project name", () => {
+test("GenArt721Core2PBAB: Can update a project name", () => {
   clearStore();
   const projectId = BigInt.fromI32(0);
   const fullProjectId = generateContractSpecificId(
@@ -1542,7 +1490,7 @@ test("GenArt721: Can update a project name", () => {
   );
 });
 
-test("GenArt721: Can update a project price per token in wei", () => {
+test("GenArt721Core2PBAB: Can update a project price per token in wei", () => {
   clearStore();
   const projectId = BigInt.fromI32(0);
   const fullProjectId = generateContractSpecificId(
@@ -1604,7 +1552,7 @@ test("GenArt721: Can update a project price per token in wei", () => {
   );
 });
 
-test("GenArt721: Can update a project script", () => {
+test("GenArt721Core2PBAB: Can update a project script", () => {
   clearStore();
   const projectId = BigInt.fromI32(0);
   const fullProjectId = generateContractSpecificId(
@@ -1693,7 +1641,7 @@ test("GenArt721: Can update a project script", () => {
   );
 });
 
-test("GenArt721: Can handleUpdateProjectScriptJSON", () => {
+test("GenArt721Core2PBAB: Can handleUpdateProjectScriptJSON", () => {
   clearStore();
   const projectId = BigInt.fromI32(0);
   const fullProjectId = generateContractSpecificId(
@@ -1749,7 +1697,7 @@ test("GenArt721: Can handleUpdateProjectScriptJSON", () => {
   );
 });
 
-test("GenArt721: Can update project secondary market royalties", () => {
+test("GenArt721Core2PBAB: Can update project secondary market royalties", () => {
   clearStore();
   const projectId = BigInt.fromI32(0);
   const fullProjectId = generateContractSpecificId(
@@ -1806,7 +1754,7 @@ test("GenArt721: Can update project secondary market royalties", () => {
   );
 });
 
-test("GenArt721: Can update a project website", () => {
+test("GenArt721Core2PBAB: Can update a project website", () => {
   clearStore();
   const projectId = BigInt.fromI32(0);
   const fullProjectId = generateContractSpecificId(
@@ -1855,7 +1803,8 @@ test("GenArt721: Can update a project website", () => {
     updateCallBlockTimestamp.toString()
   );
 });
-test("GenArt721: Can handle transfer", () => {
+
+test("GenArt721Core2PBAB: Can handle transfer", () => {
   clearStore();
   const tokenId = BigInt.fromI32(0);
   const projectId = BigInt.fromI32(0);
@@ -1913,26 +1862,624 @@ test("GenArt721: Can handle transfer", () => {
     fullTokenId
   );
 });
+
+test("GenArt721Core2EngineFlex: Can add/update a project external asset dependency", () => {
+  clearStore();
+  // Add project to store
+  const projectId = BigInt.fromI32(0);
+  const fullProjectId = generateContractSpecificId(
+    TEST_CONTRACT_ADDRESS,
+    projectId
+  );
+  addNewProjectToStore(
+    projectId,
+    "Test Project",
+    randomAddressGenerator.generateRandomAddress(),
+    BigInt.fromI64(i64(1e18)),
+    true,
+    CURRENT_BLOCK_TIMESTAMP.minus(BigInt.fromI32(100))
+  );
+
+  const event: ExternalAssetDependencyUpdated = changetype<ExternalAssetDependencyUpdated>(newMockEvent());
+  event.address = TEST_CONTRACT_ADDRESS;
+  event.block.timestamp = CURRENT_BLOCK_TIMESTAMP;
+
+  const _index0 = BigInt.zero();
+  const _dependencyType0 = BigInt.zero();
+  const _externalAssetDependencyCount0 = BigInt.fromI32(1);
+  
+  assert.fieldEquals(
+    PROJECT_ENTITY_TYPE,
+    fullProjectId,
+    "externalAssetDependencyCount",
+    BigInt.fromI32(0).toString()
+  );
+
+  event.parameters = [
+    new ethereum.EventParam("_projectId", ethereum.Value.fromUnsignedBigInt(projectId)),
+    new ethereum.EventParam("_index", ethereum.Value.fromUnsignedBigInt(_index0)),
+    new ethereum.EventParam("_cid", ethereum.Value.fromString(IPFS_CID)),
+    new ethereum.EventParam("_dependencyType", ethereum.Value.fromUnsignedBigInt(_dependencyType0)),
+    new ethereum.EventParam("_externalAssetDependencyCount", ethereum.Value.fromUnsignedBigInt(_externalAssetDependencyCount0))
+  ];
+
+  // add event
+  handleExternalAssetDependencyUpdated(event);
+  // checks project external asset dependency count
+  assert.fieldEquals(
+    PROJECT_ENTITY_TYPE,
+    fullProjectId,
+    "externalAssetDependencyCount",
+    _externalAssetDependencyCount0.toString()
+  );
+  // checks project's updatedAt 
+  assert.fieldEquals(
+    PROJECT_ENTITY_TYPE,
+    fullProjectId,
+    "updatedAt",
+    CURRENT_BLOCK_TIMESTAMP.toString()
+  );
+  // checks project external asset dependency cid
+  assert.fieldEquals(
+    PROJECT_EXTERNAL_ASSET_DEPENDENCY_ENTITY_TYPE,
+    fullProjectId + '-' + _index0.toString(),
+    "cid",
+    IPFS_CID
+  );
+  // checks project external asset dependency dependency type
+  assert.fieldEquals(
+    PROJECT_EXTERNAL_ASSET_DEPENDENCY_ENTITY_TYPE,
+    fullProjectId + '-' + _index0.toString(),
+    "dependencyType",
+    FLEX_CONTRACT_EXTERNAL_ASSET_DEP_TYPES[_dependencyType0.toI32()]
+  );
+  // checks project external asset dependency project relationship
+  assert.fieldEquals(
+    PROJECT_EXTERNAL_ASSET_DEPENDENCY_ENTITY_TYPE,
+    fullProjectId + '-' + _index0.toString(),
+    "project",
+    fullProjectId
+  );
+  
+  const updateEvent: ExternalAssetDependencyUpdated = changetype<ExternalAssetDependencyUpdated>(newMockEvent());
+  updateEvent.address = TEST_CONTRACT_ADDRESS;
+  updateEvent.block.timestamp = CURRENT_BLOCK_TIMESTAMP;
+
+  const _dependencyType1 = BigInt.fromI32(1);
+  const _externalAssetDependencyCount1 = BigInt.fromI32(2);
+  updateEvent.parameters = [
+    new ethereum.EventParam("_projectId", ethereum.Value.fromUnsignedBigInt(projectId)),
+    new ethereum.EventParam("_index", ethereum.Value.fromUnsignedBigInt(_index0)),
+    new ethereum.EventParam("_cid", ethereum.Value.fromString(IPFS_CID2)),
+    new ethereum.EventParam("_dependencyType", ethereum.Value.fromUnsignedBigInt(_dependencyType1)),
+    new ethereum.EventParam("_externalAssetDependencyCount", ethereum.Value.fromUnsignedBigInt(_externalAssetDependencyCount1))
+  ];
+  handleExternalAssetDependencyUpdated(updateEvent);
+
+  // checks project external asset dependency cid
+  assert.fieldEquals(
+    PROJECT_EXTERNAL_ASSET_DEPENDENCY_ENTITY_TYPE,
+    fullProjectId + '-' + _index0.toString(),
+    "cid",
+    IPFS_CID2
+  );
+  // checks project external asset dependency dependency type
+  assert.fieldEquals(
+    PROJECT_EXTERNAL_ASSET_DEPENDENCY_ENTITY_TYPE,
+    fullProjectId + '-' + _index0.toString(),
+    "dependencyType",
+    FLEX_CONTRACT_EXTERNAL_ASSET_DEP_TYPES[_dependencyType1.toI32()]
+  );
+
+  // checks project external asset dependency count
+  assert.fieldEquals(
+    PROJECT_ENTITY_TYPE,
+    fullProjectId,
+    "externalAssetDependencyCount",
+    _externalAssetDependencyCount1.toString()
+  );
+  
+});
+
+test("GenArt721Core2EngineFlex: Can remove a project external asset dependency", () => {
+  clearStore();
+  // Add project to store
+  const projectId = BigInt.fromI32(0);
+  const fullProjectId = generateContractSpecificId(
+    TEST_CONTRACT_ADDRESS,
+    projectId
+  );
+  addNewProjectToStore(
+    projectId,
+    "Test Project",
+    randomAddressGenerator.generateRandomAddress(),
+    BigInt.fromI64(i64(1e18)),
+    true,
+    CURRENT_BLOCK_TIMESTAMP.minus(BigInt.fromI32(100))
+  );
+
+  const event: ExternalAssetDependencyUpdated = changetype<ExternalAssetDependencyUpdated>(newMockEvent());
+  event.address = TEST_CONTRACT_ADDRESS;
+  event.block.timestamp = CURRENT_BLOCK_TIMESTAMP;
+
+  const _index0 = BigInt.zero();
+  const _dependencyType0 = BigInt.zero();
+  const _externalAssetDependencyCount0 = BigInt.fromI32(1);
+  
+  assert.fieldEquals(
+    PROJECT_ENTITY_TYPE,
+    fullProjectId,
+    "externalAssetDependencyCount",
+    BigInt.fromI32(0).toString()
+  );
+
+  event.parameters = [
+    new ethereum.EventParam("_projectId", ethereum.Value.fromUnsignedBigInt(projectId)),
+    new ethereum.EventParam("_index", ethereum.Value.fromUnsignedBigInt(_index0)),
+    new ethereum.EventParam("_cid", ethereum.Value.fromString(IPFS_CID)),
+    new ethereum.EventParam("_dependencyType", ethereum.Value.fromUnsignedBigInt(_dependencyType0)),
+    new ethereum.EventParam("_externalAssetDependencyCount", ethereum.Value.fromUnsignedBigInt(_externalAssetDependencyCount0))
+  ];
+
+  const event2: ExternalAssetDependencyUpdated = changetype<ExternalAssetDependencyUpdated>(newMockEvent());
+  event2.address = TEST_CONTRACT_ADDRESS;
+  event2.block.timestamp = CURRENT_BLOCK_TIMESTAMP;
+
+  const _externalAssetDependencyCount1 = BigInt.fromI32(2);
+  const _index1 = BigInt.fromI32(1);
+
+  event2.parameters = [
+    new ethereum.EventParam("_projectId", ethereum.Value.fromUnsignedBigInt(projectId)),
+    new ethereum.EventParam("_index", ethereum.Value.fromUnsignedBigInt(_index1)),
+    new ethereum.EventParam("_cid", ethereum.Value.fromString(IPFS_CID2)),
+    new ethereum.EventParam("_dependencyType", ethereum.Value.fromUnsignedBigInt(_dependencyType0)),
+    new ethereum.EventParam("_externalAssetDependencyCount", ethereum.Value.fromUnsignedBigInt(_externalAssetDependencyCount1))
+  ];
+
+  // add events
+  handleExternalAssetDependencyUpdated(event);
+  handleExternalAssetDependencyUpdated(event2);
+
+  //checks project external asset dependency count
+  assert.fieldEquals(
+    PROJECT_ENTITY_TYPE,
+    fullProjectId,
+    "externalAssetDependencyCount",
+    _externalAssetDependencyCount1.toString()
+  );
+
+  assert.entityCount(PROJECT_EXTERNAL_ASSET_DEPENDENCY_ENTITY_TYPE, 2);
+
+  const removeEvent: ExternalAssetDependencyRemoved = changetype<ExternalAssetDependencyRemoved>(newMockEvent());
+  removeEvent.address = TEST_CONTRACT_ADDRESS;
+  removeEvent.block.timestamp = CURRENT_BLOCK_TIMESTAMP;
+
+  removeEvent.parameters = [
+    new ethereum.EventParam("_projectId", ethereum.Value.fromUnsignedBigInt(projectId)),
+    new ethereum.EventParam("_index", ethereum.Value.fromUnsignedBigInt(BigInt.fromI32(0)))
+  ];
+  
+  let tupleArray: Array<ethereum.Value> = [
+    ethereum.Value.fromString(IPFS_CID2),
+    ethereum.Value.fromUnsignedBigInt(_dependencyType0)
+  ]
+  let tuple: ethereum.Tuple = changetype<ethereum.Tuple>(tupleArray);
+  createMockedFunction(
+    TEST_CONTRACT_ADDRESS,
+    "projectExternalAssetDependencyByIndex",
+    "projectExternalAssetDependencyByIndex(uint256,uint256):((string,uint8))"
+  )
+    .withArgs([ethereum.Value.fromUnsignedBigInt(projectId), ethereum.Value.fromUnsignedBigInt(BigInt.fromI32(0))])
+    .returns([ethereum.Value.fromTuple(tuple)]);
+    
+
+  handleExternalAssetDependencyRemoved(removeEvent);
+
+  // // checks project external asset dependency count
+  assert.fieldEquals(
+    PROJECT_ENTITY_TYPE,
+    fullProjectId,
+    "externalAssetDependencyCount",
+    _externalAssetDependencyCount0.toString()
+  );
+
+  // checks that removed project external asset dependency is not in store
+  // note that regardless of what initial index is removed, the removed index gets moved to the last index
+  assert.notInStore(PROJECT_EXTERNAL_ASSET_DEPENDENCY_ENTITY_TYPE, fullProjectId + '-' + _index1.toString());
+
+  // checks that asset at index 0 now has data that was formerly at index 1
+  assert.fieldEquals(
+    PROJECT_EXTERNAL_ASSET_DEPENDENCY_ENTITY_TYPE,
+    fullProjectId + '-' + _index0.toString(),
+    "cid",
+    IPFS_CID2
+  );
+  assert.fieldEquals(
+    PROJECT_EXTERNAL_ASSET_DEPENDENCY_ENTITY_TYPE,
+    fullProjectId + '-' + _index0.toString(),
+    "dependencyType",
+    FLEX_CONTRACT_EXTERNAL_ASSET_DEP_TYPES[_dependencyType0.toI32()]
+  );
+
+  // checks that entity count is correct
+  assert.entityCount(PROJECT_EXTERNAL_ASSET_DEPENDENCY_ENTITY_TYPE, 1);
+});
+
+test("GenArt721Core2EngineFlex: Can update a contract preferred IPFS/ARWEAVE gateway", () => {
+  clearStore();
+  const contract = addTestContractToStore(BigInt.zero());
+  
+  const event: GatewayUpdated = changetype<GatewayUpdated>(newMockEvent());
+  event.address = TEST_CONTRACT_ADDRESS;
+  event.block.timestamp = CURRENT_BLOCK_TIMESTAMP;
+
+  const _gateway = "https://ipfs.io/ipfs/";
+  const _dependencyType = BigInt.fromI32(0);
+  event.parameters = [
+    new ethereum.EventParam("_dependencyType", ethereum.Value.fromUnsignedBigInt(_dependencyType)),
+    new ethereum.EventParam("_gateway", ethereum.Value.fromString(_gateway))
+  ];
+
+  // add event
+  handleGatewayUpdated(event);
+  const loadedContractAfterEvent = Contract.load(contract.id);
+  // checks contract preferredIPFSGateway
+  assert.fieldEquals(
+    CONTRACT_ENTITY_TYPE,
+    TEST_CONTRACT_ADDRESS.toHexString(),
+    "preferredIPFSGateway",
+    _gateway.toString()
+  );
+
+  if (loadedContractAfterEvent){
+    // checks contract preferredArweaveGateway
+    assert.assertNull(loadedContractAfterEvent.preferredArweaveGateway);
+  }
+});
+
+test("GenArt721Core2EngineFlex: Can lock a project's external asset dependencies", () => {
+  clearStore();
+  // Add project to store
+  const projectId = BigInt.fromI32(0);
+  const fullProjectId = generateContractSpecificId(
+    TEST_CONTRACT_ADDRESS,
+    projectId
+  );
+  addNewProjectToStore(
+    projectId,
+    "Test Project",
+    randomAddressGenerator.generateRandomAddress(),
+    BigInt.fromI64(i64(1e18)),
+    true,
+    CURRENT_BLOCK_TIMESTAMP.minus(BigInt.fromI32(100))
+  );
+
+  const event: ExternalAssetDependencyUpdated = changetype<ExternalAssetDependencyUpdated>(newMockEvent());
+  event.address = TEST_CONTRACT_ADDRESS;
+  event.block.timestamp = CURRENT_BLOCK_TIMESTAMP;
+
+  const _index0 = BigInt.zero();
+  const _dependencyType0 = BigInt.zero();
+  const _externalAssetDependencyCount0 = BigInt.fromI32(1);
+  
+  assert.fieldEquals(
+    PROJECT_ENTITY_TYPE,
+    fullProjectId,
+    "externalAssetDependencyCount",
+    BigInt.fromI32(0).toString()
+  );
+
+  event.parameters = [
+    new ethereum.EventParam("_projectId", ethereum.Value.fromUnsignedBigInt(projectId)),
+    new ethereum.EventParam("_index", ethereum.Value.fromUnsignedBigInt(_index0)),
+    new ethereum.EventParam("_cid", ethereum.Value.fromString(IPFS_CID)),
+    new ethereum.EventParam("_dependencyType", ethereum.Value.fromUnsignedBigInt(_dependencyType0)),
+    new ethereum.EventParam("_externalAssetDependencyCount", ethereum.Value.fromUnsignedBigInt(_externalAssetDependencyCount0))
+  ];
+
+  // add event
+  handleExternalAssetDependencyUpdated(event);
+  // checks project external asset dependency count
+  assert.fieldEquals(
+    PROJECT_ENTITY_TYPE,
+    fullProjectId,
+    "externalAssetDependencyCount",
+    _externalAssetDependencyCount0.toString()
+  );
+
+   // checks project external asset dependency lock status
+   assert.fieldEquals(
+    PROJECT_ENTITY_TYPE,
+    fullProjectId,
+    "externalAssetDependenciesLocked",
+    "false"
+  );
+
+  const lockEvent: ProjectExternalAssetDependenciesLocked = changetype<ProjectExternalAssetDependenciesLocked>(newMockEvent());
+  lockEvent.address = TEST_CONTRACT_ADDRESS;
+  lockEvent.block.timestamp = CURRENT_BLOCK_TIMESTAMP;
+
+  lockEvent.parameters = [
+    new ethereum.EventParam("_projectId", ethereum.Value.fromUnsignedBigInt(projectId))
+  ];
+
+  handleProjectExternalAssetDependenciesLocked(lockEvent);
+
+  // checks project external asset dependency lock status
+  assert.fieldEquals(
+    PROJECT_ENTITY_TYPE,
+    fullProjectId,
+    "externalAssetDependenciesLocked",
+    "true"
+  );
+});
+
+test("GenArt721Core2EngineFlex: Cannot add a project external asset dependency for a non-existant project", () => {
+  clearStore();
+  // Add project to store
+  const projectId = BigInt.fromI32(0);
+  const projectIdNotInStore = BigInt.fromI32(1);
+  const fullProjectId = generateContractSpecificId(
+    TEST_CONTRACT_ADDRESS,
+    projectId
+  );
+
+  const fullProjectIdNotInStore = generateContractSpecificId(
+    TEST_CONTRACT_ADDRESS,
+    projectIdNotInStore
+  );  
+
+  addNewProjectToStore(
+    projectId,
+    "Test Project",
+    randomAddressGenerator.generateRandomAddress(),
+    BigInt.fromI64(i64(1e18)),
+    true,
+    CURRENT_BLOCK_TIMESTAMP.minus(BigInt.fromI32(100))
+  );
+
+  const event: ExternalAssetDependencyUpdated = changetype<ExternalAssetDependencyUpdated>(newMockEvent());
+  event.address = TEST_CONTRACT_ADDRESS;
+  event.block.timestamp = CURRENT_BLOCK_TIMESTAMP;
+
+  const _index0 = BigInt.zero();
+  const _dependencyType0 = BigInt.zero();
+  const _externalAssetDependencyCount0 = BigInt.fromI32(1);
+  
+  assert.fieldEquals(
+    PROJECT_ENTITY_TYPE,
+    fullProjectId,
+    "externalAssetDependencyCount",
+    BigInt.fromI32(0).toString()
+  );
+
+  event.parameters = [
+    new ethereum.EventParam("_projectId", ethereum.Value.fromUnsignedBigInt(projectIdNotInStore)),
+    new ethereum.EventParam("_index", ethereum.Value.fromUnsignedBigInt(_index0)),
+    new ethereum.EventParam("_cid", ethereum.Value.fromString(IPFS_CID)),
+    new ethereum.EventParam("_dependencyType", ethereum.Value.fromUnsignedBigInt(_dependencyType0)),
+    new ethereum.EventParam("_externalAssetDependencyCount", ethereum.Value.fromUnsignedBigInt(_externalAssetDependencyCount0))
+  ];
+
+  // add event
+  handleExternalAssetDependencyUpdated(event);
+
+  assert.fieldEquals(
+    PROJECT_ENTITY_TYPE,
+    fullProjectId,
+    "externalAssetDependencyCount",
+    BigInt.fromI32(0).toString()
+  );
+  assert.notInStore(PROJECT_EXTERNAL_ASSET_DEPENDENCY_ENTITY_TYPE, fullProjectIdNotInStore + '-0');
+
+});
+
+test("GenArt721Core2EngineFlex: Cannot remove a project external asset dependency for a non-existant project", () => {
+  clearStore();
+  // Add project to store
+  const projectId = BigInt.fromI32(0);
+  const fullProjectId = generateContractSpecificId(
+    TEST_CONTRACT_ADDRESS,
+    projectId
+  );
+  addNewProjectToStore(
+    projectId,
+    "Test Project",
+    randomAddressGenerator.generateRandomAddress(),
+    BigInt.fromI64(i64(1e18)),
+    true,
+    CURRENT_BLOCK_TIMESTAMP.minus(BigInt.fromI32(100))
+  );
+
+  const event: ExternalAssetDependencyUpdated = changetype<ExternalAssetDependencyUpdated>(newMockEvent());
+  event.address = TEST_CONTRACT_ADDRESS;
+  event.block.timestamp = CURRENT_BLOCK_TIMESTAMP;
+
+  const _index0 = BigInt.zero();
+  const _dependencyType0 = BigInt.zero();
+  const _externalAssetDependencyCount0 = BigInt.fromI32(1);
+  
+  assert.fieldEquals(
+    PROJECT_ENTITY_TYPE,
+    fullProjectId,
+    "externalAssetDependencyCount",
+    BigInt.fromI32(0).toString()
+  );
+
+  event.parameters = [
+    new ethereum.EventParam("_projectId", ethereum.Value.fromUnsignedBigInt(projectId)),
+    new ethereum.EventParam("_index", ethereum.Value.fromUnsignedBigInt(_index0)),
+    new ethereum.EventParam("_cid", ethereum.Value.fromString(IPFS_CID)),
+    new ethereum.EventParam("_dependencyType", ethereum.Value.fromUnsignedBigInt(_dependencyType0)),
+    new ethereum.EventParam("_externalAssetDependencyCount", ethereum.Value.fromUnsignedBigInt(_externalAssetDependencyCount0))
+  ];
+
+  const event2: ExternalAssetDependencyUpdated = changetype<ExternalAssetDependencyUpdated>(newMockEvent());
+  event2.address = TEST_CONTRACT_ADDRESS;
+  event2.block.timestamp = CURRENT_BLOCK_TIMESTAMP;
+
+  const _externalAssetDependencyCount1 = BigInt.fromI32(2);
+  const _index1 = BigInt.fromI32(1);
+
+  event2.parameters = [
+    new ethereum.EventParam("_projectId", ethereum.Value.fromUnsignedBigInt(projectId)),
+    new ethereum.EventParam("_index", ethereum.Value.fromUnsignedBigInt(_index1)),
+    new ethereum.EventParam("_cid", ethereum.Value.fromString(IPFS_CID2)),
+    new ethereum.EventParam("_dependencyType", ethereum.Value.fromUnsignedBigInt(_dependencyType0)),
+    new ethereum.EventParam("_externalAssetDependencyCount", ethereum.Value.fromUnsignedBigInt(_externalAssetDependencyCount1))
+  ];
+
+  // add events
+  handleExternalAssetDependencyUpdated(event);
+  handleExternalAssetDependencyUpdated(event2);
+
+  //checks project external asset dependency count
+  assert.fieldEquals(
+    PROJECT_ENTITY_TYPE,
+    fullProjectId,
+    "externalAssetDependencyCount",
+    _externalAssetDependencyCount1.toString()
+  );
+
+  assert.entityCount(PROJECT_EXTERNAL_ASSET_DEPENDENCY_ENTITY_TYPE, 2);
+  
+  const projectIdNotInStore = BigInt.fromI32(1);
+  const removeEvent: ExternalAssetDependencyRemoved = changetype<ExternalAssetDependencyRemoved>(newMockEvent());
+  removeEvent.address = TEST_CONTRACT_ADDRESS;
+  removeEvent.block.timestamp = CURRENT_BLOCK_TIMESTAMP;
+
+
+  removeEvent.parameters = [
+    new ethereum.EventParam("_projectId", ethereum.Value.fromUnsignedBigInt(projectIdNotInStore)),
+    new ethereum.EventParam("_index", ethereum.Value.fromUnsignedBigInt(BigInt.fromI32(0)))
+  ];
+  
+  let tupleArray: Array<ethereum.Value> = [
+    ethereum.Value.fromString(IPFS_CID2),
+    ethereum.Value.fromUnsignedBigInt(_dependencyType0)
+  ]
+  let tuple: ethereum.Tuple = changetype<ethereum.Tuple>(tupleArray);
+  createMockedFunction(
+    TEST_CONTRACT_ADDRESS,
+    "projectExternalAssetDependencyByIndex",
+    "projectExternalAssetDependencyByIndex(uint256,uint256):((string,uint8))"
+  )
+    .withArgs([ethereum.Value.fromUnsignedBigInt(projectIdNotInStore), ethereum.Value.fromUnsignedBigInt(BigInt.fromI32(0))])
+    .returns([ethereum.Value.fromTuple(tuple)]);
+    
+
+  handleExternalAssetDependencyRemoved(removeEvent);
+
+  // checks project external asset dependency count
+  assert.fieldEquals(
+    PROJECT_ENTITY_TYPE,
+    fullProjectId,
+    "externalAssetDependencyCount",
+    _externalAssetDependencyCount1.toString()
+  );
+
+  // checks that entity count is correct
+  assert.entityCount(PROJECT_EXTERNAL_ASSET_DEPENDENCY_ENTITY_TYPE, 2);
+});
+
+test("GenArt721Core2EngineFlex: Cannot lock a non-existant project's external asset dependencies", () => {
+  clearStore();
+  // Add project to store
+  const projectId = BigInt.fromI32(0);
+  const fullProjectId = generateContractSpecificId(
+    TEST_CONTRACT_ADDRESS,
+    projectId
+  );
+  addNewProjectToStore(
+    projectId,
+    "Test Project",
+    randomAddressGenerator.generateRandomAddress(),
+    BigInt.fromI64(i64(1e18)),
+    true,
+    CURRENT_BLOCK_TIMESTAMP.minus(BigInt.fromI32(100))
+  );
+
+  const event: ExternalAssetDependencyUpdated = changetype<ExternalAssetDependencyUpdated>(newMockEvent());
+  event.address = TEST_CONTRACT_ADDRESS;
+  event.block.timestamp = CURRENT_BLOCK_TIMESTAMP;
+
+  const _index0 = BigInt.zero();
+  const _dependencyType0 = BigInt.zero();
+  const _externalAssetDependencyCount0 = BigInt.fromI32(1);
+  
+  assert.fieldEquals(
+    PROJECT_ENTITY_TYPE,
+    fullProjectId,
+    "externalAssetDependencyCount",
+    BigInt.fromI32(0).toString()
+  );
+
+  
+  event.parameters = [
+    new ethereum.EventParam("_projectId", ethereum.Value.fromUnsignedBigInt(projectId)),
+    new ethereum.EventParam("_index", ethereum.Value.fromUnsignedBigInt(_index0)),
+    new ethereum.EventParam("_cid", ethereum.Value.fromString(IPFS_CID)),
+    new ethereum.EventParam("_dependencyType", ethereum.Value.fromUnsignedBigInt(_dependencyType0)),
+    new ethereum.EventParam("_externalAssetDependencyCount", ethereum.Value.fromUnsignedBigInt(_externalAssetDependencyCount0))
+  ];
+
+  // add event
+  handleExternalAssetDependencyUpdated(event);
+  // checks project external asset dependency count
+  assert.fieldEquals(
+    PROJECT_ENTITY_TYPE,
+    fullProjectId,
+    "externalAssetDependencyCount",
+    _externalAssetDependencyCount0.toString()
+  );
+
+   // checks project external asset dependency lock status
+   assert.fieldEquals(
+    PROJECT_ENTITY_TYPE,
+    fullProjectId,
+    "externalAssetDependenciesLocked",
+    "false"
+  );
+
+  const lockEvent: ProjectExternalAssetDependenciesLocked = changetype<ProjectExternalAssetDependenciesLocked>(newMockEvent());
+  lockEvent.address = TEST_CONTRACT_ADDRESS;
+  lockEvent.block.timestamp = CURRENT_BLOCK_TIMESTAMP;
+  
+  const projectIdNotInStore = BigInt.fromI32(1);
+
+  lockEvent.parameters = [
+    new ethereum.EventParam("_projectId", ethereum.Value.fromUnsignedBigInt(projectIdNotInStore))
+  ];
+
+  handleProjectExternalAssetDependenciesLocked(lockEvent);
+
+  // checks project external asset dependency lock status
+  assert.fieldEquals(
+    PROJECT_ENTITY_TYPE,
+    fullProjectId,
+    "externalAssetDependenciesLocked",
+    "false"
+  );
+});
+
 export {
   handleAddProject,
   handleAddWhitelisted,
   handleRemoveWhitelisted,
-  handleUpdateArtblocksAddress,
-  handleUpdateArtblocksPercentage,
+  handleAddMintWhitelisted,
+  handleUpdateRandomizerAddress,
+  handleUpdateRenderProviderAddress,
+  handleUpdateRenderProviderPercentage,
   handleAddProjectScript,
-  handleClearTokenIpfsImageUri,
-  handleOverrideTokenDynamicImageWithIpfsLink,
   handleRemoveProjectLastScript,
   handleToggleProjectIsActive,
-  handleToggleProjectIsDynamic,
   handleToggleProjectIsLocked,
   handleToggleProjectIsPaused,
-  handleToggleProjectUseIpfsForStatic,
   handleUpdateProjectAdditionalPayeeInfo,
   handleUpdateProjectArtistAddress,
   handleUpdateProjectArtistName,
-  handleUpdateProjectBaseIpfsURI,
   handleUpdateProjectBaseURI,
+  handleUpdateProjectCurrencyInfo,
   handleUpdateProjectDescription,
   handleUpdateProjectIpfsHash,
   handleUpdateProjectLicense,
@@ -1941,6 +2488,7 @@ export {
   handleUpdateProjectPricePerTokenInWei,
   handleUpdateProjectWebsite,
   handleUpdateProjectSecondaryMarketRoyaltyPercentage,
+  handleRemoveMintWhitelisted,
   handleUpdateProjectScript,
   handleUpdateProjectScriptJSON
 };

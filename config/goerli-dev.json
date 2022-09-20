@@ -1,5 +1,12 @@
 {
   "network": "goerli",
+  "genArt721CoreV3Contracts": [
+    {
+      "address": "0xF396C180bb2f92EE28535D23F5224A5b9425ceca",
+      "name": "Dev Goerli Flagship Core V3 Contract",
+      "startBlock": 7111111
+    }
+  ],
   "genArt721CoreContracts": [
     {
       "address": "0x1Bf03F29c4FEFFFe4eE26704aaA31d85c026aCE6",
@@ -26,6 +33,13 @@
       "startBlock": 7010933
     }
   ],
+  "minterFilterV1Contracts": [
+    {
+      "address": "0x7EcFFfc1A3Eb7Ce76D4b29Df3e5098D2D921D367",
+      "name": "Flagship Minter Filter for V3 core",
+      "startBlock": 7010933
+    }
+  ],
   "minterSetPriceV1Contracts": [
     {
       "address": "0x6be72fd483Ee32F0B9FF18380999A3e444dC6c66",
@@ -35,6 +49,13 @@
     {
       "address": "0x2c2E62967c5fDC4eD5Eb1342FA064E6413dADB2E",
       "name": "Art Blocks x Pace Minter",
+      "startBlock": 7010933
+    }
+  ],
+  "minterSetPriceV2Contracts": [
+    {
+      "address": "0x3A23Ae9EB73C14Ff2A83a0bBe1028A690006e0cc",
+      "name": "Flagship Minter for V3 core",
       "startBlock": 7010933
     }
   ],
@@ -50,6 +71,13 @@
       "startBlock": 7010933
     }
   ],
+  "minterSetPriceERC20V2Contracts": [
+    {
+      "address": "0x004E1cdb723869f6c65086f1d5cED55Cd9BA1971",
+      "name": "Flagship Minter for V3 core",
+      "startBlock": 7010933
+    }
+  ],
   "minterDALinV1Contracts": [
     {
       "address": "0xB49D800C5c0c02CB06855Cb73D90c6da3Bda9856",
@@ -59,6 +87,13 @@
     {
       "address": "0x04aF1595B7e18F3237985054CaF94a2FB8cF4eb1",
       "name": "Art Blocks x Pace Minter",
+      "startBlock": 7010933
+    }
+  ],
+  "minterDALinV2Contracts": [
+    {
+      "address": "0x73873eAAf65338256E31b1e612AC74D09492B5B8",
+      "name": "Flagship Minter for V3 core",
       "startBlock": 7010933
     }
   ],
@@ -74,6 +109,13 @@
       "startBlock": 7010933
     }
   ],
+  "minterDAExpV2Contracts": [
+    {
+      "address": "0xBced47092b6c1a9Ee24aFeC871E782aA44587001",
+      "name": "Flagship Minter for V3 core",
+      "startBlock": 7010933
+    }
+  ],
   "minterHolderV0Contracts": [
     {
       "address": "0x717A45024cf098D2931f2634Fe6e53a8E6B2C480",
@@ -81,10 +123,31 @@
       "startBlock": 7148716
     }
   ],
+  "minterHolderV1Contracts": [
+    {
+      "address": "0x82Df93Cd9Cd9178C8F442FB766fe3402916Fe567",
+      "name": "Flagship Minter for V3 core",
+      "startBlock": 7148716
+    }
+  ],
   "minterMerkleV0Contracts": [
     {
       "address": "0xE14757AC0075898Ad3343e22D828FAaeF2bb7595",
       "name": "Flagship Minter",
+      "startBlock": 7105457
+    }
+  ],
+  "minterMerkleV1Contracts": [
+    {
+      "address": "0xcd1AA5C612731108267D22b77745207D9728Edf8",
+      "name": "Flagship Minter for V3 core",
+      "startBlock": 7105457
+    }
+  ],
+  "adminACLV0Contracts": [
+    {
+      "address": "0x4Cbf3805011f0f4d4daeDa710b2215fBF37288Ad",
+      "name": "Initial Admin ACL V0 for V3 core (deprecated)",
       "startBlock": 7105457
     }
   ]

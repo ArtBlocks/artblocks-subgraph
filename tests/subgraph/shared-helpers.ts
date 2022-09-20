@@ -16,6 +16,7 @@ import {
   Minter,
   Project,
   ProjectMinterConfiguration,
+  ProposedArtistAddressesAndSplits,
   Token
 } from "../../generated/schema";
 import {
@@ -90,6 +91,14 @@ export const IPFS_CID = "QmQCqjqxVXZQ6vXNmZvF7FjyZkCXKXMykCyyPQQrZ6m7W";
 export const IPFS_CID2 = "QmQCqjqxVXZQ6vXNmZvF7FjyZkCXKXMykCyyPQQrZ6m7W2";
 export const CURRENT_BLOCK_TIMESTAMP = BigInt.fromI32(1647051214);
 export const TEST_CONTRACT_ADDRESS = randomAddressGenerator.generateRandomAddress();
+export const TEST_SUPER_ADMIN_ADDRESS = randomAddressGenerator.generateRandomAddress();
+export const TEST_TOKEN_HASH = Bytes.fromByteArray(
+  crypto.keccak256(Bytes.fromUTF8("token hash"))
+);
+export const TEST_TX_HASH = Bytes.fromByteArray(
+  crypto.keccak256(Bytes.fromUTF8("tx hash"))
+);
+export const TEST_MINTER_FILTER_ADDRESS = randomAddressGenerator.generateRandomAddress();
 export const ONE_ETH_IN_WEI = BigInt.fromString("1000000000000000000");
 
 export const DEFAULT_ORDER_HASH =
@@ -119,19 +128,35 @@ export const DEFAULT_ZONE = Address.fromString(
 );
 export class ContractValues {
   admin: Address;
+  type: string;
   mintWhitelisted: Bytes[];
   randomizerContract: Address;
+  minterContract: Address;
   renderProviderAddress: Address;
   renderProviderPercentage: BigInt;
+  renderProviderSecondarySalesAddress: Address;
+  renderProviderSecondarySalesBPS: BigInt;
+  dependencyRegistry: Address;
+  curationRegistry: Address;
+  newProjectsForbidden: boolean;
 }
 export const TEST_CONTRACT: ContractValues = {
   admin: Address.fromString("0x96dc73c8b5969608c77375f085949744b5177660"),
+  type: "GenArt721CoreV1",
   renderProviderPercentage: BigInt.fromI32(10),
   renderProviderAddress: Address.fromString(
     "0xf7a55108a6e830a809e88e74cbf5f5de9d930153"
   ),
+  renderProviderSecondarySalesAddress: Address.fromString(
+    "0xf4c61bd7b43e89f072fe1ef4e063fcf07f94565c"
+  ),
+  renderProviderSecondarySalesBPS: BigInt.fromI32(250),
   mintWhitelisted: [],
-  randomizerContract: RANDOMIZER_ADDRESS
+  minterContract: Address.zero(),
+  randomizerContract: RANDOMIZER_ADDRESS,
+  dependencyRegistry: Address.zero(),
+  curationRegistry: Address.zero(),
+  newProjectsForbidden: false
 };
 export const TEST_CONTRACT_CREATED_AT = BigInt.fromI32(1607763598);
 
@@ -140,10 +165,13 @@ export class DefaultProjectValues {
   active: boolean;
   additionalPayeeAddress: Address;
   additionalPayeePercentage: BigInt;
+  additionalPayeeSecondarySalesAddress: Address;
+  additionalPayeeSecondarySalesPercentage: BigInt;
   artistName: string;
   baseIpfsUri: string;
   baseUri: string;
   complete: boolean;
+  completedAt: BigInt;
   currencyAddress: Address;
   currencySymbol: string;
   description: string;
@@ -154,9 +182,12 @@ export class DefaultProjectValues {
   locked: boolean;
   maxInvocations: BigInt;
   paused: boolean;
+  completedTimestamp: BigInt;
   royaltyPercentage: BigInt;
   scriptCount: BigInt;
   scriptJSON: string;
+  scriptTypeAndVersion: string;
+  aspectRatio: string;
   useHashString: boolean;
   useIpfs: boolean;
   website: string;
@@ -172,10 +203,13 @@ export const DEFAULT_PROJECT_VALUES: DefaultProjectValues = {
   active: false,
   additionalPayeeAddress: Address.zero(),
   additionalPayeePercentage: BigInt.fromI32(0),
+  additionalPayeeSecondarySalesAddress: Address.zero(),
+  additionalPayeeSecondarySalesPercentage: BigInt.fromI32(0),
   artistName: "",
   baseIpfsUri: "",
   baseUri: "",
   complete: false,
+  completedAt: BigInt.fromI32(0),
   currencyAddress: Address.zero(),
   currencySymbol: "ETH",
   description: "",
@@ -186,9 +220,12 @@ export const DEFAULT_PROJECT_VALUES: DefaultProjectValues = {
   locked: false,
   maxInvocations: BigInt.fromI32(ONE_MILLION),
   paused: true,
+  completedTimestamp: BigInt.fromI32(0),
   royaltyPercentage: BigInt.zero(),
   scriptCount: BigInt.zero(),
   scriptJSON: "",
+  scriptTypeAndVersion: "",
+  aspectRatio: "",
   useHashString: true,
   useIpfs: false,
   website: "",
@@ -263,6 +300,7 @@ export const addNewProjectToStore = function(
 export function addNewContractToStore(): Contract {
   let contract = new Contract(DEFAULT_COLLECTION.toHexString());
   contract.admin = TEST_CONTRACT.admin;
+  contract.type = TEST_CONTRACT.type;
   contract.createdAt = CURRENT_BLOCK_TIMESTAMP.minus(BigInt.fromI32(10));
   contract.nextProjectId = BigInt.fromI32(0);
   contract.randomizerContract = TEST_CONTRACT.randomizerContract;
@@ -270,6 +308,7 @@ export function addNewContractToStore(): Contract {
   contract.renderProviderPercentage = TEST_CONTRACT.renderProviderPercentage;
   contract.updatedAt = contract.createdAt;
   contract.mintWhitelisted = TEST_CONTRACT.mintWhitelisted;
+  contract.newProjectsForbidden = false;
   contract.save();
 
   return contract;
@@ -278,13 +317,21 @@ export function addNewContractToStore(): Contract {
 export function addTestContractToStore(nextProjectId: BigInt): Contract {
   let contract = new Contract(TEST_CONTRACT_ADDRESS.toHexString());
   contract.admin = TEST_CONTRACT.admin;
+  contract.type = TEST_CONTRACT.type;
   contract.createdAt = CURRENT_BLOCK_TIMESTAMP.minus(BigInt.fromI32(10));
   contract.nextProjectId = nextProjectId;
   contract.randomizerContract = TEST_CONTRACT.randomizerContract;
   contract.renderProviderAddress = TEST_CONTRACT.renderProviderAddress;
   contract.renderProviderPercentage = TEST_CONTRACT.renderProviderPercentage;
+  contract.renderProviderSecondarySalesAddress =
+    TEST_CONTRACT.renderProviderSecondarySalesAddress;
+  contract.renderProviderSecondarySalesBPS =
+    TEST_CONTRACT.renderProviderSecondarySalesBPS;
+  contract.curationRegistry = TEST_CONTRACT.curationRegistry;
+  contract.dependencyRegistry = TEST_CONTRACT.dependencyRegistry;
   contract.updatedAt = contract.createdAt;
   contract.mintWhitelisted = TEST_CONTRACT.mintWhitelisted;
+  contract.newProjectsForbidden = false;
   contract.save();
 
   return contract;
@@ -346,6 +393,25 @@ export const mockProjectScriptByIndex = function(
   )
     .withArgs(projectScriptByIndexInputs)
     .returns([ethereum.Value.fromString(script ? script : "")]);
+};
+
+// tokenIdToHash has the same signature for all versions of
+// the GenArt contract so this mock can be shared between all versions.
+export const mockTokenIdToHash = function(
+  contractAddress: Address,
+  tokenId: BigInt,
+  hash: Bytes
+): void {
+  let tokenIdToHashInputs: Array<ethereum.Value> = [
+    ethereum.Value.fromUnsignedBigInt(tokenId)
+  ];
+  createMockedFunction(
+    contractAddress,
+    "tokenIdToHash",
+    "tokenIdToHash(uint256):(bytes32)"
+  )
+    .withArgs(tokenIdToHashInputs)
+    .returns([ethereum.Value.fromBytes(hash)]);
 };
 
 // Asserts

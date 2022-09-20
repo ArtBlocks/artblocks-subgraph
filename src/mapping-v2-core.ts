@@ -8,27 +8,20 @@ import {
   Address,
   ByteArray
 } from "@graphprotocol/graph-ts";
-import { logStore } from "matchstick-as";
 
 import {
-  GenArt721Core,
+  GenArt721Core2PBAB,
   Mint,
   Transfer,
   AddProjectCall,
   AddProjectScriptCall,
-  ClearTokenIpfsImageUriCall,
-  OverrideTokenDynamicImageWithIpfsLinkCall,
   RemoveProjectLastScriptCall,
   ToggleProjectIsActiveCall,
-  ToggleProjectIsDynamicCall,
   ToggleProjectIsLockedCall,
   ToggleProjectIsPausedCall,
-  ToggleProjectUseHashStringCall,
-  ToggleProjectUseIpfsForStaticCall,
   UpdateProjectAdditionalPayeeInfoCall,
   UpdateProjectArtistAddressCall,
   UpdateProjectArtistNameCall,
-  UpdateProjectBaseIpfsURICall,
   UpdateProjectBaseURICall,
   UpdateProjectCurrencyInfoCall,
   UpdateProjectDescriptionCall,
@@ -44,16 +37,20 @@ import {
   AddWhitelistedCall,
   AddMintWhitelistedCall,
   UpdateRandomizerAddressCall,
-  UpdateArtblocksAddressCall,
-  UpdateArtblocksPercentageCall,
+  UpdateRenderProviderAddressCall,
+  UpdateRenderProviderPercentageCall,
   RemoveWhitelistedCall,
-  RemoveMintWhitelistedCall
-} from "../generated/GenArt721Core/GenArt721Core";
+  RemoveMintWhitelistedCall,
+  UpdateAdminCall
+} from "../generated/GenArt721Core2PBAB/GenArt721Core2PBAB";
 
 import {
-  UpdateAdminCall,
-  GenArt721Core2
-} from "../generated/GenArt721Core2/GenArt721Core2";
+  ExternalAssetDependencyUpdated,
+  ExternalAssetDependencyRemoved,
+  GatewayUpdated,
+  ProjectExternalAssetDependenciesLocked,
+  GenArt721Core2EngineFlex
+} from "../generated/GenArt721Core2EngineFlex/GenArt721Core2EngineFlex";
 
 import {
   Project,
@@ -64,20 +61,25 @@ import {
   Contract,
   Whitelisting,
   ProjectScript,
-  MinterFilter,
-  ProjectMinterConfiguration
+  ProjectExternalAssetDependency
 } from "../generated/schema";
 
 import {
   generateAccountProjectId,
   generateWhitelistingId,
   generateContractSpecificId,
-  generateProjectScriptId
+  generateProjectScriptId,
+  generateProjectExternalAssetDependencyId,
+  addWhitelisting
 } from "./helpers";
+import {
+  FLEX_CONTRACT_EXTERNAL_ASSET_DEP_TYPES,
+  GEN_ART_721_CORE_V2
+} from "./constants";
 
 /*** EVENT HANDLERS ***/
 export function handleMint(event: Mint): void {
-  let contract = GenArt721Core.bind(event.address);
+  let contract = GenArt721Core2PBAB.bind(event.address);
 
   let token = new Token(
     generateContractSpecificId(event.address, event.params._tokenId)
@@ -86,8 +88,8 @@ export function handleMint(event: Mint): void {
     event.address,
     event.params._projectId
   );
-
   let project = Project.load(projectId);
+
   if (project) {
     let invocation = project.invocations;
 
@@ -106,6 +108,7 @@ export function handleMint(event: Mint): void {
     project.invocations = invocation.plus(BigInt.fromI32(1));
     if (project.invocations == project.maxInvocations) {
       project.complete = true;
+      project.completedAt = event.block.timestamp;
       project.updatedAt = event.block.timestamp;
     }
     project.save();
@@ -180,6 +183,7 @@ export function handleTransfer(event: Transfer): void {
     let transfer = new TokenTransfer(
       event.transaction.hash.toHex() + "-" + event.logIndex.toString()
     );
+
     transfer.transactionHash = event.transaction.hash;
     transfer.createdAt = event.block.timestamp;
     transfer.to = event.params.to;
@@ -188,20 +192,144 @@ export function handleTransfer(event: Transfer): void {
     transfer.save();
   }
 }
+
+export function handleExternalAssetDependencyUpdated(
+  event: ExternalAssetDependencyUpdated
+): void {
+  let project = Project.load(
+    generateContractSpecificId(event.address, event.params._projectId)
+  );
+
+  if (!project) {
+    log.warning("Project not found for ExternalAssetDependencyUpdated event", []);
+    return;
+  }
+
+  const assetEntity = new ProjectExternalAssetDependency(
+    generateProjectExternalAssetDependencyId(
+      project.id,
+      event.params._index.toString()
+    )
+  );
+  assetEntity.cid = event.params._cid;
+  assetEntity.project = project.id;
+  assetEntity.index = event.params._index;
+  assetEntity.dependencyType =
+    FLEX_CONTRACT_EXTERNAL_ASSET_DEP_TYPES[event.params._dependencyType];
+  assetEntity.save();
+
+  project.externalAssetDependencyCount =
+    event.params._externalAssetDependencyCount;
+  project.updatedAt = event.block.timestamp;
+  project.save();
+}
+
+/**
+ * Based on the way external asset dependency removal is implement on the contract
+ * we can always assume that the last index is the one being removed.
+ */
+export function handleExternalAssetDependencyRemoved(
+  event: ExternalAssetDependencyRemoved
+): void {
+  let project = Project.load(
+    generateContractSpecificId(event.address, event.params._projectId)
+  );
+
+  if (!project) {
+    log.warning("Project not found for ExternalAssetDependencyRemoved event", []);
+    return;
+  }
+
+  let contract = GenArt721Core2EngineFlex.bind(event.address);
+  // Remove last asset entity on the project
+  const lastEntityIndex = project.externalAssetDependencyCount.minus(
+    BigInt.fromI32(1)
+  );
+  const entity = ProjectExternalAssetDependency.load(
+    generateProjectExternalAssetDependencyId(
+      project.id,
+      lastEntityIndex.toString()
+    )
+  );
+
+  if (entity) {
+    store.remove("ProjectExternalAssetDependency", entity.id);
+  }
+
+  // Refresh project external asset dependencies
+  for (
+    let index = BigInt.fromI32(0);
+    index < lastEntityIndex;
+    index = index.plus(BigInt.fromI32(1))
+  ) {
+    const assetEntity = new ProjectExternalAssetDependency(
+      generateProjectExternalAssetDependencyId(project.id, index.toString())
+    );
+
+    const contractExternalAsset = contract.projectExternalAssetDependencyByIndex(
+      project.projectId,
+      index
+    );
+
+    assetEntity.cid = contractExternalAsset.cid;
+    assetEntity.project = project.id;
+    assetEntity.index = index;
+    assetEntity.dependencyType =
+      FLEX_CONTRACT_EXTERNAL_ASSET_DEP_TYPES[
+        contractExternalAsset.dependencyType
+      ];
+    assetEntity.save();
+  }
+
+  project.externalAssetDependencyCount = lastEntityIndex;
+  project.updatedAt = event.block.timestamp;
+  project.save();
+}
+
+export function handleGatewayUpdated(event: GatewayUpdated): void {
+  let contractEntity = Contract.load(event.address.toHexString());
+  
+  if (!contractEntity) {
+    log.warning("Contract not found for GatewayUpdated event", []);
+    return;
+  }
+  const dependencyType = FLEX_CONTRACT_EXTERNAL_ASSET_DEP_TYPES[event.params._dependencyType];
+  if (dependencyType === "IPFS") {
+    contractEntity.preferredIPFSGateway = event.params._gatewayAddress;
+  } else {
+    contractEntity.preferredArweaveGateway = event.params._gatewayAddress;
+  }
+  contractEntity.updatedAt = event.block.timestamp;
+  contractEntity.save();
+}
+
+export function handleProjectExternalAssetDependenciesLocked(event: ProjectExternalAssetDependenciesLocked): void {
+  let project = Project.load(
+    generateContractSpecificId(event.address, event.params._projectId)
+  );
+
+  if (!project) {
+    log.warning("Project not found for ProjectExternalAssetDependenciesLocked event", []);
+    return;
+  }
+
+  project.externalAssetDependenciesLocked = true; 
+  project.updatedAt = event.block.timestamp;
+  project.save();
+}
+
 /*** END EVENT HANDLERS ***/
 
 /*** CALL HANDLERS  (Mainnet and Ropsten Only) ***/
 export function handleAddProject(call: AddProjectCall): void {
-  let contract = GenArt721Core.bind(call.to);
+  let contract = GenArt721Core2PBAB.bind(call.to);
   let contractEntity = Contract.load(call.to.toHexString());
 
   let projectId: BigInt;
   if (!contractEntity) {
     contractEntity = refreshContract(contract, call.block.timestamp);
-    if (contractEntity) {
-      // In this case nextProjectId has already been incremented
-      projectId = contractEntity.nextProjectId.minus(BigInt.fromI32(1));
-    }
+    // In this case nextProjectId has already been incremented
+    projectId = contractEntity.nextProjectId.minus(BigInt.fromI32(1));
   } else {
     projectId = contractEntity.nextProjectId;
     contractEntity.nextProjectId = contractEntity.nextProjectId.plus(
@@ -217,7 +345,7 @@ export function handleAddProject(call: AddProjectCall): void {
   let contractAddress = call.to;
 
   let name = projectDetails.value0;
-  let dynamic = projectDetails.value5;
+  let dynamic = true;
 
   let artistAddress = projectTokenInfo.value0;
   let artist = new Account(artistAddress.toHexString());
@@ -226,12 +354,12 @@ export function handleAddProject(call: AddProjectCall): void {
   let pricePerTokenInWei = projectTokenInfo.value1;
   let invocations = projectTokenInfo.value2;
   let maxInvocations = projectTokenInfo.value3;
-  let currencyAddress = projectTokenInfo.value5;
   let currencySymbol = projectTokenInfo.value7;
+  let currencyAddress = projectTokenInfo.value8;
 
   let scriptCount = projectScriptInfo.value1;
-  let useHashString = projectScriptInfo.value2;
-  let paused = projectScriptInfo.value5;
+  let useHashString = true;
+  let paused = projectScriptInfo.value4;
 
   let project = new Project(
     generateContractSpecificId(contractAddress, projectId)
@@ -243,8 +371,8 @@ export function handleAddProject(call: AddProjectCall): void {
   project.complete = false;
   project.contract = contractAddress.toHexString();
   project.createdAt = timestamp;
-  project.currencySymbol = currencySymbol;
   project.currencyAddress = currencyAddress;
+  project.currencySymbol = currencySymbol;
   project.dynamic = dynamic;
   project.externalAssetDependencyCount = BigInt.fromI32(0);
   project.externalAssetDependenciesLocked = false;
@@ -262,46 +390,27 @@ export function handleAddProject(call: AddProjectCall): void {
 
   project.save();
 
-  if (contractEntity) {
-    contractEntity.updatedAt = call.block.timestamp;
-    contractEntity.save();
-  }
+  contractEntity.updatedAt = call.block.timestamp;
+  contractEntity.save();
 }
 
 export function handleUpdateAdmin(call: UpdateAdminCall): void {
-  let contract = GenArt721Core2.bind(call.to);
-  refreshContract(contract, call.block.timestamp);
+  let contract = GenArt721Core2PBAB.bind(call.to);
+  refreshContract(contract as GenArt721Core2PBAB, call.block.timestamp);
 }
 
 export function handleAddWhitelisted(call: AddWhitelistedCall): void {
-  let contract = GenArt721Core.bind(call.to);
+  let contract = GenArt721Core2PBAB.bind(call.to);
   let contractEntity = refreshContract(contract, call.block.timestamp);
 
-  if (contractEntity) {
-    addWhitelisting(contractEntity.id, call.inputs._address.toHexString());
-  }
-}
-
-function addWhitelisting(contractId: string, accountId: string): void {
-  let account = new Account(accountId);
-  account.save();
-
-  let whitelisting = new Whitelisting(
-    generateWhitelistingId(contractId, account.id)
-  );
-  whitelisting.account = account.id;
-  whitelisting.contract = contractId;
-
-  whitelisting.save();
+  addWhitelisting(contractEntity.id, call.inputs._address.toHexString());
 }
 
 export function handleRemoveWhitelisted(call: RemoveWhitelistedCall): void {
-  let contract = GenArt721Core.bind(call.to);
+  let contract = GenArt721Core2PBAB.bind(call.to);
   let contractEntity = refreshContract(contract, call.block.timestamp);
 
-  if (contractEntity) {
-    removeWhitelisting(contractEntity.id, call.inputs._address.toHexString());
-  }
+  removeWhitelisting(contractEntity.id, call.inputs._address.toHexString());
 }
 
 function removeWhitelisting(contractId: string, accountId: string): void {
@@ -316,36 +425,27 @@ function removeWhitelisting(contractId: string, accountId: string): void {
 }
 
 export function handleAddMintWhitelisted(call: AddMintWhitelistedCall): void {
-  let contract = GenArt721Core.bind(call.to);
+  let contract = GenArt721Core2PBAB.bind(call.to);
   let contractEntity = refreshContract(contract, call.block.timestamp);
 
-  if (contractEntity) {
-    contractEntity.mintWhitelisted = contractEntity.mintWhitelisted
-      ? contractEntity.mintWhitelisted.concat([call.inputs._address])
-      : [call.inputs._address];
-    contractEntity.save();
-  }
+  contractEntity.mintWhitelisted = contractEntity.mintWhitelisted
+    ? contractEntity.mintWhitelisted.concat([call.inputs._address])
+    : [call.inputs._address];
+  contractEntity.save();
 }
 
 export function handleRemoveMintWhitelisted(
   call: RemoveMintWhitelistedCall
 ): void {
-  let contract = GenArt721Core.bind(call.to);
+  let contract = GenArt721Core2PBAB.bind(call.to);
   let contractEntity = refreshContract(contract, call.block.timestamp);
 
-  if (contractEntity) {
-    removeMintWhitelisting(
-      contractEntity,
-      call.inputs._address,
-      call.block.timestamp
-    );
-  }
+  removeMintWhitelisting(contractEntity, call.inputs._address);
 }
 
 function removeMintWhitelisting(
   contractEntity: Contract,
-  minterAddress: Address,
-  timestamp: BigInt
+  minterAddress: Address
 ): void {
   let mintWhitelisted = contractEntity.mintWhitelisted;
 
@@ -356,30 +456,6 @@ function removeMintWhitelisting(
     }
   }
 
-  // If the minter that was removed was the minter filter for the
-  // contract then we need to null all minter configurations for
-  // the contract's projects.
-  let minterFilter = MinterFilter.load(minterAddress.toHexString());
-  if (minterFilter && contractEntity.minterFilter == minterFilter.id) {
-    contractEntity.minterFilter = null;
-    let nextProjectId = contractEntity.nextProjectId.toI32();
-    for (let i = 0; i < nextProjectId; i++) {
-      let fullProjectId = contractEntity.id + "-" + i.toString();
-      let project = Project.load(fullProjectId);
-
-      if (project && project.minterConfiguration) {
-        project.minterConfiguration = null;
-        project.updatedAt = timestamp;
-        project.save();
-      }
-
-      let prevMinterConfig = ProjectMinterConfiguration.load(fullProjectId);
-      if (prevMinterConfig) {
-        store.remove("ProjectMinterConfiguration", fullProjectId);
-      }
-    }
-  }
-
   contractEntity.mintWhitelisted = newMintWhitelisted;
   contractEntity.save();
 }
@@ -387,47 +463,33 @@ function removeMintWhitelisting(
 export function handleUpdateRandomizerAddress(
   call: UpdateRandomizerAddressCall
 ): void {
-  let contract = GenArt721Core.bind(call.to);
+  let contract = GenArt721Core2PBAB.bind(call.to);
   refreshContract(contract, call.block.timestamp);
 }
 
-export function handleUpdateArtblocksAddress(
-  call: UpdateArtblocksAddressCall
+export function handleUpdateRenderProviderAddress(
+  call: UpdateRenderProviderAddressCall
 ): void {
-  let contract = GenArt721Core.bind(call.to);
+  let contract = GenArt721Core2PBAB.bind(call.to);
   refreshContract(contract, call.block.timestamp);
 }
 
-export function handleUpdateArtblocksPercentage(
-  call: UpdateArtblocksPercentageCall
+export function handleUpdateRenderProviderPercentage(
+  call: UpdateRenderProviderPercentageCall
 ): void {
-  let contract = GenArt721Core.bind(call.to);
+  let contract = GenArt721Core2PBAB.bind(call.to);
   refreshContract(contract, call.block.timestamp);
 }
 
 export function handleAddProjectScript(call: AddProjectScriptCall): void {
-  let contract = GenArt721Core.bind(call.to);
+  let contract = GenArt721Core2PBAB.bind(call.to);
   refreshProjectScript(contract, call.inputs._projectId, call.block.timestamp);
-}
-
-export function handleClearTokenIpfsImageUri(
-  call: ClearTokenIpfsImageUriCall
-): void {
-  let contract = GenArt721Core.bind(call.to);
-  refreshTokenUri(contract, call.inputs._tokenId);
-}
-
-export function handleOverrideTokenDynamicImageWithIpfsLink(
-  call: OverrideTokenDynamicImageWithIpfsLinkCall
-): void {
-  let contract = GenArt721Core.bind(call.to);
-  refreshTokenUri(contract, call.inputs._tokenId);
 }
 
 export function handleRemoveProjectLastScript(
   call: RemoveProjectLastScriptCall
 ): void {
-  let contract = GenArt721Core.bind(call.to);
+  let contract = GenArt721Core2PBAB.bind(call.to);
   refreshProjectScript(contract, call.inputs._projectId, call.block.timestamp);
 }
 
@@ -441,21 +503,6 @@ export function handleToggleProjectIsActive(
   if (project && project.contract == call.to.toHexString()) {
     project.active = !project.active;
     project.activatedAt = project.active ? call.block.timestamp : null;
-    project.updatedAt = call.block.timestamp;
-    project.save();
-  }
-}
-
-export function handleToggleProjectIsDynamic(
-  call: ToggleProjectIsDynamicCall
-): void {
-  let project = Project.load(
-    generateContractSpecificId(call.to, call.inputs._projectId)
-  );
-
-  if (project && project.contract == call.to.toHexString()) {
-    project.dynamic = !project.dynamic;
-    project.useHashString = project.dynamic;
     project.updatedAt = call.block.timestamp;
     project.save();
   }
@@ -489,34 +536,6 @@ export function handleToggleProjectIsPaused(
   }
 }
 
-export function handleToggleProjectUseHashString(
-  call: ToggleProjectUseHashStringCall
-): void {
-  let project = Project.load(
-    generateContractSpecificId(call.to, call.inputs._projectId)
-  );
-
-  if (project && project.contract == call.to.toHexString()) {
-    project.useHashString = !project.useHashString;
-    project.updatedAt = call.block.timestamp;
-    project.save();
-  }
-}
-
-export function handleToggleProjectUseIpfsForStatic(
-  call: ToggleProjectUseIpfsForStaticCall
-): void {
-  let project = Project.load(
-    generateContractSpecificId(call.to, call.inputs._projectId)
-  );
-
-  if (project && project.contract == call.to.toHexString()) {
-    project.useIpfs = !project.useIpfs;
-    project.updatedAt = call.block.timestamp;
-    project.save();
-  }
-}
-
 export function handleUpdateProjectAdditionalPayeeInfo(
   call: UpdateProjectAdditionalPayeeInfoCall
 ): void {
@@ -541,6 +560,7 @@ export function handleUpdateProjectArtistAddress(
   let project = Project.load(
     generateContractSpecificId(call.to, call.inputs._projectId)
   );
+
   if (project) {
     project.artistAddress = call.inputs._artistAddress;
     project.artist = artist.id;
@@ -559,20 +579,6 @@ export function handleUpdateProjectArtistName(
 
   if (project) {
     project.artistName = call.inputs._projectArtistName;
-    project.updatedAt = call.block.timestamp;
-    project.save();
-  }
-}
-
-export function handleUpdateProjectBaseIpfsURI(
-  call: UpdateProjectBaseIpfsURICall
-): void {
-  let project = Project.load(
-    generateContractSpecificId(call.to, call.inputs._projectId)
-  );
-
-  if (project) {
-    project.baseIpfsUri = call.inputs._projectBaseIpfsURI;
     project.updatedAt = call.block.timestamp;
     project.save();
   }
@@ -603,6 +609,7 @@ export function handleUpdateProjectCurrencyInfo(
     project.currencySymbol = call.inputs._currencySymbol;
     project.currencyAddress = call.inputs._currencyAddress;
     project.updatedAt = call.block.timestamp;
+
     project.save();
   }
 }
@@ -659,6 +666,7 @@ export function handleUpdateProjectMaxInvocations(
   if (project) {
     project.maxInvocations = call.inputs._maxInvocations;
     project.complete = project.invocations.ge(project.maxInvocations);
+    project.completedAt = project.complete ? call.block.timestamp : null;
     project.updatedAt = call.block.timestamp;
     project.save();
   } else {
@@ -696,7 +704,7 @@ export function handleUpdateProjectPricePerTokenInWei(
 }
 
 export function handleUpdateProjectScript(call: UpdateProjectScriptCall): void {
-  let contract = GenArt721Core.bind(call.to);
+  let contract = GenArt721Core2PBAB.bind(call.to);
 
   refreshProjectScript(contract, call.inputs._projectId, call.block.timestamp);
 }
@@ -774,26 +782,28 @@ export function handleUpdateProjectWebsite(
 /*** END CALL HANDLERS  ***/
 
 /** HELPERS ***/
-function refreshContract<T>(contract: T, timestamp: BigInt): Contract | null {
-  if (!(contract instanceof GenArt721Core)) {
-    return null;
-  }
-
+function refreshContract(
+  contract: GenArt721Core2PBAB,
+  timestamp: BigInt
+): Contract {
   let admin = contract.admin();
-  let artblocksAddress = contract.artblocksAddress();
-  let artblocksPercentage = contract.artblocksPercentage();
+  let renderProviderAddress = contract.renderProviderAddress();
+  let renderProviderPercentage = contract.renderProviderPercentage();
   let nextProjectId = contract.nextProjectId();
 
   let contractEntity = Contract.load(contract._address.toHexString());
+
   if (!contractEntity) {
     contractEntity = new Contract(contract._address.toHexString());
     contractEntity.createdAt = timestamp;
     contractEntity.mintWhitelisted = [];
+    contractEntity.newProjectsForbidden = false;
   }
 
   contractEntity.admin = admin;
-  contractEntity.renderProviderAddress = artblocksAddress;
-  contractEntity.renderProviderPercentage = artblocksPercentage;
+  contractEntity.type = GEN_ART_721_CORE_V2;
+  contractEntity.renderProviderAddress = renderProviderAddress;
+  contractEntity.renderProviderPercentage = renderProviderPercentage;
   contractEntity.nextProjectId = nextProjectId;
   contractEntity.randomizerContract = contract.randomizerContract();
   contractEntity.updatedAt = timestamp;
@@ -803,7 +813,7 @@ function refreshContract<T>(contract: T, timestamp: BigInt): Contract | null {
   return contractEntity as Contract;
 }
 
-function refreshTokenUri(contract: GenArt721Core, tokenId: BigInt): void {
+function refreshTokenUri(contract: GenArt721Core2PBAB, tokenId: BigInt): void {
   let tokenURI = contract.tokenURI(tokenId);
 
   let token = Token.load(
@@ -815,15 +825,11 @@ function refreshTokenUri(contract: GenArt721Core, tokenId: BigInt): void {
   }
 }
 
-function refreshProjectScript<T>(
-  contract: T,
+function refreshProjectScript(
+  contract: GenArt721Core2PBAB,
   projectId: BigInt,
   timestamp: BigInt
 ): void {
-  if (!(contract instanceof GenArt721Core)) {
-    return;
-  }
-
   let project = Project.load(
     generateContractSpecificId(contract._address, projectId)
   );
@@ -874,4 +880,5 @@ function refreshProjectScript<T>(
     project.save();
   }
 }
+
 /** END HELPERS ***/

@@ -1,5 +1,6 @@
 {
   "network": "goerli",
+  "genArt721CoreV3Contracts": [],
   "genArt721CoreContracts": [
     {
       "address": "0xDa62f67BE7194775A75BE91CBF9FEeDcC5776D4b",
