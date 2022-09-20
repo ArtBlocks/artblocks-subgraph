@@ -9,7 +9,6 @@ import {
   ByteArray
 } from "@graphprotocol/graph-ts";
 
-import { log as logger } from "matchstick-as";
 import {
   GenArt721Core2PBAB,
   Mint,

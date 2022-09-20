@@ -40,4 +40,5 @@ export const ERC20 = "ERC20";
 export const ERC721 = "ERC721";
 export const ERC1155 = "ERC1155";
 
+// This is directly tied to the ExternalAssetDependencyType enum on the Engine Flex Core contract
 export const FLEX_CONTRACT_EXTERNAL_ASSET_DEP_TYPES = ["IPFS", "ARWEAVE"];

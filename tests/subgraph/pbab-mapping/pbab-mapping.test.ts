@@ -2105,6 +2105,66 @@ test("GenArt721Core2EngineFlex: Can remove a project external asset dependency",
   assert.entityCount(PROJECT_EXTERNAL_ASSET_DEPENDENCY_ENTITY_TYPE, 1);
 });
 
+test("GenArt721Core2EngineFlex: Cannot add a project external asset dependency for a non-existant project", () => {
+  clearStore();
+  // Add project to store
+  const projectId = BigInt.fromI32(0);
+  const projectIdNotInStore = BigInt.fromI32(1);
+  const fullProjectId = generateContractSpecificId(
+    TEST_CONTRACT_ADDRESS,
+    projectId
+  );
+
+  const fullProjectIdNotInStore = generateContractSpecificId(
+    TEST_CONTRACT_ADDRESS,
+    projectIdNotInStore
+  );  
+
+  addNewProjectToStore(
+    projectId,
+    "Test Project",
+    randomAddressGenerator.generateRandomAddress(),
+    BigInt.fromI64(i64(1e18)),
+    true,
+    CURRENT_BLOCK_TIMESTAMP.minus(BigInt.fromI32(100))
+  );
+
+  const event: ExternalAssetDependencyUpdated = changetype<ExternalAssetDependencyUpdated>(newMockEvent());
+  event.address = TEST_CONTRACT_ADDRESS;
+  event.block.timestamp = CURRENT_BLOCK_TIMESTAMP;
+
+  const _index0 = BigInt.zero();
+  const _dependencyType0 = BigInt.zero();
+  const _externalAssetDependencyCount0 = BigInt.fromI32(1);
+  
+  assert.fieldEquals(
+    PROJECT_ENTITY_TYPE,
+    fullProjectId,
+    "externalAssetDependencyCount",
+    BigInt.fromI32(0).toString()
+  );
+
+  event.parameters = [
+    new ethereum.EventParam("_projectId", ethereum.Value.fromUnsignedBigInt(projectIdNotInStore)),
+    new ethereum.EventParam("_index", ethereum.Value.fromUnsignedBigInt(_index0)),
+    new ethereum.EventParam("_cid", ethereum.Value.fromString(IPFS_CID)),
+    new ethereum.EventParam("_dependencyType", ethereum.Value.fromUnsignedBigInt(_dependencyType0)),
+    new ethereum.EventParam("_externalAssetDependencyCount", ethereum.Value.fromUnsignedBigInt(_externalAssetDependencyCount0))
+  ];
+
+  // add event
+  handleExternalAssetDependencyUpdated(event);
+
+  assert.fieldEquals(
+    PROJECT_ENTITY_TYPE,
+    fullProjectId,
+    "externalAssetDependencyCount",
+    BigInt.fromI32(0).toString()
+  );
+  assert.notInStore(PROJECT_EXTERNAL_ASSET_DEPENDENCY_ENTITY_TYPE, fullProjectIdNotInStore + '-0');
+
+});
+
 test("GenArt721Core2EngineFlex: Can update a contract preferred IPFS/ARWEAVE gateway", () => {
   clearStore();
   const contract = addTestContractToStore(BigInt.zero());
