@@ -471,6 +471,15 @@ export class Project extends Entity {
     this.set("externalAssetDependencyCount", Value.fromBigInt(value));
   }
 
+  get externalAssetDependenciesLocked(): boolean {
+    let value = this.get("externalAssetDependenciesLocked");
+    return value!.toBoolean();
+  }
+
+  set externalAssetDependenciesLocked(value: boolean) {
+    this.set("externalAssetDependenciesLocked", Value.fromBoolean(value));
+  }
+
   get scriptJSON(): string | null {
     let value = this.get("scriptJSON");
     if (!value || value.kind == ValueKind.NULL) {
@@ -1129,6 +1138,40 @@ export class Contract extends Entity {
       this.unset("minterFilter");
     } else {
       this.set("minterFilter", Value.fromString(<string>value));
+    }
+  }
+
+  get preferredIPFSGateway(): string | null {
+    let value = this.get("preferredIPFSGateway");
+    if (!value || value.kind == ValueKind.NULL) {
+      return null;
+    } else {
+      return value.toString();
+    }
+  }
+
+  set preferredIPFSGateway(value: string | null) {
+    if (!value) {
+      this.unset("preferredIPFSGateway");
+    } else {
+      this.set("preferredIPFSGateway", Value.fromString(<string>value));
+    }
+  }
+
+  get preferredArweaveGateway(): string | null {
+    let value = this.get("preferredArweaveGateway");
+    if (!value || value.kind == ValueKind.NULL) {
+      return null;
+    } else {
+      return value.toString();
+    }
+  }
+
+  set preferredArweaveGateway(value: string | null) {
+    if (!value) {
+      this.unset("preferredArweaveGateway");
+    } else {
+      this.set("preferredArweaveGateway", Value.fromString(<string>value));
     }
   }
 

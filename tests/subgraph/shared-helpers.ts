@@ -77,6 +77,7 @@ export const ACCOUNT_ENTITY_TYPE = "Account";
 export const PROJECT_ENTITY_TYPE = "Project";
 export const CONTRACT_ENTITY_TYPE = "Contract";
 export const WHITELISTING_ENTITY_TYPE = "Whitelisting";
+export const PROJECT_EXTERNAL_ASSET_DEPENDENCY_ENTITY_TYPE = "ProjectExternalAssetDependency";
 export const PROJECT_SCRIPT_ENTITY_TYPE = "ProjectScript";
 export const TOKEN_ENTITY_TYPE = "Token";
 export const TRANSFER_ENTITY_TYPE = "Transfer";
@@ -86,6 +87,8 @@ export const MINTER_FILTER_ENTITY_TYPE = "MinterFilter";
 export const MINTER_ENTITY_TYPE = "Minter";
 export const ONE_MILLION = 1000000;
 export const RANDOMIZER_ADDRESS = randomAddressGenerator.generateRandomAddress();
+export const IPFS_CID = "QmQCqjqxVXZQ6vXNmZvF7FjyZkCXKXMykCyyPQQrZ6m7W";
+export const IPFS_CID2 = "QmQCqjqxVXZQ6vXNmZvF7FjyZkCXKXMykCyyPQQrZ6m7W2";
 export const CURRENT_BLOCK_TIMESTAMP = BigInt.fromI32(1647051214);
 export const TEST_CONTRACT_ADDRESS = randomAddressGenerator.generateRandomAddress();
 export const TEST_SUPER_ADMIN_ADDRESS = randomAddressGenerator.generateRandomAddress();
@@ -189,6 +192,7 @@ export class DefaultProjectValues {
   useIpfs: boolean;
   website: string;
   externalAssetDependencyCount: BigInt;
+  externalAssetDependenciesLocked: boolean;
 }
 
 // These represent the values that would be returned by a
@@ -225,7 +229,8 @@ export const DEFAULT_PROJECT_VALUES: DefaultProjectValues = {
   useHashString: true,
   useIpfs: false,
   website: "",
-  externalAssetDependencyCount: BigInt.zero()
+  externalAssetDependencyCount: BigInt.zero(),
+  externalAssetDependenciesLocked: false
 };
 
 // Store population functions
@@ -286,7 +291,8 @@ export const addNewProjectToStore = function(
   project.useHashString = DEFAULT_PROJECT_VALUES.useHashString;
   project.useIpfs = DEFAULT_PROJECT_VALUES.useIpfs;
   project.externalAssetDependencyCount = BigInt.fromI32(0);
-
+  project.externalAssetDependenciesLocked = false;
+  
   project.save();
   return project;
 };

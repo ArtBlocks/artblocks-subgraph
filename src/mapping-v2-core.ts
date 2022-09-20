@@ -47,6 +47,8 @@ import {
 import {
   ExternalAssetDependencyUpdated,
   ExternalAssetDependencyRemoved,
+  GatewayUpdated,
+  ProjectExternalAssetDependenciesLocked,
   GenArt721Core2EngineFlex
 } from "../generated/GenArt721Core2EngineFlex/GenArt721Core2EngineFlex";
 
@@ -199,6 +201,7 @@ export function handleExternalAssetDependencyUpdated(
   );
 
   if (!project) {
+    log.warning("Project not found for ExternalAssetDependencyUpdated event", []);
     return;
   }
 
@@ -221,6 +224,10 @@ export function handleExternalAssetDependencyUpdated(
   project.save();
 }
 
+/**
+ * Based on the way external asset dependency removal is implement on the contract
+ * we can always assume that the last index is the one being removed.
+ */
 export function handleExternalAssetDependencyRemoved(
   event: ExternalAssetDependencyRemoved
 ): void {
@@ -229,6 +236,7 @@ export function handleExternalAssetDependencyRemoved(
   );
 
   if (!project) {
+    log.warning("Project not found for ExternalAssetDependencyRemoved event", []);
     return;
   }
 
@@ -277,6 +285,39 @@ export function handleExternalAssetDependencyRemoved(
   project.updatedAt = event.block.timestamp;
   project.save();
 }
+
+export function handleGatewayUpdated(event: GatewayUpdated): void {
+  let contractEntity = Contract.load(event.address.toHexString());
+  
+  if (!contractEntity) {
+    log.warning("Contract not found for GatewayUpdated event", []);
+    return;
+  }
+  const dependencyType = FLEX_CONTRACT_EXTERNAL_ASSET_DEP_TYPES[event.params._dependencyType];
+  if (dependencyType === "IPFS") {
+    contractEntity.preferredIPFSGateway = event.params._gatewayAddress;
+  } else {
+    contractEntity.preferredArweaveGateway = event.params._gatewayAddress;
+  }
+  contractEntity.updatedAt = event.block.timestamp;
+  contractEntity.save();
+}
+
+export function handleProjectExternalAssetDependenciesLocked(event: ProjectExternalAssetDependenciesLocked): void {
+  let project = Project.load(
+    generateContractSpecificId(event.address, event.params._projectId)
+  );
+
+  if (!project) {
+    log.warning("Project not found for ProjectExternalAssetDependenciesLocked event", []);
+    return;
+  }
+
+  project.externalAssetDependenciesLocked = true; 
+  project.updatedAt = event.block.timestamp;
+  project.save();
+}
+
 /*** END EVENT HANDLERS ***/
 
 /*** CALL HANDLERS  (Mainnet and Ropsten Only) ***/
@@ -334,6 +375,7 @@ export function handleAddProject(call: AddProjectCall): void {
   project.currencySymbol = currencySymbol;
   project.dynamic = dynamic;
   project.externalAssetDependencyCount = BigInt.fromI32(0);
+  project.externalAssetDependenciesLocked = false;
   project.invocations = invocations;
   project.locked = false;
   project.maxInvocations = maxInvocations;

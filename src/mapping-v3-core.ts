@@ -435,6 +435,7 @@ function createProject(
   project.currencySymbol = currencySymbol;
   project.dynamic = true;
   project.externalAssetDependencyCount = BigInt.fromI32(0);
+  project.externalAssetDependenciesLocked = false;
   project.invocations = invocations;
   project.locked = false;
   project.maxInvocations = maxInvocations;
