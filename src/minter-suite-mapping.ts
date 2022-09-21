@@ -170,7 +170,18 @@ export function handlePurchaseToDisabledUpdated(
 }
 
 // MinterDALin events
-export function handleMinimumAuctionLengthSecondsUpdated<T>(event: T): void {
+
+// This is meant to handle all `MinimumAuctionLengthSecondsUpdated` events from all
+// versions of the DALin contract because they have the same signature
+export function handleMinimumAuctionLengthSecondsUpdated(
+  event: MinimumAuctionLengthSecondsUpdatedV0
+): void {
+  handleMinimumAuctionLengthSecondsUpdatedGeneric(event);
+}
+
+export function handleMinimumAuctionLengthSecondsUpdatedGeneric<T>(
+  event: T
+): void {
   if (
     !(
       event instanceof MinimumAuctionLengthSecondsUpdatedV0 ||
@@ -189,7 +200,15 @@ export function handleMinimumAuctionLengthSecondsUpdated<T>(event: T): void {
   minter.save();
 }
 
-export function handleDALinSetAuctionDetails<T>(event: T): void {
+// This is meant to handle all `SetAuctionDetails` events from all
+// versions of the DALin contract because they have the same signature
+export function handleDALinSetAuctionDetails(
+  event: DALinV0SetAuctionDetails
+): void {
+  handleDALinSetAuctionDetailsGeneric(event);
+}
+
+export function handleDALinSetAuctionDetailsGeneric<T>(event: T): void {
   if (
     !(
       event instanceof DALinV0SetAuctionDetails ||
@@ -223,7 +242,15 @@ export function handleDALinSetAuctionDetails<T>(event: T): void {
   }
 }
 
-export function handleDALinResetAuctionDetails<T>(event: T): void {
+// This is meant to handle all `ResetAuctionDetails` events from all
+// versions of the DALin contract because they have the same signature
+export function handleDALinResetAuctionDetails(
+  event: DALinV0ResetAuctionDetails
+): void {
+  handleDALinResetAuctionDetailsGeneric(event);
+}
+
+export function handleDALinResetAuctionDetailsGeneric<T>(event: T): void {
   if (
     !(
       event instanceof DALinV0ResetAuctionDetails ||
@@ -257,8 +284,18 @@ export function handleDALinResetAuctionDetails<T>(event: T): void {
   }
 }
 
+// This is meant to handle all `AuctionHalfLifeRangeSecondsUpdated` events from all
+// versions of the DAExp contract because they have the same signature
+export function handleAuctionHalfLifeRangeSecondsUpdated(
+  event: DAExpV0SetAuctionDetails
+): void {
+  handleAuctionHalfLifeRangeSecondsUpdatedGeneric(event);
+}
+
 // MinterDAExp events
-export function handleAuctionHalfLifeRangeSecondsUpdated<T>(event: T): void {
+export function handleAuctionHalfLifeRangeSecondsUpdatedGeneric<T>(
+  event: T
+): void {
   if (
     !(
       event instanceof AuctionHalfLifeRangeSecondsUpdatedV0 ||
@@ -280,7 +317,15 @@ export function handleAuctionHalfLifeRangeSecondsUpdated<T>(event: T): void {
   minter.save();
 }
 
-export function handleDAExpSetAuctionDetails<T>(event: T): void {
+// This is meant to handle all `SetAuctionDetails` events from all
+// versions of the DAExp contract because they have the same signature
+export function handleDAExpSetAuctionDetails(
+  event: DAExpV0SetAuctionDetails
+): void {
+  handleDAExpSetAuctionDetailsGeneric(event);
+}
+
+export function handleDAExpSetAuctionDetailsGeneric<T>(event: T): void {
   if (
     !(
       event instanceof DAExpV0SetAuctionDetails ||
@@ -315,7 +360,15 @@ export function handleDAExpSetAuctionDetails<T>(event: T): void {
   }
 }
 
-export function handleDAExpResetAuctionDetails<T>(event: T): void {
+// This is meant to handle all `ResetAuctionDetails` events from all
+// versions of the DAExp contract because they have the same signature
+export function handleDAExpResetAuctionDetails(
+  event: DAExpV0ResetAuctionDetails
+): void {
+  handleDAExpResetAuctionDetailsGeneric(event);
+}
+
+export function handleDAExpResetAuctionDetailsGeneric<T>(event: T): void {
   if (
     !(
       event instanceof DAExpV0ResetAuctionDetails ||
