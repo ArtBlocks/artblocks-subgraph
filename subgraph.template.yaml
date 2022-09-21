@@ -997,9 +997,9 @@ dataSources:
         - event: ProjectCurrencyInfoUpdated(indexed uint256,indexed address,string)
           handler: handleProjectCurrencyInfoUpdated
         - event: RegisteredNFTAddress(indexed address)
-          handler: handleRegistrationNFTAddresses
+          handler: handleRegistrationNFTAddressesV0
         - event: UnregisteredNFTAddress(indexed address)
-          handler: handleRegistrationNFTAddresses
+          handler: handleRegistrationNFTAddressesV0
         - event: AllowedHoldersOfProjects(indexed uint256,address[],uint256[])
           handler: handleHoldersOfProjectsGeneric
         - event: RemovedHoldersOfProjects(indexed uint256,address[],uint256[])
@@ -1206,9 +1206,9 @@ dataSources:
         - event: ProjectCurrencyInfoUpdated(indexed uint256,indexed address,string)
           handler: handleProjectCurrencyInfoUpdated
         - event: RegisteredNFTAddress(indexed address)
-          handler: handleRegistrationNFTAddresses
+          handler: handleRegistrationNFTAddressesV1
         - event: UnregisteredNFTAddress(indexed address)
-          handler: handleRegistrationNFTAddresses
+          handler: handleRegistrationNFTAddressesV1
         - event: AllowedHoldersOfProjects(indexed uint256,address[],uint256[])
           handler: handleHoldersOfProjectsGeneric
         - event: RemovedHoldersOfProjects(indexed uint256,address[],uint256[])

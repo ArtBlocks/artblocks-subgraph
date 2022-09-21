@@ -458,6 +458,30 @@ export function handleRegistrationNFTAddresses<T>(event: T): void {
   }
 }
 
+export function handleRegisteredNFTAddressV0(
+  event: MinterHolderV0RegisteredNFTAddress
+): void {
+  handleRegistrationNFTAddresses(event);
+}
+
+export function handleUnregisteredNFTAddressV0(
+  event: MinterHolderV0UnregisteredNFTAddress
+): void {
+  handleRegistrationNFTAddresses(event);
+}
+
+export function handleRegisteredNFTAddressV1(
+  event: MinterHolderV1RegisteredNFTAddress
+): void {
+  handleRegistrationNFTAddresses(event);
+}
+
+export function handleUnregisteredNFTAddressV1(
+  event: MinterHolderV1UnregisteredNFTAddress
+): void {
+  handleRegistrationNFTAddresses(event);
+}
+
 // Generic Handlers
 // Below is all logic pertaining to generic handlers used for maintaining JSON config stores on both the ProjectMinterConfiguration and Minter entities.
 // Most logic is shared and bubbled up each respective handler for each action. We utilize ducktype to allow these to work on either a Minter or ProjectMinterConfiguration
