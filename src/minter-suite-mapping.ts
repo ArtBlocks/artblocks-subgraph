@@ -171,10 +171,18 @@ export function handlePurchaseToDisabledUpdated(
 
 // MinterDALin events
 
-// This is meant to handle all `MinimumAuctionLengthSecondsUpdated` events from all
-// versions of the DALin contract because they have the same signature
-export function handleMinimumAuctionLengthSecondsUpdated(
+export function handleMinimumAuctionLengthSecondsUpdatedV0(
   event: MinimumAuctionLengthSecondsUpdatedV0
+): void {
+  handleMinimumAuctionLengthSecondsUpdatedGeneric(event);
+}
+export function handleMinimumAuctionLengthSecondsUpdatedV1(
+  event: MinimumAuctionLengthSecondsUpdatedV1
+): void {
+  handleMinimumAuctionLengthSecondsUpdatedGeneric(event);
+}
+export function handleMinimumAuctionLengthSecondsUpdatedV2(
+  event: MinimumAuctionLengthSecondsUpdatedV2
 ): void {
   handleMinimumAuctionLengthSecondsUpdatedGeneric(event);
 }
@@ -200,10 +208,18 @@ export function handleMinimumAuctionLengthSecondsUpdatedGeneric<T>(
   minter.save();
 }
 
-// This is meant to handle all `SetAuctionDetails` events from all
-// versions of the DALin contract because they have the same signature
-export function handleDALinSetAuctionDetails(
+export function handleDALinSetAuctionDetailsV0(
   event: DALinV0SetAuctionDetails
+): void {
+  handleDALinSetAuctionDetailsGeneric(event);
+}
+export function handleDALinSetAuctionDetailsV1(
+  event: DALinV1SetAuctionDetails
+): void {
+  handleDALinSetAuctionDetailsGeneric(event);
+}
+export function handleDALinSetAuctionDetailsV2(
+  event: DALinV2SetAuctionDetails
 ): void {
   handleDALinSetAuctionDetailsGeneric(event);
 }
@@ -242,10 +258,18 @@ export function handleDALinSetAuctionDetailsGeneric<T>(event: T): void {
   }
 }
 
-// This is meant to handle all `ResetAuctionDetails` events from all
-// versions of the DALin contract because they have the same signature
-export function handleDALinResetAuctionDetails(
+export function handleDALinResetAuctionDetailsV0(
   event: DALinV0ResetAuctionDetails
+): void {
+  handleDALinResetAuctionDetailsGeneric(event);
+}
+export function handleDALinResetAuctionDetailsV1(
+  event: DALinV1ResetAuctionDetails
+): void {
+  handleDALinResetAuctionDetailsGeneric(event);
+}
+export function handleDALinResetAuctionDetailsV2(
+  event: DALinV2ResetAuctionDetails
 ): void {
   handleDALinResetAuctionDetailsGeneric(event);
 }
@@ -284,10 +308,18 @@ export function handleDALinResetAuctionDetailsGeneric<T>(event: T): void {
   }
 }
 
-// This is meant to handle all `AuctionHalfLifeRangeSecondsUpdated` events from all
-// versions of the DAExp contract because they have the same signature
-export function handleAuctionHalfLifeRangeSecondsUpdated(
+export function handleAuctionHalfLifeRangeSecondsUpdatedV0(
   event: DAExpV0SetAuctionDetails
+): void {
+  handleAuctionHalfLifeRangeSecondsUpdatedGeneric(event);
+}
+export function handleAuctionHalfLifeRangeSecondsUpdatedV1(
+  event: DAExpV1SetAuctionDetails
+): void {
+  handleAuctionHalfLifeRangeSecondsUpdatedGeneric(event);
+}
+export function handleAuctionHalfLifeRangeSecondsUpdatedV2(
+  event: DAExpV2SetAuctionDetails
 ): void {
   handleAuctionHalfLifeRangeSecondsUpdatedGeneric(event);
 }
@@ -317,10 +349,18 @@ export function handleAuctionHalfLifeRangeSecondsUpdatedGeneric<T>(
   minter.save();
 }
 
-// This is meant to handle all `SetAuctionDetails` events from all
-// versions of the DAExp contract because they have the same signature
-export function handleDAExpSetAuctionDetails(
+export function handleDAExpSetAuctionDetailsV0(
   event: DAExpV0SetAuctionDetails
+): void {
+  handleDAExpSetAuctionDetailsGeneric(event);
+}
+export function handleDAExpSetAuctionDetailsV1(
+  event: DAExpV1SetAuctionDetails
+): void {
+  handleDAExpSetAuctionDetailsGeneric(event);
+}
+export function handleDAExpSetAuctionDetailsV2(
+  event: DAExpV2SetAuctionDetails
 ): void {
   handleDAExpSetAuctionDetailsGeneric(event);
 }
@@ -360,10 +400,18 @@ export function handleDAExpSetAuctionDetailsGeneric<T>(event: T): void {
   }
 }
 
-// This is meant to handle all `ResetAuctionDetails` events from all
-// versions of the DAExp contract because they have the same signature
-export function handleDAExpResetAuctionDetails(
+export function handleDAExpResetAuctionDetailsV0(
   event: DAExpV0ResetAuctionDetails
+): void {
+  handleDAExpResetAuctionDetailsGeneric(event);
+}
+export function handleDAExpResetAuctionDetailsV1(
+  event: DAExpV1ResetAuctionDetails
+): void {
+  handleDAExpResetAuctionDetailsGeneric(event);
+}
+export function handleDAExpResetAuctionDetailsV2(
+  event: DAExpV2ResetAuctionDetails
 ): void {
   handleDAExpResetAuctionDetailsGeneric(event);
 }
@@ -472,18 +520,24 @@ export function handleHoldersOfProjectsGeneric<T>(event: T): void {
   }
 }
 
-// This is meant to handle all `AllowedHoldersOfProjects` events from all
-// versions of the MinterHolder contract because they have the same signature
-export function handleAllowHoldersOfProjects(
+export function handleAllowHoldersOfProjectsV0(
+  event: MinterHolderV0AllowedHoldersOfProjects
+): void {
+  handleHoldersOfProjectsGeneric(event);
+}
+export function handleAllowHoldersOfProjectsV1(
   event: MinterHolderV0AllowedHoldersOfProjects
 ): void {
   handleHoldersOfProjectsGeneric(event);
 }
 
-// This is meant to handle all `RemovedHoldersOfProjects` events from all
-// versions of the MinterHolder contract because they have the same signature
-export function handleRemoveHoldersOfProjects(
+export function handleRemoveHoldersOfProjectsV0(
   event: MinterHolderV0RemovedHoldersOfProjects
+): void {
+  handleHoldersOfProjectsGeneric(event);
+}
+export function handleRemoveHoldersOfProjectsV1(
+  event: MinterHolderV1RemovedHoldersOfProjects
 ): void {
   handleHoldersOfProjectsGeneric(event);
 }
@@ -527,18 +581,24 @@ export function handleRegistrationNFTAddresses<T>(event: T): void {
   }
 }
 
-// This is meant to handle all `RegisteredNFTAddress` events from all
-// versions of the MinterHolder contract because they have the same signature
-export function handleRegisteredNFTAddress(
+export function handleRegisteredNFTAddressV0(
   event: MinterHolderV0RegisteredNFTAddress
 ): void {
   handleRegistrationNFTAddresses(event);
 }
+export function handleRegisteredNFTAddressV1(
+  event: MinterHolderV1RegisteredNFTAddress
+): void {
+  handleRegistrationNFTAddresses(event);
+}
 
-// This is meant to handle all `UnregisteredNFTAddress` events from all
-// versions of the MinterHolder contract because they have the same signature
-export function handleUnregisteredNFTAddress(
+export function handleUnregisteredNFTAddressV0(
   event: MinterHolderV0UnregisteredNFTAddress
+): void {
+  handleRegistrationNFTAddresses(event);
+}
+export function handleUnregisteredNFTAddressV1(
+  event: MinterHolderV1UnregisteredNFTAddress
 ): void {
   handleRegistrationNFTAddresses(event);
 }
