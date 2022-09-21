@@ -91,7 +91,14 @@ import {
   handleAddManyAddressValueProjectConfig as handleAddManyAddressValue,
   handleAddManyBigIntValueProjectConfig as handleAddManyBigIntValue,
   handleAddManyBytesValueProjectConfig as handleAddManyBytesValue,
-  handleHoldersOfProjectsGeneric,
+  handleAllowHoldersOfProjectsV0,
+  handleAllowHoldersOfProjectsV1,
+  handleRemoveHoldersOfProjectsV0,
+  handleRemoveHoldersOfProjectsV1,
+  handleRegisteredNFTAddressV0,
+  handleRegisteredNFTAddressV1,
+  handleUnregisteredNFTAddressV0,
+  handleUnregisteredNFTAddressV1,
   handleAuctionHalfLifeRangeSecondsUpdatedV0,
   handleAuctionHalfLifeRangeSecondsUpdatedV1,
   handleAuctionHalfLifeRangeSecondsUpdatedV2,
@@ -113,7 +120,6 @@ import {
   handlePricePerTokenInWeiUpdated,
   handleProjectCurrencyInfoUpdated,
   handlePurchaseToDisabledUpdated,
-  handleRegistrationNFTAddresses,
   handleRemoveBigIntManyValueProjectConfig as handleRemoveBigIntManyValue,
   handleRemoveBytesManyValueProjectConfig as handleRemoveBytesManyValue,
   handleRemoveValueProjectConfig as handleRemoveValue,
@@ -2098,11 +2104,11 @@ describe("MinterHolder-specific tests", () => {
       event.block.timestamp = CURRENT_BLOCK_TIMESTAMP;
 
       if (minterType == "MinterHolderV0") {
-        handleHoldersOfProjectsGeneric(
+        handleAllowHoldersOfProjectsV0(
           changetype<HolderV0AllowedHoldersOfProjects>(event)
         );
       } else {
-        handleHoldersOfProjectsGeneric(
+        handleAllowHoldersOfProjectsV1(
           changetype<HolderV1AllowedHoldersOfProjects>(event)
         );
       }
@@ -2173,11 +2179,11 @@ describe("MinterHolder-specific tests", () => {
       event.block.timestamp = CURRENT_BLOCK_TIMESTAMP;
 
       if (minterType == "MinterHolderV0") {
-        handleHoldersOfProjectsGeneric(
+        handleAllowHoldersOfProjectsV0(
           changetype<HolderV0AllowedHoldersOfProjects>(event)
         );
       } else {
-        handleHoldersOfProjectsGeneric(
+        handleAllowHoldersOfProjectsV1(
           changetype<HolderV1AllowedHoldersOfProjects>(event)
         );
       }
@@ -2245,11 +2251,11 @@ describe("MinterHolder-specific tests", () => {
       event.block.timestamp = CURRENT_BLOCK_TIMESTAMP;
 
       if (minterType == "MinterHolderV0") {
-        handleHoldersOfProjectsGeneric(
+        handleRemoveHoldersOfProjectsV0(
           changetype<HolderV0RemovedHoldersOfProjects>(event)
         );
       } else {
-        handleHoldersOfProjectsGeneric(
+        handleRemoveHoldersOfProjectsV1(
           changetype<HolderV1RemovedHoldersOfProjects>(event)
         );
       }
@@ -2321,11 +2327,11 @@ describe("MinterHolder-specific tests", () => {
       event.block.timestamp = CURRENT_BLOCK_TIMESTAMP;
 
       if (minterType == "MinterHolderV0") {
-        handleHoldersOfProjectsGeneric(
+        handleRemoveHoldersOfProjectsV0(
           changetype<HolderV0RemovedHoldersOfProjects>(event)
         );
       } else {
-        handleHoldersOfProjectsGeneric(
+        handleRemoveHoldersOfProjectsV1(
           changetype<HolderV1RemovedHoldersOfProjects>(event)
         );
       }
@@ -2362,11 +2368,11 @@ describe("MinterHolder-specific tests", () => {
       event.block.timestamp = CURRENT_BLOCK_TIMESTAMP;
 
       if (minterType == "MinterHolderV0") {
-        handleRegistrationNFTAddresses(
+        handleRegisteredNFTAddressV0(
           changetype<HolderV0RegisteredNFTAddress>(event)
         );
       } else {
-        handleRegistrationNFTAddresses(
+        handleRegisteredNFTAddressV1(
           changetype<HolderV1RegisteredNFTAddress>(event)
         );
       }
@@ -2419,11 +2425,11 @@ describe("MinterHolder-specific tests", () => {
       event.block.timestamp = CURRENT_BLOCK_TIMESTAMP;
 
       if (minterType == "MinterHolderV0") {
-        handleRegistrationNFTAddresses(
+        handleUnregisteredNFTAddressV0(
           changetype<HolderV0UnregisteredNFTAddress>(event)
         );
       } else {
-        handleRegistrationNFTAddresses(
+        handleUnregisteredNFTAddressV1(
           changetype<HolderV1UnregisteredNFTAddress>(event)
         );
       }

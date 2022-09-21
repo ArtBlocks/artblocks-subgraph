@@ -452,6 +452,28 @@ export function handleDAExpResetAuctionDetailsGeneric<T>(event: T): void {
 
 // MinterHolder Specific Handlers
 
+export function handleAllowHoldersOfProjectsV0(
+  event: MinterHolderV0AllowedHoldersOfProjects
+): void {
+  handleHoldersOfProjectsGeneric(event);
+}
+export function handleAllowHoldersOfProjectsV1(
+  event: MinterHolderV1AllowedHoldersOfProjects
+): void {
+  handleHoldersOfProjectsGeneric(event);
+}
+
+export function handleRemoveHoldersOfProjectsV0(
+  event: MinterHolderV0RemovedHoldersOfProjects
+): void {
+  handleHoldersOfProjectsGeneric(event);
+}
+export function handleRemoveHoldersOfProjectsV1(
+  event: MinterHolderV1RemovedHoldersOfProjects
+): void {
+  handleHoldersOfProjectsGeneric(event);
+}
+
 export function handleHoldersOfProjectsGeneric<T>(event: T): void {
   if (
     !(
@@ -518,28 +540,6 @@ export function handleHoldersOfProjectsGeneric<T>(event: T): void {
       handleRemoveBytesManyValueProjectConfig(newRemoveEvent);
     }
   }
-}
-
-export function handleAllowHoldersOfProjectsV0(
-  event: MinterHolderV0AllowedHoldersOfProjects
-): void {
-  handleHoldersOfProjectsGeneric(event);
-}
-export function handleAllowHoldersOfProjectsV1(
-  event: MinterHolderV0AllowedHoldersOfProjects
-): void {
-  handleHoldersOfProjectsGeneric(event);
-}
-
-export function handleRemoveHoldersOfProjectsV0(
-  event: MinterHolderV0RemovedHoldersOfProjects
-): void {
-  handleHoldersOfProjectsGeneric(event);
-}
-export function handleRemoveHoldersOfProjectsV1(
-  event: MinterHolderV1RemovedHoldersOfProjects
-): void {
-  handleHoldersOfProjectsGeneric(event);
 }
 
 export function handleRegistrationNFTAddresses<T>(event: T): void {
