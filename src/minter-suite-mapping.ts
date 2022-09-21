@@ -309,17 +309,17 @@ export function handleDALinResetAuctionDetailsGeneric<T>(event: T): void {
 }
 
 export function handleAuctionHalfLifeRangeSecondsUpdatedV0(
-  event: DAExpV0SetAuctionDetails
+  event: AuctionHalfLifeRangeSecondsUpdatedV0
 ): void {
   handleAuctionHalfLifeRangeSecondsUpdatedGeneric(event);
 }
 export function handleAuctionHalfLifeRangeSecondsUpdatedV1(
-  event: DAExpV1SetAuctionDetails
+  event: AuctionHalfLifeRangeSecondsUpdatedV1
 ): void {
   handleAuctionHalfLifeRangeSecondsUpdatedGeneric(event);
 }
 export function handleAuctionHalfLifeRangeSecondsUpdatedV2(
-  event: DAExpV2SetAuctionDetails
+  event: AuctionHalfLifeRangeSecondsUpdatedV2
 ): void {
   handleAuctionHalfLifeRangeSecondsUpdatedGeneric(event);
 }
