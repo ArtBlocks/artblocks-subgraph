@@ -18,6 +18,7 @@ generated/*
 !generated/GenArt721CorePlus
 !generated/GenArt721CoreV3
 !generated/MinterFilterV0
+!generated/MinterFilterV1
 !generated/MinterDAExpV0
 !generated/MinterDALinV0
 !generated/MinterSetPriceERC20V0
@@ -36,4 +37,5 @@ generated/*
 !generated/MinterMerkleV1
 !generated/SeaportExchange
 !generated/WyvernExchange
+!generated/LooksRareExchange
 !generated/GenArt721Core2EngineFlex
