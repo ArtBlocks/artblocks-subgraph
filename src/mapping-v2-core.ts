@@ -70,7 +70,8 @@ import {
   generateContractSpecificId,
   generateProjectScriptId,
   generateProjectExternalAssetDependencyId,
-  addWhitelisting
+  addWhitelisting,
+  removeWhitelisting
 } from "./helpers";
 import {
   FLEX_CONTRACT_EXTERNAL_ASSET_DEP_TYPES,
@@ -201,7 +202,10 @@ export function handleExternalAssetDependencyUpdated(
   );
 
   if (!project) {
-    log.warning("Project not found for ExternalAssetDependencyUpdated event", []);
+    log.warning(
+      "Project not found for ExternalAssetDependencyUpdated event",
+      []
+    );
     return;
   }
 
@@ -236,7 +240,10 @@ export function handleExternalAssetDependencyRemoved(
   );
 
   if (!project) {
-    log.warning("Project not found for ExternalAssetDependencyRemoved event", []);
+    log.warning(
+      "Project not found for ExternalAssetDependencyRemoved event",
+      []
+    );
     return;
   }
 
@@ -288,12 +295,13 @@ export function handleExternalAssetDependencyRemoved(
 
 export function handleGatewayUpdated(event: GatewayUpdated): void {
   let contractEntity = Contract.load(event.address.toHexString());
-  
+
   if (!contractEntity) {
     log.warning("Contract not found for GatewayUpdated event", []);
     return;
   }
-  const dependencyType = FLEX_CONTRACT_EXTERNAL_ASSET_DEP_TYPES[event.params._dependencyType];
+  const dependencyType =
+    FLEX_CONTRACT_EXTERNAL_ASSET_DEP_TYPES[event.params._dependencyType];
   if (dependencyType === "IPFS") {
     contractEntity.preferredIPFSGateway = event.params._gatewayAddress;
   } else {
@@ -303,17 +311,22 @@ export function handleGatewayUpdated(event: GatewayUpdated): void {
   contractEntity.save();
 }
 
-export function handleProjectExternalAssetDependenciesLocked(event: ProjectExternalAssetDependenciesLocked): void {
+export function handleProjectExternalAssetDependenciesLocked(
+  event: ProjectExternalAssetDependenciesLocked
+): void {
   let project = Project.load(
     generateContractSpecificId(event.address, event.params._projectId)
   );
 
   if (!project) {
-    log.warning("Project not found for ProjectExternalAssetDependenciesLocked event", []);
+    log.warning(
+      "Project not found for ProjectExternalAssetDependenciesLocked event",
+      []
+    );
     return;
   }
 
-  project.externalAssetDependenciesLocked = true; 
+  project.externalAssetDependenciesLocked = true;
   project.updatedAt = event.block.timestamp;
   project.save();
 }
@@ -411,17 +424,6 @@ export function handleRemoveWhitelisted(call: RemoveWhitelistedCall): void {
   let contractEntity = refreshContract(contract, call.block.timestamp);
 
   removeWhitelisting(contractEntity.id, call.inputs._address.toHexString());
-}
-
-function removeWhitelisting(contractId: string, accountId: string): void {
-  let account = new Account(accountId);
-
-  let whitelistingId = generateWhitelistingId(contractId, account.id);
-  let whitelisting = Whitelisting.load(whitelistingId);
-
-  if (whitelisting) {
-    store.remove("Whitelisting", whitelistingId);
-  }
 }
 
 export function handleAddMintWhitelisted(call: AddMintWhitelistedCall): void {

@@ -5,7 +5,8 @@ import {
   json,
   JSONValue,
   JSONValueKind,
-  TypedMap
+  TypedMap,
+  store
 } from "@graphprotocol/graph-ts";
 import { MinterDAExpV0 } from "../generated/MinterDAExpV0/MinterDAExpV0";
 import { MinterDAExpV1 } from "../generated/MinterDAExpV1/MinterDAExpV1";
@@ -54,10 +55,7 @@ export function generateContractSpecificId(
 }
 
 // returns new whitelisting id
-export function addWhitelisting(
-  contractId: string,
-  accountId: string
-): Whitelisting {
+export function addWhitelisting(contractId: string, accountId: string): void {
   let account = new Account(accountId);
   account.save();
 
@@ -68,7 +66,20 @@ export function addWhitelisting(
   whitelisting.contract = contractId;
 
   whitelisting.save();
-  return whitelisting;
+}
+
+export function removeWhitelisting(
+  contractId: string,
+  accountId: string
+): void {
+  let account = new Account(accountId);
+
+  let whitelistingId = generateWhitelistingId(contractId, account.id);
+  let whitelisting = Whitelisting.load(whitelistingId);
+
+  if (whitelisting) {
+    store.remove("Whitelisting", whitelistingId);
+  }
 }
 
 export function generateProjectScriptId(

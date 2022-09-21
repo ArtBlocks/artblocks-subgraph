@@ -37,7 +37,8 @@ import {
   generateProjectIdNumberFromTokenIdNumber,
   generateContractSpecificId,
   generateProjectScriptId,
-  addWhitelisting
+  addWhitelisting,
+  removeWhitelisting
 } from "./helpers";
 
 import { NULL_ADDRESS } from "./constants";
@@ -744,20 +745,20 @@ function refreshContract(
     contractEntity.mintWhitelisted = [];
     contractEntity.newProjectsForbidden = false;
     contractEntity.nextProjectId = contract.nextProjectId();
+  } else {
+    // clear the previous admin Whitelisting entity admin was previously defined
+    if (contractEntity.admin) {
+      removeWhitelisting(contractEntity.id, contractEntity.admin.toHexString());
+    }
   }
   let _admin = contract.admin();
   if (_admin.toHexString() == NULL_ADDRESS) {
     contractEntity.admin = Bytes.fromHexString(NULL_ADDRESS);
-    contractEntity.whitelisted = [];
   } else {
     let adminACLContract = IAdminACLV0.bind(_admin);
     let superAdminAddress = adminACLContract.superAdmin();
     contractEntity.admin = superAdminAddress;
-    let whitelisting = addWhitelisting(
-      contractEntity.id,
-      superAdminAddress.toHexString()
-    );
-    contractEntity.whitelisted = [whitelisting.id];
+    addWhitelisting(contractEntity.id, superAdminAddress.toHexString());
   }
   contractEntity.type = contract.coreType();
   contractEntity.renderProviderAddress = contract.artblocksPrimarySalesAddress();
