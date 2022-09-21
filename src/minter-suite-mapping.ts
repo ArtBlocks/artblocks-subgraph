@@ -419,26 +419,18 @@ export function handleHoldersOfProjectsGeneric<T>(event: T): void {
   }
 }
 
-export function handleAllowHoldersOfProjectsV0(
+// This is meant to handle all `AllowedHoldersOfProjects` events from all
+// versions of the MinterHolder contract because they have the same signature
+export function handleAllowHoldersOfProjects(
   event: MinterHolderV0AllowedHoldersOfProjects
 ): void {
   handleHoldersOfProjectsGeneric(event);
 }
 
-export function handleRemoveHoldersOfProjectsV0(
+// This is meant to handle all `RemovedHoldersOfProjects` events from all
+// versions of the MinterHolder contract because they have the same signature
+export function handleRemoveHoldersOfProjects(
   event: MinterHolderV0RemovedHoldersOfProjects
-): void {
-  handleHoldersOfProjectsGeneric(event);
-}
-
-export function handleAllowHoldersOfProjectsV1(
-  event: MinterHolderV1AllowedHoldersOfProjects
-): void {
-  handleHoldersOfProjectsGeneric(event);
-}
-
-export function handleRemoveHoldersOfProjectsV1(
-  event: MinterHolderV1RemovedHoldersOfProjects
 ): void {
   handleHoldersOfProjectsGeneric(event);
 }
@@ -482,26 +474,18 @@ export function handleRegistrationNFTAddresses<T>(event: T): void {
   }
 }
 
-export function handleRegisteredNFTAddressV0(
+// This is meant to handle all `RegisteredNFTAddress` events from all
+// versions of the MinterHolder contract because they have the same signature
+export function handleRegisteredNFTAddress(
   event: MinterHolderV0RegisteredNFTAddress
 ): void {
   handleRegistrationNFTAddresses(event);
 }
 
-export function handleUnregisteredNFTAddressV0(
+// This is meant to handle all `UnregisteredNFTAddress` events from all
+// versions of the MinterHolder contract because they have the same signature
+export function handleUnregisteredNFTAddress(
   event: MinterHolderV0UnregisteredNFTAddress
-): void {
-  handleRegistrationNFTAddresses(event);
-}
-
-export function handleRegisteredNFTAddressV1(
-  event: MinterHolderV1RegisteredNFTAddress
-): void {
-  handleRegistrationNFTAddresses(event);
-}
-
-export function handleUnregisteredNFTAddressV1(
-  event: MinterHolderV1UnregisteredNFTAddress
 ): void {
   handleRegistrationNFTAddresses(event);
 }
