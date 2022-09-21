@@ -326,6 +326,12 @@ enum MinterType {
   MinterDAExpV1
   MinterHolderV0
   MinterMerkleV0
+  MinterSetPriceV2
+  MinterSetPriceERC20V2
+  MinterDALinV2
+  MinterDAExpV2
+  MinterHolderV1
+  MinterMerkleV1
 }
 
 type Minter @entity {
