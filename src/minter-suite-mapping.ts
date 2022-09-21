@@ -419,6 +419,30 @@ export function handleHoldersOfProjectsGeneric<T>(event: T): void {
   }
 }
 
+export function handleAllowHoldersOfProjectsV0(
+  event: MinterHolderV0AllowedHoldersOfProjects
+): void {
+  handleHoldersOfProjectsGeneric(event);
+}
+
+export function handleRemoveHoldersOfProjectsV0(
+  event: MinterHolderV0RemovedHoldersOfProjects
+): void {
+  handleHoldersOfProjectsGeneric(event);
+}
+
+export function handleAllowHoldersOfProjectsV1(
+  event: MinterHolderV1AllowedHoldersOfProjects
+): void {
+  handleHoldersOfProjectsGeneric(event);
+}
+
+export function handleRemoveHoldersOfProjectsV1(
+  event: MinterHolderV1RemovedHoldersOfProjects
+): void {
+  handleHoldersOfProjectsGeneric(event);
+}
+
 export function handleRegistrationNFTAddresses<T>(event: T): void {
   if (
     !(
