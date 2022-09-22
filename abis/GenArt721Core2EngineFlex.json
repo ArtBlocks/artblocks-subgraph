@@ -112,15 +112,15 @@
       },
       {
         "indexed": false,
-        "internalType": "enum GenArt721CoreV2_PBAB_FLEX.ExternalAssetDependencyType",
+        "internalType": "enum GenArt721CoreV2_ENGINE_FLEX.ExternalAssetDependencyType",
         "name": "_dependencyType",
         "type": "uint8"
       },
       {
         "indexed": false,
-        "internalType": "uint256",
+        "internalType": "uint24",
         "name": "_externalAssetDependencyCount",
-        "type": "uint256"
+        "type": "uint24"
       }
     ],
     "name": "ExternalAssetDependencyUpdated",
@@ -131,7 +131,7 @@
     "inputs": [
       {
         "indexed": true,
-        "internalType": "enum GenArt721CoreV2_PBAB_FLEX.ExternalAssetDependencyType",
+        "internalType": "enum GenArt721CoreV2_ENGINE_FLEX.ExternalAssetDependencyType",
         "name": "_dependencyType",
         "type": "uint8"
       },
@@ -257,7 +257,7 @@
         "type": "string"
       },
       {
-        "internalType": "enum GenArt721CoreV2_PBAB_FLEX.ExternalAssetDependencyType",
+        "internalType": "enum GenArt721CoreV2_ENGINE_FLEX.ExternalAssetDependencyType",
         "name": "_dependencyType",
         "type": "uint8"
       }
@@ -343,6 +343,32 @@
         "internalType": "uint256",
         "name": "",
         "type": "uint256"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [],
+    "name": "coreType",
+    "outputs": [
+      {
+        "internalType": "string",
+        "name": "",
+        "type": "string"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [],
+    "name": "coreVersion",
+    "outputs": [
+      {
+        "internalType": "string",
+        "name": "",
+        "type": "string"
       }
     ],
     "stateMutability": "view",
@@ -657,12 +683,12 @@
             "type": "string"
           },
           {
-            "internalType": "enum GenArt721CoreV2_PBAB_FLEX.ExternalAssetDependencyType",
+            "internalType": "enum GenArt721CoreV2_ENGINE_FLEX.ExternalAssetDependencyType",
             "name": "dependencyType",
             "type": "uint8"
           }
         ],
-        "internalType": "struct GenArt721CoreV2_PBAB_FLEX.ExternalAssetDependency",
+        "internalType": "struct GenArt721CoreV2_ENGINE_FLEX.ExternalAssetDependency",
         "name": "",
         "type": "tuple"
       }
@@ -1454,7 +1480,7 @@
         "type": "string"
       },
       {
-        "internalType": "enum GenArt721CoreV2_PBAB_FLEX.ExternalAssetDependencyType",
+        "internalType": "enum GenArt721CoreV2_ENGINE_FLEX.ExternalAssetDependencyType",
         "name": "_dependencyType",
         "type": "uint8"
       }

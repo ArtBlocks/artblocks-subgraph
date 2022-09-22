@@ -113,8 +113,8 @@ export class ExternalAssetDependencyUpdated__Params {
     return this._event.parameters[3].value.toI32();
   }
 
-  get _externalAssetDependencyCount(): BigInt {
-    return this._event.parameters[4].value.toBigInt();
+  get _externalAssetDependencyCount(): i32 {
+    return this._event.parameters[4].value.toI32();
   }
 }
 
@@ -489,6 +489,36 @@ export class GenArt721Core2EngineFlex extends ethereum.SmartContract {
     }
     let value = result.value;
     return ethereum.CallResult.fromValue(value[0].toBigInt());
+  }
+
+  coreType(): string {
+    let result = super.call("coreType", "coreType():(string)", []);
+
+    return result[0].toString();
+  }
+
+  try_coreType(): ethereum.CallResult<string> {
+    let result = super.tryCall("coreType", "coreType():(string)", []);
+    if (result.reverted) {
+      return new ethereum.CallResult();
+    }
+    let value = result.value;
+    return ethereum.CallResult.fromValue(value[0].toString());
+  }
+
+  coreVersion(): string {
+    let result = super.call("coreVersion", "coreVersion():(string)", []);
+
+    return result[0].toString();
+  }
+
+  try_coreVersion(): ethereum.CallResult<string> {
+    let result = super.tryCall("coreVersion", "coreVersion():(string)", []);
+    if (result.reverted) {
+      return new ethereum.CallResult();
+    }
+    let value = result.value;
+    return ethereum.CallResult.fromValue(value[0].toString());
   }
 
   getApproved(tokenId: BigInt): Address {

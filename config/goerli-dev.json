@@ -21,6 +21,13 @@
       "startBlock": 7010933
     }
   ],
+  "engineFlexContracts": [
+    {
+      "address": "0x57e9DFBe79cf28B392d1547c308757c9497aE9f0",
+      "name": "AB Engine Flex Demo, Goerli Dev",
+      "startBlock": 7630500
+    }
+  ],
   "minterFilterV0Contracts": [
     {
       "address": "0x7c4FB14F0c020109cB95A9B92BC4c8267C421Cc4",
@@ -31,6 +38,11 @@
       "address": "0x3411D5bf1a6Bf5FE8C66909Ec71752B7d66517f0",
       "name": "Art Blocks x Pace Minter Filter",
       "startBlock": 7010933
+    },
+    {
+      "address": "0x2F0bA37D265B1ba369e005D4C13bda6278dAeE1D",
+      "name": "AB Engine Flex Demo, Goerli Dev",
+      "startBlock": 7410621
     }
   ],
   "minterFilterV1Contracts": [
@@ -50,6 +62,11 @@
       "address": "0x2c2E62967c5fDC4eD5Eb1342FA064E6413dADB2E",
       "name": "Art Blocks x Pace Minter",
       "startBlock": 7010933
+    },
+    {
+      "address": "0xEb09a0Fc790012fd2Cda0104Ed722b238A8b0961",
+      "name": "AB Engine Flex Demo, Goerli Dev",
+      "startBlock": 7410621
     }
   ],
   "minterSetPriceV2Contracts": [
@@ -69,6 +86,11 @@
       "address": "0x5941d55296b55A2b0C380E652bce0Ab42D466384",
       "name": "Art Blocks x Pace Minter",
       "startBlock": 7010933
+    },
+    {
+      "address": "0x678981A66CbE3c4b561255739c5C24eF24228cea",
+      "name": "AB Engine Flex Demo, Goerli Dev",
+      "startBlock": 7410621
     }
   ],
   "minterSetPriceERC20V2Contracts": [
@@ -88,6 +110,11 @@
       "address": "0x04aF1595B7e18F3237985054CaF94a2FB8cF4eb1",
       "name": "Art Blocks x Pace Minter",
       "startBlock": 7010933
+    },
+    {
+      "address": "0x0C8b30EB6d09557BB33B5ea97754724014343d29",
+      "name": "AB Engine Flex Demo",
+      "startBlock": 7410621
     }
   ],
   "minterDALinV2Contracts": [
@@ -107,6 +134,11 @@
       "address": "0xe25D9B8F5Cd8E8E8ccb68F26fc70E6AD4e0C7845",
       "name": "Art Blocks x Pace Minter",
       "startBlock": 7010933
+    },
+    {
+      "address": "0x1eD8F7388D95574f404639a7D50cc122f5646d5a",
+      "name": "AB Engine Flex Demo, Goerli Dev",
+      "startBlock": 7410621
     }
   ],
   "minterDAExpV2Contracts": [
