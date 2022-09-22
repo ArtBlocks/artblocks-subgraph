@@ -73,7 +73,8 @@ import {
   generateWhitelistingId,
   generateContractSpecificId,
   generateProjectScriptId,
-  addWhitelisting
+  addWhitelisting,
+  removeWhitelisting
 } from "./helpers";
 import { GEN_ART_721_CORE_V1 } from "./constants";
 
@@ -291,17 +292,6 @@ export function handleRemoveWhitelisted(call: RemoveWhitelistedCall): void {
 
   if (contractEntity) {
     removeWhitelisting(contractEntity.id, call.inputs._address.toHexString());
-  }
-}
-
-function removeWhitelisting(contractId: string, accountId: string): void {
-  let account = new Account(accountId);
-
-  let whitelistingId = generateWhitelistingId(contractId, account.id);
-  let whitelisting = Whitelisting.load(whitelistingId);
-
-  if (whitelisting) {
-    store.remove("Whitelisting", whitelistingId);
   }
 }
 

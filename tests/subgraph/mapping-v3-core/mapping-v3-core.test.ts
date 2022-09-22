@@ -36,7 +36,8 @@ import {
   ONE_MILLION,
   booleanToString,
   TEST_CONTRACT,
-  TEST_SUPER_ADMIN_ADDRESS
+  TEST_SUPER_ADMIN_ADDRESS,
+  WHITELISTING_ENTITY_TYPE
 } from "../shared-helpers";
 import {
   mockProjectScriptDetailsCall,
@@ -261,15 +262,13 @@ test("GenArt721CoreV3: Handles OwnershipTransferred to new address and zero addr
         newOwnerSuperAdmin.toHexString()
       );
       assert.fieldEquals(
-        CONTRACT_ENTITY_TYPE,
-        TEST_CONTRACT_ADDRESS.toHexString(),
-        "whitelisted",
-        "[" +
-          generateWhitelistingId(
-            TEST_CONTRACT_ADDRESS.toHexString(),
-            newOwnerSuperAdmin.toHexString()
-          ) +
-          "]"
+        WHITELISTING_ENTITY_TYPE,
+        generateWhitelistingId(
+          TEST_CONTRACT_ADDRESS.toHexString(),
+          newOwnerSuperAdmin.toHexString()
+        ),
+        "account",
+        newOwnerSuperAdmin.toHexString()
       );
     } else {
       assert.fieldEquals(
@@ -278,12 +277,7 @@ test("GenArt721CoreV3: Handles OwnershipTransferred to new address and zero addr
         "admin",
         Address.zero().toHexString()
       );
-      assert.fieldEquals(
-        CONTRACT_ENTITY_TYPE,
-        TEST_CONTRACT_ADDRESS.toHexString(),
-        "whitelisted",
-        "[]"
-      );
+      assert.entityCount(WHITELISTING_ENTITY_TYPE, 0);
     }
     assert.fieldEquals(
       CONTRACT_ENTITY_TYPE,
@@ -377,15 +371,13 @@ test("GenArt721CoreV3: Handles OwnershipTransferred to new address and zero addr
         newOwnerSuperAdmin.toHexString()
       );
       assert.fieldEquals(
-        CONTRACT_ENTITY_TYPE,
-        TEST_CONTRACT_ADDRESS.toHexString(),
-        "whitelisted",
-        "[" +
-          generateWhitelistingId(
-            TEST_CONTRACT_ADDRESS.toHexString(),
-            newOwnerSuperAdmin.toHexString()
-          ) +
-          "]"
+        WHITELISTING_ENTITY_TYPE,
+        generateWhitelistingId(
+          TEST_CONTRACT_ADDRESS.toHexString(),
+          newOwnerSuperAdmin.toHexString()
+        ),
+        "account",
+        newOwnerSuperAdmin.toHexString()
       );
     } else {
       assert.fieldEquals(
@@ -394,12 +386,7 @@ test("GenArt721CoreV3: Handles OwnershipTransferred to new address and zero addr
         "admin",
         Address.zero().toHexString()
       );
-      assert.fieldEquals(
-        CONTRACT_ENTITY_TYPE,
-        TEST_CONTRACT_ADDRESS.toHexString(),
-        "whitelisted",
-        "[]"
-      );
+      assert.entityCount(WHITELISTING_ENTITY_TYPE, 0);
     }
     assert.fieldEquals(
       CONTRACT_ENTITY_TYPE,
@@ -954,16 +941,16 @@ describe("GenArt721CoreV3: handleIAdminACLV0SuperAdminTransferred", () => {
       newOwnerSuperAdmin.toHexString()
     );
     assert.fieldEquals(
-      CONTRACT_ENTITY_TYPE,
-      TEST_CONTRACT_ADDRESS.toHexString(),
-      "whitelisted",
-      "[" +
-        generateWhitelistingId(
-          TEST_CONTRACT_ADDRESS.toHexString(),
-          newOwnerSuperAdmin.toHexString()
-        ) +
-        "]"
+      WHITELISTING_ENTITY_TYPE,
+      generateWhitelistingId(
+        TEST_CONTRACT_ADDRESS.toHexString(),
+        newOwnerSuperAdmin.toHexString()
+      ),
+      "account",
+      newOwnerSuperAdmin.toHexString()
     );
+    // check that old super admin is removed from whitelist by confirming 1 Whitelisting entity
+    assert.entityCount(WHITELISTING_ENTITY_TYPE, 1);
   });
 });
 

@@ -37,7 +37,8 @@ import {
   generateProjectIdNumberFromTokenIdNumber,
   generateContractSpecificId,
   generateProjectScriptId,
-  addWhitelisting
+  addWhitelisting,
+  removeWhitelisting
 } from "./helpers";
 
 import { NULL_ADDRESS } from "./constants";
@@ -744,20 +745,29 @@ function refreshContract(
     contractEntity.mintWhitelisted = [];
     contractEntity.newProjectsForbidden = false;
     contractEntity.nextProjectId = contract.nextProjectId();
+  } else {
+    // clear the previous admin Whitelisting entity admin was previously defined
+    if (contractEntity.admin) {
+      // this properly handles the case where previous whitelisting does not exist
+      removeWhitelisting(contractEntity.id, contractEntity.admin.toHexString());
+    }
   }
   let _admin = contract.admin();
   if (_admin.toHexString() == NULL_ADDRESS) {
     contractEntity.admin = Bytes.fromHexString(NULL_ADDRESS);
-    contractEntity.whitelisted = [];
   } else {
     let adminACLContract = IAdminACLV0.bind(_admin);
-    let superAdminAddress = adminACLContract.superAdmin();
-    contractEntity.admin = superAdminAddress;
-    let whitelisting = addWhitelisting(
-      contractEntity.id,
-      superAdminAddress.toHexString()
-    );
-    contractEntity.whitelisted = [whitelisting.id];
+    if (adminACLContract) {
+      let superAdminAddress = adminACLContract.superAdmin();
+      contractEntity.admin = superAdminAddress;
+      addWhitelisting(contractEntity.id, superAdminAddress.toHexString());
+    } else {
+      log.warning(
+        "[WARN] Could not load AdminACL contract at address {}, so set admin for contract {} to null address.",
+        [_admin.toHexString(), contract._address.toHexString()]
+      );
+      contractEntity.admin = Bytes.fromHexString(NULL_ADDRESS);
+    }
   }
   contractEntity.type = contract.coreType();
   contractEntity.renderProviderAddress = contract.artblocksPrimarySalesAddress();
