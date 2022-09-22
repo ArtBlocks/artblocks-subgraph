@@ -25,7 +25,7 @@ dataSources:
         - Payment
         - Sale
         - SaleLookupTable
-        - ProposedArtistAddressesAndSplits
+        - ProposedArtistAddressesAndSplit
       abis:
         - name: GenArt721CoreV3
           file: ./abis/GenArt721CoreV3.json
@@ -46,8 +46,8 @@ dataSources:
           handler: handlePlatformUpdated
         - event: MinterUpdated(indexed address)
           handler: handleMinterUpdated
-        - event: ProposedArtistAddressesAndSplits(indexed uint256,address,address,uint256,address,uint256)
-          handler: handleProposedArtistAddressesAndSplits
+        - event: ProposedArtistAddressesAndSplit(indexed uint256,address,address,uint256,address,uint256)
+          handler: handleProposedArtistAddressesAndSplit
         - event: AcceptedArtistAddressesAndSplits(indexed uint256)
           handler: handleAcceptedArtistAddressesAndSplits
         - event: OwnershipTransferred(indexed address,indexed address)
@@ -77,7 +77,7 @@ dataSources:
         - Payment
         - Sale
         - SaleLookupTable
-        - ProposedArtistAddressesAndSplits
+        - ProposedArtistAddressesAndSplit
       abis:
         - name: GenArt721Core
           file: ./abis/GenArt721Core.json
@@ -180,7 +180,7 @@ dataSources:
         - Payment
         - Sale
         - SaleLookupTable
-        - ProposedArtistAddressesAndSplits
+        - ProposedArtistAddressesAndSplit
       abis:
         - name: GenArt721Core2
           file: ./abis/GenArt721Core2.json
@@ -287,7 +287,7 @@ dataSources:
         - Payment
         - Sale
         - SaleLookupTable
-        - ProposedArtistAddressesAndSplits
+        - ProposedArtistAddressesAndSplit
       abis:
         - name: GenArt721Core2PBAB
           file: ./abis/GenArt721Core2PBAB.json
@@ -381,7 +381,7 @@ dataSources:
         - Sale
         - SaleLookupTable
         - ProjectExternalAssetDependency
-        - ProposedArtistAddressesAndSplits
+        - ProposedArtistAddressesAndSplit
       abis:
         - name: GenArt721Core2EngineFlex
           file: ./abis/GenArt721Core2EngineFlex.json
@@ -484,7 +484,7 @@ dataSources:
         - Payment
         - Sale
         - SaleLookupTable
-        - ProposedArtistAddressesAndSplits
+        - ProposedArtistAddressesAndSplit
       abis:
         - name: GenArt721
           file: ./abis/GenArt721.json

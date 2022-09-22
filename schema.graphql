@@ -115,7 +115,7 @@ type Project @entity {
   website: String
 
   "Proposed Artist addresses and payment split percentages"
-  proposedArtistAddressesAndSplits: ProposedArtistAddressesAndSplits
+  proposedArtistAddressesAndSplits: ProposedArtistAddressesAndSplit
 
   "Accounts that own tokens of the project"
   owners: [AccountProject!] @derivedFrom(field: "project")
@@ -142,7 +142,7 @@ type ProjectScript @entity {
   script: String!
 }
 
-type ProposedArtistAddressesAndSplits @entity {
+type ProposedArtistAddressesAndSplit @entity {
   "Unique identifier made up of contract address and project id"
   id: ID!
 

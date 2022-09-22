@@ -16,7 +16,7 @@ import {
   Minter,
   Project,
   ProjectMinterConfiguration,
-  ProposedArtistAddressesAndSplits,
+  ProposedArtistAddressesAndSplit,
   Token
 } from "../../generated/schema";
 import {
@@ -77,7 +77,8 @@ export const ACCOUNT_ENTITY_TYPE = "Account";
 export const PROJECT_ENTITY_TYPE = "Project";
 export const CONTRACT_ENTITY_TYPE = "Contract";
 export const WHITELISTING_ENTITY_TYPE = "Whitelisting";
-export const PROJECT_EXTERNAL_ASSET_DEPENDENCY_ENTITY_TYPE = "ProjectExternalAssetDependency";
+export const PROJECT_EXTERNAL_ASSET_DEPENDENCY_ENTITY_TYPE =
+  "ProjectExternalAssetDependency";
 export const PROJECT_SCRIPT_ENTITY_TYPE = "ProjectScript";
 export const TOKEN_ENTITY_TYPE = "Token";
 export const TRANSFER_ENTITY_TYPE = "Transfer";
@@ -292,7 +293,7 @@ export const addNewProjectToStore = function(
   project.useIpfs = DEFAULT_PROJECT_VALUES.useIpfs;
   project.externalAssetDependencyCount = BigInt.fromI32(0);
   project.externalAssetDependenciesLocked = false;
-  
+
   project.save();
   return project;
 };
