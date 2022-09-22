@@ -222,8 +222,9 @@ export function handleExternalAssetDependencyUpdated(
     FLEX_CONTRACT_EXTERNAL_ASSET_DEP_TYPES[event.params._dependencyType];
   assetEntity.save();
 
-  project.externalAssetDependencyCount =
-    event.params._externalAssetDependencyCount;
+  project.externalAssetDependencyCount = BigInt.fromI32(
+    event.params._externalAssetDependencyCount
+  );
   project.updatedAt = event.block.timestamp;
   project.save();
 }
