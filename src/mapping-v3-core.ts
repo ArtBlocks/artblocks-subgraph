@@ -17,7 +17,7 @@ import {
   SuperAdminTransferred
 } from "../generated/AdminACLV0/IAdminACLV0";
 
-import { MinterFilterV0 } from "../generated/MinterFilterV0/MinterFilterV0";
+import { MinterFilterV1 } from "../generated/MinterFilterV1/MinterFilterV1";
 import { loadOrCreateAndSetProjectMinterConfiguration } from "./minter-filter-mapping";
 
 import {
@@ -37,7 +37,8 @@ import {
   generateProjectIdNumberFromTokenIdNumber,
   generateContractSpecificId,
   generateProjectScriptId,
-  addWhitelisting
+  addWhitelisting,
+  removeWhitelisting
 } from "./helpers";
 
 import { NULL_ADDRESS } from "./constants";
@@ -544,7 +545,7 @@ export function handleMinterUpdated(event: MinterUpdated): void {
   } else {
     // we can assume the minter is a MinterFilter contract.
     contractEntity.mintWhitelisted = [event.params._currentMinter];
-    let minterFilterContract = MinterFilterV0.bind(event.params._currentMinter);
+    let minterFilterContract = MinterFilterV1.bind(event.params._currentMinter);
     // create and save minter filter entity if doesn't exist
     loadOrCreateMinterFilter(minterFilterContract, event.block.timestamp);
     // check that the MinterFilter's core contract is the contract that emitted
@@ -703,7 +704,7 @@ function loadOrCreateContract(
 
 // loads or creates a MinterFilter entity and returns it.
 function loadOrCreateMinterFilter(
-  minterFilterContract: MinterFilterV0,
+  minterFilterContract: MinterFilterV1,
   timestamp: BigInt
 ): MinterFilter {
   // load or create MinterFilter entity
@@ -744,20 +745,29 @@ function refreshContract(
     contractEntity.mintWhitelisted = [];
     contractEntity.newProjectsForbidden = false;
     contractEntity.nextProjectId = contract.nextProjectId();
+  } else {
+    // clear the previous admin Whitelisting entity admin was previously defined
+    if (contractEntity.admin) {
+      // this properly handles the case where previous whitelisting does not exist
+      removeWhitelisting(contractEntity.id, contractEntity.admin.toHexString());
+    }
   }
   let _admin = contract.admin();
   if (_admin.toHexString() == NULL_ADDRESS) {
     contractEntity.admin = Bytes.fromHexString(NULL_ADDRESS);
-    contractEntity.whitelisted = [];
   } else {
     let adminACLContract = IAdminACLV0.bind(_admin);
-    let superAdminAddress = adminACLContract.superAdmin();
-    contractEntity.admin = superAdminAddress;
-    let whitelisting = addWhitelisting(
-      contractEntity.id,
-      superAdminAddress.toHexString()
-    );
-    contractEntity.whitelisted = [whitelisting.id];
+    if (adminACLContract) {
+      let superAdminAddress = adminACLContract.superAdmin();
+      contractEntity.admin = superAdminAddress;
+      addWhitelisting(contractEntity.id, superAdminAddress.toHexString());
+    } else {
+      log.warning(
+        "[WARN] Could not load AdminACL contract at address {}, so set admin for contract {} to null address.",
+        [_admin.toHexString(), contract._address.toHexString()]
+      );
+      contractEntity.admin = Bytes.fromHexString(NULL_ADDRESS);
+    }
   }
   contractEntity.type = contract.coreType();
   contractEntity.renderProviderAddress = contract.artblocksPrimarySalesAddress();
@@ -806,7 +816,7 @@ function clearAllMinterConfigurations(
 
 // Populate all project minter configurations from a given minter filter
 function populateAllExistingMinterConfigurations(
-  minterFilterContract: MinterFilterV0,
+  minterFilterContract: MinterFilterV1,
   contract: GenArt721CoreV3,
   timestamp: BigInt
 ): void {

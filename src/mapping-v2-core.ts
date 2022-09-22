@@ -70,7 +70,8 @@ import {
   generateContractSpecificId,
   generateProjectScriptId,
   generateProjectExternalAssetDependencyId,
-  addWhitelisting
+  addWhitelisting,
+  removeWhitelisting
 } from "./helpers";
 import {
   FLEX_CONTRACT_EXTERNAL_ASSET_DEP_TYPES,
@@ -424,17 +425,6 @@ export function handleRemoveWhitelisted(call: RemoveWhitelistedCall): void {
   let contractEntity = refreshContract(contract, call.block.timestamp);
 
   removeWhitelisting(contractEntity.id, call.inputs._address.toHexString());
-}
-
-function removeWhitelisting(contractId: string, accountId: string): void {
-  let account = new Account(accountId);
-
-  let whitelistingId = generateWhitelistingId(contractId, account.id);
-  let whitelisting = Whitelisting.load(whitelistingId);
-
-  if (whitelisting) {
-    store.remove("Whitelisting", whitelistingId);
-  }
 }
 
 export function handleAddMintWhitelisted(call: AddMintWhitelistedCall): void {
