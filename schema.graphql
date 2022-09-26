@@ -38,9 +38,6 @@ type Project @entity {
   "Timestamp at which a project was completed"
   completedAt: BigInt
 
-  "Curated, playground, factory. A project with no curation status is considered factory"
-  curationStatus: String
-
   "ERC-20 contract address if the project is purchasable via ERC-20"
   currencyAddress: Bytes
 
@@ -163,7 +160,7 @@ type ProposedArtistAddressesAndSplits @entity {
 
   "Project associated with this proposed artist addresses and splits"
   project: Project!
-  
+
   createdAt: BigInt!
 }
 

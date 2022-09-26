@@ -229,23 +229,6 @@ export class Project extends Entity {
     }
   }
 
-  get curationStatus(): string | null {
-    let value = this.get("curationStatus");
-    if (!value || value.kind == ValueKind.NULL) {
-      return null;
-    } else {
-      return value.toString();
-    }
-  }
-
-  set curationStatus(value: string | null) {
-    if (!value) {
-      this.unset("curationStatus");
-    } else {
-      this.set("curationStatus", Value.fromString(<string>value));
-    }
-  }
-
   get currencyAddress(): Bytes | null {
     let value = this.get("currencyAddress");
     if (!value || value.kind == ValueKind.NULL) {

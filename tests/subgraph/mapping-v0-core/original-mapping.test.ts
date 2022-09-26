@@ -1716,7 +1716,7 @@ test("GenArt721: Can handleUpdateProjectScriptJSON", () => {
   const updateCallBlockTimestamp = CURRENT_BLOCK_TIMESTAMP.plus(
     BigInt.fromI32(10)
   );
-  const scriptJSON = '{"curationStatus":"curated"}';
+  const scriptJSON = '{}';
 
   const call = changetype<UpdateProjectScriptJSONCall>(newMockCall());
 
