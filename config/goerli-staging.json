@@ -70,9 +70,9 @@
       "startBlock": 7011002
     },
     {
-      "address": "0x60c8DbC88A2BA176C99A53571bb1CfCdB946786F",
-      "name": "AB Engine Flex Demo",
-      "startBlock": 7410621
+      "address": "0x2A85C3C3E1C404A03e54CEC6aF013eE0714f26db",
+      "name": "AB Engine Flex Demo, Goerli Staging",
+      "startBlock": 7665745
     }
   ],
   "minterSetPriceV1Contracts": [
@@ -87,9 +87,9 @@
       "startBlock": 7011002
     },
     {
-      "address": "0x6016f9360D178792A45DC69d937673382573f7c1",
-      "name": "AB Engine Flex Demo",
-      "startBlock": 7410621
+      "address": "0xB7eE14Cba39AE96DFe1ab9E2D7E9173063e9c6d2",
+      "name": "AB Engine Flex Demo, Goerli Staging",
+      "startBlock": 7665745
     }
   ],
   "minterSetPriceERC20V1Contracts": [
@@ -104,9 +104,9 @@
       "startBlock": 7011002
     },
     {
-      "address": "0x58dc1cAcFD5A5Ae0180e813b800cb7Bc9Bcb0c41",
-      "name": "AB Engine Flex Demo",
-      "startBlock": 7410621
+      "address": "0xAd90358ebc62a934508c8A42B08050BE7243bF67",
+      "name": "AB Engine Flex Demo, Goerli Staging",
+      "startBlock": 7665745
     }
   ],
   "minterDALinV1Contracts": [
@@ -121,9 +121,9 @@
       "startBlock": 7011002
     },
     {
-      "address": "0xCc97f86dF835F6bFE8A425d85DEc7314Cc1C951d",
-      "name": "AB Engine Flex Demo",
-      "startBlock": 7410621
+      "address": "0x25E406FA37AdE314869f5fEEA7Fbbb252DCAcb48",
+      "name": "AB Engine Flex Demo, Goerli Staging",
+      "startBlock": 7665745
     }
   ],
   "minterDAExpV1Contracts": [
@@ -138,16 +138,16 @@
       "startBlock": 7011002
     },
     {
-      "address": "0xF011F938221e6D983733894e0Ca23b937467aa01",
-      "name": "AB Engine Flex Demo",
-      "startBlock": 7410621
+      "address": "0x3b96847E90E1b2fC74b700312FD8a8Eea6eD7002",
+      "name": "AB Engine Flex Demo, Goerli Staging",
+      "startBlock": 7665745
     }
   ],
   "engineFlexContracts": [
     {
-      "address": "0x1f2904e50742c43949a912abCC3794F3052a40F7",
-      "name": "AB Engine Flex Demo",
-      "startBlock": 7410621
+      "address": "0x7077e777C29ae870d6842B4D1E94511077c99825",
+      "name": "AB Engine Flex Demo, Goerli Staging",
+      "startBlock": 7665745
     }
   ],
   "startBlock": 7011002
