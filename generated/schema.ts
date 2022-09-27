@@ -776,7 +776,7 @@ export class ProjectScript extends Entity {
   }
 }
 
-export class ProposedArtistAddressesAndSplits extends Entity {
+export class ProposedArtistAddressesAndSplit extends Entity {
   constructor(id: string) {
     super();
     this.set("id", Value.fromString(id));
@@ -786,20 +786,20 @@ export class ProposedArtistAddressesAndSplits extends Entity {
     let id = this.get("id");
     assert(
       id != null,
-      "Cannot save ProposedArtistAddressesAndSplits entity without an ID"
+      "Cannot save ProposedArtistAddressesAndSplit entity without an ID"
     );
     if (id) {
       assert(
         id.kind == ValueKind.STRING,
-        `Entities of type ProposedArtistAddressesAndSplits must have an ID of type String but the id '${id.displayData()}' is of type ${id.displayKind()}`
+        `Entities of type ProposedArtistAddressesAndSplit must have an ID of type String but the id '${id.displayData()}' is of type ${id.displayKind()}`
       );
-      store.set("ProposedArtistAddressesAndSplits", id.toString(), this);
+      store.set("ProposedArtistAddressesAndSplit", id.toString(), this);
     }
   }
 
-  static load(id: string): ProposedArtistAddressesAndSplits | null {
-    return changetype<ProposedArtistAddressesAndSplits | null>(
-      store.get("ProposedArtistAddressesAndSplits", id)
+  static load(id: string): ProposedArtistAddressesAndSplit | null {
+    return changetype<ProposedArtistAddressesAndSplit | null>(
+      store.get("ProposedArtistAddressesAndSplit", id)
     );
   }
 

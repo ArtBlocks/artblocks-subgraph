@@ -7,7 +7,7 @@ import {
   Transfer,
   PlatformUpdated,
   MinterUpdated,
-  ProposedArtistAddressesAndSplits as ProposedArtistAddressesAndSplitsEvent,
+  ProposedArtistAddressesAndSplit as ProposedArtistAddressesAndSplitEvent,
   AcceptedArtistAddressesAndSplits,
   OwnershipTransferred
 } from "../generated/GenArt721CoreV3/GenArt721CoreV3";
@@ -29,7 +29,7 @@ import {
   ProjectScript,
   Contract,
   MinterFilter,
-  ProposedArtistAddressesAndSplits
+  ProposedArtistAddressesAndSplit
 } from "../generated/schema";
 
 import {
@@ -584,8 +584,8 @@ export function handleMinterUpdated(event: MinterUpdated): void {
 // Handle artist proposed address and splits updates
 // This is an event indicating that the artist has proposed a new set of
 // addresses and splits for a project.
-export function handleProposedArtistAddressesAndSplits(
-  event: ProposedArtistAddressesAndSplitsEvent
+export function handleProposedArtistAddressesAndSplit(
+  event: ProposedArtistAddressesAndSplitEvent
 ): void {
   // load associated project entity
   const newEntityId = generateContractSpecificId(
@@ -599,7 +599,7 @@ export function handleProposedArtistAddressesAndSplits(
   // create new proposed artist addresses and splits entity
   // note: any existing proposal entity will be overwritten, which is intended
   // all fields will be populated.
-  const proposedArtistAddressesAndSplits = new ProposedArtistAddressesAndSplits(
+  const proposedArtistAddressesAndSplits = new ProposedArtistAddressesAndSplit(
     newEntityId
   );
   // populate new entity with event params
@@ -637,9 +637,9 @@ export function handleAcceptedArtistAddressesAndSplits(
     return;
   }
   // load the existing proposed artist addresses and splits
-  const existingProposedArtistAddressesAndSplitsId =
+  const existingProposedArtistAddressesAndSplitId =
     project.proposedArtistAddressesAndSplits;
-  if (existingProposedArtistAddressesAndSplitsId === null) {
+  if (existingProposedArtistAddressesAndSplitId === null) {
     // we don't expect this state to be possible, so we should log a warning
     log.warning(
       "[WARN] No proposed artist addresses and splits found on project {}.",
@@ -647,7 +647,7 @@ export function handleAcceptedArtistAddressesAndSplits(
     );
     return;
   }
-  const proposedArtistAddressesAndSplits = ProposedArtistAddressesAndSplits.load(
+  const proposedArtistAddressesAndSplits = ProposedArtistAddressesAndSplit.load(
     entityId
   );
   if (!proposedArtistAddressesAndSplits) {
@@ -673,7 +673,7 @@ export function handleAcceptedArtistAddressesAndSplits(
   project.updatedAt = event.block.timestamp;
   project.save();
   // remove the existing proposed artist addresses and splits entity from store
-  store.remove("ProposedArtistAddressesAndSplits", entityId);
+  store.remove("ProposedArtistAddressesAndSplit", entityId);
 }
 
 // Handle OwnershipTransferred event, emitted by the Ownable contract.
