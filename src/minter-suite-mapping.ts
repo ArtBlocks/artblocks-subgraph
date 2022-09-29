@@ -560,7 +560,7 @@ export function handleRegistrationNFTAddresses<T>(event: T): void {
   genericEvent.parameters = [
     new ethereum.EventParam(
       "_key",
-      ethereum.Value.fromBytes(Bytes.fromUTF8("registeredNFTAddresses"))
+      ethereum.Value.fromBytes(Bytes.fromUTF8("RegisteredNFTAddress"))
     ),
     new ethereum.EventParam(
       "_value",
