@@ -68,11 +68,6 @@
       "address": "0x8aD21E9eebfDa9Af4D4384C747b74723E29FBB51",
       "name": "Art Blocks x Pace",
       "startBlock": 7011002
-    },
-    {
-      "address": "0x2A85C3C3E1C404A03e54CEC6aF013eE0714f26db",
-      "name": "AB Engine Flex Demo, Goerli Staging",
-      "startBlock": 7665745
     }
   ],
   "minterSetPriceV1Contracts": [
@@ -85,11 +80,6 @@
       "address": "0x3851b8f754E77f07e0a08425d280c1B4fe4e3363",
       "name": "Art Blocks x Pace",
       "startBlock": 7011002
-    },
-    {
-      "address": "0xB7eE14Cba39AE96DFe1ab9E2D7E9173063e9c6d2",
-      "name": "AB Engine Flex Demo, Goerli Staging",
-      "startBlock": 7665745
     }
   ],
   "minterSetPriceERC20V1Contracts": [
@@ -102,11 +92,6 @@
       "address": "0x5749E012767FDA174389d77Adc032e3e880b166c",
       "name": "Art Blocks x Pace",
       "startBlock": 7011002
-    },
-    {
-      "address": "0xAd90358ebc62a934508c8A42B08050BE7243bF67",
-      "name": "AB Engine Flex Demo, Goerli Staging",
-      "startBlock": 7665745
     }
   ],
   "minterDALinV1Contracts": [
@@ -119,11 +104,6 @@
       "address": "0xd125111461557f2d8A52848f55Ac4651d2426f88",
       "name": "Art Blocks x Pace",
       "startBlock": 7011002
-    },
-    {
-      "address": "0x25E406FA37AdE314869f5fEEA7Fbbb252DCAcb48",
-      "name": "AB Engine Flex Demo, Goerli Staging",
-      "startBlock": 7665745
     }
   ],
   "minterDAExpV1Contracts": [
@@ -136,11 +116,6 @@
       "address": "0xf4015573db8f9E80206296e53a32E20B87Ab1578",
       "name": "Art Blocks x Pace",
       "startBlock": 7011002
-    },
-    {
-      "address": "0x3b96847E90E1b2fC74b700312FD8a8Eea6eD7002",
-      "name": "AB Engine Flex Demo, Goerli Staging",
-      "startBlock": 7665745
     }
   ],
   "engineFlexContracts": [

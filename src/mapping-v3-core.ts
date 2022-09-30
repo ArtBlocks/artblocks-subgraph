@@ -7,7 +7,7 @@ import {
   Transfer,
   PlatformUpdated,
   MinterUpdated,
-  ProposedArtistAddressesAndSplit as ProposedArtistAddressesAndSplitEvent,
+  ProposedArtistAddressesAndSplits as ProposedArtistAddressesAndSplitsEvent,
   AcceptedArtistAddressesAndSplits,
   OwnershipTransferred
 } from "../generated/GenArt721CoreV3/GenArt721CoreV3";
@@ -584,8 +584,8 @@ export function handleMinterUpdated(event: MinterUpdated): void {
 // Handle artist proposed address and splits updates
 // This is an event indicating that the artist has proposed a new set of
 // addresses and splits for a project.
-export function handleProposedArtistAddressesAndSplit(
-  event: ProposedArtistAddressesAndSplitEvent
+export function handleProposedArtistAddressesAndSplits(
+  event: ProposedArtistAddressesAndSplitsEvent
 ): void {
   // load associated project entity
   const newEntityId = generateContractSpecificId(
