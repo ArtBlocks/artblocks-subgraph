@@ -63,11 +63,11 @@ import {
   Mint,
   Transfer,
   PlatformUpdated,
-  ProposedArtistAddressesAndSplit,
+  ProposedArtistAddressesAndSplits,
   AcceptedArtistAddressesAndSplits
 } from "../../../generated/GenArt721CoreV3/GenArt721CoreV3";
 import {
-  handleProposedArtistAddressesAndSplit,
+  handleProposedArtistAddressesAndSplits,
   handleAcceptedArtistAddressesAndSplits
 } from "../../../src/mapping-v3-core";
 import { generateContractSpecificId } from "../../../src/helpers";
@@ -115,8 +115,8 @@ describe("GenArt721CoreV3, artist propose/admin accept new payments", () => {
         BigInt.fromI32(10)
       );
 
-      const event: ProposedArtistAddressesAndSplit = changetype<
-        ProposedArtistAddressesAndSplit
+      const event: ProposedArtistAddressesAndSplits = changetype<
+        ProposedArtistAddressesAndSplits
       >(newMockEvent());
       event.address = TEST_CONTRACT_ADDRESS;
       event.transaction.hash = TEST_TX_HASH;
@@ -153,7 +153,7 @@ describe("GenArt721CoreV3, artist propose/admin accept new payments", () => {
       ];
       event.block.timestamp = updatedEventBlockTimestamp;
 
-      handleProposedArtistAddressesAndSplit(event);
+      handleProposedArtistAddressesAndSplits(event);
 
       assert.entityCount(PROJECT_ENTITY_TYPE, 0);
       assert.entityCount("ProposedArtistAddressesAndSplit", 0);
@@ -177,8 +177,8 @@ describe("GenArt721CoreV3, artist propose/admin accept new payments", () => {
         BigInt.fromI32(10)
       );
 
-      const event: ProposedArtistAddressesAndSplit = changetype<
-        ProposedArtistAddressesAndSplit
+      const event: ProposedArtistAddressesAndSplits = changetype<
+        ProposedArtistAddressesAndSplits
       >(newMockEvent());
       event.address = TEST_CONTRACT_ADDRESS;
       event.transaction.hash = TEST_TX_HASH;
@@ -215,7 +215,7 @@ describe("GenArt721CoreV3, artist propose/admin accept new payments", () => {
       ];
       event.block.timestamp = updatedEventBlockTimestamp;
 
-      handleProposedArtistAddressesAndSplit(event);
+      handleProposedArtistAddressesAndSplits(event);
 
       assert.fieldEquals(
         "ProposedArtistAddressesAndSplit",
@@ -285,8 +285,8 @@ describe("GenArt721CoreV3, artist propose/admin accept new payments", () => {
         BigInt.fromI32(10)
       );
 
-      const event: ProposedArtistAddressesAndSplit = changetype<
-        ProposedArtistAddressesAndSplit
+      const event: ProposedArtistAddressesAndSplits = changetype<
+        ProposedArtistAddressesAndSplits
       >(newMockEvent());
       event.address = TEST_CONTRACT_ADDRESS;
       event.transaction.hash = TEST_TX_HASH;
@@ -323,7 +323,7 @@ describe("GenArt721CoreV3, artist propose/admin accept new payments", () => {
       ];
       event.block.timestamp = updatedEventBlockTimestamp;
 
-      handleProposedArtistAddressesAndSplit(event);
+      handleProposedArtistAddressesAndSplits(event);
 
       // handle another artist proposal, overwriting previous one
       const newNewArtistAddress = randomAddressGenerator.generateRandomAddress();
@@ -336,8 +336,8 @@ describe("GenArt721CoreV3, artist propose/admin accept new payments", () => {
         BigInt.fromI32(10)
       );
 
-      const newEvent: ProposedArtistAddressesAndSplit = changetype<
-        ProposedArtistAddressesAndSplit
+      const newEvent: ProposedArtistAddressesAndSplits = changetype<
+        ProposedArtistAddressesAndSplits
       >(newMockEvent());
       newEvent.address = TEST_CONTRACT_ADDRESS;
       newEvent.transaction.hash = Bytes.fromByteArray(
@@ -376,7 +376,7 @@ describe("GenArt721CoreV3, artist propose/admin accept new payments", () => {
       ];
       newEvent.block.timestamp = newUpdatedEventBlockTimestamp;
 
-      handleProposedArtistAddressesAndSplit(newEvent);
+      handleProposedArtistAddressesAndSplits(newEvent);
 
       // assert that the previous proposal is not in store
       assert.entityCount("ProposedArtistAddressesAndSplit", 1);
@@ -508,8 +508,8 @@ describe("GenArt721CoreV3, artist propose/admin accept new payments", () => {
         BigInt.fromI32(10)
       );
 
-      const event: ProposedArtistAddressesAndSplit = changetype<
-        ProposedArtistAddressesAndSplit
+      const event: ProposedArtistAddressesAndSplits = changetype<
+        ProposedArtistAddressesAndSplits
       >(newMockEvent());
       event.address = TEST_CONTRACT_ADDRESS;
       event.transaction.hash = TEST_TX_HASH;
@@ -546,7 +546,7 @@ describe("GenArt721CoreV3, artist propose/admin accept new payments", () => {
       ];
       event.block.timestamp = updatedEventBlockTimestamp;
 
-      handleProposedArtistAddressesAndSplit(event);
+      handleProposedArtistAddressesAndSplits(event);
 
       // assert that the proposal is stored
       assert.entityCount("ProposedArtistAddressesAndSplit", 1);
@@ -635,8 +635,8 @@ describe("GenArt721CoreV3, artist propose/admin accept new payments", () => {
         BigInt.fromI32(10)
       );
 
-      const event: ProposedArtistAddressesAndSplit = changetype<
-        ProposedArtistAddressesAndSplit
+      const event: ProposedArtistAddressesAndSplits = changetype<
+        ProposedArtistAddressesAndSplits
       >(newMockEvent());
       event.address = TEST_CONTRACT_ADDRESS;
       event.transaction.hash = TEST_TX_HASH;
@@ -673,7 +673,7 @@ describe("GenArt721CoreV3, artist propose/admin accept new payments", () => {
       ];
       event.block.timestamp = updatedEventBlockTimestamp;
 
-      handleProposedArtistAddressesAndSplit(event);
+      handleProposedArtistAddressesAndSplits(event);
 
       // assert that the proposal is stored
       assert.entityCount("ProposedArtistAddressesAndSplit", 1);
@@ -788,8 +788,8 @@ describe("GenArt721CoreV3, artist propose/admin accept new payments", () => {
         BigInt.fromI32(10)
       );
 
-      const event: ProposedArtistAddressesAndSplit = changetype<
-        ProposedArtistAddressesAndSplit
+      const event: ProposedArtistAddressesAndSplits = changetype<
+        ProposedArtistAddressesAndSplits
       >(newMockEvent());
       event.address = TEST_CONTRACT_ADDRESS;
       event.transaction.hash = TEST_TX_HASH;
@@ -826,7 +826,7 @@ describe("GenArt721CoreV3, artist propose/admin accept new payments", () => {
       ];
       event.block.timestamp = updatedEventBlockTimestamp;
 
-      handleProposedArtistAddressesAndSplit(event);
+      handleProposedArtistAddressesAndSplits(event);
 
       // assert that the proposal is stored
       assert.entityCount("ProposedArtistAddressesAndSplit", 1);
@@ -947,6 +947,6 @@ describe("GenArt721CoreV3, artist propose/admin accept new payments", () => {
 
 // export handlers for test coverage https://github.com/LimeChain/demo-subgraph#test-coverage
 export {
-  handleProposedArtistAddressesAndSplit,
+  handleProposedArtistAddressesAndSplits,
   handleAcceptedArtistAddressesAndSplits
 };
