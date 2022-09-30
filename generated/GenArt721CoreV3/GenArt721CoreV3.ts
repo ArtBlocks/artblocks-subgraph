@@ -182,16 +182,16 @@ export class ProjectUpdated__Params {
   }
 }
 
-export class ProposedArtistAddressesAndSplit extends ethereum.Event {
-  get params(): ProposedArtistAddressesAndSplit__Params {
-    return new ProposedArtistAddressesAndSplit__Params(this);
+export class ProposedArtistAddressesAndSplits extends ethereum.Event {
+  get params(): ProposedArtistAddressesAndSplits__Params {
+    return new ProposedArtistAddressesAndSplits__Params(this);
   }
 }
 
-export class ProposedArtistAddressesAndSplit__Params {
-  _event: ProposedArtistAddressesAndSplit;
+export class ProposedArtistAddressesAndSplits__Params {
+  _event: ProposedArtistAddressesAndSplits;
 
-  constructor(event: ProposedArtistAddressesAndSplit) {
+  constructor(event: ProposedArtistAddressesAndSplits) {
     this._event = event;
   }
 
