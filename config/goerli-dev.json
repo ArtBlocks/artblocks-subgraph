@@ -139,16 +139,16 @@
   ],
   "minterMerkleV0Contracts": [
     {
-      "address": "0xE14757AC0075898Ad3343e22D828FAaeF2bb7595",
+      "address": "0x41a3F5ebF0bD56fBA2A3Fbf3100b21673592378b",
       "name": "Flagship Minter",
-      "startBlock": 7105457
+      "startBlock": 7705033
     }
   ],
   "minterMerkleV1Contracts": [
     {
-      "address": "0xcd1AA5C612731108267D22b77745207D9728Edf8",
+      "address": "0x0fB5846df789EA836963258AA4202b0E3358c2f8",
       "name": "Flagship Minter for V3 core",
-      "startBlock": 7105457
+      "startBlock": 7704966
     }
   ],
   "adminACLV0Contracts": [

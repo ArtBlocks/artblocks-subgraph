@@ -118,6 +118,13 @@
       "startBlock": 7011002
     }
   ],
+  "minterMerkleV0Contracts": [
+    {
+      "address": "0x9b452ea5692b732E724AaCAe461F902f58F8fe74",
+      "name": "Art Blocks Flagship",
+      "startBlock": 7705061
+    }
+  ],
   "engineFlexContracts": [
     {
       "address": "0x7077e777C29ae870d6842B4D1E94511077c99825",
