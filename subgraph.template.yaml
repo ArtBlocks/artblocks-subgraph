@@ -46,8 +46,8 @@ dataSources:
           handler: handlePlatformUpdated
         - event: MinterUpdated(indexed address)
           handler: handleMinterUpdated
-        - event: ProposedArtistAddressesAndSplit(indexed uint256,address,address,uint256,address,uint256)
-          handler: handleProposedArtistAddressesAndSplit
+        - event: ProposedArtistAddressesAndSplits(indexed uint256,address,address,uint256,address,uint256)
+          handler: handleProposedArtistAddressesAndSplits
         - event: AcceptedArtistAddressesAndSplits(indexed uint256)
           handler: handleAcceptedArtistAddressesAndSplits
         - event: OwnershipTransferred(indexed address,indexed address)
