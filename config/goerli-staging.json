@@ -60,14 +60,6 @@
       "name": "Endaoment Gallery for Good"
     },
     {
-      "address": "0x2146a41f2c1432895d6d0adf9c60bf0a226bac0e",
-      "name": "Bright Moments - Flex"
-    },
-    {
-      "address": "0xa319c382a702682129fcbf55d514e61a16f97f9c",
-      "name": "Verse"
-    },
-    {
       "address": "0xCa40b3b63F7181aeC95F74dBEb477655a7B87EC0",
       "name": "Art Blocks x Pace"
     }
@@ -193,6 +185,16 @@
       "address": "0x7077e777C29ae870d6842B4D1E94511077c99825",
       "name": "AB Engine Flex Demo, Goerli Staging",
       "startBlock": 7665745
+    },
+    {
+      "address": "0x2146a41f2c1432895d6d0adf9c60bf0a226bac0e",
+      "name": "Bright Moments - Flex",
+      "startBlock": 7705830
+    },
+    {
+      "address": "0xa319c382a702682129fcbf55d514e61a16f97f9c",
+      "name": "Verse",
+      "startBlock": 7705887
     }
   ],
   "startBlock": 7011002
