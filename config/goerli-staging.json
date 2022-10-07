@@ -197,5 +197,12 @@
       "startBlock": 7705887
     }
   ],
+  "adminACLV0Contracts": [
+    {
+      "address": "0x94Cc7981227D9e644e153766C386eF47556C3147",
+      "name": "Admin ACL V0 for V3 core",
+      "startBlock": 7723576
+    }
+  ],
   "startBlock": 7011002
 }
