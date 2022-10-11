@@ -1,6 +1,12 @@
 {
   "network": "mainnet",
-  "genArt721CoreV3Contracts": [],
+  "genArt721CoreV3Contracts": [
+    {
+      "address": "0x99a9B7c1116f9ceEB1652de04d5969CcE509B069",
+      "name": "Art Blocks Flagship (V3)",
+      "startBlock": 15726705
+    }
+  ],
   "genArt721CoreContracts": [
     {
       "address": "0xa7d8d9ef8D8Ce8992Df33D8b8CF4Aebabd5bD270",
@@ -71,12 +77,19 @@
     {
       "address": "0x4aafCE293b9B0faD169c78049A81e400f518E199",
       "startBlock": 14567785,
-      "name": "Art Blocks Flagship"
+      "name": "Art Blocks Flagship Minterf Fiter for V1 core"
     },
     {
       "address": "0x267313E435863f15285CF0f8572068aAA62fC40d",
       "startBlock": 14855007,
       "name": "Art Blocks x Pace"
+    }
+  ],
+  "minterFilterV1Contracts": [
+    {
+      "address": "0x092B8F64e713d66b38522978BCf4649db14b931E",
+      "name": "Art Blocks Flagship Minter Filter for V3 core",
+      "startBlock": 15726707
     }
   ],
   "minterSetPriceV0Contracts": [
@@ -153,6 +166,55 @@
       "address": "0x12b7c521a4e4b988cE4CeB241872D620815E3B48",
       "startBlock":"14855008",
       "name": "Art Blocks x Pace"
+    }
+  ],
+  "minterSetPriceV2Contracts": [
+    {
+      "address": "0x7B7917e083CeA6d9f6a3060a7330c1072fcb4e40",
+      "name": "Flagship Minter for V3 core",
+      "startBlock": 15726708
+    }
+  ],
+  "minterSetPriceERC20V2Contracts": [
+    {
+      "address": "0xe4c6EeF13649e9C4Ad8ae8A9C7fA9A7F26B4287a",
+      "name": "Flagship Minter for V3 core",
+      "startBlock": 15726709
+    }
+  ],
+  "minterDALinV2Contracts": [
+    {
+      "address": "0xdaa6D1e224f4B9f7c4f1368C362C4333A8e385A6",
+      "name": "Flagship Minter for V3 core",
+      "startBlock": 15726710
+    }
+  ],
+  "minterDAExpV2Contracts": [
+    {
+      "address": "0x706d6C6ef700a3c1C3a727f0c46492492E0A72b5",
+      "name": "Flagship Minter for V3 core",
+      "startBlock": 15726712
+    }
+  ],
+  "minterMerkleV1Contracts": [
+    {
+      "address": "0xae5A48D22Cd069c4d72dDe204A7fB4B302e614af",
+      "name": "Flagship Minter for V3 core",
+      "startBlock": 15726714
+    }
+  ],
+  "minterHolderV1Contracts": [
+    {
+      "address": "0xa198E22C32879f4214a37eB3051525bD9aff9145",
+      "name": "Flagship Minter for V3 core",
+      "startBlock": 15726716
+    }
+  ],
+  "adminACLV0Contracts": [
+    {
+      "address": "0x39F0e1e8Df2C135Df35B3FA496e943ac4B90Fe0f",
+      "name": "Admin ACL V0 for V3 core",
+      "startBlock": 15726705
     }
   ]
 }
