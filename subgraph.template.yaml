@@ -1056,6 +1056,8 @@ dataSources:
           handler: handleSetBytesValueProjectConfig
         - event: ConfigValueSet(indexed uint256,bytes32,bool)
           handler: handleSetBooleanValueProjectConfig
+        - event: ConfigValueSet(indexed uint256,bytes32,uint256)
+          handler: handleSetBigIntValueProjectConfig
       file: ./src/minter-suite-mapping.ts
   {{/minterMerkleV0Contracts}}
   {{#minterSetPriceERC20V2Contracts}}
@@ -1265,6 +1267,8 @@ dataSources:
           handler: handleSetBytesValueProjectConfig
         - event: ConfigValueSet(indexed uint256,bytes32,bool)
           handler: handleSetBooleanValueProjectConfig
+        - event: ConfigValueSet(indexed uint256,bytes32,uint256)
+          handler: handleSetBigIntValueProjectConfig
       file: ./src/minter-suite-mapping.ts
   {{/minterMerkleV1Contracts}}
   {{#adminACLV0Contracts}}
