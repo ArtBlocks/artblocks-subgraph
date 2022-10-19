@@ -45,8 +45,9 @@ For mainnet subgraph deployments, we deploy first to the hosted subgraph service
 9. **Art Blocks Devs:** Make sure Hasura `ARTBLOCKS_SUBGRAPH_URL` environment variable is pointing to the previous deployment url. If it is pointed to the subgraph id url, things will break because no indexers will have picked up the updated subgraph but the subgraph id url will point to it anyway
 10. Wait for the published subgraph to sync (~12hrs)
 11. **Art Blocks Devs:** Update the Hasura `ARTBLOCKS_SUBGRAPH_URL` environment variable to be the new subgraph deployment url (`https://gateway.thegraph.com/api/<API KEY>/deployments/id/<DEPLOYMENT ID>`)
-12. **Art Blocks Devs:** Verify that the frontend is working as expected
-13. **Art Blocks Devs:** If the newly published changes include indexing any new contracts run the sync-from.ts script in the artblocks repo. When prompted enter the list of added contract addresses separated by spaces and the unix timestamp from which to sync from (use the time the earliest deployed contract was deployed).
+12. **Art Blocks Devs:** Reload remote schema and ensure new subgraph URL is working
+13. **Art Blocks Devs:** Verify that the frontend is working as expected
+14. **Art Blocks Devs:** If the newly published changes include indexing any new contracts run the sync-from.ts script in the artblocks repo. When prompted enter the list of added contract addresses separated by spaces and the unix timestamp from which to sync from (use the time the earliest deployed contract was deployed).
 
 ## Testing
 
