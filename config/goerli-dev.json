@@ -5,6 +5,11 @@
       "address": "0xF396C180bb2f92EE28535D23F5224A5b9425ceca",
       "name": "Dev Goerli Flagship Core V3 Contract",
       "startBlock": 7111111
+    },
+    {
+      "address": "0x7244352F6C7aFbB74D4b63Bd7e8189e84a83f179",
+      "name": "Dev Goerli V3 Explorations Contract",
+      "startBlock": 7799143
     }
   ],
   "genArt721CoreContracts": [
@@ -45,6 +50,11 @@
       "address": "0x7EcFFfc1A3Eb7Ce76D4b29Df3e5098D2D921D367",
       "name": "Flagship Minter Filter for V3 core",
       "startBlock": 7010933
+    },
+    {
+      "address": "0x6600e8d744aa7545A8757eF928117866cF431A26",
+      "name": "Explorations Minter Filter",
+      "startBlock": 7799145
     }
   ],
   "minterSetPriceV1Contracts": [
@@ -64,6 +74,11 @@
       "address": "0x3A23Ae9EB73C14Ff2A83a0bBe1028A690006e0cc",
       "name": "Flagship Minter for V3 core",
       "startBlock": 7010933
+    },
+    {
+      "address": "0x80d48579537d6D95B54375794a4BFE59a0FfE8aB",
+      "name": "Explorations Minter",
+      "startBlock": 7799146
     }
   ],
   "minterSetPriceERC20V1Contracts": [
@@ -83,6 +98,11 @@
       "address": "0x004E1cdb723869f6c65086f1d5cED55Cd9BA1971",
       "name": "Flagship Minter for V3 core",
       "startBlock": 7010933
+    },
+    {
+      "address": "0x1ee2902F883C9b37DD26f6071453Ab1AB68eF7b7",
+      "name": "Explorations Minter",
+      "startBlock": 7799148
     }
   ],
   "minterDALinV1Contracts": [
@@ -102,6 +122,11 @@
       "address": "0x73873eAAf65338256E31b1e612AC74D09492B5B8",
       "name": "Flagship Minter for V3 core",
       "startBlock": 7010933
+    },
+    {
+      "address": "0xD21Ab04F0c1515253A22CE3A96349456059Fc90B",
+      "name": "Explorations Minter",
+      "startBlock": 7799150
     }
   ],
   "minterDAExpV1Contracts": [
@@ -121,6 +146,11 @@
       "address": "0xBced47092b6c1a9Ee24aFeC871E782aA44587001",
       "name": "Flagship Minter for V3 core",
       "startBlock": 7010933
+    },
+    {
+      "address": "0x73302603552432d5c8F4ac935B73dA6D428033BE",
+      "name": "Explorations Minter",
+      "startBlock": 7799152
     }
   ],
   "minterHolderV0Contracts": [
@@ -135,6 +165,11 @@
       "address": "0x82Df93Cd9Cd9178C8F442FB766fe3402916Fe567",
       "name": "Flagship Minter for V3 core",
       "startBlock": 7148716
+    },
+    {
+      "address": "0x7d2EB4e44E61725D26C8c81D8036892baBa6569C",
+      "name": "Explorations Minter",
+      "startBlock": 7799156
     }
   ],
   "minterMerkleV0Contracts": [
@@ -149,6 +184,11 @@
       "address": "0x0fB5846df789EA836963258AA4202b0E3358c2f8",
       "name": "Flagship Minter for V3 core",
       "startBlock": 7704966
+    },
+    {
+      "address": "0x67e19A0cec2e77d99e2FFE88B3080a9aF6be2a73",
+      "name": "Explorations Minter",
+      "startBlock": 7799154
     }
   ],
   "adminACLV0Contracts": [
@@ -161,6 +201,11 @@
       "address": "0x0D277C3d488CdABD86DB37E743765835e273101E",
       "name": "Updated Admin ACL V0 for V3 core (with event for indexing)",
       "startBlock": 7625379
+    },
+    {
+      "address": "0x8ADfF069C897383c107F95743b944f78e0BefC2D",
+      "name": "Explorations Admin ACL V0",
+      "startBlock": 7799141
     }
   ]
 }
