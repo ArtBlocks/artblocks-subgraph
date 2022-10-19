@@ -21,10 +21,6 @@
     "prepare:goerli-staging": "mustache config/goerli-staging.json subgraph.template.yaml > subgraph.yaml",
     "prepare:palm": "mustache config/palm.json subgraph.template.yaml > subgraph.yaml",
     "prepare:local": "mustache config/local.json subgraph.template.yaml > subgraph.yaml",
-    "deploy:ropsten-dev-hosted": "yarn prepare:ropsten-dev && graph deploy --product hosted-service --node https://api.thegraph.com/deploy/ --ipfs https://api.thegraph.com/ipfs/ artblocks/art-blocks-dev",
-    "deploy:ropsten-staging-hosted": "yarn prepare:ropsten-staging && graph deploy --product hosted-service --node https://api.thegraph.com/deploy/ --ipfs https://api.thegraph.com/ipfs/ artblocks/art-blocks-artist-staging",
-    "prepare:ropsten-dev": "mustache config/ropsten-dev.json subgraph.template.yaml > subgraph.yaml",
-    "prepare:ropsten-staging": "mustache config/ropsten-staging.json subgraph.template.yaml > subgraph.yaml"
   },
   "dependencies": {
     "@assemblyscript/loader": "^0.19.22",
