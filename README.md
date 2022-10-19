@@ -31,6 +31,7 @@ For mainnet subgraph deployments, we deploy first to the hosted subgraph service
     - Please see [ArtBlocks/artblocks-contracts](https://github.com/ArtBlocks/artblocks-contracts) for more info on contract deployment.
 2. Update the corresponding `config/` file for the desired network (e.g. `mainnet.json` for mainnet EVM) to include the newly deployed contracts
     - Verify that contract addresses added are for the correct contracts by checking Etherscan at the contract address
+    - When adding a new contract address to the config file, make sure you are adding it under the appropriate contract grouping. These contract groupings map to values used in the `subgraph.template.yaml` and will ultimately impact what ABIs/handlers get used with the provided contracts in the config.
 3. Run `yarn prepare:{NETWORK}`, (e.g. `yarn prepare:mainnet` for mainnet) to generate subgraph manifest (subgraph.yaml)
 4. Manually look over the generated subgraph manifest to make sure it is correct
 5. Run `yarn codegen` to generate contract mappings
@@ -76,6 +77,7 @@ To write to & read from the in-memory data store, use .save() and .load(). You c
     - Please see [ArtBlocks/artblocks-contracts](https://github.com/ArtBlocks/artblocks-contracts) for more info on contract deployment.
 2. Update the corresponding `config/` file for the desired network (e.g. `mainnet.json` for mainnet EVM) to include the newly deployed contracts
     - Verify that contract addresses added are for the correct contracts by checking Etherscan at the contract address
+    - When adding a new contract address to the config file, make sure you are adding it under the appropriate contract grouping. These contract groupings map to values used in the `subgraph.template.yaml` and will ultimately impact what ABIs/handlers get used with the provided contracts in the config.
 3. Run `yarn prepare:{NETWORK}`, (e.g. `yarn prepare:mainnet` for mainnet) to generate subgraph manifest (subgraph.yaml)
 4. Manually look over the generated subgraph manifest to make sure it is correct
   - [Grafting](https://thegraph.com/docs/en/developer/create-subgraph-hosted/#grafting-onto-existing-subgraphs_) is possible on hosted subgraphs. If using this functionality, the following information must be manually added near the top of the generated `subgraph.yaml` file:
