@@ -233,13 +233,18 @@
   "adminACLV0Contracts": [
     {
       "address": "0x39F0e1e8Df2C135Df35B3FA496e943ac4B90Fe0f",
-      "name": "Admin ACL V0 for V3 core",
+      "name": "(deprecated) Admin ACL V0 for V3 core",
       "startBlock": 15726705
     },
     {
       "address": "0x286bA5808A98c9237449182E05740E4B7284389e",
-      "name": "Admin ACL V0 for Explorations",
+      "name": "(deprecates) Admin ACL V0 for Explorations",
       "startBlock": 15791055
+    },
+    {
+      "address": "0x286bA5808A98c9237449182E05740E4B7284389e",
+      "name": "Admin ACL V1 for V3 core and Explorations core, treated as an AdminACLV0 for subgraph indexing purposes",
+      "startBlock": 15799761
     }
   ]
 }
