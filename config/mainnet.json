@@ -183,6 +183,11 @@
       "address": "0x7B7917e083CeA6d9f6a3060a7330c1072fcb4e40",
       "name": "Flagship Minter for V3 core",
       "startBlock": 15726708
+    },
+    {
+      "address": "0x6FB3104B0b3Cd665c7B8506b23eE833eA44d8E91",
+      "name": "Explorations Minter",
+      "startBlock": 15799084
     }
   ],
   "minterSetPriceERC20V2Contracts": [
