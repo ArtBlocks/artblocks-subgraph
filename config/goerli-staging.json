@@ -192,9 +192,24 @@
       "startBlock": 7705830
     },
     {
-      "address": "0xa319c382a702682129fcbf55d514e61a16f97f9c",
-      "name": "Verse",
-      "startBlock": 7705887
+      "address": "0x9ff1079a71dD0C77336466a008A4bB817028613c",
+      "name": "VerseGen",
+      "startBlock": 7793537
+    },
+    {
+      "address": "0x088098F7438773182b703625C4128aFf85fcFfC4",
+      "name": "ATP Love",
+      "startBlock": 7793577
+    },
+    {
+      "address": "0x28b82AA5bb6d00363ae0FBC5ecaD689Ae49BC82B",
+      "name": "Endaoment Gallery for Good - Flex",
+      "startBlock": 7793596
+    },
+    {
+      "address": "0x48742D38a0809135EFd643c1150BfC13768C3907",
+      "name": "Plottables Flex",
+      "startBlock": 7793677
     }
   ],
   "adminACLV0Contracts": [
