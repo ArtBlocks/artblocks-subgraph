@@ -242,7 +242,7 @@
       "startBlock": 15791055
     },
     {
-      "address": "0x286bA5808A98c9237449182E05740E4B7284389e",
+      "address": "0x18b18cF97a3D8BCC43f8D1Df282CebA85f717C82",
       "name": "Admin ACL V1 for V3 core and Explorations core, treated as an AdminACLV0 for subgraph indexing purposes",
       "startBlock": 15799761
     }
