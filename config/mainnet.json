@@ -5,6 +5,11 @@
       "address": "0x99a9B7c1116f9ceEB1652de04d5969CcE509B069",
       "name": "Art Blocks Flagship (V3)",
       "startBlock": 15726705
+    },
+    {
+      "address": "0x942BC2d3e7a589FE5bd4A5C6eF9727DFd82F5C8a",
+      "name": "Art Blocks Explorations",
+      "startBlock": 15791056
     }
   ],
   "genArt721CoreContracts": [
@@ -90,6 +95,11 @@
       "address": "0x092B8F64e713d66b38522978BCf4649db14b931E",
       "name": "Art Blocks Flagship Minter Filter for V3 core",
       "startBlock": 15726707
+    },
+    {
+      "address": "0x3F4bbde879F9BB0E95AEa08fF12F55E171495C8f",
+      "name": "Art Blocks Explorations Minter Filter",
+      "startBlock": 15791057
     }
   ],
   "minterSetPriceV0Contracts": [
@@ -173,6 +183,11 @@
       "address": "0x7B7917e083CeA6d9f6a3060a7330c1072fcb4e40",
       "name": "Flagship Minter for V3 core",
       "startBlock": 15726708
+    },
+    {
+      "address": "0x6FB3104B0b3Cd665c7B8506b23eE833eA44d8E91",
+      "name": "Explorations Minter",
+      "startBlock": 15799084
     }
   ],
   "minterSetPriceERC20V2Contracts": [
@@ -201,6 +216,11 @@
       "address": "0xae5A48D22Cd069c4d72dDe204A7fB4B302e614af",
       "name": "Flagship Minter for V3 core",
       "startBlock": 15726714
+    },
+    {
+      "address": "0x4A4DA854AB5C73814b17dAdE167B9b8861566066",
+      "name": "Explorations Minter",
+      "startBlock": 15791058
     }
   ],
   "minterHolderV1Contracts": [
@@ -213,8 +233,18 @@
   "adminACLV0Contracts": [
     {
       "address": "0x39F0e1e8Df2C135Df35B3FA496e943ac4B90Fe0f",
-      "name": "Admin ACL V0 for V3 core",
+      "name": "(deprecated) Admin ACL V0 for V3 core",
       "startBlock": 15726705
+    },
+    {
+      "address": "0x286bA5808A98c9237449182E05740E4B7284389e",
+      "name": "(deprecated) Admin ACL V0 for Explorations",
+      "startBlock": 15791055
+    },
+    {
+      "address": "0x18b18cF97a3D8BCC43f8D1Df282CebA85f717C82",
+      "name": "Admin ACL V1 for V3 core and Explorations core, treated as an AdminACLV0 for subgraph indexing purposes",
+      "startBlock": 15799761
     }
   ]
 }
