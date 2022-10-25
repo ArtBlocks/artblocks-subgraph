@@ -619,6 +619,8 @@ dataSources:
           file: ./abis/MinterHolderV1.json
         - name: MinterMerkleV1
           file: ./abis/MinterMerkleV1.json
+        - name: MinterMerkleV2
+          file: ./abis/MinterMerkleV2.json
       eventHandlers:
         - event: IsCanonicalMinterFilter(indexed address)
           handler: handleIsCanonicalMinterFilter
@@ -693,6 +695,8 @@ dataSources:
           file: ./abis/MinterHolderV1.json
         - name: MinterMerkleV1
           file: ./abis/MinterMerkleV1.json
+        - name: MinterMerkleV2
+          file: ./abis/MinterMerkleV2.json
       eventHandlers:
         - event: MinterApproved(indexed address,string)
           handler: handleMinterApproved
@@ -1271,6 +1275,42 @@ dataSources:
           handler: handleSetBigIntValueProjectConfig
       file: ./src/minter-suite-mapping.ts
   {{/minterMerkleV1Contracts}}
+  {{#minterMerkleV2Contracts}}
+  - kind: ethereum/contract
+    name: 'MinterMerkleV2-{{address}}'
+    network: {{network}}
+    source:
+      address: '{{address}}'
+      abi: MinterMerkleV2
+      startBlock: {{startBlock}}
+    mapping:
+      kind: ethereum/events
+      apiVersion: 0.0.5
+      language: wasm/assemblyscript
+      entities:
+        - Project
+        - Contract
+        - MinterFilter
+        - Minter
+        - ProjectMinterConfiguration
+      abis:
+        - name: MinterMerkleV2
+          file: ./abis/MinterMerkleV2.json
+        - name: IFilteredMinterV0
+          file: ./abis/IFilteredMinterV0.json
+      eventHandlers:
+        - event: PricePerTokenInWeiUpdated(indexed uint256,indexed uint256)
+          handler: handlePricePerTokenInWeiUpdated
+        - event: ProjectCurrencyInfoUpdated(indexed uint256,indexed address,string)
+          handler: handleProjectCurrencyInfoUpdated
+        - event: ConfigValueSet(indexed uint256,bytes32,bytes32)
+          handler: handleSetBytesValueProjectConfig
+        - event: ConfigValueSet(indexed uint256,bytes32,bool)
+          handler: handleSetBooleanValueProjectConfig
+        - event: ConfigValueSet(indexed uint256,bytes32,uint256)
+          handler: handleSetBigIntValueProjectConfig
+      file: ./src/minter-suite-mapping.ts
+  {{/minterMerkleV2Contracts}}
   {{#adminACLV0Contracts}}
   - kind: ethereum/contract
     name: 'AdminACLV0-{{address}}'

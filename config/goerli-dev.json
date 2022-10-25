@@ -191,6 +191,18 @@
       "startBlock": 7799154
     }
   ],
+  "minterMerkleV2Contracts": [
+    {
+      "address": "0x126eC6A5Dd59f9414c778c7433E6C9100c4936fB",
+      "name": "Flagship Minter for V3 core",
+      "startBlock": 7828561
+    },
+    {
+      "address": "0x723D5203689bA5A249Ea97630A5bE3FDd6B69cd7",
+      "name": "Explorations Minter",
+      "startBlock": 7828562
+    }
+  ],
   "adminACLV0Contracts": [
     {
       "address": "0x4Cbf3805011f0f4d4daeDa710b2215fBF37288Ad",

@@ -35,6 +35,7 @@ generated/*
 !generated/MinterMerkleV0
 !generated/MinterHolderV1
 !generated/MinterMerkleV1
+!generated/MinterMerkleV2
 !generated/SeaportExchange
 !generated/WyvernExchange
 !generated/LooksRareExchange
