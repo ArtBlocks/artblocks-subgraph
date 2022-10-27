@@ -53,7 +53,11 @@ import {
   mockGetProjectAndMinterInfoAt,
   mockMinterFilterAddress,
   mockMinterType,
-  mockPurchaseToDisabled
+  mockDAExpHalfLifeMinMax,
+  mockDALinMinAuctionLength,
+  mockPurchaseToDisabled,
+  DAExpMintersToTest,
+  DALinMintersToTest
 } from "./helpers";
 
 const randomAddressGenerator = new RandomAddressGenerator();
@@ -874,6 +878,134 @@ test("handleMinterApproved should handle the same minter being approved more tha
     "updatedAt",
     CURRENT_BLOCK_TIMESTAMP.toString()
   );
+});
+
+test("handleMinterApproved should populate DA Exp default half life ranges", () => {
+  for (let i = 0; i < DAExpMintersToTest.length; i++) {
+    clearStore();
+    const minterFilterAddress = randomAddressGenerator.generateRandomAddress();
+    const minterFilter = new MinterFilter(minterFilterAddress.toHexString());
+    const minterFilterUpdatedAt = CURRENT_BLOCK_TIMESTAMP.minus(
+      BigInt.fromI32(10)
+    );
+    minterFilter.coreContract = TEST_CONTRACT_ADDRESS.toHexString();
+    minterFilter.updatedAt = minterFilterUpdatedAt;
+    minterFilter.minterAllowlist = [];
+    minterFilter.save();
+
+    const minterToBeApprovedAddress = randomAddressGenerator.generateRandomAddress();
+    const minterToBeApprovedType = DAExpMintersToTest[i];
+    mockMinterType(minterToBeApprovedAddress, minterToBeApprovedType);
+    mockDAExpHalfLifeMinMax(
+      minterToBeApprovedAddress,
+      BigInt.fromI32(300),
+      BigInt.fromI32(3600)
+    );
+    mockMinterFilterAddress(minterToBeApprovedAddress, minterFilterAddress);
+    mockCoreContract(minterToBeApprovedAddress, TEST_CONTRACT_ADDRESS);
+
+    const minterApprovedEvent: MinterApproved = changetype<MinterApproved>(
+      newMockEvent()
+    );
+    minterApprovedEvent.address = minterFilterAddress;
+    minterApprovedEvent.block.timestamp = CURRENT_BLOCK_TIMESTAMP;
+    minterApprovedEvent.parameters = [
+      new ethereum.EventParam(
+        "_minterAddress",
+        ethereum.Value.fromAddress(minterToBeApprovedAddress)
+      ),
+      new ethereum.EventParam(
+        "_minterType",
+        ethereum.Value.fromString(minterToBeApprovedType)
+      )
+    ];
+
+    handleMinterApproved(minterApprovedEvent);
+
+    assert.fieldEquals(
+      MINTER_ENTITY_TYPE,
+      minterToBeApprovedAddress.toHexString(),
+      "type",
+      minterToBeApprovedType
+    );
+    assert.fieldEquals(
+      MINTER_ENTITY_TYPE,
+      minterToBeApprovedAddress.toHexString(),
+      "updatedAt",
+      CURRENT_BLOCK_TIMESTAMP.toString()
+    );
+    assert.fieldEquals(
+      MINTER_ENTITY_TYPE,
+      minterToBeApprovedAddress.toHexString(),
+      "minimumHalfLifeInSeconds",
+      "300"
+    );
+    assert.fieldEquals(
+      MINTER_ENTITY_TYPE,
+      minterToBeApprovedAddress.toHexString(),
+      "maximumHalfLifeInSeconds",
+      "3600"
+    );
+  }
+});
+
+test("handleMinterApproved should populate DA Lin min auction time", () => {
+  for (let i = 0; i < DALinMintersToTest.length; i++) {
+    clearStore();
+    const minterFilterAddress = randomAddressGenerator.generateRandomAddress();
+    const minterFilter = new MinterFilter(minterFilterAddress.toHexString());
+    const minterFilterUpdatedAt = CURRENT_BLOCK_TIMESTAMP.minus(
+      BigInt.fromI32(10)
+    );
+    minterFilter.coreContract = TEST_CONTRACT_ADDRESS.toHexString();
+    minterFilter.updatedAt = minterFilterUpdatedAt;
+    minterFilter.minterAllowlist = [];
+    minterFilter.save();
+
+    const minterToBeApprovedAddress = randomAddressGenerator.generateRandomAddress();
+    const minterToBeApprovedType = DALinMintersToTest[i];
+    mockMinterType(minterToBeApprovedAddress, minterToBeApprovedType);
+    mockDALinMinAuctionLength(minterToBeApprovedAddress, BigInt.fromI32(3600));
+    mockMinterFilterAddress(minterToBeApprovedAddress, minterFilterAddress);
+    mockCoreContract(minterToBeApprovedAddress, TEST_CONTRACT_ADDRESS);
+
+    const minterApprovedEvent: MinterApproved = changetype<MinterApproved>(
+      newMockEvent()
+    );
+    minterApprovedEvent.address = minterFilterAddress;
+    minterApprovedEvent.block.timestamp = CURRENT_BLOCK_TIMESTAMP;
+    minterApprovedEvent.parameters = [
+      new ethereum.EventParam(
+        "_minterAddress",
+        ethereum.Value.fromAddress(minterToBeApprovedAddress)
+      ),
+      new ethereum.EventParam(
+        "_minterType",
+        ethereum.Value.fromString(minterToBeApprovedType)
+      )
+    ];
+
+    handleMinterApproved(minterApprovedEvent);
+
+    assert.fieldEquals(
+      MINTER_ENTITY_TYPE,
+      minterToBeApprovedAddress.toHexString(),
+      "type",
+      minterToBeApprovedType
+    );
+    assert.fieldEquals(
+      MINTER_ENTITY_TYPE,
+      minterToBeApprovedAddress.toHexString(),
+      "updatedAt",
+      CURRENT_BLOCK_TIMESTAMP.toString()
+    );
+    assert.fieldEquals(
+      MINTER_ENTITY_TYPE,
+      minterToBeApprovedAddress.toHexString(),
+      "minimumAuctionLengthInSeconds",
+      "3600"
+    );
+  }
 });
 
 test("handleMinterRevoke should do nothing to MinterFilter if minter is not in store", () => {
