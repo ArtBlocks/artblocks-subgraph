@@ -2,6 +2,8 @@
 
 The Art Blocks subgraph definitions for The Graph.
 
+For more information on Art Blocks subgraph schema and queries, see the [Art Blocks documentation](https://docs.artblocks.io/creator-docs/art-blocks-api/queries/) website.
+
 ## Initial Setup
 
 If you haven't already connected your Github account to The Graph's account system, please do so by following the [instructions here](https://thegraph.com/docs/en/hosted-service/deploy-subgraph-hosted/).
@@ -98,7 +100,8 @@ To write to & read from the in-memory data store, use .save() and .load(). You c
 The following typical steps should be followed when adding new minters to Art Blocks flagship MinterSuite.
 > In general, the process should be completed on testnet entirely before deploying on mainnet
 1. Deploy new minter contracts (testnet, mainnet, etc).
-2. (any order, with the caveat that if the existing subgraph deployment cannot handle the new minters, blockchain transactions should be performed AFTER the new subgraph syncs)
+2. If new minter is a new minter type or version, add the new minter type to off-chain metadata DB via a new Hasura migration.
+3. (any order, with the caveat that if the existing subgraph deployment cannot handle the new minters, blockchain transactions MUST be performed AFTER the new subgraph syncs)
    - Deploy subgraph that indexes and handles the new minters, and wait for new subgraph to sync
-   - Admin submits transactions to allowlist the new minter contracts on MinterFilter
-3. Observe the new minter options on the frontend, ensure no subgraph errors
+   - (must wait for new subgraph to be deployed if minter is a new minter type that requires a new item in our subgraph schema `enum MinterType`) Admin submits transactions to allowlist the new minter contracts on MinterFilter
+4. Observe the new minter options on the frontend, ensure no subgraph errors
