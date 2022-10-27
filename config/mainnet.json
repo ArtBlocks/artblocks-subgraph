@@ -225,13 +225,23 @@
   ],
   "minterMerkleV2Contracts": [
     {
-      "address": "0x7ba972189ED3C527847170453fC108707F62755a",
+      "address": "0x6Ff3c104Ca9b4860D27079aFfF18701c4A532A4d",
       "name": "Flagship Minter for V3 core",
+      "startBlock": 15836139
+    },
+    {
+      "address": "0x0711A9767a41290D7f52714204618345C584f450",
+      "name": "Explorations Minter",
+      "startBlock": 15836141
+    },
+    {
+      "address": "0x7ba972189ED3C527847170453fC108707F62755a",
+      "name": "DO NOT USE | Flagship Minter for V3 core",
       "startBlock": 15822392
     },
     {
       "address": "0xD06A5109bEdEf92696B29FcC0F6184640b19c310",
-      "name": "Explorations Minter",
+      "name": "DO NOT USE | Explorations Minter",
       "startBlock": 15822393
     }
   ],
