@@ -129,18 +129,13 @@ import {
   handleSetBytesValueProjectConfig as handleSetBytesValue
 } from "../../../src/minter-suite-mapping";
 
+import {
+  DAExpMintersToTest,
+  DALinMintersToTest,
+  HolderMintersToTest
+} from "./helpers";
+
 const randomAddressGenerator = new RandomAddressGenerator();
-const DAExpMintersToTest: string[] = [
-  "MinterDAExpV0",
-  "MinterDAExpV1",
-  "MinterDAExpV2"
-];
-const DALinMintersToTest: string[] = [
-  "MinterDALinV0",
-  "MinterDALinV1",
-  "MinterDALinV2"
-];
-const HolderMintersToTest: string[] = ["MinterHolderV0", "MinterHolderV1"];
 
 describe("handlePricePerTokenInWeiUpdated", () => {
   test("handlePricePerTokenInWeiUpdated should do nothing if project is not in store", () => {
