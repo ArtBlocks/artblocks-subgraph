@@ -78,6 +78,23 @@
       "startBlock": 14969437
     }
   ],
+  "engineFlexContracts": [
+    {
+      "address": "0xBB5471c292065d3b01b2e81e299267221ae9a250",
+      "name": "Verse Flex",
+      "startBlock": 15827074
+    },
+    {
+      "address": "0x18dE6097cE5B5B2724C9Cae6Ac519917f3F178c0",
+      "name": "Plottables Flex",
+      "startBlock": 15886378
+    },
+    {
+      "address": "0xEafE7b73A3cfA804b761debcF077D4574588dfe7",
+      "name": "Endaoment Flex",
+      "startBlock": 15886561
+    }
+  ],
   "minterFilterV0Contracts": [
     {
       "address": "0x4aafCE293b9B0faD169c78049A81e400f518E199",
