@@ -62,6 +62,10 @@
     {
       "address": "0xCa40b3b63F7181aeC95F74dBEb477655a7B87EC0",
       "name": "Art Blocks x Pace"
+    },
+    {
+      "address": "0xD94C7060808f3c876824E57e685702f3834D2e13",
+      "name": "ITERATION-02"
     }
   ],
   "minterFilterV0Contracts": [
@@ -215,11 +219,6 @@
       "address": "0xc2aeC8A571e8D40d3606fAD9Cd10EbB1731D2816",
       "name": "GENCLO Flex",
       "startBlock": 7917787
-    },
-    {
-      "address": "0xD94C7060808f3c876824E57e685702f3834D2e13",
-      "name": "ITERATION-02 Flex??",
-      "startBlock": 7917739
     }
   ],
   "adminACLV0Contracts": [
