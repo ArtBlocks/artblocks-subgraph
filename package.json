@@ -20,6 +20,7 @@
     "prepare:goerli-dev": "mustache config/goerli-dev.json subgraph.template.yaml > subgraph.yaml",
     "prepare:goerli-staging": "mustache config/goerli-staging.json subgraph.template.yaml > subgraph.yaml",
     "prepare:palm": "mustache config/palm.json subgraph.template.yaml > subgraph.yaml",
+    "prepare:palm-testnet": "mustache config/palm-testnet.json subgraph.template.yaml > subgraph.yaml",
     "prepare:local": "mustache config/local.json subgraph.template.yaml > subgraph.yaml"
   },
   "dependencies": {
