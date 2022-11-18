@@ -581,6 +581,32 @@ export function handleRegistrationNFTAddresses<T>(event: T): void {
   }
 }
 
+// export function handleDelegationRegistryUpdated<T>(event: T): void {
+//   if (
+//     !(
+//       event instanceof MinterHolderV2DelegationRegistryUpdated ||
+//       event instanceof MinterMerkleV3DelegationRegistryUpdated
+//     )
+//   ) {
+//     return;
+//   }
+
+//   let minterProjectAndConfig = loadMinterProjectAndConfig(
+//     event.address,
+//     event.params.projectId,
+//     event.block.timestamp
+//   );
+
+//   if (minterProjectAndConfig) {
+//     let projectMinterConfig = minterProjectAndConfig.projectMinterConfiguration;
+//     let project = minterProjectAndConfig.project;
+
+//     projectMinterConfig.extraMinterDetails = "{dependencyRegistry: }";
+
+//     projectMinterConfig.save();
+//   }
+// }
+
 export function handleRegisteredNFTAddressV0(
   event: MinterHolderV0RegisteredNFTAddress
 ): void {
@@ -602,6 +628,12 @@ export function handleUnregisteredNFTAddressV1(
 ): void {
   handleRegistrationNFTAddresses(event);
 }
+
+// export function handleDelegationRegistryUpdatedHolderV2(
+//   event: MinterHolderV2DelegationRegistryUpdated
+// ): void {
+//   handleDelegationRegistryUpdated(event);
+// }
 
 // Generic Handlers
 // Below is all logic pertaining to generic handlers used for maintaining JSON config stores on both the ProjectMinterConfiguration and Minter entities.
