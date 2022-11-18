@@ -1,5 +1,5 @@
 {
-  "network": "palm_testnet",
+  "network": "palm-testnet",
   "pbabContracts": [
     {
       "address": "0x4C7E1e1Ba5e35934C8323d75AF838fDa26588177",
