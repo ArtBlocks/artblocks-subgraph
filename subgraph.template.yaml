@@ -693,10 +693,14 @@ dataSources:
           file: ./abis/MinterDAExpV2.json
         - name: MinterHolderV1
           file: ./abis/MinterHolderV1.json
+        - name: MinterHolderV2
+          file: ./abis/MinterHolderV2.json
         - name: MinterMerkleV1
           file: ./abis/MinterMerkleV1.json
         - name: MinterMerkleV2
           file: ./abis/MinterMerkleV2.json
+        - name: MinterMerkleV3
+          file: ./abis/MinterMerkleV3.json
       eventHandlers:
         - event: MinterApproved(indexed address,string)
           handler: handleMinterApproved
