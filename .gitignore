@@ -34,8 +34,10 @@ generated/*
 !generated/MinterHolderV0
 !generated/MinterMerkleV0
 !generated/MinterHolderV1
+!generated/MinterHolderV2
 !generated/MinterMerkleV1
 !generated/MinterMerkleV2
+!generated/MinterMerkleV3
 !generated/SeaportExchange
 !generated/WyvernExchange
 !generated/LooksRareExchange

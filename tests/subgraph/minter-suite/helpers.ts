@@ -13,7 +13,8 @@ export const DALinMintersToTest: string[] = [
 ];
 export const HolderMintersToTest: string[] = [
   "MinterHolderV0",
-  "MinterHolderV1"
+  "MinterHolderV1",
+  "MinterHolderV2"
 ];
 
 export function mockMinterType(

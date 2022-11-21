@@ -1272,15 +1272,15 @@ dataSources:
         - event: ProjectCurrencyInfoUpdated(indexed uint256,indexed address,string)
           handler: handleProjectCurrencyInfoUpdated
         - event: RegisteredNFTAddress(indexed address)
-          handler: handleRegisteredNFTAddressV1
+          handler: handleRegisteredNFTAddressV2
         - event: UnregisteredNFTAddress(indexed address)
-          handler: handleUnregisteredNFTAddressV1
+          handler: handleUnregisteredNFTAddressV2
         - event: AllowedHoldersOfProjects(indexed uint256,address[],uint256[])
-          handler: handleAllowHoldersOfProjectsV1
+          handler: handleAllowHoldersOfProjectsV2
         - event: RemovedHoldersOfProjects(indexed uint256,address[],uint256[])
-          handler: handleRemoveHoldersOfProjectsV1
+          handler: handleRemoveHoldersOfProjectsV2
         - event: DelegationRegistryUpdated(address)
-          handler: handleDelegationRegistryUpdated
+          handler: handleHolderV2DelegationRegistryUpdated
       file: ./src/minter-suite-mapping.ts
   {{/minterHolderV2Contracts}}
   {{#minterMerkleV1Contracts}}
@@ -1390,7 +1390,7 @@ dataSources:
         - event: ConfigValueSet(indexed uint256,bytes32,uint256)
           handler: handleSetBigIntValueProjectConfig
         - event: DelegationRegistryUpdated(address)
-          handler: handleDelegationRegistryUpdated
+          handler: handleMerkleV3DelegationRegistryUpdated
       file: ./src/minter-suite-mapping.ts
   {{/minterMerkleV3Contracts}}
   {{#adminACLV0Contracts}}
