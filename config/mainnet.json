@@ -81,6 +81,11 @@
       "address": "0x54a6356244059d5a50b97200a928f19a3682b669",
       "name": "ITERATION-02",
       "startBlock": 16000206
+    },
+    {
+      "address": "0x4d928ab507bf633dd8e68024a1fb4c99316bbdf3",
+      "name": "Tennis Art",
+      "startBlock": 16000534
     }
   ],
   "engineFlexContracts": [
@@ -98,11 +103,6 @@
       "address": "0xEafE7b73A3cfA804b761debcF077D4574588dfe7",
       "name": "Endaoment Flex",
       "startBlock": 15886561
-    },
-    {
-      "address": "0x4d928ab507bf633dd8e68024a1fb4c99316bbdf3",
-      "name": "Tennis Art",
-      "startBlock": 16000534
     }
   ],
   "minterFilterV0Contracts": [
