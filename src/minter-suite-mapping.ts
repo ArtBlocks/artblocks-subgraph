@@ -614,6 +614,8 @@ export function handleMerkleV3DelegationRegistryUpdated(
   genericEvent = changetype<ConfigValueSetAddress>(event);
 
   genericEvent.parameters = [
+    // dummy value ("project ID: 0") because we're not passing in a project
+    new ethereum.EventParam("_projectId", ethereum.Value.fromI32(0)),
     new ethereum.EventParam(
       "_key",
       ethereum.Value.fromBytes(Bytes.fromUTF8("delegationRegistryAddress"))
@@ -623,7 +625,6 @@ export function handleMerkleV3DelegationRegistryUpdated(
       ethereum.Value.fromAddress(event.params.delegationRegistryAddress)
     )
   ];
-  // logStore();
 
   let minter = loadOrCreateMinter(event.address, event.block.timestamp);
 
@@ -636,6 +637,8 @@ export function handleHolderV2DelegationRegistryUpdated(
   genericEvent = changetype<ConfigValueSetAddress>(event);
 
   genericEvent.parameters = [
+    // dummy value ("project ID: 0") because we're not passing in a project
+    new ethereum.EventParam("_projectId", ethereum.Value.fromI32(0)),
     new ethereum.EventParam(
       "_key",
       ethereum.Value.fromBytes(Bytes.fromUTF8("delegationRegistryAddress"))
