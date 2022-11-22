@@ -90,10 +90,10 @@ import {
   AllowedHoldersOfProjects as HolderV2AllowedHoldersOfProjects,
   RemovedHoldersOfProjects as HolderV2RemovedHoldersOfProjects,
   RegisteredNFTAddress as HolderV2RegisteredNFTAddress,
-  UnregisteredNFTAddress as HolderV2UnregisteredNFTAddress,
-  DelegationRegistryUpdated as MinterHolderV2DelegationRegistryUpdated
+  UnregisteredNFTAddress as HolderV2UnregisteredNFTAddress
 } from "../../../generated/MinterHolderV2/MinterHolderV2";
-import { DelegationRegistryUpdated as MinterMerkleV3DelegationRegistryUpdated } from "../../../generated/MinterMerkleV3/MinterMerkleV3";
+import { DelegationRegistryUpdated as MinterHolderV2DelegationRegistryUpdated } from "../../../generated/MinterHolderV2/IFilteredMinterHolderV1";
+import { DelegationRegistryUpdated as MinterMerkleV3DelegationRegistryUpdated } from "../../../generated/MinterMerkleV3/IFilteredMinterMerkleV1";
 // import handlers from minter-suite-mapping
 import {
   handleAddManyAddressValueProjectConfig as handleAddManyAddressValue,

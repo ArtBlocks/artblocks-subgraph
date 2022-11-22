@@ -1266,6 +1266,8 @@ dataSources:
           file: ./abis/MinterHolderV2.json
         - name: IFilteredMinterV0
           file: ./abis/IFilteredMinterV0.json
+        - name: IFilteredMinterHolderV1
+          file: ./abis/IFilteredMinterHolderV1.json
       eventHandlers:
         - event: PricePerTokenInWeiUpdated(indexed uint256,indexed uint256)
           handler: handlePricePerTokenInWeiUpdated
@@ -1378,6 +1380,8 @@ dataSources:
           file: ./abis/MinterMerkleV3.json
         - name: IFilteredMinterV0
           file: ./abis/IFilteredMinterV0.json
+        - name: IFilteredMinterMerkleV1
+          file: ./abis/IFilteredMinterMerkleV1.json
       eventHandlers:
         - event: PricePerTokenInWeiUpdated(indexed uint256,indexed uint256)
           handler: handlePricePerTokenInWeiUpdated

@@ -99,10 +99,10 @@ import {
   AllowedHoldersOfProjects as MinterHolderV2AllowedHoldersOfProjects,
   RegisteredNFTAddress as MinterHolderV2RegisteredNFTAddress,
   UnregisteredNFTAddress as MinterHolderV2UnregisteredNFTAddress,
-  RemovedHoldersOfProjects as MinterHolderV2RemovedHoldersOfProjects,
-  DelegationRegistryUpdated as MinterHolderV2DelegationRegistryUpdated
+  RemovedHoldersOfProjects as MinterHolderV2RemovedHoldersOfProjects
 } from "../generated/MinterHolderV2/MinterHolderV2";
-import { DelegationRegistryUpdated as MinterMerkleV3DelegationRegistryUpdated } from "../generated/MinterMerkleV3/MinterMerkleV3";
+import { DelegationRegistryUpdated as MinterHolderV2DelegationRegistryUpdated } from "../generated/MinterHolderV2/IFilteredMinterHolderV1";
+import { DelegationRegistryUpdated as MinterMerkleV3DelegationRegistryUpdated } from "../generated/MinterMerkleV3/IFilteredMinterMerkleV1";
 import { MinterConfigSetAddressEvent } from "./util-types";
 
 // IFilteredMinterV0 events
