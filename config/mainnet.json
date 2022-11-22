@@ -76,6 +76,16 @@
       "address": "0x67C0B53c8448A10f0eFaCe978fc5BE9892f33A2c",
       "name": "Samsung Bespoke Collection",
       "startBlock": 14969437
+    },
+    {
+      "address": "0x54a6356244059d5a50b97200a928f19a3682b669",
+      "name": "ITERATION-02",
+      "startBlock": 16000206
+    },
+    {
+      "address": "0x4d928ab507bf633dd8e68024a1fb4c99316bbdf3",
+      "name": "Tennis Art",
+      "startBlock": 16000534
     }
   ],
   "engineFlexContracts": [
