@@ -60,6 +60,7 @@ import {
   SetAuctionDetails as DAExpRefundSetAuctionDetails,
   ReceiptUpdated,
   SelloutPriceUpdated,
+  ArtistAndAdminRevenuesWithdrawn,
   IFilteredMinterDAExpRefundV0
 } from "../generated/MinterDAExpRefundV0/IFilteredMinterDAExpRefundV0";
 
@@ -1115,6 +1116,29 @@ export function handleReceiptUpdated(event: ReceiptUpdated): void {
 
 export function handleSelloutPriceUpdated(event: SelloutPriceUpdated): void {
   syncLatestPurchasePrice(event.address, event.params._projectId, event);
+}
+
+export function handleArtistAndAdminRevenuesWithdrawn(
+  event: ArtistAndAdminRevenuesWithdrawn
+): void {
+  // the function that emits this event can affect latest purchase price, so sync it
+  syncLatestPurchasePrice(event.address, event.params._projectId, event);
+  // update project extra minter details key `auctionRevenuesCollected` to true
+  let genericEvent: ConfigValueSetBool;
+  genericEvent = changetype<ConfigValueSetBool>(event);
+  genericEvent.parameters = [
+    new ethereum.EventParam(
+      "_projectId",
+      ethereum.Value.fromUnsignedBigInt(event.params._projectId)
+    ),
+    new ethereum.EventParam(
+      "_key",
+      ethereum.Value.fromBytes(Bytes.fromUTF8("refundableNetPrice"))
+    ),
+    new ethereum.EventParam("_value", ethereum.Value.fromBoolean(true))
+  ];
+  // call generic handler to populate project's extraMinterDetails
+  handleSetValueProjectConfig(genericEvent);
 }
 
 // Helpers
