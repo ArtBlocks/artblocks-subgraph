@@ -11,6 +11,7 @@ import {
 import { MinterDAExpV0 } from "../generated/MinterDAExpV0/MinterDAExpV0";
 import { MinterDAExpV1 } from "../generated/MinterDAExpV1/MinterDAExpV1";
 import { MinterDAExpV2 } from "../generated/MinterDAExpV2/MinterDAExpV2";
+import { MinterDAExpRefundV0 } from "../generated/MinterDAExpRefundV0/MinterDAExpRefundV0";
 import { MinterDALinV0 } from "../generated/MinterDALinV0/MinterDALinV0";
 import { MinterDALinV1 } from "../generated/MinterDALinV1/MinterDALinV1";
 import { MinterDALinV2 } from "../generated/MinterDALinV2/MinterDALinV2";
@@ -149,6 +150,10 @@ export function loadOrCreateMinter(
     let minterDAExpV2Contract = MinterDAExpV2.bind(minterAddress);
     minter.minimumHalfLifeInSeconds = minterDAExpV2Contract.minimumPriceDecayHalfLifeSeconds();
     minter.maximumHalfLifeInSeconds = minterDAExpV2Contract.maximumPriceDecayHalfLifeSeconds();
+  } else if (minterType == "MinterDAExpRefundV0") {
+    let minterDAExpRefundV0Contract = MinterDAExpRefundV0.bind(minterAddress);
+    minter.minimumHalfLifeInSeconds = minterDAExpRefundV0Contract.minimumPriceDecayHalfLifeSeconds();
+    minter.maximumHalfLifeInSeconds = minterDAExpRefundV0Contract.maximumPriceDecayHalfLifeSeconds();
   }
 
   minter.updatedAt = timestamp;

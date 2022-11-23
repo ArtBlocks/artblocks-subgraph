@@ -1234,9 +1234,8 @@ dataSources:
           handler: handlePricePerTokenInWeiUpdated
         - event: ProjectCurrencyInfoUpdated(indexed uint256,indexed address,string)
           handler: handleProjectCurrencyInfoUpdated
-        # TODO: add event handlers for the following events
-        # - event: AuctionHalfLifeRangeSecondsUpdated(uint256,uint256)
-        #   handler: handleAuctionHalfLifeRangeSecondsUpdatedRefund
+        - event: AuctionHalfLifeRangeSecondsUpdated(uint256,uint256)
+          handler: handleAuctionHalfLifeRangeSecondsUpdatedRefund
         # - event: SetAuctionDetails(indexed uint256,uint256,uint256,uint256,uint256)
         #   handler: handleDAExpRefundSetAuctionDetails
         # - event: ResetAuctionDetails(indexed uint256,uint256,uint256)

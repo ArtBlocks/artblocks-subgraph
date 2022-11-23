@@ -54,6 +54,12 @@ import {
 } from "../generated/MinterDAExpV2/MinterDAExpV2";
 
 import {
+  AuctionHalfLifeRangeSecondsUpdated as AuctionHalfLifeRangeSecondsUpdatedRefund,
+  ResetAuctionDetails as DAExpRefundResetAuctionDetails,
+  SetAuctionDetails as DAExpRefundSetAuctionDetails
+} from "../generated/MinterDAExpRefundV0/MinterDAExpRefundV0";
+
+import {
   Minter,
   Project,
   ProjectMinterConfiguration
@@ -323,6 +329,11 @@ export function handleAuctionHalfLifeRangeSecondsUpdatedV2(
 ): void {
   handleAuctionHalfLifeRangeSecondsUpdatedGeneric(event);
 }
+export function handleAuctionHalfLifeRangeSecondsUpdatedRefund(
+  event: AuctionHalfLifeRangeSecondsUpdatedRefund
+): void {
+  handleAuctionHalfLifeRangeSecondsUpdatedGeneric(event);
+}
 
 // MinterDAExp events
 export function handleAuctionHalfLifeRangeSecondsUpdatedGeneric<T>(
@@ -332,7 +343,8 @@ export function handleAuctionHalfLifeRangeSecondsUpdatedGeneric<T>(
     !(
       event instanceof AuctionHalfLifeRangeSecondsUpdatedV0 ||
       event instanceof AuctionHalfLifeRangeSecondsUpdatedV1 ||
-      event instanceof AuctionHalfLifeRangeSecondsUpdatedV2
+      event instanceof AuctionHalfLifeRangeSecondsUpdatedV2 ||
+      event instanceof AuctionHalfLifeRangeSecondsUpdatedRefund
     )
   ) {
     return;
