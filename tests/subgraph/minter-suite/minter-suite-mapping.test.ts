@@ -75,6 +75,14 @@ import {
   ResetAuctionDetails as DAExpV2ResetAuctionDetails
 } from "../../../generated/MinterDAExpV2/MinterDAExpV2";
 import {
+  AuctionHalfLifeRangeSecondsUpdated as AuctionHalfLifeRangeSecondsUpdatedRefund,
+  SetAuctionDetails as DAExpRefundSetAuctionDetails,
+  ResetAuctionDetails as DAExpRefundResetAuctionDetails,
+  SelloutPriceUpdated,
+  ReceiptUpdated,
+  ArtistAndAdminRevenuesWithdrawn
+} from "../../../generated/MinterDAExpRefundV0/IFilteredMinterDAExpRefundV0";
+import {
   AllowedHoldersOfProjects as HolderV0AllowedHoldersOfProjects,
   RemovedHoldersOfProjects as HolderV0RemovedHoldersOfProjects,
   RegisteredNFTAddress as HolderV0RegisteredNFTAddress,
@@ -126,7 +134,13 @@ import {
   handleSetAddressValueProjectConfig as handleSetAddressValue,
   handleSetBigIntValueProjectConfig as handleSetBigIntValue,
   handleSetBooleanValueProjectConfig as handleSetBooleanValue,
-  handleSetBytesValueProjectConfig as handleSetBytesValue
+  handleSetBytesValueProjectConfig as handleSetBytesValue,
+  handleAuctionHalfLifeRangeSecondsUpdatedRefund,
+  handleDAExpRefundSetAuctionDetails,
+  handleDAExpRefundResetAuctionDetails,
+  handleSelloutPriceUpdated,
+  handleReceiptUpdated,
+  handleArtistAndAdminRevenuesWithdrawn
 } from "../../../src/minter-suite-mapping";
 
 import {
@@ -888,9 +902,13 @@ describe("MinterDAExp-related tests", () => {
           handleAuctionHalfLifeRangeSecondsUpdatedV1(
             changetype<AuctionHalfLifeRangeSecondsUpdatedV1>(event)
           );
-        } else {
+        } else if (minterType === "MinterDAExpV2") {
           handleAuctionHalfLifeRangeSecondsUpdatedV2(
             changetype<AuctionHalfLifeRangeSecondsUpdatedV2>(event)
+          );
+        } else {
+          handleAuctionHalfLifeRangeSecondsUpdatedRefund(
+            changetype<AuctionHalfLifeRangeSecondsUpdatedRefund>(event)
           );
         }
 
@@ -953,9 +971,13 @@ describe("MinterDAExp-related tests", () => {
           handleDAExpSetAuctionDetailsV1(
             changetype<DAExpV1SetAuctionDetails>(event)
           );
-        } else {
+        } else if (minterType === "MinterDAExpV2") {
           handleDAExpSetAuctionDetailsV2(
             changetype<DAExpV2SetAuctionDetails>(event)
+          );
+        } else {
+          handleDAExpRefundSetAuctionDetails(
+            changetype<DAExpRefundSetAuctionDetails>(event)
           );
         }
 
@@ -1037,9 +1059,13 @@ describe("MinterDAExp-related tests", () => {
           handleDAExpSetAuctionDetailsV1(
             changetype<DAExpV1SetAuctionDetails>(event)
           );
-        } else {
+        } else if (minterType === "MinterDAExpV2") {
           handleDAExpSetAuctionDetailsV2(
             changetype<DAExpV2SetAuctionDetails>(event)
+          );
+        } else {
+          handleDAExpRefundSetAuctionDetails(
+            changetype<DAExpRefundSetAuctionDetails>(event)
           );
         }
 
@@ -1154,9 +1180,13 @@ describe("MinterDAExp-related tests", () => {
           handleDAExpSetAuctionDetailsV1(
             changetype<DAExpV1SetAuctionDetails>(event)
           );
-        } else {
+        } else if (minterType === "MinterDAExpV2") {
           handleDAExpSetAuctionDetailsV2(
             changetype<DAExpV2SetAuctionDetails>(event)
+          );
+        } else {
+          handleDAExpRefundSetAuctionDetails(
+            changetype<DAExpRefundSetAuctionDetails>(event)
           );
         }
 
@@ -1222,7 +1252,7 @@ describe("MinterDAExp-related tests", () => {
         event.address = minterAddress;
         event.parameters = [
           new ethereum.EventParam(
-            "_projectId",
+            "projectId",
             ethereum.Value.fromUnsignedBigInt(projectId)
           )
         ];
@@ -1238,9 +1268,27 @@ describe("MinterDAExp-related tests", () => {
           handleDAExpResetAuctionDetailsV1(
             changetype<DAExpV1ResetAuctionDetails>(event)
           );
-        } else {
+        } else if (minterType == "MinterDAExpV2") {
           handleDAExpResetAuctionDetailsV2(
             changetype<DAExpV2ResetAuctionDetails>(event)
+          );
+        } else {
+          // fully populate event for refundable minter
+          event.parameters.push(
+            new ethereum.EventParam(
+              "numPurchases",
+              ethereum.Value.fromUnsignedBigInt(BigInt.fromI32(5))
+            )
+          );
+          event.parameters.push(
+            new ethereum.EventParam(
+              "latestPurchasePrice",
+              ethereum.Value.fromUnsignedBigInt(BigInt.fromI32(1000000))
+            )
+          );
+          // handle refundable minter event
+          handleDAExpRefundResetAuctionDetails(
+            changetype<DAExpRefundResetAuctionDetails>(event)
           );
         }
 
@@ -1309,9 +1357,27 @@ describe("MinterDAExp-related tests", () => {
           handleDAExpResetAuctionDetailsV1(
             changetype<DAExpV1ResetAuctionDetails>(event)
           );
-        } else {
+        } else if (minterType == "MinterDAExpV2") {
           handleDAExpResetAuctionDetailsV2(
             changetype<DAExpV2ResetAuctionDetails>(event)
+          );
+        } else {
+          // fully populate event for refundable minter
+          event.parameters.push(
+            new ethereum.EventParam(
+              "numPurchases",
+              ethereum.Value.fromUnsignedBigInt(BigInt.fromI32(5))
+            )
+          );
+          event.parameters.push(
+            new ethereum.EventParam(
+              "latestPurchasePrice",
+              ethereum.Value.fromUnsignedBigInt(BigInt.fromI32(1000000))
+            )
+          );
+          // handle refundable minter event
+          handleDAExpRefundResetAuctionDetails(
+            changetype<DAExpRefundResetAuctionDetails>(event)
           );
         }
 
@@ -1410,9 +1476,27 @@ describe("MinterDAExp-related tests", () => {
           handleDAExpResetAuctionDetailsV1(
             changetype<DAExpV1ResetAuctionDetails>(event)
           );
-        } else {
+        } else if (minterType == "MinterDAExpV2") {
           handleDAExpResetAuctionDetailsV2(
             changetype<DAExpV2ResetAuctionDetails>(event)
+          );
+        } else {
+          // fully populate event for refundable minter
+          event.parameters.push(
+            new ethereum.EventParam(
+              "numPurchases",
+              ethereum.Value.fromUnsignedBigInt(BigInt.fromI32(5))
+            )
+          );
+          event.parameters.push(
+            new ethereum.EventParam(
+              "latestPurchasePrice",
+              ethereum.Value.fromUnsignedBigInt(BigInt.fromI32(1000000))
+            )
+          );
+          // handle refundable minter event
+          handleDAExpRefundResetAuctionDetails(
+            changetype<DAExpRefundResetAuctionDetails>(event)
           );
         }
 

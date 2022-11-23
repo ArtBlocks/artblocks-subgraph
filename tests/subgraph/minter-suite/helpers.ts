@@ -4,7 +4,8 @@ import { createMockedFunction } from "matchstick-as";
 export const DAExpMintersToTest: string[] = [
   "MinterDAExpV0",
   "MinterDAExpV1",
-  "MinterDAExpV2"
+  "MinterDAExpV2",
+  "MinterDAExpRefundV0"
 ];
 export const DALinMintersToTest: string[] = [
   "MinterDALinV0",
