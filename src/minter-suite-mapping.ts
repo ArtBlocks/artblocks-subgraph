@@ -1158,9 +1158,17 @@ function syncLatestPurchasePrice(
   let latestPurchasePrice = refundableMinter.getProjectLatestPurchasePrice(
     projectId
   );
-  // updated extraMinterDetails key `refundableNetPrice` to be latestPurchasePrice
-  let genericEvent: ConfigValueSetBigInt;
-  genericEvent = changetype<ConfigValueSetBigInt>(event);
+  // update extraMinterDetails key `refundableNetPrice` to be latestPurchasePrice
+  let genericEvent: ConfigValueSetBigInt = new ConfigValueSetBigInt(
+    event.address,
+    event.logIndex,
+    event.transactionLogIndex,
+    event.logType,
+    event.block,
+    event.transaction,
+    [],
+    event.receipt
+  );
   genericEvent.parameters = [
     new ethereum.EventParam(
       "_projectId",
@@ -1195,9 +1203,17 @@ function syncNumRefundableInvocations(
   let numRefundableInvocations = refundableMinter.getNumRefundableInvocations(
     projectId
   );
-  // updated extraMinterDetails key `numRefundableInvocations` to be numRefundableInvocations
-  let genericEvent: ConfigValueSetBigInt;
-  genericEvent = changetype<ConfigValueSetBigInt>(event);
+  // update extraMinterDetails key `numRefundableInvocations` to be numRefundableInvocations
+  let genericEvent: ConfigValueSetBigInt = new ConfigValueSetBigInt(
+    event.address,
+    event.logIndex,
+    event.transactionLogIndex,
+    event.logType,
+    event.block,
+    event.transaction,
+    [],
+    event.receipt
+  );
   genericEvent.parameters = [
     new ethereum.EventParam(
       "_projectId",
@@ -1205,7 +1221,7 @@ function syncNumRefundableInvocations(
     ),
     new ethereum.EventParam(
       "_key",
-      ethereum.Value.fromBytes(Bytes.fromUTF8("refundableNetPrice"))
+      ethereum.Value.fromBytes(Bytes.fromUTF8("numRefundableInvocations"))
     ),
     new ethereum.EventParam(
       "_value",

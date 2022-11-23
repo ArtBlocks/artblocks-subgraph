@@ -84,6 +84,7 @@ export const TOKEN_ENTITY_TYPE = "Token";
 export const TRANSFER_ENTITY_TYPE = "Transfer";
 export const PROJECT_MINTER_CONFIGURATION_ENTITY_TYPE =
   "ProjectMinterConfiguration";
+export const RECEIPT_ENTITY_TYPE = "Receipt";
 export const MINTER_FILTER_ENTITY_TYPE = "MinterFilter";
 export const MINTER_ENTITY_TYPE = "Minter";
 export const ONE_MILLION = 1000000;

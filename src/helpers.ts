@@ -133,6 +133,9 @@ export function loadOrCreateReceipt(
   receipt.minter = minterId;
   receipt.project = projectId;
   receipt.account = accountAddress.toHexString();
+  // populate non-nullable values with default solidity values
+  receipt.netPaid = BigInt.fromI32(0);
+  receipt.numPurchased = BigInt.fromI32(0);
   // save and return
   receipt.save();
   return receipt;
