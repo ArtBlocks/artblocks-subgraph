@@ -1201,6 +1201,54 @@ dataSources:
           handler: handleDAExpSetAuctionDetailsV2
       file: ./src/minter-suite-mapping.ts
   {{/minterDAExpV2Contracts}}
+  {{#minterDAExpRefundV0Contracts}}
+  - kind: ethereum/contract
+    name: 'MinterDAExpRefundV0-{{address}}'
+    network: {{network}}
+    source:
+      address: '{{address}}'
+      abi: MinterDAExpRefundV0
+      startBlock: {{startBlock}}
+    mapping:
+      kind: ethereum/events
+      apiVersion: 0.0.5
+      language: wasm/assemblyscript
+      entities:
+        - Project
+        - Contract
+        - MinterFilter
+        - Minter
+        - ProjectMinterConfiguration
+        - Receipt
+      abis:
+        - name: MinterDAExpRefundV0
+          file: ./abis/MinterDAExpRefundV0.json
+        - name: IFilteredMinterV0
+          file: ./abis/IFilteredMinterV0.json
+        - name: IFilteredMinterV1
+          file: ./abis/IFilteredMinterV1.json
+        - name: IFilteredMinterDAExpRefundV0
+          file: ./abis/IFilteredMinterDAExpRefundV0.json
+      eventHandlers:
+        - event: PricePerTokenInWeiUpdated(indexed uint256,indexed uint256)
+          handler: handlePricePerTokenInWeiUpdated
+        - event: ProjectCurrencyInfoUpdated(indexed uint256,indexed address,string)
+          handler: handleProjectCurrencyInfoUpdated
+        # TODO: add event handlers for the following events
+        # - event: AuctionHalfLifeRangeSecondsUpdated(uint256,uint256)
+        #   handler: handleAuctionHalfLifeRangeSecondsUpdatedRefund
+        # - event: SetAuctionDetails(indexed uint256,uint256,uint256,uint256,uint256)
+        #   handler: handleDAExpRefundSetAuctionDetails
+        # - event: ResetAuctionDetails(indexed uint256,uint256,uint256)
+        #   handler: handleDAExpRefundResetAuctionDetails
+        # - event: SelloutPriceUpdated(indexed uint256,uint256)
+        #   handler: handleDAExpRefundSelloutPriceUpdated
+        # - event: ReceiptUpdated(indexed uint256,indexed uint256,uint256,uint256)
+        #   handler: handleDAExpRefundReceiptUpdated
+        # - event: ArtistAndAdminRevenuesWithdrawn(indexed uint256)
+        #   handler: handleDAExpRefundArtistAndAdminRevenuesWithdrawn
+      file: ./src/minter-suite-mapping.ts
+  {{/minterDAExpRefundV0Contracts}}
   {{#minterHolderV1Contracts}}
   - kind: ethereum/contract
     name: 'MinterHolderV1-{{address}}'
