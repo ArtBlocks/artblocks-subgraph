@@ -433,13 +433,19 @@ export function handleDAExpResetAuctionDetailsV2(
 ): void {
   handleDAExpResetAuctionDetailsGeneric(event);
 }
+export function handleDAExpRefundResetAuctionDetails(
+  event: DAExpRefundResetAuctionDetails
+): void {
+  handleDAExpResetAuctionDetailsGeneric(event);
+}
 
 export function handleDAExpResetAuctionDetailsGeneric<T>(event: T): void {
   if (
     !(
       event instanceof DAExpV0ResetAuctionDetails ||
       event instanceof DAExpV1ResetAuctionDetails ||
-      event instanceof DAExpV2ResetAuctionDetails
+      event instanceof DAExpV2ResetAuctionDetails ||
+      event instanceof DAExpRefundResetAuctionDetails
     )
   ) {
     return;
