@@ -500,6 +500,25 @@
           "type": "uint256"
         }
       ],
+      "name": "getNumRefundableInvocations",
+      "outputs": [
+        {
+          "internalType": "uint256",
+          "name": "numRefundableInvocations",
+          "type": "uint256"
+        }
+      ],
+      "stateMutability": "view",
+      "type": "function"
+    },
+    {
+      "inputs": [
+        {
+          "internalType": "uint256",
+          "name": "_projectId",
+          "type": "uint256"
+        }
+      ],
       "name": "getPriceInfo",
       "outputs": [
         {
@@ -521,6 +540,25 @@
           "internalType": "address",
           "name": "currencyAddress",
           "type": "address"
+        }
+      ],
+      "stateMutability": "view",
+      "type": "function"
+    },
+    {
+      "inputs": [
+        {
+          "internalType": "uint256",
+          "name": "_projectId",
+          "type": "uint256"
+        }
+      ],
+      "name": "getProjectLatestPurchasePrice",
+      "outputs": [
+        {
+          "internalType": "uint256",
+          "name": "latestPurchasePrice",
+          "type": "uint256"
         }
       ],
       "stateMutability": "view",

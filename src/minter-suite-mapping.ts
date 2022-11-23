@@ -58,7 +58,9 @@ import {
   AuctionHalfLifeRangeSecondsUpdated as AuctionHalfLifeRangeSecondsUpdatedRefund,
   ResetAuctionDetails as DAExpRefundResetAuctionDetails,
   SetAuctionDetails as DAExpRefundSetAuctionDetails,
-  ReceiptUpdated
+  ReceiptUpdated,
+  SelloutPriceUpdated,
+  IFilteredMinterDAExpRefundV0
 } from "../generated/MinterDAExpRefundV0/IFilteredMinterDAExpRefundV0";
 
 import {
@@ -1085,6 +1087,16 @@ export function handleReceiptUpdated(event: ReceiptUpdated): void {
       receipt.netPaid = event.params._netPaid;
       receipt.numPurchased = event.params._numPurchased;
       receipt.save();
+      // additionally, sync latest purchase price and number of refundable
+      // purchases for project on this minter
+      // @dev this is because this can be the only event emitted from the
+      // minter during a purchase on a refundable minter
+      syncLatestPurchasePrice(event.address, event.params._projectId, event);
+      syncNumRefundableInvocations(
+        event.address,
+        event.params._projectId,
+        event
+      );
     } else {
       log.warning(
         "Error while loading/creating receipt in tx {}, log index {}",
@@ -1101,7 +1113,85 @@ export function handleReceiptUpdated(event: ReceiptUpdated): void {
   }
 }
 
+export function handleSelloutPriceUpdated(event: SelloutPriceUpdated): void {
+  syncLatestPurchasePrice(event.address, event.params._projectId, event);
+}
+
 // Helpers
+/**
+ * @notice Syncs a (refundable) minter's project latest purchase price in
+ * extraMinterDetails to the current value on the minter.
+ * @param minterAddress minter address to by synced
+ * @param projectId project id to sync (big int, not contract specific id)
+ * @param event The event emitted from the minter that triggered this sync
+ */
+function syncLatestPurchasePrice(
+  minterAddress: Address,
+  projectId: BigInt,
+  event: ethereum.Event
+): void {
+  let refundableMinter = IFilteredMinterDAExpRefundV0.bind(minterAddress);
+  let latestPurchasePrice = refundableMinter.getProjectLatestPurchasePrice(
+    projectId
+  );
+  // updated extraMinterDetails key `refundableNetPrice` to be latestPurchasePrice
+  let genericEvent: ConfigValueSetBigInt;
+  genericEvent = changetype<ConfigValueSetBigInt>(event);
+  genericEvent.parameters = [
+    new ethereum.EventParam(
+      "_projectId",
+      ethereum.Value.fromUnsignedBigInt(projectId)
+    ),
+    new ethereum.EventParam(
+      "_key",
+      ethereum.Value.fromBytes(Bytes.fromUTF8("refundableNetPrice"))
+    ),
+    new ethereum.EventParam(
+      "_value",
+      ethereum.Value.fromUnsignedBigInt(latestPurchasePrice)
+    )
+  ];
+  // call generic handler to populate project's extraMinterDetails
+  handleSetValueProjectConfig(genericEvent);
+}
+
+/**
+ * @notice Syncs a (refundable) minter's project number of refundable
+ * invocations in extraMinterDetails to the current value on the minter.
+ * @param minterAddress minter address to by synced
+ * @param projectId project id to sync (big int, not contract specific id)
+ * @param event The event emitted from the minter that triggered this sync
+ */
+function syncNumRefundableInvocations(
+  minterAddress: Address,
+  projectId: BigInt,
+  event: ethereum.Event
+): void {
+  let refundableMinter = IFilteredMinterDAExpRefundV0.bind(minterAddress);
+  let numRefundableInvocations = refundableMinter.getNumRefundableInvocations(
+    projectId
+  );
+  // updated extraMinterDetails key `numRefundableInvocations` to be numRefundableInvocations
+  let genericEvent: ConfigValueSetBigInt;
+  genericEvent = changetype<ConfigValueSetBigInt>(event);
+  genericEvent.parameters = [
+    new ethereum.EventParam(
+      "_projectId",
+      ethereum.Value.fromUnsignedBigInt(projectId)
+    ),
+    new ethereum.EventParam(
+      "_key",
+      ethereum.Value.fromBytes(Bytes.fromUTF8("refundableNetPrice"))
+    ),
+    new ethereum.EventParam(
+      "_value",
+      ethereum.Value.fromUnsignedBigInt(numRefundableInvocations)
+    )
+  ];
+  // call generic handler to populate project's extraMinterDetails
+  handleSetValueProjectConfig(genericEvent);
+}
+
 class MinterProjectAndConfig {
   minter: Minter;
   project: Project;

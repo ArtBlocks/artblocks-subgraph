@@ -1240,8 +1240,8 @@ dataSources:
           handler: handleDAExpRefundSetAuctionDetails
         - event: ResetAuctionDetails(indexed uint256,uint256,uint256)
           handler: handleDAExpRefundResetAuctionDetails
-        # - event: SelloutPriceUpdated(indexed uint256,uint256)
-        #   handler: handleDAExpRefundSelloutPriceUpdated
+        - event: SelloutPriceUpdated(indexed uint256,uint256)
+          handler: handleSelloutPriceUpdated
         - event: ReceiptUpdated(indexed address,indexed uint256,uint256,uint256)
           handler: handleReceiptUpdated
         # - event: ArtistAndAdminRevenuesWithdrawn(indexed uint256)

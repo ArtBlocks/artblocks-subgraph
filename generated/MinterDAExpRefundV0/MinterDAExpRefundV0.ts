@@ -704,6 +704,31 @@ export class MinterDAExpRefundV0 extends ethereum.SmartContract {
     return ethereum.CallResult.fromValue(value[0].toAddress());
   }
 
+  getNumRefundableInvocations(_projectId: BigInt): BigInt {
+    let result = super.call(
+      "getNumRefundableInvocations",
+      "getNumRefundableInvocations(uint256):(uint256)",
+      [ethereum.Value.fromUnsignedBigInt(_projectId)]
+    );
+
+    return result[0].toBigInt();
+  }
+
+  try_getNumRefundableInvocations(
+    _projectId: BigInt
+  ): ethereum.CallResult<BigInt> {
+    let result = super.tryCall(
+      "getNumRefundableInvocations",
+      "getNumRefundableInvocations(uint256):(uint256)",
+      [ethereum.Value.fromUnsignedBigInt(_projectId)]
+    );
+    if (result.reverted) {
+      return new ethereum.CallResult();
+    }
+    let value = result.value;
+    return ethereum.CallResult.fromValue(value[0].toBigInt());
+  }
+
   getPriceInfo(_projectId: BigInt): MinterDAExpRefundV0__getPriceInfoResult {
     let result = super.call(
       "getPriceInfo",
@@ -739,6 +764,31 @@ export class MinterDAExpRefundV0 extends ethereum.SmartContract {
         value[3].toAddress()
       )
     );
+  }
+
+  getProjectLatestPurchasePrice(_projectId: BigInt): BigInt {
+    let result = super.call(
+      "getProjectLatestPurchasePrice",
+      "getProjectLatestPurchasePrice(uint256):(uint256)",
+      [ethereum.Value.fromUnsignedBigInt(_projectId)]
+    );
+
+    return result[0].toBigInt();
+  }
+
+  try_getProjectLatestPurchasePrice(
+    _projectId: BigInt
+  ): ethereum.CallResult<BigInt> {
+    let result = super.tryCall(
+      "getProjectLatestPurchasePrice",
+      "getProjectLatestPurchasePrice(uint256):(uint256)",
+      [ethereum.Value.fromUnsignedBigInt(_projectId)]
+    );
+    if (result.reverted) {
+      return new ethereum.CallResult();
+    }
+    let value = result.value;
+    return ethereum.CallResult.fromValue(value[0].toBigInt());
   }
 
   maximumPriceDecayHalfLifeSeconds(): BigInt {
