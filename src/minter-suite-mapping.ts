@@ -376,13 +376,19 @@ export function handleDAExpSetAuctionDetailsV2(
 ): void {
   handleDAExpSetAuctionDetailsGeneric(event);
 }
+export function handleDAExpRefundSetAuctionDetails(
+  event: DAExpRefundSetAuctionDetails
+): void {
+  handleDAExpSetAuctionDetailsGeneric(event);
+}
 
 export function handleDAExpSetAuctionDetailsGeneric<T>(event: T): void {
   if (
     !(
       event instanceof DAExpV0SetAuctionDetails ||
       event instanceof DAExpV1SetAuctionDetails ||
-      event instanceof DAExpV2SetAuctionDetails
+      event instanceof DAExpV2SetAuctionDetails ||
+      event instanceof DAExpRefundSetAuctionDetails
     )
   ) {
     return;

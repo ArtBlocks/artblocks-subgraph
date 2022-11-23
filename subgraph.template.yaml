@@ -1236,8 +1236,8 @@ dataSources:
           handler: handleProjectCurrencyInfoUpdated
         - event: AuctionHalfLifeRangeSecondsUpdated(uint256,uint256)
           handler: handleAuctionHalfLifeRangeSecondsUpdatedRefund
-        # - event: SetAuctionDetails(indexed uint256,uint256,uint256,uint256,uint256)
-        #   handler: handleDAExpRefundSetAuctionDetails
+        - event: SetAuctionDetails(indexed uint256,uint256,uint256,uint256,uint256)
+          handler: handleDAExpRefundSetAuctionDetails
         # - event: ResetAuctionDetails(indexed uint256,uint256,uint256)
         #   handler: handleDAExpRefundResetAuctionDetails
         # - event: SelloutPriceUpdated(indexed uint256,uint256)
