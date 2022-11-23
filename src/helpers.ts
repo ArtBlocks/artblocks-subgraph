@@ -6,7 +6,8 @@ import {
   JSONValue,
   JSONValueKind,
   TypedMap,
-  store
+  store,
+  ethereum
 } from "@graphprotocol/graph-ts";
 import { MinterDAExpV0 } from "../generated/MinterDAExpV0/MinterDAExpV0";
 import { MinterDAExpV1 } from "../generated/MinterDAExpV1/MinterDAExpV1";
@@ -20,7 +21,8 @@ import {
   Minter,
   ProjectMinterConfiguration,
   Account,
-  Whitelisting
+  Whitelisting,
+  Receipt
 } from "../generated/schema";
 
 export function generateProjectExternalAssetDependencyId(
@@ -97,6 +99,43 @@ export function getProjectMinterConfigId(
   projectId: string
 ): string {
   return minterId + "-" + projectId.split("-")[1];
+}
+
+// @dev projectId is the number of the project, contract-specific id is not required
+export function getReceiptId(
+  minterId: string,
+  projectId: BigInt,
+  accountAddress: Address
+): string {
+  return (
+    minterId + "-" + projectId.toString() + "-" + accountAddress.toHexString()
+  );
+}
+
+// @dev projectId must be the contract-specific id
+export function loadOrCreateReceipt(
+  minterId: string,
+  projectId: string,
+  accountAddress: Address
+): Receipt {
+  let receiptId = getReceiptId(
+    minterId,
+    BigInt.fromString(projectId.split("-")[1]),
+    accountAddress
+  );
+  let receipt = Receipt.load(receiptId);
+  if (receipt) {
+    return receipt;
+  }
+  // create new Receipt entity
+  receipt = new Receipt(receiptId);
+  // populate based on format of receiptId
+  receipt.minter = minterId;
+  receipt.project = projectId;
+  receipt.account = accountAddress.toHexString();
+  // save and return
+  receipt.save();
+  return receipt;
 }
 
 export function loadOrCreateMinter(

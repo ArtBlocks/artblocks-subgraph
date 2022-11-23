@@ -8,7 +8,8 @@ import {
   json,
   JSONValue,
   JSONValueKind,
-  TypedMap
+  TypedMap,
+  log
 } from "@graphprotocol/graph-ts";
 
 import {
@@ -56,13 +57,15 @@ import {
 import {
   AuctionHalfLifeRangeSecondsUpdated as AuctionHalfLifeRangeSecondsUpdatedRefund,
   ResetAuctionDetails as DAExpRefundResetAuctionDetails,
-  SetAuctionDetails as DAExpRefundSetAuctionDetails
-} from "../generated/MinterDAExpRefundV0/MinterDAExpRefundV0";
+  SetAuctionDetails as DAExpRefundSetAuctionDetails,
+  ReceiptUpdated
+} from "../generated/MinterDAExpRefundV0/IFilteredMinterDAExpRefundV0";
 
 import {
   Minter,
   Project,
-  ProjectMinterConfiguration
+  ProjectMinterConfiguration,
+  Receipt
 } from "../generated/schema";
 import {
   arrayToJSONValue,
@@ -74,7 +77,8 @@ import {
   loadOrCreateMinter,
   stringToJSONString,
   stringToJSONValue,
-  typedMapToJSONString
+  typedMapToJSONString,
+  loadOrCreateReceipt
 } from "./helpers";
 import {
   ConfigKeyRemoved,
@@ -1061,6 +1065,40 @@ export function handleRemoveAddressManyValueMinterConfig(
   event: MinterConfigSetAddressEvent
 ): void {
   handleRemoveManyMinterConfig(event);
+}
+
+export function handleReceiptUpdated(event: ReceiptUpdated): void {
+  let minter = loadOrCreateMinter(event.address, event.block.timestamp);
+  if (minter) {
+    // load or create receipt
+    let projectId = generateContractSpecificId(
+      Address.fromString(minter.coreContract),
+      event.params._projectId
+    );
+    let receipt: Receipt = loadOrCreateReceipt(
+      minter.id,
+      projectId,
+      event.params._purchaser
+    );
+    if (receipt) {
+      // update receipt state
+      receipt.netPaid = event.params._netPaid;
+      receipt.numPurchased = event.params._numPurchased;
+      receipt.save();
+    } else {
+      log.warning(
+        "Error while loading/creating receipt in tx {}, log index {}",
+        [
+          event.transaction.hash.toHexString(),
+          event.transactionLogIndex.toString()
+        ]
+      );
+    }
+  } else {
+    log.warning("Error while loading/creating minter with id {}", [
+      event.address.toHexString()
+    ]);
+  }
 }
 
 // Helpers

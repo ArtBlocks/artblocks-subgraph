@@ -1242,8 +1242,8 @@ dataSources:
           handler: handleDAExpRefundResetAuctionDetails
         # - event: SelloutPriceUpdated(indexed uint256,uint256)
         #   handler: handleDAExpRefundSelloutPriceUpdated
-        # - event: ReceiptUpdated(indexed uint256,indexed uint256,uint256,uint256)
-        #   handler: handleDAExpRefundReceiptUpdated
+        - event: ReceiptUpdated(indexed address,indexed uint256,uint256,uint256)
+          handler: handleReceiptUpdated
         # - event: ArtistAndAdminRevenuesWithdrawn(indexed uint256)
         #   handler: handleDAExpRefundArtistAndAdminRevenuesWithdrawn
       file: ./src/minter-suite-mapping.ts
