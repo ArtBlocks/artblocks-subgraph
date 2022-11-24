@@ -1552,7 +1552,7 @@ describe("DAExpRefundMinters", () => {
       );
       const minterType = minter.type;
 
-      const projectId = BigInt.fromI32(0);
+      const projectId = BigInt.fromI32(1);
       const project = addNewProjectToStore(
         TEST_CONTRACT_ADDRESS,
         projectId,
@@ -1683,7 +1683,7 @@ describe("DAExpRefundMinters", () => {
       );
       const minterType = minter.type;
 
-      const projectId = BigInt.fromI32(0);
+      const projectId = BigInt.fromI32(1);
       const project = addNewProjectToStore(
         TEST_CONTRACT_ADDRESS,
         projectId,
@@ -1861,7 +1861,7 @@ describe("DAExpRefundMinters", () => {
       );
       const minterType = minter.type;
 
-      const projectId = BigInt.fromI32(0);
+      const projectId = BigInt.fromI32(1);
       const project = addNewProjectToStore(
         TEST_CONTRACT_ADDRESS,
         projectId,
@@ -1937,7 +1937,7 @@ describe("DAExpRefundMinters", () => {
       );
       const minterType = minter.type;
 
-      const projectId = BigInt.fromI32(0);
+      const projectId = BigInt.fromI32(1);
       const project = addNewProjectToStore(
         TEST_CONTRACT_ADDRESS,
         projectId,
@@ -2038,7 +2038,7 @@ describe("DAExpRefundMinters", () => {
       );
       const minterType = minter.type;
 
-      const projectId = BigInt.fromI32(0);
+      const projectId = BigInt.fromI32(1);
       const project = addNewProjectToStore(
         TEST_CONTRACT_ADDRESS,
         projectId,
