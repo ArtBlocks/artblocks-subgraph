@@ -1543,311 +1543,490 @@ describe("MinterDAExp-related tests", () => {
 });
 
 describe("DAExpRefundMinters", () => {
-  test("reflects updated receipt values after one receipt", () => {
-    clearStore();
-    const minter = addNewMinterToStore("MinterDAExpRefundV0");
-    const minterAddress: Address = changetype<Address>(
-      Address.fromHexString(minter.id)
-    );
-    const minterType = minter.type;
+  describe("ReceiptUpdated handler", () => {
+    test("reflects updated receipt values after one receipt", () => {
+      clearStore();
+      const minter = addNewMinterToStore("MinterDAExpRefundV0");
+      const minterAddress: Address = changetype<Address>(
+        Address.fromHexString(minter.id)
+      );
+      const minterType = minter.type;
 
-    const projectId = BigInt.fromI32(0);
-    const project = addNewProjectToStore(
-      TEST_CONTRACT_ADDRESS,
-      projectId,
-      "project 0",
-      randomAddressGenerator.generateRandomAddress(),
-      BigInt.fromI32(0),
-      CURRENT_BLOCK_TIMESTAMP.minus(BigInt.fromI32(10))
-    );
+      const projectId = BigInt.fromI32(0);
+      const project = addNewProjectToStore(
+        TEST_CONTRACT_ADDRESS,
+        projectId,
+        "project 0",
+        randomAddressGenerator.generateRandomAddress(),
+        BigInt.fromI32(0),
+        CURRENT_BLOCK_TIMESTAMP.minus(BigInt.fromI32(10))
+      );
 
-    const projectMinterConfig = new ProjectMinterConfiguration(
-      getProjectMinterConfigId(minterAddress.toHexString(), project.id)
-    );
-    projectMinterConfig.minter = minterAddress.toHexString();
-    projectMinterConfig.project = project.id;
-    projectMinterConfig.extraMinterDetails = "{}";
-    projectMinterConfig.startTime = CURRENT_BLOCK_TIMESTAMP.plus(
-      BigInt.fromI32(100)
-    );
-    projectMinterConfig.halfLifeSeconds = CURRENT_BLOCK_TIMESTAMP.plus(
-      BigInt.fromI32(300)
-    );
-    projectMinterConfig.startPrice = ONE_ETH_IN_WEI;
-    projectMinterConfig.basePrice = ONE_ETH_IN_WEI.div(BigInt.fromI32(10));
-    projectMinterConfig.priceIsConfigured = true;
-    projectMinterConfig.currencyAddress = Address.zero();
-    projectMinterConfig.currencySymbol = "ETH";
-    projectMinterConfig.purchaseToDisabled = false;
-    projectMinterConfig.save();
+      const projectMinterConfig = new ProjectMinterConfiguration(
+        getProjectMinterConfigId(minterAddress.toHexString(), project.id)
+      );
+      projectMinterConfig.minter = minterAddress.toHexString();
+      projectMinterConfig.project = project.id;
+      projectMinterConfig.extraMinterDetails = "{}";
+      projectMinterConfig.startTime = CURRENT_BLOCK_TIMESTAMP.plus(
+        BigInt.fromI32(100)
+      );
+      projectMinterConfig.halfLifeSeconds = CURRENT_BLOCK_TIMESTAMP.plus(
+        BigInt.fromI32(300)
+      );
+      projectMinterConfig.startPrice = ONE_ETH_IN_WEI;
+      projectMinterConfig.basePrice = ONE_ETH_IN_WEI.div(BigInt.fromI32(10));
+      projectMinterConfig.priceIsConfigured = true;
+      projectMinterConfig.currencyAddress = Address.zero();
+      projectMinterConfig.currencySymbol = "ETH";
+      projectMinterConfig.purchaseToDisabled = false;
+      projectMinterConfig.save();
 
-    // define purchaser and net paid, qty purchased
-    const purchaser = randomAddressGenerator.generateRandomAddress();
-    const netPaid = ONE_ETH_IN_WEI;
-    const actualPurchasePrice = ONE_ETH_IN_WEI.div(BigInt.fromI32(2));
-    let numPurchased = BigInt.fromI32(1);
+      // define purchaser and net paid, qty purchased
+      const purchaser = randomAddressGenerator.generateRandomAddress();
+      const netPaid = ONE_ETH_IN_WEI;
+      const actualPurchasePrice = ONE_ETH_IN_WEI.div(BigInt.fromI32(2));
+      let numPurchased = BigInt.fromI32(1);
 
-    const event = newMockEvent();
-    event.address = minterAddress;
-    event.parameters = [
-      new ethereum.EventParam(
-        "_purchaser",
-        ethereum.Value.fromAddress(purchaser)
-      ),
-      new ethereum.EventParam(
-        "_projectId",
-        ethereum.Value.fromUnsignedBigInt(projectId)
-      ),
-      new ethereum.EventParam(
-        "_netPaid",
-        ethereum.Value.fromUnsignedBigInt(netPaid)
-      ),
-      new ethereum.EventParam(
-        "_numPurchased",
-        ethereum.Value.fromUnsignedBigInt(numPurchased)
+      const event = newMockEvent();
+      event.address = minterAddress;
+      event.parameters = [
+        new ethereum.EventParam(
+          "_purchaser",
+          ethereum.Value.fromAddress(purchaser)
+        ),
+        new ethereum.EventParam(
+          "_projectId",
+          ethereum.Value.fromUnsignedBigInt(projectId)
+        ),
+        new ethereum.EventParam(
+          "_netPaid",
+          ethereum.Value.fromUnsignedBigInt(netPaid)
+        ),
+        new ethereum.EventParam(
+          "_numPurchased",
+          ethereum.Value.fromUnsignedBigInt(numPurchased)
+        )
+      ];
+      event.block.timestamp = CURRENT_BLOCK_TIMESTAMP;
+
+      // mock the minter functions used in handler
+      // return latest purchase price of 100 wei
+      createMockedFunction(
+        minterAddress,
+        "getProjectLatestPurchasePrice",
+        "getProjectLatestPurchasePrice(uint256):(uint256)"
       )
-    ];
-    event.block.timestamp = CURRENT_BLOCK_TIMESTAMP;
+        .withArgs([ethereum.Value.fromUnsignedBigInt(projectId)])
+        .returns([ethereum.Value.fromUnsignedBigInt(actualPurchasePrice)]);
+      // return qty of refundable invocations of 1
+      createMockedFunction(
+        minterAddress,
+        "getNumRefundableInvocations",
+        "getNumRefundableInvocations(uint256):(uint256)"
+      )
+        .withArgs([ethereum.Value.fromUnsignedBigInt(projectId)])
+        .returns([ethereum.Value.fromI32(1)]);
 
-    // mock the minter functions used in handler
-    // return latest purchase price of 100 wei
-    createMockedFunction(
-      minterAddress,
-      "getProjectLatestPurchasePrice",
-      "getProjectLatestPurchasePrice(uint256):(uint256)"
-    )
-      .withArgs([ethereum.Value.fromUnsignedBigInt(projectId)])
-      .returns([ethereum.Value.fromUnsignedBigInt(actualPurchasePrice)]);
-    // return qty of refundable invocations of 1
-    createMockedFunction(
-      minterAddress,
-      "getNumRefundableInvocations",
-      "getNumRefundableInvocations(uint256):(uint256)"
-    )
-      .withArgs([ethereum.Value.fromUnsignedBigInt(projectId)])
-      .returns([ethereum.Value.fromI32(1)]);
+      // handle refundable minter event
+      handleReceiptUpdated(changetype<ReceiptUpdated>(event));
 
-    // handle refundable minter event
-    handleReceiptUpdated(changetype<ReceiptUpdated>(event));
+      assert.fieldEquals(
+        PROJECT_MINTER_CONFIGURATION_ENTITY_TYPE,
+        getProjectMinterConfigId(minterAddress.toHexString(), project.id),
+        "extraMinterDetails",
+        `{"refundableNetPrice":${actualPurchasePrice.toString()},"numRefundableInvocations":${1}}`
+      );
+      assert.fieldEquals(
+        RECEIPT_ENTITY_TYPE,
+        getReceiptId(minterAddress.toHexString(), project.projectId, purchaser),
+        "project",
+        project.id
+      );
+      assert.fieldEquals(
+        RECEIPT_ENTITY_TYPE,
+        getReceiptId(minterAddress.toHexString(), project.projectId, purchaser),
+        "project",
+        project.id
+      );
+      assert.fieldEquals(
+        RECEIPT_ENTITY_TYPE,
+        getReceiptId(minterAddress.toHexString(), project.projectId, purchaser),
+        "minter",
+        minterAddress.toHexString()
+      );
+      assert.fieldEquals(
+        RECEIPT_ENTITY_TYPE,
+        getReceiptId(minterAddress.toHexString(), project.projectId, purchaser),
+        "account",
+        purchaser.toHexString()
+      );
+      assert.fieldEquals(
+        RECEIPT_ENTITY_TYPE,
+        getReceiptId(minterAddress.toHexString(), project.projectId, purchaser),
+        "netPaid",
+        netPaid.toString()
+      );
+      assert.fieldEquals(
+        RECEIPT_ENTITY_TYPE,
+        getReceiptId(minterAddress.toHexString(), project.projectId, purchaser),
+        "numPurchased",
+        numPurchased.toString()
+      );
+    });
 
-    assert.fieldEquals(
-      PROJECT_MINTER_CONFIGURATION_ENTITY_TYPE,
-      getProjectMinterConfigId(minterAddress.toHexString(), project.id),
-      "extraMinterDetails",
-      `{"refundableNetPrice":${actualPurchasePrice.toString()},"numRefundableInvocations":${1}}`
-    );
-    assert.fieldEquals(
-      RECEIPT_ENTITY_TYPE,
-      getReceiptId(minterAddress.toHexString(), project.projectId, purchaser),
-      "project",
-      project.id
-    );
-    assert.fieldEquals(
-      RECEIPT_ENTITY_TYPE,
-      getReceiptId(minterAddress.toHexString(), project.projectId, purchaser),
-      "project",
-      project.id
-    );
-    assert.fieldEquals(
-      RECEIPT_ENTITY_TYPE,
-      getReceiptId(minterAddress.toHexString(), project.projectId, purchaser),
-      "minter",
-      minterAddress.toHexString()
-    );
-    assert.fieldEquals(
-      RECEIPT_ENTITY_TYPE,
-      getReceiptId(minterAddress.toHexString(), project.projectId, purchaser),
-      "account",
-      purchaser.toHexString()
-    );
-    assert.fieldEquals(
-      RECEIPT_ENTITY_TYPE,
-      getReceiptId(minterAddress.toHexString(), project.projectId, purchaser),
-      "netPaid",
-      netPaid.toString()
-    );
-    assert.fieldEquals(
-      RECEIPT_ENTITY_TYPE,
-      getReceiptId(minterAddress.toHexString(), project.projectId, purchaser),
-      "numPurchased",
-      numPurchased.toString()
-    );
+    test("reflects updated receipt values after two receipts", () => {
+      clearStore();
+      const minter = addNewMinterToStore("MinterDAExpRefundV0");
+      const minterAddress: Address = changetype<Address>(
+        Address.fromHexString(minter.id)
+      );
+      const minterType = minter.type;
+
+      const projectId = BigInt.fromI32(0);
+      const project = addNewProjectToStore(
+        TEST_CONTRACT_ADDRESS,
+        projectId,
+        "project 0",
+        randomAddressGenerator.generateRandomAddress(),
+        BigInt.fromI32(0),
+        CURRENT_BLOCK_TIMESTAMP.minus(BigInt.fromI32(10))
+      );
+
+      const projectMinterConfig = new ProjectMinterConfiguration(
+        getProjectMinterConfigId(minterAddress.toHexString(), project.id)
+      );
+      projectMinterConfig.minter = minterAddress.toHexString();
+      projectMinterConfig.project = project.id;
+      projectMinterConfig.extraMinterDetails = "{}";
+      projectMinterConfig.startTime = CURRENT_BLOCK_TIMESTAMP.plus(
+        BigInt.fromI32(100)
+      );
+      projectMinterConfig.halfLifeSeconds = CURRENT_BLOCK_TIMESTAMP.plus(
+        BigInt.fromI32(300)
+      );
+      projectMinterConfig.startPrice = ONE_ETH_IN_WEI;
+      projectMinterConfig.basePrice = ONE_ETH_IN_WEI.div(BigInt.fromI32(10));
+      projectMinterConfig.priceIsConfigured = true;
+      projectMinterConfig.currencyAddress = Address.zero();
+      projectMinterConfig.currencySymbol = "ETH";
+      projectMinterConfig.purchaseToDisabled = false;
+      projectMinterConfig.save();
+
+      // define purchaser and net paid, qty purchased
+      const purchaser = randomAddressGenerator.generateRandomAddress();
+      let netPaid = ONE_ETH_IN_WEI;
+      let actualPurchasePrice = ONE_ETH_IN_WEI.div(BigInt.fromI32(2));
+      let numPurchased = BigInt.fromI32(1);
+
+      const event = newMockEvent();
+      event.address = minterAddress;
+      event.parameters = [
+        new ethereum.EventParam(
+          "_purchaser",
+          ethereum.Value.fromAddress(purchaser)
+        ),
+        new ethereum.EventParam(
+          "_projectId",
+          ethereum.Value.fromUnsignedBigInt(projectId)
+        ),
+        new ethereum.EventParam(
+          "_netPaid",
+          ethereum.Value.fromUnsignedBigInt(netPaid)
+        ),
+        new ethereum.EventParam(
+          "_numPurchased",
+          ethereum.Value.fromUnsignedBigInt(numPurchased)
+        )
+      ];
+      event.block.timestamp = CURRENT_BLOCK_TIMESTAMP;
+
+      // mock the minter functions used in handler
+      // return latest purchase price of 100 wei
+      createMockedFunction(
+        minterAddress,
+        "getProjectLatestPurchasePrice",
+        "getProjectLatestPurchasePrice(uint256):(uint256)"
+      )
+        .withArgs([ethereum.Value.fromUnsignedBigInt(projectId)])
+        .returns([ethereum.Value.fromUnsignedBigInt(actualPurchasePrice)]);
+      // return qty of refundable invocations of 1
+      createMockedFunction(
+        minterAddress,
+        "getNumRefundableInvocations",
+        "getNumRefundableInvocations(uint256):(uint256)"
+      )
+        .withArgs([ethereum.Value.fromUnsignedBigInt(projectId)])
+        .returns([ethereum.Value.fromI32(1)]);
+
+      // handle refundable minter event
+      handleReceiptUpdated(changetype<ReceiptUpdated>(event));
+
+      // mock the minter functions used in second handler call
+      // update price and num purchased
+      actualPurchasePrice = ONE_ETH_IN_WEI.div(BigInt.fromI32(3));
+      numPurchased = BigInt.fromI32(2);
+      // return latest purchase price of 100 wei
+      createMockedFunction(
+        minterAddress,
+        "getProjectLatestPurchasePrice",
+        "getProjectLatestPurchasePrice(uint256):(uint256)"
+      )
+        .withArgs([ethereum.Value.fromUnsignedBigInt(projectId)])
+        .returns([ethereum.Value.fromUnsignedBigInt(actualPurchasePrice)]);
+      // return qty of refundable invocations of 1
+      createMockedFunction(
+        minterAddress,
+        "getNumRefundableInvocations",
+        "getNumRefundableInvocations(uint256):(uint256)"
+      )
+        .withArgs([ethereum.Value.fromUnsignedBigInt(projectId)])
+        .returns([ethereum.Value.fromUnsignedBigInt(numPurchased)]);
+      // update event values
+      // net paid is now 1.5 eth
+      netPaid = ONE_ETH_IN_WEI.plus(ONE_ETH_IN_WEI.div(BigInt.fromI32(2)));
+      event.parameters = [
+        new ethereum.EventParam(
+          "_purchaser",
+          ethereum.Value.fromAddress(purchaser)
+        ),
+        new ethereum.EventParam(
+          "_projectId",
+          ethereum.Value.fromUnsignedBigInt(projectId)
+        ),
+        new ethereum.EventParam(
+          "_netPaid",
+          ethereum.Value.fromUnsignedBigInt(netPaid)
+        ),
+        new ethereum.EventParam(
+          "_numPurchased",
+          ethereum.Value.fromUnsignedBigInt(numPurchased)
+        )
+      ];
+
+      // handle refundable minter event
+      handleReceiptUpdated(changetype<ReceiptUpdated>(event));
+
+      assert.fieldEquals(
+        PROJECT_MINTER_CONFIGURATION_ENTITY_TYPE,
+        getProjectMinterConfigId(minterAddress.toHexString(), project.id),
+        "extraMinterDetails",
+        `{"numRefundableInvocations":${numPurchased.toString()},"refundableNetPrice":${actualPurchasePrice.toString()}}`
+      );
+      assert.fieldEquals(
+        RECEIPT_ENTITY_TYPE,
+        getReceiptId(minterAddress.toHexString(), project.projectId, purchaser),
+        "project",
+        project.id
+      );
+      assert.fieldEquals(
+        RECEIPT_ENTITY_TYPE,
+        getReceiptId(minterAddress.toHexString(), project.projectId, purchaser),
+        "project",
+        project.id
+      );
+      assert.fieldEquals(
+        RECEIPT_ENTITY_TYPE,
+        getReceiptId(minterAddress.toHexString(), project.projectId, purchaser),
+        "minter",
+        minterAddress.toHexString()
+      );
+      assert.fieldEquals(
+        RECEIPT_ENTITY_TYPE,
+        getReceiptId(minterAddress.toHexString(), project.projectId, purchaser),
+        "account",
+        purchaser.toHexString()
+      );
+      assert.fieldEquals(
+        RECEIPT_ENTITY_TYPE,
+        getReceiptId(minterAddress.toHexString(), project.projectId, purchaser),
+        "netPaid",
+        netPaid.toString()
+      );
+      assert.fieldEquals(
+        RECEIPT_ENTITY_TYPE,
+        getReceiptId(minterAddress.toHexString(), project.projectId, purchaser),
+        "numPurchased",
+        numPurchased.toString()
+      );
+    });
   });
 
-  test("reflects updated receipt values after two receipts", () => {
-    clearStore();
-    const minter = addNewMinterToStore("MinterDAExpRefundV0");
-    const minterAddress: Address = changetype<Address>(
-      Address.fromHexString(minter.id)
-    );
-    const minterType = minter.type;
+  describe("SelloutPriceUpdated handler", () => {
+    test("reflects updated net refund price after event", () => {
+      clearStore();
+      const minter = addNewMinterToStore("MinterDAExpRefundV0");
+      const minterAddress: Address = changetype<Address>(
+        Address.fromHexString(minter.id)
+      );
+      const minterType = minter.type;
 
-    const projectId = BigInt.fromI32(0);
-    const project = addNewProjectToStore(
-      TEST_CONTRACT_ADDRESS,
-      projectId,
-      "project 0",
-      randomAddressGenerator.generateRandomAddress(),
-      BigInt.fromI32(0),
-      CURRENT_BLOCK_TIMESTAMP.minus(BigInt.fromI32(10))
-    );
+      const projectId = BigInt.fromI32(0);
+      const project = addNewProjectToStore(
+        TEST_CONTRACT_ADDRESS,
+        projectId,
+        "project 0",
+        randomAddressGenerator.generateRandomAddress(),
+        BigInt.fromI32(0),
+        CURRENT_BLOCK_TIMESTAMP.minus(BigInt.fromI32(10))
+      );
 
-    const projectMinterConfig = new ProjectMinterConfiguration(
-      getProjectMinterConfigId(minterAddress.toHexString(), project.id)
-    );
-    projectMinterConfig.minter = minterAddress.toHexString();
-    projectMinterConfig.project = project.id;
-    projectMinterConfig.extraMinterDetails = "{}";
-    projectMinterConfig.startTime = CURRENT_BLOCK_TIMESTAMP.plus(
-      BigInt.fromI32(100)
-    );
-    projectMinterConfig.halfLifeSeconds = CURRENT_BLOCK_TIMESTAMP.plus(
-      BigInt.fromI32(300)
-    );
-    projectMinterConfig.startPrice = ONE_ETH_IN_WEI;
-    projectMinterConfig.basePrice = ONE_ETH_IN_WEI.div(BigInt.fromI32(10));
-    projectMinterConfig.priceIsConfigured = true;
-    projectMinterConfig.currencyAddress = Address.zero();
-    projectMinterConfig.currencySymbol = "ETH";
-    projectMinterConfig.purchaseToDisabled = false;
-    projectMinterConfig.save();
+      const projectMinterConfig = new ProjectMinterConfiguration(
+        getProjectMinterConfigId(minterAddress.toHexString(), project.id)
+      );
+      projectMinterConfig.minter = minterAddress.toHexString();
+      projectMinterConfig.project = project.id;
+      projectMinterConfig.extraMinterDetails = "{}";
+      projectMinterConfig.startTime = CURRENT_BLOCK_TIMESTAMP.plus(
+        BigInt.fromI32(100)
+      );
+      projectMinterConfig.halfLifeSeconds = CURRENT_BLOCK_TIMESTAMP.plus(
+        BigInt.fromI32(300)
+      );
+      projectMinterConfig.startPrice = ONE_ETH_IN_WEI;
+      projectMinterConfig.basePrice = ONE_ETH_IN_WEI.div(BigInt.fromI32(10));
+      projectMinterConfig.priceIsConfigured = true;
+      projectMinterConfig.currencyAddress = Address.zero();
+      projectMinterConfig.currencySymbol = "ETH";
+      projectMinterConfig.purchaseToDisabled = false;
+      projectMinterConfig.save();
 
-    // define purchaser and net paid, qty purchased
-    const purchaser = randomAddressGenerator.generateRandomAddress();
-    let netPaid = ONE_ETH_IN_WEI;
-    let actualPurchasePrice = ONE_ETH_IN_WEI.div(BigInt.fromI32(2));
-    let numPurchased = BigInt.fromI32(1);
+      // define relevant variables
+      let selloutPrice = ONE_ETH_IN_WEI;
 
-    const event = newMockEvent();
-    event.address = minterAddress;
-    event.parameters = [
-      new ethereum.EventParam(
-        "_purchaser",
-        ethereum.Value.fromAddress(purchaser)
-      ),
-      new ethereum.EventParam(
-        "_projectId",
-        ethereum.Value.fromUnsignedBigInt(projectId)
-      ),
-      new ethereum.EventParam(
-        "_netPaid",
-        ethereum.Value.fromUnsignedBigInt(netPaid)
-      ),
-      new ethereum.EventParam(
-        "_numPurchased",
-        ethereum.Value.fromUnsignedBigInt(numPurchased)
+      const event = newMockEvent();
+      event.address = minterAddress;
+      event.parameters = [
+        new ethereum.EventParam(
+          "_projectId",
+          ethereum.Value.fromUnsignedBigInt(projectId)
+        ),
+        new ethereum.EventParam(
+          "_selloutPrice",
+          ethereum.Value.fromUnsignedBigInt(selloutPrice)
+        )
+      ];
+      event.block.timestamp = CURRENT_BLOCK_TIMESTAMP;
+
+      // mock the minter functions used in handler
+      // return latest purchase price of 100 wei
+      createMockedFunction(
+        minterAddress,
+        "getProjectLatestPurchasePrice",
+        "getProjectLatestPurchasePrice(uint256):(uint256)"
       )
-    ];
-    event.block.timestamp = CURRENT_BLOCK_TIMESTAMP;
+        .withArgs([ethereum.Value.fromUnsignedBigInt(projectId)])
+        .returns([ethereum.Value.fromUnsignedBigInt(selloutPrice)]);
 
-    // mock the minter functions used in handler
-    // return latest purchase price of 100 wei
-    createMockedFunction(
-      minterAddress,
-      "getProjectLatestPurchasePrice",
-      "getProjectLatestPurchasePrice(uint256):(uint256)"
-    )
-      .withArgs([ethereum.Value.fromUnsignedBigInt(projectId)])
-      .returns([ethereum.Value.fromUnsignedBigInt(actualPurchasePrice)]);
-    // return qty of refundable invocations of 1
-    createMockedFunction(
-      minterAddress,
-      "getNumRefundableInvocations",
-      "getNumRefundableInvocations(uint256):(uint256)"
-    )
-      .withArgs([ethereum.Value.fromUnsignedBigInt(projectId)])
-      .returns([ethereum.Value.fromI32(1)]);
+      // handle refundable minter event
+      handleSelloutPriceUpdated(changetype<SelloutPriceUpdated>(event));
 
-    // handle refundable minter event
-    handleReceiptUpdated(changetype<ReceiptUpdated>(event));
+      assert.fieldEquals(
+        PROJECT_MINTER_CONFIGURATION_ENTITY_TYPE,
+        getProjectMinterConfigId(minterAddress.toHexString(), project.id),
+        "extraMinterDetails",
+        `{"refundableNetPrice":${selloutPrice.toString()}}`
+      );
+    });
 
-    // mock the minter functions used in second handler call
-    // update price and num purchased
-    actualPurchasePrice = ONE_ETH_IN_WEI.div(BigInt.fromI32(3));
-    numPurchased = BigInt.fromI32(2);
-    // return latest purchase price of 100 wei
-    createMockedFunction(
-      minterAddress,
-      "getProjectLatestPurchasePrice",
-      "getProjectLatestPurchasePrice(uint256):(uint256)"
-    )
-      .withArgs([ethereum.Value.fromUnsignedBigInt(projectId)])
-      .returns([ethereum.Value.fromUnsignedBigInt(actualPurchasePrice)]);
-    // return qty of refundable invocations of 1
-    createMockedFunction(
-      minterAddress,
-      "getNumRefundableInvocations",
-      "getNumRefundableInvocations(uint256):(uint256)"
-    )
-      .withArgs([ethereum.Value.fromUnsignedBigInt(projectId)])
-      .returns([ethereum.Value.fromUnsignedBigInt(numPurchased)]);
-    // update event values
-    // net paid is now 1.5 eth
-    netPaid = ONE_ETH_IN_WEI.plus(ONE_ETH_IN_WEI.div(BigInt.fromI32(2)));
-    event.parameters = [
-      new ethereum.EventParam(
-        "_purchaser",
-        ethereum.Value.fromAddress(purchaser)
-      ),
-      new ethereum.EventParam(
-        "_projectId",
-        ethereum.Value.fromUnsignedBigInt(projectId)
-      ),
-      new ethereum.EventParam(
-        "_netPaid",
-        ethereum.Value.fromUnsignedBigInt(netPaid)
-      ),
-      new ethereum.EventParam(
-        "_numPurchased",
-        ethereum.Value.fromUnsignedBigInt(numPurchased)
+    test("reflects updated net refund price after multiple events", () => {
+      clearStore();
+      const minter = addNewMinterToStore("MinterDAExpRefundV0");
+      const minterAddress: Address = changetype<Address>(
+        Address.fromHexString(minter.id)
+      );
+      const minterType = minter.type;
+
+      const projectId = BigInt.fromI32(0);
+      const project = addNewProjectToStore(
+        TEST_CONTRACT_ADDRESS,
+        projectId,
+        "project 0",
+        randomAddressGenerator.generateRandomAddress(),
+        BigInt.fromI32(0),
+        CURRENT_BLOCK_TIMESTAMP.minus(BigInt.fromI32(10))
+      );
+
+      const projectMinterConfig = new ProjectMinterConfiguration(
+        getProjectMinterConfigId(minterAddress.toHexString(), project.id)
+      );
+      projectMinterConfig.minter = minterAddress.toHexString();
+      projectMinterConfig.project = project.id;
+      projectMinterConfig.extraMinterDetails = "{}";
+      projectMinterConfig.startTime = CURRENT_BLOCK_TIMESTAMP.plus(
+        BigInt.fromI32(100)
+      );
+      projectMinterConfig.halfLifeSeconds = CURRENT_BLOCK_TIMESTAMP.plus(
+        BigInt.fromI32(300)
+      );
+      projectMinterConfig.startPrice = ONE_ETH_IN_WEI;
+      projectMinterConfig.basePrice = ONE_ETH_IN_WEI.div(BigInt.fromI32(10));
+      projectMinterConfig.priceIsConfigured = true;
+      projectMinterConfig.currencyAddress = Address.zero();
+      projectMinterConfig.currencySymbol = "ETH";
+      projectMinterConfig.purchaseToDisabled = false;
+      projectMinterConfig.save();
+
+      // define relevant variables
+      let selloutPrice = ONE_ETH_IN_WEI;
+
+      const event = newMockEvent();
+      event.address = minterAddress;
+      event.parameters = [
+        new ethereum.EventParam(
+          "_projectId",
+          ethereum.Value.fromUnsignedBigInt(projectId)
+        ),
+        new ethereum.EventParam(
+          "_selloutPrice",
+          ethereum.Value.fromUnsignedBigInt(selloutPrice)
+        )
+      ];
+      event.block.timestamp = CURRENT_BLOCK_TIMESTAMP;
+
+      // mock the minter functions used in handler
+      // return latest purchase price of 100 wei
+      createMockedFunction(
+        minterAddress,
+        "getProjectLatestPurchasePrice",
+        "getProjectLatestPurchasePrice(uint256):(uint256)"
       )
-    ];
+        .withArgs([ethereum.Value.fromUnsignedBigInt(projectId)])
+        .returns([ethereum.Value.fromUnsignedBigInt(selloutPrice)]);
 
-    // handle refundable minter event
-    handleReceiptUpdated(changetype<ReceiptUpdated>(event));
+      // handle refundable minter event
+      handleSelloutPriceUpdated(changetype<SelloutPriceUpdated>(event));
 
-    assert.fieldEquals(
-      PROJECT_MINTER_CONFIGURATION_ENTITY_TYPE,
-      getProjectMinterConfigId(minterAddress.toHexString(), project.id),
-      "extraMinterDetails",
-      `{"numRefundableInvocations":${numPurchased.toString()},"refundableNetPrice":${actualPurchasePrice.toString()}}`
-    );
-    assert.fieldEquals(
-      RECEIPT_ENTITY_TYPE,
-      getReceiptId(minterAddress.toHexString(), project.projectId, purchaser),
-      "project",
-      project.id
-    );
-    assert.fieldEquals(
-      RECEIPT_ENTITY_TYPE,
-      getReceiptId(minterAddress.toHexString(), project.projectId, purchaser),
-      "project",
-      project.id
-    );
-    assert.fieldEquals(
-      RECEIPT_ENTITY_TYPE,
-      getReceiptId(minterAddress.toHexString(), project.projectId, purchaser),
-      "minter",
-      minterAddress.toHexString()
-    );
-    assert.fieldEquals(
-      RECEIPT_ENTITY_TYPE,
-      getReceiptId(minterAddress.toHexString(), project.projectId, purchaser),
-      "account",
-      purchaser.toHexString()
-    );
-    assert.fieldEquals(
-      RECEIPT_ENTITY_TYPE,
-      getReceiptId(minterAddress.toHexString(), project.projectId, purchaser),
-      "netPaid",
-      netPaid.toString()
-    );
-    assert.fieldEquals(
-      RECEIPT_ENTITY_TYPE,
-      getReceiptId(minterAddress.toHexString(), project.projectId, purchaser),
-      "numPurchased",
-      numPurchased.toString()
-    );
+      // update mocks, event, and handle a second event
+      selloutPrice = ONE_ETH_IN_WEI.div(BigInt.fromI32(2));
+      event.parameters = [
+        new ethereum.EventParam(
+          "_projectId",
+          ethereum.Value.fromUnsignedBigInt(projectId)
+        ),
+        new ethereum.EventParam(
+          "_selloutPrice",
+          ethereum.Value.fromUnsignedBigInt(selloutPrice)
+        )
+      ];
+      createMockedFunction(
+        minterAddress,
+        "getProjectLatestPurchasePrice",
+        "getProjectLatestPurchasePrice(uint256):(uint256)"
+      )
+        .withArgs([ethereum.Value.fromUnsignedBigInt(projectId)])
+        .returns([ethereum.Value.fromUnsignedBigInt(selloutPrice)]);
+      // handle second refundable minter event
+      handleSelloutPriceUpdated(changetype<SelloutPriceUpdated>(event));
+
+      // assert refundable net price reflects the second event's value
+      assert.fieldEquals(
+        PROJECT_MINTER_CONFIGURATION_ENTITY_TYPE,
+        getProjectMinterConfigId(minterAddress.toHexString(), project.id),
+        "extraMinterDetails",
+        `{"refundableNetPrice":${selloutPrice.toString()}}`
+      );
+    });
   });
 });
 
