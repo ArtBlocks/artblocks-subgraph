@@ -1133,7 +1133,7 @@ export function handleArtistAndAdminRevenuesWithdrawn(
     ),
     new ethereum.EventParam(
       "_key",
-      ethereum.Value.fromBytes(Bytes.fromUTF8("refundableNetPrice"))
+      ethereum.Value.fromBytes(Bytes.fromUTF8("auctionRevenuesCollected"))
     ),
     new ethereum.EventParam("_value", ethereum.Value.fromBoolean(true))
   ];

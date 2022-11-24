@@ -2028,6 +2028,85 @@ describe("DAExpRefundMinters", () => {
       );
     });
   });
+
+  describe("ArtistAndAdminRevenuesWithdrawn handler", () => {
+    test("reflects updated state after artist and admin withdraw", () => {
+      clearStore();
+      const minter = addNewMinterToStore("MinterDAExpRefundV0");
+      const minterAddress: Address = changetype<Address>(
+        Address.fromHexString(minter.id)
+      );
+      const minterType = minter.type;
+
+      const projectId = BigInt.fromI32(0);
+      const project = addNewProjectToStore(
+        TEST_CONTRACT_ADDRESS,
+        projectId,
+        "project 0",
+        randomAddressGenerator.generateRandomAddress(),
+        BigInt.fromI32(0),
+        CURRENT_BLOCK_TIMESTAMP.minus(BigInt.fromI32(10))
+      );
+
+      const projectMinterConfig = new ProjectMinterConfiguration(
+        getProjectMinterConfigId(minterAddress.toHexString(), project.id)
+      );
+      projectMinterConfig.minter = minterAddress.toHexString();
+      projectMinterConfig.project = project.id;
+      projectMinterConfig.extraMinterDetails = "{}";
+      projectMinterConfig.startTime = CURRENT_BLOCK_TIMESTAMP.plus(
+        BigInt.fromI32(100)
+      );
+      projectMinterConfig.halfLifeSeconds = CURRENT_BLOCK_TIMESTAMP.plus(
+        BigInt.fromI32(300)
+      );
+      projectMinterConfig.startPrice = ONE_ETH_IN_WEI;
+      projectMinterConfig.basePrice = ONE_ETH_IN_WEI.div(BigInt.fromI32(10));
+      projectMinterConfig.priceIsConfigured = true;
+      projectMinterConfig.currencyAddress = Address.zero();
+      projectMinterConfig.currencySymbol = "ETH";
+      projectMinterConfig.purchaseToDisabled = false;
+      projectMinterConfig.save();
+
+      // define purchaser and net paid, qty purchased
+      const updatedLatestPurchasePrice = ONE_ETH_IN_WEI.div(BigInt.fromI32(2));
+      let numPurchased = BigInt.fromI32(1);
+
+      const event = newMockEvent();
+      event.address = minterAddress;
+      event.parameters = [
+        new ethereum.EventParam(
+          "_projectId",
+          ethereum.Value.fromUnsignedBigInt(projectId)
+        )
+      ];
+      event.block.timestamp = CURRENT_BLOCK_TIMESTAMP;
+
+      // mock the minter functions used in handler
+      // return latest purchase price of 100 wei
+      createMockedFunction(
+        minterAddress,
+        "getProjectLatestPurchasePrice",
+        "getProjectLatestPurchasePrice(uint256):(uint256)"
+      )
+        .withArgs([ethereum.Value.fromUnsignedBigInt(projectId)])
+        .returns([
+          ethereum.Value.fromUnsignedBigInt(updatedLatestPurchasePrice)
+        ]);
+
+      // handle refundable minter event
+      handleArtistAndAdminRevenuesWithdrawn(
+        changetype<ArtistAndAdminRevenuesWithdrawn>(event)
+      );
+
+      assert.fieldEquals(
+        PROJECT_MINTER_CONFIGURATION_ENTITY_TYPE,
+        getProjectMinterConfigId(minterAddress.toHexString(), project.id),
+        "extraMinterDetails",
+        `{"refundableNetPrice":${updatedLatestPurchasePrice.toString()},"auctionRevenuesCollected":${true}}`
+      );
+    });
+  });
 });
 
 describe("Generic minter details", () => {
