@@ -607,51 +607,39 @@ export function handleRegistrationNFTAddresses<T>(event: T): void {
   }
 }
 
-export function handleMerkleV3DelegationRegistryUpdated(
-  event: MinterMerkleV3DelegationRegistryUpdated
-): void {
-  let genericEvent: ConfigValueSetAddress;
-  genericEvent = changetype<ConfigValueSetAddress>(event);
-
-  genericEvent.parameters = [
-    // dummy value ("project ID: 0") because we're not passing in a project
-    new ethereum.EventParam("_projectId", ethereum.Value.fromI32(0)),
-    new ethereum.EventParam(
-      "_key",
-      ethereum.Value.fromBytes(Bytes.fromUTF8("delegationRegistryAddress"))
-    ),
-    new ethereum.EventParam(
-      "_value",
-      ethereum.Value.fromAddress(event.params.delegationRegistryAddress)
+export function handleDelegationRegistryUpdatedGeneric<T>(event: T): void {
+  if (
+    !(
+      event instanceof MinterMerkleV3DelegationRegistryUpdated ||
+      event instanceof MinterHolderV2DelegationRegistryUpdated
     )
-  ];
+  ) {
+    return;
+  }
 
   let minter = loadOrCreateMinter(event.address, event.block.timestamp);
 
-  handleSetValueGeneric(genericEvent, minter, null);
+  if (!minter) {
+    return;
+  }
+
+  handleSetMinterDetailsGeneric(
+    "delegationRegistryAddress",
+    event.params.delegationRegistryAddress,
+    minter
+  );
+  minter.updatedAt = event.block.timestamp;
+}
+
+export function handleMerkleV3DelegationRegistryUpdated(
+  event: MinterMerkleV3DelegationRegistryUpdated
+): void {
+  handleDelegationRegistryUpdatedGeneric(event);
 }
 export function handleHolderV2DelegationRegistryUpdated(
   event: MinterHolderV2DelegationRegistryUpdated
 ): void {
-  let genericEvent: ConfigValueSetAddress;
-  genericEvent = changetype<ConfigValueSetAddress>(event);
-
-  genericEvent.parameters = [
-    // dummy value ("project ID: 0") because we're not passing in a project
-    new ethereum.EventParam("_projectId", ethereum.Value.fromI32(0)),
-    new ethereum.EventParam(
-      "_key",
-      ethereum.Value.fromBytes(Bytes.fromUTF8("delegationRegistryAddress"))
-    ),
-    new ethereum.EventParam(
-      "_value",
-      ethereum.Value.fromAddress(event.params.delegationRegistryAddress)
-    )
-  ];
-
-  let minter = loadOrCreateMinter(event.address, event.block.timestamp);
-
-  handleSetValueGeneric(genericEvent, minter, null);
+  handleDelegationRegistryUpdatedGeneric(event);
 }
 
 export function handleRegisteredNFTAddressV0(
@@ -692,54 +680,30 @@ export function handleUnregisteredNFTAddressV2(
 // Because AssemblyScript does not support union types, we need to manually type check inside each method, to ensure correct usage.
 // For any questions reach out to @jon or @ryley-o.eth. or see the following document https://docs.google.com/document/d/1XSxl04eJyTxc_rbj6cmq-j00zaYDzApBBLT67JXtaOw/edit?disco=AAAAZa8xp-Q
 
-export function handleSetValueGeneric<T, C>(
-  event: T,
-  config: C,
-  project: Project | null
+export function handleSetMinterDetailsGeneric<T, C>(
+  key: string,
+  value: T,
+  config: C
 ): void {
-  if (
-    !(
-      event instanceof ConfigValueSetBool ||
-      event instanceof ConfigValueSetBigInt ||
-      event instanceof ConfigValueSetAddress ||
-      event instanceof ConfigValueSetBytes
-    )
-  ) {
-    return;
-  }
-
-  if (
-    !(config instanceof ProjectMinterConfiguration || config instanceof Minter)
-  ) {
-    return;
-  }
-
-  if (project) {
-    project.updatedAt = event.block.timestamp;
-  }
-
   let minterDetails = getMinterDetails(config);
-  let jsonKey = event.params._key.toString();
+  let jsonKey = key;
   let jsonValue: JSONValue;
 
-  if (event instanceof ConfigValueSetBool) {
-    jsonValue = json.fromString(booleanToString(event.params._value));
-  } else if (event instanceof ConfigValueSetBigInt) {
-    jsonValue = json.fromString(event.params._value.toString());
-  } else if (event instanceof ConfigValueSetAddress) {
-    jsonValue = stringToJSONValue(event.params._value.toHexString());
-  } else if (event instanceof ConfigValueSetBytes) {
-    jsonValue = bytesToJSONValue(event.params._value);
+  if (isBoolean(value)) {
+    jsonValue = json.fromString(booleanToString(value));
+  } else if (value instanceof BigInt) {
+    jsonValue = json.fromString(value.toString());
+  } else if (value instanceof Address) {
+    jsonValue = stringToJSONValue(value.toHexString());
+  } else if (value instanceof Bytes) {
+    jsonValue = bytesToJSONValue(value);
+  } else {
+    return;
   }
 
   minterDetails.set(jsonKey, jsonValue);
-
   config.extraMinterDetails = typedMapToJSONString(minterDetails);
-
   config.save();
-  if (project) {
-    project.save();
-  }
 }
 
 export function handleSetValueProjectConfig<T>(event: T): void {
@@ -759,11 +723,24 @@ export function handleSetValueProjectConfig<T>(event: T): void {
     event.block.timestamp
   );
   if (minterProjectAndConfig) {
-    handleSetValueGeneric(
-      event,
-      minterProjectAndConfig.projectMinterConfiguration,
-      minterProjectAndConfig.project
+    const config = minterProjectAndConfig.projectMinterConfiguration;
+    if (
+      !(
+        config instanceof Minter || config instanceof ProjectMinterConfiguration
+      )
+    ) {
+      return;
+    }
+
+    handleSetMinterDetailsGeneric(
+      event.params._key.toString(),
+      event.params._value,
+      config
     );
+
+    if (minterProjectAndConfig.project) {
+      minterProjectAndConfig.project.updatedAt = event.block.timestamp;
+    }
   }
 }
 export function handleSetBooleanValueProjectConfig(
