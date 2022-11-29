@@ -2052,13 +2052,13 @@ export class Receipt extends Entity {
     this.set("account", Value.fromString(value));
   }
 
-  get netPaid(): BigInt {
-    let value = this.get("netPaid");
+  get netPosted(): BigInt {
+    let value = this.get("netPosted");
     return value!.toBigInt();
   }
 
-  set netPaid(value: BigInt) {
-    this.set("netPaid", Value.fromBigInt(value));
+  set netPosted(value: BigInt) {
+    this.set("netPosted", Value.fromBigInt(value));
   }
 
   get numPurchased(): BigInt {
