@@ -28,7 +28,7 @@ generated/*
 !generated/MinterSetPriceERC20V1
 !generated/MinterSetPriceV1
 !generated/MinterDAExpV2
-!generated/MinterDAExpRefundV0
+!generated/MinterDAExpSettlementV0
 !generated/MinterDALinV2
 !generated/MinterSetPriceERC20V2
 !generated/MinterSetPriceV2

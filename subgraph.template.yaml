@@ -1201,13 +1201,13 @@ dataSources:
           handler: handleDAExpSetAuctionDetailsV2
       file: ./src/minter-suite-mapping.ts
   {{/minterDAExpV2Contracts}}
-  {{#minterDAExpRefundV0Contracts}}
+  {{#minterDAExpSettlementV0Contracts}}
   - kind: ethereum/contract
-    name: 'MinterDAExpRefundV0-{{address}}'
+    name: 'MinterDAExpSettlementV0-{{address}}'
     network: {{network}}
     source:
       address: '{{address}}'
-      abi: MinterDAExpRefundV0
+      abi: MinterDAExpSettlementV0
       startBlock: {{startBlock}}
     mapping:
       kind: ethereum/events
@@ -1221,14 +1221,14 @@ dataSources:
         - ProjectMinterConfiguration
         - Receipt
       abis:
-        - name: MinterDAExpRefundV0
-          file: ./abis/MinterDAExpRefundV0.json
+        - name: MinterDAExpSettlementV0
+          file: ./abis/MinterDAExpSettlementV0.json
         - name: IFilteredMinterV0
           file: ./abis/IFilteredMinterV0.json
         - name: IFilteredMinterV1
           file: ./abis/IFilteredMinterV1.json
-        - name: IFilteredMinterDAExpRefundV0
-          file: ./abis/IFilteredMinterDAExpRefundV0.json
+        - name: IFilteredMinterDAExpSettlementV0
+          file: ./abis/IFilteredMinterDAExpSettlementV0.json
       eventHandlers:
         - event: PricePerTokenInWeiUpdated(indexed uint256,indexed uint256)
           handler: handlePricePerTokenInWeiUpdated
@@ -1247,7 +1247,7 @@ dataSources:
         - event: ArtistAndAdminRevenuesWithdrawn(indexed uint256)
           handler: handleArtistAndAdminRevenuesWithdrawn
       file: ./src/minter-suite-mapping.ts
-  {{/minterDAExpRefundV0Contracts}}
+  {{/minterDAExpSettlementV0Contracts}}
   {{#minterHolderV1Contracts}}
   - kind: ethereum/contract
     name: 'MinterHolderV1-{{address}}'

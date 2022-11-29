@@ -423,7 +423,7 @@ export class ReceiptUpdated__Params {
     return this._event.parameters[1].value.toBigInt();
   }
 
-  get _netPaid(): BigInt {
+  get _netPosted(): BigInt {
     return this._event.parameters[2].value.toBigInt();
   }
 
@@ -514,7 +514,7 @@ export class SetAuctionDetails__Params {
   }
 }
 
-export class MinterDAExpRefundV0__getPriceInfoResult {
+export class MinterDAExpSettlementV0__getPriceInfoResult {
   value0: boolean;
   value1: BigInt;
   value2: string;
@@ -558,7 +558,7 @@ export class MinterDAExpRefundV0__getPriceInfoResult {
   }
 }
 
-export class MinterDAExpRefundV0__projectAuctionParametersResult {
+export class MinterDAExpSettlementV0__projectAuctionParametersResult {
   value0: BigInt;
   value1: BigInt;
   value2: BigInt;
@@ -597,7 +597,7 @@ export class MinterDAExpRefundV0__projectAuctionParametersResult {
   }
 }
 
-export class MinterDAExpRefundV0__projectConfigResult {
+export class MinterDAExpSettlementV0__projectConfigResult {
   value0: boolean;
   value1: boolean;
   value2: i32;
@@ -651,7 +651,7 @@ export class MinterDAExpRefundV0__projectConfigResult {
     return this.value1;
   }
 
-  getNumRefundableInvocations(): i32 {
+  getNumSettleableInvocations(): i32 {
     return this.value2;
   }
 
@@ -676,9 +676,9 @@ export class MinterDAExpRefundV0__projectConfigResult {
   }
 }
 
-export class MinterDAExpRefundV0 extends ethereum.SmartContract {
-  static bind(address: Address): MinterDAExpRefundV0 {
-    return new MinterDAExpRefundV0("MinterDAExpRefundV0", address);
+export class MinterDAExpSettlementV0 extends ethereum.SmartContract {
+  static bind(address: Address): MinterDAExpSettlementV0 {
+    return new MinterDAExpSettlementV0("MinterDAExpSettlementV0", address);
   }
 
   genArt721CoreAddress(): Address {
@@ -704,22 +704,22 @@ export class MinterDAExpRefundV0 extends ethereum.SmartContract {
     return ethereum.CallResult.fromValue(value[0].toAddress());
   }
 
-  getNumRefundableInvocations(_projectId: BigInt): BigInt {
+  getNumSettleableInvocations(_projectId: BigInt): BigInt {
     let result = super.call(
-      "getNumRefundableInvocations",
-      "getNumRefundableInvocations(uint256):(uint256)",
+      "getNumSettleableInvocations",
+      "getNumSettleableInvocations(uint256):(uint256)",
       [ethereum.Value.fromUnsignedBigInt(_projectId)]
     );
 
     return result[0].toBigInt();
   }
 
-  try_getNumRefundableInvocations(
+  try_getNumSettleableInvocations(
     _projectId: BigInt
   ): ethereum.CallResult<BigInt> {
     let result = super.tryCall(
-      "getNumRefundableInvocations",
-      "getNumRefundableInvocations(uint256):(uint256)",
+      "getNumSettleableInvocations",
+      "getNumSettleableInvocations(uint256):(uint256)",
       [ethereum.Value.fromUnsignedBigInt(_projectId)]
     );
     if (result.reverted) {
@@ -729,14 +729,16 @@ export class MinterDAExpRefundV0 extends ethereum.SmartContract {
     return ethereum.CallResult.fromValue(value[0].toBigInt());
   }
 
-  getPriceInfo(_projectId: BigInt): MinterDAExpRefundV0__getPriceInfoResult {
+  getPriceInfo(
+    _projectId: BigInt
+  ): MinterDAExpSettlementV0__getPriceInfoResult {
     let result = super.call(
       "getPriceInfo",
       "getPriceInfo(uint256):(bool,uint256,string,address)",
       [ethereum.Value.fromUnsignedBigInt(_projectId)]
     );
 
-    return new MinterDAExpRefundV0__getPriceInfoResult(
+    return new MinterDAExpSettlementV0__getPriceInfoResult(
       result[0].toBoolean(),
       result[1].toBigInt(),
       result[2].toString(),
@@ -746,7 +748,7 @@ export class MinterDAExpRefundV0 extends ethereum.SmartContract {
 
   try_getPriceInfo(
     _projectId: BigInt
-  ): ethereum.CallResult<MinterDAExpRefundV0__getPriceInfoResult> {
+  ): ethereum.CallResult<MinterDAExpSettlementV0__getPriceInfoResult> {
     let result = super.tryCall(
       "getPriceInfo",
       "getPriceInfo(uint256):(bool,uint256,string,address)",
@@ -757,7 +759,7 @@ export class MinterDAExpRefundV0 extends ethereum.SmartContract {
     }
     let value = result.value;
     return ethereum.CallResult.fromValue(
-      new MinterDAExpRefundV0__getPriceInfoResult(
+      new MinterDAExpSettlementV0__getPriceInfoResult(
         value[0].toBoolean(),
         value[1].toBigInt(),
         value[2].toString(),
@@ -877,14 +879,14 @@ export class MinterDAExpRefundV0 extends ethereum.SmartContract {
 
   projectAuctionParameters(
     _projectId: BigInt
-  ): MinterDAExpRefundV0__projectAuctionParametersResult {
+  ): MinterDAExpSettlementV0__projectAuctionParametersResult {
     let result = super.call(
       "projectAuctionParameters",
       "projectAuctionParameters(uint256):(uint256,uint256,uint256,uint256)",
       [ethereum.Value.fromUnsignedBigInt(_projectId)]
     );
 
-    return new MinterDAExpRefundV0__projectAuctionParametersResult(
+    return new MinterDAExpSettlementV0__projectAuctionParametersResult(
       result[0].toBigInt(),
       result[1].toBigInt(),
       result[2].toBigInt(),
@@ -894,7 +896,9 @@ export class MinterDAExpRefundV0 extends ethereum.SmartContract {
 
   try_projectAuctionParameters(
     _projectId: BigInt
-  ): ethereum.CallResult<MinterDAExpRefundV0__projectAuctionParametersResult> {
+  ): ethereum.CallResult<
+    MinterDAExpSettlementV0__projectAuctionParametersResult
+  > {
     let result = super.tryCall(
       "projectAuctionParameters",
       "projectAuctionParameters(uint256):(uint256,uint256,uint256,uint256)",
@@ -905,7 +909,7 @@ export class MinterDAExpRefundV0 extends ethereum.SmartContract {
     }
     let value = result.value;
     return ethereum.CallResult.fromValue(
-      new MinterDAExpRefundV0__projectAuctionParametersResult(
+      new MinterDAExpSettlementV0__projectAuctionParametersResult(
         value[0].toBigInt(),
         value[1].toBigInt(),
         value[2].toBigInt(),
@@ -914,14 +918,14 @@ export class MinterDAExpRefundV0 extends ethereum.SmartContract {
     );
   }
 
-  projectConfig(param0: BigInt): MinterDAExpRefundV0__projectConfigResult {
+  projectConfig(param0: BigInt): MinterDAExpSettlementV0__projectConfigResult {
     let result = super.call(
       "projectConfig",
       "projectConfig(uint256):(bool,bool,uint24,uint64,uint64,uint256,uint256,uint256)",
       [ethereum.Value.fromUnsignedBigInt(param0)]
     );
 
-    return new MinterDAExpRefundV0__projectConfigResult(
+    return new MinterDAExpSettlementV0__projectConfigResult(
       result[0].toBoolean(),
       result[1].toBoolean(),
       result[2].toI32(),
@@ -935,7 +939,7 @@ export class MinterDAExpRefundV0 extends ethereum.SmartContract {
 
   try_projectConfig(
     param0: BigInt
-  ): ethereum.CallResult<MinterDAExpRefundV0__projectConfigResult> {
+  ): ethereum.CallResult<MinterDAExpSettlementV0__projectConfigResult> {
     let result = super.tryCall(
       "projectConfig",
       "projectConfig(uint256):(bool,bool,uint24,uint64,uint64,uint256,uint256,uint256)",
@@ -946,7 +950,7 @@ export class MinterDAExpRefundV0 extends ethereum.SmartContract {
     }
     let value = result.value;
     return ethereum.CallResult.fromValue(
-      new MinterDAExpRefundV0__projectConfigResult(
+      new MinterDAExpSettlementV0__projectConfigResult(
         value[0].toBoolean(),
         value[1].toBoolean(),
         value[2].toI32(),
@@ -1049,134 +1053,6 @@ export class AdminEmergencyReduceSelloutPriceCall__Outputs {
   _call: AdminEmergencyReduceSelloutPriceCall;
 
   constructor(call: AdminEmergencyReduceSelloutPriceCall) {
-    this._call = call;
-  }
-}
-
-export class ClaimRefundCall extends ethereum.Call {
-  get inputs(): ClaimRefundCall__Inputs {
-    return new ClaimRefundCall__Inputs(this);
-  }
-
-  get outputs(): ClaimRefundCall__Outputs {
-    return new ClaimRefundCall__Outputs(this);
-  }
-}
-
-export class ClaimRefundCall__Inputs {
-  _call: ClaimRefundCall;
-
-  constructor(call: ClaimRefundCall) {
-    this._call = call;
-  }
-
-  get _projectId(): BigInt {
-    return this._call.inputValues[0].value.toBigInt();
-  }
-}
-
-export class ClaimRefundCall__Outputs {
-  _call: ClaimRefundCall;
-
-  constructor(call: ClaimRefundCall) {
-    this._call = call;
-  }
-}
-
-export class ClaimRefundToCall extends ethereum.Call {
-  get inputs(): ClaimRefundToCall__Inputs {
-    return new ClaimRefundToCall__Inputs(this);
-  }
-
-  get outputs(): ClaimRefundToCall__Outputs {
-    return new ClaimRefundToCall__Outputs(this);
-  }
-}
-
-export class ClaimRefundToCall__Inputs {
-  _call: ClaimRefundToCall;
-
-  constructor(call: ClaimRefundToCall) {
-    this._call = call;
-  }
-
-  get _to(): Address {
-    return this._call.inputValues[0].value.toAddress();
-  }
-
-  get _projectId(): BigInt {
-    return this._call.inputValues[1].value.toBigInt();
-  }
-}
-
-export class ClaimRefundToCall__Outputs {
-  _call: ClaimRefundToCall;
-
-  constructor(call: ClaimRefundToCall) {
-    this._call = call;
-  }
-}
-
-export class ClaimRefundsCall extends ethereum.Call {
-  get inputs(): ClaimRefundsCall__Inputs {
-    return new ClaimRefundsCall__Inputs(this);
-  }
-
-  get outputs(): ClaimRefundsCall__Outputs {
-    return new ClaimRefundsCall__Outputs(this);
-  }
-}
-
-export class ClaimRefundsCall__Inputs {
-  _call: ClaimRefundsCall;
-
-  constructor(call: ClaimRefundsCall) {
-    this._call = call;
-  }
-
-  get _projectIds(): Array<BigInt> {
-    return this._call.inputValues[0].value.toBigIntArray();
-  }
-}
-
-export class ClaimRefundsCall__Outputs {
-  _call: ClaimRefundsCall;
-
-  constructor(call: ClaimRefundsCall) {
-    this._call = call;
-  }
-}
-
-export class ClaimRefundsToCall extends ethereum.Call {
-  get inputs(): ClaimRefundsToCall__Inputs {
-    return new ClaimRefundsToCall__Inputs(this);
-  }
-
-  get outputs(): ClaimRefundsToCall__Outputs {
-    return new ClaimRefundsToCall__Outputs(this);
-  }
-}
-
-export class ClaimRefundsToCall__Inputs {
-  _call: ClaimRefundsToCall;
-
-  constructor(call: ClaimRefundsToCall) {
-    this._call = call;
-  }
-
-  get _to(): Address {
-    return this._call.inputValues[0].value.toAddress();
-  }
-
-  get _projectIds(): Array<BigInt> {
-    return this._call.inputValues[1].value.toBigIntArray();
-  }
-}
-
-export class ClaimRefundsToCall__Outputs {
-  _call: ClaimRefundsToCall;
-
-  constructor(call: ClaimRefundsToCall) {
     this._call = call;
   }
 }
@@ -1322,6 +1198,134 @@ export class Purchase_H4MCall__Outputs {
 
   get tokenId(): BigInt {
     return this._call.outputValues[0].value.toBigInt();
+  }
+}
+
+export class ReclaimProjectExcessSettlementFundsCall extends ethereum.Call {
+  get inputs(): ReclaimProjectExcessSettlementFundsCall__Inputs {
+    return new ReclaimProjectExcessSettlementFundsCall__Inputs(this);
+  }
+
+  get outputs(): ReclaimProjectExcessSettlementFundsCall__Outputs {
+    return new ReclaimProjectExcessSettlementFundsCall__Outputs(this);
+  }
+}
+
+export class ReclaimProjectExcessSettlementFundsCall__Inputs {
+  _call: ReclaimProjectExcessSettlementFundsCall;
+
+  constructor(call: ReclaimProjectExcessSettlementFundsCall) {
+    this._call = call;
+  }
+
+  get _projectId(): BigInt {
+    return this._call.inputValues[0].value.toBigInt();
+  }
+}
+
+export class ReclaimProjectExcessSettlementFundsCall__Outputs {
+  _call: ReclaimProjectExcessSettlementFundsCall;
+
+  constructor(call: ReclaimProjectExcessSettlementFundsCall) {
+    this._call = call;
+  }
+}
+
+export class ReclaimProjectExcessSettlementFundsToCall extends ethereum.Call {
+  get inputs(): ReclaimProjectExcessSettlementFundsToCall__Inputs {
+    return new ReclaimProjectExcessSettlementFundsToCall__Inputs(this);
+  }
+
+  get outputs(): ReclaimProjectExcessSettlementFundsToCall__Outputs {
+    return new ReclaimProjectExcessSettlementFundsToCall__Outputs(this);
+  }
+}
+
+export class ReclaimProjectExcessSettlementFundsToCall__Inputs {
+  _call: ReclaimProjectExcessSettlementFundsToCall;
+
+  constructor(call: ReclaimProjectExcessSettlementFundsToCall) {
+    this._call = call;
+  }
+
+  get _to(): Address {
+    return this._call.inputValues[0].value.toAddress();
+  }
+
+  get _projectId(): BigInt {
+    return this._call.inputValues[1].value.toBigInt();
+  }
+}
+
+export class ReclaimProjectExcessSettlementFundsToCall__Outputs {
+  _call: ReclaimProjectExcessSettlementFundsToCall;
+
+  constructor(call: ReclaimProjectExcessSettlementFundsToCall) {
+    this._call = call;
+  }
+}
+
+export class ReclaimProjectsExcessSettlementFundsCall extends ethereum.Call {
+  get inputs(): ReclaimProjectsExcessSettlementFundsCall__Inputs {
+    return new ReclaimProjectsExcessSettlementFundsCall__Inputs(this);
+  }
+
+  get outputs(): ReclaimProjectsExcessSettlementFundsCall__Outputs {
+    return new ReclaimProjectsExcessSettlementFundsCall__Outputs(this);
+  }
+}
+
+export class ReclaimProjectsExcessSettlementFundsCall__Inputs {
+  _call: ReclaimProjectsExcessSettlementFundsCall;
+
+  constructor(call: ReclaimProjectsExcessSettlementFundsCall) {
+    this._call = call;
+  }
+
+  get _projectIds(): Array<BigInt> {
+    return this._call.inputValues[0].value.toBigIntArray();
+  }
+}
+
+export class ReclaimProjectsExcessSettlementFundsCall__Outputs {
+  _call: ReclaimProjectsExcessSettlementFundsCall;
+
+  constructor(call: ReclaimProjectsExcessSettlementFundsCall) {
+    this._call = call;
+  }
+}
+
+export class ReclaimProjectsExcessSettlementFundsToCall extends ethereum.Call {
+  get inputs(): ReclaimProjectsExcessSettlementFundsToCall__Inputs {
+    return new ReclaimProjectsExcessSettlementFundsToCall__Inputs(this);
+  }
+
+  get outputs(): ReclaimProjectsExcessSettlementFundsToCall__Outputs {
+    return new ReclaimProjectsExcessSettlementFundsToCall__Outputs(this);
+  }
+}
+
+export class ReclaimProjectsExcessSettlementFundsToCall__Inputs {
+  _call: ReclaimProjectsExcessSettlementFundsToCall;
+
+  constructor(call: ReclaimProjectsExcessSettlementFundsToCall) {
+    this._call = call;
+  }
+
+  get _to(): Address {
+    return this._call.inputValues[0].value.toAddress();
+  }
+
+  get _projectIds(): Array<BigInt> {
+    return this._call.inputValues[1].value.toBigIntArray();
+  }
+}
+
+export class ReclaimProjectsExcessSettlementFundsToCall__Outputs {
+  _call: ReclaimProjectsExcessSettlementFundsToCall;
+
+  constructor(call: ReclaimProjectsExcessSettlementFundsToCall) {
+    this._call = call;
   }
 }
 

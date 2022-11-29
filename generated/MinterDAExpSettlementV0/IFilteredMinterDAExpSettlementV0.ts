@@ -423,7 +423,7 @@ export class ReceiptUpdated__Params {
     return this._event.parameters[1].value.toBigInt();
   }
 
-  get _netPaid(): BigInt {
+  get _netPosted(): BigInt {
     return this._event.parameters[2].value.toBigInt();
   }
 
@@ -514,7 +514,7 @@ export class SetAuctionDetails__Params {
   }
 }
 
-export class IFilteredMinterDAExpRefundV0__getPriceInfoResult {
+export class IFilteredMinterDAExpSettlementV0__getPriceInfoResult {
   value0: boolean;
   value1: BigInt;
   value2: string;
@@ -558,10 +558,10 @@ export class IFilteredMinterDAExpRefundV0__getPriceInfoResult {
   }
 }
 
-export class IFilteredMinterDAExpRefundV0 extends ethereum.SmartContract {
-  static bind(address: Address): IFilteredMinterDAExpRefundV0 {
-    return new IFilteredMinterDAExpRefundV0(
-      "IFilteredMinterDAExpRefundV0",
+export class IFilteredMinterDAExpSettlementV0 extends ethereum.SmartContract {
+  static bind(address: Address): IFilteredMinterDAExpSettlementV0 {
+    return new IFilteredMinterDAExpSettlementV0(
+      "IFilteredMinterDAExpSettlementV0",
       address
     );
   }
@@ -589,22 +589,22 @@ export class IFilteredMinterDAExpRefundV0 extends ethereum.SmartContract {
     return ethereum.CallResult.fromValue(value[0].toAddress());
   }
 
-  getNumRefundableInvocations(_projectId: BigInt): BigInt {
+  getNumSettleableInvocations(_projectId: BigInt): BigInt {
     let result = super.call(
-      "getNumRefundableInvocations",
-      "getNumRefundableInvocations(uint256):(uint256)",
+      "getNumSettleableInvocations",
+      "getNumSettleableInvocations(uint256):(uint256)",
       [ethereum.Value.fromUnsignedBigInt(_projectId)]
     );
 
     return result[0].toBigInt();
   }
 
-  try_getNumRefundableInvocations(
+  try_getNumSettleableInvocations(
     _projectId: BigInt
   ): ethereum.CallResult<BigInt> {
     let result = super.tryCall(
-      "getNumRefundableInvocations",
-      "getNumRefundableInvocations(uint256):(uint256)",
+      "getNumSettleableInvocations",
+      "getNumSettleableInvocations(uint256):(uint256)",
       [ethereum.Value.fromUnsignedBigInt(_projectId)]
     );
     if (result.reverted) {
@@ -616,14 +616,14 @@ export class IFilteredMinterDAExpRefundV0 extends ethereum.SmartContract {
 
   getPriceInfo(
     _projectId: BigInt
-  ): IFilteredMinterDAExpRefundV0__getPriceInfoResult {
+  ): IFilteredMinterDAExpSettlementV0__getPriceInfoResult {
     let result = super.call(
       "getPriceInfo",
       "getPriceInfo(uint256):(bool,uint256,string,address)",
       [ethereum.Value.fromUnsignedBigInt(_projectId)]
     );
 
-    return new IFilteredMinterDAExpRefundV0__getPriceInfoResult(
+    return new IFilteredMinterDAExpSettlementV0__getPriceInfoResult(
       result[0].toBoolean(),
       result[1].toBigInt(),
       result[2].toString(),
@@ -633,7 +633,7 @@ export class IFilteredMinterDAExpRefundV0 extends ethereum.SmartContract {
 
   try_getPriceInfo(
     _projectId: BigInt
-  ): ethereum.CallResult<IFilteredMinterDAExpRefundV0__getPriceInfoResult> {
+  ): ethereum.CallResult<IFilteredMinterDAExpSettlementV0__getPriceInfoResult> {
     let result = super.tryCall(
       "getPriceInfo",
       "getPriceInfo(uint256):(bool,uint256,string,address)",
@@ -644,7 +644,7 @@ export class IFilteredMinterDAExpRefundV0 extends ethereum.SmartContract {
     }
     let value = result.value;
     return ethereum.CallResult.fromValue(
-      new IFilteredMinterDAExpRefundV0__getPriceInfoResult(
+      new IFilteredMinterDAExpSettlementV0__getPriceInfoResult(
         value[0].toBoolean(),
         value[1].toBigInt(),
         value[2].toString(),

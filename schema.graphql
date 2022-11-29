@@ -120,7 +120,7 @@ type Project @entity {
   "Accounts that own tokens of the project"
   owners: [AccountProject!] @derivedFrom(field: "project")
 
-  "Receipts for this project, only on minters with refunds"
+  "Receipts for this project, only on minters with settlement"
   receipts: [Receipt!] @derivedFrom(field: "project")
 
   createdAt: BigInt!
@@ -253,7 +253,7 @@ type Account @entity {
   "Projects the account is listed as artist for"
   projectsCreated: [Project!] @derivedFrom(field: "artist")
 
-  "Receipts for the account, on minters with refunds"
+  "Receipts for the account, on minters with settlement"
   receipts: [Receipt!] @derivedFrom(field: "account")
 
   "Contracts the account is whitelisted on"
@@ -339,7 +339,7 @@ enum MinterType {
   MinterHolderV1
   MinterMerkleV1
   MinterMerkleV2
-  MinterDAExpRefundV0
+  MinterDAExpSettlementV0
 }
 
 type Minter @entity {
@@ -366,7 +366,7 @@ type Minter @entity {
 
   coreContract: Contract!
 
-  "Receipts for this minter, only for minters with refunds"
+  "Receipts for this minter, only for minters with settlement"
   receipts: [Receipt!] @derivedFrom(field: "minter")
 
   updatedAt: BigInt!
@@ -426,8 +426,8 @@ type Receipt @entity {
   "The associated account"
   account: Account!
 
-  "The total net amount paid for tokens"
-  netPaid: BigInt!
+  "The total net amount posted (sent to settlement contract) for tokens"
+  netPosted: BigInt!
 
   "The total quantity of tokens purchased on the project"
   numPurchased: BigInt!

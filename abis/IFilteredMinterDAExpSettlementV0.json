@@ -1,7 +1,7 @@
 {
   "_format": "hh-sol-artifact-1",
-  "contractName": "IFilteredMinterDAExpRefundV0",
-  "sourceName": "contracts/interfaces/0.8.x/IFilteredMinterDAExpRefundV0.sol",
+  "contractName": "IFilteredMinterDAExpSettlementV0",
+  "sourceName": "contracts/interfaces/0.8.x/IFilteredMinterDAExpSettlementV0.sol",
   "abi": [
     {
       "anonymous": false,
@@ -385,7 +385,7 @@
         {
           "indexed": false,
           "internalType": "uint256",
-          "name": "_netPaid",
+          "name": "_netPosted",
           "type": "uint256"
         },
         {
@@ -500,11 +500,11 @@
           "type": "uint256"
         }
       ],
-      "name": "getNumRefundableInvocations",
+      "name": "getNumSettleableInvocations",
       "outputs": [
         {
           "internalType": "uint256",
-          "name": "numRefundableInvocations",
+          "name": "numSettleableInvocations",
           "type": "uint256"
         }
       ],
