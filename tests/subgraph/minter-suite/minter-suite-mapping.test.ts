@@ -92,8 +92,8 @@ import {
   RegisteredNFTAddress as HolderV2RegisteredNFTAddress,
   UnregisteredNFTAddress as HolderV2UnregisteredNFTAddress
 } from "../../../generated/MinterHolderV2/MinterHolderV2";
-import { DelegationRegistryUpdated as MinterHolderV2DelegationRegistryUpdated } from "../../../generated/MinterHolderV2/IFilteredMinterHolderV1";
-import { DelegationRegistryUpdated as MinterMerkleV3DelegationRegistryUpdated } from "../../../generated/MinterMerkleV3/IFilteredMinterMerkleV1";
+import { DelegationRegistryUpdated as MinterHolderDelegationRegistryUpdated } from "../../../generated/MinterHolderV2/IFilteredMinterHolderV1";
+import { DelegationRegistryUpdated as MinterMerkleDelegationRegistryUpdated } from "../../../generated/MinterMerkleV3/IFilteredMinterMerkleV1";
 // import handlers from minter-suite-mapping
 import {
   handleAddManyAddressValueProjectConfig as handleAddManyAddressValue,
@@ -111,8 +111,8 @@ import {
   handleUnregisteredNFTAddressV0,
   handleUnregisteredNFTAddressV1,
   handleUnregisteredNFTAddressV2,
-  handleMerkleV3DelegationRegistryUpdated,
-  handleHolderV2DelegationRegistryUpdated,
+  handleMerkleDelegationRegistryUpdated,
+  handleHolderDelegationRegistryUpdated,
   handleAuctionHalfLifeRangeSecondsUpdatedV0,
   handleAuctionHalfLifeRangeSecondsUpdatedV1,
   handleAuctionHalfLifeRangeSecondsUpdatedV2,
@@ -2468,7 +2468,7 @@ describe("MinterHolder-specific tests", () => {
     }
   });
 
-  test("handleMerkleV3DelegationRegistryUpdated adds the delegationRegistry address to extraMinterDetails", () => {
+  test("handleMerkleDelegationRegistryUpdated adds the delegationRegistry address to extraMinterDetails", () => {
     // mock, pass event to handler, etc
     clearStore();
     const minter = addNewMinterToStore("MinterMerkleV3");
@@ -2479,8 +2479,8 @@ describe("MinterHolder-specific tests", () => {
 
     const testAddy = randomAddressGenerator.generateRandomAddress();
 
-    const event: MinterMerkleV3DelegationRegistryUpdated = changetype<
-      MinterMerkleV3DelegationRegistryUpdated
+    const event: MinterMerkleDelegationRegistryUpdated = changetype<
+      MinterMerkleDelegationRegistryUpdated
     >(newMockEvent());
     event.address = minterAddress;
     event.parameters = [
@@ -2497,8 +2497,8 @@ describe("MinterHolder-specific tests", () => {
 
     event.block.timestamp = CURRENT_BLOCK_TIMESTAMP;
 
-    handleMerkleV3DelegationRegistryUpdated(
-      changetype<MinterMerkleV3DelegationRegistryUpdated>(event)
+    handleMerkleDelegationRegistryUpdated(
+      changetype<MinterMerkleDelegationRegistryUpdated>(event)
     );
 
     assert.fieldEquals(
@@ -2509,7 +2509,7 @@ describe("MinterHolder-specific tests", () => {
     );
   });
 
-  test("handleHolderV2DelegationRegistryUpdated adds the delegationRegistry address to extraMinterDetails", () => {
+  test("handleHolderDelegationRegistryUpdated adds the delegationRegistry address to extraMinterDetails", () => {
     // mock, pass event to handler, etc
     clearStore();
     const minter = addNewMinterToStore("MinterHolderV2");
@@ -2520,8 +2520,8 @@ describe("MinterHolder-specific tests", () => {
 
     const testAddy = randomAddressGenerator.generateRandomAddress();
 
-    const event: MinterHolderV2DelegationRegistryUpdated = changetype<
-      MinterHolderV2DelegationRegistryUpdated
+    const event: MinterHolderDelegationRegistryUpdated = changetype<
+      MinterHolderDelegationRegistryUpdated
     >(newMockEvent());
     event.address = minterAddress;
     event.parameters = [
@@ -2538,8 +2538,8 @@ describe("MinterHolder-specific tests", () => {
 
     event.block.timestamp = CURRENT_BLOCK_TIMESTAMP;
 
-    handleHolderV2DelegationRegistryUpdated(
-      changetype<MinterHolderV2DelegationRegistryUpdated>(event)
+    handleHolderDelegationRegistryUpdated(
+      changetype<MinterHolderDelegationRegistryUpdated>(event)
     );
 
     assert.fieldEquals(

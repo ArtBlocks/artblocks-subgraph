@@ -8,7 +8,8 @@ import {
   json,
   JSONValue,
   JSONValueKind,
-  TypedMap
+  TypedMap,
+  log
 } from "@graphprotocol/graph-ts";
 
 import {
@@ -101,8 +102,8 @@ import {
   UnregisteredNFTAddress as MinterHolderV2UnregisteredNFTAddress,
   RemovedHoldersOfProjects as MinterHolderV2RemovedHoldersOfProjects
 } from "../generated/MinterHolderV2/MinterHolderV2";
-import { DelegationRegistryUpdated as MinterHolderV2DelegationRegistryUpdated } from "../generated/MinterHolderV2/IFilteredMinterHolderV1";
-import { DelegationRegistryUpdated as MinterMerkleV3DelegationRegistryUpdated } from "../generated/MinterMerkleV3/IFilteredMinterMerkleV1";
+import { DelegationRegistryUpdated as MinterHolderDelegationRegistryUpdated } from "../generated/MinterHolderV2/IFilteredMinterHolderV1";
+import { DelegationRegistryUpdated as MinterMerkleDelegationRegistryUpdated } from "../generated/MinterMerkleV3/IFilteredMinterMerkleV1";
 import { MinterConfigSetAddressEvent } from "./util-types";
 
 // IFilteredMinterV0 events
@@ -610,8 +611,8 @@ export function handleRegistrationNFTAddresses<T>(event: T): void {
 export function handleDelegationRegistryUpdatedGeneric<T>(event: T): void {
   if (
     !(
-      event instanceof MinterMerkleV3DelegationRegistryUpdated ||
-      event instanceof MinterHolderV2DelegationRegistryUpdated
+      event instanceof MinterMerkleDelegationRegistryUpdated ||
+      event instanceof MinterHolderDelegationRegistryUpdated
     )
   ) {
     return;
@@ -631,13 +632,13 @@ export function handleDelegationRegistryUpdatedGeneric<T>(event: T): void {
   minter.updatedAt = event.block.timestamp;
 }
 
-export function handleMerkleV3DelegationRegistryUpdated(
-  event: MinterMerkleV3DelegationRegistryUpdated
+export function handleMerkleDelegationRegistryUpdated(
+  event: MinterMerkleDelegationRegistryUpdated
 ): void {
   handleDelegationRegistryUpdatedGeneric(event);
 }
-export function handleHolderV2DelegationRegistryUpdated(
-  event: MinterHolderV2DelegationRegistryUpdated
+export function handleHolderDelegationRegistryUpdated(
+  event: MinterHolderDelegationRegistryUpdated
 ): void {
   handleDelegationRegistryUpdatedGeneric(event);
 }
@@ -698,6 +699,10 @@ export function handleSetMinterDetailsGeneric<T, C>(
   } else if (value instanceof Bytes) {
     jsonValue = bytesToJSONValue(value);
   } else {
+    log.warning(
+      "handleSetMinterDetailsGeneric received unexpected typed value",
+      []
+    );
     return;
   }
 

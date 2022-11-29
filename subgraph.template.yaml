@@ -1282,7 +1282,7 @@ dataSources:
         - event: RemovedHoldersOfProjects(indexed uint256,address[],uint256[])
           handler: handleRemoveHoldersOfProjectsV2
         - event: DelegationRegistryUpdated(address)
-          handler: handleHolderV2DelegationRegistryUpdated
+          handler: handleHolderDelegationRegistryUpdated
       file: ./src/minter-suite-mapping.ts
   {{/minterHolderV2Contracts}}
   {{#minterMerkleV1Contracts}}
@@ -1394,7 +1394,7 @@ dataSources:
         - event: ConfigValueSet(indexed uint256,bytes32,uint256)
           handler: handleSetBigIntValueProjectConfig
         - event: DelegationRegistryUpdated(address)
-          handler: handleMerkleV3DelegationRegistryUpdated
+          handler: handleMerkleDelegationRegistryUpdated
       file: ./src/minter-suite-mapping.ts
   {{/minterMerkleV3Contracts}}
   {{#adminACLV0Contracts}}
