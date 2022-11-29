@@ -8,7 +8,8 @@ import {
   json,
   JSONValue,
   JSONValueKind,
-  TypedMap
+  TypedMap,
+  log
 } from "@graphprotocol/graph-ts";
 
 import {
@@ -95,6 +96,14 @@ import {
   UnregisteredNFTAddress as MinterHolderV1UnregisteredNFTAddress,
   RemovedHoldersOfProjects as MinterHolderV1RemovedHoldersOfProjects
 } from "../generated/MinterHolderV1/MinterHolderV1";
+import {
+  AllowedHoldersOfProjects as MinterHolderV2AllowedHoldersOfProjects,
+  RegisteredNFTAddress as MinterHolderV2RegisteredNFTAddress,
+  UnregisteredNFTAddress as MinterHolderV2UnregisteredNFTAddress,
+  RemovedHoldersOfProjects as MinterHolderV2RemovedHoldersOfProjects
+} from "../generated/MinterHolderV2/MinterHolderV2";
+import { DelegationRegistryUpdated as MinterHolderDelegationRegistryUpdated } from "../generated/MinterHolderV2/IFilteredMinterHolderV1";
+import { DelegationRegistryUpdated as MinterMerkleDelegationRegistryUpdated } from "../generated/MinterMerkleV3/IFilteredMinterMerkleV1";
 import { MinterConfigSetAddressEvent } from "./util-types";
 
 // IFilteredMinterV0 events
@@ -462,6 +471,11 @@ export function handleAllowHoldersOfProjectsV1(
 ): void {
   handleHoldersOfProjectsGeneric(event);
 }
+export function handleAllowHoldersOfProjectsV2(
+  event: MinterHolderV2AllowedHoldersOfProjects
+): void {
+  handleHoldersOfProjectsGeneric(event);
+}
 
 export function handleRemoveHoldersOfProjectsV0(
   event: MinterHolderV0RemovedHoldersOfProjects
@@ -473,6 +487,11 @@ export function handleRemoveHoldersOfProjectsV1(
 ): void {
   handleHoldersOfProjectsGeneric(event);
 }
+export function handleRemoveHoldersOfProjectsV2(
+  event: MinterHolderV2RemovedHoldersOfProjects
+): void {
+  handleHoldersOfProjectsGeneric(event);
+}
 
 export function handleHoldersOfProjectsGeneric<T>(event: T): void {
   if (
@@ -480,7 +499,9 @@ export function handleHoldersOfProjectsGeneric<T>(event: T): void {
       event instanceof MinterHolderV0AllowedHoldersOfProjects ||
       event instanceof MinterHolderV0RemovedHoldersOfProjects ||
       event instanceof MinterHolderV1AllowedHoldersOfProjects ||
-      event instanceof MinterHolderV1RemovedHoldersOfProjects
+      event instanceof MinterHolderV1RemovedHoldersOfProjects ||
+      event instanceof MinterHolderV2AllowedHoldersOfProjects ||
+      event instanceof MinterHolderV2RemovedHoldersOfProjects
     )
   ) {
     return;
@@ -510,7 +531,8 @@ export function handleHoldersOfProjectsGeneric<T>(event: T): void {
     ];
     if (
       event instanceof MinterHolderV0AllowedHoldersOfProjects ||
-      event instanceof MinterHolderV1AllowedHoldersOfProjects
+      event instanceof MinterHolderV1AllowedHoldersOfProjects ||
+      event instanceof MinterHolderV2AllowedHoldersOfProjects
     ) {
       newAddEvent = new ConfigValueAddedToSetBytes(
         event.address,
@@ -525,7 +547,8 @@ export function handleHoldersOfProjectsGeneric<T>(event: T): void {
       handleAddManyBytesValueProjectConfig(newAddEvent);
     } else if (
       event instanceof MinterHolderV0RemovedHoldersOfProjects ||
-      event instanceof MinterHolderV1RemovedHoldersOfProjects
+      event instanceof MinterHolderV1RemovedHoldersOfProjects ||
+      event instanceof MinterHolderV2RemovedHoldersOfProjects
     ) {
       newRemoveEvent = new ConfigValueRemovedFromSetBytes(
         event.address,
@@ -548,7 +571,9 @@ export function handleRegistrationNFTAddresses<T>(event: T): void {
       event instanceof MinterHolderV0RegisteredNFTAddress ||
       event instanceof MinterHolderV1RegisteredNFTAddress ||
       event instanceof MinterHolderV0UnregisteredNFTAddress ||
-      event instanceof MinterHolderV1UnregisteredNFTAddress
+      event instanceof MinterHolderV1UnregisteredNFTAddress ||
+      event instanceof MinterHolderV2RegisteredNFTAddress ||
+      event instanceof MinterHolderV2UnregisteredNFTAddress
     )
   ) {
     return;
@@ -570,15 +595,53 @@ export function handleRegistrationNFTAddresses<T>(event: T): void {
 
   if (
     event instanceof MinterHolderV0RegisteredNFTAddress ||
-    event instanceof MinterHolderV1RegisteredNFTAddress
+    event instanceof MinterHolderV1RegisteredNFTAddress ||
+    event instanceof MinterHolderV2RegisteredNFTAddress
   ) {
     handleAddManyAddressValueMinterConfig(genericEvent);
   } else if (
     event instanceof MinterHolderV0UnregisteredNFTAddress ||
-    event instanceof MinterHolderV1UnregisteredNFTAddress
+    event instanceof MinterHolderV1UnregisteredNFTAddress ||
+    event instanceof MinterHolderV2UnregisteredNFTAddress
   ) {
     handleRemoveAddressManyValueMinterConfig(genericEvent);
   }
+}
+
+export function handleDelegationRegistryUpdatedGeneric<T>(event: T): void {
+  if (
+    !(
+      event instanceof MinterMerkleDelegationRegistryUpdated ||
+      event instanceof MinterHolderDelegationRegistryUpdated
+    )
+  ) {
+    return;
+  }
+
+  let minter = loadOrCreateMinter(event.address, event.block.timestamp);
+
+  if (!minter) {
+    return;
+  }
+
+  handleSetMinterDetailsGeneric(
+    "delegationRegistryAddress",
+    event.params.delegationRegistryAddress,
+    minter
+  );
+  minter.updatedAt = event.block.timestamp;
+  minter.save();
+}
+
+export function handleMerkleDelegationRegistryUpdated(
+  event: MinterMerkleDelegationRegistryUpdated
+): void {
+  handleDelegationRegistryUpdatedGeneric(event);
+}
+export function handleHolderDelegationRegistryUpdated(
+  event: MinterHolderDelegationRegistryUpdated
+): void {
+  handleDelegationRegistryUpdatedGeneric(event);
 }
 
 export function handleRegisteredNFTAddressV0(
@@ -588,6 +651,11 @@ export function handleRegisteredNFTAddressV0(
 }
 export function handleRegisteredNFTAddressV1(
   event: MinterHolderV1RegisteredNFTAddress
+): void {
+  handleRegistrationNFTAddresses(event);
+}
+export function handleRegisteredNFTAddressV2(
+  event: MinterHolderV2RegisteredNFTAddress
 ): void {
   handleRegistrationNFTAddresses(event);
 }
@@ -602,61 +670,57 @@ export function handleUnregisteredNFTAddressV1(
 ): void {
   handleRegistrationNFTAddresses(event);
 }
+export function handleUnregisteredNFTAddressV2(
+  event: MinterHolderV2UnregisteredNFTAddress
+): void {
+  handleRegistrationNFTAddresses(event);
+}
 
 // Generic Handlers
 // Below is all logic pertaining to generic handlers used for maintaining JSON config stores on both the ProjectMinterConfiguration and Minter entities.
 // Most logic is shared and bubbled up each respective handler for each action. We utilize ducktype to allow these to work on either a Minter or ProjectMinterConfiguration
 // Because AssemblyScript does not support union types, we need to manually type check inside each method, to ensure correct usage.
+// Currently supported key-value types (value: T) include boolean, BigInt, ETH address, and bytes values.
 // For any questions reach out to @jon or @ryley-o.eth. or see the following document https://docs.google.com/document/d/1XSxl04eJyTxc_rbj6cmq-j00zaYDzApBBLT67JXtaOw/edit?disco=AAAAZa8xp-Q
 
-export function handleSetValueGeneric<T, C>(
-  event: T,
-  config: C,
-  project: Project | null
+export function handleSetMinterDetailsGeneric<T, C>(
+  key: string,
+  value: T,
+  config: C
 ): void {
-  if (
-    !(
-      event instanceof ConfigValueSetBool ||
-      event instanceof ConfigValueSetBigInt ||
-      event instanceof ConfigValueSetAddress ||
-      event instanceof ConfigValueSetBytes
-    )
-  ) {
-    return;
-  }
-
-  if (
-    !(config instanceof ProjectMinterConfiguration || config instanceof Minter)
-  ) {
-    return;
-  }
-
-  if (project) {
-    project.updatedAt = event.block.timestamp;
-  }
-
   let minterDetails = getMinterDetails(config);
-  let jsonKey = event.params._key.toString();
+  let jsonKey = key;
   let jsonValue: JSONValue;
 
-  if (event instanceof ConfigValueSetBool) {
-    jsonValue = json.fromString(booleanToString(event.params._value));
-  } else if (event instanceof ConfigValueSetBigInt) {
-    jsonValue = json.fromString(event.params._value.toString());
-  } else if (event instanceof ConfigValueSetAddress) {
-    jsonValue = stringToJSONValue(event.params._value.toHexString());
-  } else if (event instanceof ConfigValueSetBytes) {
-    jsonValue = bytesToJSONValue(event.params._value);
+  if (
+    !(config instanceof Minter || config instanceof ProjectMinterConfiguration)
+  ) {
+    log.warning(
+      "[WARN] Generic property attempted to be set on something not a Minter or ProjectMinterConfiguration",
+      []
+    );
+    return;
+  }
+
+  if (isBoolean(value)) {
+    jsonValue = json.fromString(booleanToString(value));
+  } else if (value instanceof BigInt) {
+    jsonValue = json.fromString(value.toString());
+  } else if (value instanceof Address) {
+    jsonValue = stringToJSONValue(value.toHexString());
+  } else if (value instanceof Bytes) {
+    jsonValue = bytesToJSONValue(value);
+  } else {
+    log.warning(
+      "handleSetMinterDetailsGeneric received unexpected typed value",
+      []
+    );
+    return;
   }
 
   minterDetails.set(jsonKey, jsonValue);
-
   config.extraMinterDetails = typedMapToJSONString(minterDetails);
-
   config.save();
-  if (project) {
-    project.save();
-  }
 }
 
 export function handleSetValueProjectConfig<T>(event: T): void {
@@ -676,11 +740,25 @@ export function handleSetValueProjectConfig<T>(event: T): void {
     event.block.timestamp
   );
   if (minterProjectAndConfig) {
-    handleSetValueGeneric(
-      event,
-      minterProjectAndConfig.projectMinterConfiguration,
-      minterProjectAndConfig.project
+    const config = minterProjectAndConfig.projectMinterConfiguration;
+    if (
+      !(
+        config instanceof Minter || config instanceof ProjectMinterConfiguration
+      )
+    ) {
+      return;
+    }
+
+    handleSetMinterDetailsGeneric(
+      event.params._key.toString(),
+      event.params._value,
+      config
     );
+
+    if (minterProjectAndConfig.project) {
+      minterProjectAndConfig.project.updatedAt = event.block.timestamp;
+      minterProjectAndConfig.project.save();
+    }
   }
 }
 export function handleSetBooleanValueProjectConfig(

@@ -86,6 +86,14 @@ import {
   RegisteredNFTAddress as HolderV1RegisteredNFTAddress,
   UnregisteredNFTAddress as HolderV1UnregisteredNFTAddress
 } from "../../../generated/MinterHolderV1/MinterHolderV1";
+import {
+  AllowedHoldersOfProjects as HolderV2AllowedHoldersOfProjects,
+  RemovedHoldersOfProjects as HolderV2RemovedHoldersOfProjects,
+  RegisteredNFTAddress as HolderV2RegisteredNFTAddress,
+  UnregisteredNFTAddress as HolderV2UnregisteredNFTAddress
+} from "../../../generated/MinterHolderV2/MinterHolderV2";
+import { DelegationRegistryUpdated as MinterHolderDelegationRegistryUpdated } from "../../../generated/MinterHolderV2/IFilteredMinterHolderV1";
+import { DelegationRegistryUpdated as MinterMerkleDelegationRegistryUpdated } from "../../../generated/MinterMerkleV3/IFilteredMinterMerkleV1";
 // import handlers from minter-suite-mapping
 import {
   handleAddManyAddressValueProjectConfig as handleAddManyAddressValue,
@@ -93,12 +101,18 @@ import {
   handleAddManyBytesValueProjectConfig as handleAddManyBytesValue,
   handleAllowHoldersOfProjectsV0,
   handleAllowHoldersOfProjectsV1,
+  handleAllowHoldersOfProjectsV2,
   handleRemoveHoldersOfProjectsV0,
   handleRemoveHoldersOfProjectsV1,
+  handleRemoveHoldersOfProjectsV2,
   handleRegisteredNFTAddressV0,
   handleRegisteredNFTAddressV1,
+  handleRegisteredNFTAddressV2,
   handleUnregisteredNFTAddressV0,
   handleUnregisteredNFTAddressV1,
+  handleUnregisteredNFTAddressV2,
+  handleMerkleDelegationRegistryUpdated,
+  handleHolderDelegationRegistryUpdated,
   handleAuctionHalfLifeRangeSecondsUpdatedV0,
   handleAuctionHalfLifeRangeSecondsUpdatedV1,
   handleAuctionHalfLifeRangeSecondsUpdatedV2,
@@ -2102,9 +2116,13 @@ describe("MinterHolder-specific tests", () => {
         handleAllowHoldersOfProjectsV0(
           changetype<HolderV0AllowedHoldersOfProjects>(event)
         );
-      } else {
+      } else if (minterType == "MinterHolderV1") {
         handleAllowHoldersOfProjectsV1(
           changetype<HolderV1AllowedHoldersOfProjects>(event)
+        );
+      } else {
+        handleAllowHoldersOfProjectsV2(
+          changetype<HolderV2AllowedHoldersOfProjects>(event)
         );
       }
 
@@ -2325,9 +2343,13 @@ describe("MinterHolder-specific tests", () => {
         handleRemoveHoldersOfProjectsV0(
           changetype<HolderV0RemovedHoldersOfProjects>(event)
         );
-      } else {
+      } else if (minterType == "MinterHolderV1") {
         handleRemoveHoldersOfProjectsV1(
           changetype<HolderV1RemovedHoldersOfProjects>(event)
+        );
+      } else {
+        handleRemoveHoldersOfProjectsV2(
+          changetype<HolderV2RemovedHoldersOfProjects>(event)
         );
       }
 
@@ -2366,9 +2388,13 @@ describe("MinterHolder-specific tests", () => {
         handleRegisteredNFTAddressV0(
           changetype<HolderV0RegisteredNFTAddress>(event)
         );
-      } else {
+      } else if (minterType == "MinterHolderV1") {
         handleRegisteredNFTAddressV1(
           changetype<HolderV1RegisteredNFTAddress>(event)
+        );
+      } else {
+        handleRegisteredNFTAddressV2(
+          changetype<HolderV2RegisteredNFTAddress>(event)
         );
       }
 
@@ -2423,9 +2449,13 @@ describe("MinterHolder-specific tests", () => {
         handleUnregisteredNFTAddressV0(
           changetype<HolderV0UnregisteredNFTAddress>(event)
         );
-      } else {
+      } else if (minterType == "MinterHolderV1") {
         handleUnregisteredNFTAddressV1(
           changetype<HolderV1UnregisteredNFTAddress>(event)
+        );
+      } else {
+        handleUnregisteredNFTAddressV2(
+          changetype<HolderV2UnregisteredNFTAddress>(event)
         );
       }
 
@@ -2436,5 +2466,87 @@ describe("MinterHolder-specific tests", () => {
         '{"registeredNFTAddresses":["0x"]}'
       );
     }
+  });
+
+  test("handleMerkleDelegationRegistryUpdated adds the delegationRegistry address to extraMinterDetails", () => {
+    // mock, pass event to handler, etc
+    clearStore();
+    const minter = addNewMinterToStore("MinterMerkleV3");
+    const minterAddress: Address = changetype<Address>(
+      Address.fromHexString(minter.id)
+    );
+    minter.save();
+
+    const testAddy = randomAddressGenerator.generateRandomAddress();
+
+    const event: MinterMerkleDelegationRegistryUpdated = changetype<
+      MinterMerkleDelegationRegistryUpdated
+    >(newMockEvent());
+    event.address = minterAddress;
+    event.parameters = [
+      new ethereum.EventParam(
+        "delegationRegistryAddress",
+        ethereum.Value.fromAddress(testAddy)
+      ),
+      new ethereum.EventParam(
+        "_key",
+        ethereum.Value.fromBytes(Bytes.fromUTF8("address"))
+      ),
+      new ethereum.EventParam("_value", ethereum.Value.fromAddress(testAddy))
+    ];
+
+    event.block.timestamp = CURRENT_BLOCK_TIMESTAMP;
+
+    handleMerkleDelegationRegistryUpdated(
+      changetype<MinterMerkleDelegationRegistryUpdated>(event)
+    );
+
+    assert.fieldEquals(
+      MINTER_ENTITY_TYPE,
+      minter.id,
+      "extraMinterDetails",
+      '{"delegationRegistryAddress":' + '"' + testAddy.toHexString() + '"' + "}"
+    );
+  });
+
+  test("handleHolderDelegationRegistryUpdated adds the delegationRegistry address to extraMinterDetails", () => {
+    // mock, pass event to handler, etc
+    clearStore();
+    const minter = addNewMinterToStore("MinterHolderV2");
+    const minterAddress: Address = changetype<Address>(
+      Address.fromHexString(minter.id)
+    );
+    minter.save();
+
+    const testAddy = randomAddressGenerator.generateRandomAddress();
+
+    const event: MinterHolderDelegationRegistryUpdated = changetype<
+      MinterHolderDelegationRegistryUpdated
+    >(newMockEvent());
+    event.address = minterAddress;
+    event.parameters = [
+      new ethereum.EventParam(
+        "delegationRegistryAddress",
+        ethereum.Value.fromAddress(testAddy)
+      ),
+      new ethereum.EventParam(
+        "_key",
+        ethereum.Value.fromBytes(Bytes.fromUTF8("address"))
+      ),
+      new ethereum.EventParam("_value", ethereum.Value.fromAddress(testAddy))
+    ];
+
+    event.block.timestamp = CURRENT_BLOCK_TIMESTAMP;
+
+    handleHolderDelegationRegistryUpdated(
+      changetype<MinterHolderDelegationRegistryUpdated>(event)
+    );
+
+    assert.fieldEquals(
+      MINTER_ENTITY_TYPE,
+      minter.id,
+      "extraMinterDetails",
+      '{"delegationRegistryAddress":' + '"' + testAddy.toHexString() + '"' + "}"
+    );
   });
 });
