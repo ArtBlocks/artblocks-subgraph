@@ -677,8 +677,8 @@ export function handleUnregisteredNFTAddressV2(
 }
 
 // Generic Handlers
-// Below is all logic pertaining to generic handlers used for maintaining JSON config stores on both the Project and Minter entities.
-// Most logic is shared and bubbled up each respective handler for each action. We utilize ducktype to allow these to work on either a Minter or Project
+// Below is all logic pertaining to generic handlers used for maintaining JSON config stores on both the ProjectMinterConfiguration and Minter entities.
+// Most logic is shared and bubbled up each respective handler for each action. We utilize ducktype to allow these to work on either a Minter or ProjectMinterConfiguration
 // Because AssemblyScript does not support union types, we need to manually type check inside each method, to ensure correct usage.
 // Currently supported key-value types (value: T) include boolean, BigInt, ETH address, and bytes values.
 // For any questions reach out to @jon or @ryley-o.eth. or see the following document https://docs.google.com/document/d/1XSxl04eJyTxc_rbj6cmq-j00zaYDzApBBLT67JXtaOw/edit?disco=AAAAZa8xp-Q
@@ -692,9 +692,11 @@ export function handleSetMinterDetailsGeneric<T, C>(
   let jsonKey = key;
   let jsonValue: JSONValue;
 
-  if (!(config instanceof Minter || config instanceof Project)) {
+  if (
+    !(config instanceof Minter || config instanceof ProjectMinterConfiguration)
+  ) {
     log.warning(
-      "[WARN] Generic property attempted to be set on something not a Minter or Project",
+      "[WARN] Generic property attempted to be set on something not a Minter or ProjectMinterConfiguration",
       []
     );
     return;
