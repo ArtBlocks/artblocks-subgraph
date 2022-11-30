@@ -2069,6 +2069,15 @@ export class Receipt extends Entity {
   set numPurchased(value: BigInt) {
     this.set("numPurchased", Value.fromBigInt(value));
   }
+
+  get updatedAt(): BigInt {
+    let value = this.get("updatedAt");
+    return value!.toBigInt();
+  }
+
+  set updatedAt(value: BigInt) {
+    this.set("updatedAt", Value.fromBigInt(value));
+  }
 }
 
 export class Payment extends Entity {

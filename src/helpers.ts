@@ -116,7 +116,8 @@ export function getReceiptId(
 export function loadOrCreateReceipt(
   minterId: string,
   projectId: string,
-  accountAddress: Address
+  accountAddress: Address,
+  timestamp: BigInt
 ): Receipt {
   let receiptId = getReceiptId(
     minterId,
@@ -137,6 +138,7 @@ export function loadOrCreateReceipt(
   receipt.netPosted = BigInt.fromI32(0);
   receipt.numPurchased = BigInt.fromI32(0);
   // save and return
+  receipt.updatedAt = timestamp;
   receipt.save();
   return receipt;
 }
