@@ -551,6 +551,30 @@
           "internalType": "uint256",
           "name": "_projectId",
           "type": "uint256"
+        },
+        {
+          "internalType": "address",
+          "name": "_walletAddress",
+          "type": "address"
+        }
+      ],
+      "name": "getProjectExcessSettlementFunds",
+      "outputs": [
+        {
+          "internalType": "uint256",
+          "name": "excessSettlementFundsInWei",
+          "type": "uint256"
+        }
+      ],
+      "stateMutability": "view",
+      "type": "function"
+    },
+    {
+      "inputs": [
+        {
+          "internalType": "uint256",
+          "name": "_projectId",
+          "type": "uint256"
         }
       ],
       "name": "getProjectLatestPurchasePrice",
