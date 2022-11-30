@@ -217,12 +217,12 @@
   ],
   "minterMerkleV3Contracts": [
     {
-      "address": "0x8B92DE329e114d7ACE5459D9Aff096BbC0543506",
+      "address": "0x8FF245EF2d669D3a3B0397bA43D060534074df32",
       "name": "Flagship Minter for V3 core",
       "startBlock": 7976906
     },
     {
-      "address": "0x4DFC0E683d626A2Fec74385cB0782b2bb1365d76",
+      "address": "0x3D7278b1Cb7132f6DFed5e301a0E4552C5d02769",
       "name": "Explorations Minter",
       "startBlock": 7976933
     }
