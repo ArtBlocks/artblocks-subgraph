@@ -55,14 +55,14 @@ import {
 } from "../generated/MinterDAExpV2/MinterDAExpV2";
 
 import {
-  AuctionHalfLifeRangeSecondsUpdated as AuctionHalfLifeRangeSecondsUpdatedRefund,
-  ResetAuctionDetails as DAExpRefundResetAuctionDetails,
-  SetAuctionDetails as DAExpRefundSetAuctionDetails,
+  AuctionHalfLifeRangeSecondsUpdated as AuctionHalfLifeRangeSecondsUpdatedSettlement,
+  ResetAuctionDetails as DAExpSettlementResetAuctionDetails,
+  SetAuctionDetails as DAExpSettlementSetAuctionDetails,
   ReceiptUpdated,
   SelloutPriceUpdated,
   ArtistAndAdminRevenuesWithdrawn,
-  IFilteredMinterDAExpRefundV0
-} from "../generated/MinterDAExpRefundV0/IFilteredMinterDAExpRefundV0";
+  IFilteredMinterDAExpSettlementV0
+} from "../generated/MinterDAExpSettlementV0/IFilteredMinterDAExpSettlementV0";
 
 import {
   Minter,
@@ -336,8 +336,8 @@ export function handleAuctionHalfLifeRangeSecondsUpdatedV2(
 ): void {
   handleAuctionHalfLifeRangeSecondsUpdatedGeneric(event);
 }
-export function handleAuctionHalfLifeRangeSecondsUpdatedRefund(
-  event: AuctionHalfLifeRangeSecondsUpdatedRefund
+export function handleAuctionHalfLifeRangeSecondsUpdatedSettlement(
+  event: AuctionHalfLifeRangeSecondsUpdatedSettlement
 ): void {
   handleAuctionHalfLifeRangeSecondsUpdatedGeneric(event);
 }
@@ -351,7 +351,7 @@ export function handleAuctionHalfLifeRangeSecondsUpdatedGeneric<T>(
       event instanceof AuctionHalfLifeRangeSecondsUpdatedV0 ||
       event instanceof AuctionHalfLifeRangeSecondsUpdatedV1 ||
       event instanceof AuctionHalfLifeRangeSecondsUpdatedV2 ||
-      event instanceof AuctionHalfLifeRangeSecondsUpdatedRefund
+      event instanceof AuctionHalfLifeRangeSecondsUpdatedSettlement
     )
   ) {
     return;
@@ -383,8 +383,8 @@ export function handleDAExpSetAuctionDetailsV2(
 ): void {
   handleDAExpSetAuctionDetailsGeneric(event);
 }
-export function handleDAExpRefundSetAuctionDetails(
-  event: DAExpRefundSetAuctionDetails
+export function handleDAExpSettlementSetAuctionDetails(
+  event: DAExpSettlementSetAuctionDetails
 ): void {
   handleDAExpSetAuctionDetailsGeneric(event);
 }
@@ -395,7 +395,7 @@ export function handleDAExpSetAuctionDetailsGeneric<T>(event: T): void {
       event instanceof DAExpV0SetAuctionDetails ||
       event instanceof DAExpV1SetAuctionDetails ||
       event instanceof DAExpV2SetAuctionDetails ||
-      event instanceof DAExpRefundSetAuctionDetails
+      event instanceof DAExpSettlementSetAuctionDetails
     )
   ) {
     return;
@@ -440,8 +440,8 @@ export function handleDAExpResetAuctionDetailsV2(
 ): void {
   handleDAExpResetAuctionDetailsGeneric(event);
 }
-export function handleDAExpRefundResetAuctionDetails(
-  event: DAExpRefundResetAuctionDetails
+export function handleDAExpSettlementResetAuctionDetails(
+  event: DAExpSettlementResetAuctionDetails
 ): void {
   handleDAExpResetAuctionDetailsGeneric(event);
 }
@@ -452,7 +452,7 @@ export function handleDAExpResetAuctionDetailsGeneric<T>(event: T): void {
       event instanceof DAExpV0ResetAuctionDetails ||
       event instanceof DAExpV1ResetAuctionDetails ||
       event instanceof DAExpV2ResetAuctionDetails ||
-      event instanceof DAExpRefundResetAuctionDetails
+      event instanceof DAExpSettlementResetAuctionDetails
     )
   ) {
     return;
@@ -1085,15 +1085,15 @@ export function handleReceiptUpdated(event: ReceiptUpdated): void {
     );
     if (receipt) {
       // update receipt state
-      receipt.netPaid = event.params._netPaid;
+      receipt.netPosted = event.params._netPosted;
       receipt.numPurchased = event.params._numPurchased;
       receipt.save();
-      // additionally, sync latest purchase price and number of refundable
+      // additionally, sync latest purchase price and number of settleable
       // purchases for project on this minter
       // @dev this is because this can be the only event emitted from the
-      // minter during a purchase on a refundable minter
+      // minter during a purchase on a settleable minter
       syncLatestPurchasePrice(event.address, event.params._projectId, event);
-      syncNumRefundableInvocations(
+      syncNumSettleableInvocations(
         event.address,
         event.params._projectId,
         event
@@ -1143,7 +1143,7 @@ export function handleArtistAndAdminRevenuesWithdrawn(
 
 // Helpers
 /**
- * @notice Syncs a (refundable) minter's project latest purchase price in
+ * @notice Syncs a (settleable) minter's project latest purchase price in
  * extraMinterDetails to the current value on the minter.
  * @param minterAddress minter address to by synced
  * @param projectId project id to sync (big int, not contract specific id)
@@ -1154,11 +1154,11 @@ function syncLatestPurchasePrice(
   projectId: BigInt,
   event: ethereum.Event
 ): void {
-  let refundableMinter = IFilteredMinterDAExpRefundV0.bind(minterAddress);
-  let latestPurchasePrice = refundableMinter.getProjectLatestPurchasePrice(
+  let settleableMinter = IFilteredMinterDAExpSettlementV0.bind(minterAddress);
+  let latestPurchasePrice = settleableMinter.getProjectLatestPurchasePrice(
     projectId
   );
-  // update extraMinterDetails key `refundableNetPrice` to be latestPurchasePrice
+  // update extraMinterDetails key `currentSettledPrice` to be latestPurchasePrice
   let genericEvent: ConfigValueSetBigInt = new ConfigValueSetBigInt(
     event.address,
     event.logIndex,
@@ -1176,7 +1176,7 @@ function syncLatestPurchasePrice(
     ),
     new ethereum.EventParam(
       "_key",
-      ethereum.Value.fromBytes(Bytes.fromUTF8("refundableNetPrice"))
+      ethereum.Value.fromBytes(Bytes.fromUTF8("currentSettledPrice"))
     ),
     new ethereum.EventParam(
       "_value",
@@ -1188,22 +1188,22 @@ function syncLatestPurchasePrice(
 }
 
 /**
- * @notice Syncs a (refundable) minter's project number of refundable
+ * @notice Syncs a (settleable) minter's project number of settleable
  * invocations in extraMinterDetails to the current value on the minter.
  * @param minterAddress minter address to by synced
  * @param projectId project id to sync (big int, not contract specific id)
  * @param event The event emitted from the minter that triggered this sync
  */
-function syncNumRefundableInvocations(
+function syncNumSettleableInvocations(
   minterAddress: Address,
   projectId: BigInt,
   event: ethereum.Event
 ): void {
-  let refundableMinter = IFilteredMinterDAExpRefundV0.bind(minterAddress);
-  let numRefundableInvocations = refundableMinter.getNumRefundableInvocations(
+  let settleableMinter = IFilteredMinterDAExpSettlementV0.bind(minterAddress);
+  let numSettleableInvocations = settleableMinter.getNumSettleableInvocations(
     projectId
   );
-  // update extraMinterDetails key `numRefundableInvocations` to be numRefundableInvocations
+  // update extraMinterDetails key `numSettleableInvocations` to be numSettleableInvocations
   let genericEvent: ConfigValueSetBigInt = new ConfigValueSetBigInt(
     event.address,
     event.logIndex,
@@ -1221,11 +1221,11 @@ function syncNumRefundableInvocations(
     ),
     new ethereum.EventParam(
       "_key",
-      ethereum.Value.fromBytes(Bytes.fromUTF8("numRefundableInvocations"))
+      ethereum.Value.fromBytes(Bytes.fromUTF8("numSettleableInvocations"))
     ),
     new ethereum.EventParam(
       "_value",
-      ethereum.Value.fromUnsignedBigInt(numRefundableInvocations)
+      ethereum.Value.fromUnsignedBigInt(numSettleableInvocations)
     )
   ];
   // call generic handler to populate project's extraMinterDetails

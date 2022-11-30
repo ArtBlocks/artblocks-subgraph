@@ -5,7 +5,7 @@ export const DAExpMintersToTest: string[] = [
   "MinterDAExpV0",
   "MinterDAExpV1",
   "MinterDAExpV2",
-  "MinterDAExpRefundV0"
+  "MinterDAExpSettlementV0"
 ];
 export const DALinMintersToTest: string[] = [
   "MinterDALinV0",

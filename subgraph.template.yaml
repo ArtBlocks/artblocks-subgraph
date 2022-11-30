@@ -1235,11 +1235,11 @@ dataSources:
         - event: ProjectCurrencyInfoUpdated(indexed uint256,indexed address,string)
           handler: handleProjectCurrencyInfoUpdated
         - event: AuctionHalfLifeRangeSecondsUpdated(uint256,uint256)
-          handler: handleAuctionHalfLifeRangeSecondsUpdatedRefund
+          handler: handleAuctionHalfLifeRangeSecondsUpdatedSettlement
         - event: SetAuctionDetails(indexed uint256,uint256,uint256,uint256,uint256)
-          handler: handleDAExpRefundSetAuctionDetails
+          handler: handleDAExpSettlementSetAuctionDetails
         - event: ResetAuctionDetails(indexed uint256,uint256,uint256)
-          handler: handleDAExpRefundResetAuctionDetails
+          handler: handleDAExpSettlementResetAuctionDetails
         - event: SelloutPriceUpdated(indexed uint256,uint256)
           handler: handleSelloutPriceUpdated
         - event: ReceiptUpdated(indexed address,indexed uint256,uint256,uint256)

@@ -78,13 +78,13 @@ import {
   ResetAuctionDetails as DAExpV2ResetAuctionDetails
 } from "../../../generated/MinterDAExpV2/MinterDAExpV2";
 import {
-  AuctionHalfLifeRangeSecondsUpdated as AuctionHalfLifeRangeSecondsUpdatedRefund,
-  SetAuctionDetails as DAExpRefundSetAuctionDetails,
-  ResetAuctionDetails as DAExpRefundResetAuctionDetails,
+  AuctionHalfLifeRangeSecondsUpdated as AuctionHalfLifeRangeSecondsUpdatedSettlement,
+  SetAuctionDetails as DAExpSettlementSetAuctionDetails,
+  ResetAuctionDetails as DAExpSettlementResetAuctionDetails,
   SelloutPriceUpdated,
   ReceiptUpdated,
   ArtistAndAdminRevenuesWithdrawn
-} from "../../../generated/MinterDAExpRefundV0/IFilteredMinterDAExpRefundV0";
+} from "../../../generated/MinterDAExpSettlementV0/IFilteredMinterDAExpSettlementV0";
 import {
   AllowedHoldersOfProjects as HolderV0AllowedHoldersOfProjects,
   RemovedHoldersOfProjects as HolderV0RemovedHoldersOfProjects,
@@ -138,9 +138,9 @@ import {
   handleSetBigIntValueProjectConfig as handleSetBigIntValue,
   handleSetBooleanValueProjectConfig as handleSetBooleanValue,
   handleSetBytesValueProjectConfig as handleSetBytesValue,
-  handleAuctionHalfLifeRangeSecondsUpdatedRefund,
-  handleDAExpRefundSetAuctionDetails,
-  handleDAExpRefundResetAuctionDetails,
+  handleAuctionHalfLifeRangeSecondsUpdatedSettlement,
+  handleDAExpSettlementSetAuctionDetails,
+  handleDAExpSettlementResetAuctionDetails,
   handleSelloutPriceUpdated,
   handleReceiptUpdated,
   handleArtistAndAdminRevenuesWithdrawn
@@ -910,8 +910,8 @@ describe("MinterDAExp-related tests", () => {
             changetype<AuctionHalfLifeRangeSecondsUpdatedV2>(event)
           );
         } else {
-          handleAuctionHalfLifeRangeSecondsUpdatedRefund(
-            changetype<AuctionHalfLifeRangeSecondsUpdatedRefund>(event)
+          handleAuctionHalfLifeRangeSecondsUpdatedSettlement(
+            changetype<AuctionHalfLifeRangeSecondsUpdatedSettlement>(event)
           );
         }
 
@@ -979,8 +979,8 @@ describe("MinterDAExp-related tests", () => {
             changetype<DAExpV2SetAuctionDetails>(event)
           );
         } else {
-          handleDAExpRefundSetAuctionDetails(
-            changetype<DAExpRefundSetAuctionDetails>(event)
+          handleDAExpSettlementSetAuctionDetails(
+            changetype<DAExpSettlementSetAuctionDetails>(event)
           );
         }
 
@@ -1067,8 +1067,8 @@ describe("MinterDAExp-related tests", () => {
             changetype<DAExpV2SetAuctionDetails>(event)
           );
         } else {
-          handleDAExpRefundSetAuctionDetails(
-            changetype<DAExpRefundSetAuctionDetails>(event)
+          handleDAExpSettlementSetAuctionDetails(
+            changetype<DAExpSettlementSetAuctionDetails>(event)
           );
         }
 
@@ -1188,8 +1188,8 @@ describe("MinterDAExp-related tests", () => {
             changetype<DAExpV2SetAuctionDetails>(event)
           );
         } else {
-          handleDAExpRefundSetAuctionDetails(
-            changetype<DAExpRefundSetAuctionDetails>(event)
+          handleDAExpSettlementSetAuctionDetails(
+            changetype<DAExpSettlementSetAuctionDetails>(event)
           );
         }
 
@@ -1276,7 +1276,7 @@ describe("MinterDAExp-related tests", () => {
             changetype<DAExpV2ResetAuctionDetails>(event)
           );
         } else {
-          // fully populate event for refundable minter
+          // fully populate event for settlement minter
           event.parameters.push(
             new ethereum.EventParam(
               "numPurchases",
@@ -1289,9 +1289,9 @@ describe("MinterDAExp-related tests", () => {
               ethereum.Value.fromUnsignedBigInt(BigInt.fromI32(1000000))
             )
           );
-          // handle refundable minter event
-          handleDAExpRefundResetAuctionDetails(
-            changetype<DAExpRefundResetAuctionDetails>(event)
+          // handle settlement minter event
+          handleDAExpSettlementResetAuctionDetails(
+            changetype<DAExpSettlementResetAuctionDetails>(event)
           );
         }
 
@@ -1365,7 +1365,7 @@ describe("MinterDAExp-related tests", () => {
             changetype<DAExpV2ResetAuctionDetails>(event)
           );
         } else {
-          // fully populate event for refundable minter
+          // fully populate event for settlement minter
           event.parameters.push(
             new ethereum.EventParam(
               "numPurchases",
@@ -1378,9 +1378,9 @@ describe("MinterDAExp-related tests", () => {
               ethereum.Value.fromUnsignedBigInt(BigInt.fromI32(1000000))
             )
           );
-          // handle refundable minter event
-          handleDAExpRefundResetAuctionDetails(
-            changetype<DAExpRefundResetAuctionDetails>(event)
+          // handle settlement minter event
+          handleDAExpSettlementResetAuctionDetails(
+            changetype<DAExpSettlementResetAuctionDetails>(event)
           );
         }
 
@@ -1484,7 +1484,7 @@ describe("MinterDAExp-related tests", () => {
             changetype<DAExpV2ResetAuctionDetails>(event)
           );
         } else {
-          // fully populate event for refundable minter
+          // fully populate event for settlement minter
           event.parameters.push(
             new ethereum.EventParam(
               "numPurchases",
@@ -1497,9 +1497,9 @@ describe("MinterDAExp-related tests", () => {
               ethereum.Value.fromUnsignedBigInt(BigInt.fromI32(1000000))
             )
           );
-          // handle refundable minter event
-          handleDAExpRefundResetAuctionDetails(
-            changetype<DAExpRefundResetAuctionDetails>(event)
+          // handle settlement minter event
+          handleDAExpSettlementResetAuctionDetails(
+            changetype<DAExpSettlementResetAuctionDetails>(event)
           );
         }
 
@@ -1542,11 +1542,11 @@ describe("MinterDAExp-related tests", () => {
   });
 });
 
-describe("DAExpRefundMinters", () => {
+describe("DAExpSettlementMinters", () => {
   describe("ReceiptUpdated handler", () => {
     test("reflects updated receipt values after one receipt", () => {
       clearStore();
-      const minter = addNewMinterToStore("MinterDAExpRefundV0");
+      const minter = addNewMinterToStore("MinterDAExpSettlementV0");
       const minterAddress: Address = changetype<Address>(
         Address.fromHexString(minter.id)
       );
@@ -1584,7 +1584,7 @@ describe("DAExpRefundMinters", () => {
 
       // define purchaser and net paid, qty purchased
       const purchaser = randomAddressGenerator.generateRandomAddress();
-      const netPaid = ONE_ETH_IN_WEI;
+      const netPosted = ONE_ETH_IN_WEI;
       const actualPurchasePrice = ONE_ETH_IN_WEI.div(BigInt.fromI32(2));
       let numPurchased = BigInt.fromI32(1);
 
@@ -1600,8 +1600,8 @@ describe("DAExpRefundMinters", () => {
           ethereum.Value.fromUnsignedBigInt(projectId)
         ),
         new ethereum.EventParam(
-          "_netPaid",
-          ethereum.Value.fromUnsignedBigInt(netPaid)
+          "_netPosted",
+          ethereum.Value.fromUnsignedBigInt(netPosted)
         ),
         new ethereum.EventParam(
           "_numPurchased",
@@ -1619,23 +1619,23 @@ describe("DAExpRefundMinters", () => {
       )
         .withArgs([ethereum.Value.fromUnsignedBigInt(projectId)])
         .returns([ethereum.Value.fromUnsignedBigInt(actualPurchasePrice)]);
-      // return qty of refundable invocations of 1
+      // return qty of settleable invocations of 1
       createMockedFunction(
         minterAddress,
-        "getNumRefundableInvocations",
-        "getNumRefundableInvocations(uint256):(uint256)"
+        "getNumSettleableInvocations",
+        "getNumSettleableInvocations(uint256):(uint256)"
       )
         .withArgs([ethereum.Value.fromUnsignedBigInt(projectId)])
         .returns([ethereum.Value.fromI32(1)]);
 
-      // handle refundable minter event
+      // handle settlement minter event
       handleReceiptUpdated(changetype<ReceiptUpdated>(event));
 
       assert.fieldEquals(
         PROJECT_MINTER_CONFIGURATION_ENTITY_TYPE,
         getProjectMinterConfigId(minterAddress.toHexString(), project.id),
         "extraMinterDetails",
-        `{"refundableNetPrice":${actualPurchasePrice.toString()},"numRefundableInvocations":${1}}`
+        `{"currentSettledPrice":${actualPurchasePrice.toString()},"numSettleableInvocations":${1}}`
       );
       assert.fieldEquals(
         RECEIPT_ENTITY_TYPE,
@@ -1664,8 +1664,8 @@ describe("DAExpRefundMinters", () => {
       assert.fieldEquals(
         RECEIPT_ENTITY_TYPE,
         getReceiptId(minterAddress.toHexString(), project.projectId, purchaser),
-        "netPaid",
-        netPaid.toString()
+        "netPosted",
+        netPosted.toString()
       );
       assert.fieldEquals(
         RECEIPT_ENTITY_TYPE,
@@ -1677,7 +1677,7 @@ describe("DAExpRefundMinters", () => {
 
     test("reflects updated receipt values after two receipts", () => {
       clearStore();
-      const minter = addNewMinterToStore("MinterDAExpRefundV0");
+      const minter = addNewMinterToStore("MinterDAExpSettlementV0");
       const minterAddress: Address = changetype<Address>(
         Address.fromHexString(minter.id)
       );
@@ -1715,7 +1715,7 @@ describe("DAExpRefundMinters", () => {
 
       // define purchaser and net paid, qty purchased
       const purchaser = randomAddressGenerator.generateRandomAddress();
-      let netPaid = ONE_ETH_IN_WEI;
+      let netPosted = ONE_ETH_IN_WEI;
       let actualPurchasePrice = ONE_ETH_IN_WEI.div(BigInt.fromI32(2));
       let numPurchased = BigInt.fromI32(1);
 
@@ -1731,8 +1731,8 @@ describe("DAExpRefundMinters", () => {
           ethereum.Value.fromUnsignedBigInt(projectId)
         ),
         new ethereum.EventParam(
-          "_netPaid",
-          ethereum.Value.fromUnsignedBigInt(netPaid)
+          "_netPosted",
+          ethereum.Value.fromUnsignedBigInt(netPosted)
         ),
         new ethereum.EventParam(
           "_numPurchased",
@@ -1750,16 +1750,16 @@ describe("DAExpRefundMinters", () => {
       )
         .withArgs([ethereum.Value.fromUnsignedBigInt(projectId)])
         .returns([ethereum.Value.fromUnsignedBigInt(actualPurchasePrice)]);
-      // return qty of refundable invocations of 1
+      // return qty of settleable invocations of 1
       createMockedFunction(
         minterAddress,
-        "getNumRefundableInvocations",
-        "getNumRefundableInvocations(uint256):(uint256)"
+        "getNumSettleableInvocations",
+        "getNumSettleableInvocations(uint256):(uint256)"
       )
         .withArgs([ethereum.Value.fromUnsignedBigInt(projectId)])
         .returns([ethereum.Value.fromI32(1)]);
 
-      // handle refundable minter event
+      // handle settleable minter event
       handleReceiptUpdated(changetype<ReceiptUpdated>(event));
 
       // mock the minter functions used in second handler call
@@ -1774,17 +1774,17 @@ describe("DAExpRefundMinters", () => {
       )
         .withArgs([ethereum.Value.fromUnsignedBigInt(projectId)])
         .returns([ethereum.Value.fromUnsignedBigInt(actualPurchasePrice)]);
-      // return qty of refundable invocations of 1
+      // return qty of settleable invocations of 1
       createMockedFunction(
         minterAddress,
-        "getNumRefundableInvocations",
-        "getNumRefundableInvocations(uint256):(uint256)"
+        "getNumSettleableInvocations",
+        "getNumSettleableInvocations(uint256):(uint256)"
       )
         .withArgs([ethereum.Value.fromUnsignedBigInt(projectId)])
         .returns([ethereum.Value.fromUnsignedBigInt(numPurchased)]);
       // update event values
       // net paid is now 1.5 eth
-      netPaid = ONE_ETH_IN_WEI.plus(ONE_ETH_IN_WEI.div(BigInt.fromI32(2)));
+      netPosted = ONE_ETH_IN_WEI.plus(ONE_ETH_IN_WEI.div(BigInt.fromI32(2)));
       event.parameters = [
         new ethereum.EventParam(
           "_purchaser",
@@ -1795,8 +1795,8 @@ describe("DAExpRefundMinters", () => {
           ethereum.Value.fromUnsignedBigInt(projectId)
         ),
         new ethereum.EventParam(
-          "_netPaid",
-          ethereum.Value.fromUnsignedBigInt(netPaid)
+          "_netPosted",
+          ethereum.Value.fromUnsignedBigInt(netPosted)
         ),
         new ethereum.EventParam(
           "_numPurchased",
@@ -1804,14 +1804,14 @@ describe("DAExpRefundMinters", () => {
         )
       ];
 
-      // handle refundable minter event
+      // handle settleable minter event
       handleReceiptUpdated(changetype<ReceiptUpdated>(event));
 
       assert.fieldEquals(
         PROJECT_MINTER_CONFIGURATION_ENTITY_TYPE,
         getProjectMinterConfigId(minterAddress.toHexString(), project.id),
         "extraMinterDetails",
-        `{"numRefundableInvocations":${numPurchased.toString()},"refundableNetPrice":${actualPurchasePrice.toString()}}`
+        `{"currentSettledPrice":${actualPurchasePrice.toString()},"numSettleableInvocations":${numPurchased.toString()}}`
       );
       assert.fieldEquals(
         RECEIPT_ENTITY_TYPE,
@@ -1840,8 +1840,8 @@ describe("DAExpRefundMinters", () => {
       assert.fieldEquals(
         RECEIPT_ENTITY_TYPE,
         getReceiptId(minterAddress.toHexString(), project.projectId, purchaser),
-        "netPaid",
-        netPaid.toString()
+        "netPosted",
+        netPosted.toString()
       );
       assert.fieldEquals(
         RECEIPT_ENTITY_TYPE,
@@ -1853,9 +1853,9 @@ describe("DAExpRefundMinters", () => {
   });
 
   describe("SelloutPriceUpdated handler", () => {
-    test("reflects updated net refund price after event", () => {
+    test("reflects updated net settlement price after event", () => {
       clearStore();
-      const minter = addNewMinterToStore("MinterDAExpRefundV0");
+      const minter = addNewMinterToStore("MinterDAExpSettlementV0");
       const minterAddress: Address = changetype<Address>(
         Address.fromHexString(minter.id)
       );
@@ -1918,20 +1918,20 @@ describe("DAExpRefundMinters", () => {
         .withArgs([ethereum.Value.fromUnsignedBigInt(projectId)])
         .returns([ethereum.Value.fromUnsignedBigInt(selloutPrice)]);
 
-      // handle refundable minter event
+      // handle settlement minter event
       handleSelloutPriceUpdated(changetype<SelloutPriceUpdated>(event));
 
       assert.fieldEquals(
         PROJECT_MINTER_CONFIGURATION_ENTITY_TYPE,
         getProjectMinterConfigId(minterAddress.toHexString(), project.id),
         "extraMinterDetails",
-        `{"refundableNetPrice":${selloutPrice.toString()}}`
+        `{"currentSettledPrice":${selloutPrice.toString()}}`
       );
     });
 
-    test("reflects updated net refund price after multiple events", () => {
+    test("reflects updated net settlement price after multiple events", () => {
       clearStore();
-      const minter = addNewMinterToStore("MinterDAExpRefundV0");
+      const minter = addNewMinterToStore("MinterDAExpSettlementV0");
       const minterAddress: Address = changetype<Address>(
         Address.fromHexString(minter.id)
       );
@@ -1994,7 +1994,7 @@ describe("DAExpRefundMinters", () => {
         .withArgs([ethereum.Value.fromUnsignedBigInt(projectId)])
         .returns([ethereum.Value.fromUnsignedBigInt(selloutPrice)]);
 
-      // handle refundable minter event
+      // handle settlement minter event
       handleSelloutPriceUpdated(changetype<SelloutPriceUpdated>(event));
 
       // update mocks, event, and handle a second event
@@ -2016,15 +2016,15 @@ describe("DAExpRefundMinters", () => {
       )
         .withArgs([ethereum.Value.fromUnsignedBigInt(projectId)])
         .returns([ethereum.Value.fromUnsignedBigInt(selloutPrice)]);
-      // handle second refundable minter event
+      // handle second settlement minter event
       handleSelloutPriceUpdated(changetype<SelloutPriceUpdated>(event));
 
-      // assert refundable net price reflects the second event's value
+      // assert settlement net price reflects the second event's value
       assert.fieldEquals(
         PROJECT_MINTER_CONFIGURATION_ENTITY_TYPE,
         getProjectMinterConfigId(minterAddress.toHexString(), project.id),
         "extraMinterDetails",
-        `{"refundableNetPrice":${selloutPrice.toString()}}`
+        `{"currentSettledPrice":${selloutPrice.toString()}}`
       );
     });
   });
@@ -2032,7 +2032,7 @@ describe("DAExpRefundMinters", () => {
   describe("ArtistAndAdminRevenuesWithdrawn handler", () => {
     test("reflects updated state after artist and admin withdraw", () => {
       clearStore();
-      const minter = addNewMinterToStore("MinterDAExpRefundV0");
+      const minter = addNewMinterToStore("MinterDAExpSettlementV0");
       const minterAddress: Address = changetype<Address>(
         Address.fromHexString(minter.id)
       );
@@ -2094,7 +2094,7 @@ describe("DAExpRefundMinters", () => {
           ethereum.Value.fromUnsignedBigInt(updatedLatestPurchasePrice)
         ]);
 
-      // handle refundable minter event
+      // handle settlement minter event
       handleArtistAndAdminRevenuesWithdrawn(
         changetype<ArtistAndAdminRevenuesWithdrawn>(event)
       );
@@ -2103,7 +2103,7 @@ describe("DAExpRefundMinters", () => {
         PROJECT_MINTER_CONFIGURATION_ENTITY_TYPE,
         getProjectMinterConfigId(minterAddress.toHexString(), project.id),
         "extraMinterDetails",
-        `{"refundableNetPrice":${updatedLatestPurchasePrice.toString()},"auctionRevenuesCollected":${true}}`
+        `{"currentSettledPrice":${updatedLatestPurchasePrice.toString()},"auctionRevenuesCollected":${true}}`
       );
     });
   });
