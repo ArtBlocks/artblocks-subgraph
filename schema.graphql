@@ -337,9 +337,11 @@ enum MinterType {
   MinterDALinV2
   MinterDAExpV2
   MinterHolderV1
+  MinterHolderV2
   MinterMerkleV1
   MinterMerkleV2
   MinterDAExpSettlementV0
+  MinterMerkleV3
 }
 
 type Minter @entity {

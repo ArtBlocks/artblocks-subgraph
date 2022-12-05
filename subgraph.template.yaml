@@ -693,10 +693,14 @@ dataSources:
           file: ./abis/MinterDAExpV2.json
         - name: MinterHolderV1
           file: ./abis/MinterHolderV1.json
+        - name: MinterHolderV2
+          file: ./abis/MinterHolderV2.json
         - name: MinterMerkleV1
           file: ./abis/MinterMerkleV1.json
         - name: MinterMerkleV2
           file: ./abis/MinterMerkleV2.json
+        - name: MinterMerkleV3
+          file: ./abis/MinterMerkleV3.json
       eventHandlers:
         - event: MinterApproved(indexed address,string)
           handler: handleMinterApproved
@@ -1286,6 +1290,48 @@ dataSources:
           handler: handleRemoveHoldersOfProjectsV1
       file: ./src/minter-suite-mapping.ts
   {{/minterHolderV1Contracts}}
+{{#minterHolderV2Contracts}}
+  - kind: ethereum/contract
+    name: 'MinterHolderV2-{{address}}'
+    network: {{network}}
+    source:
+      address: '{{address}}'
+      abi: MinterHolderV2
+      startBlock: {{startBlock}}
+    mapping:
+      kind: ethereum/events
+      apiVersion: 0.0.5
+      language: wasm/assemblyscript
+      entities:
+        - Project
+        - Contract
+        - MinterFilter
+        - Minter
+        - ProjectMinterConfiguration
+      abis:
+        - name: MinterHolderV2
+          file: ./abis/MinterHolderV2.json
+        - name: IFilteredMinterV0
+          file: ./abis/IFilteredMinterV0.json
+        - name: IFilteredMinterHolderV1
+          file: ./abis/IFilteredMinterHolderV1.json
+      eventHandlers:
+        - event: PricePerTokenInWeiUpdated(indexed uint256,indexed uint256)
+          handler: handlePricePerTokenInWeiUpdated
+        - event: ProjectCurrencyInfoUpdated(indexed uint256,indexed address,string)
+          handler: handleProjectCurrencyInfoUpdated
+        - event: RegisteredNFTAddress(indexed address)
+          handler: handleRegisteredNFTAddressV2
+        - event: UnregisteredNFTAddress(indexed address)
+          handler: handleUnregisteredNFTAddressV2
+        - event: AllowedHoldersOfProjects(indexed uint256,address[],uint256[])
+          handler: handleAllowHoldersOfProjectsV2
+        - event: RemovedHoldersOfProjects(indexed uint256,address[],uint256[])
+          handler: handleRemoveHoldersOfProjectsV2
+        - event: DelegationRegistryUpdated(address)
+          handler: handleHolderDelegationRegistryUpdated
+      file: ./src/minter-suite-mapping.ts
+  {{/minterHolderV2Contracts}}
   {{#minterMerkleV1Contracts}}
   - kind: ethereum/contract
     name: 'MinterMerkleV1-{{address}}'
@@ -1358,6 +1404,46 @@ dataSources:
           handler: handleSetBigIntValueProjectConfig
       file: ./src/minter-suite-mapping.ts
   {{/minterMerkleV2Contracts}}
+{{#minterMerkleV3Contracts}}
+  - kind: ethereum/contract
+    name: 'MinterMerkleV3-{{address}}'
+    network: {{network}}
+    source:
+      address: '{{address}}'
+      abi: MinterMerkleV3
+      startBlock: {{startBlock}}
+    mapping:
+      kind: ethereum/events
+      apiVersion: 0.0.5
+      language: wasm/assemblyscript
+      entities:
+        - Project
+        - Contract
+        - MinterFilter
+        - Minter
+        - ProjectMinterConfiguration
+      abis:
+        - name: MinterMerkleV3
+          file: ./abis/MinterMerkleV3.json
+        - name: IFilteredMinterV0
+          file: ./abis/IFilteredMinterV0.json
+        - name: IFilteredMinterMerkleV1
+          file: ./abis/IFilteredMinterMerkleV1.json
+      eventHandlers:
+        - event: PricePerTokenInWeiUpdated(indexed uint256,indexed uint256)
+          handler: handlePricePerTokenInWeiUpdated
+        - event: ProjectCurrencyInfoUpdated(indexed uint256,indexed address,string)
+          handler: handleProjectCurrencyInfoUpdated
+        - event: ConfigValueSet(indexed uint256,bytes32,bytes32)
+          handler: handleSetBytesValueProjectConfig
+        - event: ConfigValueSet(indexed uint256,bytes32,bool)
+          handler: handleSetBooleanValueProjectConfig
+        - event: ConfigValueSet(indexed uint256,bytes32,uint256)
+          handler: handleSetBigIntValueProjectConfig
+        - event: DelegationRegistryUpdated(address)
+          handler: handleMerkleDelegationRegistryUpdated
+      file: ./src/minter-suite-mapping.ts
+  {{/minterMerkleV3Contracts}}
   {{#adminACLV0Contracts}}
   - kind: ethereum/contract
     name: 'AdminACLV0-{{address}}'
