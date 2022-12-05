@@ -414,7 +414,7 @@ type ProjectMinterConfiguration @entity {
 }
 
 type Receipt @entity {
-  "Unique identifier made up of minterAddress-projectId-accountAddress"
+  "Unique identifier made up of minter contract address-projectId-accountAddress"
   id: ID!
 
   "The associated project"

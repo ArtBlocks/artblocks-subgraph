@@ -1234,19 +1234,18 @@ dataSources:
           handler: handlePricePerTokenInWeiUpdated
         - event: ProjectCurrencyInfoUpdated(indexed uint256,indexed address,string)
           handler: handleProjectCurrencyInfoUpdated
-        # TODO: add event handlers for the following events
-        # - event: AuctionHalfLifeRangeSecondsUpdated(uint256,uint256)
-        #   handler: handleAuctionHalfLifeRangeSecondsUpdatedSettlement
-        # - event: SetAuctionDetails(indexed uint256,uint256,uint256,uint256,uint256)
-        #   handler: handleDAExpSettlementSetAuctionDetails
-        # - event: ResetAuctionDetails(indexed uint256,uint256,uint256)
-        #   handler: handleDAExpSettlementResetAuctionDetails
-        # - event: SelloutPriceUpdated(indexed uint256,uint256)
-        #   handler: handleDAExpSettlementSelloutPriceUpdated
-        # - event: ReceiptUpdated(indexed uint256,indexed uint256,uint256,uint256)
-        #   handler: handleDAExpSettlementReceiptUpdated
-        # - event: ArtistAndAdminRevenuesWithdrawn(indexed uint256)
-        #   handler: handleDAExpSettlementArtistAndAdminRevenuesWithdrawn
+        - event: AuctionHalfLifeRangeSecondsUpdated(uint256,uint256)
+          handler: handleAuctionHalfLifeRangeSecondsUpdatedSettlement
+        - event: SetAuctionDetails(indexed uint256,uint256,uint256,uint256,uint256)
+          handler: handleDAExpSettlementSetAuctionDetails
+        - event: ResetAuctionDetails(indexed uint256,uint256,uint256)
+          handler: handleDAExpSettlementResetAuctionDetails
+        - event: SelloutPriceUpdated(indexed uint256,uint256)
+          handler: handleSelloutPriceUpdated
+        - event: ReceiptUpdated(indexed address,indexed uint256,uint256,uint256)
+          handler: handleReceiptUpdated
+        - event: ArtistAndAdminRevenuesWithdrawn(indexed uint256)
+          handler: handleArtistAndAdminRevenuesWithdrawn
       file: ./src/minter-suite-mapping.ts
   {{/minterDAExpSettlementV0Contracts}}
   {{#minterHolderV1Contracts}}
