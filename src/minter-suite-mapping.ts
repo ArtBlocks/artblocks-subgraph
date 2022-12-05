@@ -1081,12 +1081,14 @@ export function handleReceiptUpdated(event: ReceiptUpdated): void {
     let receipt: Receipt = loadOrCreateReceipt(
       minter.id,
       projectId,
-      event.params._purchaser
+      event.params._purchaser,
+      event.block.timestamp
     );
     if (receipt) {
       // update receipt state
       receipt.netPosted = event.params._netPosted;
       receipt.numPurchased = event.params._numPurchased;
+      receipt.updatedAt = event.block.timestamp;
       receipt.save();
       // additionally, sync latest purchase price and number of settleable
       // purchases for project on this minter

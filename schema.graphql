@@ -431,6 +431,8 @@ type Receipt @entity {
 
   "The total quantity of tokens purchased on the project"
   numPurchased: BigInt!
+  
+  updatedAt: BigInt!
 }
 
 enum SaleType {

@@ -1673,6 +1673,12 @@ describe("DAExpSettlementMinters", () => {
         "numPurchased",
         numPurchased.toString()
       );
+      assert.fieldEquals(
+        RECEIPT_ENTITY_TYPE,
+        getReceiptId(minterAddress.toHexString(), project.projectId, purchaser),
+        "updatedAt",
+        CURRENT_BLOCK_TIMESTAMP.toString()
+      );
     });
 
     test("reflects updated receipt values after two receipts", () => {
@@ -1803,6 +1809,8 @@ describe("DAExpSettlementMinters", () => {
           ethereum.Value.fromUnsignedBigInt(numPurchased)
         )
       ];
+      const newBlockTimestamp = CURRENT_BLOCK_TIMESTAMP.plus(BigInt.fromI32(1));
+      event.block.timestamp = newBlockTimestamp;
 
       // handle settleable minter event
       handleReceiptUpdated(changetype<ReceiptUpdated>(event));
@@ -1848,6 +1856,12 @@ describe("DAExpSettlementMinters", () => {
         getReceiptId(minterAddress.toHexString(), project.projectId, purchaser),
         "numPurchased",
         numPurchased.toString()
+      );
+      assert.fieldEquals(
+        RECEIPT_ENTITY_TYPE,
+        getReceiptId(minterAddress.toHexString(), project.projectId, purchaser),
+        "updatedAt",
+        newBlockTimestamp.toString()
       );
     });
   });
