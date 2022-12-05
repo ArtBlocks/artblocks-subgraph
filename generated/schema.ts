@@ -620,6 +620,23 @@ export class Project extends Entity {
     }
   }
 
+  get receipts(): Array<string> | null {
+    let value = this.get("receipts");
+    if (!value || value.kind == ValueKind.NULL) {
+      return null;
+    } else {
+      return value.toStringArray();
+    }
+  }
+
+  set receipts(value: Array<string> | null) {
+    if (!value) {
+      this.unset("receipts");
+    } else {
+      this.set("receipts", Value.fromStringArray(<Array<string>>value));
+    }
+  }
+
   get createdAt(): BigInt {
     let value = this.get("createdAt");
     return value!.toBigInt();
@@ -1317,6 +1334,23 @@ export class Account extends Entity {
     }
   }
 
+  get receipts(): Array<string> | null {
+    let value = this.get("receipts");
+    if (!value || value.kind == ValueKind.NULL) {
+      return null;
+    } else {
+      return value.toStringArray();
+    }
+  }
+
+  set receipts(value: Array<string> | null) {
+    if (!value) {
+      this.unset("receipts");
+    } else {
+      this.set("receipts", Value.fromStringArray(<Array<string>>value));
+    }
+  }
+
   get whitelistedOn(): Array<string> | null {
     let value = this.get("whitelistedOn");
     if (!value || value.kind == ValueKind.NULL) {
@@ -1748,6 +1782,23 @@ export class Minter extends Entity {
     this.set("coreContract", Value.fromString(value));
   }
 
+  get receipts(): Array<string> | null {
+    let value = this.get("receipts");
+    if (!value || value.kind == ValueKind.NULL) {
+      return null;
+    } else {
+      return value.toStringArray();
+    }
+  }
+
+  set receipts(value: Array<string> | null) {
+    if (!value) {
+      this.unset("receipts");
+    } else {
+      this.set("receipts", Value.fromStringArray(<Array<string>>value));
+    }
+  }
+
   get updatedAt(): BigInt {
     let value = this.get("updatedAt");
     return value!.toBigInt();
@@ -1940,6 +1991,83 @@ export class ProjectMinterConfiguration extends Entity {
 
   set extraMinterDetails(value: string) {
     this.set("extraMinterDetails", Value.fromString(value));
+  }
+}
+
+export class Receipt extends Entity {
+  constructor(id: string) {
+    super();
+    this.set("id", Value.fromString(id));
+  }
+
+  save(): void {
+    let id = this.get("id");
+    assert(id != null, "Cannot save Receipt entity without an ID");
+    if (id) {
+      assert(
+        id.kind == ValueKind.STRING,
+        `Entities of type Receipt must have an ID of type String but the id '${id.displayData()}' is of type ${id.displayKind()}`
+      );
+      store.set("Receipt", id.toString(), this);
+    }
+  }
+
+  static load(id: string): Receipt | null {
+    return changetype<Receipt | null>(store.get("Receipt", id));
+  }
+
+  get id(): string {
+    let value = this.get("id");
+    return value!.toString();
+  }
+
+  set id(value: string) {
+    this.set("id", Value.fromString(value));
+  }
+
+  get project(): string {
+    let value = this.get("project");
+    return value!.toString();
+  }
+
+  set project(value: string) {
+    this.set("project", Value.fromString(value));
+  }
+
+  get minter(): string {
+    let value = this.get("minter");
+    return value!.toString();
+  }
+
+  set minter(value: string) {
+    this.set("minter", Value.fromString(value));
+  }
+
+  get account(): string {
+    let value = this.get("account");
+    return value!.toString();
+  }
+
+  set account(value: string) {
+    this.set("account", Value.fromString(value));
+  }
+
+  get netPosted(): BigInt {
+    let value = this.get("netPosted");
+    return value!.toBigInt();
+  }
+
+  set netPosted(value: BigInt) {
+    this.set("netPosted", Value.fromBigInt(value));
+  }
+
+  get numPurchased(): BigInt {
+    let value = this.get("numPurchased");
+    return value!.toBigInt();
+  }
+
+  set numPurchased(value: BigInt) {
+    this.set("numPurchased", Value.fromBigInt(value));
   }
 }
 
