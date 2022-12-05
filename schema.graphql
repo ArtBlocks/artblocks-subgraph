@@ -120,6 +120,9 @@ type Project @entity {
   "Accounts that own tokens of the project"
   owners: [AccountProject!] @derivedFrom(field: "project")
 
+  "Receipts for this project, only on minters with settlement"
+  receipts: [Receipt!] @derivedFrom(field: "project")
+
   createdAt: BigInt!
   updatedAt: BigInt!
   activatedAt: BigInt
@@ -250,6 +253,9 @@ type Account @entity {
   "Projects the account is listed as artist for"
   projectsCreated: [Project!] @derivedFrom(field: "artist")
 
+  "Receipts for the account, on minters with settlement"
+  receipts: [Receipt!] @derivedFrom(field: "account")
+
   "Contracts the account is whitelisted on"
   whitelistedOn: [Whitelisting!] @derivedFrom(field: "account")
 }
@@ -333,6 +339,7 @@ enum MinterType {
   MinterHolderV1
   MinterMerkleV1
   MinterMerkleV2
+  MinterDAExpSettlementV0
 }
 
 type Minter @entity {
@@ -358,6 +365,9 @@ type Minter @entity {
   extraMinterDetails: String!
 
   coreContract: Contract!
+
+  "Receipts for this minter, only for minters with settlement"
+  receipts: [Receipt!] @derivedFrom(field: "minter")
 
   updatedAt: BigInt!
 }
@@ -401,6 +411,28 @@ type ProjectMinterConfiguration @entity {
 
   "Configuration details used by specific minter project configurations (json string)"
   extraMinterDetails: String!
+}
+
+type Receipt @entity {
+  "Unique identifier made up of minter contract address-projectId-accountAddress"
+  id: ID!
+
+  "The associated project"
+  project: Project!
+
+  "The associated minter"
+  minter: Minter!
+
+  "The associated account"
+  account: Account!
+
+  "The total net amount posted (sent to settlement contract) for tokens"
+  netPosted: BigInt!
+
+  "The total quantity of tokens purchased on the project"
+  numPurchased: BigInt!
+  
+  updatedAt: BigInt!
 }
 
 enum SaleType {

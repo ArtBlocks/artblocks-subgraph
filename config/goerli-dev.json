@@ -203,6 +203,13 @@
       "startBlock": 7828562
     }
   ],
+  "minterDAExpSettlementV0Contracts": [
+    {
+      "address": "0x0000000000000000000000000000000000000000",
+      "name": "Flagship Minter for V3 core (TODO-ADD-ADDRESS)",
+      "startBlock": 7000000
+    }
+  ],
   "adminACLV0Contracts": [
     {
       "address": "0x4Cbf3805011f0f4d4daeDa710b2215fBF37288Ad",
