@@ -217,7 +217,7 @@
   ],
   "minterDAExpSettlementV0Contracts": [
     {
-      "address": "0x0000000000000000000000000000000000000000",
+      "address": "0xaC85613A8C8b39a713175bC0F54630199A40D2D8",
       "name": "Flagship Minter for V3 core (TODO-ADD-ADDRESS)",
       "startBlock": 7000000
     }
