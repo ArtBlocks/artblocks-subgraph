@@ -4,9 +4,10 @@ import {
   clearStore,
   test,
   newMockEvent,
-  describe
+  describe,
+  createMockedFunction
 } from "matchstick-as/assembly/index";
-import { ProjectMinterConfiguration } from "../../../generated/schema";
+import { ProjectMinterConfiguration, Receipt } from "../../../generated/schema";
 import {
   addNewMinterToStore,
   addNewProjectMinterConfigToStore,
@@ -16,12 +17,14 @@ import {
   ONE_ETH_IN_WEI,
   PROJECT_ENTITY_TYPE,
   PROJECT_MINTER_CONFIGURATION_ENTITY_TYPE,
+  RECEIPT_ENTITY_TYPE,
   RandomAddressGenerator,
   TEST_CONTRACT_ADDRESS
 } from "../shared-helpers";
 import {
   generateContractSpecificId,
-  getProjectMinterConfigId
+  getProjectMinterConfigId,
+  getReceiptId
 } from "../../../src/helpers";
 // import events from generated minter-suite
 // interfaces
@@ -74,6 +77,14 @@ import {
   SetAuctionDetails as DAExpV2SetAuctionDetails,
   ResetAuctionDetails as DAExpV2ResetAuctionDetails
 } from "../../../generated/MinterDAExpV2/MinterDAExpV2";
+import {
+  AuctionHalfLifeRangeSecondsUpdated as AuctionHalfLifeRangeSecondsUpdatedSettlement,
+  SetAuctionDetails as DAExpSettlementSetAuctionDetails,
+  ResetAuctionDetails as DAExpSettlementResetAuctionDetails,
+  SelloutPriceUpdated,
+  ReceiptUpdated,
+  ArtistAndAdminRevenuesWithdrawn
+} from "../../../generated/MinterDAExpSettlementV0/IFilteredMinterDAExpSettlementV0";
 import {
   AllowedHoldersOfProjects as HolderV0AllowedHoldersOfProjects,
   RemovedHoldersOfProjects as HolderV0RemovedHoldersOfProjects,
@@ -140,7 +151,13 @@ import {
   handleSetAddressValueProjectConfig as handleSetAddressValue,
   handleSetBigIntValueProjectConfig as handleSetBigIntValue,
   handleSetBooleanValueProjectConfig as handleSetBooleanValue,
-  handleSetBytesValueProjectConfig as handleSetBytesValue
+  handleSetBytesValueProjectConfig as handleSetBytesValue,
+  handleAuctionHalfLifeRangeSecondsUpdatedSettlement,
+  handleDAExpSettlementSetAuctionDetails,
+  handleDAExpSettlementResetAuctionDetails,
+  handleSelloutPriceUpdated,
+  handleReceiptUpdated,
+  handleArtistAndAdminRevenuesWithdrawn
 } from "../../../src/minter-suite-mapping";
 
 import {
@@ -902,9 +919,13 @@ describe("MinterDAExp-related tests", () => {
           handleAuctionHalfLifeRangeSecondsUpdatedV1(
             changetype<AuctionHalfLifeRangeSecondsUpdatedV1>(event)
           );
-        } else {
+        } else if (minterType === "MinterDAExpV2") {
           handleAuctionHalfLifeRangeSecondsUpdatedV2(
             changetype<AuctionHalfLifeRangeSecondsUpdatedV2>(event)
+          );
+        } else {
+          handleAuctionHalfLifeRangeSecondsUpdatedSettlement(
+            changetype<AuctionHalfLifeRangeSecondsUpdatedSettlement>(event)
           );
         }
 
@@ -967,9 +988,13 @@ describe("MinterDAExp-related tests", () => {
           handleDAExpSetAuctionDetailsV1(
             changetype<DAExpV1SetAuctionDetails>(event)
           );
-        } else {
+        } else if (minterType === "MinterDAExpV2") {
           handleDAExpSetAuctionDetailsV2(
             changetype<DAExpV2SetAuctionDetails>(event)
+          );
+        } else {
+          handleDAExpSettlementSetAuctionDetails(
+            changetype<DAExpSettlementSetAuctionDetails>(event)
           );
         }
 
@@ -1051,9 +1076,13 @@ describe("MinterDAExp-related tests", () => {
           handleDAExpSetAuctionDetailsV1(
             changetype<DAExpV1SetAuctionDetails>(event)
           );
-        } else {
+        } else if (minterType === "MinterDAExpV2") {
           handleDAExpSetAuctionDetailsV2(
             changetype<DAExpV2SetAuctionDetails>(event)
+          );
+        } else {
+          handleDAExpSettlementSetAuctionDetails(
+            changetype<DAExpSettlementSetAuctionDetails>(event)
           );
         }
 
@@ -1168,9 +1197,13 @@ describe("MinterDAExp-related tests", () => {
           handleDAExpSetAuctionDetailsV1(
             changetype<DAExpV1SetAuctionDetails>(event)
           );
-        } else {
+        } else if (minterType === "MinterDAExpV2") {
           handleDAExpSetAuctionDetailsV2(
             changetype<DAExpV2SetAuctionDetails>(event)
+          );
+        } else {
+          handleDAExpSettlementSetAuctionDetails(
+            changetype<DAExpSettlementSetAuctionDetails>(event)
           );
         }
 
@@ -1236,7 +1269,7 @@ describe("MinterDAExp-related tests", () => {
         event.address = minterAddress;
         event.parameters = [
           new ethereum.EventParam(
-            "_projectId",
+            "projectId",
             ethereum.Value.fromUnsignedBigInt(projectId)
           )
         ];
@@ -1252,9 +1285,27 @@ describe("MinterDAExp-related tests", () => {
           handleDAExpResetAuctionDetailsV1(
             changetype<DAExpV1ResetAuctionDetails>(event)
           );
-        } else {
+        } else if (minterType == "MinterDAExpV2") {
           handleDAExpResetAuctionDetailsV2(
             changetype<DAExpV2ResetAuctionDetails>(event)
+          );
+        } else {
+          // fully populate event for settlement minter
+          event.parameters.push(
+            new ethereum.EventParam(
+              "numPurchases",
+              ethereum.Value.fromUnsignedBigInt(BigInt.fromI32(5))
+            )
+          );
+          event.parameters.push(
+            new ethereum.EventParam(
+              "latestPurchasePrice",
+              ethereum.Value.fromUnsignedBigInt(BigInt.fromI32(1000000))
+            )
+          );
+          // handle settlement minter event
+          handleDAExpSettlementResetAuctionDetails(
+            changetype<DAExpSettlementResetAuctionDetails>(event)
           );
         }
 
@@ -1323,9 +1374,27 @@ describe("MinterDAExp-related tests", () => {
           handleDAExpResetAuctionDetailsV1(
             changetype<DAExpV1ResetAuctionDetails>(event)
           );
-        } else {
+        } else if (minterType == "MinterDAExpV2") {
           handleDAExpResetAuctionDetailsV2(
             changetype<DAExpV2ResetAuctionDetails>(event)
+          );
+        } else {
+          // fully populate event for settlement minter
+          event.parameters.push(
+            new ethereum.EventParam(
+              "numPurchases",
+              ethereum.Value.fromUnsignedBigInt(BigInt.fromI32(5))
+            )
+          );
+          event.parameters.push(
+            new ethereum.EventParam(
+              "latestPurchasePrice",
+              ethereum.Value.fromUnsignedBigInt(BigInt.fromI32(1000000))
+            )
+          );
+          // handle settlement minter event
+          handleDAExpSettlementResetAuctionDetails(
+            changetype<DAExpSettlementResetAuctionDetails>(event)
           );
         }
 
@@ -1424,9 +1493,27 @@ describe("MinterDAExp-related tests", () => {
           handleDAExpResetAuctionDetailsV1(
             changetype<DAExpV1ResetAuctionDetails>(event)
           );
-        } else {
+        } else if (minterType == "MinterDAExpV2") {
           handleDAExpResetAuctionDetailsV2(
             changetype<DAExpV2ResetAuctionDetails>(event)
+          );
+        } else {
+          // fully populate event for settlement minter
+          event.parameters.push(
+            new ethereum.EventParam(
+              "numPurchases",
+              ethereum.Value.fromUnsignedBigInt(BigInt.fromI32(5))
+            )
+          );
+          event.parameters.push(
+            new ethereum.EventParam(
+              "latestPurchasePrice",
+              ethereum.Value.fromUnsignedBigInt(BigInt.fromI32(1000000))
+            )
+          );
+          // handle settlement minter event
+          handleDAExpSettlementResetAuctionDetails(
+            changetype<DAExpSettlementResetAuctionDetails>(event)
           );
         }
 
@@ -1465,6 +1552,587 @@ describe("MinterDAExp-related tests", () => {
           CURRENT_BLOCK_TIMESTAMP.toString()
         );
       }
+    });
+  });
+});
+
+describe("DAExpSettlementMinters", () => {
+  describe("ReceiptUpdated handler", () => {
+    test("reflects updated receipt values after one receipt", () => {
+      clearStore();
+      const minter = addNewMinterToStore("MinterDAExpSettlementV0");
+      const minterAddress: Address = changetype<Address>(
+        Address.fromHexString(minter.id)
+      );
+      const minterType = minter.type;
+
+      const projectId = BigInt.fromI32(1);
+      const project = addNewProjectToStore(
+        TEST_CONTRACT_ADDRESS,
+        projectId,
+        "project 0",
+        randomAddressGenerator.generateRandomAddress(),
+        BigInt.fromI32(0),
+        CURRENT_BLOCK_TIMESTAMP.minus(BigInt.fromI32(10))
+      );
+
+      const projectMinterConfig = new ProjectMinterConfiguration(
+        getProjectMinterConfigId(minterAddress.toHexString(), project.id)
+      );
+      projectMinterConfig.minter = minterAddress.toHexString();
+      projectMinterConfig.project = project.id;
+      projectMinterConfig.extraMinterDetails = "{}";
+      projectMinterConfig.startTime = CURRENT_BLOCK_TIMESTAMP.plus(
+        BigInt.fromI32(100)
+      );
+      projectMinterConfig.halfLifeSeconds = CURRENT_BLOCK_TIMESTAMP.plus(
+        BigInt.fromI32(300)
+      );
+      projectMinterConfig.startPrice = ONE_ETH_IN_WEI;
+      projectMinterConfig.basePrice = ONE_ETH_IN_WEI.div(BigInt.fromI32(10));
+      projectMinterConfig.priceIsConfigured = true;
+      projectMinterConfig.currencyAddress = Address.zero();
+      projectMinterConfig.currencySymbol = "ETH";
+      projectMinterConfig.purchaseToDisabled = false;
+      projectMinterConfig.save();
+
+      // define purchaser and net paid, qty purchased
+      const purchaser = randomAddressGenerator.generateRandomAddress();
+      const netPosted = ONE_ETH_IN_WEI;
+      const actualPurchasePrice = ONE_ETH_IN_WEI.div(BigInt.fromI32(2));
+      let numPurchased = BigInt.fromI32(1);
+
+      const event = newMockEvent();
+      event.address = minterAddress;
+      event.parameters = [
+        new ethereum.EventParam(
+          "_purchaser",
+          ethereum.Value.fromAddress(purchaser)
+        ),
+        new ethereum.EventParam(
+          "_projectId",
+          ethereum.Value.fromUnsignedBigInt(projectId)
+        ),
+        new ethereum.EventParam(
+          "_netPosted",
+          ethereum.Value.fromUnsignedBigInt(netPosted)
+        ),
+        new ethereum.EventParam(
+          "_numPurchased",
+          ethereum.Value.fromUnsignedBigInt(numPurchased)
+        )
+      ];
+      event.block.timestamp = CURRENT_BLOCK_TIMESTAMP;
+
+      // mock the minter functions used in handler
+      // return latest purchase price of 100 wei
+      createMockedFunction(
+        minterAddress,
+        "getProjectLatestPurchasePrice",
+        "getProjectLatestPurchasePrice(uint256):(uint256)"
+      )
+        .withArgs([ethereum.Value.fromUnsignedBigInt(projectId)])
+        .returns([ethereum.Value.fromUnsignedBigInt(actualPurchasePrice)]);
+      // return qty of settleable invocations of 1
+      createMockedFunction(
+        minterAddress,
+        "getNumSettleableInvocations",
+        "getNumSettleableInvocations(uint256):(uint256)"
+      )
+        .withArgs([ethereum.Value.fromUnsignedBigInt(projectId)])
+        .returns([ethereum.Value.fromI32(1)]);
+
+      // handle settlement minter event
+      handleReceiptUpdated(changetype<ReceiptUpdated>(event));
+
+      assert.fieldEquals(
+        PROJECT_MINTER_CONFIGURATION_ENTITY_TYPE,
+        getProjectMinterConfigId(minterAddress.toHexString(), project.id),
+        "extraMinterDetails",
+        `{"currentSettledPrice":${actualPurchasePrice.toString()},"numSettleableInvocations":${1}}`
+      );
+      assert.fieldEquals(
+        RECEIPT_ENTITY_TYPE,
+        getReceiptId(minterAddress.toHexString(), project.projectId, purchaser),
+        "project",
+        project.id
+      );
+      assert.fieldEquals(
+        RECEIPT_ENTITY_TYPE,
+        getReceiptId(minterAddress.toHexString(), project.projectId, purchaser),
+        "project",
+        project.id
+      );
+      assert.fieldEquals(
+        RECEIPT_ENTITY_TYPE,
+        getReceiptId(minterAddress.toHexString(), project.projectId, purchaser),
+        "minter",
+        minterAddress.toHexString()
+      );
+      assert.fieldEquals(
+        RECEIPT_ENTITY_TYPE,
+        getReceiptId(minterAddress.toHexString(), project.projectId, purchaser),
+        "account",
+        purchaser.toHexString()
+      );
+      assert.fieldEquals(
+        RECEIPT_ENTITY_TYPE,
+        getReceiptId(minterAddress.toHexString(), project.projectId, purchaser),
+        "netPosted",
+        netPosted.toString()
+      );
+      assert.fieldEquals(
+        RECEIPT_ENTITY_TYPE,
+        getReceiptId(minterAddress.toHexString(), project.projectId, purchaser),
+        "numPurchased",
+        numPurchased.toString()
+      );
+      assert.fieldEquals(
+        RECEIPT_ENTITY_TYPE,
+        getReceiptId(minterAddress.toHexString(), project.projectId, purchaser),
+        "updatedAt",
+        CURRENT_BLOCK_TIMESTAMP.toString()
+      );
+    });
+
+    test("reflects updated receipt values after two receipts", () => {
+      clearStore();
+      const minter = addNewMinterToStore("MinterDAExpSettlementV0");
+      const minterAddress: Address = changetype<Address>(
+        Address.fromHexString(minter.id)
+      );
+      const minterType = minter.type;
+
+      const projectId = BigInt.fromI32(1);
+      const project = addNewProjectToStore(
+        TEST_CONTRACT_ADDRESS,
+        projectId,
+        "project 0",
+        randomAddressGenerator.generateRandomAddress(),
+        BigInt.fromI32(0),
+        CURRENT_BLOCK_TIMESTAMP.minus(BigInt.fromI32(10))
+      );
+
+      const projectMinterConfig = new ProjectMinterConfiguration(
+        getProjectMinterConfigId(minterAddress.toHexString(), project.id)
+      );
+      projectMinterConfig.minter = minterAddress.toHexString();
+      projectMinterConfig.project = project.id;
+      projectMinterConfig.extraMinterDetails = "{}";
+      projectMinterConfig.startTime = CURRENT_BLOCK_TIMESTAMP.plus(
+        BigInt.fromI32(100)
+      );
+      projectMinterConfig.halfLifeSeconds = CURRENT_BLOCK_TIMESTAMP.plus(
+        BigInt.fromI32(300)
+      );
+      projectMinterConfig.startPrice = ONE_ETH_IN_WEI;
+      projectMinterConfig.basePrice = ONE_ETH_IN_WEI.div(BigInt.fromI32(10));
+      projectMinterConfig.priceIsConfigured = true;
+      projectMinterConfig.currencyAddress = Address.zero();
+      projectMinterConfig.currencySymbol = "ETH";
+      projectMinterConfig.purchaseToDisabled = false;
+      projectMinterConfig.save();
+
+      // define purchaser and net paid, qty purchased
+      const purchaser = randomAddressGenerator.generateRandomAddress();
+      let netPosted = ONE_ETH_IN_WEI;
+      let actualPurchasePrice = ONE_ETH_IN_WEI.div(BigInt.fromI32(2));
+      let numPurchased = BigInt.fromI32(1);
+
+      const event = newMockEvent();
+      event.address = minterAddress;
+      event.parameters = [
+        new ethereum.EventParam(
+          "_purchaser",
+          ethereum.Value.fromAddress(purchaser)
+        ),
+        new ethereum.EventParam(
+          "_projectId",
+          ethereum.Value.fromUnsignedBigInt(projectId)
+        ),
+        new ethereum.EventParam(
+          "_netPosted",
+          ethereum.Value.fromUnsignedBigInt(netPosted)
+        ),
+        new ethereum.EventParam(
+          "_numPurchased",
+          ethereum.Value.fromUnsignedBigInt(numPurchased)
+        )
+      ];
+      event.block.timestamp = CURRENT_BLOCK_TIMESTAMP;
+
+      // mock the minter functions used in handler
+      // return latest purchase price of 100 wei
+      createMockedFunction(
+        minterAddress,
+        "getProjectLatestPurchasePrice",
+        "getProjectLatestPurchasePrice(uint256):(uint256)"
+      )
+        .withArgs([ethereum.Value.fromUnsignedBigInt(projectId)])
+        .returns([ethereum.Value.fromUnsignedBigInt(actualPurchasePrice)]);
+      // return qty of settleable invocations of 1
+      createMockedFunction(
+        minterAddress,
+        "getNumSettleableInvocations",
+        "getNumSettleableInvocations(uint256):(uint256)"
+      )
+        .withArgs([ethereum.Value.fromUnsignedBigInt(projectId)])
+        .returns([ethereum.Value.fromI32(1)]);
+
+      // handle settleable minter event
+      handleReceiptUpdated(changetype<ReceiptUpdated>(event));
+
+      // mock the minter functions used in second handler call
+      // update price and num purchased
+      actualPurchasePrice = ONE_ETH_IN_WEI.div(BigInt.fromI32(3));
+      numPurchased = BigInt.fromI32(2);
+      // return latest purchase price of 100 wei
+      createMockedFunction(
+        minterAddress,
+        "getProjectLatestPurchasePrice",
+        "getProjectLatestPurchasePrice(uint256):(uint256)"
+      )
+        .withArgs([ethereum.Value.fromUnsignedBigInt(projectId)])
+        .returns([ethereum.Value.fromUnsignedBigInt(actualPurchasePrice)]);
+      // return qty of settleable invocations of 1
+      createMockedFunction(
+        minterAddress,
+        "getNumSettleableInvocations",
+        "getNumSettleableInvocations(uint256):(uint256)"
+      )
+        .withArgs([ethereum.Value.fromUnsignedBigInt(projectId)])
+        .returns([ethereum.Value.fromUnsignedBigInt(numPurchased)]);
+      // update event values
+      // net paid is now 1.5 eth
+      netPosted = ONE_ETH_IN_WEI.plus(ONE_ETH_IN_WEI.div(BigInt.fromI32(2)));
+      event.parameters = [
+        new ethereum.EventParam(
+          "_purchaser",
+          ethereum.Value.fromAddress(purchaser)
+        ),
+        new ethereum.EventParam(
+          "_projectId",
+          ethereum.Value.fromUnsignedBigInt(projectId)
+        ),
+        new ethereum.EventParam(
+          "_netPosted",
+          ethereum.Value.fromUnsignedBigInt(netPosted)
+        ),
+        new ethereum.EventParam(
+          "_numPurchased",
+          ethereum.Value.fromUnsignedBigInt(numPurchased)
+        )
+      ];
+      const newBlockTimestamp = CURRENT_BLOCK_TIMESTAMP.plus(BigInt.fromI32(1));
+      event.block.timestamp = newBlockTimestamp;
+
+      // handle settleable minter event
+      handleReceiptUpdated(changetype<ReceiptUpdated>(event));
+
+      assert.fieldEquals(
+        PROJECT_MINTER_CONFIGURATION_ENTITY_TYPE,
+        getProjectMinterConfigId(minterAddress.toHexString(), project.id),
+        "extraMinterDetails",
+        `{"currentSettledPrice":${actualPurchasePrice.toString()},"numSettleableInvocations":${numPurchased.toString()}}`
+      );
+      assert.fieldEquals(
+        RECEIPT_ENTITY_TYPE,
+        getReceiptId(minterAddress.toHexString(), project.projectId, purchaser),
+        "project",
+        project.id
+      );
+      assert.fieldEquals(
+        RECEIPT_ENTITY_TYPE,
+        getReceiptId(minterAddress.toHexString(), project.projectId, purchaser),
+        "project",
+        project.id
+      );
+      assert.fieldEquals(
+        RECEIPT_ENTITY_TYPE,
+        getReceiptId(minterAddress.toHexString(), project.projectId, purchaser),
+        "minter",
+        minterAddress.toHexString()
+      );
+      assert.fieldEquals(
+        RECEIPT_ENTITY_TYPE,
+        getReceiptId(minterAddress.toHexString(), project.projectId, purchaser),
+        "account",
+        purchaser.toHexString()
+      );
+      assert.fieldEquals(
+        RECEIPT_ENTITY_TYPE,
+        getReceiptId(minterAddress.toHexString(), project.projectId, purchaser),
+        "netPosted",
+        netPosted.toString()
+      );
+      assert.fieldEquals(
+        RECEIPT_ENTITY_TYPE,
+        getReceiptId(minterAddress.toHexString(), project.projectId, purchaser),
+        "numPurchased",
+        numPurchased.toString()
+      );
+      assert.fieldEquals(
+        RECEIPT_ENTITY_TYPE,
+        getReceiptId(minterAddress.toHexString(), project.projectId, purchaser),
+        "updatedAt",
+        newBlockTimestamp.toString()
+      );
+    });
+  });
+
+  describe("SelloutPriceUpdated handler", () => {
+    test("reflects updated net settlement price after event", () => {
+      clearStore();
+      const minter = addNewMinterToStore("MinterDAExpSettlementV0");
+      const minterAddress: Address = changetype<Address>(
+        Address.fromHexString(minter.id)
+      );
+      const minterType = minter.type;
+
+      const projectId = BigInt.fromI32(1);
+      const project = addNewProjectToStore(
+        TEST_CONTRACT_ADDRESS,
+        projectId,
+        "project 0",
+        randomAddressGenerator.generateRandomAddress(),
+        BigInt.fromI32(0),
+        CURRENT_BLOCK_TIMESTAMP.minus(BigInt.fromI32(10))
+      );
+
+      const projectMinterConfig = new ProjectMinterConfiguration(
+        getProjectMinterConfigId(minterAddress.toHexString(), project.id)
+      );
+      projectMinterConfig.minter = minterAddress.toHexString();
+      projectMinterConfig.project = project.id;
+      projectMinterConfig.extraMinterDetails = "{}";
+      projectMinterConfig.startTime = CURRENT_BLOCK_TIMESTAMP.plus(
+        BigInt.fromI32(100)
+      );
+      projectMinterConfig.halfLifeSeconds = CURRENT_BLOCK_TIMESTAMP.plus(
+        BigInt.fromI32(300)
+      );
+      projectMinterConfig.startPrice = ONE_ETH_IN_WEI;
+      projectMinterConfig.basePrice = ONE_ETH_IN_WEI.div(BigInt.fromI32(10));
+      projectMinterConfig.priceIsConfigured = true;
+      projectMinterConfig.currencyAddress = Address.zero();
+      projectMinterConfig.currencySymbol = "ETH";
+      projectMinterConfig.purchaseToDisabled = false;
+      projectMinterConfig.save();
+
+      // define relevant variables
+      let selloutPrice = ONE_ETH_IN_WEI;
+
+      const event = newMockEvent();
+      event.address = minterAddress;
+      event.parameters = [
+        new ethereum.EventParam(
+          "_projectId",
+          ethereum.Value.fromUnsignedBigInt(projectId)
+        ),
+        new ethereum.EventParam(
+          "_selloutPrice",
+          ethereum.Value.fromUnsignedBigInt(selloutPrice)
+        )
+      ];
+      event.block.timestamp = CURRENT_BLOCK_TIMESTAMP;
+
+      // mock the minter functions used in handler
+      // return latest purchase price of 100 wei
+      createMockedFunction(
+        minterAddress,
+        "getProjectLatestPurchasePrice",
+        "getProjectLatestPurchasePrice(uint256):(uint256)"
+      )
+        .withArgs([ethereum.Value.fromUnsignedBigInt(projectId)])
+        .returns([ethereum.Value.fromUnsignedBigInt(selloutPrice)]);
+
+      // handle settlement minter event
+      handleSelloutPriceUpdated(changetype<SelloutPriceUpdated>(event));
+
+      assert.fieldEquals(
+        PROJECT_MINTER_CONFIGURATION_ENTITY_TYPE,
+        getProjectMinterConfigId(minterAddress.toHexString(), project.id),
+        "extraMinterDetails",
+        `{"currentSettledPrice":${selloutPrice.toString()}}`
+      );
+    });
+
+    test("reflects updated net settlement price after multiple events", () => {
+      clearStore();
+      const minter = addNewMinterToStore("MinterDAExpSettlementV0");
+      const minterAddress: Address = changetype<Address>(
+        Address.fromHexString(minter.id)
+      );
+      const minterType = minter.type;
+
+      const projectId = BigInt.fromI32(1);
+      const project = addNewProjectToStore(
+        TEST_CONTRACT_ADDRESS,
+        projectId,
+        "project 0",
+        randomAddressGenerator.generateRandomAddress(),
+        BigInt.fromI32(0),
+        CURRENT_BLOCK_TIMESTAMP.minus(BigInt.fromI32(10))
+      );
+
+      const projectMinterConfig = new ProjectMinterConfiguration(
+        getProjectMinterConfigId(minterAddress.toHexString(), project.id)
+      );
+      projectMinterConfig.minter = minterAddress.toHexString();
+      projectMinterConfig.project = project.id;
+      projectMinterConfig.extraMinterDetails = "{}";
+      projectMinterConfig.startTime = CURRENT_BLOCK_TIMESTAMP.plus(
+        BigInt.fromI32(100)
+      );
+      projectMinterConfig.halfLifeSeconds = CURRENT_BLOCK_TIMESTAMP.plus(
+        BigInt.fromI32(300)
+      );
+      projectMinterConfig.startPrice = ONE_ETH_IN_WEI;
+      projectMinterConfig.basePrice = ONE_ETH_IN_WEI.div(BigInt.fromI32(10));
+      projectMinterConfig.priceIsConfigured = true;
+      projectMinterConfig.currencyAddress = Address.zero();
+      projectMinterConfig.currencySymbol = "ETH";
+      projectMinterConfig.purchaseToDisabled = false;
+      projectMinterConfig.save();
+
+      // define relevant variables
+      let selloutPrice = ONE_ETH_IN_WEI;
+
+      const event = newMockEvent();
+      event.address = minterAddress;
+      event.parameters = [
+        new ethereum.EventParam(
+          "_projectId",
+          ethereum.Value.fromUnsignedBigInt(projectId)
+        ),
+        new ethereum.EventParam(
+          "_selloutPrice",
+          ethereum.Value.fromUnsignedBigInt(selloutPrice)
+        )
+      ];
+      event.block.timestamp = CURRENT_BLOCK_TIMESTAMP;
+
+      // mock the minter functions used in handler
+      // return latest purchase price of 100 wei
+      createMockedFunction(
+        minterAddress,
+        "getProjectLatestPurchasePrice",
+        "getProjectLatestPurchasePrice(uint256):(uint256)"
+      )
+        .withArgs([ethereum.Value.fromUnsignedBigInt(projectId)])
+        .returns([ethereum.Value.fromUnsignedBigInt(selloutPrice)]);
+
+      // handle settlement minter event
+      handleSelloutPriceUpdated(changetype<SelloutPriceUpdated>(event));
+
+      // update mocks, event, and handle a second event
+      selloutPrice = ONE_ETH_IN_WEI.div(BigInt.fromI32(2));
+      event.parameters = [
+        new ethereum.EventParam(
+          "_projectId",
+          ethereum.Value.fromUnsignedBigInt(projectId)
+        ),
+        new ethereum.EventParam(
+          "_selloutPrice",
+          ethereum.Value.fromUnsignedBigInt(selloutPrice)
+        )
+      ];
+      createMockedFunction(
+        minterAddress,
+        "getProjectLatestPurchasePrice",
+        "getProjectLatestPurchasePrice(uint256):(uint256)"
+      )
+        .withArgs([ethereum.Value.fromUnsignedBigInt(projectId)])
+        .returns([ethereum.Value.fromUnsignedBigInt(selloutPrice)]);
+      // handle second settlement minter event
+      handleSelloutPriceUpdated(changetype<SelloutPriceUpdated>(event));
+
+      // assert settlement net price reflects the second event's value
+      assert.fieldEquals(
+        PROJECT_MINTER_CONFIGURATION_ENTITY_TYPE,
+        getProjectMinterConfigId(minterAddress.toHexString(), project.id),
+        "extraMinterDetails",
+        `{"currentSettledPrice":${selloutPrice.toString()}}`
+      );
+    });
+  });
+
+  describe("ArtistAndAdminRevenuesWithdrawn handler", () => {
+    test("reflects updated state after artist and admin withdraw", () => {
+      clearStore();
+      const minter = addNewMinterToStore("MinterDAExpSettlementV0");
+      const minterAddress: Address = changetype<Address>(
+        Address.fromHexString(minter.id)
+      );
+      const minterType = minter.type;
+
+      const projectId = BigInt.fromI32(1);
+      const project = addNewProjectToStore(
+        TEST_CONTRACT_ADDRESS,
+        projectId,
+        "project 0",
+        randomAddressGenerator.generateRandomAddress(),
+        BigInt.fromI32(0),
+        CURRENT_BLOCK_TIMESTAMP.minus(BigInt.fromI32(10))
+      );
+
+      const projectMinterConfig = new ProjectMinterConfiguration(
+        getProjectMinterConfigId(minterAddress.toHexString(), project.id)
+      );
+      projectMinterConfig.minter = minterAddress.toHexString();
+      projectMinterConfig.project = project.id;
+      projectMinterConfig.extraMinterDetails = "{}";
+      projectMinterConfig.startTime = CURRENT_BLOCK_TIMESTAMP.plus(
+        BigInt.fromI32(100)
+      );
+      projectMinterConfig.halfLifeSeconds = CURRENT_BLOCK_TIMESTAMP.plus(
+        BigInt.fromI32(300)
+      );
+      projectMinterConfig.startPrice = ONE_ETH_IN_WEI;
+      projectMinterConfig.basePrice = ONE_ETH_IN_WEI.div(BigInt.fromI32(10));
+      projectMinterConfig.priceIsConfigured = true;
+      projectMinterConfig.currencyAddress = Address.zero();
+      projectMinterConfig.currencySymbol = "ETH";
+      projectMinterConfig.purchaseToDisabled = false;
+      projectMinterConfig.save();
+
+      // define purchaser and net paid, qty purchased
+      const updatedLatestPurchasePrice = ONE_ETH_IN_WEI.div(BigInt.fromI32(2));
+      let numPurchased = BigInt.fromI32(1);
+
+      const event = newMockEvent();
+      event.address = minterAddress;
+      event.parameters = [
+        new ethereum.EventParam(
+          "_projectId",
+          ethereum.Value.fromUnsignedBigInt(projectId)
+        )
+      ];
+      event.block.timestamp = CURRENT_BLOCK_TIMESTAMP;
+
+      // mock the minter functions used in handler
+      // return latest purchase price of 100 wei
+      createMockedFunction(
+        minterAddress,
+        "getProjectLatestPurchasePrice",
+        "getProjectLatestPurchasePrice(uint256):(uint256)"
+      )
+        .withArgs([ethereum.Value.fromUnsignedBigInt(projectId)])
+        .returns([
+          ethereum.Value.fromUnsignedBigInt(updatedLatestPurchasePrice)
+        ]);
+
+      // handle settlement minter event
+      handleArtistAndAdminRevenuesWithdrawn(
+        changetype<ArtistAndAdminRevenuesWithdrawn>(event)
+      );
+
+      assert.fieldEquals(
+        PROJECT_MINTER_CONFIGURATION_ENTITY_TYPE,
+        getProjectMinterConfigId(minterAddress.toHexString(), project.id),
+        "extraMinterDetails",
+        `{"currentSettledPrice":${updatedLatestPurchasePrice.toString()},"auctionRevenuesCollected":${true}}`
+      );
     });
   });
 });
