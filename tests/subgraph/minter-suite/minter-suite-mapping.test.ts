@@ -1614,12 +1614,12 @@ describe("DAExpSettlementMinters", () => {
           ethereum.Value.fromUnsignedBigInt(projectId)
         ),
         new ethereum.EventParam(
-          "_netPosted",
-          ethereum.Value.fromUnsignedBigInt(netPosted)
-        ),
-        new ethereum.EventParam(
           "_numPurchased",
           ethereum.Value.fromUnsignedBigInt(numPurchased)
+        ),
+        new ethereum.EventParam(
+          "_netPosted",
+          ethereum.Value.fromUnsignedBigInt(netPosted)
         )
       ];
       event.block.timestamp = CURRENT_BLOCK_TIMESTAMP;
@@ -1751,12 +1751,12 @@ describe("DAExpSettlementMinters", () => {
           ethereum.Value.fromUnsignedBigInt(projectId)
         ),
         new ethereum.EventParam(
-          "_netPosted",
-          ethereum.Value.fromUnsignedBigInt(netPosted)
-        ),
-        new ethereum.EventParam(
           "_numPurchased",
           ethereum.Value.fromUnsignedBigInt(numPurchased)
+        ),
+        new ethereum.EventParam(
+          "_netPosted",
+          ethereum.Value.fromUnsignedBigInt(netPosted)
         )
       ];
       event.block.timestamp = CURRENT_BLOCK_TIMESTAMP;
@@ -1815,12 +1815,12 @@ describe("DAExpSettlementMinters", () => {
           ethereum.Value.fromUnsignedBigInt(projectId)
         ),
         new ethereum.EventParam(
-          "_netPosted",
-          ethereum.Value.fromUnsignedBigInt(netPosted)
-        ),
-        new ethereum.EventParam(
           "_numPurchased",
           ethereum.Value.fromUnsignedBigInt(numPurchased)
+        ),
+        new ethereum.EventParam(
+          "_netPosted",
+          ethereum.Value.fromUnsignedBigInt(netPosted)
         )
       ];
       const newBlockTimestamp = CURRENT_BLOCK_TIMESTAMP.plus(BigInt.fromI32(1));
