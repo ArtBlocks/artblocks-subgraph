@@ -6,11 +6,13 @@ import {
   JSONValue,
   JSONValueKind,
   TypedMap,
-  store
+  store,
+  ethereum
 } from "@graphprotocol/graph-ts";
 import { MinterDAExpV0 } from "../generated/MinterDAExpV0/MinterDAExpV0";
 import { MinterDAExpV1 } from "../generated/MinterDAExpV1/MinterDAExpV1";
 import { MinterDAExpV2 } from "../generated/MinterDAExpV2/MinterDAExpV2";
+import { MinterDAExpSettlementV0 } from "../generated/MinterDAExpSettlementV0/MinterDAExpSettlementV0";
 import { MinterDALinV0 } from "../generated/MinterDALinV0/MinterDALinV0";
 import { MinterDALinV1 } from "../generated/MinterDALinV1/MinterDALinV1";
 import { MinterDALinV2 } from "../generated/MinterDALinV2/MinterDALinV2";
@@ -19,7 +21,8 @@ import {
   Minter,
   ProjectMinterConfiguration,
   Account,
-  Whitelisting
+  Whitelisting,
+  Receipt
 } from "../generated/schema";
 
 export function generateProjectExternalAssetDependencyId(
@@ -98,6 +101,48 @@ export function getProjectMinterConfigId(
   return minterId + "-" + projectId.split("-")[1];
 }
 
+// @dev projectId is the number of the project, contract-specific id is not required
+export function getReceiptId(
+  minterId: string,
+  projectId: BigInt,
+  accountAddress: Address
+): string {
+  return (
+    minterId + "-" + projectId.toString() + "-" + accountAddress.toHexString()
+  );
+}
+
+// @dev projectId must be the contract-specific id
+export function loadOrCreateReceipt(
+  minterId: string,
+  projectId: string,
+  accountAddress: Address,
+  timestamp: BigInt
+): Receipt {
+  let receiptId = getReceiptId(
+    minterId,
+    BigInt.fromString(projectId.split("-")[1]),
+    accountAddress
+  );
+  let receipt = Receipt.load(receiptId);
+  if (receipt) {
+    return receipt;
+  }
+  // create new Receipt entity
+  receipt = new Receipt(receiptId);
+  // populate based on format of receiptId
+  receipt.minter = minterId;
+  receipt.project = projectId;
+  receipt.account = accountAddress.toHexString();
+  // populate non-nullable values with default solidity values
+  receipt.netPosted = BigInt.fromI32(0);
+  receipt.numPurchased = BigInt.fromI32(0);
+  // save and return
+  receipt.updatedAt = timestamp;
+  receipt.save();
+  return receipt;
+}
+
 export function loadOrCreateMinter(
   minterAddress: Address,
   timestamp: BigInt
@@ -149,6 +194,12 @@ export function loadOrCreateMinter(
     let minterDAExpV2Contract = MinterDAExpV2.bind(minterAddress);
     minter.minimumHalfLifeInSeconds = minterDAExpV2Contract.minimumPriceDecayHalfLifeSeconds();
     minter.maximumHalfLifeInSeconds = minterDAExpV2Contract.maximumPriceDecayHalfLifeSeconds();
+  } else if (minterType == "MinterDAExpSettlementV0") {
+    let minterDAExpSettlementV0Contract = MinterDAExpSettlementV0.bind(
+      minterAddress
+    );
+    minter.minimumHalfLifeInSeconds = minterDAExpSettlementV0Contract.minimumPriceDecayHalfLifeSeconds();
+    minter.maximumHalfLifeInSeconds = minterDAExpSettlementV0Contract.maximumPriceDecayHalfLifeSeconds();
   }
 
   minter.updatedAt = timestamp;

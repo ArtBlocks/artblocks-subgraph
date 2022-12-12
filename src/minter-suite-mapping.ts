@@ -55,9 +55,20 @@ import {
 } from "../generated/MinterDAExpV2/MinterDAExpV2";
 
 import {
+  AuctionHalfLifeRangeSecondsUpdated as AuctionHalfLifeRangeSecondsUpdatedSettlement,
+  ResetAuctionDetails as DAExpSettlementResetAuctionDetails,
+  SetAuctionDetails as DAExpSettlementSetAuctionDetails,
+  ReceiptUpdated,
+  SelloutPriceUpdated,
+  ArtistAndAdminRevenuesWithdrawn,
+  IFilteredMinterDAExpSettlementV0
+} from "../generated/MinterDAExpSettlementV0/IFilteredMinterDAExpSettlementV0";
+
+import {
   Minter,
   Project,
-  ProjectMinterConfiguration
+  ProjectMinterConfiguration,
+  Receipt
 } from "../generated/schema";
 import {
   arrayToJSONValue,
@@ -69,7 +80,8 @@ import {
   loadOrCreateMinter,
   stringToJSONString,
   stringToJSONValue,
-  typedMapToJSONString
+  typedMapToJSONString,
+  loadOrCreateReceipt
 } from "./helpers";
 import {
   ConfigKeyRemoved,
@@ -332,6 +344,11 @@ export function handleAuctionHalfLifeRangeSecondsUpdatedV2(
 ): void {
   handleAuctionHalfLifeRangeSecondsUpdatedGeneric(event);
 }
+export function handleAuctionHalfLifeRangeSecondsUpdatedSettlement(
+  event: AuctionHalfLifeRangeSecondsUpdatedSettlement
+): void {
+  handleAuctionHalfLifeRangeSecondsUpdatedGeneric(event);
+}
 
 // MinterDAExp events
 export function handleAuctionHalfLifeRangeSecondsUpdatedGeneric<T>(
@@ -341,7 +358,8 @@ export function handleAuctionHalfLifeRangeSecondsUpdatedGeneric<T>(
     !(
       event instanceof AuctionHalfLifeRangeSecondsUpdatedV0 ||
       event instanceof AuctionHalfLifeRangeSecondsUpdatedV1 ||
-      event instanceof AuctionHalfLifeRangeSecondsUpdatedV2
+      event instanceof AuctionHalfLifeRangeSecondsUpdatedV2 ||
+      event instanceof AuctionHalfLifeRangeSecondsUpdatedSettlement
     )
   ) {
     return;
@@ -373,13 +391,19 @@ export function handleDAExpSetAuctionDetailsV2(
 ): void {
   handleDAExpSetAuctionDetailsGeneric(event);
 }
+export function handleDAExpSettlementSetAuctionDetails(
+  event: DAExpSettlementSetAuctionDetails
+): void {
+  handleDAExpSetAuctionDetailsGeneric(event);
+}
 
 export function handleDAExpSetAuctionDetailsGeneric<T>(event: T): void {
   if (
     !(
       event instanceof DAExpV0SetAuctionDetails ||
       event instanceof DAExpV1SetAuctionDetails ||
-      event instanceof DAExpV2SetAuctionDetails
+      event instanceof DAExpV2SetAuctionDetails ||
+      event instanceof DAExpSettlementSetAuctionDetails
     )
   ) {
     return;
@@ -424,13 +448,19 @@ export function handleDAExpResetAuctionDetailsV2(
 ): void {
   handleDAExpResetAuctionDetailsGeneric(event);
 }
+export function handleDAExpSettlementResetAuctionDetails(
+  event: DAExpSettlementResetAuctionDetails
+): void {
+  handleDAExpResetAuctionDetailsGeneric(event);
+}
 
 export function handleDAExpResetAuctionDetailsGeneric<T>(event: T): void {
   if (
     !(
       event instanceof DAExpV0ResetAuctionDetails ||
       event instanceof DAExpV1ResetAuctionDetails ||
-      event instanceof DAExpV2ResetAuctionDetails
+      event instanceof DAExpV2ResetAuctionDetails ||
+      event instanceof DAExpSettlementResetAuctionDetails
     )
   ) {
     return;
@@ -1117,7 +1147,170 @@ export function handleRemoveAddressManyValueMinterConfig(
   handleRemoveManyMinterConfig(event);
 }
 
+export function handleReceiptUpdated(event: ReceiptUpdated): void {
+  let minter = loadOrCreateMinter(event.address, event.block.timestamp);
+  if (minter) {
+    // load or create receipt
+    let projectId = generateContractSpecificId(
+      Address.fromString(minter.coreContract),
+      event.params._projectId
+    );
+    let receipt: Receipt = loadOrCreateReceipt(
+      minter.id,
+      projectId,
+      event.params._purchaser,
+      event.block.timestamp
+    );
+    if (receipt) {
+      // update receipt state
+      receipt.netPosted = event.params._netPosted;
+      receipt.numPurchased = event.params._numPurchased;
+      receipt.updatedAt = event.block.timestamp;
+      receipt.save();
+      // additionally, sync latest purchase price and number of settleable
+      // purchases for project on this minter
+      // @dev this is because this can be the only event emitted from the
+      // minter during a purchase on a settleable minter
+      syncLatestPurchasePrice(event.address, event.params._projectId, event);
+      syncNumSettleableInvocations(
+        event.address,
+        event.params._projectId,
+        event
+      );
+    } else {
+      log.warning(
+        "Error while loading/creating receipt in tx {}, log index {}",
+        [
+          event.transaction.hash.toHexString(),
+          event.transactionLogIndex.toString()
+        ]
+      );
+    }
+  } else {
+    log.warning("Error while loading/creating minter with id {}", [
+      event.address.toHexString()
+    ]);
+  }
+}
+
+export function handleSelloutPriceUpdated(event: SelloutPriceUpdated): void {
+  syncLatestPurchasePrice(event.address, event.params._projectId, event);
+}
+
+export function handleArtistAndAdminRevenuesWithdrawn(
+  event: ArtistAndAdminRevenuesWithdrawn
+): void {
+  // the function that emits this event can affect latest purchase price, so sync it
+  syncLatestPurchasePrice(event.address, event.params._projectId, event);
+  // update project extra minter details key `auctionRevenuesCollected` to true
+  let genericEvent: ConfigValueSetBool;
+  genericEvent = changetype<ConfigValueSetBool>(event);
+  genericEvent.parameters = [
+    new ethereum.EventParam(
+      "_projectId",
+      ethereum.Value.fromUnsignedBigInt(event.params._projectId)
+    ),
+    new ethereum.EventParam(
+      "_key",
+      ethereum.Value.fromBytes(Bytes.fromUTF8("auctionRevenuesCollected"))
+    ),
+    new ethereum.EventParam("_value", ethereum.Value.fromBoolean(true))
+  ];
+  // call generic handler to populate project's extraMinterDetails
+  handleSetValueProjectConfig(genericEvent);
+}
+
 // Helpers
+/**
+ * @notice Syncs a (settleable) minter's project latest purchase price in
+ * extraMinterDetails to the current value on the minter.
+ * @param minterAddress minter address to by synced
+ * @param projectId project id to sync (big int, not contract specific id)
+ * @param event The event emitted from the minter that triggered this sync
+ */
+function syncLatestPurchasePrice(
+  minterAddress: Address,
+  projectId: BigInt,
+  event: ethereum.Event
+): void {
+  let settleableMinter = IFilteredMinterDAExpSettlementV0.bind(minterAddress);
+  let latestPurchasePrice = settleableMinter.getProjectLatestPurchasePrice(
+    projectId
+  );
+  // update extraMinterDetails key `currentSettledPrice` to be latestPurchasePrice
+  let genericEvent: ConfigValueSetBigInt = new ConfigValueSetBigInt(
+    event.address,
+    event.logIndex,
+    event.transactionLogIndex,
+    event.logType,
+    event.block,
+    event.transaction,
+    [],
+    event.receipt
+  );
+  genericEvent.parameters = [
+    new ethereum.EventParam(
+      "_projectId",
+      ethereum.Value.fromUnsignedBigInt(projectId)
+    ),
+    new ethereum.EventParam(
+      "_key",
+      ethereum.Value.fromBytes(Bytes.fromUTF8("currentSettledPrice"))
+    ),
+    new ethereum.EventParam(
+      "_value",
+      ethereum.Value.fromUnsignedBigInt(latestPurchasePrice)
+    )
+  ];
+  // call generic handler to populate project's extraMinterDetails
+  handleSetValueProjectConfig(genericEvent);
+}
+
+/**
+ * @notice Syncs a (settleable) minter's project number of settleable
+ * invocations in extraMinterDetails to the current value on the minter.
+ * @param minterAddress minter address to by synced
+ * @param projectId project id to sync (big int, not contract specific id)
+ * @param event The event emitted from the minter that triggered this sync
+ */
+function syncNumSettleableInvocations(
+  minterAddress: Address,
+  projectId: BigInt,
+  event: ethereum.Event
+): void {
+  let settleableMinter = IFilteredMinterDAExpSettlementV0.bind(minterAddress);
+  let numSettleableInvocations = settleableMinter.getNumSettleableInvocations(
+    projectId
+  );
+  // update extraMinterDetails key `numSettleableInvocations` to be numSettleableInvocations
+  let genericEvent: ConfigValueSetBigInt = new ConfigValueSetBigInt(
+    event.address,
+    event.logIndex,
+    event.transactionLogIndex,
+    event.logType,
+    event.block,
+    event.transaction,
+    [],
+    event.receipt
+  );
+  genericEvent.parameters = [
+    new ethereum.EventParam(
+      "_projectId",
+      ethereum.Value.fromUnsignedBigInt(projectId)
+    ),
+    new ethereum.EventParam(
+      "_key",
+      ethereum.Value.fromBytes(Bytes.fromUTF8("numSettleableInvocations"))
+    ),
+    new ethereum.EventParam(
+      "_value",
+      ethereum.Value.fromUnsignedBigInt(numSettleableInvocations)
+    )
+  ];
+  // call generic handler to populate project's extraMinterDetails
+  handleSetValueProjectConfig(genericEvent);
+}
+
 class MinterProjectAndConfig {
   minter: Minter;
   project: Project;
