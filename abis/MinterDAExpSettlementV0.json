@@ -401,13 +401,13 @@
         {
           "indexed": false,
           "internalType": "uint256",
-          "name": "_netPosted",
+          "name": "_numPurchased",
           "type": "uint256"
         },
         {
           "indexed": false,
           "internalType": "uint256",
-          "name": "_numPurchased",
+          "name": "_netPosted",
           "type": "uint256"
         }
       ],
