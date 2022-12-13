@@ -423,11 +423,11 @@ export class ReceiptUpdated__Params {
     return this._event.parameters[1].value.toBigInt();
   }
 
-  get _netPosted(): BigInt {
+  get _numPurchased(): BigInt {
     return this._event.parameters[2].value.toBigInt();
   }
 
-  get _numPurchased(): BigInt {
+  get _netPosted(): BigInt {
     return this._event.parameters[3].value.toBigInt();
   }
 }
@@ -651,6 +651,41 @@ export class IFilteredMinterDAExpSettlementV0 extends ethereum.SmartContract {
         value[3].toAddress()
       )
     );
+  }
+
+  getProjectExcessSettlementFunds(
+    _projectId: BigInt,
+    _walletAddress: Address
+  ): BigInt {
+    let result = super.call(
+      "getProjectExcessSettlementFunds",
+      "getProjectExcessSettlementFunds(uint256,address):(uint256)",
+      [
+        ethereum.Value.fromUnsignedBigInt(_projectId),
+        ethereum.Value.fromAddress(_walletAddress)
+      ]
+    );
+
+    return result[0].toBigInt();
+  }
+
+  try_getProjectExcessSettlementFunds(
+    _projectId: BigInt,
+    _walletAddress: Address
+  ): ethereum.CallResult<BigInt> {
+    let result = super.tryCall(
+      "getProjectExcessSettlementFunds",
+      "getProjectExcessSettlementFunds(uint256,address):(uint256)",
+      [
+        ethereum.Value.fromUnsignedBigInt(_projectId),
+        ethereum.Value.fromAddress(_walletAddress)
+      ]
+    );
+    if (result.reverted) {
+      return new ethereum.CallResult();
+    }
+    let value = result.value;
+    return ethereum.CallResult.fromValue(value[0].toBigInt());
   }
 
   getProjectLatestPurchasePrice(_projectId: BigInt): BigInt {
