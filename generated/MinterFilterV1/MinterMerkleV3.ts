@@ -292,6 +292,42 @@ export class ConfigValueSet3__Params {
   }
 }
 
+export class DefaultMaxInvocationsPerAddress extends ethereum.Event {
+  get params(): DefaultMaxInvocationsPerAddress__Params {
+    return new DefaultMaxInvocationsPerAddress__Params(this);
+  }
+}
+
+export class DefaultMaxInvocationsPerAddress__Params {
+  _event: DefaultMaxInvocationsPerAddress;
+
+  constructor(event: DefaultMaxInvocationsPerAddress) {
+    this._event = event;
+  }
+
+  get defaultMaxInvocationsPerAddress(): BigInt {
+    return this._event.parameters[0].value.toBigInt();
+  }
+}
+
+export class DelegationRegistryUpdated extends ethereum.Event {
+  get params(): DelegationRegistryUpdated__Params {
+    return new DelegationRegistryUpdated__Params(this);
+  }
+}
+
+export class DelegationRegistryUpdated__Params {
+  _event: DelegationRegistryUpdated;
+
+  constructor(event: DelegationRegistryUpdated) {
+    this._event = event;
+  }
+
+  get delegationRegistryAddress(): Address {
+    return this._event.parameters[0].value.toAddress();
+  }
+}
+
 export class PricePerTokenInWeiUpdated extends ethereum.Event {
   get params(): PricePerTokenInWeiUpdated__Params {
     return new PricePerTokenInWeiUpdated__Params(this);
@@ -362,7 +398,7 @@ export class PurchaseToDisabledUpdated__Params {
   }
 }
 
-export class MinterMerkleV1__getPriceInfoResult {
+export class MinterMerkleV3__getPriceInfoResult {
   value0: boolean;
   value1: BigInt;
   value2: string;
@@ -406,7 +442,7 @@ export class MinterMerkleV1__getPriceInfoResult {
   }
 }
 
-export class MinterMerkleV1__projectConfigResult {
+export class MinterMerkleV3__projectConfigResult {
   value0: boolean;
   value1: boolean;
   value2: boolean;
@@ -472,7 +508,7 @@ export class MinterMerkleV1__projectConfigResult {
   }
 }
 
-export class MinterMerkleV1__projectRemainingInvocationsForAddressResult {
+export class MinterMerkleV3__projectRemainingInvocationsForAddressResult {
   value0: boolean;
   value1: BigInt;
 
@@ -497,9 +533,9 @@ export class MinterMerkleV1__projectRemainingInvocationsForAddressResult {
   }
 }
 
-export class MinterMerkleV1 extends ethereum.SmartContract {
-  static bind(address: Address): MinterMerkleV1 {
-    return new MinterMerkleV1("MinterMerkleV1", address);
+export class MinterMerkleV3 extends ethereum.SmartContract {
+  static bind(address: Address): MinterMerkleV3 {
+    return new MinterMerkleV3("MinterMerkleV3", address);
   }
 
   DEFAULT_MAX_INVOCATIONS_PER_ADDRESS(): BigInt {
@@ -525,6 +561,29 @@ export class MinterMerkleV1 extends ethereum.SmartContract {
     return ethereum.CallResult.fromValue(value[0].toBigInt());
   }
 
+  delegationRegistryAddress(): Address {
+    let result = super.call(
+      "delegationRegistryAddress",
+      "delegationRegistryAddress():(address)",
+      []
+    );
+
+    return result[0].toAddress();
+  }
+
+  try_delegationRegistryAddress(): ethereum.CallResult<Address> {
+    let result = super.tryCall(
+      "delegationRegistryAddress",
+      "delegationRegistryAddress():(address)",
+      []
+    );
+    if (result.reverted) {
+      return new ethereum.CallResult();
+    }
+    let value = result.value;
+    return ethereum.CallResult.fromValue(value[0].toAddress());
+  }
+
   genArt721CoreAddress(): Address {
     let result = super.call(
       "genArt721CoreAddress",
@@ -548,14 +607,14 @@ export class MinterMerkleV1 extends ethereum.SmartContract {
     return ethereum.CallResult.fromValue(value[0].toAddress());
   }
 
-  getPriceInfo(_projectId: BigInt): MinterMerkleV1__getPriceInfoResult {
+  getPriceInfo(_projectId: BigInt): MinterMerkleV3__getPriceInfoResult {
     let result = super.call(
       "getPriceInfo",
       "getPriceInfo(uint256):(bool,uint256,string,address)",
       [ethereum.Value.fromUnsignedBigInt(_projectId)]
     );
 
-    return new MinterMerkleV1__getPriceInfoResult(
+    return new MinterMerkleV3__getPriceInfoResult(
       result[0].toBoolean(),
       result[1].toBigInt(),
       result[2].toString(),
@@ -565,7 +624,7 @@ export class MinterMerkleV1 extends ethereum.SmartContract {
 
   try_getPriceInfo(
     _projectId: BigInt
-  ): ethereum.CallResult<MinterMerkleV1__getPriceInfoResult> {
+  ): ethereum.CallResult<MinterMerkleV3__getPriceInfoResult> {
     let result = super.tryCall(
       "getPriceInfo",
       "getPriceInfo(uint256):(bool,uint256,string,address)",
@@ -576,7 +635,7 @@ export class MinterMerkleV1 extends ethereum.SmartContract {
     }
     let value = result.value;
     return ethereum.CallResult.fromValue(
-      new MinterMerkleV1__getPriceInfoResult(
+      new MinterMerkleV3__getPriceInfoResult(
         value[0].toBoolean(),
         value[1].toBigInt(),
         value[2].toString(),
@@ -676,14 +735,14 @@ export class MinterMerkleV1 extends ethereum.SmartContract {
     return ethereum.CallResult.fromValue(value[0].toBytes());
   }
 
-  projectConfig(param0: BigInt): MinterMerkleV1__projectConfigResult {
+  projectConfig(param0: BigInt): MinterMerkleV3__projectConfigResult {
     let result = super.call(
       "projectConfig",
       "projectConfig(uint256):(bool,bool,bool,uint24,uint24,uint256)",
       [ethereum.Value.fromUnsignedBigInt(param0)]
     );
 
-    return new MinterMerkleV1__projectConfigResult(
+    return new MinterMerkleV3__projectConfigResult(
       result[0].toBoolean(),
       result[1].toBoolean(),
       result[2].toBoolean(),
@@ -695,7 +754,7 @@ export class MinterMerkleV1 extends ethereum.SmartContract {
 
   try_projectConfig(
     param0: BigInt
-  ): ethereum.CallResult<MinterMerkleV1__projectConfigResult> {
+  ): ethereum.CallResult<MinterMerkleV3__projectConfigResult> {
     let result = super.tryCall(
       "projectConfig",
       "projectConfig(uint256):(bool,bool,bool,uint24,uint24,uint256)",
@@ -706,7 +765,7 @@ export class MinterMerkleV1 extends ethereum.SmartContract {
     }
     let value = result.value;
     return ethereum.CallResult.fromValue(
-      new MinterMerkleV1__projectConfigResult(
+      new MinterMerkleV3__projectConfigResult(
         value[0].toBoolean(),
         value[1].toBoolean(),
         value[2].toBoolean(),
@@ -816,7 +875,7 @@ export class MinterMerkleV1 extends ethereum.SmartContract {
   projectRemainingInvocationsForAddress(
     _projectId: BigInt,
     _address: Address
-  ): MinterMerkleV1__projectRemainingInvocationsForAddressResult {
+  ): MinterMerkleV3__projectRemainingInvocationsForAddressResult {
     let result = super.call(
       "projectRemainingInvocationsForAddress",
       "projectRemainingInvocationsForAddress(uint256,address):(bool,uint256)",
@@ -826,7 +885,7 @@ export class MinterMerkleV1 extends ethereum.SmartContract {
       ]
     );
 
-    return new MinterMerkleV1__projectRemainingInvocationsForAddressResult(
+    return new MinterMerkleV3__projectRemainingInvocationsForAddressResult(
       result[0].toBoolean(),
       result[1].toBigInt()
     );
@@ -836,7 +895,7 @@ export class MinterMerkleV1 extends ethereum.SmartContract {
     _projectId: BigInt,
     _address: Address
   ): ethereum.CallResult<
-    MinterMerkleV1__projectRemainingInvocationsForAddressResult
+    MinterMerkleV3__projectRemainingInvocationsForAddressResult
   > {
     let result = super.tryCall(
       "projectRemainingInvocationsForAddress",
@@ -851,7 +910,7 @@ export class MinterMerkleV1 extends ethereum.SmartContract {
     }
     let value = result.value;
     return ethereum.CallResult.fromValue(
-      new MinterMerkleV1__projectRemainingInvocationsForAddressResult(
+      new MinterMerkleV3__projectRemainingInvocationsForAddressResult(
         value[0].toBoolean(),
         value[1].toBigInt()
       )
@@ -953,6 +1012,10 @@ export class ConstructorCall__Inputs {
 
   get _minterFilter(): Address {
     return this._call.inputValues[1].value.toAddress();
+  }
+
+  get _delegationRegistryAddress(): Address {
+    return this._call.inputValues[2].value.toAddress();
   }
 }
 
@@ -1116,20 +1179,20 @@ export class PurchaseTo1Call__Outputs {
   }
 }
 
-export class PurchaseTo_K1LCall extends ethereum.Call {
-  get inputs(): PurchaseTo_K1LCall__Inputs {
-    return new PurchaseTo_K1LCall__Inputs(this);
+export class PurchaseTo2Call extends ethereum.Call {
+  get inputs(): PurchaseTo2Call__Inputs {
+    return new PurchaseTo2Call__Inputs(this);
   }
 
-  get outputs(): PurchaseTo_K1LCall__Outputs {
-    return new PurchaseTo_K1LCall__Outputs(this);
+  get outputs(): PurchaseTo2Call__Outputs {
+    return new PurchaseTo2Call__Outputs(this);
   }
 }
 
-export class PurchaseTo_K1LCall__Inputs {
-  _call: PurchaseTo_K1LCall;
+export class PurchaseTo2Call__Inputs {
+  _call: PurchaseTo2Call;
 
-  constructor(call: PurchaseTo_K1LCall) {
+  constructor(call: PurchaseTo2Call) {
     this._call = call;
   }
 
@@ -1144,12 +1207,62 @@ export class PurchaseTo_K1LCall__Inputs {
   get _proof(): Array<Bytes> {
     return this._call.inputValues[2].value.toBytesArray();
   }
+
+  get _vault(): Address {
+    return this._call.inputValues[3].value.toAddress();
+  }
 }
 
-export class PurchaseTo_K1LCall__Outputs {
-  _call: PurchaseTo_K1LCall;
+export class PurchaseTo2Call__Outputs {
+  _call: PurchaseTo2Call;
 
-  constructor(call: PurchaseTo_K1LCall) {
+  constructor(call: PurchaseTo2Call) {
+    this._call = call;
+  }
+
+  get tokenId(): BigInt {
+    return this._call.outputValues[0].value.toBigInt();
+  }
+}
+
+export class PurchaseTo_kemCall extends ethereum.Call {
+  get inputs(): PurchaseTo_kemCall__Inputs {
+    return new PurchaseTo_kemCall__Inputs(this);
+  }
+
+  get outputs(): PurchaseTo_kemCall__Outputs {
+    return new PurchaseTo_kemCall__Outputs(this);
+  }
+}
+
+export class PurchaseTo_kemCall__Inputs {
+  _call: PurchaseTo_kemCall;
+
+  constructor(call: PurchaseTo_kemCall) {
+    this._call = call;
+  }
+
+  get _to(): Address {
+    return this._call.inputValues[0].value.toAddress();
+  }
+
+  get _projectId(): BigInt {
+    return this._call.inputValues[1].value.toBigInt();
+  }
+
+  get _proof(): Array<Bytes> {
+    return this._call.inputValues[2].value.toBytesArray();
+  }
+
+  get _vault(): Address {
+    return this._call.inputValues[3].value.toAddress();
+  }
+}
+
+export class PurchaseTo_kemCall__Outputs {
+  _call: PurchaseTo_kemCall;
+
+  constructor(call: PurchaseTo_kemCall) {
     this._call = call;
   }
 

@@ -106,6 +106,22 @@ export class MinterSetPriceERC20V0__getPriceInfoResult {
     map.set("value3", ethereum.Value.fromAddress(this.value3));
     return map;
   }
+
+  getIsConfigured(): boolean {
+    return this.value0;
+  }
+
+  getTokenPriceInWei(): BigInt {
+    return this.value1;
+  }
+
+  getCurrencySymbol(): string {
+    return this.value2;
+  }
+
+  getCurrencyAddress(): Address {
+    return this.value3;
+  }
 }
 
 export class MinterSetPriceERC20V0 extends ethereum.SmartContract {
@@ -161,20 +177,20 @@ export class MinterSetPriceERC20V0 extends ethereum.SmartContract {
     return ethereum.CallResult.fromValue(value[0].toBoolean());
   }
 
-  genArtCoreContract(): Address {
+  genArt721CoreAddress(): Address {
     let result = super.call(
-      "genArtCoreContract",
-      "genArtCoreContract():(address)",
+      "genArt721CoreAddress",
+      "genArt721CoreAddress():(address)",
       []
     );
 
     return result[0].toAddress();
   }
 
-  try_genArtCoreContract(): ethereum.CallResult<Address> {
+  try_genArt721CoreAddress(): ethereum.CallResult<Address> {
     let result = super.tryCall(
-      "genArtCoreContract",
-      "genArtCoreContract():(address)",
+      "genArt721CoreAddress",
+      "genArt721CoreAddress():(address)",
       []
     );
     if (result.reverted) {
@@ -246,14 +262,22 @@ export class MinterSetPriceERC20V0 extends ethereum.SmartContract {
     return ethereum.CallResult.fromValue(value[0].toBigInt());
   }
 
-  minterFilter(): Address {
-    let result = super.call("minterFilter", "minterFilter():(address)", []);
+  minterFilterAddress(): Address {
+    let result = super.call(
+      "minterFilterAddress",
+      "minterFilterAddress():(address)",
+      []
+    );
 
     return result[0].toAddress();
   }
 
-  try_minterFilter(): ethereum.CallResult<Address> {
-    let result = super.tryCall("minterFilter", "minterFilter():(address)", []);
+  try_minterFilterAddress(): ethereum.CallResult<Address> {
+    let result = super.tryCall(
+      "minterFilterAddress",
+      "minterFilterAddress():(address)",
+      []
+    );
     if (result.reverted) {
       return new ethereum.CallResult();
     }

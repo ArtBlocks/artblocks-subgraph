@@ -130,6 +130,18 @@ export class MinterFilterV0__getProjectAndMinterInfoAtResult {
     map.set("value2", ethereum.Value.fromString(this.value2));
     return map;
   }
+
+  getProjectId(): BigInt {
+    return this.value0;
+  }
+
+  getMinterAddress(): Address {
+    return this.value1;
+  }
+
+  getMinterType(): string {
+    return this.value2;
+  }
 }
 
 export class MinterFilterV0 extends ethereum.SmartContract {

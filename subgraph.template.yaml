@@ -4,12 +4,12 @@ schema:
 dataSources:
   {{#genArt721CoreV3Contracts}}
   - kind: ethereum/contract
-    name: 'GenArt721CoreV3-{{address}}'
+    name: 'GenArt721CoreV3{{#address}}-{{address}}{{/address}}'
     network: {{network}}
     source:
-      address: '{{address}}'
+      address: "{{#address}}{{address}}{{/address}}{{^address}}0x0000000000000000000000000000000000000000{{/address}}"
       abi: GenArt721CoreV3
-      startBlock: {{startBlock}}
+      {{#startBlock}}startBlock: {{startBlock}}{{/startBlock}}
     mapping:
       kind: ethereum/events
       apiVersion: 0.0.5
@@ -56,12 +56,12 @@ dataSources:
   {{/genArt721CoreV3Contracts}}
   {{#genArt721CoreContracts}}
   - kind: ethereum/contract
-    name: 'GenArt721Core-{{address}}'
+    name: 'GenArt721Core{{#address}}-{{address}}{{/address}}'
     network: {{network}}
     source:
-      address: '{{address}}'
+      address: "{{#address}}{{address}}{{/address}}{{^address}}0x0000000000000000000000000000000000000000{{/address}}"
       abi: GenArt721Core
-      startBlock: {{startBlock}}
+      {{#startBlock}}startBlock: {{startBlock}}{{/startBlock}}
     mapping:
       kind: ethereum/events
       apiVersion: 0.0.5
@@ -159,12 +159,12 @@ dataSources:
   {{/genArt721CoreContracts}}
   {{#genArt721Core2Contracts}}
   - kind: ethereum/contract
-    name: 'GenArt721Core2-{{address}}'
+    name: 'GenArt721Core2{{#address}}-{{address}}{{/address}}'
     network: {{network}}
     source:
-      address: '{{address}}'
+      address: "{{#address}}{{address}}{{/address}}{{^address}}0x0000000000000000000000000000000000000000{{/address}}"
       abi: GenArt721Core2
-      startBlock: {{startBlock}}
+      {{#startBlock}}startBlock: {{startBlock}}{{/startBlock}}
     mapping:
       kind: ethereum/events
       apiVersion: 0.0.5
@@ -266,12 +266,12 @@ dataSources:
   {{/genArt721Core2Contracts}}
   {{#pbabContracts}}
   - kind: ethereum/contract
-    name: 'GenArt721Core2PBAB-{{address}}'
+    name: 'GenArt721Core2PBAB{{#address}}-{{address}}{{/address}}'
     network: {{network}}
     source:
-      address: '{{address}}'
+      address: "{{#address}}{{address}}{{/address}}{{^address}}0x0000000000000000000000000000000000000000{{/address}}"
       abi: GenArt721Core2PBAB
-      startBlock: {{startBlock}}
+      {{#startBlock}}startBlock: {{startBlock}}{{/startBlock}}
     mapping:
       kind: ethereum/events
       apiVersion: 0.0.5
@@ -359,12 +359,12 @@ dataSources:
   {{/pbabContracts}}
   {{#engineFlexContracts}}
   - kind: ethereum/contract
-    name: 'GenArt721Core2EngineFlex-{{address}}'
+    name: 'GenArt721Core2EngineFlex{{#address}}-{{address}}{{/address}}'
     network: {{network}}
     source:
-      address: '{{address}}'
+      address: "{{#address}}{{address}}{{/address}}{{^address}}0x0000000000000000000000000000000000000000{{/address}}"
       abi: GenArt721Core2EngineFlex
-      startBlock: {{startBlock}}
+      {{#startBlock}}startBlock: {{startBlock}}{{/startBlock}}
     mapping:
       kind: ethereum/events
       apiVersion: 0.0.5
@@ -466,9 +466,9 @@ dataSources:
     name: GenArt721
     network: {{network}}
     source:
-      address: '{{address}}'
+      address: "{{#address}}{{address}}{{/address}}{{^address}}0x0000000000000000000000000000000000000000{{/address}}"
       abi: GenArt721
-      startBlock: {{startBlock}}
+      {{#startBlock}}startBlock: {{startBlock}}{{/startBlock}}
     mapping:
       kind: ethereum/events
       apiVersion: 0.0.5
@@ -560,12 +560,12 @@ dataSources:
   {{/genArt721Contracts}}
   {{#minterFilterV0Contracts}}
   - kind: ethereum/contract
-    name: 'MinterFilterV0-{{address}}'
+    name: 'MinterFilterV0{{#address}}-{{address}}{{/address}}'
     network: {{network}}
     source:
-      address: '{{address}}'
+      address: "{{#address}}{{address}}{{/address}}{{^address}}0x0000000000000000000000000000000000000000{{/address}}"
       abi: MinterFilterV0
-      startBlock: {{startBlock}}
+      {{#startBlock}}startBlock: {{startBlock}}{{/startBlock}}
     mapping:
       kind: ethereum/events
       apiVersion: 0.0.5
@@ -638,12 +638,12 @@ dataSources:
   {{/minterFilterV0Contracts}}
   {{#minterFilterV1Contracts}}
   - kind: ethereum/contract
-    name: 'MinterFilterV1-{{address}}'
+    name: 'MinterFilterV1{{#address}}-{{address}}{{/address}}'
     network: {{network}}
     source:
-      address: '{{address}}'
+      address: "{{#address}}{{address}}{{/address}}{{^address}}0x0000000000000000000000000000000000000000{{/address}}"
       abi: MinterFilterV1
-      startBlock: {{startBlock}}
+      {{#startBlock}}startBlock: {{startBlock}}{{/startBlock}}
     mapping:
       kind: ethereum/events
       apiVersion: 0.0.5
@@ -718,12 +718,12 @@ dataSources:
   {{/minterFilterV1Contracts}}
   {{#minterSetPriceERC20V0Contracts}}
   - kind: ethereum/contract
-    name: 'MinterSetPriceERC20V0-{{address}}'
+    name: 'MinterSetPriceERC20V0{{#address}}-{{address}}{{/address}}'
     network: {{network}}
     source:
-      address: '{{address}}'
+      address: "{{#address}}{{address}}{{/address}}{{^address}}0x0000000000000000000000000000000000000000{{/address}}"
       abi: MinterSetPriceERC20V0
-      startBlock: {{startBlock}}
+      {{#startBlock}}startBlock: {{startBlock}}{{/startBlock}}
     mapping:
       kind: ethereum/events
       apiVersion: 0.0.5
@@ -750,12 +750,12 @@ dataSources:
   {{/minterSetPriceERC20V0Contracts}}
   {{#minterSetPriceV0Contracts}}
   - kind: ethereum/contract
-    name: 'MinterSetPriceV0-{{address}}'
+    name: 'MinterSetPriceV0{{#address}}-{{address}}{{/address}}'
     network: {{network}}
     source:
-      address: '{{address}}'
+      address: "{{#address}}{{address}}{{/address}}{{^address}}0x0000000000000000000000000000000000000000{{/address}}"
       abi: MinterSetPriceV0
-      startBlock: {{startBlock}}
+      {{#startBlock}}startBlock: {{startBlock}}{{/startBlock}}
     mapping:
       kind: ethereum/events
       apiVersion: 0.0.5
@@ -787,12 +787,12 @@ dataSources:
   {{/minterSetPriceV0Contracts}}
   {{#minterDALinV0Contracts}}
   - kind: ethereum/contract
-    name: 'MinterDALinV0-{{address}}'
+    name: 'MinterDALinV0{{#address}}-{{address}}{{/address}}'
     network: {{network}}
     source:
-      address: '{{address}}'
+      address: "{{#address}}{{address}}{{/address}}{{^address}}0x0000000000000000000000000000000000000000{{/address}}"
       abi: MinterDALinV0
-      startBlock: {{startBlock}}
+      {{#startBlock}}startBlock: {{startBlock}}{{/startBlock}}
     mapping:
       kind: ethereum/events
       apiVersion: 0.0.5
@@ -825,12 +825,12 @@ dataSources:
   {{/minterDALinV0Contracts}}
   {{#minterDAExpV0Contracts}}
   - kind: ethereum/contract
-    name: 'MinterDAExpV0-{{address}}'
+    name: 'MinterDAExpV0{{#address}}-{{address}}{{/address}}'
     network: {{network}}
     source:
-      address: '{{address}}'
+      address: "{{#address}}{{address}}{{/address}}{{^address}}0x0000000000000000000000000000000000000000{{/address}}"
       abi: MinterDAExpV0
-      startBlock: {{startBlock}}
+      {{#startBlock}}startBlock: {{startBlock}}{{/startBlock}}
     mapping:
       kind: ethereum/events
       apiVersion: 0.0.5
@@ -863,12 +863,12 @@ dataSources:
   {{/minterDAExpV0Contracts}}
   {{#minterSetPriceERC20V1Contracts}}
   - kind: ethereum/contract
-    name: 'MinterSetPriceERC20V1-{{address}}'
+    name: 'MinterSetPriceERC20V1{{#address}}-{{address}}{{/address}}'
     network: {{network}}
     source:
-      address: '{{address}}'
+      address: "{{#address}}{{address}}{{/address}}{{^address}}0x0000000000000000000000000000000000000000{{/address}}"
       abi: MinterSetPriceERC20V1
-      startBlock: {{startBlock}}
+      {{#startBlock}}startBlock: {{startBlock}}{{/startBlock}}
     mapping:
       kind: ethereum/events
       apiVersion: 0.0.5
@@ -893,12 +893,12 @@ dataSources:
   {{/minterSetPriceERC20V1Contracts}}
   {{#minterSetPriceV1Contracts}}
   - kind: ethereum/contract
-    name: 'MinterSetPriceV1-{{address}}'
+    name: 'MinterSetPriceV1{{#address}}-{{address}}{{/address}}'
     network: {{network}}
     source:
-      address: '{{address}}'
+      address: "{{#address}}{{address}}{{/address}}{{^address}}0x0000000000000000000000000000000000000000{{/address}}"
       abi: MinterSetPriceV1
-      startBlock: {{startBlock}}
+      {{#startBlock}}startBlock: {{startBlock}}{{/startBlock}}
     mapping:
       kind: ethereum/events
       apiVersion: 0.0.5
@@ -928,12 +928,12 @@ dataSources:
   {{/minterSetPriceV1Contracts}}
   {{#minterDALinV1Contracts}}
   - kind: ethereum/contract
-    name: 'MinterDALinV1-{{address}}'
+    name: 'MinterDALinV1{{#address}}-{{address}}{{/address}}'
     network: {{network}}
     source:
-      address: '{{address}}'
+      address: "{{#address}}{{address}}{{/address}}{{^address}}0x0000000000000000000000000000000000000000{{/address}}"
       abi: MinterDALinV1
-      startBlock: {{startBlock}}
+      {{#startBlock}}startBlock: {{startBlock}}{{/startBlock}}
     mapping:
       kind: ethereum/events
       apiVersion: 0.0.5
@@ -964,12 +964,12 @@ dataSources:
   {{/minterDALinV1Contracts}}
   {{#minterDAExpV1Contracts}}
   - kind: ethereum/contract
-    name: 'MinterDAExpV1-{{address}}'
+    name: 'MinterDAExpV1{{#address}}-{{address}}{{/address}}'
     network: {{network}}
     source:
-      address: '{{address}}'
+      address: "{{#address}}{{address}}{{/address}}{{^address}}0x0000000000000000000000000000000000000000{{/address}}"
       abi: MinterDAExpV1
-      startBlock: {{startBlock}}
+      {{#startBlock}}startBlock: {{startBlock}}{{/startBlock}}
     mapping:
       kind: ethereum/events
       apiVersion: 0.0.5
@@ -1000,12 +1000,12 @@ dataSources:
   {{/minterDAExpV1Contracts}}
   {{#minterHolderV0Contracts}}
   - kind: ethereum/contract
-    name: 'MinterHolderV0-{{address}}'
+    name: 'MinterHolderV0{{#address}}-{{address}}{{/address}}'
     network: {{network}}
     source:
-      address: '{{address}}'
+      address: "{{#address}}{{address}}{{/address}}{{^address}}0x0000000000000000000000000000000000000000{{/address}}"
       abi: MinterHolderV0
-      startBlock: {{startBlock}}
+      {{#startBlock}}startBlock: {{startBlock}}{{/startBlock}}
     mapping:
       kind: ethereum/events
       apiVersion: 0.0.5
@@ -1038,12 +1038,12 @@ dataSources:
   {{/minterHolderV0Contracts}}
   {{#minterMerkleV0Contracts}}
   - kind: ethereum/contract
-    name: 'MinterMerkleV0-{{address}}'
+    name: 'MinterMerkleV0{{#address}}-{{address}}{{/address}}'
     network: {{network}}
     source:
-      address: '{{address}}'
+      address: "{{#address}}{{address}}{{/address}}{{^address}}0x0000000000000000000000000000000000000000{{/address}}"
       abi: MinterMerkleV0
-      startBlock: {{startBlock}}
+      {{#startBlock}}startBlock: {{startBlock}}{{/startBlock}}
     mapping:
       kind: ethereum/events
       apiVersion: 0.0.5
@@ -1074,12 +1074,12 @@ dataSources:
   {{/minterMerkleV0Contracts}}
   {{#minterSetPriceERC20V2Contracts}}
   - kind: ethereum/contract
-    name: 'MinterSetPriceERC20V2-{{address}}'
+    name: 'MinterSetPriceERC20V2{{#address}}-{{address}}{{/address}}'
     network: {{network}}
     source:
-      address: '{{address}}'
+      address: "{{#address}}{{address}}{{/address}}{{^address}}0x0000000000000000000000000000000000000000{{/address}}"
       abi: MinterSetPriceERC20V2
-      startBlock: {{startBlock}}
+      {{#startBlock}}startBlock: {{startBlock}}{{/startBlock}}
     mapping:
       kind: ethereum/events
       apiVersion: 0.0.5
@@ -1104,12 +1104,12 @@ dataSources:
   {{/minterSetPriceERC20V2Contracts}}
   {{#minterSetPriceV2Contracts}}
   - kind: ethereum/contract
-    name: 'MinterSetPriceV2-{{address}}'
+    name: 'MinterSetPriceV2{{#address}}-{{address}}{{/address}}'
     network: {{network}}
     source:
-      address: '{{address}}'
+      address: "{{#address}}{{address}}{{/address}}{{^address}}0x0000000000000000000000000000000000000000{{/address}}"
       abi: MinterSetPriceV2
-      startBlock: {{startBlock}}
+      {{#startBlock}}startBlock: {{startBlock}}{{/startBlock}}
     mapping:
       kind: ethereum/events
       apiVersion: 0.0.5
@@ -1139,12 +1139,12 @@ dataSources:
   {{/minterSetPriceV2Contracts}}
   {{#minterDALinV2Contracts}}
   - kind: ethereum/contract
-    name: 'MinterDALinV2-{{address}}'
+    name: 'MinterDALinV2{{#address}}-{{address}}{{/address}}'
     network: {{network}}
     source:
-      address: '{{address}}'
+      address: "{{#address}}{{address}}{{/address}}{{^address}}0x0000000000000000000000000000000000000000{{/address}}"
       abi: MinterDALinV2
-      startBlock: {{startBlock}}
+      {{#startBlock}}startBlock: {{startBlock}}{{/startBlock}}
     mapping:
       kind: ethereum/events
       apiVersion: 0.0.5
@@ -1175,12 +1175,12 @@ dataSources:
   {{/minterDALinV2Contracts}}
   {{#minterDAExpV2Contracts}}
   - kind: ethereum/contract
-    name: 'MinterDAExpV2-{{address}}'
+    name: 'MinterDAExpV2{{#address}}-{{address}}{{/address}}'
     network: {{network}}
     source:
-      address: '{{address}}'
+      address: "{{#address}}{{address}}{{/address}}{{^address}}0x0000000000000000000000000000000000000000{{/address}}"
       abi: MinterDAExpV2
-      startBlock: {{startBlock}}
+      {{#startBlock}}startBlock: {{startBlock}}{{/startBlock}}
     mapping:
       kind: ethereum/events
       apiVersion: 0.0.5
@@ -1211,12 +1211,12 @@ dataSources:
   {{/minterDAExpV2Contracts}}
   {{#minterDAExpSettlementV0Contracts}}
   - kind: ethereum/contract
-    name: 'MinterDAExpSettlementV0-{{address}}'
+    name: 'MinterDAExpSettlementV0{{#address}}-{{address}}{{/address}}'
     network: {{network}}
     source:
-      address: '{{address}}'
+      address: "{{#address}}{{address}}{{/address}}{{^address}}0x0000000000000000000000000000000000000000{{/address}}"
       abi: MinterDAExpSettlementV0
-      startBlock: {{startBlock}}
+      {{#startBlock}}startBlock: {{startBlock}}{{/startBlock}}
     mapping:
       kind: ethereum/events
       apiVersion: 0.0.5
@@ -1258,12 +1258,12 @@ dataSources:
   {{/minterDAExpSettlementV0Contracts}}
   {{#minterHolderV1Contracts}}
   - kind: ethereum/contract
-    name: 'MinterHolderV1-{{address}}'
+    name: 'MinterHolderV1{{#address}}-{{address}}{{/address}}'
     network: {{network}}
     source:
-      address: '{{address}}'
+      address: "{{#address}}{{address}}{{/address}}{{^address}}0x0000000000000000000000000000000000000000{{/address}}"
       abi: MinterHolderV1
-      startBlock: {{startBlock}}
+      {{#startBlock}}startBlock: {{startBlock}}{{/startBlock}}
     mapping:
       kind: ethereum/events
       apiVersion: 0.0.5
@@ -1296,12 +1296,12 @@ dataSources:
   {{/minterHolderV1Contracts}}
 {{#minterHolderV2Contracts}}
   - kind: ethereum/contract
-    name: 'MinterHolderV2-{{address}}'
+    name: 'MinterHolderV2{{#address}}-{{address}}{{/address}}'
     network: {{network}}
     source:
-      address: '{{address}}'
+      address: "{{#address}}{{address}}{{/address}}{{^address}}0x0000000000000000000000000000000000000000{{/address}}"
       abi: MinterHolderV2
-      startBlock: {{startBlock}}
+      {{#startBlock}}startBlock: {{startBlock}}{{/startBlock}}
     mapping:
       kind: ethereum/events
       apiVersion: 0.0.5
@@ -1338,12 +1338,12 @@ dataSources:
   {{/minterHolderV2Contracts}}
   {{#minterMerkleV1Contracts}}
   - kind: ethereum/contract
-    name: 'MinterMerkleV1-{{address}}'
+    name: 'MinterMerkleV1{{#address}}-{{address}}{{/address}}'
     network: {{network}}
     source:
-      address: '{{address}}'
+      address: "{{#address}}{{address}}{{/address}}{{^address}}0x0000000000000000000000000000000000000000{{/address}}"
       abi: MinterMerkleV1
-      startBlock: {{startBlock}}
+      {{#startBlock}}startBlock: {{startBlock}}{{/startBlock}}
     mapping:
       kind: ethereum/events
       apiVersion: 0.0.5
@@ -1374,12 +1374,12 @@ dataSources:
   {{/minterMerkleV1Contracts}}
   {{#minterMerkleV2Contracts}}
   - kind: ethereum/contract
-    name: 'MinterMerkleV2-{{address}}'
+    name: 'MinterMerkleV2{{#address}}-{{address}}{{/address}}'
     network: {{network}}
     source:
-      address: '{{address}}'
+      address: "{{#address}}{{address}}{{/address}}{{^address}}0x0000000000000000000000000000000000000000{{/address}}"
       abi: MinterMerkleV2
-      startBlock: {{startBlock}}
+      {{#startBlock}}startBlock: {{startBlock}}{{/startBlock}}
     mapping:
       kind: ethereum/events
       apiVersion: 0.0.5
@@ -1410,12 +1410,12 @@ dataSources:
   {{/minterMerkleV2Contracts}}
 {{#minterMerkleV3Contracts}}
   - kind: ethereum/contract
-    name: 'MinterMerkleV3-{{address}}'
+    name: 'MinterMerkleV3{{#address}}-{{address}}{{/address}}'
     network: {{network}}
     source:
-      address: '{{address}}'
+      address: "{{#address}}{{address}}{{/address}}{{^address}}0x0000000000000000000000000000000000000000{{/address}}"
       abi: MinterMerkleV3
-      startBlock: {{startBlock}}
+      {{#startBlock}}startBlock: {{startBlock}}{{/startBlock}}
     mapping:
       kind: ethereum/events
       apiVersion: 0.0.5
@@ -1450,12 +1450,12 @@ dataSources:
   {{/minterMerkleV3Contracts}}
   {{#adminACLV0Contracts}}
   - kind: ethereum/contract
-    name: 'AdminACLV0-{{address}}'
+    name: 'AdminACLV0{{#address}}-{{address}}{{/address}}'
     network: {{network}}
     source:
-      address: '{{address}}'
+      address: "{{#address}}{{address}}{{/address}}{{^address}}0x0000000000000000000000000000000000000000{{/address}}"
       abi: AdminACLV0
-      startBlock: {{startBlock}}
+      {{#startBlock}}startBlock: {{startBlock}}{{/startBlock}}
     mapping:
       kind: ethereum/events
       apiVersion: 0.0.5
@@ -1478,11 +1478,11 @@ dataSources:
   {{#openSeaContractV1}}
   - kind: ethereum/contract
     name: WyvernExchange
-    network: mainnet
+    network: {{network}}
     source:
-      address: '{{address}}'
+      address: "{{#address}}{{address}}{{/address}}{{^address}}0x0000000000000000000000000000000000000000{{/address}}"
       abi: WyvernExchange
-      startBlock: {{startBlock}}
+      {{#startBlock}}startBlock: {{startBlock}}{{/startBlock}}
     mapping:
       kind: ethereum/events
       apiVersion: 0.0.5
@@ -1509,11 +1509,11 @@ dataSources:
   {{#openSeaContractV2}}
   - kind: ethereum/contract
     name: WyvernExchangeWithBulkCancellations
-    network: mainnet
+    network: {{network}}
     source:
-      address: '{{address}}'
+      address: "{{#address}}{{address}}{{/address}}{{^address}}0x0000000000000000000000000000000000000000{{/address}}"
       abi: WyvernExchangeWithBulkCancellations
-      startBlock: {{startBlock}}
+      {{#startBlock}}startBlock: {{startBlock}}{{/startBlock}}
     mapping:
       kind: ethereum/events
       apiVersion: 0.0.5
@@ -1540,11 +1540,11 @@ dataSources:
   {{#looksRare}}
   - kind: ethereum/contract
     name: LooksRareExchange
-    network: mainnet
+    network: {{network}}
     source:
-      address: '{{address}}'
+      address: "{{#address}}{{address}}{{/address}}{{^address}}0x0000000000000000000000000000000000000000{{/address}}"
       abi: LooksRareExchange
-      startBlock: {{startBlock}}
+      {{#startBlock}}startBlock: {{startBlock}}{{/startBlock}}
     mapping:
       kind: ethereum/events
       apiVersion: 0.0.5
@@ -1573,11 +1573,11 @@ dataSources:
   {{#openSeaSeaport}}
   - kind: ethereum/contract
     name: SeaportExchange
-    network: mainnet
+    network: {{network}}
     source:
-      address: '{{address}}'
+      address: "{{#address}}{{address}}{{/address}}{{^address}}0x0000000000000000000000000000000000000000{{/address}}"
       abi: SeaportExchange
-      startBlock: {{startBlock}}
+      {{#startBlock}}startBlock: {{startBlock}}{{/startBlock}}
     mapping:
       kind: ethereum/events
       apiVersion: 0.0.5
