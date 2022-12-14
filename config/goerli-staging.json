@@ -180,14 +180,9 @@
   ],
   "minterMerkleV3Contracts": [
     {
-      "address": "0x2FB0d2410117ac190CD6FfF017B989195A522a87",
+      "address": "0xD3241C7101D5BDD0A8cC6f866D2d8b7AF1fF1962",
       "name": "Flagship Minter for V3 core",
-      "startBlock": 8128478
-    },
-    {
-      "address": "0xc4081Fbc41859b7749D97FE363DE671d51f9bD01",
-      "name": "Explorations Minter",
-      "startBlock": 8128520
+      "startBlock": 8136221
     }
   ],
   "minterHolderV1Contracts": [
@@ -199,14 +194,9 @@
   ],
   "minterHolderV2Contracts": [
     {
-      "address": "0xB5Cc0e80e2043cBB5F63d548E1832F22CD1a97b2",
+      "address": "0x6f9953e06675904AAE18568b1697544778616DAA",
       "name": "Flagship Minter for V3 core",
-      "startBlock": 8128721
-    },
-    {
-      "address": "0x980b482072838C38090c40e3F95A150E572719Dd",
-      "name": "Explorations Minter",
-      "startBlock": 8128726
+      "startBlock": 8136182
     }
   ],
   "engineFlexContracts": [
