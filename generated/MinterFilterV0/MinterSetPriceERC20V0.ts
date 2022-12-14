@@ -106,6 +106,22 @@ export class MinterSetPriceERC20V0__getPriceInfoResult {
     map.set("value3", ethereum.Value.fromAddress(this.value3));
     return map;
   }
+
+  getIsConfigured(): boolean {
+    return this.value0;
+  }
+
+  getTokenPriceInWei(): BigInt {
+    return this.value1;
+  }
+
+  getCurrencySymbol(): string {
+    return this.value2;
+  }
+
+  getCurrencyAddress(): Address {
+    return this.value3;
+  }
 }
 
 export class MinterSetPriceERC20V0 extends ethereum.SmartContract {

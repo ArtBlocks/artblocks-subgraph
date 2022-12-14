@@ -1,0 +1,158 @@
+{
+  "network": "goerli",
+  "genArt721CoreV3Contracts": [
+    {
+      "address": ""
+    }
+  ],
+  "genArt721CoreContracts": [
+    {
+      "address": ""
+    }
+  ],
+  "genArt721Core2Contracts": [
+    {
+      "address": ""
+    }
+  ],
+  "genArt721Contracts": [
+    {
+      "address": ""
+    }
+  ],
+  "pbabContracts": [
+    {
+      "address": ""
+    }
+  ],
+  "engineFlexContracts": [
+    {
+      "address": ""
+    }
+  ],
+  "minterFilterV0Contracts": [
+    {
+      "address": ""
+    }
+  ],
+  "minterFilterV1Contracts": [
+    {
+      "address": ""
+    }
+  ],
+  "minterSetPriceV0Contracts": [
+    {
+      "address": ""
+    }
+  ],
+  "minterSetPriceERC20V0Contracts": [
+    {
+      "address": ""
+    }
+  ],
+  "minterDALinV0Contracts": [
+    {
+      "address": ""
+    }
+  ],
+  "minterDAExpV0Contracts": [
+    {
+      "address": ""
+    }
+  ],
+  "minterSetPriceV1Contracts": [
+    {
+      "address": ""
+    }
+  ],
+  "minterSetPriceERC20V1Contracts": [
+    {
+      "address": ""
+    }
+  ],
+  "minterDALinV1Contracts": [
+    {
+      "address": ""
+    }
+  ],
+  "minterDAExpV1Contracts": [
+    {
+      "address": ""
+    }
+  ],
+  "minterSetPriceV2Contracts": [
+    {
+      "address": ""
+    }
+  ],
+  "minterSetPriceERC20V2Contracts": [
+    {
+      "address": ""
+    }
+  ],
+  "minterDALinV2Contracts": [
+    {
+      "address": ""
+    }
+  ],
+  "minterDAExpV2Contracts": [
+    {
+      "address": ""
+    }
+  ],
+  "minterDAExpSettlementV0Contracts": [
+    {
+      "address": ""
+    }
+  ],
+  "minterMerkleV1Contracts": [
+    {
+      "address": ""
+    }
+  ],
+  "minterMerkleV2Contracts": [
+    {
+      "address": ""
+    }
+  ],
+  "minterMerkleV3Contracts": [
+    {
+      "address": ""
+    }
+  ],
+  "minterHolderV1Contracts": [
+    {
+      "address": ""
+    }
+  ],
+  "minterHolderV2Contracts": [
+    {
+      "address": ""
+    }
+  ],
+  "openSeaContractV1": [
+    {
+      "address": ""
+    }
+  ],
+  "openSeaContractV2": [
+    {
+      "address": ""
+    }
+  ],
+  "looksRare": [
+    {
+      "address": ""
+    }
+  ],
+  "openSeaSeaPort": [
+    {
+      "address": ""
+    }
+  ],
+  "adminACLV0Contracts": [
+    {
+      "address": ""
+    }
+  ]
+}

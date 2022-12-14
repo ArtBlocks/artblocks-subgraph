@@ -36,6 +36,24 @@ export class AllowedHoldersOfProjects__Params {
   }
 }
 
+export class DelegationRegistryUpdated extends ethereum.Event {
+  get params(): DelegationRegistryUpdated__Params {
+    return new DelegationRegistryUpdated__Params(this);
+  }
+}
+
+export class DelegationRegistryUpdated__Params {
+  _event: DelegationRegistryUpdated;
+
+  constructor(event: DelegationRegistryUpdated) {
+    this._event = event;
+  }
+
+  get delegationRegistryAddress(): Address {
+    return this._event.parameters[0].value.toAddress();
+  }
+}
+
 export class PricePerTokenInWeiUpdated extends ethereum.Event {
   get params(): PricePerTokenInWeiUpdated__Params {
     return new PricePerTokenInWeiUpdated__Params(this);
@@ -168,7 +186,7 @@ export class UnregisteredNFTAddress__Params {
   }
 }
 
-export class MinterHolderV0__getPriceInfoResult {
+export class MinterHolderV2__getPriceInfoResult {
   value0: boolean;
   value1: BigInt;
   value2: string;
@@ -212,9 +230,51 @@ export class MinterHolderV0__getPriceInfoResult {
   }
 }
 
-export class MinterHolderV0 extends ethereum.SmartContract {
-  static bind(address: Address): MinterHolderV0 {
-    return new MinterHolderV0("MinterHolderV0", address);
+export class MinterHolderV2__projectConfigResult {
+  value0: boolean;
+  value1: boolean;
+  value2: i32;
+  value3: BigInt;
+
+  constructor(value0: boolean, value1: boolean, value2: i32, value3: BigInt) {
+    this.value0 = value0;
+    this.value1 = value1;
+    this.value2 = value2;
+    this.value3 = value3;
+  }
+
+  toMap(): TypedMap<string, ethereum.Value> {
+    let map = new TypedMap<string, ethereum.Value>();
+    map.set("value0", ethereum.Value.fromBoolean(this.value0));
+    map.set("value1", ethereum.Value.fromBoolean(this.value1));
+    map.set(
+      "value2",
+      ethereum.Value.fromUnsignedBigInt(BigInt.fromI32(this.value2))
+    );
+    map.set("value3", ethereum.Value.fromUnsignedBigInt(this.value3));
+    return map;
+  }
+
+  getMaxHasBeenInvoked(): boolean {
+    return this.value0;
+  }
+
+  getPriceIsConfigured(): boolean {
+    return this.value1;
+  }
+
+  getMaxInvocations(): i32 {
+    return this.value2;
+  }
+
+  getPricePerTokenInWei(): BigInt {
+    return this.value3;
+  }
+}
+
+export class MinterHolderV2 extends ethereum.SmartContract {
+  static bind(address: Address): MinterHolderV2 {
+    return new MinterHolderV2("MinterHolderV2", address);
   }
 
   allowedProjectHolders(
@@ -254,6 +314,29 @@ export class MinterHolderV0 extends ethereum.SmartContract {
     }
     let value = result.value;
     return ethereum.CallResult.fromValue(value[0].toBoolean());
+  }
+
+  delegationRegistryAddress(): Address {
+    let result = super.call(
+      "delegationRegistryAddress",
+      "delegationRegistryAddress():(address)",
+      []
+    );
+
+    return result[0].toAddress();
+  }
+
+  try_delegationRegistryAddress(): ethereum.CallResult<Address> {
+    let result = super.tryCall(
+      "delegationRegistryAddress",
+      "delegationRegistryAddress():(address)",
+      []
+    );
+    if (result.reverted) {
+      return new ethereum.CallResult();
+    }
+    let value = result.value;
+    return ethereum.CallResult.fromValue(value[0].toAddress());
   }
 
   genArt721CoreAddress(): Address {
@@ -302,14 +385,14 @@ export class MinterHolderV0 extends ethereum.SmartContract {
     return ethereum.CallResult.fromValue(value[0].toBigInt());
   }
 
-  getPriceInfo(_projectId: BigInt): MinterHolderV0__getPriceInfoResult {
+  getPriceInfo(_projectId: BigInt): MinterHolderV2__getPriceInfoResult {
     let result = super.call(
       "getPriceInfo",
       "getPriceInfo(uint256):(bool,uint256,string,address)",
       [ethereum.Value.fromUnsignedBigInt(_projectId)]
     );
 
-    return new MinterHolderV0__getPriceInfoResult(
+    return new MinterHolderV2__getPriceInfoResult(
       result[0].toBoolean(),
       result[1].toBigInt(),
       result[2].toString(),
@@ -319,7 +402,7 @@ export class MinterHolderV0 extends ethereum.SmartContract {
 
   try_getPriceInfo(
     _projectId: BigInt
-  ): ethereum.CallResult<MinterHolderV0__getPriceInfoResult> {
+  ): ethereum.CallResult<MinterHolderV2__getPriceInfoResult> {
     let result = super.tryCall(
       "getPriceInfo",
       "getPriceInfo(uint256):(bool,uint256,string,address)",
@@ -330,7 +413,7 @@ export class MinterHolderV0 extends ethereum.SmartContract {
     }
     let value = result.value;
     return ethereum.CallResult.fromValue(
-      new MinterHolderV0__getPriceInfoResult(
+      new MinterHolderV2__getPriceInfoResult(
         value[0].toBoolean(),
         value[1].toBigInt(),
         value[2].toString(),
@@ -439,21 +522,60 @@ export class MinterHolderV0 extends ethereum.SmartContract {
     return ethereum.CallResult.fromValue(value[0].toString());
   }
 
-  projectMaxHasBeenInvoked(param0: BigInt): boolean {
+  projectConfig(param0: BigInt): MinterHolderV2__projectConfigResult {
+    let result = super.call(
+      "projectConfig",
+      "projectConfig(uint256):(bool,bool,uint24,uint256)",
+      [ethereum.Value.fromUnsignedBigInt(param0)]
+    );
+
+    return new MinterHolderV2__projectConfigResult(
+      result[0].toBoolean(),
+      result[1].toBoolean(),
+      result[2].toI32(),
+      result[3].toBigInt()
+    );
+  }
+
+  try_projectConfig(
+    param0: BigInt
+  ): ethereum.CallResult<MinterHolderV2__projectConfigResult> {
+    let result = super.tryCall(
+      "projectConfig",
+      "projectConfig(uint256):(bool,bool,uint24,uint256)",
+      [ethereum.Value.fromUnsignedBigInt(param0)]
+    );
+    if (result.reverted) {
+      return new ethereum.CallResult();
+    }
+    let value = result.value;
+    return ethereum.CallResult.fromValue(
+      new MinterHolderV2__projectConfigResult(
+        value[0].toBoolean(),
+        value[1].toBoolean(),
+        value[2].toI32(),
+        value[3].toBigInt()
+      )
+    );
+  }
+
+  projectMaxHasBeenInvoked(_projectId: BigInt): boolean {
     let result = super.call(
       "projectMaxHasBeenInvoked",
       "projectMaxHasBeenInvoked(uint256):(bool)",
-      [ethereum.Value.fromUnsignedBigInt(param0)]
+      [ethereum.Value.fromUnsignedBigInt(_projectId)]
     );
 
     return result[0].toBoolean();
   }
 
-  try_projectMaxHasBeenInvoked(param0: BigInt): ethereum.CallResult<boolean> {
+  try_projectMaxHasBeenInvoked(
+    _projectId: BigInt
+  ): ethereum.CallResult<boolean> {
     let result = super.tryCall(
       "projectMaxHasBeenInvoked",
       "projectMaxHasBeenInvoked(uint256):(bool)",
-      [ethereum.Value.fromUnsignedBigInt(param0)]
+      [ethereum.Value.fromUnsignedBigInt(_projectId)]
     );
     if (result.reverted) {
       return new ethereum.CallResult();
@@ -462,21 +584,21 @@ export class MinterHolderV0 extends ethereum.SmartContract {
     return ethereum.CallResult.fromValue(value[0].toBoolean());
   }
 
-  projectMaxInvocations(param0: BigInt): BigInt {
+  projectMaxInvocations(_projectId: BigInt): BigInt {
     let result = super.call(
       "projectMaxInvocations",
       "projectMaxInvocations(uint256):(uint256)",
-      [ethereum.Value.fromUnsignedBigInt(param0)]
+      [ethereum.Value.fromUnsignedBigInt(_projectId)]
     );
 
     return result[0].toBigInt();
   }
 
-  try_projectMaxInvocations(param0: BigInt): ethereum.CallResult<BigInt> {
+  try_projectMaxInvocations(_projectId: BigInt): ethereum.CallResult<BigInt> {
     let result = super.tryCall(
       "projectMaxInvocations",
       "projectMaxInvocations(uint256):(uint256)",
-      [ethereum.Value.fromUnsignedBigInt(param0)]
+      [ethereum.Value.fromUnsignedBigInt(_projectId)]
     );
     if (result.reverted) {
       return new ethereum.CallResult();
@@ -509,6 +631,10 @@ export class ConstructorCall__Inputs {
 
   get _minterFilter(): Address {
     return this._call.inputValues[1].value.toAddress();
+  }
+
+  get _delegationRegistryAddress(): Address {
+    return this._call.inputValues[2].value.toAddress();
   }
 }
 
@@ -697,12 +823,24 @@ export class PurchaseToCall__Inputs {
     this._call = call;
   }
 
-  get value0(): Address {
+  get _to(): Address {
     return this._call.inputValues[0].value.toAddress();
   }
 
-  get value1(): BigInt {
+  get _projectId(): BigInt {
     return this._call.inputValues[1].value.toBigInt();
+  }
+
+  get _ownedNFTAddress(): Address {
+    return this._call.inputValues[2].value.toAddress();
+  }
+
+  get _ownedNFTTokenId(): BigInt {
+    return this._call.inputValues[3].value.toBigInt();
+  }
+
+  get _vault(): Address {
+    return this._call.inputValues[4].value.toAddress();
   }
 }
 
@@ -713,7 +851,7 @@ export class PurchaseToCall__Outputs {
     this._call = call;
   }
 
-  get value0(): BigInt {
+  get tokenId(): BigInt {
     return this._call.outputValues[0].value.toBigInt();
   }
 }
@@ -735,6 +873,44 @@ export class PurchaseTo1Call__Inputs {
     this._call = call;
   }
 
+  get value0(): Address {
+    return this._call.inputValues[0].value.toAddress();
+  }
+
+  get value1(): BigInt {
+    return this._call.inputValues[1].value.toBigInt();
+  }
+}
+
+export class PurchaseTo1Call__Outputs {
+  _call: PurchaseTo1Call;
+
+  constructor(call: PurchaseTo1Call) {
+    this._call = call;
+  }
+
+  get value0(): BigInt {
+    return this._call.outputValues[0].value.toBigInt();
+  }
+}
+
+export class PurchaseTo2Call extends ethereum.Call {
+  get inputs(): PurchaseTo2Call__Inputs {
+    return new PurchaseTo2Call__Inputs(this);
+  }
+
+  get outputs(): PurchaseTo2Call__Outputs {
+    return new PurchaseTo2Call__Outputs(this);
+  }
+}
+
+export class PurchaseTo2Call__Inputs {
+  _call: PurchaseTo2Call;
+
+  constructor(call: PurchaseTo2Call) {
+    this._call = call;
+  }
+
   get _to(): Address {
     return this._call.inputValues[0].value.toAddress();
   }
@@ -752,10 +928,102 @@ export class PurchaseTo1Call__Inputs {
   }
 }
 
-export class PurchaseTo1Call__Outputs {
-  _call: PurchaseTo1Call;
+export class PurchaseTo2Call__Outputs {
+  _call: PurchaseTo2Call;
 
-  constructor(call: PurchaseTo1Call) {
+  constructor(call: PurchaseTo2Call) {
+    this._call = call;
+  }
+
+  get tokenId(): BigInt {
+    return this._call.outputValues[0].value.toBigInt();
+  }
+}
+
+export class PurchaseTo_dlcCall extends ethereum.Call {
+  get inputs(): PurchaseTo_dlcCall__Inputs {
+    return new PurchaseTo_dlcCall__Inputs(this);
+  }
+
+  get outputs(): PurchaseTo_dlcCall__Outputs {
+    return new PurchaseTo_dlcCall__Outputs(this);
+  }
+}
+
+export class PurchaseTo_dlcCall__Inputs {
+  _call: PurchaseTo_dlcCall;
+
+  constructor(call: PurchaseTo_dlcCall) {
+    this._call = call;
+  }
+
+  get _to(): Address {
+    return this._call.inputValues[0].value.toAddress();
+  }
+
+  get _projectId(): BigInt {
+    return this._call.inputValues[1].value.toBigInt();
+  }
+
+  get _ownedNFTAddress(): Address {
+    return this._call.inputValues[2].value.toAddress();
+  }
+
+  get _ownedNFTTokenId(): BigInt {
+    return this._call.inputValues[3].value.toBigInt();
+  }
+
+  get _vault(): Address {
+    return this._call.inputValues[4].value.toAddress();
+  }
+}
+
+export class PurchaseTo_dlcCall__Outputs {
+  _call: PurchaseTo_dlcCall;
+
+  constructor(call: PurchaseTo_dlcCall) {
+    this._call = call;
+  }
+
+  get tokenId(): BigInt {
+    return this._call.outputValues[0].value.toBigInt();
+  }
+}
+
+export class Purchase_nnfCall extends ethereum.Call {
+  get inputs(): Purchase_nnfCall__Inputs {
+    return new Purchase_nnfCall__Inputs(this);
+  }
+
+  get outputs(): Purchase_nnfCall__Outputs {
+    return new Purchase_nnfCall__Outputs(this);
+  }
+}
+
+export class Purchase_nnfCall__Inputs {
+  _call: Purchase_nnfCall;
+
+  constructor(call: Purchase_nnfCall) {
+    this._call = call;
+  }
+
+  get _projectId(): BigInt {
+    return this._call.inputValues[0].value.toBigInt();
+  }
+
+  get _ownedNFTAddress(): Address {
+    return this._call.inputValues[1].value.toAddress();
+  }
+
+  get _ownedNFTTokenId(): BigInt {
+    return this._call.inputValues[2].value.toBigInt();
+  }
+}
+
+export class Purchase_nnfCall__Outputs {
+  _call: Purchase_nnfCall;
+
+  constructor(call: Purchase_nnfCall) {
     this._call = call;
   }
 

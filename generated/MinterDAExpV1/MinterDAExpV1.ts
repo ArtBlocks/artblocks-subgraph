@@ -180,6 +180,22 @@ export class MinterDAExpV1__getPriceInfoResult {
     map.set("value3", ethereum.Value.fromAddress(this.value3));
     return map;
   }
+
+  getIsConfigured(): boolean {
+    return this.value0;
+  }
+
+  getTokenPriceInWei(): BigInt {
+    return this.value1;
+  }
+
+  getCurrencySymbol(): string {
+    return this.value2;
+  }
+
+  getCurrencyAddress(): Address {
+    return this.value3;
+  }
 }
 
 export class MinterDAExpV1__projectAuctionParametersResult {
@@ -202,6 +218,22 @@ export class MinterDAExpV1__projectAuctionParametersResult {
     map.set("value2", ethereum.Value.fromUnsignedBigInt(this.value2));
     map.set("value3", ethereum.Value.fromUnsignedBigInt(this.value3));
     return map;
+  }
+
+  getTimestampStart(): BigInt {
+    return this.value0;
+  }
+
+  getPriceDecayHalfLifeSeconds(): BigInt {
+    return this.value1;
+  }
+
+  getStartPrice(): BigInt {
+    return this.value2;
+  }
+
+  getBasePrice(): BigInt {
+    return this.value3;
   }
 }
 
@@ -430,61 +462,6 @@ export class MinterDAExpV1 extends ethereum.SmartContract {
     let result = super.tryCall(
       "projectMaxInvocations",
       "projectMaxInvocations(uint256):(uint256)",
-      [ethereum.Value.fromUnsignedBigInt(param0)]
-    );
-    if (result.reverted) {
-      return new ethereum.CallResult();
-    }
-    let value = result.value;
-    return ethereum.CallResult.fromValue(value[0].toBigInt());
-  }
-
-  projectMintCounter(param0: Address, param1: BigInt): BigInt {
-    let result = super.call(
-      "projectMintCounter",
-      "projectMintCounter(address,uint256):(uint256)",
-      [
-        ethereum.Value.fromAddress(param0),
-        ethereum.Value.fromUnsignedBigInt(param1)
-      ]
-    );
-
-    return result[0].toBigInt();
-  }
-
-  try_projectMintCounter(
-    param0: Address,
-    param1: BigInt
-  ): ethereum.CallResult<BigInt> {
-    let result = super.tryCall(
-      "projectMintCounter",
-      "projectMintCounter(address,uint256):(uint256)",
-      [
-        ethereum.Value.fromAddress(param0),
-        ethereum.Value.fromUnsignedBigInt(param1)
-      ]
-    );
-    if (result.reverted) {
-      return new ethereum.CallResult();
-    }
-    let value = result.value;
-    return ethereum.CallResult.fromValue(value[0].toBigInt());
-  }
-
-  projectMintLimit(param0: BigInt): BigInt {
-    let result = super.call(
-      "projectMintLimit",
-      "projectMintLimit(uint256):(uint256)",
-      [ethereum.Value.fromUnsignedBigInt(param0)]
-    );
-
-    return result[0].toBigInt();
-  }
-
-  try_projectMintLimit(param0: BigInt): ethereum.CallResult<BigInt> {
-    let result = super.tryCall(
-      "projectMintLimit",
-      "projectMintLimit(uint256):(uint256)",
       [ethereum.Value.fromUnsignedBigInt(param0)]
     );
     if (result.reverted) {
@@ -737,40 +714,6 @@ export class SetProjectMaxInvocationsCall__Outputs {
   _call: SetProjectMaxInvocationsCall;
 
   constructor(call: SetProjectMaxInvocationsCall) {
-    this._call = call;
-  }
-}
-
-export class SetProjectMintLimitCall extends ethereum.Call {
-  get inputs(): SetProjectMintLimitCall__Inputs {
-    return new SetProjectMintLimitCall__Inputs(this);
-  }
-
-  get outputs(): SetProjectMintLimitCall__Outputs {
-    return new SetProjectMintLimitCall__Outputs(this);
-  }
-}
-
-export class SetProjectMintLimitCall__Inputs {
-  _call: SetProjectMintLimitCall;
-
-  constructor(call: SetProjectMintLimitCall) {
-    this._call = call;
-  }
-
-  get _projectId(): BigInt {
-    return this._call.inputValues[0].value.toBigInt();
-  }
-
-  get _limit(): i32 {
-    return this._call.inputValues[1].value.toI32();
-  }
-}
-
-export class SetProjectMintLimitCall__Outputs {
-  _call: SetProjectMintLimitCall;
-
-  constructor(call: SetProjectMintLimitCall) {
     this._call = call;
   }
 }

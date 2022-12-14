@@ -176,6 +176,22 @@ export class MinterDALinV1__getPriceInfoResult {
     map.set("value3", ethereum.Value.fromAddress(this.value3));
     return map;
   }
+
+  getIsConfigured(): boolean {
+    return this.value0;
+  }
+
+  getTokenPriceInWei(): BigInt {
+    return this.value1;
+  }
+
+  getCurrencySymbol(): string {
+    return this.value2;
+  }
+
+  getCurrencyAddress(): Address {
+    return this.value3;
+  }
 }
 
 export class MinterDALinV1__projectAuctionParametersResult {
@@ -198,6 +214,22 @@ export class MinterDALinV1__projectAuctionParametersResult {
     map.set("value2", ethereum.Value.fromUnsignedBigInt(this.value2));
     map.set("value3", ethereum.Value.fromUnsignedBigInt(this.value3));
     return map;
+  }
+
+  getTimestampStart(): BigInt {
+    return this.value0;
+  }
+
+  getTimestampEnd(): BigInt {
+    return this.value1;
+  }
+
+  getStartPrice(): BigInt {
+    return this.value2;
+  }
+
+  getBasePrice(): BigInt {
+    return this.value3;
   }
 }
 
