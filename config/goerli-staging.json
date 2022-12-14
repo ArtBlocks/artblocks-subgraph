@@ -178,11 +178,35 @@
       "startBlock": 7723588
     }
   ],
+  "minterMerkleV3Contracts": [
+    {
+      "address": "0x2FB0d2410117ac190CD6FfF017B989195A522a87",
+      "name": "Flagship Minter for V3 core",
+      "startBlock": 8128478
+    },
+    {
+      "address": "0xc4081Fbc41859b7749D97FE363DE671d51f9bD01",
+      "name": "Explorations Minter",
+      "startBlock": 8128520
+    }
+  ],
   "minterHolderV1Contracts": [
     {
       "address": "0x3e8d9D70906d39225bDcb14002cAFD8a652aD97A",
       "name": "Flagship Minter for V3 core",
       "startBlock": 7723589
+    }
+  ],
+  "minterHolderV2Contracts": [
+    {
+      "address": "0xB5Cc0e80e2043cBB5F63d548E1832F22CD1a97b2",
+      "name": "Flagship Minter for V3 core",
+      "startBlock": 8128721
+    },
+    {
+      "address": "0x980b482072838C38090c40e3F95A150E572719Dd",
+      "name": "Explorations Minter",
+      "startBlock": 8128726
     }
   ],
   "engineFlexContracts": [
