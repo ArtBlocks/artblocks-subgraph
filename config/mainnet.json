@@ -103,6 +103,11 @@
       "address": "0xEafE7b73A3cfA804b761debcF077D4574588dfe7",
       "name": "Endaoment Flex",
       "startBlock": 15886561
+    },
+    {
+      "address": "0x7c3Ea2b7B3beFA1115aB51c09F0C9f245C500B18",
+      "name": "Bright Moments Flex",
+      "startBlock": 16186518
     }
   ],
   "minterFilterV0Contracts": [
