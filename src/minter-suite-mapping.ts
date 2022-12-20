@@ -1238,7 +1238,7 @@ function syncLatestPurchasePrice(
     projectId
   );
   // update extraMinterDetails key `currentSettledPrice` to be latestPurchasePrice
-  let genericEvent: ConfigValueSetBigInt = new ConfigValueSetBigInt(
+  let genericEvent: ConfigValueSetBytes = new ConfigValueSetBytes(
     event.address,
     event.logIndex,
     event.transactionLogIndex,
@@ -1259,7 +1259,7 @@ function syncLatestPurchasePrice(
     ),
     new ethereum.EventParam(
       "_value",
-      ethereum.Value.fromUnsignedBigInt(latestPurchasePrice)
+      ethereum.Value.fromBytes(Bytes.fromUTF8(latestPurchasePrice.toString()))
     )
   ];
   // call generic handler to populate project's extraMinterDetails
