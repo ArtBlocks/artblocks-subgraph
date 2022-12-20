@@ -388,11 +388,75 @@ export class MinterMerkleV0__getPriceInfoResult {
     map.set("value3", ethereum.Value.fromAddress(this.value3));
     return map;
   }
+
+  getIsConfigured(): boolean {
+    return this.value0;
+  }
+
+  getTokenPriceInWei(): BigInt {
+    return this.value1;
+  }
+
+  getCurrencySymbol(): string {
+    return this.value2;
+  }
+
+  getCurrencyAddress(): Address {
+    return this.value3;
+  }
+}
+
+export class MinterMerkleV0__projectRemainingInvocationsForAddressResult {
+  value0: boolean;
+  value1: BigInt;
+
+  constructor(value0: boolean, value1: BigInt) {
+    this.value0 = value0;
+    this.value1 = value1;
+  }
+
+  toMap(): TypedMap<string, ethereum.Value> {
+    let map = new TypedMap<string, ethereum.Value>();
+    map.set("value0", ethereum.Value.fromBoolean(this.value0));
+    map.set("value1", ethereum.Value.fromUnsignedBigInt(this.value1));
+    return map;
+  }
+
+  getProjectLimitsMintInvocationsPerAddress(): boolean {
+    return this.value0;
+  }
+
+  getMintInvocationsRemaining(): BigInt {
+    return this.value1;
+  }
 }
 
 export class MinterMerkleV0 extends ethereum.SmartContract {
   static bind(address: Address): MinterMerkleV0 {
     return new MinterMerkleV0("MinterMerkleV0", address);
+  }
+
+  DEFAULT_MAX_INVOCATIONS_PER_ADDRESS(): BigInt {
+    let result = super.call(
+      "DEFAULT_MAX_INVOCATIONS_PER_ADDRESS",
+      "DEFAULT_MAX_INVOCATIONS_PER_ADDRESS():(uint256)",
+      []
+    );
+
+    return result[0].toBigInt();
+  }
+
+  try_DEFAULT_MAX_INVOCATIONS_PER_ADDRESS(): ethereum.CallResult<BigInt> {
+    let result = super.tryCall(
+      "DEFAULT_MAX_INVOCATIONS_PER_ADDRESS",
+      "DEFAULT_MAX_INVOCATIONS_PER_ADDRESS():(uint256)",
+      []
+    );
+    if (result.reverted) {
+      return new ethereum.CallResult();
+    }
+    let value = result.value;
+    return ethereum.CallResult.fromValue(value[0].toBigInt());
   }
 
   genArt721CoreAddress(): Address {
@@ -592,6 +656,56 @@ export class MinterMerkleV0 extends ethereum.SmartContract {
     return ethereum.CallResult.fromValue(value[0].toBigInt());
   }
 
+  projectMaxInvocationsPerAddress(_projectId: BigInt): BigInt {
+    let result = super.call(
+      "projectMaxInvocationsPerAddress",
+      "projectMaxInvocationsPerAddress(uint256):(uint256)",
+      [ethereum.Value.fromUnsignedBigInt(_projectId)]
+    );
+
+    return result[0].toBigInt();
+  }
+
+  try_projectMaxInvocationsPerAddress(
+    _projectId: BigInt
+  ): ethereum.CallResult<BigInt> {
+    let result = super.tryCall(
+      "projectMaxInvocationsPerAddress",
+      "projectMaxInvocationsPerAddress(uint256):(uint256)",
+      [ethereum.Value.fromUnsignedBigInt(_projectId)]
+    );
+    if (result.reverted) {
+      return new ethereum.CallResult();
+    }
+    let value = result.value;
+    return ethereum.CallResult.fromValue(value[0].toBigInt());
+  }
+
+  projectMaxInvocationsPerAddressOverride(param0: BigInt): BigInt {
+    let result = super.call(
+      "projectMaxInvocationsPerAddressOverride",
+      "projectMaxInvocationsPerAddressOverride(uint256):(uint256)",
+      [ethereum.Value.fromUnsignedBigInt(param0)]
+    );
+
+    return result[0].toBigInt();
+  }
+
+  try_projectMaxInvocationsPerAddressOverride(
+    param0: BigInt
+  ): ethereum.CallResult<BigInt> {
+    let result = super.tryCall(
+      "projectMaxInvocationsPerAddressOverride",
+      "projectMaxInvocationsPerAddressOverride(uint256):(uint256)",
+      [ethereum.Value.fromUnsignedBigInt(param0)]
+    );
+    if (result.reverted) {
+      return new ethereum.CallResult();
+    }
+    let value = result.value;
+    return ethereum.CallResult.fromValue(value[0].toBigInt());
+  }
+
   projectMerkleRoot(param0: BigInt): Bytes {
     let result = super.call(
       "projectMerkleRoot",
@@ -615,49 +729,96 @@ export class MinterMerkleV0 extends ethereum.SmartContract {
     return ethereum.CallResult.fromValue(value[0].toBytes());
   }
 
-  projectMintLimiterDisabled(param0: BigInt): boolean {
+  projectRemainingInvocationsForAddress(
+    _projectId: BigInt,
+    _address: Address
+  ): MinterMerkleV0__projectRemainingInvocationsForAddressResult {
     let result = super.call(
-      "projectMintLimiterDisabled",
-      "projectMintLimiterDisabled(uint256):(bool)",
-      [ethereum.Value.fromUnsignedBigInt(param0)]
+      "projectRemainingInvocationsForAddress",
+      "projectRemainingInvocationsForAddress(uint256,address):(bool,uint256)",
+      [
+        ethereum.Value.fromUnsignedBigInt(_projectId),
+        ethereum.Value.fromAddress(_address)
+      ]
     );
 
-    return result[0].toBoolean();
+    return new MinterMerkleV0__projectRemainingInvocationsForAddressResult(
+      result[0].toBoolean(),
+      result[1].toBigInt()
+    );
   }
 
-  try_projectMintLimiterDisabled(param0: BigInt): ethereum.CallResult<boolean> {
+  try_projectRemainingInvocationsForAddress(
+    _projectId: BigInt,
+    _address: Address
+  ): ethereum.CallResult<
+    MinterMerkleV0__projectRemainingInvocationsForAddressResult
+  > {
     let result = super.tryCall(
-      "projectMintLimiterDisabled",
-      "projectMintLimiterDisabled(uint256):(bool)",
-      [ethereum.Value.fromUnsignedBigInt(param0)]
+      "projectRemainingInvocationsForAddress",
+      "projectRemainingInvocationsForAddress(uint256,address):(bool,uint256)",
+      [
+        ethereum.Value.fromUnsignedBigInt(_projectId),
+        ethereum.Value.fromAddress(_address)
+      ]
     );
     if (result.reverted) {
       return new ethereum.CallResult();
     }
     let value = result.value;
-    return ethereum.CallResult.fromValue(value[0].toBoolean());
+    return ethereum.CallResult.fromValue(
+      new MinterMerkleV0__projectRemainingInvocationsForAddressResult(
+        value[0].toBoolean(),
+        value[1].toBigInt()
+      )
+    );
   }
 
-  projectMintedBy(param0: BigInt, param1: Address): boolean {
+  projectUseMaxInvocationsPerAddressOverride(param0: BigInt): boolean {
     let result = super.call(
-      "projectMintedBy",
-      "projectMintedBy(uint256,address):(bool)",
-      [
-        ethereum.Value.fromUnsignedBigInt(param0),
-        ethereum.Value.fromAddress(param1)
-      ]
+      "projectUseMaxInvocationsPerAddressOverride",
+      "projectUseMaxInvocationsPerAddressOverride(uint256):(bool)",
+      [ethereum.Value.fromUnsignedBigInt(param0)]
     );
 
     return result[0].toBoolean();
   }
 
-  try_projectMintedBy(
-    param0: BigInt,
-    param1: Address
+  try_projectUseMaxInvocationsPerAddressOverride(
+    param0: BigInt
   ): ethereum.CallResult<boolean> {
     let result = super.tryCall(
-      "projectMintedBy",
-      "projectMintedBy(uint256,address):(bool)",
+      "projectUseMaxInvocationsPerAddressOverride",
+      "projectUseMaxInvocationsPerAddressOverride(uint256):(bool)",
+      [ethereum.Value.fromUnsignedBigInt(param0)]
+    );
+    if (result.reverted) {
+      return new ethereum.CallResult();
+    }
+    let value = result.value;
+    return ethereum.CallResult.fromValue(value[0].toBoolean());
+  }
+
+  projectUserMintInvocations(param0: BigInt, param1: Address): BigInt {
+    let result = super.call(
+      "projectUserMintInvocations",
+      "projectUserMintInvocations(uint256,address):(uint256)",
+      [
+        ethereum.Value.fromUnsignedBigInt(param0),
+        ethereum.Value.fromAddress(param1)
+      ]
+    );
+
+    return result[0].toBigInt();
+  }
+
+  try_projectUserMintInvocations(
+    param0: BigInt,
+    param1: Address
+  ): ethereum.CallResult<BigInt> {
+    let result = super.tryCall(
+      "projectUserMintInvocations",
+      "projectUserMintInvocations(uint256,address):(uint256)",
       [
         ethereum.Value.fromUnsignedBigInt(param0),
         ethereum.Value.fromAddress(param1)
@@ -667,7 +828,7 @@ export class MinterMerkleV0 extends ethereum.SmartContract {
       return new ethereum.CallResult();
     }
     let value = result.value;
-    return ethereum.CallResult.fromValue(value[0].toBoolean());
+    return ethereum.CallResult.fromValue(value[0].toBigInt());
   }
 
   verifyAddress(
@@ -896,6 +1057,40 @@ export class PurchaseTo1Call__Outputs {
   }
 }
 
+export class SetProjectInvocationsPerAddressCall extends ethereum.Call {
+  get inputs(): SetProjectInvocationsPerAddressCall__Inputs {
+    return new SetProjectInvocationsPerAddressCall__Inputs(this);
+  }
+
+  get outputs(): SetProjectInvocationsPerAddressCall__Outputs {
+    return new SetProjectInvocationsPerAddressCall__Outputs(this);
+  }
+}
+
+export class SetProjectInvocationsPerAddressCall__Inputs {
+  _call: SetProjectInvocationsPerAddressCall;
+
+  constructor(call: SetProjectInvocationsPerAddressCall) {
+    this._call = call;
+  }
+
+  get _projectId(): BigInt {
+    return this._call.inputValues[0].value.toBigInt();
+  }
+
+  get _maxInvocationsPerAddress(): i32 {
+    return this._call.inputValues[1].value.toI32();
+  }
+}
+
+export class SetProjectInvocationsPerAddressCall__Outputs {
+  _call: SetProjectInvocationsPerAddressCall;
+
+  constructor(call: SetProjectInvocationsPerAddressCall) {
+    this._call = call;
+  }
+}
+
 export class SetProjectMaxInvocationsCall extends ethereum.Call {
   get inputs(): SetProjectMaxInvocationsCall__Inputs {
     return new SetProjectMaxInvocationsCall__Inputs(this);
@@ -922,36 +1117,6 @@ export class SetProjectMaxInvocationsCall__Outputs {
   _call: SetProjectMaxInvocationsCall;
 
   constructor(call: SetProjectMaxInvocationsCall) {
-    this._call = call;
-  }
-}
-
-export class ToggleProjectMintLimiterCall extends ethereum.Call {
-  get inputs(): ToggleProjectMintLimiterCall__Inputs {
-    return new ToggleProjectMintLimiterCall__Inputs(this);
-  }
-
-  get outputs(): ToggleProjectMintLimiterCall__Outputs {
-    return new ToggleProjectMintLimiterCall__Outputs(this);
-  }
-}
-
-export class ToggleProjectMintLimiterCall__Inputs {
-  _call: ToggleProjectMintLimiterCall;
-
-  constructor(call: ToggleProjectMintLimiterCall) {
-    this._call = call;
-  }
-
-  get _projectId(): BigInt {
-    return this._call.inputValues[0].value.toBigInt();
-  }
-}
-
-export class ToggleProjectMintLimiterCall__Outputs {
-  _call: ToggleProjectMintLimiterCall;
-
-  constructor(call: ToggleProjectMintLimiterCall) {
     this._call = call;
   }
 }

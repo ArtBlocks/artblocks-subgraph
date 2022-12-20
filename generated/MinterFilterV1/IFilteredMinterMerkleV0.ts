@@ -10,46 +10,6 @@ import {
   BigInt
 } from "@graphprotocol/graph-ts";
 
-export class ArtistAndAdminRevenuesWithdrawn extends ethereum.Event {
-  get params(): ArtistAndAdminRevenuesWithdrawn__Params {
-    return new ArtistAndAdminRevenuesWithdrawn__Params(this);
-  }
-}
-
-export class ArtistAndAdminRevenuesWithdrawn__Params {
-  _event: ArtistAndAdminRevenuesWithdrawn;
-
-  constructor(event: ArtistAndAdminRevenuesWithdrawn) {
-    this._event = event;
-  }
-
-  get _projectId(): BigInt {
-    return this._event.parameters[0].value.toBigInt();
-  }
-}
-
-export class AuctionHalfLifeRangeSecondsUpdated extends ethereum.Event {
-  get params(): AuctionHalfLifeRangeSecondsUpdated__Params {
-    return new AuctionHalfLifeRangeSecondsUpdated__Params(this);
-  }
-}
-
-export class AuctionHalfLifeRangeSecondsUpdated__Params {
-  _event: AuctionHalfLifeRangeSecondsUpdated;
-
-  constructor(event: AuctionHalfLifeRangeSecondsUpdated) {
-    this._event = event;
-  }
-
-  get _minimumPriceDecayHalfLifeSeconds(): BigInt {
-    return this._event.parameters[0].value.toBigInt();
-  }
-
-  get _maximumPriceDecayHalfLifeSeconds(): BigInt {
-    return this._event.parameters[1].value.toBigInt();
-  }
-}
-
 export class ConfigKeyRemoved extends ethereum.Event {
   get params(): ConfigKeyRemoved__Params {
     return new ConfigKeyRemoved__Params(this);
@@ -332,6 +292,24 @@ export class ConfigValueSet3__Params {
   }
 }
 
+export class DefaultMaxInvocationsPerAddress extends ethereum.Event {
+  get params(): DefaultMaxInvocationsPerAddress__Params {
+    return new DefaultMaxInvocationsPerAddress__Params(this);
+  }
+}
+
+export class DefaultMaxInvocationsPerAddress__Params {
+  _event: DefaultMaxInvocationsPerAddress;
+
+  constructor(event: DefaultMaxInvocationsPerAddress) {
+    this._event = event;
+  }
+
+  get defaultMaxInvocationsPerAddress(): BigInt {
+    return this._event.parameters[0].value.toBigInt();
+  }
+}
+
 export class PricePerTokenInWeiUpdated extends ethereum.Event {
   get params(): PricePerTokenInWeiUpdated__Params {
     return new PricePerTokenInWeiUpdated__Params(this);
@@ -402,137 +380,7 @@ export class PurchaseToDisabledUpdated__Params {
   }
 }
 
-export class ReceiptUpdated extends ethereum.Event {
-  get params(): ReceiptUpdated__Params {
-    return new ReceiptUpdated__Params(this);
-  }
-}
-
-export class ReceiptUpdated__Params {
-  _event: ReceiptUpdated;
-
-  constructor(event: ReceiptUpdated) {
-    this._event = event;
-  }
-
-  get _purchaser(): Address {
-    return this._event.parameters[0].value.toAddress();
-  }
-
-  get _projectId(): BigInt {
-    return this._event.parameters[1].value.toBigInt();
-  }
-
-  get _numPurchased(): BigInt {
-    return this._event.parameters[2].value.toBigInt();
-  }
-
-  get _netPosted(): BigInt {
-    return this._event.parameters[3].value.toBigInt();
-  }
-}
-
-export class ResetAuctionDetails extends ethereum.Event {
-  get params(): ResetAuctionDetails__Params {
-    return new ResetAuctionDetails__Params(this);
-  }
-}
-
-export class ResetAuctionDetails__Params {
-  _event: ResetAuctionDetails;
-
-  constructor(event: ResetAuctionDetails) {
-    this._event = event;
-  }
-
-  get projectId(): BigInt {
-    return this._event.parameters[0].value.toBigInt();
-  }
-
-  get numPurchases(): BigInt {
-    return this._event.parameters[1].value.toBigInt();
-  }
-
-  get latestPurchasePrice(): BigInt {
-    return this._event.parameters[2].value.toBigInt();
-  }
-}
-
-export class ResetAuctionDetails1 extends ethereum.Event {
-  get params(): ResetAuctionDetails1__Params {
-    return new ResetAuctionDetails1__Params(this);
-  }
-}
-
-export class ResetAuctionDetails1__Params {
-  _event: ResetAuctionDetails1;
-
-  constructor(event: ResetAuctionDetails1) {
-    this._event = event;
-  }
-
-  get projectId(): BigInt {
-    return this._event.parameters[0].value.toBigInt();
-  }
-}
-
-export class SelloutPriceUpdated extends ethereum.Event {
-  get params(): SelloutPriceUpdated__Params {
-    return new SelloutPriceUpdated__Params(this);
-  }
-}
-
-export class SelloutPriceUpdated__Params {
-  _event: SelloutPriceUpdated;
-
-  constructor(event: SelloutPriceUpdated) {
-    this._event = event;
-  }
-
-  get _projectId(): BigInt {
-    return this._event.parameters[0].value.toBigInt();
-  }
-
-  get _selloutPrice(): BigInt {
-    return this._event.parameters[1].value.toBigInt();
-  }
-}
-
-export class SetAuctionDetails extends ethereum.Event {
-  get params(): SetAuctionDetails__Params {
-    return new SetAuctionDetails__Params(this);
-  }
-}
-
-export class SetAuctionDetails__Params {
-  _event: SetAuctionDetails;
-
-  constructor(event: SetAuctionDetails) {
-    this._event = event;
-  }
-
-  get projectId(): BigInt {
-    return this._event.parameters[0].value.toBigInt();
-  }
-
-  get _auctionTimestampStart(): BigInt {
-    return this._event.parameters[1].value.toBigInt();
-  }
-
-  get _priceDecayHalfLifeSeconds(): BigInt {
-    return this._event.parameters[2].value.toBigInt();
-  }
-
-  get _startPrice(): BigInt {
-    return this._event.parameters[3].value.toBigInt();
-  }
-
-  get _basePrice(): BigInt {
-    return this._event.parameters[4].value.toBigInt();
-  }
-}
-
-export class IFilteredMinterDAExpSettlementV0__getPriceInfoResult {
+export class IFilteredMinterMerkleV0__getPriceInfoResult {
   value0: boolean;
   value1: BigInt;
   value2: string;
@@ -576,12 +424,9 @@ export class IFilteredMinterDAExpSettlementV0__getPriceInfoResult {
   }
 }
 
-export class IFilteredMinterDAExpSettlementV0 extends ethereum.SmartContract {
-  static bind(address: Address): IFilteredMinterDAExpSettlementV0 {
-    return new IFilteredMinterDAExpSettlementV0(
-      "IFilteredMinterDAExpSettlementV0",
-      address
-    );
+export class IFilteredMinterMerkleV0 extends ethereum.SmartContract {
+  static bind(address: Address): IFilteredMinterMerkleV0 {
+    return new IFilteredMinterMerkleV0("IFilteredMinterMerkleV0", address);
   }
 
   genArt721CoreAddress(): Address {
@@ -607,41 +452,16 @@ export class IFilteredMinterDAExpSettlementV0 extends ethereum.SmartContract {
     return ethereum.CallResult.fromValue(value[0].toAddress());
   }
 
-  getNumSettleableInvocations(_projectId: BigInt): BigInt {
-    let result = super.call(
-      "getNumSettleableInvocations",
-      "getNumSettleableInvocations(uint256):(uint256)",
-      [ethereum.Value.fromUnsignedBigInt(_projectId)]
-    );
-
-    return result[0].toBigInt();
-  }
-
-  try_getNumSettleableInvocations(
-    _projectId: BigInt
-  ): ethereum.CallResult<BigInt> {
-    let result = super.tryCall(
-      "getNumSettleableInvocations",
-      "getNumSettleableInvocations(uint256):(uint256)",
-      [ethereum.Value.fromUnsignedBigInt(_projectId)]
-    );
-    if (result.reverted) {
-      return new ethereum.CallResult();
-    }
-    let value = result.value;
-    return ethereum.CallResult.fromValue(value[0].toBigInt());
-  }
-
   getPriceInfo(
     _projectId: BigInt
-  ): IFilteredMinterDAExpSettlementV0__getPriceInfoResult {
+  ): IFilteredMinterMerkleV0__getPriceInfoResult {
     let result = super.call(
       "getPriceInfo",
       "getPriceInfo(uint256):(bool,uint256,string,address)",
       [ethereum.Value.fromUnsignedBigInt(_projectId)]
     );
 
-    return new IFilteredMinterDAExpSettlementV0__getPriceInfoResult(
+    return new IFilteredMinterMerkleV0__getPriceInfoResult(
       result[0].toBoolean(),
       result[1].toBigInt(),
       result[2].toString(),
@@ -651,7 +471,7 @@ export class IFilteredMinterDAExpSettlementV0 extends ethereum.SmartContract {
 
   try_getPriceInfo(
     _projectId: BigInt
-  ): ethereum.CallResult<IFilteredMinterDAExpSettlementV0__getPriceInfoResult> {
+  ): ethereum.CallResult<IFilteredMinterMerkleV0__getPriceInfoResult> {
     let result = super.tryCall(
       "getPriceInfo",
       "getPriceInfo(uint256):(bool,uint256,string,address)",
@@ -662,119 +482,13 @@ export class IFilteredMinterDAExpSettlementV0 extends ethereum.SmartContract {
     }
     let value = result.value;
     return ethereum.CallResult.fromValue(
-      new IFilteredMinterDAExpSettlementV0__getPriceInfoResult(
+      new IFilteredMinterMerkleV0__getPriceInfoResult(
         value[0].toBoolean(),
         value[1].toBigInt(),
         value[2].toString(),
         value[3].toAddress()
       )
     );
-  }
-
-  getProjectExcessSettlementFunds(
-    _projectId: BigInt,
-    _walletAddress: Address
-  ): BigInt {
-    let result = super.call(
-      "getProjectExcessSettlementFunds",
-      "getProjectExcessSettlementFunds(uint256,address):(uint256)",
-      [
-        ethereum.Value.fromUnsignedBigInt(_projectId),
-        ethereum.Value.fromAddress(_walletAddress)
-      ]
-    );
-
-    return result[0].toBigInt();
-  }
-
-  try_getProjectExcessSettlementFunds(
-    _projectId: BigInt,
-    _walletAddress: Address
-  ): ethereum.CallResult<BigInt> {
-    let result = super.tryCall(
-      "getProjectExcessSettlementFunds",
-      "getProjectExcessSettlementFunds(uint256,address):(uint256)",
-      [
-        ethereum.Value.fromUnsignedBigInt(_projectId),
-        ethereum.Value.fromAddress(_walletAddress)
-      ]
-    );
-    if (result.reverted) {
-      return new ethereum.CallResult();
-    }
-    let value = result.value;
-    return ethereum.CallResult.fromValue(value[0].toBigInt());
-  }
-
-  getProjectLatestPurchasePrice(_projectId: BigInt): BigInt {
-    let result = super.call(
-      "getProjectLatestPurchasePrice",
-      "getProjectLatestPurchasePrice(uint256):(uint256)",
-      [ethereum.Value.fromUnsignedBigInt(_projectId)]
-    );
-
-    return result[0].toBigInt();
-  }
-
-  try_getProjectLatestPurchasePrice(
-    _projectId: BigInt
-  ): ethereum.CallResult<BigInt> {
-    let result = super.tryCall(
-      "getProjectLatestPurchasePrice",
-      "getProjectLatestPurchasePrice(uint256):(uint256)",
-      [ethereum.Value.fromUnsignedBigInt(_projectId)]
-    );
-    if (result.reverted) {
-      return new ethereum.CallResult();
-    }
-    let value = result.value;
-    return ethereum.CallResult.fromValue(value[0].toBigInt());
-  }
-
-  maximumPriceDecayHalfLifeSeconds(): BigInt {
-    let result = super.call(
-      "maximumPriceDecayHalfLifeSeconds",
-      "maximumPriceDecayHalfLifeSeconds():(uint256)",
-      []
-    );
-
-    return result[0].toBigInt();
-  }
-
-  try_maximumPriceDecayHalfLifeSeconds(): ethereum.CallResult<BigInt> {
-    let result = super.tryCall(
-      "maximumPriceDecayHalfLifeSeconds",
-      "maximumPriceDecayHalfLifeSeconds():(uint256)",
-      []
-    );
-    if (result.reverted) {
-      return new ethereum.CallResult();
-    }
-    let value = result.value;
-    return ethereum.CallResult.fromValue(value[0].toBigInt());
-  }
-
-  minimumPriceDecayHalfLifeSeconds(): BigInt {
-    let result = super.call(
-      "minimumPriceDecayHalfLifeSeconds",
-      "minimumPriceDecayHalfLifeSeconds():(uint256)",
-      []
-    );
-
-    return result[0].toBigInt();
-  }
-
-  try_minimumPriceDecayHalfLifeSeconds(): ethereum.CallResult<BigInt> {
-    let result = super.tryCall(
-      "minimumPriceDecayHalfLifeSeconds",
-      "minimumPriceDecayHalfLifeSeconds():(uint256)",
-      []
-    );
-    if (result.reverted) {
-      return new ethereum.CallResult();
-    }
-    let value = result.value;
-    return ethereum.CallResult.fromValue(value[0].toBigInt());
   }
 
   minterFilterAddress(): Address {
@@ -896,12 +610,50 @@ export class PurchaseCall__Inputs {
   get _projectId(): BigInt {
     return this._call.inputValues[0].value.toBigInt();
   }
+
+  get _proof(): Array<Bytes> {
+    return this._call.inputValues[1].value.toBytesArray();
+  }
 }
 
 export class PurchaseCall__Outputs {
   _call: PurchaseCall;
 
   constructor(call: PurchaseCall) {
+    this._call = call;
+  }
+
+  get tokenId(): BigInt {
+    return this._call.outputValues[0].value.toBigInt();
+  }
+}
+
+export class Purchase1Call extends ethereum.Call {
+  get inputs(): Purchase1Call__Inputs {
+    return new Purchase1Call__Inputs(this);
+  }
+
+  get outputs(): Purchase1Call__Outputs {
+    return new Purchase1Call__Outputs(this);
+  }
+}
+
+export class Purchase1Call__Inputs {
+  _call: Purchase1Call;
+
+  constructor(call: Purchase1Call) {
+    this._call = call;
+  }
+
+  get _projectId(): BigInt {
+    return this._call.inputValues[0].value.toBigInt();
+  }
+}
+
+export class Purchase1Call__Outputs {
+  _call: Purchase1Call;
+
+  constructor(call: Purchase1Call) {
     this._call = call;
   }
 
@@ -934,12 +686,54 @@ export class PurchaseToCall__Inputs {
   get _projectId(): BigInt {
     return this._call.inputValues[1].value.toBigInt();
   }
+
+  get _proof(): Array<Bytes> {
+    return this._call.inputValues[2].value.toBytesArray();
+  }
 }
 
 export class PurchaseToCall__Outputs {
   _call: PurchaseToCall;
 
   constructor(call: PurchaseToCall) {
+    this._call = call;
+  }
+
+  get tokenId(): BigInt {
+    return this._call.outputValues[0].value.toBigInt();
+  }
+}
+
+export class PurchaseTo1Call extends ethereum.Call {
+  get inputs(): PurchaseTo1Call__Inputs {
+    return new PurchaseTo1Call__Inputs(this);
+  }
+
+  get outputs(): PurchaseTo1Call__Outputs {
+    return new PurchaseTo1Call__Outputs(this);
+  }
+}
+
+export class PurchaseTo1Call__Inputs {
+  _call: PurchaseTo1Call;
+
+  constructor(call: PurchaseTo1Call) {
+    this._call = call;
+  }
+
+  get _to(): Address {
+    return this._call.inputValues[0].value.toAddress();
+  }
+
+  get _projectId(): BigInt {
+    return this._call.inputValues[1].value.toBigInt();
+  }
+}
+
+export class PurchaseTo1Call__Outputs {
+  _call: PurchaseTo1Call;
+
+  constructor(call: PurchaseTo1Call) {
     this._call = call;
   }
 

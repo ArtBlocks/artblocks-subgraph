@@ -9,13 +9,6 @@ import {
   store,
   ethereum
 } from "@graphprotocol/graph-ts";
-import { MinterDAExpV0 } from "../generated/MinterDAExpV0/MinterDAExpV0";
-import { MinterDAExpV1 } from "../generated/MinterDAExpV1/MinterDAExpV1";
-import { MinterDAExpV2 } from "../generated/MinterDAExpV2/MinterDAExpV2";
-import { MinterDAExpSettlementV0 } from "../generated/MinterDAExpSettlementV0/MinterDAExpSettlementV0";
-import { MinterDALinV0 } from "../generated/MinterDALinV0/MinterDALinV0";
-import { MinterDALinV1 } from "../generated/MinterDALinV1/MinterDALinV1";
-import { MinterDALinV2 } from "../generated/MinterDALinV2/MinterDALinV2";
 import { IFilteredMinterV0 } from "../generated/MinterSetPriceV0/IFilteredMinterV0";
 import {
   Minter,
@@ -24,6 +17,8 @@ import {
   Whitelisting,
   Receipt
 } from "../generated/schema";
+import { IFilteredMinterDALinV0 } from "../generated/MinterDALinV0/IFilteredMinterDALinV0";
+import { IFilteredMinterDAExpV0 } from "../generated/MinterDAExpV0/IFilteredMinterDAExpV0";
 
 export function generateProjectExternalAssetDependencyId(
   projectId: string,
@@ -173,33 +168,13 @@ export function loadOrCreateMinter(
   // values assigned during contract deployments
   let minterType = filteredMinterContract.minterType();
   minter.type = minterType;
-  if (minterType == "MinterDALinV0") {
-    let minterDALinV0Contract = MinterDALinV0.bind(minterAddress);
-    minter.minimumAuctionLengthInSeconds = minterDALinV0Contract.minimumAuctionLengthSeconds();
-  } else if (minterType == "MinterDALinV1") {
-    let minterDALinV1Contract = MinterDALinV1.bind(minterAddress);
-    minter.minimumAuctionLengthInSeconds = minterDALinV1Contract.minimumAuctionLengthSeconds();
-  } else if (minterType == "MinterDALinV2") {
-    let minterDALinV2Contract = MinterDALinV2.bind(minterAddress);
-    minter.minimumAuctionLengthInSeconds = minterDALinV2Contract.minimumAuctionLengthSeconds();
-  } else if (minterType == "MinterDAExpV0") {
-    let minterDAExpV0Contract = MinterDAExpV0.bind(minterAddress);
-    minter.minimumHalfLifeInSeconds = minterDAExpV0Contract.minimumPriceDecayHalfLifeSeconds();
-    minter.maximumHalfLifeInSeconds = minterDAExpV0Contract.maximumPriceDecayHalfLifeSeconds();
-  } else if (minterType == "MinterDAExpV1") {
-    let minterDAExpV1Contract = MinterDAExpV1.bind(minterAddress);
-    minter.minimumHalfLifeInSeconds = minterDAExpV1Contract.minimumPriceDecayHalfLifeSeconds();
-    minter.maximumHalfLifeInSeconds = minterDAExpV1Contract.maximumPriceDecayHalfLifeSeconds();
-  } else if (minterType == "MinterDAExpV2") {
-    let minterDAExpV2Contract = MinterDAExpV2.bind(minterAddress);
-    minter.minimumHalfLifeInSeconds = minterDAExpV2Contract.minimumPriceDecayHalfLifeSeconds();
-    minter.maximumHalfLifeInSeconds = minterDAExpV2Contract.maximumPriceDecayHalfLifeSeconds();
-  } else if (minterType == "MinterDAExpSettlementV0") {
-    let minterDAExpSettlementV0Contract = MinterDAExpSettlementV0.bind(
-      minterAddress
-    );
-    minter.minimumHalfLifeInSeconds = minterDAExpSettlementV0Contract.minimumPriceDecayHalfLifeSeconds();
-    minter.maximumHalfLifeInSeconds = minterDAExpSettlementV0Contract.maximumPriceDecayHalfLifeSeconds();
+  if (minterType.startsWith("MinterDALin")) {
+    const contract = IFilteredMinterDALinV0.bind(minterAddress);
+    minter.minimumAuctionLengthInSeconds = contract.minimumAuctionLengthSeconds();
+  } else if (minterType.startsWith("MinterDAExp")) {
+    const contract = IFilteredMinterDAExpV0.bind(minterAddress);
+    minter.minimumHalfLifeInSeconds = contract.minimumPriceDecayHalfLifeSeconds();
+    minter.maximumHalfLifeInSeconds = contract.maximumPriceDecayHalfLifeSeconds();
   }
 
   minter.updatedAt = timestamp;

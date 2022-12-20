@@ -105,6 +105,11 @@
       "address": ""
     }
   ],
+  "minterMerkleV0Contracts": [
+    {
+      "address": ""
+    }
+  ],
   "minterMerkleV1Contracts": [
     {
       "address": ""
@@ -116,6 +121,11 @@
     }
   ],
   "minterMerkleV3Contracts": [
+    {
+      "address": ""
+    }
+  ],
+  "minterHolderV0Contracts": [
     {
       "address": ""
     }
