@@ -1649,7 +1649,9 @@ describe("DAExpSettlementMinters", () => {
         PROJECT_MINTER_CONFIGURATION_ENTITY_TYPE,
         getProjectMinterConfigId(minterAddress.toHexString(), project.id),
         "extraMinterDetails",
-        `{"currentSettledPrice":${actualPurchasePrice.toString()},"numSettleableInvocations":${1}}`
+        `{"currentSettledPrice":${'"' +
+          actualPurchasePrice.toString() +
+          '"'},"numSettleableInvocations":${1}}`
       );
       assert.fieldEquals(
         RECEIPT_ENTITY_TYPE,
@@ -1833,7 +1835,9 @@ describe("DAExpSettlementMinters", () => {
         PROJECT_MINTER_CONFIGURATION_ENTITY_TYPE,
         getProjectMinterConfigId(minterAddress.toHexString(), project.id),
         "extraMinterDetails",
-        `{"currentSettledPrice":${actualPurchasePrice.toString()},"numSettleableInvocations":${numPurchased.toString()}}`
+        `{"currentSettledPrice":${'"' +
+          actualPurchasePrice.toString() +
+          '"'},"numSettleableInvocations":${numPurchased.toString()}}`
       );
       assert.fieldEquals(
         RECEIPT_ENTITY_TYPE,
@@ -1953,7 +1957,7 @@ describe("DAExpSettlementMinters", () => {
         PROJECT_MINTER_CONFIGURATION_ENTITY_TYPE,
         getProjectMinterConfigId(minterAddress.toHexString(), project.id),
         "extraMinterDetails",
-        `{"currentSettledPrice":${selloutPrice.toString()}}`
+        `{"currentSettledPrice":${'"' + selloutPrice.toString() + '"'}}`
       );
     });
 
@@ -2052,7 +2056,7 @@ describe("DAExpSettlementMinters", () => {
         PROJECT_MINTER_CONFIGURATION_ENTITY_TYPE,
         getProjectMinterConfigId(minterAddress.toHexString(), project.id),
         "extraMinterDetails",
-        `{"currentSettledPrice":${selloutPrice.toString()}}`
+        `{"currentSettledPrice":${'"' + selloutPrice.toString() + '"'}}`
       );
     });
   });
@@ -2131,7 +2135,9 @@ describe("DAExpSettlementMinters", () => {
         PROJECT_MINTER_CONFIGURATION_ENTITY_TYPE,
         getProjectMinterConfigId(minterAddress.toHexString(), project.id),
         "extraMinterDetails",
-        `{"currentSettledPrice":${updatedLatestPurchasePrice.toString()},"auctionRevenuesCollected":${true}}`
+        `{"currentSettledPrice":${'"' +
+          updatedLatestPurchasePrice.toString() +
+          '"'},"auctionRevenuesCollected":${true}}`
       );
     });
   });
