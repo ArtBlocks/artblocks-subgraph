@@ -67,6 +67,11 @@
       "address": "0xD94C7060808f3c876824E57e685702f3834D2e13",
       "name": "ITERATION-02",
       "startBlock": 7917739
+    },
+    {
+      "address": "0xAbf9B1c2c14399CFD1753BE2090b7dA3c0A1434B",
+      "name": "VerticalCrypto Gen Art",
+      "startBlock": 8171667
     }
   ],
   "minterFilterV0Contracts": [
@@ -234,6 +239,16 @@
       "address": "0xc2aeC8A571e8D40d3606fAD9Cd10EbB1731D2816",
       "name": "GENCLO Flex",
       "startBlock": 7917787
+    },
+    {
+      "address": "0xc8FA62D76fbbCD71482C603cae4a5ebfaD5c7C78",
+      "name": "TRAMExCPG",
+      "startBlock": 8170848
+    },
+    {
+      "address": "0x9dF9dc3Fe9985aa4e1F93543f5a20688f49E6dCa",
+      "name": "XCORE",
+      "startBlock": 8165411
     }
   ],
   "adminACLV0Contracts": [
