@@ -552,7 +552,7 @@ type Transfer @entity(immutable: true) {
   from: Bytes!
 }
 
-type ProjectDependency @entity {
+type Dependency @entity {
   id: ID!
   preferredCDN: String!
   additionalCDNs: [DependencyAdditionalCDN!]! @derivedFrom(field: "dependency")
@@ -560,8 +560,8 @@ type ProjectDependency @entity {
   preferredRepository: String!
   additionalRepositoryCount: BigInt!
   additionalRepositories: [DependencyAdditionalRepository!]! @derivedFrom(field: "dependency")
-  scriptCount: BigInt!
   scripts: [DependencyScript!]! @derivedFrom(field: "dependency")
+  scriptCount: BigInt!
   referenceWebsite: String!
 }
 
