@@ -889,6 +889,11 @@ export function handleAddManyValueGeneric<T, C>(
   if (project) {
     project.updatedAt = event.block.timestamp;
   }
+
+  if (config instanceof Minter) {
+    config.updatedAt = event.block.timestamp;
+  }
+
   let jsonResult = json.try_fromString(config.extraMinterDetails);
 
   let minterDetails: TypedMap<string, JSONValue>;
