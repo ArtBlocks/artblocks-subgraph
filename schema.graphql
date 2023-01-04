@@ -552,12 +552,43 @@ type Transfer @entity(immutable: true) {
   from: Bytes!
 }
 
+type ProjectDependency @entity {
+  id: ID!
+  preferredCDN: String!
+  additionalCDNs: [DependencyAdditionalCDN!]! @derivedFrom(field: "dependency")
+  additionalCDNCount: BigInt!
+  preferredRepository: String!
+  additionalRepositoryCount: BigInt!
+  additionalRepositories: [DependencyAdditionalRepository!]! @derivedFrom(field: "dependency")
+  scriptCount: BigInt!
+  scripts: [DependencyScript!]! @derivedFrom(field: "dependency")
+  referenceWebsite: String!
+}
+
+type DependencyAdditionalCDN @entity {
+  id: ID!
+  dependency: Dependency!
+}
+
+type DependencyAdditionalRepository @entity {
+  id: ID!
+  dependency: Dependency!
+}
+
+type DependencyScript @entity {
+  id: ID!
+  dependency: Dependency!
+  index: BigInt!
+  address: Address!
+}
+
 enum ProjectExternalAssetDependencyType {
   "Asset hosted on IPFS"
   IPFS
   "Asset hosted on Arweave"
   ARWEAVE
 }
+
 type ProjectExternalAssetDependency @entity {
   "Unique identifier made up of projectId-index"
   id: ID!
