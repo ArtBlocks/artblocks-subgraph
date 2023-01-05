@@ -579,7 +579,7 @@ type DependencyScript @entity {
   id: ID!
   dependency: Dependency!
   index: BigInt!
-  address: Address!
+  address: Bytes!
 }
 
 enum ProjectExternalAssetDependencyType {

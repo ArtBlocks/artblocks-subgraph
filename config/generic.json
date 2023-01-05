@@ -154,5 +154,10 @@
     {
       "address": ""
     }
+  ],
+  "iDependencyRegistryV0Contracts": [
+    {
+      "address": ""
+    }
   ]
 }
