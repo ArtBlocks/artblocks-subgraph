@@ -72,6 +72,73 @@
       "address": "0xAbf9B1c2c14399CFD1753BE2090b7dA3c0A1434B",
       "name": "VerticalCrypto Gen Art",
       "startBlock": 8171667
+    },
+    {
+      "address": "0x437A628E93B2b7C6503B3F6695D83362A3910d9A",
+      "name": "Tender",
+      "startBlock": 8268110
+    },
+    {
+      "address": "0x47e2df2723238f913741Cc6b1963e76fdfD19B94",
+      "name": "fab DAO",
+      "startBlock": 8268387
+    },
+    {
+      "address": "0x84FB2A4Cf29425f77098f5fBFE1C12B35A6BBbbf",
+      "name": "Art Blocks Engine Test",
+      "startBlock": 8268432
+    }
+  ],
+  "engineFlexContracts": [
+    {
+      "address": "0x7077e777C29ae870d6842B4D1E94511077c99825",
+      "name": "AB Engine Flex Demo, Goerli Staging",
+      "startBlock": 7665745
+    },
+    {
+      "address": "0x2146a41f2c1432895d6d0adf9c60bf0a226bac0e",
+      "name": "Bright Moments - Flex",
+      "startBlock": 7705830
+    },
+    {
+      "address": "0x9ff1079a71dD0C77336466a008A4bB817028613c",
+      "name": "VerseGen",
+      "startBlock": 7793537
+    },
+    {
+      "address": "0x088098F7438773182b703625C4128aFf85fcFfC4",
+      "name": "ATP Love",
+      "startBlock": 7793577
+    },
+    {
+      "address": "0x28b82AA5bb6d00363ae0FBC5ecaD689Ae49BC82B",
+      "name": "Endaoment Gallery for Good - Flex",
+      "startBlock": 7793596
+    },
+    {
+      "address": "0x48742D38a0809135EFd643c1150BfC13768C3907",
+      "name": "Plottables Flex",
+      "startBlock": 7793677
+    },
+    {
+      "address": "0xc2aeC8A571e8D40d3606fAD9Cd10EbB1731D2816",
+      "name": "GENCLO Flex",
+      "startBlock": 7917787
+    },
+    {
+      "address": "0xc8FA62D76fbbCD71482C603cae4a5ebfaD5c7C78",
+      "name": "TRAMExCPG",
+      "startBlock": 8170848
+    },
+    {
+      "address": "0x9dF9dc3Fe9985aa4e1F93543f5a20688f49E6dCa",
+      "name": "XCORE",
+      "startBlock": 8165411
+    },
+    {
+      "address": "0x883eF3c3E22320c423D0eF8859454a36b5c8746d",
+      "name": "Art Blocks FLEX Engine Test",
+      "startBlock": 8268432
     }
   ],
   "minterFilterV0Contracts": [
@@ -202,53 +269,6 @@
       "address": "0x6f9953e06675904AAE18568b1697544778616DAA",
       "name": "Flagship Minter for V3 core",
       "startBlock": 8136182
-    }
-  ],
-  "engineFlexContracts": [
-    {
-      "address": "0x7077e777C29ae870d6842B4D1E94511077c99825",
-      "name": "AB Engine Flex Demo, Goerli Staging",
-      "startBlock": 7665745
-    },
-    {
-      "address": "0x2146a41f2c1432895d6d0adf9c60bf0a226bac0e",
-      "name": "Bright Moments - Flex",
-      "startBlock": 7705830
-    },
-    {
-      "address": "0x9ff1079a71dD0C77336466a008A4bB817028613c",
-      "name": "VerseGen",
-      "startBlock": 7793537
-    },
-    {
-      "address": "0x088098F7438773182b703625C4128aFf85fcFfC4",
-      "name": "ATP Love",
-      "startBlock": 7793577
-    },
-    {
-      "address": "0x28b82AA5bb6d00363ae0FBC5ecaD689Ae49BC82B",
-      "name": "Endaoment Gallery for Good - Flex",
-      "startBlock": 7793596
-    },
-    {
-      "address": "0x48742D38a0809135EFd643c1150BfC13768C3907",
-      "name": "Plottables Flex",
-      "startBlock": 7793677
-    },
-    {
-      "address": "0xc2aeC8A571e8D40d3606fAD9Cd10EbB1731D2816",
-      "name": "GENCLO Flex",
-      "startBlock": 7917787
-    },
-    {
-      "address": "0xc8FA62D76fbbCD71482C603cae4a5ebfaD5c7C78",
-      "name": "TRAMExCPG",
-      "startBlock": 8170848
-    },
-    {
-      "address": "0x9dF9dc3Fe9985aa4e1F93543f5a20688f49E6dCa",
-      "name": "XCORE",
-      "startBlock": 8165411
     }
   ],
   "adminACLV0Contracts": [
