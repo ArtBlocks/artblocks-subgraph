@@ -10,6 +10,24 @@ import {
   BigInt
 } from "@graphprotocol/graph-ts";
 
+export class MinimumAuctionLengthSecondsUpdated extends ethereum.Event {
+  get params(): MinimumAuctionLengthSecondsUpdated__Params {
+    return new MinimumAuctionLengthSecondsUpdated__Params(this);
+  }
+}
+
+export class MinimumAuctionLengthSecondsUpdated__Params {
+  _event: MinimumAuctionLengthSecondsUpdated;
+
+  constructor(event: MinimumAuctionLengthSecondsUpdated) {
+    this._event = event;
+  }
+
+  get _minimumAuctionLengthSeconds(): BigInt {
+    return this._event.parameters[0].value.toBigInt();
+  }
+}
+
 export class PricePerTokenInWeiUpdated extends ethereum.Event {
   get params(): PricePerTokenInWeiUpdated__Params {
     return new PricePerTokenInWeiUpdated__Params(this);
@@ -80,7 +98,59 @@ export class PurchaseToDisabledUpdated__Params {
   }
 }
 
-export class IFilteredMinterV0__getPriceInfoResult {
+export class ResetAuctionDetails extends ethereum.Event {
+  get params(): ResetAuctionDetails__Params {
+    return new ResetAuctionDetails__Params(this);
+  }
+}
+
+export class ResetAuctionDetails__Params {
+  _event: ResetAuctionDetails;
+
+  constructor(event: ResetAuctionDetails) {
+    this._event = event;
+  }
+
+  get projectId(): BigInt {
+    return this._event.parameters[0].value.toBigInt();
+  }
+}
+
+export class SetAuctionDetails extends ethereum.Event {
+  get params(): SetAuctionDetails__Params {
+    return new SetAuctionDetails__Params(this);
+  }
+}
+
+export class SetAuctionDetails__Params {
+  _event: SetAuctionDetails;
+
+  constructor(event: SetAuctionDetails) {
+    this._event = event;
+  }
+
+  get projectId(): BigInt {
+    return this._event.parameters[0].value.toBigInt();
+  }
+
+  get _auctionTimestampStart(): BigInt {
+    return this._event.parameters[1].value.toBigInt();
+  }
+
+  get _auctionTimestampEnd(): BigInt {
+    return this._event.parameters[2].value.toBigInt();
+  }
+
+  get _startPrice(): BigInt {
+    return this._event.parameters[3].value.toBigInt();
+  }
+
+  get _basePrice(): BigInt {
+    return this._event.parameters[4].value.toBigInt();
+  }
+}
+
+export class IFilteredMinterDALinV0__getPriceInfoResult {
   value0: boolean;
   value1: BigInt;
   value2: string;
@@ -124,9 +194,9 @@ export class IFilteredMinterV0__getPriceInfoResult {
   }
 }
 
-export class IFilteredMinterV0 extends ethereum.SmartContract {
-  static bind(address: Address): IFilteredMinterV0 {
-    return new IFilteredMinterV0("IFilteredMinterV0", address);
+export class IFilteredMinterDALinV0 extends ethereum.SmartContract {
+  static bind(address: Address): IFilteredMinterDALinV0 {
+    return new IFilteredMinterDALinV0("IFilteredMinterDALinV0", address);
   }
 
   genArt721CoreAddress(): Address {
@@ -152,14 +222,14 @@ export class IFilteredMinterV0 extends ethereum.SmartContract {
     return ethereum.CallResult.fromValue(value[0].toAddress());
   }
 
-  getPriceInfo(_projectId: BigInt): IFilteredMinterV0__getPriceInfoResult {
+  getPriceInfo(_projectId: BigInt): IFilteredMinterDALinV0__getPriceInfoResult {
     let result = super.call(
       "getPriceInfo",
       "getPriceInfo(uint256):(bool,uint256,string,address)",
       [ethereum.Value.fromUnsignedBigInt(_projectId)]
     );
 
-    return new IFilteredMinterV0__getPriceInfoResult(
+    return new IFilteredMinterDALinV0__getPriceInfoResult(
       result[0].toBoolean(),
       result[1].toBigInt(),
       result[2].toString(),
@@ -169,7 +239,7 @@ export class IFilteredMinterV0 extends ethereum.SmartContract {
 
   try_getPriceInfo(
     _projectId: BigInt
-  ): ethereum.CallResult<IFilteredMinterV0__getPriceInfoResult> {
+  ): ethereum.CallResult<IFilteredMinterDALinV0__getPriceInfoResult> {
     let result = super.tryCall(
       "getPriceInfo",
       "getPriceInfo(uint256):(bool,uint256,string,address)",
@@ -180,13 +250,36 @@ export class IFilteredMinterV0 extends ethereum.SmartContract {
     }
     let value = result.value;
     return ethereum.CallResult.fromValue(
-      new IFilteredMinterV0__getPriceInfoResult(
+      new IFilteredMinterDALinV0__getPriceInfoResult(
         value[0].toBoolean(),
         value[1].toBigInt(),
         value[2].toString(),
         value[3].toAddress()
       )
     );
+  }
+
+  minimumAuctionLengthSeconds(): BigInt {
+    let result = super.call(
+      "minimumAuctionLengthSeconds",
+      "minimumAuctionLengthSeconds():(uint256)",
+      []
+    );
+
+    return result[0].toBigInt();
+  }
+
+  try_minimumAuctionLengthSeconds(): ethereum.CallResult<BigInt> {
+    let result = super.tryCall(
+      "minimumAuctionLengthSeconds",
+      "minimumAuctionLengthSeconds():(uint256)",
+      []
+    );
+    if (result.reverted) {
+      return new ethereum.CallResult();
+    }
+    let value = result.value;
+    return ethereum.CallResult.fromValue(value[0].toBigInt());
   }
 
   minterFilterAddress(): Address {

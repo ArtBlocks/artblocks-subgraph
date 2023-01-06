@@ -168,7 +168,7 @@ export class UnregisteredNFTAddress__Params {
   }
 }
 
-export class MinterHolderV0__getPriceInfoResult {
+export class IFilteredMinterHolderV0__getPriceInfoResult {
   value0: boolean;
   value1: BigInt;
   value2: string;
@@ -212,48 +212,9 @@ export class MinterHolderV0__getPriceInfoResult {
   }
 }
 
-export class MinterHolderV0 extends ethereum.SmartContract {
-  static bind(address: Address): MinterHolderV0 {
-    return new MinterHolderV0("MinterHolderV0", address);
-  }
-
-  allowedProjectHolders(
-    param0: BigInt,
-    param1: Address,
-    param2: BigInt
-  ): boolean {
-    let result = super.call(
-      "allowedProjectHolders",
-      "allowedProjectHolders(uint256,address,uint256):(bool)",
-      [
-        ethereum.Value.fromUnsignedBigInt(param0),
-        ethereum.Value.fromAddress(param1),
-        ethereum.Value.fromUnsignedBigInt(param2)
-      ]
-    );
-
-    return result[0].toBoolean();
-  }
-
-  try_allowedProjectHolders(
-    param0: BigInt,
-    param1: Address,
-    param2: BigInt
-  ): ethereum.CallResult<boolean> {
-    let result = super.tryCall(
-      "allowedProjectHolders",
-      "allowedProjectHolders(uint256,address,uint256):(bool)",
-      [
-        ethereum.Value.fromUnsignedBigInt(param0),
-        ethereum.Value.fromAddress(param1),
-        ethereum.Value.fromUnsignedBigInt(param2)
-      ]
-    );
-    if (result.reverted) {
-      return new ethereum.CallResult();
-    }
-    let value = result.value;
-    return ethereum.CallResult.fromValue(value[0].toBoolean());
+export class IFilteredMinterHolderV0 extends ethereum.SmartContract {
+  static bind(address: Address): IFilteredMinterHolderV0 {
+    return new IFilteredMinterHolderV0("IFilteredMinterHolderV0", address);
   }
 
   genArt721CoreAddress(): Address {
@@ -279,37 +240,16 @@ export class MinterHolderV0 extends ethereum.SmartContract {
     return ethereum.CallResult.fromValue(value[0].toAddress());
   }
 
-  getNumRegisteredNFTAddresses(): BigInt {
-    let result = super.call(
-      "getNumRegisteredNFTAddresses",
-      "getNumRegisteredNFTAddresses():(uint256)",
-      []
-    );
-
-    return result[0].toBigInt();
-  }
-
-  try_getNumRegisteredNFTAddresses(): ethereum.CallResult<BigInt> {
-    let result = super.tryCall(
-      "getNumRegisteredNFTAddresses",
-      "getNumRegisteredNFTAddresses():(uint256)",
-      []
-    );
-    if (result.reverted) {
-      return new ethereum.CallResult();
-    }
-    let value = result.value;
-    return ethereum.CallResult.fromValue(value[0].toBigInt());
-  }
-
-  getPriceInfo(_projectId: BigInt): MinterHolderV0__getPriceInfoResult {
+  getPriceInfo(
+    _projectId: BigInt
+  ): IFilteredMinterHolderV0__getPriceInfoResult {
     let result = super.call(
       "getPriceInfo",
       "getPriceInfo(uint256):(bool,uint256,string,address)",
       [ethereum.Value.fromUnsignedBigInt(_projectId)]
     );
 
-    return new MinterHolderV0__getPriceInfoResult(
+    return new IFilteredMinterHolderV0__getPriceInfoResult(
       result[0].toBoolean(),
       result[1].toBigInt(),
       result[2].toString(),
@@ -319,7 +259,7 @@ export class MinterHolderV0 extends ethereum.SmartContract {
 
   try_getPriceInfo(
     _projectId: BigInt
-  ): ethereum.CallResult<MinterHolderV0__getPriceInfoResult> {
+  ): ethereum.CallResult<IFilteredMinterHolderV0__getPriceInfoResult> {
     let result = super.tryCall(
       "getPriceInfo",
       "getPriceInfo(uint256):(bool,uint256,string,address)",
@@ -330,75 +270,13 @@ export class MinterHolderV0 extends ethereum.SmartContract {
     }
     let value = result.value;
     return ethereum.CallResult.fromValue(
-      new MinterHolderV0__getPriceInfoResult(
+      new IFilteredMinterHolderV0__getPriceInfoResult(
         value[0].toBoolean(),
         value[1].toBigInt(),
         value[2].toString(),
         value[3].toAddress()
       )
     );
-  }
-
-  getRegisteredNFTAddressAt(_index: BigInt): Address {
-    let result = super.call(
-      "getRegisteredNFTAddressAt",
-      "getRegisteredNFTAddressAt(uint256):(address)",
-      [ethereum.Value.fromUnsignedBigInt(_index)]
-    );
-
-    return result[0].toAddress();
-  }
-
-  try_getRegisteredNFTAddressAt(_index: BigInt): ethereum.CallResult<Address> {
-    let result = super.tryCall(
-      "getRegisteredNFTAddressAt",
-      "getRegisteredNFTAddressAt(uint256):(address)",
-      [ethereum.Value.fromUnsignedBigInt(_index)]
-    );
-    if (result.reverted) {
-      return new ethereum.CallResult();
-    }
-    let value = result.value;
-    return ethereum.CallResult.fromValue(value[0].toAddress());
-  }
-
-  isAllowlistedNFT(
-    _projectId: BigInt,
-    _ownedNFTAddress: Address,
-    _ownedNFTTokenId: BigInt
-  ): boolean {
-    let result = super.call(
-      "isAllowlistedNFT",
-      "isAllowlistedNFT(uint256,address,uint256):(bool)",
-      [
-        ethereum.Value.fromUnsignedBigInt(_projectId),
-        ethereum.Value.fromAddress(_ownedNFTAddress),
-        ethereum.Value.fromUnsignedBigInt(_ownedNFTTokenId)
-      ]
-    );
-
-    return result[0].toBoolean();
-  }
-
-  try_isAllowlistedNFT(
-    _projectId: BigInt,
-    _ownedNFTAddress: Address,
-    _ownedNFTTokenId: BigInt
-  ): ethereum.CallResult<boolean> {
-    let result = super.tryCall(
-      "isAllowlistedNFT",
-      "isAllowlistedNFT(uint256,address,uint256):(bool)",
-      [
-        ethereum.Value.fromUnsignedBigInt(_projectId),
-        ethereum.Value.fromAddress(_ownedNFTAddress),
-        ethereum.Value.fromUnsignedBigInt(_ownedNFTTokenId)
-      ]
-    );
-    if (result.reverted) {
-      return new ethereum.CallResult();
-    }
-    let value = result.value;
-    return ethereum.CallResult.fromValue(value[0].toBoolean());
   }
 
   minterFilterAddress(): Address {
@@ -438,169 +316,65 @@ export class MinterHolderV0 extends ethereum.SmartContract {
     let value = result.value;
     return ethereum.CallResult.fromValue(value[0].toString());
   }
+}
 
-  projectMaxHasBeenInvoked(param0: BigInt): boolean {
-    let result = super.call(
-      "projectMaxHasBeenInvoked",
-      "projectMaxHasBeenInvoked(uint256):(bool)",
-      [ethereum.Value.fromUnsignedBigInt(param0)]
-    );
-
-    return result[0].toBoolean();
+export class GenArt721CoreAddressCall extends ethereum.Call {
+  get inputs(): GenArt721CoreAddressCall__Inputs {
+    return new GenArt721CoreAddressCall__Inputs(this);
   }
 
-  try_projectMaxHasBeenInvoked(param0: BigInt): ethereum.CallResult<boolean> {
-    let result = super.tryCall(
-      "projectMaxHasBeenInvoked",
-      "projectMaxHasBeenInvoked(uint256):(bool)",
-      [ethereum.Value.fromUnsignedBigInt(param0)]
-    );
-    if (result.reverted) {
-      return new ethereum.CallResult();
-    }
-    let value = result.value;
-    return ethereum.CallResult.fromValue(value[0].toBoolean());
-  }
-
-  projectMaxInvocations(param0: BigInt): BigInt {
-    let result = super.call(
-      "projectMaxInvocations",
-      "projectMaxInvocations(uint256):(uint256)",
-      [ethereum.Value.fromUnsignedBigInt(param0)]
-    );
-
-    return result[0].toBigInt();
-  }
-
-  try_projectMaxInvocations(param0: BigInt): ethereum.CallResult<BigInt> {
-    let result = super.tryCall(
-      "projectMaxInvocations",
-      "projectMaxInvocations(uint256):(uint256)",
-      [ethereum.Value.fromUnsignedBigInt(param0)]
-    );
-    if (result.reverted) {
-      return new ethereum.CallResult();
-    }
-    let value = result.value;
-    return ethereum.CallResult.fromValue(value[0].toBigInt());
+  get outputs(): GenArt721CoreAddressCall__Outputs {
+    return new GenArt721CoreAddressCall__Outputs(this);
   }
 }
 
-export class ConstructorCall extends ethereum.Call {
-  get inputs(): ConstructorCall__Inputs {
-    return new ConstructorCall__Inputs(this);
-  }
+export class GenArt721CoreAddressCall__Inputs {
+  _call: GenArt721CoreAddressCall;
 
-  get outputs(): ConstructorCall__Outputs {
-    return new ConstructorCall__Outputs(this);
-  }
-}
-
-export class ConstructorCall__Inputs {
-  _call: ConstructorCall;
-
-  constructor(call: ConstructorCall) {
-    this._call = call;
-  }
-
-  get _genArt721Address(): Address {
-    return this._call.inputValues[0].value.toAddress();
-  }
-
-  get _minterFilter(): Address {
-    return this._call.inputValues[1].value.toAddress();
-  }
-}
-
-export class ConstructorCall__Outputs {
-  _call: ConstructorCall;
-
-  constructor(call: ConstructorCall) {
+  constructor(call: GenArt721CoreAddressCall) {
     this._call = call;
   }
 }
 
-export class AllowHoldersOfProjectsCall extends ethereum.Call {
-  get inputs(): AllowHoldersOfProjectsCall__Inputs {
-    return new AllowHoldersOfProjectsCall__Inputs(this);
-  }
+export class GenArt721CoreAddressCall__Outputs {
+  _call: GenArt721CoreAddressCall;
 
-  get outputs(): AllowHoldersOfProjectsCall__Outputs {
-    return new AllowHoldersOfProjectsCall__Outputs(this);
-  }
-}
-
-export class AllowHoldersOfProjectsCall__Inputs {
-  _call: AllowHoldersOfProjectsCall;
-
-  constructor(call: AllowHoldersOfProjectsCall) {
+  constructor(call: GenArt721CoreAddressCall) {
     this._call = call;
   }
 
-  get _projectId(): BigInt {
-    return this._call.inputValues[0].value.toBigInt();
-  }
-
-  get _ownedNFTAddresses(): Array<Address> {
-    return this._call.inputValues[1].value.toAddressArray();
-  }
-
-  get _ownedNFTProjectIds(): Array<BigInt> {
-    return this._call.inputValues[2].value.toBigIntArray();
+  get value0(): Address {
+    return this._call.outputValues[0].value.toAddress();
   }
 }
 
-export class AllowHoldersOfProjectsCall__Outputs {
-  _call: AllowHoldersOfProjectsCall;
+export class MinterFilterAddressCall extends ethereum.Call {
+  get inputs(): MinterFilterAddressCall__Inputs {
+    return new MinterFilterAddressCall__Inputs(this);
+  }
 
-  constructor(call: AllowHoldersOfProjectsCall) {
+  get outputs(): MinterFilterAddressCall__Outputs {
+    return new MinterFilterAddressCall__Outputs(this);
+  }
+}
+
+export class MinterFilterAddressCall__Inputs {
+  _call: MinterFilterAddressCall;
+
+  constructor(call: MinterFilterAddressCall) {
     this._call = call;
   }
 }
 
-export class AllowRemoveHoldersOfProjectsCall extends ethereum.Call {
-  get inputs(): AllowRemoveHoldersOfProjectsCall__Inputs {
-    return new AllowRemoveHoldersOfProjectsCall__Inputs(this);
-  }
+export class MinterFilterAddressCall__Outputs {
+  _call: MinterFilterAddressCall;
 
-  get outputs(): AllowRemoveHoldersOfProjectsCall__Outputs {
-    return new AllowRemoveHoldersOfProjectsCall__Outputs(this);
-  }
-}
-
-export class AllowRemoveHoldersOfProjectsCall__Inputs {
-  _call: AllowRemoveHoldersOfProjectsCall;
-
-  constructor(call: AllowRemoveHoldersOfProjectsCall) {
+  constructor(call: MinterFilterAddressCall) {
     this._call = call;
   }
 
-  get _projectId(): BigInt {
-    return this._call.inputValues[0].value.toBigInt();
-  }
-
-  get _ownedNFTAddressesAdd(): Array<Address> {
-    return this._call.inputValues[1].value.toAddressArray();
-  }
-
-  get _ownedNFTProjectIdsAdd(): Array<BigInt> {
-    return this._call.inputValues[2].value.toBigIntArray();
-  }
-
-  get _ownedNFTAddressesRemove(): Array<Address> {
-    return this._call.inputValues[3].value.toAddressArray();
-  }
-
-  get _ownedNFTProjectIdsRemove(): Array<BigInt> {
-    return this._call.inputValues[4].value.toBigIntArray();
-  }
-}
-
-export class AllowRemoveHoldersOfProjectsCall__Outputs {
-  _call: AllowRemoveHoldersOfProjectsCall;
-
-  constructor(call: AllowRemoveHoldersOfProjectsCall) {
-    this._call = call;
+  get value0(): Address {
+    return this._call.outputValues[0].value.toAddress();
   }
 }
 
@@ -625,11 +399,11 @@ export class PurchaseCall__Inputs {
     return this._call.inputValues[0].value.toBigInt();
   }
 
-  get _ownedNFTAddress(): Address {
+  get _ownedNftAddress(): Address {
     return this._call.inputValues[1].value.toAddress();
   }
 
-  get _ownedNFTTokenId(): BigInt {
+  get _ownedNftTokenId(): BigInt {
     return this._call.inputValues[2].value.toBigInt();
   }
 }
@@ -663,7 +437,7 @@ export class Purchase1Call__Inputs {
     this._call = call;
   }
 
-  get value0(): BigInt {
+  get _projectId(): BigInt {
     return this._call.inputValues[0].value.toBigInt();
   }
 }
@@ -675,7 +449,7 @@ export class Purchase1Call__Outputs {
     this._call = call;
   }
 
-  get value0(): BigInt {
+  get tokenId(): BigInt {
     return this._call.outputValues[0].value.toBigInt();
   }
 }
@@ -697,11 +471,11 @@ export class PurchaseToCall__Inputs {
     this._call = call;
   }
 
-  get value0(): Address {
+  get _to(): Address {
     return this._call.inputValues[0].value.toAddress();
   }
 
-  get value1(): BigInt {
+  get _projectId(): BigInt {
     return this._call.inputValues[1].value.toBigInt();
   }
 }
@@ -713,7 +487,7 @@ export class PurchaseToCall__Outputs {
     this._call = call;
   }
 
-  get value0(): BigInt {
+  get tokenId(): BigInt {
     return this._call.outputValues[0].value.toBigInt();
   }
 }
@@ -743,11 +517,11 @@ export class PurchaseTo1Call__Inputs {
     return this._call.inputValues[1].value.toBigInt();
   }
 
-  get _ownedNFTAddress(): Address {
+  get _ownedNftAddress(): Address {
     return this._call.inputValues[2].value.toAddress();
   }
 
-  get _ownedNFTTokenId(): BigInt {
+  get _ownedNftTokenId(): BigInt {
     return this._call.inputValues[3].value.toBigInt();
   }
 }
@@ -761,74 +535,6 @@ export class PurchaseTo1Call__Outputs {
 
   get tokenId(): BigInt {
     return this._call.outputValues[0].value.toBigInt();
-  }
-}
-
-export class RegisterNFTAddressCall extends ethereum.Call {
-  get inputs(): RegisterNFTAddressCall__Inputs {
-    return new RegisterNFTAddressCall__Inputs(this);
-  }
-
-  get outputs(): RegisterNFTAddressCall__Outputs {
-    return new RegisterNFTAddressCall__Outputs(this);
-  }
-}
-
-export class RegisterNFTAddressCall__Inputs {
-  _call: RegisterNFTAddressCall;
-
-  constructor(call: RegisterNFTAddressCall) {
-    this._call = call;
-  }
-
-  get _NFTAddress(): Address {
-    return this._call.inputValues[0].value.toAddress();
-  }
-}
-
-export class RegisterNFTAddressCall__Outputs {
-  _call: RegisterNFTAddressCall;
-
-  constructor(call: RegisterNFTAddressCall) {
-    this._call = call;
-  }
-}
-
-export class RemoveHoldersOfProjectsCall extends ethereum.Call {
-  get inputs(): RemoveHoldersOfProjectsCall__Inputs {
-    return new RemoveHoldersOfProjectsCall__Inputs(this);
-  }
-
-  get outputs(): RemoveHoldersOfProjectsCall__Outputs {
-    return new RemoveHoldersOfProjectsCall__Outputs(this);
-  }
-}
-
-export class RemoveHoldersOfProjectsCall__Inputs {
-  _call: RemoveHoldersOfProjectsCall;
-
-  constructor(call: RemoveHoldersOfProjectsCall) {
-    this._call = call;
-  }
-
-  get _projectId(): BigInt {
-    return this._call.inputValues[0].value.toBigInt();
-  }
-
-  get _ownedNFTAddresses(): Array<Address> {
-    return this._call.inputValues[1].value.toAddressArray();
-  }
-
-  get _ownedNFTProjectIds(): Array<BigInt> {
-    return this._call.inputValues[2].value.toBigIntArray();
-  }
-}
-
-export class RemoveHoldersOfProjectsCall__Outputs {
-  _call: RemoveHoldersOfProjectsCall;
-
-  constructor(call: RemoveHoldersOfProjectsCall) {
-    this._call = call;
   }
 }
 
@@ -862,66 +568,32 @@ export class SetProjectMaxInvocationsCall__Outputs {
   }
 }
 
-export class UnregisterNFTAddressCall extends ethereum.Call {
-  get inputs(): UnregisterNFTAddressCall__Inputs {
-    return new UnregisterNFTAddressCall__Inputs(this);
+export class TogglePurchaseToDisabledCall extends ethereum.Call {
+  get inputs(): TogglePurchaseToDisabledCall__Inputs {
+    return new TogglePurchaseToDisabledCall__Inputs(this);
   }
 
-  get outputs(): UnregisterNFTAddressCall__Outputs {
-    return new UnregisterNFTAddressCall__Outputs(this);
-  }
-}
-
-export class UnregisterNFTAddressCall__Inputs {
-  _call: UnregisterNFTAddressCall;
-
-  constructor(call: UnregisterNFTAddressCall) {
-    this._call = call;
-  }
-
-  get _NFTAddress(): Address {
-    return this._call.inputValues[0].value.toAddress();
+  get outputs(): TogglePurchaseToDisabledCall__Outputs {
+    return new TogglePurchaseToDisabledCall__Outputs(this);
   }
 }
 
-export class UnregisterNFTAddressCall__Outputs {
-  _call: UnregisterNFTAddressCall;
+export class TogglePurchaseToDisabledCall__Inputs {
+  _call: TogglePurchaseToDisabledCall;
 
-  constructor(call: UnregisterNFTAddressCall) {
-    this._call = call;
-  }
-}
-
-export class UpdatePricePerTokenInWeiCall extends ethereum.Call {
-  get inputs(): UpdatePricePerTokenInWeiCall__Inputs {
-    return new UpdatePricePerTokenInWeiCall__Inputs(this);
-  }
-
-  get outputs(): UpdatePricePerTokenInWeiCall__Outputs {
-    return new UpdatePricePerTokenInWeiCall__Outputs(this);
-  }
-}
-
-export class UpdatePricePerTokenInWeiCall__Inputs {
-  _call: UpdatePricePerTokenInWeiCall;
-
-  constructor(call: UpdatePricePerTokenInWeiCall) {
+  constructor(call: TogglePurchaseToDisabledCall) {
     this._call = call;
   }
 
   get _projectId(): BigInt {
     return this._call.inputValues[0].value.toBigInt();
   }
-
-  get _pricePerTokenInWei(): BigInt {
-    return this._call.inputValues[1].value.toBigInt();
-  }
 }
 
-export class UpdatePricePerTokenInWeiCall__Outputs {
-  _call: UpdatePricePerTokenInWeiCall;
+export class TogglePurchaseToDisabledCall__Outputs {
+  _call: TogglePurchaseToDisabledCall;
 
-  constructor(call: UpdatePricePerTokenInWeiCall) {
+  constructor(call: TogglePurchaseToDisabledCall) {
     this._call = call;
   }
 }
