@@ -210,7 +210,7 @@ type Contract @entity {
   curationRegistry: Bytes
 
   "Dependency registry contract address"
-  dependencyRegistry: Bytes
+  dependencyRegistry: DependencyRegistry
 
   nextProjectId: BigInt!
 
@@ -562,23 +562,35 @@ type Dependency @entity {
   additionalRepositories: [DependencyAdditionalRepository!]! @derivedFrom(field: "dependency")
   scripts: [DependencyScript!]! @derivedFrom(field: "dependency")
   scriptCount: BigInt!
+  script: String!
   referenceWebsite: String!
+}
+
+type DependencyRegistry @entity {
+  id: Bytes!
+  supportedCoreContracts: [Contract!]! @derivedFrom(field: "dependencyRegistry")
+  owner: Bytes!
 }
 
 type DependencyAdditionalCDN @entity {
   id: ID!
   dependency: Dependency!
+  cdn: String!
+  index: BigInt!
 }
 
 type DependencyAdditionalRepository @entity {
   id: ID!
   dependency: Dependency!
+  repository: String!
+  index: BigInt!
 }
 
 type DependencyScript @entity {
   id: ID!
   dependency: Dependency!
   index: BigInt!
+  script: String!
   address: Bytes!
 }
 
