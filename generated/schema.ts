@@ -2396,15 +2396,6 @@ export class Transfer extends Entity {
     this.set("id", Value.fromString(value));
   }
 
-  get transactionHash(): Bytes {
-    let value = this.get("transactionHash");
-    return value!.toBytes();
-  }
-
-  set transactionHash(value: Bytes) {
-    this.set("transactionHash", Value.fromBytes(value));
-  }
-
   get token(): string {
     let value = this.get("token");
     return value!.toString();
@@ -2412,15 +2403,6 @@ export class Transfer extends Entity {
 
   set token(value: string) {
     this.set("token", Value.fromString(value));
-  }
-
-  get createdAt(): BigInt {
-    let value = this.get("createdAt");
-    return value!.toBigInt();
-  }
-
-  set createdAt(value: BigInt) {
-    this.set("createdAt", Value.fromBigInt(value));
   }
 
   get to(): Bytes {
@@ -2439,6 +2421,42 @@ export class Transfer extends Entity {
 
   set from(value: Bytes) {
     this.set("from", Value.fromBytes(value));
+  }
+
+  get transactionHash(): Bytes {
+    let value = this.get("transactionHash");
+    return value!.toBytes();
+  }
+
+  set transactionHash(value: Bytes) {
+    this.set("transactionHash", Value.fromBytes(value));
+  }
+
+  get blockHash(): Bytes {
+    let value = this.get("blockHash");
+    return value!.toBytes();
+  }
+
+  set blockHash(value: Bytes) {
+    this.set("blockHash", Value.fromBytes(value));
+  }
+
+  get blockNumber(): BigInt {
+    let value = this.get("blockNumber");
+    return value!.toBigInt();
+  }
+
+  set blockNumber(value: BigInt) {
+    this.set("blockNumber", Value.fromBigInt(value));
+  }
+
+  get blockTimestamp(): BigInt {
+    let value = this.get("blockTimestamp");
+    return value!.toBigInt();
+  }
+
+  set blockTimestamp(value: BigInt) {
+    this.set("blockTimestamp", Value.fromBigInt(value));
   }
 }
 

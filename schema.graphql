@@ -541,15 +541,17 @@ type SaleLookupTable @entity {
 type Transfer @entity(immutable: true) {
   id: ID!
 
-  transactionHash: Bytes!
-
   token: Token!
-
-  createdAt: BigInt!
 
   to: Bytes!
 
   from: Bytes!
+
+  transactionHash: Bytes!
+  
+  blockHash: Bytes!
+  blockNumber: BigInt!
+  blockTimestamp: BigInt!
 }
 
 enum ProjectExternalAssetDependencyType {
@@ -558,6 +560,7 @@ enum ProjectExternalAssetDependencyType {
   "Asset hosted on Arweave"
   ARWEAVE
 }
+
 type ProjectExternalAssetDependency @entity {
   "Unique identifier made up of projectId-index"
   id: ID!
