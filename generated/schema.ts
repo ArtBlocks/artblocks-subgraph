@@ -896,6 +896,47 @@ export class ProposedArtistAddressesAndSplit extends Entity {
   }
 }
 
+export class EngineRegistry extends Entity {
+  constructor(id: string) {
+    super();
+    this.set("id", Value.fromString(id));
+  }
+
+  save(): void {
+    let id = this.get("id");
+    assert(id != null, "Cannot save EngineRegistry entity without an ID");
+    if (id) {
+      assert(
+        id.kind == ValueKind.STRING,
+        `Entities of type EngineRegistry must have an ID of type String but the id '${id.displayData()}' is of type ${id.displayKind()}`
+      );
+      store.set("EngineRegistry", id.toString(), this);
+    }
+  }
+
+  static load(id: string): EngineRegistry | null {
+    return changetype<EngineRegistry | null>(store.get("EngineRegistry", id));
+  }
+
+  get id(): string {
+    let value = this.get("id");
+    return value!.toString();
+  }
+
+  set id(value: string) {
+    this.set("id", Value.fromString(value));
+  }
+
+  get registeredContracts(): Array<string> {
+    let value = this.get("registeredContracts");
+    return value!.toStringArray();
+  }
+
+  set registeredContracts(value: Array<string>) {
+    this.set("registeredContracts", Value.fromStringArray(value));
+  }
+}
+
 export class Contract extends Entity {
   constructor(id: string) {
     super();

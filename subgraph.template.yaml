@@ -558,6 +558,33 @@ dataSources:
           handler: handleUpdateProjectWebsite
       file: ./src/mapping-v0-core.ts
   {{/genArt721Contracts}}
+  {{#engineRegistryV0Contracts}}
+  - kind: ethereum/contract
+    name: 'EngineRegistryV0{{#address}}-{{address}}{{/address}}'
+    network: {{network}}
+    source:
+      address: "{{#address}}{{address}}{{/address}}{{^address}}0x0000000000000000000000000000000000000000{{/address}}"
+      abi: EngineRegistryV0
+      {{#startBlock}}startBlock: {{startBlock}}{{/startBlock}}
+    mapping:
+      kind: ethereum/events
+      apiVersion: 0.0.5
+      language: wasm/assemblyscript
+      entities:
+        - EngineRegistry
+        - Contract
+      abis:
+        - name: IEngineRegistryV0
+          file: ./abis/IEngineRegistryV0.json
+        - name: EngineRegistryV0
+          file: ./abis/EngineRegistryV0.json
+      eventHandlers:
+        - event: ContractRegistered(indexed address,bytes32,bytes32)
+          handler: handleContractRegistered
+        - event: ContractUnregistered(indexed address)
+          handler: handleContractUnregistered
+      file: ./src/engine-registry.ts
+  {{/engineRegistryV0Contracts}}
   {{#minterFilterV0Contracts}}
   - kind: ethereum/contract
     name: 'MinterFilterV0{{#address}}-{{address}}{{/address}}'
