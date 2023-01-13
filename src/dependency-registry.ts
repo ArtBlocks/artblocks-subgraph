@@ -112,47 +112,33 @@ export function handleDependencyAdditionalCDNRemoved(
   event: DependencyAdditionalCDNRemoved
 ): void {
   const dependency = Dependency.load(event.params._dependencyType.toString());
-  if (dependency) {
-    const id = generateDependencyAdditionalCDNId(
-      dependency.id,
-      event.params._additionalCDNIndex
-    );
-
-    const additionalCDN = DependencyAdditionalCDN.load(id);
-    if (!additionalCDN) {
-      return;
-    }
-    store.remove("DependencyAdditionalCDN", additionalCDN.id);
-
-    // Load each additional CDN after the removed one and decrement their index
-    for (
-      let i = event.params._additionalCDNIndex.toI32() + 1;
-      i < dependency.additionalCDNCount.toI32();
-      i++
-    ) {
-      const currentId = generateDependencyAdditionalCDNId(
-        dependency.id,
-        BigInt.fromI32(i)
-      );
-      const currentAdditionalCDN = DependencyAdditionalCDN.load(currentId);
-      if (currentAdditionalCDN) {
-        store.remove("DependencyAdditionalCDN", currentAdditionalCDN.id);
-        const updatedIndex = currentAdditionalCDN.index.minus(
-          BigInt.fromI32(1)
-        );
-        const updatedId = generateDependencyAdditionalCDNId(
-          dependency.id,
-          updatedIndex
-        );
-
-        const updatedAdditionalCDN = new DependencyAdditionalCDN(updatedId);
-        updatedAdditionalCDN.index = updatedIndex;
-        updatedAdditionalCDN.dependency = dependency.id;
-        updatedAdditionalCDN.cdn = currentAdditionalCDN.cdn;
-        additionalCDN.save();
-      }
-    }
+  if (!dependency) {
+    return;
   }
+  const id = generateDependencyAdditionalCDNId(
+    dependency.id,
+    event.params._additionalCDNIndex
+  );
+
+  const additionalCDN = DependencyAdditionalCDN.load(id);
+  if (!additionalCDN) {
+    return;
+  }
+
+  const lastAdditionalCDNIndex = dependency.additionalCDNCount.minus(
+    BigInt.fromI32(1)
+  );
+  const lastAdditionalCDN = DependencyAdditionalCDN.load(
+    generateDependencyAdditionalCDNId(dependency.id, lastAdditionalCDNIndex)
+  );
+  if (!lastAdditionalCDN) {
+    return;
+  }
+
+  additionalCDN.cdn = lastAdditionalCDN.cdn;
+  additionalCDN.save();
+
+  store.remove("DependencyAdditionalCDN", lastAdditionalCDN.id);
 }
 
 export function handleDependencyAdditionalRepositoryUpdated(
@@ -199,44 +185,24 @@ export function handleDependencyAdditionalRepositoryRemoved(
   if (!additionalRepository) {
     return;
   }
-  store.remove("DependencyAdditionalRepository", additionalRepository.id);
 
-  // Load each additional repository after the removed one and decrement their index
-  for (
-    let i = event.params._additionalRepositoryIndex.toI32() + 1;
-    i < dependency.additionalRepositoryCount.toI32();
-    i++
-  ) {
-    const currentId = generateDependencyAdditionalRepositoryId(
+  const lastAdditionalRepositoryIndex = dependency.additionalRepositoryCount.minus(
+    BigInt.fromI32(1)
+  );
+  const lastAdditionalRepository = DependencyAdditionalRepository.load(
+    generateDependencyAdditionalRepositoryId(
       dependency.id,
-      BigInt.fromI32(i)
-    );
-    const currentAdditionalRepository = DependencyAdditionalRepository.load(
-      currentId
-    );
-    if (currentAdditionalRepository) {
-      store.remove(
-        "DependencyAdditionalRepository",
-        currentAdditionalRepository.id
-      );
-      const updatedIndex = currentAdditionalRepository.index.minus(
-        BigInt.fromI32(1)
-      );
-      const updatedId = generateDependencyAdditionalRepositoryId(
-        dependency.id,
-        updatedIndex
-      );
-
-      const updatedAdditionalRepository = new DependencyAdditionalRepository(
-        updatedId
-      );
-      updatedAdditionalRepository.index = updatedIndex;
-      updatedAdditionalRepository.dependency = dependency.id;
-      updatedAdditionalRepository.repository =
-        currentAdditionalRepository.repository;
-      updatedAdditionalRepository.save();
-    }
+      lastAdditionalRepositoryIndex
+    )
+  );
+  if (!lastAdditionalRepository) {
+    return;
   }
+
+  additionalRepository.repository = lastAdditionalRepository.repository;
+  additionalRepository.save();
+
+  store.remove("DependencyAdditionalRepository", lastAdditionalRepository.id);
 }
 
 export function handleDependencyScriptUpdated(
