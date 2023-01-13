@@ -246,13 +246,15 @@ export class Transfer__Params {
   }
 }
 
-export class GenArt721CoreV3__getPrimaryRevenueSplitsResult {
+export class GenArt721CoreV3_Engine__getPrimaryRevenueSplitsResult {
   value0: BigInt;
   value1: Address;
   value2: BigInt;
   value3: Address;
   value4: BigInt;
   value5: Address;
+  value6: BigInt;
+  value7: Address;
 
   constructor(
     value0: BigInt,
@@ -260,7 +262,9 @@ export class GenArt721CoreV3__getPrimaryRevenueSplitsResult {
     value2: BigInt,
     value3: Address,
     value4: BigInt,
-    value5: Address
+    value5: Address,
+    value6: BigInt,
+    value7: Address
   ) {
     this.value0 = value0;
     this.value1 = value1;
@@ -268,6 +272,8 @@ export class GenArt721CoreV3__getPrimaryRevenueSplitsResult {
     this.value3 = value3;
     this.value4 = value4;
     this.value5 = value5;
+    this.value6 = value6;
+    this.value7 = value7;
   }
 
   toMap(): TypedMap<string, ethereum.Value> {
@@ -278,35 +284,45 @@ export class GenArt721CoreV3__getPrimaryRevenueSplitsResult {
     map.set("value3", ethereum.Value.fromAddress(this.value3));
     map.set("value4", ethereum.Value.fromUnsignedBigInt(this.value4));
     map.set("value5", ethereum.Value.fromAddress(this.value5));
+    map.set("value6", ethereum.Value.fromUnsignedBigInt(this.value6));
+    map.set("value7", ethereum.Value.fromAddress(this.value7));
     return map;
   }
 
-  getArtblocksRevenue_(): BigInt {
+  getRenderProviderRevenue_(): BigInt {
     return this.value0;
   }
 
-  getArtblocksAddress_(): Address {
+  getRenderProviderAddress_(): Address {
     return this.value1;
   }
 
-  getArtistRevenue_(): BigInt {
+  getPlatformProviderRevenue_(): BigInt {
     return this.value2;
   }
 
-  getArtistAddress_(): Address {
+  getPlatformProviderAddress_(): Address {
     return this.value3;
   }
 
-  getAdditionalPayeePrimaryRevenue_(): BigInt {
+  getArtistRevenue_(): BigInt {
     return this.value4;
   }
 
-  getAdditionalPayeePrimaryAddress_(): Address {
+  getArtistAddress_(): Address {
     return this.value5;
+  }
+
+  getAdditionalPayeePrimaryRevenue_(): BigInt {
+    return this.value6;
+  }
+
+  getAdditionalPayeePrimaryAddress_(): Address {
+    return this.value7;
   }
 }
 
-export class GenArt721CoreV3__getRoyaltiesResult {
+export class GenArt721CoreV3_Engine__getRoyaltiesResult {
   value0: Array<Address>;
   value1: Array<BigInt>;
 
@@ -331,51 +347,7 @@ export class GenArt721CoreV3__getRoyaltiesResult {
   }
 }
 
-export class GenArt721CoreV3__getRoyaltyDataResult {
-  value0: Address;
-  value1: Address;
-  value2: BigInt;
-  value3: BigInt;
-
-  constructor(
-    value0: Address,
-    value1: Address,
-    value2: BigInt,
-    value3: BigInt
-  ) {
-    this.value0 = value0;
-    this.value1 = value1;
-    this.value2 = value2;
-    this.value3 = value3;
-  }
-
-  toMap(): TypedMap<string, ethereum.Value> {
-    let map = new TypedMap<string, ethereum.Value>();
-    map.set("value0", ethereum.Value.fromAddress(this.value0));
-    map.set("value1", ethereum.Value.fromAddress(this.value1));
-    map.set("value2", ethereum.Value.fromUnsignedBigInt(this.value2));
-    map.set("value3", ethereum.Value.fromUnsignedBigInt(this.value3));
-    return map;
-  }
-
-  getArtistAddress(): Address {
-    return this.value0;
-  }
-
-  getAdditionalPayee(): Address {
-    return this.value1;
-  }
-
-  getAdditionalPayeePercentage(): BigInt {
-    return this.value2;
-  }
-
-  getRoyaltyFeeByID(): BigInt {
-    return this.value3;
-  }
-}
-
-export class GenArt721CoreV3__projectArtistPaymentInfoResult {
+export class GenArt721CoreV3_Engine__projectArtistPaymentInfoResult {
   value0: Address;
   value1: Address;
   value2: BigInt;
@@ -435,7 +407,7 @@ export class GenArt721CoreV3__projectArtistPaymentInfoResult {
   }
 }
 
-export class GenArt721CoreV3__projectDetailsResult {
+export class GenArt721CoreV3_Engine__projectDetailsResult {
   value0: string;
   value1: string;
   value2: string;
@@ -487,7 +459,7 @@ export class GenArt721CoreV3__projectDetailsResult {
   }
 }
 
-export class GenArt721CoreV3__projectScriptDetailsResult {
+export class GenArt721CoreV3_Engine__projectScriptDetailsResult {
   value0: string;
   value1: string;
   value2: BigInt;
@@ -519,7 +491,7 @@ export class GenArt721CoreV3__projectScriptDetailsResult {
   }
 }
 
-export class GenArt721CoreV3__projectStateDataResult {
+export class GenArt721CoreV3_Engine__projectStateDataResult {
   value0: BigInt;
   value1: BigInt;
   value2: boolean;
@@ -579,55 +551,9 @@ export class GenArt721CoreV3__projectStateDataResult {
   }
 }
 
-export class GenArt721CoreV3 extends ethereum.SmartContract {
-  static bind(address: Address): GenArt721CoreV3 {
-    return new GenArt721CoreV3("GenArt721CoreV3", address);
-  }
-
-  ART_BLOCKS_ERC721TOKEN_ADDRESS_V0(): Address {
-    let result = super.call(
-      "ART_BLOCKS_ERC721TOKEN_ADDRESS_V0",
-      "ART_BLOCKS_ERC721TOKEN_ADDRESS_V0():(address)",
-      []
-    );
-
-    return result[0].toAddress();
-  }
-
-  try_ART_BLOCKS_ERC721TOKEN_ADDRESS_V0(): ethereum.CallResult<Address> {
-    let result = super.tryCall(
-      "ART_BLOCKS_ERC721TOKEN_ADDRESS_V0",
-      "ART_BLOCKS_ERC721TOKEN_ADDRESS_V0():(address)",
-      []
-    );
-    if (result.reverted) {
-      return new ethereum.CallResult();
-    }
-    let value = result.value;
-    return ethereum.CallResult.fromValue(value[0].toAddress());
-  }
-
-  ART_BLOCKS_ERC721TOKEN_ADDRESS_V1(): Address {
-    let result = super.call(
-      "ART_BLOCKS_ERC721TOKEN_ADDRESS_V1",
-      "ART_BLOCKS_ERC721TOKEN_ADDRESS_V1():(address)",
-      []
-    );
-
-    return result[0].toAddress();
-  }
-
-  try_ART_BLOCKS_ERC721TOKEN_ADDRESS_V1(): ethereum.CallResult<Address> {
-    let result = super.tryCall(
-      "ART_BLOCKS_ERC721TOKEN_ADDRESS_V1",
-      "ART_BLOCKS_ERC721TOKEN_ADDRESS_V1():(address)",
-      []
-    );
-    if (result.reverted) {
-      return new ethereum.CallResult();
-    }
-    let value = result.value;
-    return ethereum.CallResult.fromValue(value[0].toAddress());
+export class GenArt721CoreV3_Engine extends ethereum.SmartContract {
+  static bind(address: Address): GenArt721CoreV3_Engine {
+    return new GenArt721CoreV3_Engine("GenArt721CoreV3_Engine", address);
   }
 
   admin(): Address {
@@ -707,52 +633,6 @@ export class GenArt721CoreV3 extends ethereum.SmartContract {
     return ethereum.CallResult.fromValue(value[0].toAddress());
   }
 
-  artblocksAddress(): Address {
-    let result = super.call(
-      "artblocksAddress",
-      "artblocksAddress():(address)",
-      []
-    );
-
-    return result[0].toAddress();
-  }
-
-  try_artblocksAddress(): ethereum.CallResult<Address> {
-    let result = super.tryCall(
-      "artblocksAddress",
-      "artblocksAddress():(address)",
-      []
-    );
-    if (result.reverted) {
-      return new ethereum.CallResult();
-    }
-    let value = result.value;
-    return ethereum.CallResult.fromValue(value[0].toAddress());
-  }
-
-  artblocksCurationRegistryAddress(): Address {
-    let result = super.call(
-      "artblocksCurationRegistryAddress",
-      "artblocksCurationRegistryAddress():(address)",
-      []
-    );
-
-    return result[0].toAddress();
-  }
-
-  try_artblocksCurationRegistryAddress(): ethereum.CallResult<Address> {
-    let result = super.tryCall(
-      "artblocksCurationRegistryAddress",
-      "artblocksCurationRegistryAddress():(address)",
-      []
-    );
-    if (result.reverted) {
-      return new ethereum.CallResult();
-    }
-    let value = result.value;
-    return ethereum.CallResult.fromValue(value[0].toAddress());
-  }
-
   artblocksDependencyRegistryAddress(): Address {
     let result = super.call(
       "artblocksDependencyRegistryAddress",
@@ -776,119 +656,27 @@ export class GenArt721CoreV3 extends ethereum.SmartContract {
     return ethereum.CallResult.fromValue(value[0].toAddress());
   }
 
-  artblocksPercentage(): BigInt {
+  autoApproveArtistSplitProposals(): boolean {
     let result = super.call(
-      "artblocksPercentage",
-      "artblocksPercentage():(uint256)",
+      "autoApproveArtistSplitProposals",
+      "autoApproveArtistSplitProposals():(bool)",
       []
     );
 
-    return result[0].toBigInt();
+    return result[0].toBoolean();
   }
 
-  try_artblocksPercentage(): ethereum.CallResult<BigInt> {
+  try_autoApproveArtistSplitProposals(): ethereum.CallResult<boolean> {
     let result = super.tryCall(
-      "artblocksPercentage",
-      "artblocksPercentage():(uint256)",
+      "autoApproveArtistSplitProposals",
+      "autoApproveArtistSplitProposals():(bool)",
       []
     );
     if (result.reverted) {
       return new ethereum.CallResult();
     }
     let value = result.value;
-    return ethereum.CallResult.fromValue(value[0].toBigInt());
-  }
-
-  artblocksPrimarySalesAddress(): Address {
-    let result = super.call(
-      "artblocksPrimarySalesAddress",
-      "artblocksPrimarySalesAddress():(address)",
-      []
-    );
-
-    return result[0].toAddress();
-  }
-
-  try_artblocksPrimarySalesAddress(): ethereum.CallResult<Address> {
-    let result = super.tryCall(
-      "artblocksPrimarySalesAddress",
-      "artblocksPrimarySalesAddress():(address)",
-      []
-    );
-    if (result.reverted) {
-      return new ethereum.CallResult();
-    }
-    let value = result.value;
-    return ethereum.CallResult.fromValue(value[0].toAddress());
-  }
-
-  artblocksPrimarySalesPercentage(): BigInt {
-    let result = super.call(
-      "artblocksPrimarySalesPercentage",
-      "artblocksPrimarySalesPercentage():(uint256)",
-      []
-    );
-
-    return result[0].toBigInt();
-  }
-
-  try_artblocksPrimarySalesPercentage(): ethereum.CallResult<BigInt> {
-    let result = super.tryCall(
-      "artblocksPrimarySalesPercentage",
-      "artblocksPrimarySalesPercentage():(uint256)",
-      []
-    );
-    if (result.reverted) {
-      return new ethereum.CallResult();
-    }
-    let value = result.value;
-    return ethereum.CallResult.fromValue(value[0].toBigInt());
-  }
-
-  artblocksSecondarySalesAddress(): Address {
-    let result = super.call(
-      "artblocksSecondarySalesAddress",
-      "artblocksSecondarySalesAddress():(address)",
-      []
-    );
-
-    return result[0].toAddress();
-  }
-
-  try_artblocksSecondarySalesAddress(): ethereum.CallResult<Address> {
-    let result = super.tryCall(
-      "artblocksSecondarySalesAddress",
-      "artblocksSecondarySalesAddress():(address)",
-      []
-    );
-    if (result.reverted) {
-      return new ethereum.CallResult();
-    }
-    let value = result.value;
-    return ethereum.CallResult.fromValue(value[0].toAddress());
-  }
-
-  artblocksSecondarySalesBPS(): BigInt {
-    let result = super.call(
-      "artblocksSecondarySalesBPS",
-      "artblocksSecondarySalesBPS():(uint256)",
-      []
-    );
-
-    return result[0].toBigInt();
-  }
-
-  try_artblocksSecondarySalesBPS(): ethereum.CallResult<BigInt> {
-    let result = super.tryCall(
-      "artblocksSecondarySalesBPS",
-      "artblocksSecondarySalesBPS():(uint256)",
-      []
-    );
-    if (result.reverted) {
-      return new ethereum.CallResult();
-    }
-    let value = result.value;
-    return ethereum.CallResult.fromValue(value[0].toBigInt());
+    return ethereum.CallResult.fromValue(value[0].toBoolean());
   }
 
   balanceOf(owner: Address): BigInt {
@@ -1006,33 +794,37 @@ export class GenArt721CoreV3 extends ethereum.SmartContract {
   getPrimaryRevenueSplits(
     _projectId: BigInt,
     _price: BigInt
-  ): GenArt721CoreV3__getPrimaryRevenueSplitsResult {
+  ): GenArt721CoreV3_Engine__getPrimaryRevenueSplitsResult {
     let result = super.call(
       "getPrimaryRevenueSplits",
-      "getPrimaryRevenueSplits(uint256,uint256):(uint256,address,uint256,address,uint256,address)",
+      "getPrimaryRevenueSplits(uint256,uint256):(uint256,address,uint256,address,uint256,address,uint256,address)",
       [
         ethereum.Value.fromUnsignedBigInt(_projectId),
         ethereum.Value.fromUnsignedBigInt(_price)
       ]
     );
 
-    return new GenArt721CoreV3__getPrimaryRevenueSplitsResult(
+    return new GenArt721CoreV3_Engine__getPrimaryRevenueSplitsResult(
       result[0].toBigInt(),
       result[1].toAddress(),
       result[2].toBigInt(),
       result[3].toAddress(),
       result[4].toBigInt(),
-      result[5].toAddress()
+      result[5].toAddress(),
+      result[6].toBigInt(),
+      result[7].toAddress()
     );
   }
 
   try_getPrimaryRevenueSplits(
     _projectId: BigInt,
     _price: BigInt
-  ): ethereum.CallResult<GenArt721CoreV3__getPrimaryRevenueSplitsResult> {
+  ): ethereum.CallResult<
+    GenArt721CoreV3_Engine__getPrimaryRevenueSplitsResult
+  > {
     let result = super.tryCall(
       "getPrimaryRevenueSplits",
-      "getPrimaryRevenueSplits(uint256,uint256):(uint256,address,uint256,address,uint256,address)",
+      "getPrimaryRevenueSplits(uint256,uint256):(uint256,address,uint256,address,uint256,address,uint256,address)",
       [
         ethereum.Value.fromUnsignedBigInt(_projectId),
         ethereum.Value.fromUnsignedBigInt(_price)
@@ -1043,25 +835,27 @@ export class GenArt721CoreV3 extends ethereum.SmartContract {
     }
     let value = result.value;
     return ethereum.CallResult.fromValue(
-      new GenArt721CoreV3__getPrimaryRevenueSplitsResult(
+      new GenArt721CoreV3_Engine__getPrimaryRevenueSplitsResult(
         value[0].toBigInt(),
         value[1].toAddress(),
         value[2].toBigInt(),
         value[3].toAddress(),
         value[4].toBigInt(),
-        value[5].toAddress()
+        value[5].toAddress(),
+        value[6].toBigInt(),
+        value[7].toAddress()
       )
     );
   }
 
-  getRoyalties(_tokenId: BigInt): GenArt721CoreV3__getRoyaltiesResult {
+  getRoyalties(_tokenId: BigInt): GenArt721CoreV3_Engine__getRoyaltiesResult {
     let result = super.call(
       "getRoyalties",
       "getRoyalties(uint256):(address[],uint256[])",
       [ethereum.Value.fromUnsignedBigInt(_tokenId)]
     );
 
-    return new GenArt721CoreV3__getRoyaltiesResult(
+    return new GenArt721CoreV3_Engine__getRoyaltiesResult(
       result[0].toAddressArray(),
       result[1].toBigIntArray()
     );
@@ -1069,7 +863,7 @@ export class GenArt721CoreV3 extends ethereum.SmartContract {
 
   try_getRoyalties(
     _tokenId: BigInt
-  ): ethereum.CallResult<GenArt721CoreV3__getRoyaltiesResult> {
+  ): ethereum.CallResult<GenArt721CoreV3_Engine__getRoyaltiesResult> {
     let result = super.tryCall(
       "getRoyalties",
       "getRoyalties(uint256):(address[],uint256[])",
@@ -1080,46 +874,9 @@ export class GenArt721CoreV3 extends ethereum.SmartContract {
     }
     let value = result.value;
     return ethereum.CallResult.fromValue(
-      new GenArt721CoreV3__getRoyaltiesResult(
+      new GenArt721CoreV3_Engine__getRoyaltiesResult(
         value[0].toAddressArray(),
         value[1].toBigIntArray()
-      )
-    );
-  }
-
-  getRoyaltyData(_tokenId: BigInt): GenArt721CoreV3__getRoyaltyDataResult {
-    let result = super.call(
-      "getRoyaltyData",
-      "getRoyaltyData(uint256):(address,address,uint256,uint256)",
-      [ethereum.Value.fromUnsignedBigInt(_tokenId)]
-    );
-
-    return new GenArt721CoreV3__getRoyaltyDataResult(
-      result[0].toAddress(),
-      result[1].toAddress(),
-      result[2].toBigInt(),
-      result[3].toBigInt()
-    );
-  }
-
-  try_getRoyaltyData(
-    _tokenId: BigInt
-  ): ethereum.CallResult<GenArt721CoreV3__getRoyaltyDataResult> {
-    let result = super.tryCall(
-      "getRoyaltyData",
-      "getRoyaltyData(uint256):(address,address,uint256,uint256)",
-      [ethereum.Value.fromUnsignedBigInt(_tokenId)]
-    );
-    if (result.reverted) {
-      return new ethereum.CallResult();
-    }
-    let value = result.value;
-    return ethereum.CallResult.fromValue(
-      new GenArt721CoreV3__getRoyaltyDataResult(
-        value[0].toAddress(),
-        value[1].toAddress(),
-        value[2].toBigInt(),
-        value[3].toBigInt()
       )
     );
   }
@@ -1341,16 +1098,108 @@ export class GenArt721CoreV3 extends ethereum.SmartContract {
     return ethereum.CallResult.fromValue(value[0].toAddress());
   }
 
+  platformProviderPrimarySalesAddress(): Address {
+    let result = super.call(
+      "platformProviderPrimarySalesAddress",
+      "platformProviderPrimarySalesAddress():(address)",
+      []
+    );
+
+    return result[0].toAddress();
+  }
+
+  try_platformProviderPrimarySalesAddress(): ethereum.CallResult<Address> {
+    let result = super.tryCall(
+      "platformProviderPrimarySalesAddress",
+      "platformProviderPrimarySalesAddress():(address)",
+      []
+    );
+    if (result.reverted) {
+      return new ethereum.CallResult();
+    }
+    let value = result.value;
+    return ethereum.CallResult.fromValue(value[0].toAddress());
+  }
+
+  platformProviderPrimarySalesPercentage(): BigInt {
+    let result = super.call(
+      "platformProviderPrimarySalesPercentage",
+      "platformProviderPrimarySalesPercentage():(uint256)",
+      []
+    );
+
+    return result[0].toBigInt();
+  }
+
+  try_platformProviderPrimarySalesPercentage(): ethereum.CallResult<BigInt> {
+    let result = super.tryCall(
+      "platformProviderPrimarySalesPercentage",
+      "platformProviderPrimarySalesPercentage():(uint256)",
+      []
+    );
+    if (result.reverted) {
+      return new ethereum.CallResult();
+    }
+    let value = result.value;
+    return ethereum.CallResult.fromValue(value[0].toBigInt());
+  }
+
+  platformProviderSecondarySalesAddress(): Address {
+    let result = super.call(
+      "platformProviderSecondarySalesAddress",
+      "platformProviderSecondarySalesAddress():(address)",
+      []
+    );
+
+    return result[0].toAddress();
+  }
+
+  try_platformProviderSecondarySalesAddress(): ethereum.CallResult<Address> {
+    let result = super.tryCall(
+      "platformProviderSecondarySalesAddress",
+      "platformProviderSecondarySalesAddress():(address)",
+      []
+    );
+    if (result.reverted) {
+      return new ethereum.CallResult();
+    }
+    let value = result.value;
+    return ethereum.CallResult.fromValue(value[0].toAddress());
+  }
+
+  platformProviderSecondarySalesBPS(): BigInt {
+    let result = super.call(
+      "platformProviderSecondarySalesBPS",
+      "platformProviderSecondarySalesBPS():(uint256)",
+      []
+    );
+
+    return result[0].toBigInt();
+  }
+
+  try_platformProviderSecondarySalesBPS(): ethereum.CallResult<BigInt> {
+    let result = super.tryCall(
+      "platformProviderSecondarySalesBPS",
+      "platformProviderSecondarySalesBPS():(uint256)",
+      []
+    );
+    if (result.reverted) {
+      return new ethereum.CallResult();
+    }
+    let value = result.value;
+    return ethereum.CallResult.fromValue(value[0].toBigInt());
+  }
+
   projectArtistPaymentInfo(
     _projectId: BigInt
-  ): GenArt721CoreV3__projectArtistPaymentInfoResult {
+  ): GenArt721CoreV3_Engine__projectArtistPaymentInfoResult {
     let result = super.call(
       "projectArtistPaymentInfo",
       "projectArtistPaymentInfo(uint256):(address,address,uint256,address,uint256,uint256)",
       [ethereum.Value.fromUnsignedBigInt(_projectId)]
     );
 
-    return new GenArt721CoreV3__projectArtistPaymentInfoResult(
+    return new GenArt721CoreV3_Engine__projectArtistPaymentInfoResult(
       result[0].toAddress(),
       result[1].toAddress(),
       result[2].toBigInt(),
@@ -1362,7 +1211,9 @@ export class GenArt721CoreV3 extends ethereum.SmartContract {
 
   try_projectArtistPaymentInfo(
     _projectId: BigInt
-  ): ethereum.CallResult<GenArt721CoreV3__projectArtistPaymentInfoResult> {
+  ): ethereum.CallResult<
+    GenArt721CoreV3_Engine__projectArtistPaymentInfoResult
+  > {
     let result = super.tryCall(
       "projectArtistPaymentInfo",
       "projectArtistPaymentInfo(uint256):(address,address,uint256,address,uint256,uint256)",
@@ -1373,7 +1224,7 @@ export class GenArt721CoreV3 extends ethereum.SmartContract {
     }
     let value = result.value;
     return ethereum.CallResult.fromValue(
-      new GenArt721CoreV3__projectArtistPaymentInfoResult(
+      new GenArt721CoreV3_Engine__projectArtistPaymentInfoResult(
         value[0].toAddress(),
         value[1].toAddress(),
         value[2].toBigInt(),
@@ -1384,14 +1235,16 @@ export class GenArt721CoreV3 extends ethereum.SmartContract {
     );
   }
 
-  projectDetails(_projectId: BigInt): GenArt721CoreV3__projectDetailsResult {
+  projectDetails(
+    _projectId: BigInt
+  ): GenArt721CoreV3_Engine__projectDetailsResult {
     let result = super.call(
       "projectDetails",
       "projectDetails(uint256):(string,string,string,string,string)",
       [ethereum.Value.fromUnsignedBigInt(_projectId)]
     );
 
-    return new GenArt721CoreV3__projectDetailsResult(
+    return new GenArt721CoreV3_Engine__projectDetailsResult(
       result[0].toString(),
       result[1].toString(),
       result[2].toString(),
@@ -1402,7 +1255,7 @@ export class GenArt721CoreV3 extends ethereum.SmartContract {
 
   try_projectDetails(
     _projectId: BigInt
-  ): ethereum.CallResult<GenArt721CoreV3__projectDetailsResult> {
+  ): ethereum.CallResult<GenArt721CoreV3_Engine__projectDetailsResult> {
     let result = super.tryCall(
       "projectDetails",
       "projectDetails(uint256):(string,string,string,string,string)",
@@ -1413,7 +1266,7 @@ export class GenArt721CoreV3 extends ethereum.SmartContract {
     }
     let value = result.value;
     return ethereum.CallResult.fromValue(
-      new GenArt721CoreV3__projectDetailsResult(
+      new GenArt721CoreV3_Engine__projectDetailsResult(
         value[0].toString(),
         value[1].toString(),
         value[2].toString(),
@@ -1644,14 +1497,14 @@ export class GenArt721CoreV3 extends ethereum.SmartContract {
 
   projectScriptDetails(
     _projectId: BigInt
-  ): GenArt721CoreV3__projectScriptDetailsResult {
+  ): GenArt721CoreV3_Engine__projectScriptDetailsResult {
     let result = super.call(
       "projectScriptDetails",
       "projectScriptDetails(uint256):(string,string,uint256)",
       [ethereum.Value.fromUnsignedBigInt(_projectId)]
     );
 
-    return new GenArt721CoreV3__projectScriptDetailsResult(
+    return new GenArt721CoreV3_Engine__projectScriptDetailsResult(
       result[0].toString(),
       result[1].toString(),
       result[2].toBigInt()
@@ -1660,7 +1513,7 @@ export class GenArt721CoreV3 extends ethereum.SmartContract {
 
   try_projectScriptDetails(
     _projectId: BigInt
-  ): ethereum.CallResult<GenArt721CoreV3__projectScriptDetailsResult> {
+  ): ethereum.CallResult<GenArt721CoreV3_Engine__projectScriptDetailsResult> {
     let result = super.tryCall(
       "projectScriptDetails",
       "projectScriptDetails(uint256):(string,string,uint256)",
@@ -1671,7 +1524,7 @@ export class GenArt721CoreV3 extends ethereum.SmartContract {
     }
     let value = result.value;
     return ethereum.CallResult.fromValue(
-      new GenArt721CoreV3__projectScriptDetailsResult(
+      new GenArt721CoreV3_Engine__projectScriptDetailsResult(
         value[0].toString(),
         value[1].toString(),
         value[2].toBigInt()
@@ -1681,14 +1534,14 @@ export class GenArt721CoreV3 extends ethereum.SmartContract {
 
   projectStateData(
     _projectId: BigInt
-  ): GenArt721CoreV3__projectStateDataResult {
+  ): GenArt721CoreV3_Engine__projectStateDataResult {
     let result = super.call(
       "projectStateData",
       "projectStateData(uint256):(uint256,uint256,bool,bool,uint256,bool)",
       [ethereum.Value.fromUnsignedBigInt(_projectId)]
     );
 
-    return new GenArt721CoreV3__projectStateDataResult(
+    return new GenArt721CoreV3_Engine__projectStateDataResult(
       result[0].toBigInt(),
       result[1].toBigInt(),
       result[2].toBoolean(),
@@ -1700,7 +1553,7 @@ export class GenArt721CoreV3 extends ethereum.SmartContract {
 
   try_projectStateData(
     _projectId: BigInt
-  ): ethereum.CallResult<GenArt721CoreV3__projectStateDataResult> {
+  ): ethereum.CallResult<GenArt721CoreV3_Engine__projectStateDataResult> {
     let result = super.tryCall(
       "projectStateData",
       "projectStateData(uint256):(uint256,uint256,bool,bool,uint256,bool)",
@@ -1711,7 +1564,7 @@ export class GenArt721CoreV3 extends ethereum.SmartContract {
     }
     let value = result.value;
     return ethereum.CallResult.fromValue(
-      new GenArt721CoreV3__projectStateDataResult(
+      new GenArt721CoreV3_Engine__projectStateDataResult(
         value[0].toBigInt(),
         value[1].toBigInt(),
         value[2].toBoolean(),
@@ -1791,6 +1644,98 @@ export class GenArt721CoreV3 extends ethereum.SmartContract {
     }
     let value = result.value;
     return ethereum.CallResult.fromValue(value[0].toAddress());
+  }
+
+  renderProviderPrimarySalesAddress(): Address {
+    let result = super.call(
+      "renderProviderPrimarySalesAddress",
+      "renderProviderPrimarySalesAddress():(address)",
+      []
+    );
+
+    return result[0].toAddress();
+  }
+
+  try_renderProviderPrimarySalesAddress(): ethereum.CallResult<Address> {
+    let result = super.tryCall(
+      "renderProviderPrimarySalesAddress",
+      "renderProviderPrimarySalesAddress():(address)",
+      []
+    );
+    if (result.reverted) {
+      return new ethereum.CallResult();
+    }
+    let value = result.value;
+    return ethereum.CallResult.fromValue(value[0].toAddress());
+  }
+
+  renderProviderPrimarySalesPercentage(): BigInt {
+    let result = super.call(
+      "renderProviderPrimarySalesPercentage",
+      "renderProviderPrimarySalesPercentage():(uint256)",
+      []
+    );
+
+    return result[0].toBigInt();
+  }
+
+  try_renderProviderPrimarySalesPercentage(): ethereum.CallResult<BigInt> {
+    let result = super.tryCall(
+      "renderProviderPrimarySalesPercentage",
+      "renderProviderPrimarySalesPercentage():(uint256)",
+      []
+    );
+    if (result.reverted) {
+      return new ethereum.CallResult();
+    }
+    let value = result.value;
+    return ethereum.CallResult.fromValue(value[0].toBigInt());
+  }
+
+  renderProviderSecondarySalesAddress(): Address {
+    let result = super.call(
+      "renderProviderSecondarySalesAddress",
+      "renderProviderSecondarySalesAddress():(address)",
+      []
+    );
+
+    return result[0].toAddress();
+  }
+
+  try_renderProviderSecondarySalesAddress(): ethereum.CallResult<Address> {
+    let result = super.tryCall(
+      "renderProviderSecondarySalesAddress",
+      "renderProviderSecondarySalesAddress():(address)",
+      []
+    );
+    if (result.reverted) {
+      return new ethereum.CallResult();
+    }
+    let value = result.value;
+    return ethereum.CallResult.fromValue(value[0].toAddress());
+  }
+
+  renderProviderSecondarySalesBPS(): BigInt {
+    let result = super.call(
+      "renderProviderSecondarySalesBPS",
+      "renderProviderSecondarySalesBPS():(uint256)",
+      []
+    );
+
+    return result[0].toBigInt();
+  }
+
+  try_renderProviderSecondarySalesBPS(): ethereum.CallResult<BigInt> {
+    let result = super.tryCall(
+      "renderProviderSecondarySalesBPS",
+      "renderProviderSecondarySalesBPS():(uint256)",
+      []
+    );
+    if (result.reverted) {
+      return new ethereum.CallResult();
+    }
+    let value = result.value;
+    return ethereum.CallResult.fromValue(value[0].toBigInt());
   }
 
   startingProjectId(): BigInt {
@@ -1877,6 +1822,29 @@ export class GenArt721CoreV3 extends ethereum.SmartContract {
     return ethereum.CallResult.fromValue(value[0].toBytes());
   }
 
+  tokenIdToHashSeed(_tokenId: BigInt): Bytes {
+    let result = super.call(
+      "tokenIdToHashSeed",
+      "tokenIdToHashSeed(uint256):(bytes12)",
+      [ethereum.Value.fromUnsignedBigInt(_tokenId)]
+    );
+
+    return result[0].toBytes();
+  }
+
+  try_tokenIdToHashSeed(_tokenId: BigInt): ethereum.CallResult<Bytes> {
+    let result = super.tryCall(
+      "tokenIdToHashSeed",
+      "tokenIdToHashSeed(uint256):(bytes12)",
+      [ethereum.Value.fromUnsignedBigInt(_tokenId)]
+    );
+    if (result.reverted) {
+      return new ethereum.CallResult();
+    }
+    let value = result.value;
+    return ethereum.CallResult.fromValue(value[0].toBytes());
+  }
+
   tokenIdToProjectId(_tokenId: BigInt): BigInt {
     let result = super.call(
       "tokenIdToProjectId",
@@ -1945,16 +1913,32 @@ export class ConstructorCall__Inputs {
     return this._call.inputValues[1].value.toString();
   }
 
-  get _randomizerContract(): Address {
+  get _renderProviderAddress(): Address {
     return this._call.inputValues[2].value.toAddress();
   }
 
-  get _adminACLContract(): Address {
+  get _platformProviderAddress(): Address {
     return this._call.inputValues[3].value.toAddress();
   }
 
+  get _randomizerContract(): Address {
+    return this._call.inputValues[4].value.toAddress();
+  }
+
+  get _adminACLContract(): Address {
+    return this._call.inputValues[5].value.toAddress();
+  }
+
   get _startingProjectId(): BigInt {
-    return this._call.inputValues[4].value.toBigInt();
+    return this._call.inputValues[6].value.toBigInt();
+  }
+
+  get _autoApproveArtistSplitProposals(): boolean {
+    return this._call.inputValues[7].value.toBoolean();
+  }
+
+  get _engineRegistryContract(): Address {
+    return this._call.inputValues[8].value.toAddress();
   }
 }
 
@@ -2610,36 +2594,6 @@ export class TransferOwnershipCall__Outputs {
   }
 }
 
-export class UpdateArtblocksCurationRegistryAddressCall extends ethereum.Call {
-  get inputs(): UpdateArtblocksCurationRegistryAddressCall__Inputs {
-    return new UpdateArtblocksCurationRegistryAddressCall__Inputs(this);
-  }
-
-  get outputs(): UpdateArtblocksCurationRegistryAddressCall__Outputs {
-    return new UpdateArtblocksCurationRegistryAddressCall__Outputs(this);
-  }
-}
-
-export class UpdateArtblocksCurationRegistryAddressCall__Inputs {
-  _call: UpdateArtblocksCurationRegistryAddressCall;
-
-  constructor(call: UpdateArtblocksCurationRegistryAddressCall) {
-    this._call = call;
-  }
-
-  get _artblocksCurationRegistryAddress(): Address {
-    return this._call.inputValues[0].value.toAddress();
-  }
-}
-
-export class UpdateArtblocksCurationRegistryAddressCall__Outputs {
-  _call: UpdateArtblocksCurationRegistryAddressCall;
-
-  constructor(call: UpdateArtblocksCurationRegistryAddressCall) {
-    this._call = call;
-  }
-}
-
 export class UpdateArtblocksDependencyRegistryAddressCall extends ethereum.Call {
   get inputs(): UpdateArtblocksDependencyRegistryAddressCall__Inputs {
     return new UpdateArtblocksDependencyRegistryAddressCall__Inputs(this);
@@ -2666,126 +2620,6 @@ export class UpdateArtblocksDependencyRegistryAddressCall__Outputs {
   _call: UpdateArtblocksDependencyRegistryAddressCall;
 
   constructor(call: UpdateArtblocksDependencyRegistryAddressCall) {
-    this._call = call;
-  }
-}
-
-export class UpdateArtblocksPrimarySalesAddressCall extends ethereum.Call {
-  get inputs(): UpdateArtblocksPrimarySalesAddressCall__Inputs {
-    return new UpdateArtblocksPrimarySalesAddressCall__Inputs(this);
-  }
-
-  get outputs(): UpdateArtblocksPrimarySalesAddressCall__Outputs {
-    return new UpdateArtblocksPrimarySalesAddressCall__Outputs(this);
-  }
-}
-
-export class UpdateArtblocksPrimarySalesAddressCall__Inputs {
-  _call: UpdateArtblocksPrimarySalesAddressCall;
-
-  constructor(call: UpdateArtblocksPrimarySalesAddressCall) {
-    this._call = call;
-  }
-
-  get _artblocksPrimarySalesAddress(): Address {
-    return this._call.inputValues[0].value.toAddress();
-  }
-}
-
-export class UpdateArtblocksPrimarySalesAddressCall__Outputs {
-  _call: UpdateArtblocksPrimarySalesAddressCall;
-
-  constructor(call: UpdateArtblocksPrimarySalesAddressCall) {
-    this._call = call;
-  }
-}
-
-export class UpdateArtblocksPrimarySalesPercentageCall extends ethereum.Call {
-  get inputs(): UpdateArtblocksPrimarySalesPercentageCall__Inputs {
-    return new UpdateArtblocksPrimarySalesPercentageCall__Inputs(this);
-  }
-
-  get outputs(): UpdateArtblocksPrimarySalesPercentageCall__Outputs {
-    return new UpdateArtblocksPrimarySalesPercentageCall__Outputs(this);
-  }
-}
-
-export class UpdateArtblocksPrimarySalesPercentageCall__Inputs {
-  _call: UpdateArtblocksPrimarySalesPercentageCall;
-
-  constructor(call: UpdateArtblocksPrimarySalesPercentageCall) {
-    this._call = call;
-  }
-
-  get artblocksPrimarySalesPercentage_(): BigInt {
-    return this._call.inputValues[0].value.toBigInt();
-  }
-}
-
-export class UpdateArtblocksPrimarySalesPercentageCall__Outputs {
-  _call: UpdateArtblocksPrimarySalesPercentageCall;
-
-  constructor(call: UpdateArtblocksPrimarySalesPercentageCall) {
-    this._call = call;
-  }
-}
-
-export class UpdateArtblocksSecondarySalesAddressCall extends ethereum.Call {
-  get inputs(): UpdateArtblocksSecondarySalesAddressCall__Inputs {
-    return new UpdateArtblocksSecondarySalesAddressCall__Inputs(this);
-  }
-
-  get outputs(): UpdateArtblocksSecondarySalesAddressCall__Outputs {
-    return new UpdateArtblocksSecondarySalesAddressCall__Outputs(this);
-  }
-}
-
-export class UpdateArtblocksSecondarySalesAddressCall__Inputs {
-  _call: UpdateArtblocksSecondarySalesAddressCall;
-
-  constructor(call: UpdateArtblocksSecondarySalesAddressCall) {
-    this._call = call;
-  }
-
-  get _artblocksSecondarySalesAddress(): Address {
-    return this._call.inputValues[0].value.toAddress();
-  }
-}
-
-export class UpdateArtblocksSecondarySalesAddressCall__Outputs {
-  _call: UpdateArtblocksSecondarySalesAddressCall;
-
-  constructor(call: UpdateArtblocksSecondarySalesAddressCall) {
-    this._call = call;
-  }
-}
-
-export class UpdateArtblocksSecondarySalesBPSCall extends ethereum.Call {
-  get inputs(): UpdateArtblocksSecondarySalesBPSCall__Inputs {
-    return new UpdateArtblocksSecondarySalesBPSCall__Inputs(this);
-  }
-
-  get outputs(): UpdateArtblocksSecondarySalesBPSCall__Outputs {
-    return new UpdateArtblocksSecondarySalesBPSCall__Outputs(this);
-  }
-}
-
-export class UpdateArtblocksSecondarySalesBPSCall__Inputs {
-  _call: UpdateArtblocksSecondarySalesBPSCall;
-
-  constructor(call: UpdateArtblocksSecondarySalesBPSCall) {
-    this._call = call;
-  }
-
-  get _artblocksSecondarySalesBPS(): BigInt {
-    return this._call.inputValues[0].value.toBigInt();
-  }
-}
-
-export class UpdateArtblocksSecondarySalesBPSCall__Outputs {
-  _call: UpdateArtblocksSecondarySalesBPSCall;
-
-  constructor(call: UpdateArtblocksSecondarySalesBPSCall) {
     this._call = call;
   }
 }
@@ -3258,6 +3092,116 @@ export class UpdateProjectWebsiteCall__Outputs {
   _call: UpdateProjectWebsiteCall;
 
   constructor(call: UpdateProjectWebsiteCall) {
+    this._call = call;
+  }
+}
+
+export class UpdateProviderPrimarySalesPercentagesCall extends ethereum.Call {
+  get inputs(): UpdateProviderPrimarySalesPercentagesCall__Inputs {
+    return new UpdateProviderPrimarySalesPercentagesCall__Inputs(this);
+  }
+
+  get outputs(): UpdateProviderPrimarySalesPercentagesCall__Outputs {
+    return new UpdateProviderPrimarySalesPercentagesCall__Outputs(this);
+  }
+}
+
+export class UpdateProviderPrimarySalesPercentagesCall__Inputs {
+  _call: UpdateProviderPrimarySalesPercentagesCall;
+
+  constructor(call: UpdateProviderPrimarySalesPercentagesCall) {
+    this._call = call;
+  }
+
+  get renderProviderPrimarySalesPercentage_(): BigInt {
+    return this._call.inputValues[0].value.toBigInt();
+  }
+
+  get platformProviderPrimarySalesPercentage_(): BigInt {
+    return this._call.inputValues[1].value.toBigInt();
+  }
+}
+
+export class UpdateProviderPrimarySalesPercentagesCall__Outputs {
+  _call: UpdateProviderPrimarySalesPercentagesCall;
+
+  constructor(call: UpdateProviderPrimarySalesPercentagesCall) {
+    this._call = call;
+  }
+}
+
+export class UpdateProviderSalesAddressesCall extends ethereum.Call {
+  get inputs(): UpdateProviderSalesAddressesCall__Inputs {
+    return new UpdateProviderSalesAddressesCall__Inputs(this);
+  }
+
+  get outputs(): UpdateProviderSalesAddressesCall__Outputs {
+    return new UpdateProviderSalesAddressesCall__Outputs(this);
+  }
+}
+
+export class UpdateProviderSalesAddressesCall__Inputs {
+  _call: UpdateProviderSalesAddressesCall;
+
+  constructor(call: UpdateProviderSalesAddressesCall) {
+    this._call = call;
+  }
+
+  get _renderProviderPrimarySalesAddress(): Address {
+    return this._call.inputValues[0].value.toAddress();
+  }
+
+  get _renderProviderSecondarySalesAddress(): Address {
+    return this._call.inputValues[1].value.toAddress();
+  }
+
+  get _platformProviderPrimarySalesAddress(): Address {
+    return this._call.inputValues[2].value.toAddress();
+  }
+
+  get _platformProviderSecondarySalesAddress(): Address {
+    return this._call.inputValues[3].value.toAddress();
+  }
+}
+
+export class UpdateProviderSalesAddressesCall__Outputs {
+  _call: UpdateProviderSalesAddressesCall;
+
+  constructor(call: UpdateProviderSalesAddressesCall) {
+    this._call = call;
+  }
+}
+
+export class UpdateProviderSecondarySalesBPSCall extends ethereum.Call {
+  get inputs(): UpdateProviderSecondarySalesBPSCall__Inputs {
+    return new UpdateProviderSecondarySalesBPSCall__Inputs(this);
+  }
+
+  get outputs(): UpdateProviderSecondarySalesBPSCall__Outputs {
+    return new UpdateProviderSecondarySalesBPSCall__Outputs(this);
+  }
+}
+
+export class UpdateProviderSecondarySalesBPSCall__Inputs {
+  _call: UpdateProviderSecondarySalesBPSCall;
+
+  constructor(call: UpdateProviderSecondarySalesBPSCall) {
+    this._call = call;
+  }
+
+  get _renderProviderSecondarySalesBPS(): BigInt {
+    return this._call.inputValues[0].value.toBigInt();
+  }
+
+  get _platformProviderSecondarySalesBPS(): BigInt {
+    return this._call.inputValues[1].value.toBigInt();
+  }
+}
+
+export class UpdateProviderSecondarySalesBPSCall__Outputs {
+  _call: UpdateProviderSecondarySalesBPSCall;
+
+  constructor(call: UpdateProviderSecondarySalesBPSCall) {
     this._call = call;
   }
 }

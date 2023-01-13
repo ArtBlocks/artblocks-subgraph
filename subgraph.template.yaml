@@ -29,6 +29,14 @@ dataSources:
       abis:
         - name: GenArt721CoreV3
           file: ./abis/GenArt721CoreV3.json
+        - name: IGenArt721CoreContractV3
+          file: ./abis/IGenArt721CoreContractV3.json
+        - name: IGenArt721CoreContractV3_Base
+          file: ./abis/IGenArt721CoreContractV3_Base.json
+        - name: IERC721
+          file: ./abis/IERC721.json
+        - name: Ownable
+          file: ./abis/Ownable.json
         - name: IAdminACLV0
           file: ./abis/IAdminACLV0.json
         - name: IMinterFilterV0
