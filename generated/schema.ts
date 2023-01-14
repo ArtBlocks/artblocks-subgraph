@@ -1044,6 +1044,83 @@ export class Contract extends Entity {
     }
   }
 
+  get enginePlatformProviderAddress(): Bytes | null {
+    let value = this.get("enginePlatformProviderAddress");
+    if (!value || value.kind == ValueKind.NULL) {
+      return null;
+    } else {
+      return value.toBytes();
+    }
+  }
+
+  set enginePlatformProviderAddress(value: Bytes | null) {
+    if (!value) {
+      this.unset("enginePlatformProviderAddress");
+    } else {
+      this.set("enginePlatformProviderAddress", Value.fromBytes(<Bytes>value));
+    }
+  }
+
+  get enginePlatformProviderPercentage(): BigInt | null {
+    let value = this.get("enginePlatformProviderPercentage");
+    if (!value || value.kind == ValueKind.NULL) {
+      return null;
+    } else {
+      return value.toBigInt();
+    }
+  }
+
+  set enginePlatformProviderPercentage(value: BigInt | null) {
+    if (!value) {
+      this.unset("enginePlatformProviderPercentage");
+    } else {
+      this.set(
+        "enginePlatformProviderPercentage",
+        Value.fromBigInt(<BigInt>value)
+      );
+    }
+  }
+
+  get enginePlatformProviderSecondarySalesAddress(): Bytes | null {
+    let value = this.get("enginePlatformProviderSecondarySalesAddress");
+    if (!value || value.kind == ValueKind.NULL) {
+      return null;
+    } else {
+      return value.toBytes();
+    }
+  }
+
+  set enginePlatformProviderSecondarySalesAddress(value: Bytes | null) {
+    if (!value) {
+      this.unset("enginePlatformProviderSecondarySalesAddress");
+    } else {
+      this.set(
+        "enginePlatformProviderSecondarySalesAddress",
+        Value.fromBytes(<Bytes>value)
+      );
+    }
+  }
+
+  get enginePlatformProviderSecondarySalesBPS(): BigInt | null {
+    let value = this.get("enginePlatformProviderSecondarySalesBPS");
+    if (!value || value.kind == ValueKind.NULL) {
+      return null;
+    } else {
+      return value.toBigInt();
+    }
+  }
+
+  set enginePlatformProviderSecondarySalesBPS(value: BigInt | null) {
+    if (!value) {
+      this.unset("enginePlatformProviderSecondarySalesBPS");
+    } else {
+      this.set(
+        "enginePlatformProviderSecondarySalesBPS",
+        Value.fromBigInt(<BigInt>value)
+      );
+    }
+  }
+
   get mintWhitelisted(): Array<Bytes> {
     let value = this.get("mintWhitelisted");
     return value!.toBytesArray();
@@ -1240,6 +1317,15 @@ export class Contract extends Entity {
 
   set newProjectsForbidden(value: boolean) {
     this.set("newProjectsForbidden", Value.fromBoolean(value));
+  }
+
+  get autoApproveArtistSplitProposals(): boolean {
+    let value = this.get("autoApproveArtistSplitProposals");
+    return value!.toBoolean();
+  }
+
+  set autoApproveArtistSplitProposals(value: boolean) {
+    this.set("autoApproveArtistSplitProposals", Value.fromBoolean(value));
   }
 }
 

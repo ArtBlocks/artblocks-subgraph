@@ -416,6 +416,17 @@ export const mockTokenIdToHash = function(
     .returns([ethereum.Value.fromBytes(hash)]);
 };
 
+// mockCoreType is intended for V3+ core and-on
+export const mockCoreType = function(
+  contractAddress: Address,
+  coreType: string
+): void {
+  let args: Array<ethereum.Value> = [];
+  createMockedFunction(contractAddress, "coreType", "coreType():(string)")
+    .withArgs(args)
+    .returns([ethereum.Value.fromString(coreType)]);
+};
+
 // Asserts
 export function assertNewProjectFields(
   contractAddress: Address,
