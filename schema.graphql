@@ -250,7 +250,7 @@ type Contract @entity {
 
   updatedAt: BigInt!
 
-  "Associated minter filter (if applicable) - not indexed for Engine contracts, see mintWhitelisted"
+  "Associated minter filter (if being indexed) - not always indexed for Engine contracts"
   minterFilter: MinterFilter
 
   preferredIPFSGateway: String
