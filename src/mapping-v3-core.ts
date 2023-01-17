@@ -676,16 +676,27 @@ export function handleMinterUpdated(event: MinterUpdated): void {
 
 // helper function for `handleMinterUpdated`
 function _handleMinterUpdated<T>(contract: T, event: MinterUpdated): void {
-  if (contract instanceof GenArt721CoreV3_Engine) {
-    // For Engine contracts, we explicitly do not index the minter suite, so
-    // simply refresh the contract and expect mintWhitelisted to updated
-    // appropriately.
-    refreshContract(contract, event.block.timestamp);
-    return;
-  } else if (!(contract instanceof GenArt721CoreV3)) {
+  if (
+    !(
+      contract instanceof GenArt721CoreV3 ||
+      contract instanceof GenArt721CoreV3_Engine
+    )
+  ) {
     return;
   }
-  // we can assume this is a V3 flagship contract
+  if (contract instanceof GenArt721CoreV3_Engine) {
+    // For Engine contracts, only index minter filters that are in the config
+    // and actively being indexed
+    let minterFilter = MinterFilter.load(
+      event.params._currentMinter.toHexString()
+    );
+    if (!minterFilter) {
+      // minter filter is not in config, so just refresh contract
+      // and expect mintWhitelisted to be updated appropriately
+      refreshContract(contract, event.block.timestamp);
+      return;
+    }
+  }
   let contractEntity = loadOrCreateContract(contract, event.block.timestamp);
   if (!contractEntity) {
     // this should never happen
@@ -1049,10 +1060,15 @@ function refreshContract<T>(contract: T, timestamp: BigInt): Contract | null {
 }
 
 // Clear all minter configurations for all of a V3 core contract's projects
-function clearAllMinterConfigurations(
-  contract: GenArt721CoreV3,
-  timestamp: BigInt
-): void {
+function clearAllMinterConfigurations<T>(contract: T, timestamp: BigInt): void {
+  if (
+    !(
+      contract instanceof GenArt721CoreV3 ||
+      contract instanceof GenArt721CoreV3_Engine
+    )
+  ) {
+    return;
+  }
   let contractEntity = loadOrCreateContract(contract, timestamp);
   if (!contractEntity) {
     // this should never happen
@@ -1074,11 +1090,19 @@ function clearAllMinterConfigurations(
 }
 
 // Populate all project minter configurations from a given minter filter
-function populateAllExistingMinterConfigurations(
+function populateAllExistingMinterConfigurations<T>(
   minterFilterContract: MinterFilterV1,
-  contract: GenArt721CoreV3,
+  contract: T,
   timestamp: BigInt
 ): void {
+  if (
+    !(
+      contract instanceof GenArt721CoreV3 ||
+      contract instanceof GenArt721CoreV3_Engine
+    )
+  ) {
+    return;
+  }
   // Check the new minter filter for any pre-allowlisted minters and update Projects accordingly
   let numProjectsWithMinters = minterFilterContract.getNumProjectsWithMinters();
   for (
