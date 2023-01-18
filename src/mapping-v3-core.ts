@@ -957,7 +957,7 @@ function getV3EngineContract(
   return null;
 }
 
-function refreshContractAtAddress(
+export function refreshContractAtAddress(
   contractAddress: Address,
   timestamp: BigInt
 ): void {
