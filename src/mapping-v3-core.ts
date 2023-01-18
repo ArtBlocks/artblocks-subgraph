@@ -1028,8 +1028,10 @@ function refreshContract<T>(contract: T, timestamp: BigInt): Contract | null {
     contractEntity.renderProviderPercentage = contract.artblocksPrimarySalesPercentage();
     contractEntity.renderProviderSecondarySalesAddress = contract.artblocksSecondarySalesAddress();
     contractEntity.renderProviderSecondarySalesBPS = contract.artblocksSecondarySalesBPS();
-    // curation registry exists only on flagship
+    // curation registry exists on flagship
     contractEntity.curationRegistry = contract.artblocksCurationRegistryAddress();
+    // flagship never auto approves artist split proposals for all changes
+    contractEntity.autoApproveArtistSplitProposals = false;
   } else if (contract instanceof GenArt721CoreV3_Engine) {
     // render provider address and percentage are called renderProvider* on engine
     contractEntity.renderProviderAddress = contract.renderProviderPrimarySalesAddress();
@@ -1041,7 +1043,9 @@ function refreshContract<T>(contract: T, timestamp: BigInt): Contract | null {
     contractEntity.enginePlatformProviderPercentage = contract.platformProviderPrimarySalesPercentage();
     contractEntity.enginePlatformProviderSecondarySalesAddress = contract.platformProviderSecondarySalesAddress();
     contractEntity.enginePlatformProviderSecondarySalesBPS = contract.platformProviderSecondarySalesBPS();
-    // automatic approval exists only on engine contracts
+    // null curation registry on engine contracts
+    contractEntity.curationRegistry = null;
+    // automatic approval exists on engine contracts
     contractEntity.autoApproveArtistSplitProposals = contract.autoApproveArtistSplitProposals();
   }
   contractEntity.nextProjectId = contract.nextProjectId();
