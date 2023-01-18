@@ -2545,13 +2545,21 @@ export class Dependency extends Entity {
     this.set("scriptCount", Value.fromBigInt(value));
   }
 
-  get script(): string {
+  get script(): string | null {
     let value = this.get("script");
-    return value!.toString();
+    if (!value || value.kind == ValueKind.NULL) {
+      return null;
+    } else {
+      return value.toString();
+    }
   }
 
-  set script(value: string) {
-    this.set("script", Value.fromString(value));
+  set script(value: string | null) {
+    if (!value) {
+      this.unset("script");
+    } else {
+      this.set("script", Value.fromString(<string>value));
+    }
   }
 
   get referenceWebsite(): string {
@@ -2561,6 +2569,15 @@ export class Dependency extends Entity {
 
   set referenceWebsite(value: string) {
     this.set("referenceWebsite", Value.fromString(value));
+  }
+
+  get updatedAt(): BigInt {
+    let value = this.get("updatedAt");
+    return value!.toBigInt();
+  }
+
+  set updatedAt(value: BigInt) {
+    this.set("updatedAt", Value.fromBigInt(value));
   }
 }
 
@@ -2613,6 +2630,15 @@ export class DependencyRegistry extends Entity {
 
   set owner(value: Bytes) {
     this.set("owner", Value.fromBytes(value));
+  }
+
+  get updatedAt(): BigInt {
+    let value = this.get("updatedAt");
+    return value!.toBigInt();
+  }
+
+  set updatedAt(value: BigInt) {
+    this.set("updatedAt", Value.fromBigInt(value));
   }
 }
 

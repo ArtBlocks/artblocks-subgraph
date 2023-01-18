@@ -562,14 +562,16 @@ type Dependency @entity {
   additionalRepositories: [DependencyAdditionalRepository!]! @derivedFrom(field: "dependency")
   scripts: [DependencyScript!]! @derivedFrom(field: "dependency")
   scriptCount: BigInt!
-  script: String!
+  script: String
   referenceWebsite: String!
+  updatedAt: BigInt!
 }
 
 type DependencyRegistry @entity {
   id: Bytes!
   supportedCoreContracts: [Contract!]! @derivedFrom(field: "dependencyRegistry")
   owner: Bytes!
+  updatedAt: BigInt!
 }
 
 type DependencyAdditionalCDN @entity {
