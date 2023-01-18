@@ -17,6 +17,7 @@ import {
   TEST_TX_HASH,
   TEST_MINTER_FILTER_ADDRESS,
   addTestContractToStore,
+  addTestMinterFilterToStore,
   addNewProjectToStore,
   MINTER_FILTER_ENTITY_TYPE,
   ONE_ETH_IN_WEI,
@@ -40,7 +41,8 @@ import { getProjectMinterConfigId } from "../../../src/helpers";
 
 const randomAddressGenerator = new RandomAddressGenerator();
 
-const coreType = "GenArt721CoreV3";
+const coreType = "GenArt721CoreV3_Engine";
+
 test(`${coreType}/MinterUpdated: should handle setting minter to zero address`, () => {
   clearStore();
   const startingProjectId = BigInt.fromI32(100);
@@ -133,18 +135,23 @@ test(`${coreType}/MinterUpdated: should list invalid MinterFilter with different
     "updatedAt",
     updateCallBlockTimestamp.toString()
   );
-  assert.fieldEquals(
+  // minter filter should NOT be added to store for engine contracts
+  assert.notInStore(
     MINTER_FILTER_ENTITY_TYPE,
-    TEST_MINTER_FILTER_ADDRESS.toHexString(),
-    "coreContract",
-    differentCoreAddress.toHexString()
+    TEST_MINTER_FILTER_ADDRESS.toHexString()
   );
 });
 
-test(`${coreType}/MinterUpdated: should create Contract and/or MinterFilter entities when not yet created, associate them`, () => {
+test(`${coreType}/MinterUpdated: should create Contract but NOT MinterFilter entities when not yet created, and NOT assign minterFilter`, () => {
   clearStore();
   const startingProjectId = BigInt.fromI32(100);
   mockRefreshContractCalls(startingProjectId, coreType, null);
+  // override mocked minterContract to return new minter filter address
+  createMockedFunction(
+    TEST_CONTRACT_ADDRESS,
+    "minterContract",
+    "minterContract():(address)"
+  ).returns([ethereum.Value.fromAddress(TEST_MINTER_FILTER_ADDRESS)]);
   mockMinterUpdatedCallsNoPreconfiguredProjects(startingProjectId);
   const updateCallBlockTimestamp = CURRENT_BLOCK_TIMESTAMP.plus(
     BigInt.fromI32(10)
@@ -168,7 +175,7 @@ test(`${coreType}/MinterUpdated: should create Contract and/or MinterFilter enti
     CONTRACT_ENTITY_TYPE,
     TEST_CONTRACT_ADDRESS.toHexString(),
     "minterFilter",
-    TEST_MINTER_FILTER_ADDRESS.toHexString()
+    "null"
   );
   assert.fieldEquals(
     CONTRACT_ENTITY_TYPE,
@@ -182,25 +189,18 @@ test(`${coreType}/MinterUpdated: should create Contract and/or MinterFilter enti
     "updatedAt",
     updateCallBlockTimestamp.toString()
   );
-  assert.fieldEquals(
+  assert.notInStore(
     MINTER_FILTER_ENTITY_TYPE,
-    TEST_MINTER_FILTER_ADDRESS.toHexString(),
-    "coreContract",
-    TEST_CONTRACT_ADDRESS.toHexString()
-  );
-  assert.fieldEquals(
-    MINTER_FILTER_ENTITY_TYPE,
-    TEST_MINTER_FILTER_ADDRESS.toHexString(),
-    "minterAllowlist",
-    "[]"
+    TEST_MINTER_FILTER_ADDRESS.toHexString()
   );
 });
 
-test(`${coreType}/MinterUpdated: should populate project minter configurations for all projects preconfigured on the minter filter`, () => {
+test(`${coreType}/MinterUpdated: should populate project minter configurations for all projects preconfigured on existing minter filter`, () => {
   clearStore();
   const startingProjectId = BigInt.fromI32(100);
   addTestContractToStore(startingProjectId);
-
+  // add minter filter to store so engine contract actively indexes it
+  addTestMinterFilterToStore();
   mockRefreshContractCalls(startingProjectId, coreType, null);
   mockMinterUpdatedCallsNoPreconfiguredProjects(startingProjectId);
 

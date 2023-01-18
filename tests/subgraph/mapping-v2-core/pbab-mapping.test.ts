@@ -4,7 +4,7 @@ import {
   test,
   newMockCall,
   newMockEvent,
-  createMockedFunction,
+  createMockedFunction
 } from "matchstick-as/assembly/index";
 import { BigInt, Bytes, ethereum } from "@graphprotocol/graph-ts";
 import {
@@ -1880,14 +1880,16 @@ test("GenArt721Core2EngineFlex: Can add/update a project external asset dependen
     CURRENT_BLOCK_TIMESTAMP.minus(BigInt.fromI32(100))
   );
 
-  const event: ExternalAssetDependencyUpdated = changetype<ExternalAssetDependencyUpdated>(newMockEvent());
+  const event: ExternalAssetDependencyUpdated = changetype<
+    ExternalAssetDependencyUpdated
+  >(newMockEvent());
   event.address = TEST_CONTRACT_ADDRESS;
   event.block.timestamp = CURRENT_BLOCK_TIMESTAMP;
 
   const _index0 = BigInt.zero();
   const _dependencyType0 = BigInt.zero();
   const _externalAssetDependencyCount0 = BigInt.fromI32(1);
-  
+
   assert.fieldEquals(
     PROJECT_ENTITY_TYPE,
     fullProjectId,
@@ -1896,11 +1898,23 @@ test("GenArt721Core2EngineFlex: Can add/update a project external asset dependen
   );
 
   event.parameters = [
-    new ethereum.EventParam("_projectId", ethereum.Value.fromUnsignedBigInt(projectId)),
-    new ethereum.EventParam("_index", ethereum.Value.fromUnsignedBigInt(_index0)),
+    new ethereum.EventParam(
+      "_projectId",
+      ethereum.Value.fromUnsignedBigInt(projectId)
+    ),
+    new ethereum.EventParam(
+      "_index",
+      ethereum.Value.fromUnsignedBigInt(_index0)
+    ),
     new ethereum.EventParam("_cid", ethereum.Value.fromString(IPFS_CID)),
-    new ethereum.EventParam("_dependencyType", ethereum.Value.fromUnsignedBigInt(_dependencyType0)),
-    new ethereum.EventParam("_externalAssetDependencyCount", ethereum.Value.fromUnsignedBigInt(_externalAssetDependencyCount0))
+    new ethereum.EventParam(
+      "_dependencyType",
+      ethereum.Value.fromUnsignedBigInt(_dependencyType0)
+    ),
+    new ethereum.EventParam(
+      "_externalAssetDependencyCount",
+      ethereum.Value.fromUnsignedBigInt(_externalAssetDependencyCount0)
+    )
   ];
 
   // add event
@@ -1912,7 +1926,7 @@ test("GenArt721Core2EngineFlex: Can add/update a project external asset dependen
     "externalAssetDependencyCount",
     _externalAssetDependencyCount0.toString()
   );
-  // checks project's updatedAt 
+  // checks project's updatedAt
   assert.fieldEquals(
     PROJECT_ENTITY_TYPE,
     fullProjectId,
@@ -1922,51 +1936,65 @@ test("GenArt721Core2EngineFlex: Can add/update a project external asset dependen
   // checks project external asset dependency cid
   assert.fieldEquals(
     PROJECT_EXTERNAL_ASSET_DEPENDENCY_ENTITY_TYPE,
-    fullProjectId + '-' + _index0.toString(),
+    fullProjectId + "-" + _index0.toString(),
     "cid",
     IPFS_CID
   );
   // checks project external asset dependency dependency type
   assert.fieldEquals(
     PROJECT_EXTERNAL_ASSET_DEPENDENCY_ENTITY_TYPE,
-    fullProjectId + '-' + _index0.toString(),
+    fullProjectId + "-" + _index0.toString(),
     "dependencyType",
     FLEX_CONTRACT_EXTERNAL_ASSET_DEP_TYPES[_dependencyType0.toI32()]
   );
   // checks project external asset dependency project relationship
   assert.fieldEquals(
     PROJECT_EXTERNAL_ASSET_DEPENDENCY_ENTITY_TYPE,
-    fullProjectId + '-' + _index0.toString(),
+    fullProjectId + "-" + _index0.toString(),
     "project",
     fullProjectId
   );
-  
-  const updateEvent: ExternalAssetDependencyUpdated = changetype<ExternalAssetDependencyUpdated>(newMockEvent());
+
+  const updateEvent: ExternalAssetDependencyUpdated = changetype<
+    ExternalAssetDependencyUpdated
+  >(newMockEvent());
   updateEvent.address = TEST_CONTRACT_ADDRESS;
   updateEvent.block.timestamp = CURRENT_BLOCK_TIMESTAMP;
 
   const _dependencyType1 = BigInt.fromI32(1);
   const _externalAssetDependencyCount1 = BigInt.fromI32(2);
   updateEvent.parameters = [
-    new ethereum.EventParam("_projectId", ethereum.Value.fromUnsignedBigInt(projectId)),
-    new ethereum.EventParam("_index", ethereum.Value.fromUnsignedBigInt(_index0)),
+    new ethereum.EventParam(
+      "_projectId",
+      ethereum.Value.fromUnsignedBigInt(projectId)
+    ),
+    new ethereum.EventParam(
+      "_index",
+      ethereum.Value.fromUnsignedBigInt(_index0)
+    ),
     new ethereum.EventParam("_cid", ethereum.Value.fromString(IPFS_CID2)),
-    new ethereum.EventParam("_dependencyType", ethereum.Value.fromUnsignedBigInt(_dependencyType1)),
-    new ethereum.EventParam("_externalAssetDependencyCount", ethereum.Value.fromUnsignedBigInt(_externalAssetDependencyCount1))
+    new ethereum.EventParam(
+      "_dependencyType",
+      ethereum.Value.fromUnsignedBigInt(_dependencyType1)
+    ),
+    new ethereum.EventParam(
+      "_externalAssetDependencyCount",
+      ethereum.Value.fromUnsignedBigInt(_externalAssetDependencyCount1)
+    )
   ];
   handleExternalAssetDependencyUpdated(updateEvent);
 
   // checks project external asset dependency cid
   assert.fieldEquals(
     PROJECT_EXTERNAL_ASSET_DEPENDENCY_ENTITY_TYPE,
-    fullProjectId + '-' + _index0.toString(),
+    fullProjectId + "-" + _index0.toString(),
     "cid",
     IPFS_CID2
   );
   // checks project external asset dependency dependency type
   assert.fieldEquals(
     PROJECT_EXTERNAL_ASSET_DEPENDENCY_ENTITY_TYPE,
-    fullProjectId + '-' + _index0.toString(),
+    fullProjectId + "-" + _index0.toString(),
     "dependencyType",
     FLEX_CONTRACT_EXTERNAL_ASSET_DEP_TYPES[_dependencyType1.toI32()]
   );
@@ -1978,7 +2006,6 @@ test("GenArt721Core2EngineFlex: Can add/update a project external asset dependen
     "externalAssetDependencyCount",
     _externalAssetDependencyCount1.toString()
   );
-  
 });
 
 test("GenArt721Core2EngineFlex: Can remove a project external asset dependency", () => {
@@ -1998,14 +2025,16 @@ test("GenArt721Core2EngineFlex: Can remove a project external asset dependency",
     CURRENT_BLOCK_TIMESTAMP.minus(BigInt.fromI32(100))
   );
 
-  const event: ExternalAssetDependencyUpdated = changetype<ExternalAssetDependencyUpdated>(newMockEvent());
+  const event: ExternalAssetDependencyUpdated = changetype<
+    ExternalAssetDependencyUpdated
+  >(newMockEvent());
   event.address = TEST_CONTRACT_ADDRESS;
   event.block.timestamp = CURRENT_BLOCK_TIMESTAMP;
 
   const _index0 = BigInt.zero();
   const _dependencyType0 = BigInt.zero();
   const _externalAssetDependencyCount0 = BigInt.fromI32(1);
-  
+
   assert.fieldEquals(
     PROJECT_ENTITY_TYPE,
     fullProjectId,
@@ -2014,14 +2043,28 @@ test("GenArt721Core2EngineFlex: Can remove a project external asset dependency",
   );
 
   event.parameters = [
-    new ethereum.EventParam("_projectId", ethereum.Value.fromUnsignedBigInt(projectId)),
-    new ethereum.EventParam("_index", ethereum.Value.fromUnsignedBigInt(_index0)),
+    new ethereum.EventParam(
+      "_projectId",
+      ethereum.Value.fromUnsignedBigInt(projectId)
+    ),
+    new ethereum.EventParam(
+      "_index",
+      ethereum.Value.fromUnsignedBigInt(_index0)
+    ),
     new ethereum.EventParam("_cid", ethereum.Value.fromString(IPFS_CID)),
-    new ethereum.EventParam("_dependencyType", ethereum.Value.fromUnsignedBigInt(_dependencyType0)),
-    new ethereum.EventParam("_externalAssetDependencyCount", ethereum.Value.fromUnsignedBigInt(_externalAssetDependencyCount0))
+    new ethereum.EventParam(
+      "_dependencyType",
+      ethereum.Value.fromUnsignedBigInt(_dependencyType0)
+    ),
+    new ethereum.EventParam(
+      "_externalAssetDependencyCount",
+      ethereum.Value.fromUnsignedBigInt(_externalAssetDependencyCount0)
+    )
   ];
 
-  const event2: ExternalAssetDependencyUpdated = changetype<ExternalAssetDependencyUpdated>(newMockEvent());
+  const event2: ExternalAssetDependencyUpdated = changetype<
+    ExternalAssetDependencyUpdated
+  >(newMockEvent());
   event2.address = TEST_CONTRACT_ADDRESS;
   event2.block.timestamp = CURRENT_BLOCK_TIMESTAMP;
 
@@ -2029,11 +2072,23 @@ test("GenArt721Core2EngineFlex: Can remove a project external asset dependency",
   const _index1 = BigInt.fromI32(1);
 
   event2.parameters = [
-    new ethereum.EventParam("_projectId", ethereum.Value.fromUnsignedBigInt(projectId)),
-    new ethereum.EventParam("_index", ethereum.Value.fromUnsignedBigInt(_index1)),
+    new ethereum.EventParam(
+      "_projectId",
+      ethereum.Value.fromUnsignedBigInt(projectId)
+    ),
+    new ethereum.EventParam(
+      "_index",
+      ethereum.Value.fromUnsignedBigInt(_index1)
+    ),
     new ethereum.EventParam("_cid", ethereum.Value.fromString(IPFS_CID2)),
-    new ethereum.EventParam("_dependencyType", ethereum.Value.fromUnsignedBigInt(_dependencyType0)),
-    new ethereum.EventParam("_externalAssetDependencyCount", ethereum.Value.fromUnsignedBigInt(_externalAssetDependencyCount1))
+    new ethereum.EventParam(
+      "_dependencyType",
+      ethereum.Value.fromUnsignedBigInt(_dependencyType0)
+    ),
+    new ethereum.EventParam(
+      "_externalAssetDependencyCount",
+      ethereum.Value.fromUnsignedBigInt(_externalAssetDependencyCount1)
+    )
   ];
 
   // add events
@@ -2050,28 +2105,38 @@ test("GenArt721Core2EngineFlex: Can remove a project external asset dependency",
 
   assert.entityCount(PROJECT_EXTERNAL_ASSET_DEPENDENCY_ENTITY_TYPE, 2);
 
-  const removeEvent: ExternalAssetDependencyRemoved = changetype<ExternalAssetDependencyRemoved>(newMockEvent());
+  const removeEvent: ExternalAssetDependencyRemoved = changetype<
+    ExternalAssetDependencyRemoved
+  >(newMockEvent());
   removeEvent.address = TEST_CONTRACT_ADDRESS;
   removeEvent.block.timestamp = CURRENT_BLOCK_TIMESTAMP;
 
   removeEvent.parameters = [
-    new ethereum.EventParam("_projectId", ethereum.Value.fromUnsignedBigInt(projectId)),
-    new ethereum.EventParam("_index", ethereum.Value.fromUnsignedBigInt(BigInt.fromI32(0)))
+    new ethereum.EventParam(
+      "_projectId",
+      ethereum.Value.fromUnsignedBigInt(projectId)
+    ),
+    new ethereum.EventParam(
+      "_index",
+      ethereum.Value.fromUnsignedBigInt(BigInt.fromI32(0))
+    )
   ];
-  
+
   let tupleArray: Array<ethereum.Value> = [
     ethereum.Value.fromString(IPFS_CID2),
     ethereum.Value.fromUnsignedBigInt(_dependencyType0)
-  ]
+  ];
   let tuple: ethereum.Tuple = changetype<ethereum.Tuple>(tupleArray);
   createMockedFunction(
     TEST_CONTRACT_ADDRESS,
     "projectExternalAssetDependencyByIndex",
     "projectExternalAssetDependencyByIndex(uint256,uint256):((string,uint8))"
   )
-    .withArgs([ethereum.Value.fromUnsignedBigInt(projectId), ethereum.Value.fromUnsignedBigInt(BigInt.fromI32(0))])
+    .withArgs([
+      ethereum.Value.fromUnsignedBigInt(projectId),
+      ethereum.Value.fromUnsignedBigInt(BigInt.fromI32(0))
+    ])
     .returns([ethereum.Value.fromTuple(tuple)]);
-    
 
   handleExternalAssetDependencyRemoved(removeEvent);
 
@@ -2085,18 +2150,21 @@ test("GenArt721Core2EngineFlex: Can remove a project external asset dependency",
 
   // checks that removed project external asset dependency is not in store
   // note that regardless of what initial index is removed, the removed index gets moved to the last index
-  assert.notInStore(PROJECT_EXTERNAL_ASSET_DEPENDENCY_ENTITY_TYPE, fullProjectId + '-' + _index1.toString());
+  assert.notInStore(
+    PROJECT_EXTERNAL_ASSET_DEPENDENCY_ENTITY_TYPE,
+    fullProjectId + "-" + _index1.toString()
+  );
 
   // checks that asset at index 0 now has data that was formerly at index 1
   assert.fieldEquals(
     PROJECT_EXTERNAL_ASSET_DEPENDENCY_ENTITY_TYPE,
-    fullProjectId + '-' + _index0.toString(),
+    fullProjectId + "-" + _index0.toString(),
     "cid",
     IPFS_CID2
   );
   assert.fieldEquals(
     PROJECT_EXTERNAL_ASSET_DEPENDENCY_ENTITY_TYPE,
-    fullProjectId + '-' + _index0.toString(),
+    fullProjectId + "-" + _index0.toString(),
     "dependencyType",
     FLEX_CONTRACT_EXTERNAL_ASSET_DEP_TYPES[_dependencyType0.toI32()]
   );
@@ -2108,7 +2176,7 @@ test("GenArt721Core2EngineFlex: Can remove a project external asset dependency",
 test("GenArt721Core2EngineFlex: Can update a contract preferred IPFS/ARWEAVE gateway", () => {
   clearStore();
   const contract = addTestContractToStore(BigInt.zero());
-  
+
   const event: GatewayUpdated = changetype<GatewayUpdated>(newMockEvent());
   event.address = TEST_CONTRACT_ADDRESS;
   event.block.timestamp = CURRENT_BLOCK_TIMESTAMP;
@@ -2116,7 +2184,10 @@ test("GenArt721Core2EngineFlex: Can update a contract preferred IPFS/ARWEAVE gat
   const _gateway = "https://ipfs.io/ipfs/";
   const _dependencyType = BigInt.fromI32(0);
   event.parameters = [
-    new ethereum.EventParam("_dependencyType", ethereum.Value.fromUnsignedBigInt(_dependencyType)),
+    new ethereum.EventParam(
+      "_dependencyType",
+      ethereum.Value.fromUnsignedBigInt(_dependencyType)
+    ),
     new ethereum.EventParam("_gateway", ethereum.Value.fromString(_gateway))
   ];
 
@@ -2131,7 +2202,7 @@ test("GenArt721Core2EngineFlex: Can update a contract preferred IPFS/ARWEAVE gat
     _gateway.toString()
   );
 
-  if (loadedContractAfterEvent){
+  if (loadedContractAfterEvent) {
     // checks contract preferredArweaveGateway
     assert.assertNull(loadedContractAfterEvent.preferredArweaveGateway);
   }
@@ -2154,14 +2225,16 @@ test("GenArt721Core2EngineFlex: Can lock a project's external asset dependencies
     CURRENT_BLOCK_TIMESTAMP.minus(BigInt.fromI32(100))
   );
 
-  const event: ExternalAssetDependencyUpdated = changetype<ExternalAssetDependencyUpdated>(newMockEvent());
+  const event: ExternalAssetDependencyUpdated = changetype<
+    ExternalAssetDependencyUpdated
+  >(newMockEvent());
   event.address = TEST_CONTRACT_ADDRESS;
   event.block.timestamp = CURRENT_BLOCK_TIMESTAMP;
 
   const _index0 = BigInt.zero();
   const _dependencyType0 = BigInt.zero();
   const _externalAssetDependencyCount0 = BigInt.fromI32(1);
-  
+
   assert.fieldEquals(
     PROJECT_ENTITY_TYPE,
     fullProjectId,
@@ -2170,11 +2243,23 @@ test("GenArt721Core2EngineFlex: Can lock a project's external asset dependencies
   );
 
   event.parameters = [
-    new ethereum.EventParam("_projectId", ethereum.Value.fromUnsignedBigInt(projectId)),
-    new ethereum.EventParam("_index", ethereum.Value.fromUnsignedBigInt(_index0)),
+    new ethereum.EventParam(
+      "_projectId",
+      ethereum.Value.fromUnsignedBigInt(projectId)
+    ),
+    new ethereum.EventParam(
+      "_index",
+      ethereum.Value.fromUnsignedBigInt(_index0)
+    ),
     new ethereum.EventParam("_cid", ethereum.Value.fromString(IPFS_CID)),
-    new ethereum.EventParam("_dependencyType", ethereum.Value.fromUnsignedBigInt(_dependencyType0)),
-    new ethereum.EventParam("_externalAssetDependencyCount", ethereum.Value.fromUnsignedBigInt(_externalAssetDependencyCount0))
+    new ethereum.EventParam(
+      "_dependencyType",
+      ethereum.Value.fromUnsignedBigInt(_dependencyType0)
+    ),
+    new ethereum.EventParam(
+      "_externalAssetDependencyCount",
+      ethereum.Value.fromUnsignedBigInt(_externalAssetDependencyCount0)
+    )
   ];
 
   // add event
@@ -2187,20 +2272,25 @@ test("GenArt721Core2EngineFlex: Can lock a project's external asset dependencies
     _externalAssetDependencyCount0.toString()
   );
 
-   // checks project external asset dependency lock status
-   assert.fieldEquals(
+  // checks project external asset dependency lock status
+  assert.fieldEquals(
     PROJECT_ENTITY_TYPE,
     fullProjectId,
     "externalAssetDependenciesLocked",
     "false"
   );
 
-  const lockEvent: ProjectExternalAssetDependenciesLocked = changetype<ProjectExternalAssetDependenciesLocked>(newMockEvent());
+  const lockEvent: ProjectExternalAssetDependenciesLocked = changetype<
+    ProjectExternalAssetDependenciesLocked
+  >(newMockEvent());
   lockEvent.address = TEST_CONTRACT_ADDRESS;
   lockEvent.block.timestamp = CURRENT_BLOCK_TIMESTAMP;
 
   lockEvent.parameters = [
-    new ethereum.EventParam("_projectId", ethereum.Value.fromUnsignedBigInt(projectId))
+    new ethereum.EventParam(
+      "_projectId",
+      ethereum.Value.fromUnsignedBigInt(projectId)
+    )
   ];
 
   handleProjectExternalAssetDependenciesLocked(lockEvent);
@@ -2227,7 +2317,7 @@ test("GenArt721Core2EngineFlex: Cannot add a project external asset dependency f
   const fullProjectIdNotInStore = generateContractSpecificId(
     TEST_CONTRACT_ADDRESS,
     projectIdNotInStore
-  );  
+  );
 
   addNewProjectToStore(
     projectId,
@@ -2238,14 +2328,16 @@ test("GenArt721Core2EngineFlex: Cannot add a project external asset dependency f
     CURRENT_BLOCK_TIMESTAMP.minus(BigInt.fromI32(100))
   );
 
-  const event: ExternalAssetDependencyUpdated = changetype<ExternalAssetDependencyUpdated>(newMockEvent());
+  const event: ExternalAssetDependencyUpdated = changetype<
+    ExternalAssetDependencyUpdated
+  >(newMockEvent());
   event.address = TEST_CONTRACT_ADDRESS;
   event.block.timestamp = CURRENT_BLOCK_TIMESTAMP;
 
   const _index0 = BigInt.zero();
   const _dependencyType0 = BigInt.zero();
   const _externalAssetDependencyCount0 = BigInt.fromI32(1);
-  
+
   assert.fieldEquals(
     PROJECT_ENTITY_TYPE,
     fullProjectId,
@@ -2254,11 +2346,23 @@ test("GenArt721Core2EngineFlex: Cannot add a project external asset dependency f
   );
 
   event.parameters = [
-    new ethereum.EventParam("_projectId", ethereum.Value.fromUnsignedBigInt(projectIdNotInStore)),
-    new ethereum.EventParam("_index", ethereum.Value.fromUnsignedBigInt(_index0)),
+    new ethereum.EventParam(
+      "_projectId",
+      ethereum.Value.fromUnsignedBigInt(projectIdNotInStore)
+    ),
+    new ethereum.EventParam(
+      "_index",
+      ethereum.Value.fromUnsignedBigInt(_index0)
+    ),
     new ethereum.EventParam("_cid", ethereum.Value.fromString(IPFS_CID)),
-    new ethereum.EventParam("_dependencyType", ethereum.Value.fromUnsignedBigInt(_dependencyType0)),
-    new ethereum.EventParam("_externalAssetDependencyCount", ethereum.Value.fromUnsignedBigInt(_externalAssetDependencyCount0))
+    new ethereum.EventParam(
+      "_dependencyType",
+      ethereum.Value.fromUnsignedBigInt(_dependencyType0)
+    ),
+    new ethereum.EventParam(
+      "_externalAssetDependencyCount",
+      ethereum.Value.fromUnsignedBigInt(_externalAssetDependencyCount0)
+    )
   ];
 
   // add event
@@ -2270,8 +2374,10 @@ test("GenArt721Core2EngineFlex: Cannot add a project external asset dependency f
     "externalAssetDependencyCount",
     BigInt.fromI32(0).toString()
   );
-  assert.notInStore(PROJECT_EXTERNAL_ASSET_DEPENDENCY_ENTITY_TYPE, fullProjectIdNotInStore + '-0');
-
+  assert.notInStore(
+    PROJECT_EXTERNAL_ASSET_DEPENDENCY_ENTITY_TYPE,
+    fullProjectIdNotInStore + "-0"
+  );
 });
 
 test("GenArt721Core2EngineFlex: Cannot remove a project external asset dependency for a non-existant project", () => {
@@ -2291,14 +2397,16 @@ test("GenArt721Core2EngineFlex: Cannot remove a project external asset dependenc
     CURRENT_BLOCK_TIMESTAMP.minus(BigInt.fromI32(100))
   );
 
-  const event: ExternalAssetDependencyUpdated = changetype<ExternalAssetDependencyUpdated>(newMockEvent());
+  const event: ExternalAssetDependencyUpdated = changetype<
+    ExternalAssetDependencyUpdated
+  >(newMockEvent());
   event.address = TEST_CONTRACT_ADDRESS;
   event.block.timestamp = CURRENT_BLOCK_TIMESTAMP;
 
   const _index0 = BigInt.zero();
   const _dependencyType0 = BigInt.zero();
   const _externalAssetDependencyCount0 = BigInt.fromI32(1);
-  
+
   assert.fieldEquals(
     PROJECT_ENTITY_TYPE,
     fullProjectId,
@@ -2307,14 +2415,28 @@ test("GenArt721Core2EngineFlex: Cannot remove a project external asset dependenc
   );
 
   event.parameters = [
-    new ethereum.EventParam("_projectId", ethereum.Value.fromUnsignedBigInt(projectId)),
-    new ethereum.EventParam("_index", ethereum.Value.fromUnsignedBigInt(_index0)),
+    new ethereum.EventParam(
+      "_projectId",
+      ethereum.Value.fromUnsignedBigInt(projectId)
+    ),
+    new ethereum.EventParam(
+      "_index",
+      ethereum.Value.fromUnsignedBigInt(_index0)
+    ),
     new ethereum.EventParam("_cid", ethereum.Value.fromString(IPFS_CID)),
-    new ethereum.EventParam("_dependencyType", ethereum.Value.fromUnsignedBigInt(_dependencyType0)),
-    new ethereum.EventParam("_externalAssetDependencyCount", ethereum.Value.fromUnsignedBigInt(_externalAssetDependencyCount0))
+    new ethereum.EventParam(
+      "_dependencyType",
+      ethereum.Value.fromUnsignedBigInt(_dependencyType0)
+    ),
+    new ethereum.EventParam(
+      "_externalAssetDependencyCount",
+      ethereum.Value.fromUnsignedBigInt(_externalAssetDependencyCount0)
+    )
   ];
 
-  const event2: ExternalAssetDependencyUpdated = changetype<ExternalAssetDependencyUpdated>(newMockEvent());
+  const event2: ExternalAssetDependencyUpdated = changetype<
+    ExternalAssetDependencyUpdated
+  >(newMockEvent());
   event2.address = TEST_CONTRACT_ADDRESS;
   event2.block.timestamp = CURRENT_BLOCK_TIMESTAMP;
 
@@ -2322,11 +2444,23 @@ test("GenArt721Core2EngineFlex: Cannot remove a project external asset dependenc
   const _index1 = BigInt.fromI32(1);
 
   event2.parameters = [
-    new ethereum.EventParam("_projectId", ethereum.Value.fromUnsignedBigInt(projectId)),
-    new ethereum.EventParam("_index", ethereum.Value.fromUnsignedBigInt(_index1)),
+    new ethereum.EventParam(
+      "_projectId",
+      ethereum.Value.fromUnsignedBigInt(projectId)
+    ),
+    new ethereum.EventParam(
+      "_index",
+      ethereum.Value.fromUnsignedBigInt(_index1)
+    ),
     new ethereum.EventParam("_cid", ethereum.Value.fromString(IPFS_CID2)),
-    new ethereum.EventParam("_dependencyType", ethereum.Value.fromUnsignedBigInt(_dependencyType0)),
-    new ethereum.EventParam("_externalAssetDependencyCount", ethereum.Value.fromUnsignedBigInt(_externalAssetDependencyCount1))
+    new ethereum.EventParam(
+      "_dependencyType",
+      ethereum.Value.fromUnsignedBigInt(_dependencyType0)
+    ),
+    new ethereum.EventParam(
+      "_externalAssetDependencyCount",
+      ethereum.Value.fromUnsignedBigInt(_externalAssetDependencyCount1)
+    )
   ];
 
   // add events
@@ -2342,31 +2476,40 @@ test("GenArt721Core2EngineFlex: Cannot remove a project external asset dependenc
   );
 
   assert.entityCount(PROJECT_EXTERNAL_ASSET_DEPENDENCY_ENTITY_TYPE, 2);
-  
+
   const projectIdNotInStore = BigInt.fromI32(1);
-  const removeEvent: ExternalAssetDependencyRemoved = changetype<ExternalAssetDependencyRemoved>(newMockEvent());
+  const removeEvent: ExternalAssetDependencyRemoved = changetype<
+    ExternalAssetDependencyRemoved
+  >(newMockEvent());
   removeEvent.address = TEST_CONTRACT_ADDRESS;
   removeEvent.block.timestamp = CURRENT_BLOCK_TIMESTAMP;
 
-
   removeEvent.parameters = [
-    new ethereum.EventParam("_projectId", ethereum.Value.fromUnsignedBigInt(projectIdNotInStore)),
-    new ethereum.EventParam("_index", ethereum.Value.fromUnsignedBigInt(BigInt.fromI32(0)))
+    new ethereum.EventParam(
+      "_projectId",
+      ethereum.Value.fromUnsignedBigInt(projectIdNotInStore)
+    ),
+    new ethereum.EventParam(
+      "_index",
+      ethereum.Value.fromUnsignedBigInt(BigInt.fromI32(0))
+    )
   ];
-  
+
   let tupleArray: Array<ethereum.Value> = [
     ethereum.Value.fromString(IPFS_CID2),
     ethereum.Value.fromUnsignedBigInt(_dependencyType0)
-  ]
+  ];
   let tuple: ethereum.Tuple = changetype<ethereum.Tuple>(tupleArray);
   createMockedFunction(
     TEST_CONTRACT_ADDRESS,
     "projectExternalAssetDependencyByIndex",
     "projectExternalAssetDependencyByIndex(uint256,uint256):((string,uint8))"
   )
-    .withArgs([ethereum.Value.fromUnsignedBigInt(projectIdNotInStore), ethereum.Value.fromUnsignedBigInt(BigInt.fromI32(0))])
+    .withArgs([
+      ethereum.Value.fromUnsignedBigInt(projectIdNotInStore),
+      ethereum.Value.fromUnsignedBigInt(BigInt.fromI32(0))
+    ])
     .returns([ethereum.Value.fromTuple(tuple)]);
-    
 
   handleExternalAssetDependencyRemoved(removeEvent);
 
@@ -2399,14 +2542,16 @@ test("GenArt721Core2EngineFlex: Cannot lock a non-existant project's external as
     CURRENT_BLOCK_TIMESTAMP.minus(BigInt.fromI32(100))
   );
 
-  const event: ExternalAssetDependencyUpdated = changetype<ExternalAssetDependencyUpdated>(newMockEvent());
+  const event: ExternalAssetDependencyUpdated = changetype<
+    ExternalAssetDependencyUpdated
+  >(newMockEvent());
   event.address = TEST_CONTRACT_ADDRESS;
   event.block.timestamp = CURRENT_BLOCK_TIMESTAMP;
 
   const _index0 = BigInt.zero();
   const _dependencyType0 = BigInt.zero();
   const _externalAssetDependencyCount0 = BigInt.fromI32(1);
-  
+
   assert.fieldEquals(
     PROJECT_ENTITY_TYPE,
     fullProjectId,
@@ -2414,13 +2559,24 @@ test("GenArt721Core2EngineFlex: Cannot lock a non-existant project's external as
     BigInt.fromI32(0).toString()
   );
 
-  
   event.parameters = [
-    new ethereum.EventParam("_projectId", ethereum.Value.fromUnsignedBigInt(projectId)),
-    new ethereum.EventParam("_index", ethereum.Value.fromUnsignedBigInt(_index0)),
+    new ethereum.EventParam(
+      "_projectId",
+      ethereum.Value.fromUnsignedBigInt(projectId)
+    ),
+    new ethereum.EventParam(
+      "_index",
+      ethereum.Value.fromUnsignedBigInt(_index0)
+    ),
     new ethereum.EventParam("_cid", ethereum.Value.fromString(IPFS_CID)),
-    new ethereum.EventParam("_dependencyType", ethereum.Value.fromUnsignedBigInt(_dependencyType0)),
-    new ethereum.EventParam("_externalAssetDependencyCount", ethereum.Value.fromUnsignedBigInt(_externalAssetDependencyCount0))
+    new ethereum.EventParam(
+      "_dependencyType",
+      ethereum.Value.fromUnsignedBigInt(_dependencyType0)
+    ),
+    new ethereum.EventParam(
+      "_externalAssetDependencyCount",
+      ethereum.Value.fromUnsignedBigInt(_externalAssetDependencyCount0)
+    )
   ];
 
   // add event
@@ -2433,22 +2589,27 @@ test("GenArt721Core2EngineFlex: Cannot lock a non-existant project's external as
     _externalAssetDependencyCount0.toString()
   );
 
-   // checks project external asset dependency lock status
-   assert.fieldEquals(
+  // checks project external asset dependency lock status
+  assert.fieldEquals(
     PROJECT_ENTITY_TYPE,
     fullProjectId,
     "externalAssetDependenciesLocked",
     "false"
   );
 
-  const lockEvent: ProjectExternalAssetDependenciesLocked = changetype<ProjectExternalAssetDependenciesLocked>(newMockEvent());
+  const lockEvent: ProjectExternalAssetDependenciesLocked = changetype<
+    ProjectExternalAssetDependenciesLocked
+  >(newMockEvent());
   lockEvent.address = TEST_CONTRACT_ADDRESS;
   lockEvent.block.timestamp = CURRENT_BLOCK_TIMESTAMP;
-  
+
   const projectIdNotInStore = BigInt.fromI32(1);
 
   lockEvent.parameters = [
-    new ethereum.EventParam("_projectId", ethereum.Value.fromUnsignedBigInt(projectIdNotInStore))
+    new ethereum.EventParam(
+      "_projectId",
+      ethereum.Value.fromUnsignedBigInt(projectIdNotInStore)
+    )
   ];
 
   handleProjectExternalAssetDependenciesLocked(lockEvent);
