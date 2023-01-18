@@ -24,7 +24,9 @@ export function handleContractRegistered(event: ContractRegistered): void {
   // only register the contract if it is not already registered
   if (!isRegistered) {
     // add the contract to the engine registry
-    engineRegistryEntity.registeredContracts.push(coreAddress.toHexString());
+    registeredContracts.push(coreAddress.toHexString());
+    engineRegistryEntity.registeredContracts = registeredContracts;
+    engineRegistryEntity.save();
   }
   // dynamically track the new contract if not already in store, and refresh it
   // state to ensure it is up to date
@@ -56,6 +58,7 @@ export function handleContractUnregistered(event: ContractUnregistered): void {
       registeredContracts[registeredContracts.length - 1];
     registeredContracts.pop();
     engineRegistryEntity.registeredContracts = registeredContracts;
+    engineRegistryEntity.save();
   }
   // We do not remove the contract entity from the store because it will likely
   // be re-added upon handling the contract's next emitted event.
@@ -67,6 +70,12 @@ function loadOrCreateEngineRegistry(address: Address): EngineRegistry {
   let engineRegistryEntity = EngineRegistry.load(address.toHexString());
   if (!engineRegistryEntity) {
     engineRegistryEntity = new EngineRegistry(address.toHexString());
+    // initialize the engine registry's registered contracts array
+    // must assume empty, since not enumerable mapping in the contract
+    // @dev this means we must track engine registry contract events
+    // immendiatly after deployment to ensure we have a complete list
+    // of registered contracts
+    engineRegistryEntity.registeredContracts = [];
     engineRegistryEntity.save();
   }
   return engineRegistryEntity as EngineRegistry;
