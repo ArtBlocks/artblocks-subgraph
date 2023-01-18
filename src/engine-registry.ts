@@ -17,8 +17,10 @@ export function handleContractRegistered(event: ContractRegistered): void {
   // check if the contract is already registered
   const coreAddress = event.params._contractAddress;
   const registeredContracts = engineRegistryEntity.registeredContracts;
-  const isRegistered =
-    indexOf(registeredContracts, coreAddress.toHexString()) >= 0;
+  const isRegistered = indexOf(
+    registeredContracts,
+    coreAddress.toHexString()
+  ).gt(BigInt.fromI32(-1));
   // only register the contract if it is not already registered
   if (!isRegistered) {
     // add the contract to the engine registry
@@ -49,8 +51,8 @@ export function handleContractUnregistered(event: ContractUnregistered): void {
     coreAddress.toHexString()
   );
   // un-register if it is registered
-  if (contractRegisteredIndex >= 0) {
-    registeredContracts[contractRegisteredIndex] =
+  if (contractRegisteredIndex >= BigInt.fromI32(0)) {
+    registeredContracts[contractRegisteredIndex.toI32()] =
       registeredContracts[registeredContracts.length - 1];
     registeredContracts.pop();
     engineRegistryEntity.registeredContracts = registeredContracts;
@@ -70,11 +72,15 @@ function loadOrCreateEngineRegistry(address: Address): EngineRegistry {
   return engineRegistryEntity as EngineRegistry;
 }
 
-function indexOf(array: string[], value: string): number {
-  for (let i = 0; i < array.length; i++) {
-    if (array[i] == value) {
+function indexOf(array: string[], value: string): BigInt {
+  for (
+    let i = BigInt.fromI32(0);
+    i.lt(BigInt.fromI32(array.length));
+    i = i.plus(BigInt.fromI32(1))
+  ) {
+    if (array[i.toI32()] == value) {
       return i;
     }
   }
-  return -1;
+  return BigInt.fromI32(-1);
 }
