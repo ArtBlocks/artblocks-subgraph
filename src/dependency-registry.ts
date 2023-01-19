@@ -14,7 +14,7 @@ import {
   ProjectDependencyTypeOverrideRemoved,
   SupportedCoreContractAdded,
   SupportedCoreContractRemoved
-} from "../generated/DependencyRegistryV0/DependencyRegistryV0";
+} from "../generated/DependencyRegistryV0/IDependencyRegistryV0";
 import { OwnershipTransferred } from "../generated/DependencyRegistryV0/OwnableUpgradeable";
 import { IDependencyRegistryCompatibleV0 } from "../generated/DependencyRegistryV0/IDependencyRegistryCompatibleV0";
 import {
@@ -27,14 +27,12 @@ import {
   Project
 } from "../generated/schema";
 import {
-  booleanToString,
   generateContractSpecificId,
   generateDependencyAdditionalCDNId,
   generateDependencyAdditionalRepositoryId,
   generateDependencyScriptId
 } from "./helpers";
 import { DependencyRegistryV0 } from "../generated/DependencyRegistryV0/DependencyRegistryV0";
-import { test, log as testLog } from "matchstick-as";
 
 export function handleDependencyAdded(event: DependencyAdded): void {
   const dependency = new Dependency(event.params._dependencyType.toString());
@@ -44,14 +42,27 @@ export function handleDependencyAdded(event: DependencyAdded): void {
   dependency.additionalRepositoryCount = BigInt.fromI32(0);
   dependency.referenceWebsite = event.params._referenceWebsite;
   dependency.scriptCount = BigInt.fromI32(0);
+  dependency.dependencyRegistry = event.address;
   dependency.updatedAt = event.block.timestamp;
   dependency.save();
+
+  const dependencyRegistry = DependencyRegistry.load(event.address);
+  if (dependencyRegistry) {
+    dependencyRegistry.updatedAt = event.block.timestamp;
+    dependencyRegistry.save();
+  }
 }
 
 export function handleDependencyRemoved(event: DependencyRemoved): void {
   const dependency = Dependency.load(event.params._dependencyType.toString());
   if (dependency) {
     store.remove("Dependency", dependency.id);
+  }
+
+  const dependencyRegistry = DependencyRegistry.load(event.address);
+  if (dependencyRegistry) {
+    dependencyRegistry.updatedAt = event.block.timestamp;
+    dependencyRegistry.save();
   }
 }
 
@@ -329,6 +340,7 @@ export function handleProjectDependencyTypeOverrideAdded(
     event.params._coreContractAddress,
     event.params._projectId
   );
+
   const project = Project.load(projectId);
   if (!project) {
     return;
@@ -372,9 +384,9 @@ export function handleOwnershipTransferred(event: OwnershipTransferred): void {
   let dependencyRegistry = DependencyRegistry.load(event.address);
   if (!dependencyRegistry) {
     dependencyRegistry = new DependencyRegistry(event.address);
-    return;
   }
 
   dependencyRegistry.owner = event.params.newOwner;
+  dependencyRegistry.updatedAt = event.block.timestamp;
   dependencyRegistry.save();
 }

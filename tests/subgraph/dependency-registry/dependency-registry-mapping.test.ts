@@ -2,60 +2,28 @@ import {
   assert,
   clearStore,
   test,
-  newMockCall,
-  log,
-  logStore,
   createMockedFunction,
   newMockEvent,
   describe,
   beforeEach
 } from "matchstick-as/assembly/index";
+
+import { BigInt, Bytes, ethereum, Address } from "@graphprotocol/graph-ts";
+
 import {
-  BigInt,
-  Bytes,
-  ethereum,
-  crypto,
-  store,
-  Value
-} from "@graphprotocol/graph-ts";
-import {
-  ACCOUNT_ENTITY_TYPE,
-  PROJECT_ENTITY_TYPE,
-  CONTRACT_ENTITY_TYPE,
-  WHITELISTING_ENTITY_TYPE,
-  PROJECT_SCRIPT_ENTITY_TYPE,
-  TOKEN_ENTITY_TYPE,
-  DEFAULT_PROJECT_VALUES,
   CURRENT_BLOCK_TIMESTAMP,
   RandomAddressGenerator,
-  mockProjectScriptByIndex,
-  mockTokenIdToHash,
-  PROJECT_MINTER_CONFIGURATION_ENTITY_TYPE,
-  TEST_CONTRACT_ADDRESS,
-  TEST_CONTRACT_CREATED_AT,
-  TEST_CONTRACT,
-  TEST_TOKEN_HASH,
-  TEST_TX_HASH,
-  assertNewProjectFields,
-  assertTestContractFields,
   addTestContractToStore,
   addNewProjectToStore,
-  addNewTokenToStore,
-  addNewContractToStore,
-  TRANSFER_ENTITY_TYPE,
-  DEFAULT_COLLECTION
+  addNewContractToStore
 } from "../shared-helpers";
 
 import {
-  handleProposedArtistAddressesAndSplits,
-  handleAcceptedArtistAddressesAndSplits
-} from "../../../src/mapping-v3-core";
-import {
-  generateContractSpecificId,
   generateDependencyAdditionalCDNId,
   generateDependencyAdditionalRepositoryId,
   generateDependencyScriptId
 } from "../../../src/helpers";
+
 import {
   DependencyAdded,
   DependencyAdditionalCDNRemoved,
@@ -66,8 +34,15 @@ import {
   DependencyPreferredRepositoryUpdated,
   DependencyReferenceWebsiteUpdated,
   DependencyRemoved,
-  DependencyScriptUpdated
-} from "../../../generated/DependencyRegistryV0/DependencyRegistryV0";
+  DependencyScriptUpdated,
+  ProjectDependencyTypeOverrideAdded,
+  ProjectDependencyTypeOverrideRemoved,
+  SupportedCoreContractAdded,
+  SupportedCoreContractRemoved
+} from "../../../generated/DependencyRegistryV0/IDependencyRegistryV0";
+
+import { OwnershipTransferred } from "../../../generated/DependencyRegistryV0/OwnableUpgradeable";
+
 import {
   handleDependencyAdded,
   handleDependencyAdditionalCDNRemoved,
@@ -78,13 +53,19 @@ import {
   handleDependencyPreferredRepositoryUpdated,
   handleDependencyReferenceWebsiteUpdated,
   handleDependencyRemoved,
-  handleDependencyScriptUpdated
+  handleDependencyScriptUpdated,
+  handleOwnershipTransferred,
+  handleProjectDependencyTypeOverrideAdded,
+  handleProjectDependencyTypeOverrideRemoved,
+  handleSupportedCoreContractAdded,
+  handleSupportedCoreContractRemoved
 } from "../../../src/dependency-registry";
-import { mockRefreshContractCalls } from "../mapping-v3-core/helpers";
+
 import {
   Dependency,
   DependencyAdditionalCDN,
   DependencyAdditionalRepository,
+  DependencyRegistry,
   DependencyScript
 } from "../../../generated/schema";
 
@@ -106,6 +87,7 @@ describe("DependencyRegistry", () => {
     dependency.additionalCDNCount = BigInt.fromI32(0);
     dependency.additionalRepositoryCount = BigInt.fromI32(0);
     dependency.scriptCount = BigInt.fromI32(0);
+    dependency.dependencyRegistry = DEPENDENCY_REGISTRY_ADDRESS;
     dependency.updatedAt = CURRENT_BLOCK_TIMESTAMP;
     dependency.save();
   });
@@ -116,6 +98,13 @@ describe("DependencyRegistry", () => {
     const preferredRepository = "repository.com";
     const referenceWebsite = "p5js.org";
     const dependencyRegistryAddress = DEPENDENCY_REGISTRY_ADDRESS;
+
+    const dependencyRegistry = new DependencyRegistry(
+      dependencyRegistryAddress
+    );
+    dependencyRegistry.owner = randomAddressGenerator.generateRandomAddress();
+    dependencyRegistry.updatedAt = CURRENT_BLOCK_TIMESTAMP;
+    dependencyRegistry.save();
 
     const event: DependencyAdded = changetype<DependencyAdded>(newMockEvent());
     event.address = dependencyRegistryAddress;
@@ -152,6 +141,13 @@ describe("DependencyRegistry", () => {
       "updatedAt",
       updatedAtBlockTimestamp.toString()
     );
+
+    assert.fieldEquals(
+      "DependencyRegistry",
+      dependencyRegistryAddress.toHexString(),
+      "updatedAt",
+      updatedAtBlockTimestamp.toString()
+    );
   });
 
   describe("handleDependencyRemoved", () => {
@@ -175,6 +171,13 @@ describe("DependencyRegistry", () => {
       assert.entityCount("Dependency", 1);
     });
     test("should remove existing dependency", () => {
+      const dependencyRegistry = new DependencyRegistry(
+        DEPENDENCY_REGISTRY_ADDRESS
+      );
+      dependencyRegistry.owner = randomAddressGenerator.generateRandomAddress();
+      dependencyRegistry.updatedAt = CURRENT_BLOCK_TIMESTAMP;
+      dependencyRegistry.save();
+
       assert.entityCount("Dependency", 1);
 
       // redefining here because closures aren't supported in AssemblyScript
@@ -189,10 +192,22 @@ describe("DependencyRegistry", () => {
           ethereum.Value.fromBytes(Bytes.fromUTF8(dependencyType))
         )
       ];
+      const updatedAtBlockTimestamp = CURRENT_BLOCK_TIMESTAMP.plus(
+        BigInt.fromI32(1)
+      );
+      event.block.timestamp = updatedAtBlockTimestamp;
+      event.address = DEPENDENCY_REGISTRY_ADDRESS;
 
       handleDependencyRemoved(event);
 
       assert.entityCount("Dependency", 0);
+
+      assert.fieldEquals(
+        "DependencyRegistry",
+        DEPENDENCY_REGISTRY_ADDRESS.toHexString(),
+        "updatedAt",
+        updatedAtBlockTimestamp.toString()
+      );
     });
   });
   describe("handleDependencyPreferredCDNUpdated", () => {
@@ -1246,7 +1261,6 @@ describe("DependencyRegistry", () => {
       );
       event.block.timestamp = updatedAtBlockTimestamp;
       event.address = DEPENDENCY_REGISTRY_ADDRESS;
-      log.info("event.address: {}", [event.address.toHexString()]);
       handleDependencyScriptUpdated(event);
 
       const dependencyScriptId = generateDependencyScriptId(
@@ -1483,6 +1497,427 @@ describe("DependencyRegistry", () => {
       assert.fieldEquals(
         "Dependency",
         EXISTING_DEPENDENCY_TYPE,
+        "updatedAt",
+        updatedAtBlockTimestamp.toString()
+      );
+    });
+  });
+  describe("handleSupportedCoreContractAdded", () => {
+    test("should do nothing if core contract does not exist", () => {
+      const event: SupportedCoreContractAdded = changetype<
+        SupportedCoreContractAdded
+      >(newMockEvent());
+      event.parameters = [
+        new ethereum.EventParam(
+          "_coreContract",
+          ethereum.Value.fromAddress(
+            randomAddressGenerator.generateRandomAddress()
+          )
+        )
+      ];
+      handleSupportedCoreContractAdded(event);
+
+      assert.entityCount("Contract", 0);
+    });
+    test("should update core contract if core contract exists", () => {
+      const dependencyRegistryAddress = randomAddressGenerator.generateRandomAddress();
+      const coreContract = addTestContractToStore(BigInt.fromI32(1));
+
+      const event: SupportedCoreContractAdded = changetype<
+        SupportedCoreContractAdded
+      >(newMockEvent());
+      event.parameters = [
+        new ethereum.EventParam(
+          "_coreContract",
+          ethereum.Value.fromAddress(Address.fromString(coreContract.id))
+        )
+      ];
+      const updatedAtBlockTimestamp = CURRENT_BLOCK_TIMESTAMP.plus(
+        BigInt.fromI32(1)
+      );
+      event.address = dependencyRegistryAddress;
+      event.block.timestamp = updatedAtBlockTimestamp;
+
+      handleSupportedCoreContractAdded(event);
+
+      assert.fieldEquals(
+        "Contract",
+        coreContract.id,
+        "dependencyRegistry",
+        dependencyRegistryAddress.toHexString()
+      );
+      assert.fieldEquals(
+        "Contract",
+        coreContract.id,
+        "updatedAt",
+        updatedAtBlockTimestamp.toString()
+      );
+    });
+  });
+  describe("handleSupportedCoreContractRemoved", () => {
+    test("should do nothing if core contract does not exist", () => {
+      const event: SupportedCoreContractRemoved = changetype<
+        SupportedCoreContractRemoved
+      >(newMockEvent());
+      event.parameters = [
+        new ethereum.EventParam(
+          "_coreContract",
+          ethereum.Value.fromAddress(
+            randomAddressGenerator.generateRandomAddress()
+          )
+        )
+      ];
+      handleSupportedCoreContractRemoved(event);
+
+      assert.entityCount("Contract", 0);
+    });
+    test("should update core contract if core contract exists", () => {
+      const dependencyRegistryAddress = randomAddressGenerator.generateRandomAddress();
+      const coreContract = addTestContractToStore(BigInt.fromI32(1));
+      coreContract.dependencyRegistry = dependencyRegistryAddress;
+      coreContract.save();
+
+      const event: SupportedCoreContractRemoved = changetype<
+        SupportedCoreContractRemoved
+      >(newMockEvent());
+      event.parameters = [
+        new ethereum.EventParam(
+          "_coreContract",
+          ethereum.Value.fromAddress(Address.fromString(coreContract.id))
+        )
+      ];
+      const updatedAtBlockTimestamp = CURRENT_BLOCK_TIMESTAMP.plus(
+        BigInt.fromI32(1)
+      );
+      event.address = dependencyRegistryAddress;
+      event.block.timestamp = updatedAtBlockTimestamp;
+
+      handleSupportedCoreContractRemoved(event);
+
+      assert.fieldEquals(
+        "Contract",
+        coreContract.id,
+        "dependencyRegistry",
+        "null"
+      );
+      assert.fieldEquals(
+        "Contract",
+        coreContract.id,
+        "updatedAt",
+        updatedAtBlockTimestamp.toString()
+      );
+    });
+  });
+  describe("handleProjectDependencyTypeOverrideAdded", () => {
+    test("should do nothing if project does not exist", () => {
+      const event: ProjectDependencyTypeOverrideAdded = changetype<
+        ProjectDependencyTypeOverrideAdded
+      >(newMockEvent());
+      event.parameters = [
+        new ethereum.EventParam(
+          "_coreContractAddress",
+          ethereum.Value.fromAddress(
+            randomAddressGenerator.generateRandomAddress()
+          )
+        ),
+        new ethereum.EventParam(
+          "_projectId",
+          ethereum.Value.fromUnsignedBigInt(BigInt.fromI32(1))
+        ),
+        new ethereum.EventParam(
+          "_dependencyType",
+          ethereum.Value.fromBytes(Bytes.fromUTF8(EXISTING_DEPENDENCY_TYPE))
+        )
+      ];
+      handleProjectDependencyTypeOverrideAdded(event);
+
+      assert.entityCount("Project", 0);
+    });
+    test("should add project dependency type override if project exists", () => {
+      const contract = addNewContractToStore();
+      const contractAddress = Address.fromString(contract.id);
+
+      const project = addNewProjectToStore(
+        contractAddress,
+        BigInt.fromI32(0),
+        "test project",
+        randomAddressGenerator.generateRandomAddress(),
+        BigInt.fromI32(0),
+        CURRENT_BLOCK_TIMESTAMP
+      );
+
+      const event: ProjectDependencyTypeOverrideAdded = changetype<
+        ProjectDependencyTypeOverrideAdded
+      >(newMockEvent());
+      event.parameters = [
+        new ethereum.EventParam(
+          "_coreContractAddress",
+          ethereum.Value.fromAddress(Address.fromString(contract.id))
+        ),
+        new ethereum.EventParam(
+          "_projectId",
+          ethereum.Value.fromUnsignedBigInt(project.projectId)
+        ),
+        new ethereum.EventParam(
+          "_dependencyType",
+          ethereum.Value.fromBytes(Bytes.fromUTF8(EXISTING_DEPENDENCY_TYPE))
+        )
+      ];
+      const updatedAtBlockTimestamp = CURRENT_BLOCK_TIMESTAMP.plus(
+        BigInt.fromI32(1)
+      );
+      event.block.timestamp = updatedAtBlockTimestamp;
+
+      assert.assertNull(project.scriptTypeAndVersion);
+
+      handleProjectDependencyTypeOverrideAdded(event);
+
+      assert.fieldEquals(
+        "Project",
+        project.id,
+        "scriptTypeAndVersion",
+        EXISTING_DEPENDENCY_TYPE
+      );
+      assert.fieldEquals(
+        "Project",
+        project.id,
+        "updatedAt",
+        updatedAtBlockTimestamp.toString()
+      );
+    });
+  });
+  describe("handleProjectDependencyTypeOverrideRemoved", () => {
+    test("should do nothing if project does not exist", () => {
+      const event: ProjectDependencyTypeOverrideRemoved = changetype<
+        ProjectDependencyTypeOverrideRemoved
+      >(newMockEvent());
+      event.parameters = [
+        new ethereum.EventParam(
+          "_coreContractAddress",
+          ethereum.Value.fromAddress(
+            randomAddressGenerator.generateRandomAddress()
+          )
+        ),
+        new ethereum.EventParam(
+          "_projectId",
+          ethereum.Value.fromUnsignedBigInt(BigInt.fromI32(1))
+        )
+      ];
+      handleProjectDependencyTypeOverrideRemoved(event);
+
+      assert.entityCount("Project", 0);
+    });
+    test("should remove project dependency type override and reset to address on contract", () => {
+      const coreContract = addNewContractToStore();
+      const coreContractAddress = Address.fromString(coreContract.id);
+      const coreContractScriptTypeAndVersion = "three@0.0.24";
+
+      const project = addNewProjectToStore(
+        coreContractAddress,
+        BigInt.fromI32(0),
+        "test project",
+        randomAddressGenerator.generateRandomAddress(),
+        BigInt.fromI32(0),
+        CURRENT_BLOCK_TIMESTAMP
+      );
+      project.scriptTypeAndVersion = EXISTING_DEPENDENCY_TYPE;
+      project.save();
+
+      createMockedFunction(
+        coreContractAddress,
+        "projectScriptDetails",
+        "projectScriptDetails(uint256):(string,string,uint256)"
+      )
+        .withArgs([ethereum.Value.fromUnsignedBigInt(project.projectId)])
+        .returns([
+          ethereum.Value.fromString(coreContractScriptTypeAndVersion),
+          ethereum.Value.fromString("1.77"),
+          ethereum.Value.fromUnsignedBigInt(BigInt.fromI32(0))
+        ]);
+
+      const event: ProjectDependencyTypeOverrideRemoved = changetype<
+        ProjectDependencyTypeOverrideRemoved
+      >(newMockEvent());
+      event.parameters = [
+        new ethereum.EventParam(
+          "_coreContractAddress",
+          ethereum.Value.fromAddress(coreContractAddress)
+        ),
+        new ethereum.EventParam(
+          "_projectId",
+          ethereum.Value.fromUnsignedBigInt(project.projectId)
+        )
+      ];
+      const updatedAtBlockTimestamp = CURRENT_BLOCK_TIMESTAMP.plus(
+        BigInt.fromI32(1)
+      );
+      event.block.timestamp = updatedAtBlockTimestamp;
+
+      assert.fieldEquals(
+        "Project",
+        project.id,
+        "scriptTypeAndVersion",
+        EXISTING_DEPENDENCY_TYPE
+      );
+
+      handleProjectDependencyTypeOverrideRemoved(event);
+
+      assert.fieldEquals(
+        "Project",
+        project.id,
+        "scriptTypeAndVersion",
+        coreContractScriptTypeAndVersion
+      );
+      assert.fieldEquals(
+        "Project",
+        project.id,
+        "updatedAt",
+        updatedAtBlockTimestamp.toString()
+      );
+    });
+    test("should remove project dependency type override and reset to null if not dependency registry compatible", () => {
+      const coreContract = addNewContractToStore();
+      const coreContractAddress = Address.fromString(coreContract.id);
+
+      const project = addNewProjectToStore(
+        coreContractAddress,
+        BigInt.fromI32(0),
+        "test project",
+        randomAddressGenerator.generateRandomAddress(),
+        BigInt.fromI32(0),
+        CURRENT_BLOCK_TIMESTAMP
+      );
+      project.scriptTypeAndVersion = EXISTING_DEPENDENCY_TYPE;
+      project.save();
+
+      createMockedFunction(
+        coreContractAddress,
+        "projectScriptDetails",
+        "projectScriptDetails(uint256):(string,string,uint256)"
+      )
+        .withArgs([ethereum.Value.fromUnsignedBigInt(project.projectId)])
+        .reverts();
+
+      const event: ProjectDependencyTypeOverrideRemoved = changetype<
+        ProjectDependencyTypeOverrideRemoved
+      >(newMockEvent());
+      event.parameters = [
+        new ethereum.EventParam(
+          "_coreContractAddress",
+          ethereum.Value.fromAddress(coreContractAddress)
+        ),
+        new ethereum.EventParam(
+          "_projectId",
+          ethereum.Value.fromUnsignedBigInt(project.projectId)
+        )
+      ];
+      const updatedAtBlockTimestamp = CURRENT_BLOCK_TIMESTAMP.plus(
+        BigInt.fromI32(1)
+      );
+      event.block.timestamp = updatedAtBlockTimestamp;
+
+      assert.fieldEquals(
+        "Project",
+        project.id,
+        "scriptTypeAndVersion",
+        EXISTING_DEPENDENCY_TYPE
+      );
+
+      handleProjectDependencyTypeOverrideRemoved(event);
+
+      assert.fieldEquals("Project", project.id, "scriptTypeAndVersion", "null");
+      assert.fieldEquals(
+        "Project",
+        project.id,
+        "updatedAt",
+        updatedAtBlockTimestamp.toString()
+      );
+    });
+  });
+  describe("handleOwnershipTransferred", () => {
+    test("should set owner on new dependency registry", () => {
+      const prevOwner = Address.zero();
+      const newOwner = randomAddressGenerator.generateRandomAddress();
+
+      const event = changetype<OwnershipTransferred>(newMockEvent());
+      event.parameters = [
+        new ethereum.EventParam(
+          "_previousOwner",
+          ethereum.Value.fromAddress(prevOwner)
+        ),
+        new ethereum.EventParam(
+          "_newOwner",
+          ethereum.Value.fromAddress(newOwner)
+        )
+      ];
+      event.address = DEPENDENCY_REGISTRY_ADDRESS;
+
+      const updatedAtBlockTimestamp = CURRENT_BLOCK_TIMESTAMP.plus(
+        BigInt.fromI32(1)
+      );
+      event.block.timestamp = updatedAtBlockTimestamp;
+
+      assert.entityCount("DependencyRegistry", 0);
+
+      handleOwnershipTransferred(event);
+
+      assert.entityCount("DependencyRegistry", 1);
+      assert.fieldEquals(
+        "DependencyRegistry",
+        event.address.toHexString(),
+        "owner",
+        newOwner.toHexString()
+      );
+      assert.fieldEquals(
+        "DependencyRegistry",
+        event.address.toHexString(),
+        "updatedAt",
+        updatedAtBlockTimestamp.toString()
+      );
+    });
+    test("should update owner on existing dependency registry", () => {
+      const prevOwner = randomAddressGenerator.generateRandomAddress();
+      const newOwner = randomAddressGenerator.generateRandomAddress();
+
+      const dependencyRegistry = new DependencyRegistry(
+        DEPENDENCY_REGISTRY_ADDRESS
+      );
+      dependencyRegistry.owner = prevOwner;
+      dependencyRegistry.updatedAt = CURRENT_BLOCK_TIMESTAMP;
+      dependencyRegistry.save();
+
+      const event = changetype<OwnershipTransferred>(newMockEvent());
+      event.parameters = [
+        new ethereum.EventParam(
+          "_previousOwner",
+          ethereum.Value.fromAddress(prevOwner)
+        ),
+        new ethereum.EventParam(
+          "_newOwner",
+          ethereum.Value.fromAddress(newOwner)
+        )
+      ];
+      event.address = DEPENDENCY_REGISTRY_ADDRESS;
+
+      const updatedAtBlockTimestamp = CURRENT_BLOCK_TIMESTAMP.plus(
+        BigInt.fromI32(1)
+      );
+      event.block.timestamp = updatedAtBlockTimestamp;
+
+      assert.entityCount("DependencyRegistry", 1);
+
+      handleOwnershipTransferred(event);
+
+      assert.entityCount("DependencyRegistry", 1);
+      assert.fieldEquals(
+        "DependencyRegistry",
+        event.address.toHexString(),
+        "owner",
+        newOwner.toHexString()
+      );
+      assert.fieldEquals(
+        "DependencyRegistry",
+        event.address.toHexString(),
         "updatedAt",
         updatedAtBlockTimestamp.toString()
       );

@@ -564,12 +564,14 @@ type Dependency @entity {
   scriptCount: BigInt!
   script: String
   referenceWebsite: String!
+  dependencyRegistry: DependencyRegistry!
   updatedAt: BigInt!
 }
 
 type DependencyRegistry @entity {
   id: Bytes!
   supportedCoreContracts: [Contract!]! @derivedFrom(field: "dependencyRegistry")
+  dependencies: [Dependency!] @derivedFrom(field: "dependencyRegistry")
   owner: Bytes!
   updatedAt: BigInt!
 }
