@@ -293,3 +293,10 @@ export function bytesToJSONValue(value: Bytes): JSONValue {
 export function stringToJSONString(value: string): string {
   return '"' + value + '"';
 }
+
+export function generateTransferId(
+  transactionHash: Bytes,
+  logIndex: BigInt
+): string {
+  return transactionHash.toHexString() + "-" + logIndex.toString();
+}
