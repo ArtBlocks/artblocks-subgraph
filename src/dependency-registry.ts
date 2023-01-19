@@ -14,7 +14,7 @@ import {
   ProjectDependencyTypeOverrideRemoved,
   SupportedCoreContractAdded,
   SupportedCoreContractRemoved
-} from "../generated/DependencyRegistryV0/DependencyRegistryV0";
+} from "../generated/DependencyRegistryV0/IDependencyRegistryV0";
 import { OwnershipTransferred } from "../generated/DependencyRegistryV0/OwnableUpgradeable";
 import { IDependencyRegistryCompatibleV0 } from "../generated/DependencyRegistryV0/IDependencyRegistryCompatibleV0";
 import {
@@ -42,12 +42,27 @@ export function handleDependencyAdded(event: DependencyAdded): void {
   dependency.additionalRepositoryCount = BigInt.fromI32(0);
   dependency.referenceWebsite = event.params._referenceWebsite;
   dependency.scriptCount = BigInt.fromI32(0);
+  dependency.dependencyRegistry = event.address;
+  dependency.updatedAt = event.block.timestamp;
+  dependency.save();
+
+  const dependencyRegistry = DependencyRegistry.load(event.address);
+  if (dependencyRegistry) {
+    dependencyRegistry.updatedAt = event.block.timestamp;
+    dependencyRegistry.save();
+  }
 }
 
 export function handleDependencyRemoved(event: DependencyRemoved): void {
   const dependency = Dependency.load(event.params._dependencyType.toString());
   if (dependency) {
     store.remove("Dependency", dependency.id);
+  }
+
+  const dependencyRegistry = DependencyRegistry.load(event.address);
+  if (dependencyRegistry) {
+    dependencyRegistry.updatedAt = event.block.timestamp;
+    dependencyRegistry.save();
   }
 }
 
@@ -57,6 +72,7 @@ export function handleDependencyPreferredCDNUpdated(
   const dependency = Dependency.load(event.params._dependencyType.toString());
   if (dependency) {
     dependency.preferredCDN = event.params._preferredCDN;
+    dependency.updatedAt = event.block.timestamp;
     dependency.save();
   }
 }
@@ -67,6 +83,7 @@ export function handleDependencyPreferredRepositoryUpdated(
   const dependency = Dependency.load(event.params._dependencyType.toString());
   if (dependency) {
     dependency.preferredRepository = event.params._preferredRepository;
+    dependency.updatedAt = event.block.timestamp;
     dependency.save();
   }
 }
@@ -77,6 +94,7 @@ export function handleDependencyReferenceWebsiteUpdated(
   const dependency = Dependency.load(event.params._dependencyType.toString());
   if (dependency) {
     dependency.referenceWebsite = event.params._referenceWebsite;
+    dependency.updatedAt = event.block.timestamp;
     dependency.save();
   }
 }
@@ -85,27 +103,30 @@ export function handleDependencyAdditionalCDNUpdated(
   event: DependencyAdditionalCDNUpdated
 ): void {
   const dependency = Dependency.load(event.params._dependencyType.toString());
-  if (dependency) {
-    const id = generateDependencyAdditionalCDNId(
-      dependency.id,
-      event.params._additionalCDNIndex
-    );
-
-    let additionalCDN = DependencyAdditionalCDN.load(id);
-
-    if (!additionalCDN) {
-      additionalCDN = new DependencyAdditionalCDN(id);
-      dependency.additionalCDNCount = dependency.additionalCDNCount.plus(
-        BigInt.fromI32(1)
-      );
-      dependency.save();
-    }
-
-    additionalCDN.dependency = dependency.id;
-    additionalCDN.cdn = event.params._additionalCDN;
-    additionalCDN.index = event.params._additionalCDNIndex;
-    additionalCDN.save();
+  if (!dependency) {
+    return;
   }
+  const id = generateDependencyAdditionalCDNId(
+    dependency.id,
+    event.params._additionalCDNIndex
+  );
+
+  let additionalCDN = DependencyAdditionalCDN.load(id);
+
+  if (!additionalCDN) {
+    additionalCDN = new DependencyAdditionalCDN(id);
+    dependency.additionalCDNCount = dependency.additionalCDNCount.plus(
+      BigInt.fromI32(1)
+    );
+  }
+
+  dependency.updatedAt = event.block.timestamp;
+  dependency.save();
+
+  additionalCDN.dependency = dependency.id;
+  additionalCDN.cdn = event.params._additionalCDN;
+  additionalCDN.index = event.params._additionalCDNIndex;
+  additionalCDN.save();
 }
 
 export function handleDependencyAdditionalCDNRemoved(
@@ -138,6 +159,10 @@ export function handleDependencyAdditionalCDNRemoved(
   additionalCDN.cdn = lastAdditionalCDN.cdn;
   additionalCDN.save();
 
+  dependency.additionalCDNCount = dependency.additionalCDNCount = lastAdditionalCDNIndex;
+  dependency.updatedAt = event.block.timestamp;
+  dependency.save();
+
   store.remove("DependencyAdditionalCDN", lastAdditionalCDN.id);
 }
 
@@ -160,8 +185,10 @@ export function handleDependencyAdditionalRepositoryUpdated(
     dependency.additionalRepositoryCount = dependency.additionalRepositoryCount.plus(
       BigInt.fromI32(1)
     );
-    dependency.save();
   }
+
+  dependency.updatedAt = event.block.timestamp;
+  dependency.save();
 
   additionalRepository.dependency = dependency.id;
   additionalRepository.repository = event.params._additionalRepository;
@@ -202,6 +229,10 @@ export function handleDependencyAdditionalRepositoryRemoved(
   additionalRepository.repository = lastAdditionalRepository.repository;
   additionalRepository.save();
 
+  dependency.additionalRepositoryCount = lastAdditionalRepositoryIndex;
+  dependency.updatedAt = event.block.timestamp;
+  dependency.save();
+
   store.remove("DependencyAdditionalRepository", lastAdditionalRepository.id);
 }
 
@@ -241,6 +272,10 @@ export function handleDependencyScriptUpdated(
       event.params._dependencyType,
       BigInt.fromI32(i)
     );
+    let scriptAddress = dependencyRegistryContract.getDependencyScriptBytecodeAddressAtIndex(
+      event.params._dependencyType,
+      BigInt.fromI32(i)
+    );
 
     let dependencyScriptIndex = BigInt.fromI32(i);
     let dependencyScript = new DependencyScript(
@@ -249,6 +284,7 @@ export function handleDependencyScriptUpdated(
     dependencyScript.index = dependencyScriptIndex;
     dependencyScript.dependency = dependencyType;
     dependencyScript.script = script;
+    dependencyScript.address = scriptAddress;
     dependencyScript.save();
 
     if (script) {
@@ -256,10 +292,11 @@ export function handleDependencyScriptUpdated(
     }
   }
 
-  const script = scripts.join("");
+  let script = scripts.join("");
 
   dependency.script = script;
-  dependency.scriptCount = scriptCount;
+  dependency.scriptCount = BigInt.fromI32(scriptCount);
+  dependency.updatedAt = event.block.timestamp;
 
   dependency.save();
 }
@@ -303,6 +340,7 @@ export function handleProjectDependencyTypeOverrideAdded(
     event.params._coreContractAddress,
     event.params._projectId
   );
+
   const project = Project.load(projectId);
   if (!project) {
     return;
@@ -346,9 +384,9 @@ export function handleOwnershipTransferred(event: OwnershipTransferred): void {
   let dependencyRegistry = DependencyRegistry.load(event.address);
   if (!dependencyRegistry) {
     dependencyRegistry = new DependencyRegistry(event.address);
-    return;
   }
 
   dependencyRegistry.owner = event.params.newOwner;
+  dependencyRegistry.updatedAt = event.block.timestamp;
   dependencyRegistry.save();
 }

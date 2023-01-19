@@ -2562,6 +2562,24 @@ export class Dependency extends Entity {
   set referenceWebsite(value: string) {
     this.set("referenceWebsite", Value.fromString(value));
   }
+
+  get dependencyRegistry(): Bytes {
+    let value = this.get("dependencyRegistry");
+    return value!.toBytes();
+  }
+
+  set dependencyRegistry(value: Bytes) {
+    this.set("dependencyRegistry", Value.fromBytes(value));
+  }
+
+  get updatedAt(): BigInt {
+    let value = this.get("updatedAt");
+    return value!.toBigInt();
+  }
+
+  set updatedAt(value: BigInt) {
+    this.set("updatedAt", Value.fromBigInt(value));
+  }
 }
 
 export class DependencyRegistry extends Entity {
@@ -2606,6 +2624,23 @@ export class DependencyRegistry extends Entity {
     this.set("supportedCoreContracts", Value.fromStringArray(value));
   }
 
+  get dependencies(): Array<string> | null {
+    let value = this.get("dependencies");
+    if (!value || value.kind == ValueKind.NULL) {
+      return null;
+    } else {
+      return value.toStringArray();
+    }
+  }
+
+  set dependencies(value: Array<string> | null) {
+    if (!value) {
+      this.unset("dependencies");
+    } else {
+      this.set("dependencies", Value.fromStringArray(<Array<string>>value));
+    }
+  }
+
   get owner(): Bytes {
     let value = this.get("owner");
     return value!.toBytes();
@@ -2613,6 +2648,15 @@ export class DependencyRegistry extends Entity {
 
   set owner(value: Bytes) {
     this.set("owner", Value.fromBytes(value));
+  }
+
+  get updatedAt(): BigInt {
+    let value = this.get("updatedAt");
+    return value!.toBigInt();
+  }
+
+  set updatedAt(value: BigInt) {
+    this.set("updatedAt", Value.fromBigInt(value));
   }
 }
 
