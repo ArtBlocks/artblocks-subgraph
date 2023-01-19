@@ -84,6 +84,7 @@ import {
 import {
   generateContractSpecificId,
   generateProjectScriptId,
+  generateTransferId,
   generateWhitelistingId
 } from "../../../src/helpers";
 
@@ -201,6 +202,91 @@ test(`${coreType}: Can handle transfer`, () => {
     "token",
     fullTokenId
   );
+
+  assert.fieldEquals(
+    TRANSFER_ENTITY_TYPE,
+    generateTransferId(TEST_TX_HASH, logIndex),
+    "blockHash",
+    event.block.hash.toHexString()
+  )
+  assert.fieldEquals(
+    TRANSFER_ENTITY_TYPE,
+    generateTransferId(TEST_TX_HASH, logIndex),
+    "blockNumber",
+    event.block.number.toString()
+  )
+  assert.fieldEquals(
+    TRANSFER_ENTITY_TYPE,
+    generateTransferId(TEST_TX_HASH, logIndex),
+    "blockTimestamp",
+    event.block.timestamp.toString()
+  )
+});
+
+test("GenArt721CoreV3: Can handle mint transfer", () => {
+  clearStore();
+  const tokenId = BigInt.fromI32(0);
+  const fullTokenId = generateContractSpecificId(
+    TEST_CONTRACT_ADDRESS,
+    tokenId
+  );
+
+  const fromAddress = Address.zero();
+  const toAddress = randomAddressGenerator.generateRandomAddress();
+
+  const logIndex = BigInt.fromI32(0);
+  const event: Transfer = changetype<Transfer>(newMockEvent());
+  event.address = TEST_CONTRACT_ADDRESS;
+  event.transaction.hash = TEST_TX_HASH;
+  event.logIndex = logIndex;
+  event.parameters = [
+    new ethereum.EventParam("from", ethereum.Value.fromAddress(fromAddress)),
+    new ethereum.EventParam("to", ethereum.Value.fromAddress(toAddress)),
+    new ethereum.EventParam(
+      "tokenId",
+      ethereum.Value.fromUnsignedBigInt(tokenId)
+    )
+  ];
+
+  handleTransfer(event);
+
+  assert.fieldEquals(
+    TRANSFER_ENTITY_TYPE,
+    TEST_TX_HASH.toHex() + "-" + logIndex.toString(),
+    "to",
+    toAddress.toHexString()
+  );
+  assert.fieldEquals(
+    TRANSFER_ENTITY_TYPE,
+    TEST_TX_HASH.toHex() + "-" + logIndex.toString(),
+    "from",
+    fromAddress.toHexString()
+  );
+  assert.fieldEquals(
+    TRANSFER_ENTITY_TYPE,
+    TEST_TX_HASH.toHex() + "-" + logIndex.toString(),
+    "token",
+    fullTokenId
+  );
+
+  assert.fieldEquals(
+    TRANSFER_ENTITY_TYPE,
+    generateTransferId(TEST_TX_HASH, logIndex),
+    "blockHash",
+    event.block.hash.toHexString()
+  )
+  assert.fieldEquals(
+    TRANSFER_ENTITY_TYPE,
+    generateTransferId(TEST_TX_HASH, logIndex),
+    "blockNumber",
+    event.block.number.toString()
+  )
+  assert.fieldEquals(
+    TRANSFER_ENTITY_TYPE,
+    generateTransferId(TEST_TX_HASH, logIndex),
+    "blockTimestamp",
+    event.block.timestamp.toString()
+  )
 });
 
 test(`${coreType}: Handles OwnershipTransferred to new address and zero address, when Contract not in store`, () => {
