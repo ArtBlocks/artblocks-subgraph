@@ -2545,21 +2545,13 @@ export class Dependency extends Entity {
     this.set("scriptCount", Value.fromBigInt(value));
   }
 
-  get script(): string | null {
+  get script(): string {
     let value = this.get("script");
-    if (!value || value.kind == ValueKind.NULL) {
-      return null;
-    } else {
-      return value.toString();
-    }
+    return value!.toString();
   }
 
-  set script(value: string | null) {
-    if (!value) {
-      this.unset("script");
-    } else {
-      this.set("script", Value.fromString(<string>value));
-    }
+  set script(value: string) {
+    this.set("script", Value.fromString(value));
   }
 
   get referenceWebsite(): string {

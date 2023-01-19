@@ -1488,12 +1488,7 @@ describe("DependencyRegistry", () => {
         "scriptCount",
         "0"
       );
-      assert.fieldEquals(
-        "Dependency",
-        EXISTING_DEPENDENCY_TYPE,
-        "script",
-        "null"
-      );
+      assert.fieldEquals("Dependency", EXISTING_DEPENDENCY_TYPE, "script", "");
       assert.fieldEquals(
         "Dependency",
         EXISTING_DEPENDENCY_TYPE,
