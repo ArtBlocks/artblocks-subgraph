@@ -1003,6 +1003,7 @@ function refreshContract<T>(contract: T, timestamp: BigInt): Contract | null {
     contractEntity.mintWhitelisted = [];
     contractEntity.newProjectsForbidden = false;
     contractEntity.nextProjectId = contract.nextProjectId();
+    contractEntity.registeredOn = null;
   } else {
     // clear the previous admin Whitelisting entity admin was previously defined
     if (contractEntity.admin) {

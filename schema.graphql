@@ -174,7 +174,8 @@ type EngineRegistry @entity {
   "Unique identifier made up of the Engine Registry's contract address"
   id: ID!
 
-  registeredContracts: [Contract!]!
+  "Core contracts that are registered on this Engine Registry, when this is most recent Engine Registry to add the contract"
+  registeredContracts: [Contract!] @derivedFrom(field: "registeredOn")
 }
 
 enum CoreType {
@@ -262,6 +263,9 @@ type Contract @entity {
 
   "Automatically approve all artist split proposals (used on V3 Engine contracts)"
   autoApproveArtistSplitProposals: Boolean
+
+  "Latest engine registry that this contract is registered with, if any (used for indexing purposes)"
+  registeredOn: EngineRegistry
 }
 
 type Whitelisting @entity {

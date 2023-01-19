@@ -356,6 +356,7 @@ export function addTestContractToStore(nextProjectId: BigInt): Contract {
   contract.updatedAt = contract.createdAt;
   contract.mintWhitelisted = TEST_CONTRACT.mintWhitelisted;
   contract.newProjectsForbidden = false;
+  contract.registeredOn = null;
   contract.save();
 
   return contract;

@@ -119,12 +119,12 @@ describe("ContractRegistered event", () => {
       RANDOMIZER_ADDRESS.toHexString()
     );
 
-    // ensure engine registry array is updated
+    // ensure engine registry is populated in Contract's `registeredOn` field
     assert.fieldEquals(
-      ENGINE_REGISTRY_TYPE,
-      contractRegistryAddress.toHexString(),
-      "registeredContracts",
-      "[" + TEST_CONTRACT_ADDRESS.toHexString() + "]"
+      CONTRACT_ENTITY_TYPE,
+      TEST_CONTRACT_ADDRESS.toHexString(),
+      "registeredOn",
+      contractRegistryAddress.toHexString()
     );
 
     // @dev no way to determine if contract was added as template source
@@ -136,7 +136,6 @@ describe("ContractRegistered event", () => {
     // specifically add test contract to store
     addTestContractToStore(defaultNextProjectId);
     mockRefreshContractCalls(defaultNextProjectId, coreType, null);
-    const contractRegistryAddress = randomAddressGenerator.generateRandomAddress();
     const event: ContractRegistered = changetype<ContractRegistered>(
       newMockEvent()
     );
@@ -183,12 +182,12 @@ describe("ContractRegistered event", () => {
       RANDOMIZER_ADDRESS.toHexString()
     );
 
-    // ensure engine registry array is updated
+    // ensure engine registry is populated in Contract's `registeredOn` field
     assert.fieldEquals(
-      ENGINE_REGISTRY_TYPE,
-      contractRegistryAddress.toHexString(),
-      "registeredContracts",
-      "[" + TEST_CONTRACT_ADDRESS.toHexString() + "]"
+      CONTRACT_ENTITY_TYPE,
+      TEST_CONTRACT_ADDRESS.toHexString(),
+      "registeredOn",
+      contractRegistryAddress.toHexString()
     );
   });
 });
@@ -197,7 +196,6 @@ describe("ContractUnregistered event", () => {
   test("handles unregistering contract not already in store", () => {
     clearStore();
     mockRefreshContractCalls(defaultNextProjectId, coreType, null);
-    const contractRegistryAddress = randomAddressGenerator.generateRandomAddress();
     const event: ContractUnregistered = changetype<ContractUnregistered>(
       newMockEvent()
     );
@@ -224,14 +222,6 @@ describe("ContractUnregistered event", () => {
     assert.notInStore(
       CONTRACT_ENTITY_TYPE,
       TEST_CONTRACT_ADDRESS.toHexString()
-    );
-
-    // ensure engine registry array remains empty
-    assert.fieldEquals(
-      ENGINE_REGISTRY_TYPE,
-      contractRegistryAddress.toHexString(),
-      "registeredContracts",
-      "[]"
     );
   });
 
@@ -273,12 +263,12 @@ describe("ContractUnregistered event", () => {
       TEST_CONTRACT_ADDRESS.toHexString()
     );
 
-    // ensure engine registry array remains empty
+    // ensure contract `registeredOn` field is null
     assert.fieldEquals(
-      ENGINE_REGISTRY_TYPE,
-      contractRegistryAddress.toHexString(),
-      "registeredContracts",
-      "[]"
+      CONTRACT_ENTITY_TYPE,
+      TEST_CONTRACT_ADDRESS.toHexString(),
+      "registeredOn",
+      "null"
     );
   });
 });
@@ -332,16 +322,18 @@ describe("Registered/Unregistered Sequence(s)", () => {
     // handle event for second contract
     handleContractRegistered(event);
 
-    // ensure engine registry array is updated
+    // ensure registeredOn is updated for both contracts
     assert.fieldEquals(
-      ENGINE_REGISTRY_TYPE,
-      contractRegistryAddress.toHexString(),
-      "registeredContracts",
-      "[" +
-        TEST_CONTRACT_ADDRESS.toHexString() +
-        ", " +
-        engineContractAddress2.toHexString() +
-        "]"
+      CONTRACT_ENTITY_TYPE,
+      TEST_CONTRACT_ADDRESS.toHexString(),
+      "registeredOn",
+      contractRegistryAddress.toHexString()
+    );
+    assert.fieldEquals(
+      CONTRACT_ENTITY_TYPE,
+      engineContractAddress2.toHexString(),
+      "registeredOn",
+      contractRegistryAddress.toHexString()
     );
 
     // remove first contract
@@ -361,12 +353,19 @@ describe("Registered/Unregistered Sequence(s)", () => {
     // handle event
     handleContractUnregistered(event2);
 
-    // ensure engine registry array is updated
+    // ensure registeredOn is updated for first contract
     assert.fieldEquals(
-      ENGINE_REGISTRY_TYPE,
-      contractRegistryAddress.toHexString(),
-      "registeredContracts",
-      "[" + engineContractAddress2.toHexString() + "]"
+      CONTRACT_ENTITY_TYPE,
+      TEST_CONTRACT_ADDRESS.toHexString(),
+      "registeredOn",
+      "null"
+    );
+    // ensure registeredOn is not updated for second contract
+    assert.fieldEquals(
+      CONTRACT_ENTITY_TYPE,
+      engineContractAddress2.toHexString(),
+      "registeredOn",
+      contractRegistryAddress.toHexString()
     );
   });
 });

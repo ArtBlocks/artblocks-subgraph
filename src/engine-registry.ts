@@ -11,54 +11,45 @@ import {
 } from "../generated/EngineRegistryV0/IEngineRegistryV0";
 
 /*** EVENT HANDLERS ***/
+// Registered contracts are tracked dynamically, and the contract's `registeredOn`
+// field is set to this engine registry.
 export function handleContractRegistered(event: ContractRegistered): void {
   // ensure an engine registry entity exists
-  const engineRegistryEntity = loadOrCreateEngineRegistry(event.address);
+  const _ = loadOrCreateEngineRegistry(event.address);
   // check if the contract is already registered
   const coreAddress = event.params._contractAddress;
-  const registeredContracts = engineRegistryEntity.registeredContracts;
-  const isRegistered = indexOf(
-    registeredContracts,
-    coreAddress.toHexString()
-  ).gt(BigInt.fromI32(-1));
-  // only register the contract if it is not already registered
-  if (!isRegistered) {
-    // add the contract to the engine registry
-    registeredContracts.push(coreAddress.toHexString());
-    engineRegistryEntity.registeredContracts = registeredContracts;
-    engineRegistryEntity.save();
-  }
   // dynamically track the new contract if not already in store, and refresh it
   // state to ensure it is up to date
   let contractEntity = Contract.load(coreAddress.toHexString());
   if (!contractEntity) {
-    GenArt721CoreV3_Dynamic.create(event.params._contractAddress);
-    refreshContractAtAddress(
-      event.params._contractAddress,
-      event.block.timestamp
-    );
+    GenArt721CoreV3_Dynamic.create(coreAddress);
+    refreshContractAtAddress(coreAddress, event.block.timestamp);
+  }
+  // set this engine registry as the contract's registeredOn field
+  // @dev this will overwrite the previous engine registry if the contract
+  // was previously not in store
+  let contractEntityReload = Contract.load(coreAddress.toHexString());
+  if (contractEntityReload) {
+    contractEntityReload.registeredOn = event.address.toHexString();
+    contractEntityReload.updatedAt = event.block.timestamp;
+    contractEntityReload.save();
   }
 }
 
-// Unregistered contracts are not removed from the store, but the contract
-// will be removed from the engine registry's registeredContracts array.
+// Unregistered contracts are not removed from the store, but the contract's
+// `registeredOn` field will be nulled if this engine registry is the current
+// engine registry.
 export function handleContractUnregistered(event: ContractUnregistered): void {
   // ensure an engine registry entity exists
-  const engineRegistryEntity = loadOrCreateEngineRegistry(event.address);
-  // check if the contract is registered
+  const _ = loadOrCreateEngineRegistry(event.address);
+  // remove this engine registry from the contract's registeredOn field
   const coreAddress = event.params._contractAddress;
-  const registeredContracts = engineRegistryEntity.registeredContracts;
-  const contractRegisteredIndex = indexOf(
-    registeredContracts,
-    coreAddress.toHexString()
-  );
-  // un-register if it is registered
-  if (contractRegisteredIndex >= BigInt.fromI32(0)) {
-    registeredContracts[contractRegisteredIndex.toI32()] =
-      registeredContracts[registeredContracts.length - 1];
-    registeredContracts.pop();
-    engineRegistryEntity.registeredContracts = registeredContracts;
-    engineRegistryEntity.save();
+  let contractEntity = Contract.load(coreAddress.toHexString());
+  if (contractEntity) {
+    if (contractEntity.registeredOn == event.address.toHexString()) {
+      contractEntity.registeredOn = null;
+      contractEntity.save();
+    }
   }
   // We do not remove the contract entity from the store because it will likely
   // be re-added upon handling the contract's next emitted event.
@@ -79,17 +70,4 @@ function loadOrCreateEngineRegistry(address: Address): EngineRegistry {
     engineRegistryEntity.save();
   }
   return engineRegistryEntity as EngineRegistry;
-}
-
-function indexOf(array: string[], value: string): BigInt {
-  for (
-    let i = BigInt.fromI32(0);
-    i.lt(BigInt.fromI32(array.length));
-    i = i.plus(BigInt.fromI32(1))
-  ) {
-    if (array[i.toI32()] == value) {
-      return i;
-    }
-  }
-  return BigInt.fromI32(-1);
 }
