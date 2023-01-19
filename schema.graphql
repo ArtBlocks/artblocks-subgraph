@@ -170,6 +170,13 @@ type ProposedArtistAddressesAndSplit @entity {
   createdAt: BigInt!
 }
 
+type EngineRegistry @entity {
+  "Unique identifier made up of the Engine Registry's contract address"
+  id: ID!
+
+  registeredContracts: [Contract!]!
+}
+
 enum CoreType {
   "First Art Blocks flagship core"
   GenArt721CoreV0
@@ -182,7 +189,9 @@ enum CoreType {
 }
 
 type Contract @entity {
+  "Unique identifier made up of the contract address"
   id: ID!
+
   admin: Bytes!
 
   "Core contract type"

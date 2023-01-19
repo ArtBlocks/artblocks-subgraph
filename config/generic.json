@@ -164,5 +164,10 @@
     {
       "address": ""
     }
+  ],
+  "engineRegistryV0Contracts": [
+    {
+      "address": ""
+    }
   ]
 }
