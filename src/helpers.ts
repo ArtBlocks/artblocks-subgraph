@@ -171,15 +171,22 @@ export function loadOrCreateMinter(
   minter.extraMinterDetails = "{}";
 
   // values assigned during contract deployments
-  let minterType = filteredMinterContract.minterType();
-  minter.type = minterType;
-  if (minterType.startsWith("MinterDALin")) {
-    const contract = IFilteredMinterDALinV0.bind(minterAddress);
-    minter.minimumAuctionLengthInSeconds = contract.minimumAuctionLengthSeconds();
-  } else if (minterType.startsWith("MinterDAExp")) {
-    const contract = IFilteredMinterDAExpV0.bind(minterAddress);
-    minter.minimumHalfLifeInSeconds = contract.minimumPriceDecayHalfLifeSeconds();
-    minter.maximumHalfLifeInSeconds = contract.maximumPriceDecayHalfLifeSeconds();
+  let minterType = filteredMinterContract.try_minterType();
+  if (!minterType.reverted) {
+    minter.type = minterType.value;
+    // populate any minter-specific values
+    if (minter.type.startsWith("MinterDALin")) {
+      const contract = IFilteredMinterDALinV0.bind(minterAddress);
+      minter.minimumAuctionLengthInSeconds = contract.minimumAuctionLengthSeconds();
+    } else if (minter.type.startsWith("MinterDAExp")) {
+      const contract = IFilteredMinterDAExpV0.bind(minterAddress);
+      minter.minimumHalfLifeInSeconds = contract.minimumPriceDecayHalfLifeSeconds();
+      minter.maximumHalfLifeInSeconds = contract.maximumPriceDecayHalfLifeSeconds();
+    }
+  } else {
+    // if minterType() reverts, then the minter is not as expected and is
+    // designated as empty string
+    minter.type = "";
   }
 
   minter.updatedAt = timestamp;

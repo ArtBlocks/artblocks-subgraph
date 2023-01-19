@@ -321,35 +321,12 @@ type MinterFilter @entity {
   updatedAt: BigInt!
 }
 
-enum MinterType {
-  MinterSetPriceV0
-  MinterSetPriceERC20V0
-  MinterDALinV0
-  MinterDAExpV0
-  MinterSetPriceV1
-  MinterSetPriceERC20V1
-  MinterDALinV1
-  MinterDAExpV1
-  MinterHolderV0
-  MinterMerkleV0
-  MinterSetPriceV2
-  MinterSetPriceERC20V2
-  MinterDALinV2
-  MinterDAExpV2
-  MinterHolderV1
-  MinterHolderV2
-  MinterMerkleV1
-  MinterMerkleV2
-  MinterDAExpSettlementV0
-  MinterMerkleV3
-}
-
 type Minter @entity {
   "Unique identifier made up of minter contract address"
   id: ID!
 
-  "Minter type"
-  type: MinterType!
+  "Minter type - String if minter returns it's type, empty string otherwise"
+  type: String!
 
   "Associated Minter Filter"
   minterFilter: MinterFilter!
