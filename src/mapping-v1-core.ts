@@ -74,7 +74,8 @@ import {
   generateContractSpecificId,
   generateProjectScriptId,
   addWhitelisting,
-  removeWhitelisting
+  removeWhitelisting,
+  generateTransferId
 } from "./helpers";
 import { GEN_ART_721_CORE_V1 } from "./constants";
 
@@ -134,9 +135,11 @@ export function handleMint(event: Mint): void {
 export function handleTransfer(event: Transfer): void {
   // This will only create a new token if a token with the
   // same id does not already exist
-  let token = Token.load(
-    generateContractSpecificId(event.address, event.params.tokenId)
+  const tokenId = generateContractSpecificId(
+    event.address,
+    event.params.tokenId
   );
+  let token = Token.load(tokenId);
 
   // Let mint handlers deal with new tokens
   if (token) {
@@ -180,17 +183,20 @@ export function handleTransfer(event: Transfer): void {
     token.owner = event.params.to.toHexString();
     token.updatedAt = event.block.timestamp;
     token.save();
-
-    let transfer = new TokenTransfer(
-      event.transaction.hash.toHex() + "-" + event.logIndex.toString()
-    );
-    transfer.transactionHash = event.transaction.hash;
-    transfer.createdAt = event.block.timestamp;
-    transfer.to = event.params.to;
-    transfer.from = event.params.from;
-    transfer.token = token.id;
-    transfer.save();
   }
+
+  let transfer = new TokenTransfer(
+    generateTransferId(event.transaction.hash, event.logIndex)
+  );
+  transfer.transactionHash = event.transaction.hash;
+  transfer.to = event.params.to;
+  transfer.from = event.params.from;
+  transfer.token = tokenId;
+
+  transfer.blockHash = event.block.hash;
+  transfer.blockNumber = event.block.number;
+  transfer.blockTimestamp = event.block.timestamp;
+  transfer.save();
 }
 /*** END EVENT HANDLERS ***/
 
