@@ -51,10 +51,10 @@ import { Project } from "../../../generated/schema";
 import {
   Mint,
   ProjectUpdated,
-  Transfer,
-  PlatformUpdated,
-  OwnershipTransferred
-} from "../../../generated/GenArt721CoreV3/GenArt721CoreV3";
+  PlatformUpdated
+} from "../../../generated/GenArt721CoreV3/IGenArt721CoreContractV3_Base";
+import { Transfer } from "../../../generated/GenArt721CoreV3/IERC721";
+import { OwnershipTransferred } from "../../../generated/GenArt721CoreV3/Ownable";
 import { SuperAdminTransferred } from "../../../generated/AdminACLV0/IAdminACLV0";
 import {
   FIELD_PROJECT_ACTIVE,

@@ -1,16 +1,19 @@
 import { BigInt, store, log, Address, Bytes } from "@graphprotocol/graph-ts";
 
 import {
-  GenArt721CoreV3,
   Mint,
   ProjectUpdated,
-  Transfer,
   PlatformUpdated,
   MinterUpdated,
   ProposedArtistAddressesAndSplits as ProposedArtistAddressesAndSplitsEvent,
-  AcceptedArtistAddressesAndSplits,
-  OwnershipTransferred
-} from "../generated/GenArt721CoreV3/GenArt721CoreV3";
+  AcceptedArtistAddressesAndSplits
+} from "../generated/GenArt721CoreV3/IGenArt721CoreContractV3_Base";
+
+import { GenArt721CoreV3 } from "../generated/GenArt721CoreV3/GenArt721CoreV3";
+
+import { Transfer } from "../generated/GenArt721CoreV3/IERC721";
+
+import { OwnershipTransferred } from "../generated/GenArt721CoreV3/Ownable";
 
 import {
   IAdminACLV0,

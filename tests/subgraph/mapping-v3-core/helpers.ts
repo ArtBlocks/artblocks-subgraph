@@ -35,7 +35,7 @@ import {
   FIELD_PROJECT_WEBSITE,
   handleProjectUpdated
 } from "../../../src/mapping-v3-core";
-import { ProjectUpdated } from "../../../generated/GenArt721CoreV3/GenArt721CoreV3";
+import { ProjectUpdated } from "../../../generated/GenArt721CoreV3/IGenArt721CoreContractV3_Base";
 
 // mocks return values for Soldity contract calls in refreshContract() helper function
 export function mockRefreshContractCalls(

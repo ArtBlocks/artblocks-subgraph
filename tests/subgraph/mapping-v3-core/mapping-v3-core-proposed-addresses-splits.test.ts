@@ -60,12 +60,9 @@ import {
   ProposedArtistAddressesAndSplit as ProposedArtistAddressesAndSplitEntity
 } from "../../../generated/schema";
 import {
-  Mint,
-  Transfer,
-  PlatformUpdated,
   ProposedArtistAddressesAndSplits,
   AcceptedArtistAddressesAndSplits
-} from "../../../generated/GenArt721CoreV3/GenArt721CoreV3";
+} from "../../../generated/GenArt721CoreV3/IGenArt721CoreContractV3_Base";
 import {
   handleProposedArtistAddressesAndSplits,
   handleAcceptedArtistAddressesAndSplits
