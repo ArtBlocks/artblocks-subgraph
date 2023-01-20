@@ -153,6 +153,30 @@ export function handlePurchaseToDisabledUpdated(
   project.save();
 }
 
+// IFilteredMinterV2 events
+export function ProjectMaxInvocationsLimitUpdated(
+  event: ProjectMaxInvocationsLimitUpdated
+): void {
+  let minterProjectAndConfig = loadMinterProjectAndConfig(
+    event.address,
+    event.params._projectId,
+    event.block.timestamp
+  );
+
+  if (!minterProjectAndConfig) {
+    return;
+  }
+
+  let project = minterProjectAndConfig.project;
+  let projectMinterConfig = minterProjectAndConfig.projectMinterConfiguration;
+
+  projectMinterConfig.maxInvocations = event.params._maxInvocations;
+  projectMinterConfig.save();
+
+  project.updatedAt = event.block.timestamp;
+  project.save();
+}
+
 // MinterDALin events
 export function handleMinimumAuctionLengthSecondsUpdated(
   event: MinimumAuctionLengthSecondsUpdated

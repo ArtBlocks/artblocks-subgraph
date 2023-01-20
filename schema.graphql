@@ -135,7 +135,8 @@ type Project @entity {
   "Lookup table to get the Sale history of the project"
   saleLookupTables: [SaleLookupTable!]! @derivedFrom(field: "project")
 
-  externalAssetDependencies: [ProjectExternalAssetDependency!]! @derivedFrom(field: "project")
+  externalAssetDependencies: [ProjectExternalAssetDependency!]!
+    @derivedFrom(field: "project")
 }
 
 type ProjectScript @entity {
@@ -166,7 +167,7 @@ type ProposedArtistAddressesAndSplit @entity {
 
   "Project associated with this proposed artist addresses and splits"
   project: Project!
-  
+
   createdAt: BigInt!
 }
 
@@ -399,6 +400,9 @@ type ProjectMinterConfiguration @entity {
 
   "Configuration details used by specific minter project configurations (json string)"
   extraMinterDetails: String!
+
+  "Maximum number of invocations allowed for the project (on the minter)"
+  maxInvocations: BigInt
 }
 
 type Receipt @entity {
@@ -419,7 +423,7 @@ type Receipt @entity {
 
   "The total quantity of tokens purchased on the project"
   numPurchased: BigInt!
-  
+
   updatedAt: BigInt!
 }
 
@@ -534,7 +538,7 @@ type Transfer @entity(immutable: true) {
   from: Bytes!
 
   transactionHash: Bytes!
-  
+
   blockHash: Bytes!
   blockNumber: BigInt!
   blockTimestamp: BigInt!
