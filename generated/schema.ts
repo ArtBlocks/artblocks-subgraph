@@ -927,13 +927,24 @@ export class EngineRegistry extends Entity {
     this.set("id", Value.fromString(value));
   }
 
-  get registeredContracts(): Array<string> {
+  get registeredContracts(): Array<string> | null {
     let value = this.get("registeredContracts");
-    return value!.toStringArray();
+    if (!value || value.kind == ValueKind.NULL) {
+      return null;
+    } else {
+      return value.toStringArray();
+    }
   }
 
-  set registeredContracts(value: Array<string>) {
-    this.set("registeredContracts", Value.fromStringArray(value));
+  set registeredContracts(value: Array<string> | null) {
+    if (!value) {
+      this.unset("registeredContracts");
+    } else {
+      this.set(
+        "registeredContracts",
+        Value.fromStringArray(<Array<string>>value)
+      );
+    }
   }
 }
 
@@ -1326,6 +1337,23 @@ export class Contract extends Entity {
 
   set autoApproveArtistSplitProposals(value: boolean) {
     this.set("autoApproveArtistSplitProposals", Value.fromBoolean(value));
+  }
+
+  get registeredOn(): string | null {
+    let value = this.get("registeredOn");
+    if (!value || value.kind == ValueKind.NULL) {
+      return null;
+    } else {
+      return value.toString();
+    }
+  }
+
+  set registeredOn(value: string | null) {
+    if (!value) {
+      this.unset("registeredOn");
+    } else {
+      this.set("registeredOn", Value.fromString(<string>value));
+    }
   }
 }
 
