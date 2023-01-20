@@ -24,6 +24,7 @@ import {
   RandomAddressGenerator,
   mockProjectScriptByIndex,
   mockTokenIdToHash,
+  mockCoreType,
   TEST_CONTRACT_ADDRESS,
   TEST_TOKEN_HASH,
   TEST_TX_HASH,
@@ -96,6 +97,7 @@ test("GenArt721CoreV3: Can handle Mint", () => {
   const tokenId = BigInt.fromI32(1000001);
   addTestContractToStore(projectId);
   mockTokenIdToHash(TEST_CONTRACT_ADDRESS, tokenId, TEST_TOKEN_HASH);
+  mockCoreType(TEST_CONTRACT_ADDRESS, "GenArt721CoreV3");
   // add project to store
   const fullProjectId = generateContractSpecificId(
     TEST_CONTRACT_ADDRESS,
