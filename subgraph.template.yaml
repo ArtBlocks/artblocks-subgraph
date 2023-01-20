@@ -31,6 +31,10 @@ dataSources:
           file: ./abis/GenArt721CoreV3.json
         - name: IGenArt721CoreContractV3
           file: ./abis/IGenArt721CoreContractV3.json
+        - name: GenArt721CoreV3_Engine
+          file: ./abis/GenArt721CoreV3_Engine.json
+        - name: IGenArt721CoreContractV3_Engine
+          file: ./abis/IGenArt721CoreContractV3_Engine.json
         - name: IGenArt721CoreContractV3_Base
           file: ./abis/IGenArt721CoreContractV3_Base.json
         - name: IERC721
