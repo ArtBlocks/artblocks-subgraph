@@ -87,6 +87,16 @@
       "address": "0x84FB2A4Cf29425f77098f5fBFE1C12B35A6BBbbf",
       "name": "Art Blocks Engine Test",
       "startBlock": 8268432
+    },
+    {
+      "address": "0xfB8fEc1DC1A54B7F9edB46Ab979998C9Bc175454",
+      "name": "CoinDesk Deployer",
+      "startBlock": 8346661
+    },
+    {
+      "address": "0xe2bD5181D87ffC02815E96C35fE13A7726233500",
+      "name": "newrafael.work",
+      "startBlock": 8346750
     }
   ],
   "engineFlexContracts": [
@@ -139,6 +149,16 @@
       "address": "0x883eF3c3E22320c423D0eF8859454a36b5c8746d",
       "name": "Art Blocks FLEX Engine Test",
       "startBlock": 8268432
+    },
+    {
+      "address": "0x783D27cF1Ed18bEDf1360902ce80E44DC6F673B4",
+      "name": "VerticalCrypto Gen Art (Flex)",
+      "startBlock": 8346736
+    },
+    {
+      "address": "0xBCb1343e7ef0C25d6BFB78BA5B4DA9200946aaf8",
+      "name": "Venus Over Manhattan",
+      "startBlock": 8346719
     }
   ],
   "minterFilterV0Contracts": [
@@ -234,6 +254,13 @@
       "address": "0xb61ABA1c6b4079c976Fb664F27a0D9C47b81a05B",
       "name": "Flagship Minter for V3 core",
       "startBlock": 7723587
+    }
+  ],
+  "minterDAExpSettlementV0Contracts": [
+    {
+      "address": "0x1D5E143CDf39ed1c50adF400e7c6c1E7da7c43A7",
+      "name": "Flagship Minter for V3 core",
+      "startBlock": 8339496
     }
   ],
   "minterMerkleV0Contracts": [

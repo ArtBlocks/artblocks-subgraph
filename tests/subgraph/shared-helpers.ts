@@ -77,6 +77,7 @@ const randomAddressGenerator = new RandomAddressGenerator();
 export const ACCOUNT_ENTITY_TYPE = "Account";
 export const PROJECT_ENTITY_TYPE = "Project";
 export const CONTRACT_ENTITY_TYPE = "Contract";
+export const ENGINE_REGISTRY_TYPE = "EngineRegistry";
 export const WHITELISTING_ENTITY_TYPE = "Whitelisting";
 export const PROJECT_EXTERNAL_ASSET_DEPENDENCY_ENTITY_TYPE =
   "ProjectExternalAssetDependency";
@@ -339,6 +340,33 @@ export function addNewContractToStore(): Contract {
 
 export function addTestContractToStore(nextProjectId: BigInt): Contract {
   let contract = new Contract(TEST_CONTRACT_ADDRESS.toHexString());
+  contract.admin = TEST_CONTRACT.admin;
+  contract.type = TEST_CONTRACT.type;
+  contract.createdAt = CURRENT_BLOCK_TIMESTAMP.minus(BigInt.fromI32(10));
+  contract.nextProjectId = nextProjectId;
+  contract.randomizerContract = TEST_CONTRACT.randomizerContract;
+  contract.renderProviderAddress = TEST_CONTRACT.renderProviderAddress;
+  contract.renderProviderPercentage = TEST_CONTRACT.renderProviderPercentage;
+  contract.renderProviderSecondarySalesAddress =
+    TEST_CONTRACT.renderProviderSecondarySalesAddress;
+  contract.renderProviderSecondarySalesBPS =
+    TEST_CONTRACT.renderProviderSecondarySalesBPS;
+  contract.curationRegistry = TEST_CONTRACT.curationRegistry;
+  contract.dependencyRegistry = TEST_CONTRACT.dependencyRegistry;
+  contract.updatedAt = contract.createdAt;
+  contract.mintWhitelisted = TEST_CONTRACT.mintWhitelisted;
+  contract.newProjectsForbidden = false;
+  contract.registeredOn = null;
+  contract.save();
+
+  return contract;
+}
+
+export function addArbitraryContractToStore(
+  contractAddress: Address,
+  nextProjectId: BigInt
+): Contract {
+  let contract = new Contract(contractAddress.toHexString());
   contract.admin = TEST_CONTRACT.admin;
   contract.type = TEST_CONTRACT.type;
   contract.createdAt = CURRENT_BLOCK_TIMESTAMP.minus(BigInt.fromI32(10));
