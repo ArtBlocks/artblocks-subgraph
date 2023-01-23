@@ -84,13 +84,12 @@ import {
 import {
   generateContractSpecificId,
   generateProjectScriptId,
-  generateTransferId,
   generateWhitelistingId
 } from "../../../src/helpers";
 
 const randomAddressGenerator = new RandomAddressGenerator();
 
-const coreType = "GenArt721CoreV3";
+const coreType = "GenArt721CoreV3_Engine";
 
 test(`${coreType}: Can handle Mint`, () => {
   clearStore();
@@ -202,91 +201,6 @@ test(`${coreType}: Can handle transfer`, () => {
     "token",
     fullTokenId
   );
-
-  assert.fieldEquals(
-    TRANSFER_ENTITY_TYPE,
-    generateTransferId(TEST_TX_HASH, logIndex),
-    "blockHash",
-    event.block.hash.toHexString()
-  )
-  assert.fieldEquals(
-    TRANSFER_ENTITY_TYPE,
-    generateTransferId(TEST_TX_HASH, logIndex),
-    "blockNumber",
-    event.block.number.toString()
-  )
-  assert.fieldEquals(
-    TRANSFER_ENTITY_TYPE,
-    generateTransferId(TEST_TX_HASH, logIndex),
-    "blockTimestamp",
-    event.block.timestamp.toString()
-  )
-});
-
-test("GenArt721CoreV3: Can handle mint transfer", () => {
-  clearStore();
-  const tokenId = BigInt.fromI32(0);
-  const fullTokenId = generateContractSpecificId(
-    TEST_CONTRACT_ADDRESS,
-    tokenId
-  );
-
-  const fromAddress = Address.zero();
-  const toAddress = randomAddressGenerator.generateRandomAddress();
-
-  const logIndex = BigInt.fromI32(0);
-  const event: Transfer = changetype<Transfer>(newMockEvent());
-  event.address = TEST_CONTRACT_ADDRESS;
-  event.transaction.hash = TEST_TX_HASH;
-  event.logIndex = logIndex;
-  event.parameters = [
-    new ethereum.EventParam("from", ethereum.Value.fromAddress(fromAddress)),
-    new ethereum.EventParam("to", ethereum.Value.fromAddress(toAddress)),
-    new ethereum.EventParam(
-      "tokenId",
-      ethereum.Value.fromUnsignedBigInt(tokenId)
-    )
-  ];
-
-  handleTransfer(event);
-
-  assert.fieldEquals(
-    TRANSFER_ENTITY_TYPE,
-    TEST_TX_HASH.toHex() + "-" + logIndex.toString(),
-    "to",
-    toAddress.toHexString()
-  );
-  assert.fieldEquals(
-    TRANSFER_ENTITY_TYPE,
-    TEST_TX_HASH.toHex() + "-" + logIndex.toString(),
-    "from",
-    fromAddress.toHexString()
-  );
-  assert.fieldEquals(
-    TRANSFER_ENTITY_TYPE,
-    TEST_TX_HASH.toHex() + "-" + logIndex.toString(),
-    "token",
-    fullTokenId
-  );
-
-  assert.fieldEquals(
-    TRANSFER_ENTITY_TYPE,
-    generateTransferId(TEST_TX_HASH, logIndex),
-    "blockHash",
-    event.block.hash.toHexString()
-  )
-  assert.fieldEquals(
-    TRANSFER_ENTITY_TYPE,
-    generateTransferId(TEST_TX_HASH, logIndex),
-    "blockNumber",
-    event.block.number.toString()
-  )
-  assert.fieldEquals(
-    TRANSFER_ENTITY_TYPE,
-    generateTransferId(TEST_TX_HASH, logIndex),
-    "blockTimestamp",
-    event.block.timestamp.toString()
-  )
 });
 
 test(`${coreType}: Handles OwnershipTransferred to new address and zero address, when Contract not in store`, () => {
@@ -620,20 +534,47 @@ test(`${coreType}: Handles PlatformUpdated::artblocksPrimarySalesAddress - defau
   );
 });
 
-test(`${coreType}: Handles PlatformUpdated::artblocksPrimarySalesAddress - changed value`, () => {
+test(`${coreType}: Handles PlatformUpdated::providerSalesAddresses - changed value`, () => {
   clearStore();
   // add new contract to store
   const projectId = BigInt.fromI32(0);
   addTestContractToStore(projectId);
   mockRefreshContractCalls(BigInt.fromI32(0), coreType, null);
 
-  // update mock function return value
-  const newAddress = randomAddressGenerator.generateRandomAddress();
+  // update mock function return values
+  const newRenderProviderPrimarySalesAddress = randomAddressGenerator.generateRandomAddress();
   createMockedFunction(
     TEST_CONTRACT_ADDRESS,
-    "artblocksPrimarySalesAddress",
-    "artblocksPrimarySalesAddress():(address)"
-  ).returns([ethereum.Value.fromAddress(newAddress)]);
+    "renderProviderPrimarySalesAddress",
+    "renderProviderPrimarySalesAddress():(address)"
+  ).returns([ethereum.Value.fromAddress(newRenderProviderPrimarySalesAddress)]);
+
+  const newRenderProviderSecondarySalesAddress = randomAddressGenerator.generateRandomAddress();
+  createMockedFunction(
+    TEST_CONTRACT_ADDRESS,
+    "renderProviderSecondarySalesAddress",
+    "renderProviderSecondarySalesAddress():(address)"
+  ).returns([
+    ethereum.Value.fromAddress(newRenderProviderSecondarySalesAddress)
+  ]);
+
+  const newPlatformProviderPrimarySalesAddress = randomAddressGenerator.generateRandomAddress();
+  createMockedFunction(
+    TEST_CONTRACT_ADDRESS,
+    "platformProviderPrimarySalesAddress",
+    "platformProviderPrimarySalesAddress():(address)"
+  ).returns([
+    ethereum.Value.fromAddress(newPlatformProviderPrimarySalesAddress)
+  ]);
+
+  const newPlatformProviderSecondarySalesAddress = randomAddressGenerator.generateRandomAddress();
+  createMockedFunction(
+    TEST_CONTRACT_ADDRESS,
+    "platformProviderSecondarySalesAddress",
+    "platformProviderSecondarySalesAddress():(address)"
+  ).returns([
+    ethereum.Value.fromAddress(newPlatformProviderSecondarySalesAddress)
+  ]);
 
   // create event
   const event: PlatformUpdated = changetype<PlatformUpdated>(newMockEvent());
@@ -643,22 +584,40 @@ test(`${coreType}: Handles PlatformUpdated::artblocksPrimarySalesAddress - chang
   event.parameters = [
     new ethereum.EventParam(
       "_field",
-      ethereum.Value.fromBytes(Bytes.fromUTF8("artblocksPrimarySalesAddress"))
+      ethereum.Value.fromBytes(Bytes.fromUTF8("providerSalesAddresses"))
     )
   ];
   // handle event
   handlePlatformUpdated(event);
 
-  // value in store should be updated
+  // all four payment addresses in store should be updated
   assert.fieldEquals(
     CONTRACT_ENTITY_TYPE,
     TEST_CONTRACT_ADDRESS.toHexString(),
     "renderProviderAddress",
-    newAddress.toHexString()
+    newRenderProviderPrimarySalesAddress.toHexString()
+  );
+  assert.fieldEquals(
+    CONTRACT_ENTITY_TYPE,
+    TEST_CONTRACT_ADDRESS.toHexString(),
+    "renderProviderSecondarySalesAddress",
+    newRenderProviderSecondarySalesAddress.toHexString()
+  );
+  assert.fieldEquals(
+    CONTRACT_ENTITY_TYPE,
+    TEST_CONTRACT_ADDRESS.toHexString(),
+    "enginePlatformProviderAddress",
+    newPlatformProviderPrimarySalesAddress.toHexString()
+  );
+  assert.fieldEquals(
+    CONTRACT_ENTITY_TYPE,
+    TEST_CONTRACT_ADDRESS.toHexString(),
+    "enginePlatformProviderSecondarySalesAddress",
+    newPlatformProviderSecondarySalesAddress.toHexString()
   );
 });
 
-test(`${coreType}: Handles PlatformUpdated::artblocksSecondarySalesAddress - default value`, () => {
+test(`${coreType}: Handles PlatformUpdated::providerPrimaryPercentages - default value`, () => {
   // default value is false
   clearStore();
   // add new contract to store
@@ -672,44 +631,6 @@ test(`${coreType}: Handles PlatformUpdated::artblocksSecondarySalesAddress - def
     TEST_CONTRACT_ADDRESS.toHexString(),
     "renderProviderSecondarySalesAddress",
     TEST_CONTRACT.renderProviderSecondarySalesAddress.toHexString()
-  );
-});
-
-test(`${coreType}: Handles PlatformUpdated::artblocksSecondarySalesAddress - changed value`, () => {
-  clearStore();
-  // add new contract to store
-  const projectId = BigInt.fromI32(0);
-  addTestContractToStore(projectId);
-  mockRefreshContractCalls(BigInt.fromI32(0), coreType, null);
-
-  // update mock function return value
-  const newAddress = randomAddressGenerator.generateRandomAddress();
-  createMockedFunction(
-    TEST_CONTRACT_ADDRESS,
-    "artblocksSecondarySalesAddress",
-    "artblocksSecondarySalesAddress():(address)"
-  ).returns([ethereum.Value.fromAddress(newAddress)]);
-
-  // create event
-  const event: PlatformUpdated = changetype<PlatformUpdated>(newMockEvent());
-  event.address = TEST_CONTRACT_ADDRESS;
-  event.transaction.hash = TEST_TX_HASH;
-  event.logIndex = BigInt.fromI32(0);
-  event.parameters = [
-    new ethereum.EventParam(
-      "_field",
-      ethereum.Value.fromBytes(Bytes.fromUTF8("artblocksSecondarySalesAddress"))
-    )
-  ];
-  // handle event
-  handlePlatformUpdated(event);
-
-  // value in store should be updated
-  assert.fieldEquals(
-    CONTRACT_ENTITY_TYPE,
-    TEST_CONTRACT_ADDRESS.toHexString(),
-    "renderProviderSecondarySalesAddress",
-    newAddress.toHexString()
   );
 });
 
@@ -776,7 +697,7 @@ test(`${coreType}: Handles PlatformUpdated::curationRegistryAddress - default va
   addTestContractToStore(projectId);
   mockRefreshContractCalls(BigInt.fromI32(0), coreType, null);
 
-  // default value should be false
+  // default value should be nothing
   assert.fieldEquals(
     CONTRACT_ENTITY_TYPE,
     TEST_CONTRACT_ADDRESS.toHexString(),
@@ -785,22 +706,22 @@ test(`${coreType}: Handles PlatformUpdated::curationRegistryAddress - default va
   );
 });
 
-test(`${coreType}: Handles PlatformUpdated::curationRegistryAddress - changed value`, () => {
+test(`${coreType}: Null curationRegistryAddress on Engine contract`, () => {
   clearStore();
   // add new contract to store
   const projectId = BigInt.fromI32(0);
   addTestContractToStore(projectId);
   mockRefreshContractCalls(BigInt.fromI32(0), coreType, null);
 
-  // update mock function return value
+  // update mock function for curation registry to revert
   const newAddress = randomAddressGenerator.generateRandomAddress();
   createMockedFunction(
     TEST_CONTRACT_ADDRESS,
     "artblocksCurationRegistryAddress",
     "artblocksCurationRegistryAddress():(address)"
-  ).returns([ethereum.Value.fromAddress(newAddress)]);
+  ).reverts();
 
-  // create event
+  // create dummy event to induce contract sync
   const event: PlatformUpdated = changetype<PlatformUpdated>(newMockEvent());
   event.address = TEST_CONTRACT_ADDRESS;
   event.transaction.hash = TEST_TX_HASH;
@@ -808,18 +729,18 @@ test(`${coreType}: Handles PlatformUpdated::curationRegistryAddress - changed va
   event.parameters = [
     new ethereum.EventParam(
       "_field",
-      ethereum.Value.fromBytes(Bytes.fromUTF8("curationRegistryAddress"))
+      ethereum.Value.fromBytes(Bytes.fromUTF8("dummyField"))
     )
   ];
   // handle event
   handlePlatformUpdated(event);
 
-  // value in store should be updated
+  // value in store should reflect a null curation registry address
   assert.fieldEquals(
     CONTRACT_ENTITY_TYPE,
     TEST_CONTRACT_ADDRESS.toHexString(),
     "curationRegistry",
-    newAddress.toHexString()
+    "null"
   );
 });
 
@@ -837,43 +758,6 @@ test(`${coreType}: Handles PlatformUpdated::dependencyRegistryAddress - default 
     TEST_CONTRACT_ADDRESS.toHexString(),
     "dependencyRegistry",
     TEST_CONTRACT.dependencyRegistry.toHexString()
-  );
-});
-
-test(`${coreType}: autoApproveAtistSplitProposals always false on Engine contract`, () => {
-  clearStore();
-  // add new contract to store
-  const projectId = BigInt.fromI32(0);
-  addTestContractToStore(projectId);
-  mockRefreshContractCalls(BigInt.fromI32(0), coreType, null);
-
-  // update mock function for autoApproveArtistSplitProposals to revert
-  createMockedFunction(
-    TEST_CONTRACT_ADDRESS,
-    "autoApproveArtistSplitProposals",
-    "autoApproveArtistSplitProposals():(bool)"
-  ).reverts();
-
-  // create dummy event to induce contract sync
-  const event: PlatformUpdated = changetype<PlatformUpdated>(newMockEvent());
-  event.address = TEST_CONTRACT_ADDRESS;
-  event.transaction.hash = TEST_TX_HASH;
-  event.logIndex = BigInt.fromI32(0);
-  event.parameters = [
-    new ethereum.EventParam(
-      "_field",
-      ethereum.Value.fromBytes(Bytes.fromUTF8("dummyField"))
-    )
-  ];
-  // handle event
-  handlePlatformUpdated(event);
-
-  // value in store should always be false for Flagship contract
-  assert.fieldEquals(
-    CONTRACT_ENTITY_TYPE,
-    TEST_CONTRACT_ADDRESS.toHexString(),
-    "autoApproveArtistSplitProposals",
-    "false"
   );
 });
 
@@ -915,7 +799,48 @@ test(`${coreType}: Handles PlatformUpdated::dependencyRegistryAddress - changed 
   );
 });
 
-test(`${coreType}: Handles PlatformUpdated::artblocksPrimaryPercentage - default value`, () => {
+test(`${coreType}: Populated autoApproveAtistSplitProposals on Engine contract`, () => {
+  clearStore();
+  // add new contract to store
+  const projectId = BigInt.fromI32(0);
+  addTestContractToStore(projectId);
+  mockRefreshContractCalls(BigInt.fromI32(0), coreType, null);
+
+  // update mock function for autoApproveArtistSplitProposals to return tested value
+  const valuesToTest = [true, false];
+  for (let i = 0; i < valuesToTest.length; i++) {
+    const val = valuesToTest[i];
+    createMockedFunction(
+      TEST_CONTRACT_ADDRESS,
+      "autoApproveArtistSplitProposals",
+      "autoApproveArtistSplitProposals():(bool)"
+    ).returns([ethereum.Value.fromBoolean(val)]);
+
+    // create dummy event to induce contract sync
+    const event: PlatformUpdated = changetype<PlatformUpdated>(newMockEvent());
+    event.address = TEST_CONTRACT_ADDRESS;
+    event.transaction.hash = TEST_TX_HASH;
+    event.logIndex = BigInt.fromI32(0);
+    event.parameters = [
+      new ethereum.EventParam(
+        "_field",
+        ethereum.Value.fromBytes(Bytes.fromUTF8("dummyField"))
+      )
+    ];
+    // handle event
+    handlePlatformUpdated(event);
+
+    // value in store should reflect a null curation registry address
+    assert.fieldEquals(
+      CONTRACT_ENTITY_TYPE,
+      TEST_CONTRACT_ADDRESS.toHexString(),
+      "autoApproveArtistSplitProposals",
+      val.toString()
+    );
+  }
+});
+
+test(`${coreType}: Handles PlatformUpdated::providerPrimaryPercentages - default value`, () => {
   // default value is false
   clearStore();
   // add new contract to store
@@ -932,20 +857,31 @@ test(`${coreType}: Handles PlatformUpdated::artblocksPrimaryPercentage - default
   );
 });
 
-test(`${coreType}: Handles PlatformUpdated::artblocksPrimaryPercentage - changed value`, () => {
+test(`${coreType}: Handles PlatformUpdated::providerPrimaryPercentages - changed value`, () => {
   clearStore();
   // add new contract to store
   const projectId = BigInt.fromI32(0);
   addTestContractToStore(projectId);
   mockRefreshContractCalls(BigInt.fromI32(0), coreType, null);
 
-  // update mock function return value
-  const newValue = BigInt.fromI32(13);
+  // update mock function return values
+  const newRenderProviderPrimarySalesPercentage = BigInt.fromI32(13);
   createMockedFunction(
     TEST_CONTRACT_ADDRESS,
-    "artblocksPrimarySalesPercentage",
-    "artblocksPrimarySalesPercentage():(uint256)"
-  ).returns([ethereum.Value.fromUnsignedBigInt(newValue)]);
+    "renderProviderPrimarySalesPercentage",
+    "renderProviderPrimarySalesPercentage():(uint256)"
+  ).returns([
+    ethereum.Value.fromUnsignedBigInt(newRenderProviderPrimarySalesPercentage)
+  ]);
+
+  const newPlatformProviderPrimarySalesPercentage = BigInt.fromI32(14);
+  createMockedFunction(
+    TEST_CONTRACT_ADDRESS,
+    "platformProviderPrimarySalesPercentage",
+    "platformProviderPrimarySalesPercentage():(uint256)"
+  ).returns([
+    ethereum.Value.fromUnsignedBigInt(newPlatformProviderPrimarySalesPercentage)
+  ]);
 
   // create event
   const event: PlatformUpdated = changetype<PlatformUpdated>(newMockEvent());
@@ -955,22 +891,28 @@ test(`${coreType}: Handles PlatformUpdated::artblocksPrimaryPercentage - changed
   event.parameters = [
     new ethereum.EventParam(
       "_field",
-      ethereum.Value.fromBytes(Bytes.fromUTF8("artblocksPrimaryPercentage"))
+      ethereum.Value.fromBytes(Bytes.fromUTF8("providerPrimaryPercentages"))
     )
   ];
   // handle event
   handlePlatformUpdated(event);
 
-  // value in store should be updated
+  // values in store should be updated
   assert.fieldEquals(
     CONTRACT_ENTITY_TYPE,
     TEST_CONTRACT_ADDRESS.toHexString(),
     "renderProviderPercentage",
-    newValue.toString()
+    newRenderProviderPrimarySalesPercentage.toString()
+  );
+  assert.fieldEquals(
+    CONTRACT_ENTITY_TYPE,
+    TEST_CONTRACT_ADDRESS.toHexString(),
+    "enginePlatformProviderPercentage",
+    newPlatformProviderPrimarySalesPercentage.toString()
   );
 });
 
-test(`${coreType}: Handles PlatformUpdated::artblocksSecondaryBPS - default value`, () => {
+test(`${coreType}: Handles PlatformUpdated::providerSecondaryBPS - default value`, () => {
   // default value is false
   clearStore();
   // add new contract to store
@@ -987,20 +929,31 @@ test(`${coreType}: Handles PlatformUpdated::artblocksSecondaryBPS - default valu
   );
 });
 
-test(`${coreType}: Handles PlatformUpdated::artblocksSecondaryBPS - changed value`, () => {
+test(`${coreType}: Handles PlatformUpdated::providerSecondaryBPS - changed value`, () => {
   clearStore();
   // add new contract to store
   const projectId = BigInt.fromI32(0);
   addTestContractToStore(projectId);
   mockRefreshContractCalls(BigInt.fromI32(0), coreType, null);
 
-  // update mock function return value
-  const newValue = BigInt.fromI32(250);
+  // update mock function return values
+  const newRenderProviderSecondarySalesBPS = BigInt.fromI32(250);
   createMockedFunction(
     TEST_CONTRACT_ADDRESS,
-    "artblocksSecondarySalesBPS",
-    "artblocksSecondarySalesBPS():(uint256)"
-  ).returns([ethereum.Value.fromUnsignedBigInt(newValue)]);
+    "renderProviderSecondarySalesBPS",
+    "renderProviderSecondarySalesBPS():(uint256)"
+  ).returns([
+    ethereum.Value.fromUnsignedBigInt(newRenderProviderSecondarySalesBPS)
+  ]);
+
+  const newPlatformProviderSecondarySalesBPS = BigInt.fromI32(200);
+  createMockedFunction(
+    TEST_CONTRACT_ADDRESS,
+    "platformProviderSecondarySalesBPS",
+    "platformProviderSecondarySalesBPS():(uint256)"
+  ).returns([
+    ethereum.Value.fromUnsignedBigInt(newPlatformProviderSecondarySalesBPS)
+  ]);
 
   // create event
   const event: PlatformUpdated = changetype<PlatformUpdated>(newMockEvent());
@@ -1010,18 +963,24 @@ test(`${coreType}: Handles PlatformUpdated::artblocksSecondaryBPS - changed valu
   event.parameters = [
     new ethereum.EventParam(
       "_field",
-      ethereum.Value.fromBytes(Bytes.fromUTF8("artblocksSecondaryBPS"))
+      ethereum.Value.fromBytes(Bytes.fromUTF8("providerSecondaryBPS"))
     )
   ];
   // handle event
   handlePlatformUpdated(event);
 
-  // value in store should be updated
+  // values in store should be updated
   assert.fieldEquals(
     CONTRACT_ENTITY_TYPE,
     TEST_CONTRACT_ADDRESS.toHexString(),
     "renderProviderSecondarySalesBPS",
-    newValue.toString()
+    newRenderProviderSecondarySalesBPS.toString()
+  );
+  assert.fieldEquals(
+    CONTRACT_ENTITY_TYPE,
+    TEST_CONTRACT_ADDRESS.toHexString(),
+    "enginePlatformProviderSecondarySalesBPS",
+    newPlatformProviderSecondarySalesBPS.toString()
   );
 });
 
