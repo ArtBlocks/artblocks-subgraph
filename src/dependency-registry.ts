@@ -13,10 +13,11 @@ import {
   ProjectDependencyTypeOverrideAdded,
   ProjectDependencyTypeOverrideRemoved,
   SupportedCoreContractAdded,
-  SupportedCoreContractRemoved
-} from "../generated/DependencyRegistryV0/IDependencyRegistryV0";
-import { OwnershipTransferred } from "../generated/DependencyRegistryV0/OwnableUpgradeable";
-import { IDependencyRegistryCompatibleV0 } from "../generated/DependencyRegistryV0/IDependencyRegistryCompatibleV0";
+  SupportedCoreContractRemoved,
+  IDependencyRegistryV0
+} from "../generated/IDependencyRegistryV0/IDependencyRegistryV0";
+import { OwnershipTransferred } from "../generated/OwnableUpgradeable/OwnableUpgradeable";
+import { IDependencyRegistryCompatibleV0 } from "../generated/IDependencyRegistryV0/IDependencyRegistryCompatibleV0";
 import {
   Contract,
   Dependency,
@@ -32,7 +33,6 @@ import {
   generateDependencyAdditionalRepositoryId,
   generateDependencyScriptId
 } from "./helpers";
-import { DependencyRegistryV0 } from "../generated/DependencyRegistryV0/DependencyRegistryV0";
 
 export function handleDependencyAdded(event: DependencyAdded): void {
   const dependency = new Dependency(event.params._dependencyType.toString());
@@ -245,7 +245,7 @@ export function handleDependencyScriptUpdated(
     return;
   }
 
-  const dependencyRegistryContract = DependencyRegistryV0.bind(event.address);
+  const dependencyRegistryContract = IDependencyRegistryV0.bind(event.address);
   let prevScriptCount = dependency.scriptCount.toI32();
   const scriptCount = dependencyRegistryContract
     .getDependencyScriptCount(event.params._dependencyType)

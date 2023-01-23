@@ -39,9 +39,9 @@ import {
   ProjectDependencyTypeOverrideRemoved,
   SupportedCoreContractAdded,
   SupportedCoreContractRemoved
-} from "../../../generated/DependencyRegistryV0/IDependencyRegistryV0";
+} from "../../../generated/IDependencyRegistryV0/IDependencyRegistryV0";
 
-import { OwnershipTransferred } from "../../../generated/DependencyRegistryV0/OwnableUpgradeable";
+import { OwnershipTransferred } from "../../../generated/OwnableUpgradeable/OwnableUpgradeable";
 
 import {
   handleDependencyAdded,
@@ -1488,7 +1488,12 @@ describe("DependencyRegistry", () => {
         "scriptCount",
         "0"
       );
-      assert.fieldEquals("Dependency", EXISTING_DEPENDENCY_TYPE, "script", "");
+      assert.fieldEquals(
+        "Dependency",
+        EXISTING_DEPENDENCY_TYPE,
+        "script",
+        "null"
+      );
       assert.fieldEquals(
         "Dependency",
         EXISTING_DEPENDENCY_TYPE,
