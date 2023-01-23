@@ -85,7 +85,17 @@
       "address": ""
     }
   ],
+  "minterSetPriceV3Contracts": [
+    {
+      "address": ""
+    }
+  ],
   "minterSetPriceERC20V2Contracts": [
+    {
+      "address": ""
+    }
+  ],
+  "minterSetPriceERC20V3Contracts": [
     {
       "address": ""
     }
@@ -95,7 +105,17 @@
       "address": ""
     }
   ],
+  "minterDALinV3Contracts": [
+    {
+      "address": ""
+    }
+  ],
   "minterDAExpV2Contracts": [
+    {
+      "address": ""
+    }
+  ],
+  "minterDAExpV3Contracts": [
     {
       "address": ""
     }
@@ -125,6 +145,11 @@
       "address": ""
     }
   ],
+  "minterMerkleV4Contracts": [
+    {
+      "address": ""
+    }
+  ],
   "minterHolderV0Contracts": [
     {
       "address": ""
@@ -136,6 +161,11 @@
     }
   ],
   "minterHolderV2Contracts": [
+    {
+      "address": ""
+    }
+  ],
+  "minterHolderV3Contracts": [
     {
       "address": ""
     }

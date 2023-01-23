@@ -154,7 +154,7 @@ export function handlePurchaseToDisabledUpdated(
 }
 
 // IFilteredMinterV2 events
-export function ProjectMaxInvocationsLimitUpdated(
+export function handleProjectMaxInvocationsLimitUpdated(
   event: ProjectMaxInvocationsLimitUpdated
 ): void {
   let minterProjectAndConfig = loadMinterProjectAndConfig(

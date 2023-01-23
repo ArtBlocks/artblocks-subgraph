@@ -2033,6 +2033,23 @@ export class ProjectMinterConfiguration extends Entity {
   set extraMinterDetails(value: string) {
     this.set("extraMinterDetails", Value.fromString(value));
   }
+
+  get maxInvocations(): BigInt | null {
+    let value = this.get("maxInvocations");
+    if (!value || value.kind == ValueKind.NULL) {
+      return null;
+    } else {
+      return value.toBigInt();
+    }
+  }
+
+  set maxInvocations(value: BigInt | null) {
+    if (!value) {
+      this.unset("maxInvocations");
+    } else {
+      this.set("maxInvocations", Value.fromBigInt(<BigInt>value));
+    }
+  }
 }
 
 export class Receipt extends Entity {
