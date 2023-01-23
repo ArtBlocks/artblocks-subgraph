@@ -18,6 +18,8 @@ import {
   PurchaseToDisabledUpdated
 } from "../generated/MinterSetPriceV0/IFilteredMinterV0";
 
+import { ProjectMaxInvocationsLimitUpdated } from "../generated/MinterSetPriceV3/IFilteredMinterV2";
+
 import {
   MinimumAuctionLengthSecondsUpdated,
   ResetAuctionDetails as DALinResetAuctionDetails,
