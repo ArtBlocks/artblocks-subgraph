@@ -906,12 +906,14 @@ test(`${coreType}: Handles PlatformUpdated::dependencyRegistryAddress - changed 
   // handle event
   handlePlatformUpdated(event);
 
-  // value in store should be updated
+  // value in store should not be updated
+  // We allow the dependency registry to control this field
+  // and not the engine contract so nothing should change.
   assert.fieldEquals(
     CONTRACT_ENTITY_TYPE,
     TEST_CONTRACT_ADDRESS.toHexString(),
     "dependencyRegistry",
-    TEST_CONTRACT.dependencyRegistry.toHexString()
+    Address.zero().toHexString()
   );
 });
 
