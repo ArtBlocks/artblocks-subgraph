@@ -784,7 +784,6 @@ function refreshContract(
   }
   contractEntity.newProjectsForbidden = contract.newProjectsForbidden();
   contractEntity.curationRegistry = contract.artblocksCurationRegistryAddress();
-  contractEntity.dependencyRegistry = contract.artblocksDependencyRegistryAddress();
 
   contractEntity.updatedAt = timestamp;
 
