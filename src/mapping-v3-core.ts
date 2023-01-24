@@ -1,16 +1,20 @@
 import { BigInt, store, log, Address, Bytes } from "@graphprotocol/graph-ts";
 
 import {
-  GenArt721CoreV3,
   Mint,
   ProjectUpdated,
-  Transfer,
   PlatformUpdated,
   MinterUpdated,
   ProposedArtistAddressesAndSplits as ProposedArtistAddressesAndSplitsEvent,
-  AcceptedArtistAddressesAndSplits,
-  OwnershipTransferred
-} from "../generated/GenArt721CoreV3/GenArt721CoreV3";
+  AcceptedArtistAddressesAndSplits
+} from "../generated/GenArt721CoreV3/IGenArt721CoreContractV3_Base";
+
+import { GenArt721CoreV3 } from "../generated/GenArt721CoreV3/GenArt721CoreV3";
+import { GenArt721CoreV3_Engine } from "../generated/GenArt721CoreV3/GenArt721CoreV3_Engine";
+
+import { Transfer } from "../generated/GenArt721CoreV3/IERC721";
+
+import { OwnershipTransferred } from "../generated/GenArt721CoreV3/Ownable";
 
 import {
   IAdminACLV0,
@@ -38,7 +42,8 @@ import {
   generateContractSpecificId,
   generateProjectScriptId,
   addWhitelisting,
-  removeWhitelisting
+  removeWhitelisting,
+  generateTransferId
 } from "./helpers";
 
 import { NULL_ADDRESS } from "./constants";
@@ -62,15 +67,37 @@ export function handleIAdminACLV0SuperAdminTransferred(
     let contractEntity = Contract.load(contractAddress.toHexString());
     if (contractEntity) {
       // refresh the contract entity to pick up the new super admin
-      let contract = GenArt721CoreV3.bind(contractAddress);
-      refreshContract(contract, event.block.timestamp);
+      refreshContractAtAddress(contractAddress, event.block.timestamp);
     }
   }
 }
 
 export function handleMint(event: Mint): void {
-  let contract = GenArt721CoreV3.bind(event.address);
+  const flagshipContract = getV3FlagshipContract(event.address);
+  if (flagshipContract) {
+    _handleMint(flagshipContract, event);
+    return;
+  }
+  const engineContract = getV3EngineContract(event.address);
+  if (engineContract) {
+    _handleMint(engineContract, event);
+    return;
+  }
+  log.warning("[WARN] Unknown V3 coreType for contract at address {}.", [
+    event.address.toHexString()
+  ]);
+}
 
+// helper function for `handleMint`
+function _handleMint<T>(contract: T, event: Mint): void {
+  if (
+    !(
+      contract instanceof GenArt721CoreV3 ||
+      contract instanceof GenArt721CoreV3_Engine
+    )
+  ) {
+    return;
+  }
   let token = new Token(
     generateContractSpecificId(event.address, event.params._tokenId)
   );
@@ -129,9 +156,11 @@ export function handleMint(event: Mint): void {
 export function handleTransfer(event: Transfer): void {
   // This will only create a new token if a token with the
   // same id does not already exist
-  let token = Token.load(
-    generateContractSpecificId(event.address, event.params.tokenId)
+  const tokenId = generateContractSpecificId(
+    event.address,
+    event.params.tokenId
   );
+  let token = Token.load(tokenId);
 
   // Let mint handlers deal with new tokens
   if (token) {
@@ -175,17 +204,20 @@ export function handleTransfer(event: Transfer): void {
     token.owner = event.params.to.toHexString();
     token.updatedAt = event.block.timestamp;
     token.save();
-
-    let transfer = new TokenTransfer(
-      event.transaction.hash.toHex() + "-" + event.logIndex.toString()
-    );
-    transfer.transactionHash = event.transaction.hash;
-    transfer.createdAt = event.block.timestamp;
-    transfer.to = event.params.to;
-    transfer.from = event.params.from;
-    transfer.token = token.id;
-    transfer.save();
   }
+
+  let transfer = new TokenTransfer(
+    generateTransferId(event.transaction.hash, event.logIndex)
+  );
+  transfer.transactionHash = event.transaction.hash;
+  transfer.to = event.params.to;
+  transfer.from = event.params.from;
+  transfer.token = tokenId;
+
+  transfer.blockHash = event.block.hash;
+  transfer.blockNumber = event.block.number;
+  transfer.blockTimestamp = event.block.timestamp;
+  transfer.save();
 }
 
 export const FIELD_PROJECT_ACTIVE = "active";
@@ -208,7 +240,32 @@ export const FIELD_PROJECT_WEBSITE = "website";
 
 export function handleProjectUpdated(event: ProjectUpdated): void {
   log.info("handleProjectUpdated", []);
-  let contract = GenArt721CoreV3.bind(event.address);
+  const flagshipContract = getV3FlagshipContract(event.address);
+  if (flagshipContract) {
+    _handleProjectUpdated(flagshipContract, event);
+    return;
+  }
+  const engineContract = getV3EngineContract(event.address);
+  if (engineContract) {
+    _handleProjectUpdated(engineContract, event);
+    return;
+  }
+  log.warning("[WARN] Unknown V3 coreType for contract at address {}.", [
+    event.address.toHexString()
+  ]);
+}
+
+// helper function for `handleProjectUpdated`
+function _handleProjectUpdated<T>(contract: T, event: ProjectUpdated): void {
+  if (
+    !(
+      contract instanceof GenArt721CoreV3 ||
+      contract instanceof GenArt721CoreV3_Engine
+    )
+  ) {
+    return;
+  }
+
   const update = event.params._update.toString();
   const timestamp = event.block.timestamp;
   const projectId = event.params._projectId;
@@ -271,11 +328,19 @@ export function handleProjectUpdated(event: ProjectUpdated): void {
 }
 
 /*** PROJECT UPDATED FUNCTIONS ***/
-function handleProjectStateDataUpdated(
-  contract: GenArt721CoreV3,
+function handleProjectStateDataUpdated<T>(
+  contract: T,
   project: Project,
   timestamp: BigInt
 ): void {
+  if (
+    !(
+      contract instanceof GenArt721CoreV3 ||
+      contract instanceof GenArt721CoreV3_Engine
+    )
+  ) {
+    return;
+  }
   const projectStateData = contract.try_projectStateData(project.projectId);
   if (!projectStateData.reverted) {
     project.active = projectStateData.value.getActive();
@@ -286,11 +351,19 @@ function handleProjectStateDataUpdated(
   }
 }
 
-function handleProjectArtistAddressUpdated(
-  contract: GenArt721CoreV3,
+function handleProjectArtistAddressUpdated<T>(
+  contract: T,
   project: Project,
   timestamp: BigInt
 ): void {
+  if (
+    !(
+      contract instanceof GenArt721CoreV3 ||
+      contract instanceof GenArt721CoreV3_Engine
+    )
+  ) {
+    return;
+  }
   const projectArtistAddress = contract.try_projectIdToArtistAddress(
     project.projectId
   );
@@ -301,11 +374,19 @@ function handleProjectArtistAddressUpdated(
   }
 }
 
-function handleProjectDetailsUpdated(
-  contract: GenArt721CoreV3,
+function handleProjectDetailsUpdated<T>(
+  contract: T,
   project: Project,
   timestamp: BigInt
 ): void {
+  if (
+    !(
+      contract instanceof GenArt721CoreV3 ||
+      contract instanceof GenArt721CoreV3_Engine
+    )
+  ) {
+    return;
+  }
   const projectDetails = contract.try_projectDetails(project.projectId);
   if (!projectDetails.reverted) {
     project.artistName = projectDetails.value.getArtist();
@@ -318,11 +399,19 @@ function handleProjectDetailsUpdated(
   }
 }
 
-function handleProjectScriptDetailsUpdated(
-  contract: GenArt721CoreV3,
+function handleProjectScriptDetailsUpdated<T>(
+  contract: T,
   project: Project,
   timestamp: BigInt
 ): void {
+  if (
+    !(
+      contract instanceof GenArt721CoreV3 ||
+      contract instanceof GenArt721CoreV3_Engine
+    )
+  ) {
+    return;
+  }
   const projectScriptDetails = contract.try_projectScriptDetails(
     project.projectId
   );
@@ -334,11 +423,19 @@ function handleProjectScriptDetailsUpdated(
   }
 }
 
-function handleProjectBaseURIUpdated(
-  contract: GenArt721CoreV3,
+function handleProjectBaseURIUpdated<T>(
+  contract: T,
   project: Project,
   timestamp: BigInt
 ): void {
+  if (
+    !(
+      contract instanceof GenArt721CoreV3 ||
+      contract instanceof GenArt721CoreV3_Engine
+    )
+  ) {
+    return;
+  }
   const projectBaseURI = contract.try_projectURIInfo(project.projectId);
   if (!projectBaseURI.reverted) {
     project.baseUri = projectBaseURI.value;
@@ -354,11 +451,19 @@ function handleProjectCompleted(project: Project, timestamp: BigInt): void {
   project.save();
 }
 
-function handleProjectSecondaryMarketRoyaltyPercentageUpdated(
-  contract: GenArt721CoreV3,
+function handleProjectSecondaryMarketRoyaltyPercentageUpdated<T>(
+  contract: T,
   project: Project,
   timestamp: BigInt
 ): void {
+  if (
+    !(
+      contract instanceof GenArt721CoreV3 ||
+      contract instanceof GenArt721CoreV3_Engine
+    )
+  ) {
+    return;
+  }
   const projectSecondaryMarketRoyaltyPercentage = contract.try_projectIdToSecondaryMarketRoyaltyPercentage(
     project.projectId
   );
@@ -369,11 +474,19 @@ function handleProjectSecondaryMarketRoyaltyPercentageUpdated(
   }
 }
 
-function createProject(
-  contract: GenArt721CoreV3,
+function createProject<T>(
+  contract: T,
   projectId: BigInt,
   timestamp: BigInt
 ): Project | null {
+  if (
+    !(
+      contract instanceof GenArt721CoreV3 ||
+      contract instanceof GenArt721CoreV3_Engine
+    )
+  ) {
+    return null;
+  }
   const contractAddress = contract._address.toHexString();
   let contractEntity = Contract.load(contractAddress);
   // Starting with v3, the contract entity should always exists
@@ -453,11 +566,19 @@ function createProject(
   return project;
 }
 
-function refreshProjectScript(
-  contract: GenArt721CoreV3,
+function refreshProjectScript<T>(
+  contract: T,
   project: Project,
   timestamp: BigInt
 ): void {
+  if (
+    !(
+      contract instanceof GenArt721CoreV3 ||
+      contract instanceof GenArt721CoreV3_Engine
+    )
+  ) {
+    return;
+  }
   let scriptDetails = contract.try_projectScriptDetails(project.projectId);
   if (scriptDetails.reverted) {
     log.warning("Could not retrive script info for project {}", [project.id]);
@@ -516,7 +637,24 @@ function refreshProjectScript(
 // contract state variables. All of the expected `_field` values are handled in
 // the `refreshContract` helper function.
 export function handlePlatformUpdated(event: PlatformUpdated): void {
-  let contract = GenArt721CoreV3.bind(event.address);
+  log.info("handleProjectUpdated", []);
+  const flagshipContract = getV3FlagshipContract(event.address);
+  if (flagshipContract) {
+    _handlePlatformUpdated(flagshipContract, event);
+    return;
+  }
+  const engineContract = getV3EngineContract(event.address);
+  if (engineContract) {
+    _handlePlatformUpdated(engineContract, event);
+    return;
+  }
+  log.warning("[WARN] Unknown V3 coreType for contract at address {}.", [
+    event.address.toHexString()
+  ]);
+}
+
+// helper function for `handlePlatformUpdated`
+function _handlePlatformUpdated<T>(contract: T, event: PlatformUpdated): void {
   refreshContract(contract, event.block.timestamp);
 }
 
@@ -527,9 +665,52 @@ export function handlePlatformUpdated(event: PlatformUpdated): void {
 // @dev it can be assumed that the minter on V3 is a MinterFilter contract that
 // conforms to IMinterFilterV0, unless the minter address is the zero address.
 export function handleMinterUpdated(event: MinterUpdated): void {
-  let contract = GenArt721CoreV3.bind(event.address);
+  const flagshipContract = getV3FlagshipContract(event.address);
+  if (flagshipContract) {
+    _handleMinterUpdated(flagshipContract, event);
+    return;
+  }
+  const engineContract = getV3EngineContract(event.address);
+  if (engineContract) {
+    _handleMinterUpdated(engineContract, event);
+    return;
+  }
+  log.warning("[WARN] Unknown V3 coreType for contract at address {}.", [
+    event.address.toHexString()
+  ]);
+}
 
+// helper function for `handleMinterUpdated`
+function _handleMinterUpdated<T>(contract: T, event: MinterUpdated): void {
+  if (
+    !(
+      contract instanceof GenArt721CoreV3 ||
+      contract instanceof GenArt721CoreV3_Engine
+    )
+  ) {
+    return;
+  }
+  // load or create contract entity
   let contractEntity = loadOrCreateContract(contract, event.block.timestamp);
+  if (!contractEntity) {
+    // this should never happen
+    return;
+  }
+  if (contract instanceof GenArt721CoreV3_Engine) {
+    // For Engine contracts, only index minter filters that are in the config
+    // and actively being indexed
+    let minterFilter = MinterFilter.load(
+      event.params._currentMinter.toHexString()
+    );
+    if (!minterFilter) {
+      // minter filter is not in config, set minterFilter to null
+      contractEntity.minterFilter = null;
+      contractEntity.save();
+      // refresh contract to update mintWhitelisted
+      refreshContract(contract, event.block.timestamp);
+      return;
+    }
+  }
 
   // Clear the minter config for all projects on core contract when a new
   // minter filter is set
@@ -679,7 +860,26 @@ export function handleAcceptedArtistAddressesAndSplits(
 // Handle OwnershipTransferred event, emitted by the Ownable contract.
 // This event is updated whenever an admin address is changed.
 export function handleOwnershipTransferred(event: OwnershipTransferred): void {
-  let contract = GenArt721CoreV3.bind(event.address);
+  const flagshipContract = getV3FlagshipContract(event.address);
+  if (flagshipContract) {
+    _handleOwnershipTransferred(flagshipContract, event);
+    return;
+  }
+  const engineContract = getV3EngineContract(event.address);
+  if (engineContract) {
+    _handleOwnershipTransferred(engineContract, event);
+    return;
+  }
+  log.warning("[WARN] Unknown V3 coreType for contract at address {}.", [
+    event.address.toHexString()
+  ]);
+}
+
+// helper function for `handleOwnershipTransferred`
+function _handleOwnershipTransferred<T>(
+  contract: T,
+  event: OwnershipTransferred
+): void {
   // refresh the contract to get the latest admin address
   refreshContract(contract, event.block.timestamp);
 }
@@ -691,10 +891,18 @@ export function handleOwnershipTransferred(event: OwnershipTransferred): void {
 /** HELPERS ***/
 
 // loads or creates a contract entity and returns it.
-function loadOrCreateContract(
-  contract: GenArt721CoreV3,
+function loadOrCreateContract<T>(
+  contract: T,
   timestamp: BigInt
-): Contract {
+): Contract | null {
+  if (
+    !(
+      contract instanceof GenArt721CoreV3 ||
+      contract instanceof GenArt721CoreV3_Engine
+    )
+  ) {
+    return null;
+  }
   let contractEntity = Contract.load(contract._address.toHexString());
   if (!contractEntity) {
     contractEntity = refreshContract(contract, timestamp);
@@ -729,15 +937,65 @@ function loadOrCreateMinterFilter(
   return minterFilter;
 }
 
-// Refresh contract entity state. Creates new contract in store if one does not
-// already exist. Expected to handle any update that emits a `PlatformUpdated`
-// event.
-// @dev Warning - this does not handle updates where the contract's
-// minterFilter is updated. For that, see handleMinterUpdated.
-function refreshContract(
-  contract: GenArt721CoreV3,
+// Returns a V3 flagship contract if the contract type is GenArt721CoreV3,
+// otherwise returns null.
+function getV3FlagshipContract(
+  contractAddress: Address
+): GenArt721CoreV3 | null {
+  const contract = GenArt721CoreV3.bind(contractAddress);
+  const coreType = contract.coreType();
+  if (coreType == "GenArt721CoreV3") {
+    return contract;
+  }
+  return null;
+}
+
+// Returns a V3 engine contract if the contract type is GenArt721CoreV3_Engine,
+// otherwise returns null.
+function getV3EngineContract(
+  contractAddress: Address
+): GenArt721CoreV3_Engine | null {
+  const contract = GenArt721CoreV3_Engine.bind(contractAddress);
+  const coreType = contract.coreType();
+  if (coreType == "GenArt721CoreV3_Engine") {
+    return contract;
+  }
+  return null;
+}
+
+export function refreshContractAtAddress(
+  contractAddress: Address,
   timestamp: BigInt
-): Contract {
+): void {
+  const flagshipContract = getV3FlagshipContract(contractAddress);
+  if (flagshipContract) {
+    refreshContract(flagshipContract, timestamp);
+    return;
+  }
+  const engineContract = getV3EngineContract(contractAddress);
+  if (engineContract) {
+    refreshContract(engineContract, timestamp);
+    return;
+  }
+  log.warning("[WARN] Unknown V3 coreType for contract at address {}.", [
+    contractAddress.toHexString()
+  ]);
+}
+
+// Refresh core contract entity state. Creates new contract in store if one does
+// not already exist. Expected to handle any update that emits a
+// `PlatformUpdated` event.
+// @dev Warning - this does not handle updates where the contract's
+// minterFilter is updated. For that, see handleMinterUpdated or handleMinterUpdatedEngine.
+function refreshContract<T>(contract: T, timestamp: BigInt): Contract | null {
+  if (
+    !(
+      contract instanceof GenArt721CoreV3 ||
+      contract instanceof GenArt721CoreV3_Engine
+    )
+  ) {
+    return null;
+  }
   let contractEntity = Contract.load(contract._address.toHexString());
   if (!contractEntity) {
     contractEntity = new Contract(contract._address.toHexString());
@@ -745,6 +1003,7 @@ function refreshContract(
     contractEntity.mintWhitelisted = [];
     contractEntity.newProjectsForbidden = false;
     contractEntity.nextProjectId = contract.nextProjectId();
+    contractEntity.registeredOn = null;
   } else {
     // clear the previous admin Whitelisting entity admin was previously defined
     if (contractEntity.admin) {
@@ -770,10 +1029,32 @@ function refreshContract(
     }
   }
   contractEntity.type = contract.coreType();
-  contractEntity.renderProviderAddress = contract.artblocksPrimarySalesAddress();
-  contractEntity.renderProviderPercentage = contract.artblocksPrimarySalesPercentage();
-  contractEntity.renderProviderSecondarySalesAddress = contract.artblocksSecondarySalesAddress();
-  contractEntity.renderProviderSecondarySalesBPS = contract.artblocksSecondarySalesBPS();
+  if (contract instanceof GenArt721CoreV3) {
+    // render provider address and percentage are called arblocks* on flagship
+    contractEntity.renderProviderAddress = contract.artblocksPrimarySalesAddress();
+    contractEntity.renderProviderPercentage = contract.artblocksPrimarySalesPercentage();
+    contractEntity.renderProviderSecondarySalesAddress = contract.artblocksSecondarySalesAddress();
+    contractEntity.renderProviderSecondarySalesBPS = contract.artblocksSecondarySalesBPS();
+    // curation registry exists on flagship
+    contractEntity.curationRegistry = contract.artblocksCurationRegistryAddress();
+    // flagship never auto approves artist split proposals for all changes
+    contractEntity.autoApproveArtistSplitProposals = false;
+  } else if (contract instanceof GenArt721CoreV3_Engine) {
+    // render provider address and percentage are called renderProvider* on engine
+    contractEntity.renderProviderAddress = contract.renderProviderPrimarySalesAddress();
+    contractEntity.renderProviderPercentage = contract.renderProviderPrimarySalesPercentage();
+    contractEntity.renderProviderSecondarySalesAddress = contract.renderProviderSecondarySalesAddress();
+    contractEntity.renderProviderSecondarySalesBPS = contract.renderProviderSecondarySalesBPS();
+    // platform provider address and percentage are defined on engine contracts
+    contractEntity.enginePlatformProviderAddress = contract.platformProviderPrimarySalesAddress();
+    contractEntity.enginePlatformProviderPercentage = contract.platformProviderPrimarySalesPercentage();
+    contractEntity.enginePlatformProviderSecondarySalesAddress = contract.platformProviderSecondarySalesAddress();
+    contractEntity.enginePlatformProviderSecondarySalesBPS = contract.platformProviderSecondarySalesBPS();
+    // null curation registry on engine contracts
+    contractEntity.curationRegistry = null;
+    // automatic approval exists on engine contracts
+    contractEntity.autoApproveArtistSplitProposals = contract.autoApproveArtistSplitProposals();
+  }
   contractEntity.nextProjectId = contract.nextProjectId();
   contractEntity.randomizerContract = contract.randomizerContract();
   let _minterContract = contract.minterContract();
@@ -793,11 +1074,20 @@ function refreshContract(
 }
 
 // Clear all minter configurations for all of a V3 core contract's projects
-function clearAllMinterConfigurations(
-  contract: GenArt721CoreV3,
-  timestamp: BigInt
-): void {
+function clearAllMinterConfigurations<T>(contract: T, timestamp: BigInt): void {
+  if (
+    !(
+      contract instanceof GenArt721CoreV3 ||
+      contract instanceof GenArt721CoreV3_Engine
+    )
+  ) {
+    return;
+  }
   let contractEntity = loadOrCreateContract(contract, timestamp);
+  if (!contractEntity) {
+    // this should never happen
+    return;
+  }
 
   let startingProjectId = contract.startingProjectId().toI32();
   let nextProjectId = contractEntity.nextProjectId.toI32();
@@ -814,11 +1104,19 @@ function clearAllMinterConfigurations(
 }
 
 // Populate all project minter configurations from a given minter filter
-function populateAllExistingMinterConfigurations(
+function populateAllExistingMinterConfigurations<T>(
   minterFilterContract: MinterFilterV1,
-  contract: GenArt721CoreV3,
+  contract: T,
   timestamp: BigInt
 ): void {
+  if (
+    !(
+      contract instanceof GenArt721CoreV3 ||
+      contract instanceof GenArt721CoreV3_Engine
+    )
+  ) {
+    return;
+  }
   // Check the new minter filter for any pre-allowlisted minters and update Projects accordingly
   let numProjectsWithMinters = minterFilterContract.getNumProjectsWithMinters();
   for (

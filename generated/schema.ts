@@ -896,6 +896,58 @@ export class ProposedArtistAddressesAndSplit extends Entity {
   }
 }
 
+export class EngineRegistry extends Entity {
+  constructor(id: string) {
+    super();
+    this.set("id", Value.fromString(id));
+  }
+
+  save(): void {
+    let id = this.get("id");
+    assert(id != null, "Cannot save EngineRegistry entity without an ID");
+    if (id) {
+      assert(
+        id.kind == ValueKind.STRING,
+        `Entities of type EngineRegistry must have an ID of type String but the id '${id.displayData()}' is of type ${id.displayKind()}`
+      );
+      store.set("EngineRegistry", id.toString(), this);
+    }
+  }
+
+  static load(id: string): EngineRegistry | null {
+    return changetype<EngineRegistry | null>(store.get("EngineRegistry", id));
+  }
+
+  get id(): string {
+    let value = this.get("id");
+    return value!.toString();
+  }
+
+  set id(value: string) {
+    this.set("id", Value.fromString(value));
+  }
+
+  get registeredContracts(): Array<string> | null {
+    let value = this.get("registeredContracts");
+    if (!value || value.kind == ValueKind.NULL) {
+      return null;
+    } else {
+      return value.toStringArray();
+    }
+  }
+
+  set registeredContracts(value: Array<string> | null) {
+    if (!value) {
+      this.unset("registeredContracts");
+    } else {
+      this.set(
+        "registeredContracts",
+        Value.fromStringArray(<Array<string>>value)
+      );
+    }
+  }
+}
+
 export class Contract extends Entity {
   constructor(id: string) {
     super();
@@ -998,6 +1050,83 @@ export class Contract extends Entity {
     } else {
       this.set(
         "renderProviderSecondarySalesBPS",
+        Value.fromBigInt(<BigInt>value)
+      );
+    }
+  }
+
+  get enginePlatformProviderAddress(): Bytes | null {
+    let value = this.get("enginePlatformProviderAddress");
+    if (!value || value.kind == ValueKind.NULL) {
+      return null;
+    } else {
+      return value.toBytes();
+    }
+  }
+
+  set enginePlatformProviderAddress(value: Bytes | null) {
+    if (!value) {
+      this.unset("enginePlatformProviderAddress");
+    } else {
+      this.set("enginePlatformProviderAddress", Value.fromBytes(<Bytes>value));
+    }
+  }
+
+  get enginePlatformProviderPercentage(): BigInt | null {
+    let value = this.get("enginePlatformProviderPercentage");
+    if (!value || value.kind == ValueKind.NULL) {
+      return null;
+    } else {
+      return value.toBigInt();
+    }
+  }
+
+  set enginePlatformProviderPercentage(value: BigInt | null) {
+    if (!value) {
+      this.unset("enginePlatformProviderPercentage");
+    } else {
+      this.set(
+        "enginePlatformProviderPercentage",
+        Value.fromBigInt(<BigInt>value)
+      );
+    }
+  }
+
+  get enginePlatformProviderSecondarySalesAddress(): Bytes | null {
+    let value = this.get("enginePlatformProviderSecondarySalesAddress");
+    if (!value || value.kind == ValueKind.NULL) {
+      return null;
+    } else {
+      return value.toBytes();
+    }
+  }
+
+  set enginePlatformProviderSecondarySalesAddress(value: Bytes | null) {
+    if (!value) {
+      this.unset("enginePlatformProviderSecondarySalesAddress");
+    } else {
+      this.set(
+        "enginePlatformProviderSecondarySalesAddress",
+        Value.fromBytes(<Bytes>value)
+      );
+    }
+  }
+
+  get enginePlatformProviderSecondarySalesBPS(): BigInt | null {
+    let value = this.get("enginePlatformProviderSecondarySalesBPS");
+    if (!value || value.kind == ValueKind.NULL) {
+      return null;
+    } else {
+      return value.toBigInt();
+    }
+  }
+
+  set enginePlatformProviderSecondarySalesBPS(value: BigInt | null) {
+    if (!value) {
+      this.unset("enginePlatformProviderSecondarySalesBPS");
+    } else {
+      this.set(
+        "enginePlatformProviderSecondarySalesBPS",
         Value.fromBigInt(<BigInt>value)
       );
     }
@@ -1199,6 +1328,32 @@ export class Contract extends Entity {
 
   set newProjectsForbidden(value: boolean) {
     this.set("newProjectsForbidden", Value.fromBoolean(value));
+  }
+
+  get autoApproveArtistSplitProposals(): boolean {
+    let value = this.get("autoApproveArtistSplitProposals");
+    return value!.toBoolean();
+  }
+
+  set autoApproveArtistSplitProposals(value: boolean) {
+    this.set("autoApproveArtistSplitProposals", Value.fromBoolean(value));
+  }
+
+  get registeredOn(): string | null {
+    let value = this.get("registeredOn");
+    if (!value || value.kind == ValueKind.NULL) {
+      return null;
+    } else {
+      return value.toString();
+    }
+  }
+
+  set registeredOn(value: string | null) {
+    if (!value) {
+      this.unset("registeredOn");
+    } else {
+      this.set("registeredOn", Value.fromString(<string>value));
+    }
   }
 }
 
@@ -2396,15 +2551,6 @@ export class Transfer extends Entity {
     this.set("id", Value.fromString(value));
   }
 
-  get transactionHash(): Bytes {
-    let value = this.get("transactionHash");
-    return value!.toBytes();
-  }
-
-  set transactionHash(value: Bytes) {
-    this.set("transactionHash", Value.fromBytes(value));
-  }
-
   get token(): string {
     let value = this.get("token");
     return value!.toString();
@@ -2412,15 +2558,6 @@ export class Transfer extends Entity {
 
   set token(value: string) {
     this.set("token", Value.fromString(value));
-  }
-
-  get createdAt(): BigInt {
-    let value = this.get("createdAt");
-    return value!.toBigInt();
-  }
-
-  set createdAt(value: BigInt) {
-    this.set("createdAt", Value.fromBigInt(value));
   }
 
   get to(): Bytes {
@@ -2439,6 +2576,42 @@ export class Transfer extends Entity {
 
   set from(value: Bytes) {
     this.set("from", Value.fromBytes(value));
+  }
+
+  get transactionHash(): Bytes {
+    let value = this.get("transactionHash");
+    return value!.toBytes();
+  }
+
+  set transactionHash(value: Bytes) {
+    this.set("transactionHash", Value.fromBytes(value));
+  }
+
+  get blockHash(): Bytes {
+    let value = this.get("blockHash");
+    return value!.toBytes();
+  }
+
+  set blockHash(value: Bytes) {
+    this.set("blockHash", Value.fromBytes(value));
+  }
+
+  get blockNumber(): BigInt {
+    let value = this.get("blockNumber");
+    return value!.toBigInt();
+  }
+
+  set blockNumber(value: BigInt) {
+    this.set("blockNumber", Value.fromBigInt(value));
+  }
+
+  get blockTimestamp(): BigInt {
+    let value = this.get("blockTimestamp");
+    return value!.toBigInt();
+  }
+
+  set blockTimestamp(value: BigInt) {
+    this.set("blockTimestamp", Value.fromBigInt(value));
   }
 }
 

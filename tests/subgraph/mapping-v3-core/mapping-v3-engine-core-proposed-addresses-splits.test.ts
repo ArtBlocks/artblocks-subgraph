@@ -1,3 +1,5 @@
+// this file is intended to be identical to ./mapping-v3-core-proposed-addresses-splits.test.ts,
+// except that coreType is defined to be a V3 engine contract
 import {
   assert,
   clearStore,
@@ -72,7 +74,7 @@ import { generateContractSpecificId } from "../../../src/helpers";
 const randomAddressGenerator = new RandomAddressGenerator();
 const artistAddress = randomAddressGenerator.generateRandomAddress();
 
-const coreType = "GenArt721CoreV3";
+const coreType = "GenArt721CoreV3_Engine";
 
 describe(`${coreType}, artist propose/admin accept new payments`, () => {
   beforeEach(() => {

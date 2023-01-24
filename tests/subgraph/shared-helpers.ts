@@ -14,6 +14,7 @@ import {
 import {
   Contract,
   Minter,
+  MinterFilter,
   Project,
   ProjectMinterConfiguration,
   ProposedArtistAddressesAndSplit,
@@ -76,6 +77,7 @@ const randomAddressGenerator = new RandomAddressGenerator();
 export const ACCOUNT_ENTITY_TYPE = "Account";
 export const PROJECT_ENTITY_TYPE = "Project";
 export const CONTRACT_ENTITY_TYPE = "Contract";
+export const ENGINE_REGISTRY_TYPE = "EngineRegistry";
 export const WHITELISTING_ENTITY_TYPE = "Whitelisting";
 export const PROJECT_EXTERNAL_ASSET_DEPENDENCY_ENTITY_TYPE =
   "ProjectExternalAssetDependency";
@@ -128,6 +130,14 @@ export const DEFAULT_PRICE = BigInt.fromString("700000000000000000");
 export const DEFAULT_ZONE = Address.fromString(
   "0x004C00500000aD104D7DBd00e3ae0A5C00560C00"
 );
+export const ENGINE_PLATFORM_PROVIDER_ADDRESS = randomAddressGenerator.generateRandomAddress();
+export const ENGINE_PLATFORM_PROVIDER_SECONDARY_SALES_ADDRESS = randomAddressGenerator.generateRandomAddress();
+export const ENGINE_PLATFORM_PROVIDER_PERCENTAGE = BigInt.fromString("10");
+export const ENGINE_PLATFORM_PROVIDER_SECONDARY_SALES_BPS = BigInt.fromString(
+  "300"
+);
+export const DEFAULT_AUTO_APPROVE_ARTIST_SPLIT_PROPOSALS = false;
+
 export class ContractValues {
   admin: Address;
   type: string;
@@ -141,6 +151,12 @@ export class ContractValues {
   dependencyRegistry: Address;
   curationRegistry: Address;
   newProjectsForbidden: boolean;
+  // engine-specific fields
+  enginePlatformProviderAddress: Address;
+  enginePlatformProviderPercentage: BigInt;
+  enginePlatformProviderSecondarySalesAddress: Address;
+  enginePlatformProviderSecondarySalesBPS: BigInt;
+  autoApproveArtistSplitProposals: boolean;
 }
 export const TEST_CONTRACT: ContractValues = {
   admin: Address.fromString("0x96dc73c8b5969608c77375f085949744b5177660"),
@@ -158,7 +174,13 @@ export const TEST_CONTRACT: ContractValues = {
   randomizerContract: RANDOMIZER_ADDRESS,
   dependencyRegistry: Address.zero(),
   curationRegistry: Address.zero(),
-  newProjectsForbidden: false
+  newProjectsForbidden: false,
+  // engine-specific fields
+  enginePlatformProviderAddress: ENGINE_PLATFORM_PROVIDER_ADDRESS,
+  enginePlatformProviderPercentage: ENGINE_PLATFORM_PROVIDER_PERCENTAGE,
+  enginePlatformProviderSecondarySalesAddress: ENGINE_PLATFORM_PROVIDER_SECONDARY_SALES_ADDRESS,
+  enginePlatformProviderSecondarySalesBPS: ENGINE_PLATFORM_PROVIDER_SECONDARY_SALES_BPS,
+  autoApproveArtistSplitProposals: DEFAULT_AUTO_APPROVE_ARTIST_SPLIT_PROPOSALS
 };
 export const TEST_CONTRACT_CREATED_AT = BigInt.fromI32(1607763598);
 
@@ -334,9 +356,46 @@ export function addTestContractToStore(nextProjectId: BigInt): Contract {
   contract.updatedAt = contract.createdAt;
   contract.mintWhitelisted = TEST_CONTRACT.mintWhitelisted;
   contract.newProjectsForbidden = false;
+  contract.registeredOn = null;
   contract.save();
 
   return contract;
+}
+
+export function addArbitraryContractToStore(
+  contractAddress: Address,
+  nextProjectId: BigInt
+): Contract {
+  let contract = new Contract(contractAddress.toHexString());
+  contract.admin = TEST_CONTRACT.admin;
+  contract.type = TEST_CONTRACT.type;
+  contract.createdAt = CURRENT_BLOCK_TIMESTAMP.minus(BigInt.fromI32(10));
+  contract.nextProjectId = nextProjectId;
+  contract.randomizerContract = TEST_CONTRACT.randomizerContract;
+  contract.renderProviderAddress = TEST_CONTRACT.renderProviderAddress;
+  contract.renderProviderPercentage = TEST_CONTRACT.renderProviderPercentage;
+  contract.renderProviderSecondarySalesAddress =
+    TEST_CONTRACT.renderProviderSecondarySalesAddress;
+  contract.renderProviderSecondarySalesBPS =
+    TEST_CONTRACT.renderProviderSecondarySalesBPS;
+  contract.curationRegistry = TEST_CONTRACT.curationRegistry;
+  contract.dependencyRegistry = TEST_CONTRACT.dependencyRegistry;
+  contract.updatedAt = contract.createdAt;
+  contract.mintWhitelisted = TEST_CONTRACT.mintWhitelisted;
+  contract.newProjectsForbidden = false;
+  contract.save();
+
+  return contract;
+}
+
+export function addTestMinterFilterToStore(): MinterFilter {
+  let minterFilter = new MinterFilter(TEST_MINTER_FILTER_ADDRESS.toHexString());
+  minterFilter.coreContract = TEST_CONTRACT_ADDRESS.toHexString();
+  minterFilter.updatedAt = CURRENT_BLOCK_TIMESTAMP.minus(BigInt.fromI32(10));
+  minterFilter.minterAllowlist = [];
+  minterFilter.save();
+
+  return minterFilter;
 }
 
 export const addNewMinterToStore = (type: string): Minter => {
@@ -414,6 +473,17 @@ export const mockTokenIdToHash = function(
   )
     .withArgs(tokenIdToHashInputs)
     .returns([ethereum.Value.fromBytes(hash)]);
+};
+
+// mockCoreType is intended for V3+ core and-on
+export const mockCoreType = function(
+  contractAddress: Address,
+  coreType: string
+): void {
+  let args: Array<ethereum.Value> = [];
+  createMockedFunction(contractAddress, "coreType", "coreType():(string)")
+    .withArgs(args)
+    .returns([ethereum.Value.fromString(coreType)]);
 };
 
 // Asserts

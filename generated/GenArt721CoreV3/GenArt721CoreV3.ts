@@ -1607,6 +1607,41 @@ export class GenArt721CoreV3 extends ethereum.SmartContract {
     return ethereum.CallResult.fromValue(value[0].toString());
   }
 
+  projectScriptBytecodeAddressByIndex(
+    _projectId: BigInt,
+    _index: BigInt
+  ): Address {
+    let result = super.call(
+      "projectScriptBytecodeAddressByIndex",
+      "projectScriptBytecodeAddressByIndex(uint256,uint256):(address)",
+      [
+        ethereum.Value.fromUnsignedBigInt(_projectId),
+        ethereum.Value.fromUnsignedBigInt(_index)
+      ]
+    );
+
+    return result[0].toAddress();
+  }
+
+  try_projectScriptBytecodeAddressByIndex(
+    _projectId: BigInt,
+    _index: BigInt
+  ): ethereum.CallResult<Address> {
+    let result = super.tryCall(
+      "projectScriptBytecodeAddressByIndex",
+      "projectScriptBytecodeAddressByIndex(uint256,uint256):(address)",
+      [
+        ethereum.Value.fromUnsignedBigInt(_projectId),
+        ethereum.Value.fromUnsignedBigInt(_index)
+      ]
+    );
+    if (result.reverted) {
+      return new ethereum.CallResult();
+    }
+    let value = result.value;
+    return ethereum.CallResult.fromValue(value[0].toAddress());
+  }
+
   projectScriptDetails(
     _projectId: BigInt
   ): GenArt721CoreV3__projectScriptDetailsResult {

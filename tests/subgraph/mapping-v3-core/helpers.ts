@@ -35,11 +35,13 @@ import {
   FIELD_PROJECT_WEBSITE,
   handleProjectUpdated
 } from "../../../src/mapping-v3-core";
-import { ProjectUpdated } from "../../../generated/GenArt721CoreV3/GenArt721CoreV3";
+import { ProjectUpdated } from "../../../generated/GenArt721CoreV3/IGenArt721CoreContractV3_Base";
 
 // mocks return values for Soldity contract calls in refreshContract() helper function
+// currently handles V3 flagship and engine contracts
 export function mockRefreshContractCalls(
   nextProjectId: BigInt,
+  coreType: string,
   overrides: Map<string, string> | null
 ): void {
   createMockedFunction(
@@ -58,59 +60,158 @@ export function mockRefreshContractCalls(
     TEST_CONTRACT_ADDRESS,
     "coreType",
     "coreType():(string)"
-  ).returns([ethereum.Value.fromString("GenArt721CoreV3")]);
+  ).returns([ethereum.Value.fromString(coreType)]);
 
-  createMockedFunction(
-    TEST_CONTRACT_ADDRESS,
-    "artblocksPrimarySalesAddress",
-    "artblocksPrimarySalesAddress():(address)"
-  ).returns([ethereum.Value.fromAddress(TEST_CONTRACT.renderProviderAddress)]);
+  if (coreType == "GenArt721CoreV3") {
+    // flagship contract functions
+    createMockedFunction(
+      TEST_CONTRACT_ADDRESS,
+      "artblocksPrimarySalesAddress",
+      "artblocksPrimarySalesAddress():(address)"
+    ).returns([
+      ethereum.Value.fromAddress(TEST_CONTRACT.renderProviderAddress)
+    ]);
 
-  // Note: not used in V3 sync, but good to add backwards-compatible mock here
-  //for the backwards-compatible V3 external function
-  createMockedFunction(
-    TEST_CONTRACT_ADDRESS,
-    "artblocksAddress",
-    "artblocksAddress():(address)"
-  ).returns([ethereum.Value.fromAddress(TEST_CONTRACT.renderProviderAddress)]);
+    // Note: not used in V3 sync, but good to add backwards-compatible mock here
+    //for the backwards-compatible V3 external function
+    createMockedFunction(
+      TEST_CONTRACT_ADDRESS,
+      "artblocksAddress",
+      "artblocksAddress():(address)"
+    ).returns([
+      ethereum.Value.fromAddress(TEST_CONTRACT.renderProviderAddress)
+    ]);
 
-  createMockedFunction(
-    TEST_CONTRACT_ADDRESS,
-    "artblocksPrimarySalesPercentage",
-    "artblocksPrimarySalesPercentage():(uint256)"
-  ).returns([
-    ethereum.Value.fromUnsignedBigInt(TEST_CONTRACT.renderProviderPercentage)
-  ]);
+    createMockedFunction(
+      TEST_CONTRACT_ADDRESS,
+      "artblocksPrimarySalesPercentage",
+      "artblocksPrimarySalesPercentage():(uint256)"
+    ).returns([
+      ethereum.Value.fromUnsignedBigInt(TEST_CONTRACT.renderProviderPercentage)
+    ]);
 
-  // Note: not used in V3 sync, but good to add backwards-compatible mock here
-  //for the backwards-compatible V3 external function
-  createMockedFunction(
-    TEST_CONTRACT_ADDRESS,
-    "artblocksPercentage",
-    "artblocksPercentage():(uint256)"
-  ).returns([
-    ethereum.Value.fromUnsignedBigInt(TEST_CONTRACT.renderProviderPercentage)
-  ]);
+    // Note: not used in V3 sync, but good to add backwards-compatible mock here
+    //for the backwards-compatible V3 external function
+    createMockedFunction(
+      TEST_CONTRACT_ADDRESS,
+      "artblocksPercentage",
+      "artblocksPercentage():(uint256)"
+    ).returns([
+      ethereum.Value.fromUnsignedBigInt(TEST_CONTRACT.renderProviderPercentage)
+    ]);
 
-  createMockedFunction(
-    TEST_CONTRACT_ADDRESS,
-    "artblocksSecondarySalesAddress",
-    "artblocksSecondarySalesAddress():(address)"
-  ).returns([
-    ethereum.Value.fromAddress(
-      TEST_CONTRACT.renderProviderSecondarySalesAddress
-    )
-  ]);
+    createMockedFunction(
+      TEST_CONTRACT_ADDRESS,
+      "artblocksSecondarySalesAddress",
+      "artblocksSecondarySalesAddress():(address)"
+    ).returns([
+      ethereum.Value.fromAddress(
+        TEST_CONTRACT.renderProviderSecondarySalesAddress
+      )
+    ]);
 
-  createMockedFunction(
-    TEST_CONTRACT_ADDRESS,
-    "artblocksSecondarySalesBPS",
-    "artblocksSecondarySalesBPS():(uint256)"
-  ).returns([
-    ethereum.Value.fromUnsignedBigInt(
-      TEST_CONTRACT.renderProviderSecondarySalesBPS
-    )
-  ]);
+    createMockedFunction(
+      TEST_CONTRACT_ADDRESS,
+      "artblocksSecondarySalesBPS",
+      "artblocksSecondarySalesBPS():(uint256)"
+    ).returns([
+      ethereum.Value.fromUnsignedBigInt(
+        TEST_CONTRACT.renderProviderSecondarySalesBPS
+      )
+    ]);
+
+    createMockedFunction(
+      TEST_CONTRACT_ADDRESS,
+      "artblocksCurationRegistryAddress",
+      "artblocksCurationRegistryAddress():(address)"
+    ).returns([ethereum.Value.fromAddress(TEST_CONTRACT.curationRegistry)]);
+  } else if (coreType == "GenArt721CoreV3_Engine") {
+    // engine contract functions
+    createMockedFunction(
+      TEST_CONTRACT_ADDRESS,
+      "renderProviderPrimarySalesAddress",
+      "renderProviderPrimarySalesAddress():(address)"
+    ).returns([
+      ethereum.Value.fromAddress(TEST_CONTRACT.renderProviderAddress)
+    ]);
+
+    createMockedFunction(
+      TEST_CONTRACT_ADDRESS,
+      "renderProviderPrimarySalesPercentage",
+      "renderProviderPrimarySalesPercentage():(uint256)"
+    ).returns([
+      ethereum.Value.fromUnsignedBigInt(TEST_CONTRACT.renderProviderPercentage)
+    ]);
+
+    createMockedFunction(
+      TEST_CONTRACT_ADDRESS,
+      "renderProviderSecondarySalesAddress",
+      "renderProviderSecondarySalesAddress():(address)"
+    ).returns([
+      ethereum.Value.fromAddress(
+        TEST_CONTRACT.renderProviderSecondarySalesAddress
+      )
+    ]);
+
+    createMockedFunction(
+      TEST_CONTRACT_ADDRESS,
+      "renderProviderSecondarySalesBPS",
+      "renderProviderSecondarySalesBPS():(uint256)"
+    ).returns([
+      ethereum.Value.fromUnsignedBigInt(
+        TEST_CONTRACT.renderProviderSecondarySalesBPS
+      )
+    ]);
+
+    // platform provider address and percentages are defined on engine contracts
+    createMockedFunction(
+      TEST_CONTRACT_ADDRESS,
+      "platformProviderPrimarySalesAddress",
+      "platformProviderPrimarySalesAddress():(address)"
+    ).returns([
+      ethereum.Value.fromAddress(TEST_CONTRACT.enginePlatformProviderAddress)
+    ]);
+
+    createMockedFunction(
+      TEST_CONTRACT_ADDRESS,
+      "platformProviderPrimarySalesPercentage",
+      "platformProviderPrimarySalesPercentage():(uint256)"
+    ).returns([
+      ethereum.Value.fromUnsignedBigInt(
+        TEST_CONTRACT.enginePlatformProviderPercentage
+      )
+    ]);
+
+    createMockedFunction(
+      TEST_CONTRACT_ADDRESS,
+      "platformProviderSecondarySalesAddress",
+      "platformProviderSecondarySalesAddress():(address)"
+    ).returns([
+      ethereum.Value.fromAddress(
+        TEST_CONTRACT.enginePlatformProviderSecondarySalesAddress
+      )
+    ]);
+
+    createMockedFunction(
+      TEST_CONTRACT_ADDRESS,
+      "platformProviderSecondarySalesBPS",
+      "platformProviderSecondarySalesBPS():(uint256)"
+    ).returns([
+      ethereum.Value.fromUnsignedBigInt(
+        TEST_CONTRACT.enginePlatformProviderSecondarySalesBPS
+      )
+    ]);
+
+    createMockedFunction(
+      TEST_CONTRACT_ADDRESS,
+      "autoApproveArtistSplitProposals",
+      "autoApproveArtistSplitProposals():(bool)"
+    ).returns([
+      ethereum.Value.fromBoolean(TEST_CONTRACT.autoApproveArtistSplitProposals)
+    ]);
+  } else {
+    throw new Error("invalid coreType passed to mockRefreshContractCalls");
+  }
 
   createMockedFunction(
     TEST_CONTRACT_ADDRESS,
@@ -135,12 +236,6 @@ export function mockRefreshContractCalls(
     "newProjectsForbidden",
     "newProjectsForbidden():(bool)"
   ).returns([ethereum.Value.fromBoolean(TEST_CONTRACT.newProjectsForbidden)]);
-
-  createMockedFunction(
-    TEST_CONTRACT_ADDRESS,
-    "artblocksCurationRegistryAddress",
-    "artblocksCurationRegistryAddress():(address)"
-  ).returns([ethereum.Value.fromAddress(TEST_CONTRACT.curationRegistry)]);
 
   createMockedFunction(
     TEST_CONTRACT_ADDRESS,

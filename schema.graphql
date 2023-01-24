@@ -170,6 +170,14 @@ type ProposedArtistAddressesAndSplit @entity {
   createdAt: BigInt!
 }
 
+type EngineRegistry @entity {
+  "Unique identifier made up of the Engine Registry's contract address"
+  id: ID!
+
+  "Core contracts that are registered on this Engine Registry, when this is most recent Engine Registry to add the contract"
+  registeredContracts: [Contract!] @derivedFrom(field: "registeredOn")
+}
+
 enum CoreType {
   "First Art Blocks flagship core"
   GenArt721CoreV0
@@ -179,10 +187,14 @@ enum CoreType {
   GenArt721CoreV2
   "Third Art Blocks flagship core"
   GenArt721CoreV3
+  "V3 Derivative - Art Blocks Engine core"
+  GenArt721CoreV3_Engine
 }
 
 type Contract @entity {
+  "Unique identifier made up of the contract address"
   id: ID!
+
   admin: Bytes!
 
   "Core contract type"
@@ -199,6 +211,18 @@ type Contract @entity {
 
   "Basis points of secondary sales allocated to the platform (null for pre-V3 contracts, check Royalty Registry)"
   renderProviderSecondarySalesBPS: BigInt
+
+  "Address that receives primary sales platform fees, only for V3_Engine contracts"
+  enginePlatformProviderAddress: Bytes
+
+  "Percentage of primary sales allocated to the platform, only for V3_Engine contracts"
+  enginePlatformProviderPercentage: BigInt
+
+  "Address that receives secondary sales platform royalties, only for V3_Engine contracts"
+  enginePlatformProviderSecondarySalesAddress: Bytes
+
+  "Basis points of secondary sales allocated to the platform, only for V3_Engine contracts"
+  enginePlatformProviderSecondarySalesBPS: BigInt
 
   "List of contracts that are allowed to mint"
   mintWhitelisted: [Bytes!]!
@@ -227,14 +251,21 @@ type Contract @entity {
 
   updatedAt: BigInt!
 
-  "Associated minter filter (if applicable)"
+  "Associated minter filter (if being indexed) - not always indexed for Engine contracts"
   minterFilter: MinterFilter
 
   preferredIPFSGateway: String
 
   preferredArweaveGateway: String
+  
   "New projects forbidden (can only be true on V3+ contracts)"
   newProjectsForbidden: Boolean!
+
+  "Automatically approve all artist split proposals (used on V3 Engine contracts)"
+  autoApproveArtistSplitProposals: Boolean
+
+  "Latest engine registry that this contract is registered with, if any (used for indexing purposes)"
+  registeredOn: EngineRegistry
 }
 
 type Whitelisting @entity {
@@ -518,15 +549,17 @@ type SaleLookupTable @entity {
 type Transfer @entity(immutable: true) {
   id: ID!
 
-  transactionHash: Bytes!
-
   token: Token!
-
-  createdAt: BigInt!
 
   to: Bytes!
 
   from: Bytes!
+
+  transactionHash: Bytes!
+  
+  blockHash: Bytes!
+  blockNumber: BigInt!
+  blockTimestamp: BigInt!
 }
 
 type Dependency @entity {
