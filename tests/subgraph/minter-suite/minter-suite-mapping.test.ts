@@ -32,7 +32,7 @@ import {
   PricePerTokenInWeiUpdated,
   ProjectCurrencyInfoUpdated,
   PurchaseToDisabledUpdated
-} from "../../../generated/MinterSetPrice/IFilteredMinterV2";
+} from "../../../generated/MinterSetPrice/IFilteredMinterV3";
 import {
   ConfigKeyRemoved,
   ConfigValueAddedToSet as ConfigValueAddedToSetBigInt,
@@ -45,19 +45,19 @@ import {
   ConfigValueSet1 as ConfigValueSetBigInt,
   ConfigValueSet2 as ConfigValueSetAddress,
   ConfigValueSet3 as ConfigValueSetBytes
-} from "../../../generated/MinterFilterV0/IFilteredMinterV1";
+} from "../../../generated/MinterFilterV0/IFilteredMinterV3";
 
 import {
   SetAuctionDetails as DALinSetAuctionDetails,
   ResetAuctionDetails as DALinResetAuctionDetails,
   MinimumAuctionLengthSecondsUpdated
-} from "../../../generated/MinterDALin/IFilteredMinterDALinV1";
+} from "../../../generated/MinterDALin/IFilteredMinterDALinV2";
 
 import {
   AuctionHalfLifeRangeSecondsUpdated,
   SetAuctionDetails as DAExpSetAuctionDetails,
   ResetAuctionDetails as DAExpResetAuctionDetails
-} from "../../../generated/MinterDAExp/IFilteredMinterDAExpV1";
+} from "../../../generated/MinterDAExp/IFilteredMinterDAExpV2";
 
 import {
   AllowedHoldersOfProjects,
@@ -65,16 +65,16 @@ import {
   RegisteredNFTAddress as HolderRegisteredNFTAddress,
   UnregisteredNFTAddress as HolderUnregisteredNFTAddress,
   DelegationRegistryUpdated as MinterHolderDelegationRegistryUpdated
-} from "../../../generated/MinterHolder/IFilteredMinterHolderV2";
+} from "../../../generated/MinterHolder/IFilteredMinterHolderV3";
 
-import { DelegationRegistryUpdated as MinterMerkleDelegationRegistryUpdated } from "../../../generated/MinterMerkle/IFilteredMinterMerkleV2";
+import { DelegationRegistryUpdated as MinterMerkleDelegationRegistryUpdated } from "../../../generated/MinterMerkle/IFilteredMinterMerkleV3";
 
 import {
   ResetAuctionDetails as DAExpSettlementResetAuctionDetails,
   SelloutPriceUpdated,
   ReceiptUpdated,
   ArtistAndAdminRevenuesWithdrawn
-} from "../../../generated/MinterDAExpSettlement/IFilteredMinterDAExpSettlementV0";
+} from "../../../generated/MinterDAExpSettlement/IFilteredMinterDAExpSettlementV1";
 
 // import handlers from minter-suite-mapping
 import {
