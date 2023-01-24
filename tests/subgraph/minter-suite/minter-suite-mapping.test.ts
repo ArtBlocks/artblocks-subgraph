@@ -32,7 +32,7 @@ import {
   PricePerTokenInWeiUpdated,
   ProjectCurrencyInfoUpdated,
   PurchaseToDisabledUpdated
-} from "../../../generated/MinterSetPriceV0/IFilteredMinterV0";
+} from "../../../generated/MinterSetPrice/IFilteredMinterV2";
 import {
   ConfigKeyRemoved,
   ConfigValueAddedToSet as ConfigValueAddedToSetBigInt,
@@ -51,31 +51,30 @@ import {
   SetAuctionDetails as DALinSetAuctionDetails,
   ResetAuctionDetails as DALinResetAuctionDetails,
   MinimumAuctionLengthSecondsUpdated
-} from "../../../generated/MinterDALinV0/IFilteredMinterDALinV0";
+} from "../../../generated/MinterDALin/IFilteredMinterDALinV1";
 
 import {
   AuctionHalfLifeRangeSecondsUpdated,
   SetAuctionDetails as DAExpSetAuctionDetails,
   ResetAuctionDetails as DAExpResetAuctionDetails
-} from "../../../generated/MinterDAExpV0/IFilteredMinterDAExpV0";
+} from "../../../generated/MinterDAExp/IFilteredMinterDAExpV1";
 
 import {
   AllowedHoldersOfProjects,
   RemovedHoldersOfProjects,
   RegisteredNFTAddress as HolderRegisteredNFTAddress,
-  UnregisteredNFTAddress as HolderUnregisteredNFTAddress
-} from "../../../generated/MinterHolderV0/IFilteredMinterHolderV0";
+  UnregisteredNFTAddress as HolderUnregisteredNFTAddress,
+  DelegationRegistryUpdated as MinterHolderDelegationRegistryUpdated
+} from "../../../generated/MinterHolder/IFilteredMinterHolderV2";
 
-import { DelegationRegistryUpdated as MinterHolderDelegationRegistryUpdated } from "../../../generated/MinterHolderV2/IFilteredMinterHolderV1";
-import { DelegationRegistryUpdated as MinterMerkleDelegationRegistryUpdated } from "../../../generated/MinterMerkleV3/IFilteredMinterMerkleV1";
+import { DelegationRegistryUpdated as MinterMerkleDelegationRegistryUpdated } from "../../../generated/MinterMerkle/IFilteredMinterMerkleV2";
 
-// events not part of interfaces
 import {
   ResetAuctionDetails as DAExpSettlementResetAuctionDetails,
   SelloutPriceUpdated,
   ReceiptUpdated,
   ArtistAndAdminRevenuesWithdrawn
-} from "../../../generated/MinterDAExpSettlementV0/IFilteredMinterDAExpSettlementV0";
+} from "../../../generated/MinterDAExpSettlement/IFilteredMinterDAExpSettlementV0";
 
 // import handlers from minter-suite-mapping
 import {
@@ -476,19 +475,9 @@ describe("MinterDALin-related tests", () => {
         ];
         event.block.timestamp = CURRENT_BLOCK_TIMESTAMP;
 
-        if (minterType == "MinterDALinV0") {
-          handleMinimumAuctionLengthSecondsUpdated(
-            changetype<MinimumAuctionLengthSecondsUpdated>(event)
-          );
-        } else if (minterType == "MinterDALinV1") {
-          handleMinimumAuctionLengthSecondsUpdated(
-            changetype<MinimumAuctionLengthSecondsUpdated>(event)
-          );
-        } else {
-          handleMinimumAuctionLengthSecondsUpdated(
-            changetype<MinimumAuctionLengthSecondsUpdated>(event)
-          );
-        }
+        handleMinimumAuctionLengthSecondsUpdated(
+          changetype<MinimumAuctionLengthSecondsUpdated>(event)
+        );
 
         assert.fieldEquals(
           MINTER_ENTITY_TYPE,
@@ -538,19 +527,7 @@ describe("MinterDALin-related tests", () => {
 
         assert.notInStore(PROJECT_ENTITY_TYPE, fullProjectId);
 
-        if (minterType == "MinterDALinV0") {
-          handleDALinSetAuctionDetails(
-            changetype<DALinSetAuctionDetails>(event)
-          );
-        } else if (minterType == "MinterDALinV1") {
-          handleDALinSetAuctionDetails(
-            changetype<DALinSetAuctionDetails>(event)
-          );
-        } else {
-          handleDALinSetAuctionDetails(
-            changetype<DALinSetAuctionDetails>(event)
-          );
-        }
+        handleDALinSetAuctionDetails(changetype<DALinSetAuctionDetails>(event));
 
         assert.notInStore(
           PROJECT_MINTER_CONFIGURATION_ENTITY_TYPE,
@@ -622,19 +599,7 @@ describe("MinterDALin-related tests", () => {
         ];
         event.block.timestamp = CURRENT_BLOCK_TIMESTAMP;
 
-        if (minterType == "MinterDALinV0") {
-          handleDALinSetAuctionDetails(
-            changetype<DALinSetAuctionDetails>(event)
-          );
-        } else if (minterType == "MinterDALinV1") {
-          handleDALinSetAuctionDetails(
-            changetype<DALinSetAuctionDetails>(event)
-          );
-        } else {
-          handleDALinSetAuctionDetails(
-            changetype<DALinSetAuctionDetails>(event)
-          );
-        }
+        handleDALinSetAuctionDetails(changetype<DALinSetAuctionDetails>(event));
 
         assert.fieldEquals(
           PROJECT_MINTER_CONFIGURATION_ENTITY_TYPE,
@@ -704,23 +669,8 @@ describe("MinterDALin-related tests", () => {
 
           assert.notInStore(PROJECT_ENTITY_TYPE, fullProjectId);
 
-          if (minterType == "MinterDALinV0") {
-            handleDALinResetAuctionDetails(
-              changetype<DALinResetAuctionDetails>(event)
-            );
-          } else if (minterType == "MinterDALinV1") {
-            handleDALinResetAuctionDetails(
-              changetype<DALinResetAuctionDetails>(event)
-            );
-          } else {
-            handleDALinResetAuctionDetails(
-              changetype<DALinResetAuctionDetails>(event)
-            );
-          }
-
-          assert.notInStore(
-            PROJECT_MINTER_CONFIGURATION_ENTITY_TYPE,
-            fullProjectId
+          handleDALinResetAuctionDetails(
+            changetype<DALinResetAuctionDetails>(event)
           );
         }
       });
@@ -777,19 +727,9 @@ describe("MinterDALin-related tests", () => {
           ];
           event.block.timestamp = CURRENT_BLOCK_TIMESTAMP;
 
-          if (minterType == "MinterDALinV0") {
-            handleDALinResetAuctionDetails(
-              changetype<DALinResetAuctionDetails>(event)
-            );
-          } else if (minterType == "MinterDALinV1") {
-            handleDALinResetAuctionDetails(
-              changetype<DALinResetAuctionDetails>(event)
-            );
-          } else {
-            handleDALinResetAuctionDetails(
-              changetype<DALinResetAuctionDetails>(event)
-            );
-          }
+          handleDALinResetAuctionDetails(
+            changetype<DALinResetAuctionDetails>(event)
+          );
 
           const updatedProjectMinterConfig: ProjectMinterConfiguration = changetype<
             ProjectMinterConfiguration
@@ -861,23 +801,9 @@ describe("MinterDAExp-related tests", () => {
         ];
         event.block.timestamp = CURRENT_BLOCK_TIMESTAMP;
 
-        if (minterType === "MinterDAExpV0") {
-          handleAuctionHalfLifeRangeSecondsUpdated(
-            changetype<AuctionHalfLifeRangeSecondsUpdated>(event)
-          );
-        } else if (minterType === "MinterDAExpV1") {
-          handleAuctionHalfLifeRangeSecondsUpdated(
-            changetype<AuctionHalfLifeRangeSecondsUpdated>(event)
-          );
-        } else if (minterType === "MinterDAExpV2") {
-          handleAuctionHalfLifeRangeSecondsUpdated(
-            changetype<AuctionHalfLifeRangeSecondsUpdated>(event)
-          );
-        } else {
-          handleAuctionHalfLifeRangeSecondsUpdated(
-            changetype<AuctionHalfLifeRangeSecondsUpdated>(event)
-          );
-        }
+        handleAuctionHalfLifeRangeSecondsUpdated(
+          changetype<AuctionHalfLifeRangeSecondsUpdated>(event)
+        );
 
         assert.fieldEquals(
           MINTER_ENTITY_TYPE,
@@ -930,23 +856,7 @@ describe("MinterDAExp-related tests", () => {
 
         assert.notInStore(PROJECT_ENTITY_TYPE, fullProjectId);
 
-        if (minterType === "MinterDAExpV0") {
-          handleDAExpSetAuctionDetails(
-            changetype<DAExpSetAuctionDetails>(event)
-          );
-        } else if (minterType === "MinterDAExpV1") {
-          handleDAExpSetAuctionDetails(
-            changetype<DAExpSetAuctionDetails>(event)
-          );
-        } else if (minterType === "MinterDAExpV2") {
-          handleDAExpSetAuctionDetails(
-            changetype<DAExpSetAuctionDetails>(event)
-          );
-        } else {
-          handleDAExpSetAuctionDetails(
-            changetype<DAExpSetAuctionDetails>(event)
-          );
-        }
+        handleDAExpSetAuctionDetails(changetype<DAExpSetAuctionDetails>(event));
 
         assert.notInStore(
           PROJECT_MINTER_CONFIGURATION_ENTITY_TYPE,
@@ -1018,23 +928,7 @@ describe("MinterDAExp-related tests", () => {
         ];
         event.block.timestamp = CURRENT_BLOCK_TIMESTAMP;
 
-        if (minterType === "MinterDAExpV0") {
-          handleDAExpSetAuctionDetails(
-            changetype<DAExpSetAuctionDetails>(event)
-          );
-        } else if (minterType === "MinterDAExpV1") {
-          handleDAExpSetAuctionDetails(
-            changetype<DAExpSetAuctionDetails>(event)
-          );
-        } else if (minterType === "MinterDAExpV2") {
-          handleDAExpSetAuctionDetails(
-            changetype<DAExpSetAuctionDetails>(event)
-          );
-        } else {
-          handleDAExpSetAuctionDetails(
-            changetype<DAExpSetAuctionDetails>(event)
-          );
-        }
+        handleDAExpSetAuctionDetails(changetype<DAExpSetAuctionDetails>(event));
 
         assert.fieldEquals(
           PROJECT_MINTER_CONFIGURATION_ENTITY_TYPE,
@@ -1139,23 +1033,7 @@ describe("MinterDAExp-related tests", () => {
         ];
         event.block.timestamp = CURRENT_BLOCK_TIMESTAMP;
 
-        if (minterType === "MinterDAExpV0") {
-          handleDAExpSetAuctionDetails(
-            changetype<DAExpSetAuctionDetails>(event)
-          );
-        } else if (minterType === "MinterDAExpV1") {
-          handleDAExpSetAuctionDetails(
-            changetype<DAExpSetAuctionDetails>(event)
-          );
-        } else if (minterType === "MinterDAExpV2") {
-          handleDAExpSetAuctionDetails(
-            changetype<DAExpSetAuctionDetails>(event)
-          );
-        } else {
-          handleDAExpSetAuctionDetails(
-            changetype<DAExpSetAuctionDetails>(event)
-          );
-        }
+        handleDAExpSetAuctionDetails(changetype<DAExpSetAuctionDetails>(event));
 
         assert.fieldEquals(
           PROJECT_MINTER_CONFIGURATION_ENTITY_TYPE,
@@ -1227,15 +1105,7 @@ describe("MinterDAExp-related tests", () => {
 
         assert.notInStore(PROJECT_ENTITY_TYPE, fullProjectId);
 
-        if (minterType == "MinterDAExpV0") {
-          handleDAExpResetAuctionDetails(
-            changetype<DAExpResetAuctionDetails>(event)
-          );
-        } else if (minterType == "MinterDAExpV1") {
-          handleDAExpResetAuctionDetails(
-            changetype<DAExpResetAuctionDetails>(event)
-          );
-        } else if (minterType == "MinterDAExpV2") {
+        if (!minterType.startsWith("MinterDAExpSettlement")) {
           handleDAExpResetAuctionDetails(
             changetype<DAExpResetAuctionDetails>(event)
           );
@@ -1316,15 +1186,7 @@ describe("MinterDAExp-related tests", () => {
         ];
         event.block.timestamp = CURRENT_BLOCK_TIMESTAMP;
 
-        if (minterType == "MinterDAExpV0") {
-          handleDAExpResetAuctionDetails(
-            changetype<DAExpResetAuctionDetails>(event)
-          );
-        } else if (minterType == "MinterDAExpV1") {
-          handleDAExpResetAuctionDetails(
-            changetype<DAExpResetAuctionDetails>(event)
-          );
-        } else if (minterType == "MinterDAExpV2") {
+        if (!minterType.startsWith("MinterDAExpSettlement")) {
           handleDAExpResetAuctionDetails(
             changetype<DAExpResetAuctionDetails>(event)
           );
@@ -1435,15 +1297,7 @@ describe("MinterDAExp-related tests", () => {
         ];
         event.block.timestamp = CURRENT_BLOCK_TIMESTAMP;
 
-        if (minterType == "MinterDAExpV0") {
-          handleDAExpResetAuctionDetails(
-            changetype<DAExpResetAuctionDetails>(event)
-          );
-        } else if (minterType == "MinterDAExpV1") {
-          handleDAExpResetAuctionDetails(
-            changetype<DAExpResetAuctionDetails>(event)
-          );
-        } else if (minterType == "MinterDAExpV2") {
+        if (!minterType.startsWith("MinterDAExpSettlement")) {
           handleDAExpResetAuctionDetails(
             changetype<DAExpResetAuctionDetails>(event)
           );
