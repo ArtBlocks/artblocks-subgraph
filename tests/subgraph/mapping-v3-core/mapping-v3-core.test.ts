@@ -750,6 +750,8 @@ test("GenArt721CoreV3: Handles PlatformUpdated::dependencyRegistryAddress - defa
   );
 });
 
+// We allow the dependency registry to dictate what core contracts can use it
+// so we don't need to update the dependency registry address
 test("GenArt721CoreV3: Handles PlatformUpdated::dependencyRegistryAddress - changed value", () => {
   clearStore();
   // add new contract to store
@@ -784,7 +786,7 @@ test("GenArt721CoreV3: Handles PlatformUpdated::dependencyRegistryAddress - chan
     CONTRACT_ENTITY_TYPE,
     TEST_CONTRACT_ADDRESS.toHexString(),
     "dependencyRegistry",
-    newAddress.toHexString()
+    TEST_CONTRACT.dependencyRegistry.toHexString()
   );
 });
 

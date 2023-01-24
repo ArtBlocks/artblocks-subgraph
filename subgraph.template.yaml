@@ -1488,13 +1488,17 @@ dataSources:
       apiVersion: 0.0.5
       language: wasm/assemblyscript
       entities:
+        - DependencyRegistry
         - Dependency
         - DependencyAdditionalCDN
         - DependencyAdditionalRepository
         - Project
+        - Contract
       abis:
         - name: IDependencyRegistryV0
           file: ./abis/IDependencyRegistryV0.json
+        - name: IDependencyRegistryCompatibleV0
+          file: ./abis/IDependencyRegistryCompatibleV0.json
       eventHandlers:
         - event: DependencyAdded(indexed bytes32,string,string,string)
           handler: handleDependencyAdded
@@ -1524,8 +1528,30 @@ dataSources:
           handler: handleSupportedCoreContractAdded
         - event: SupportedCoreContractRemoved(indexed address)
           handler: handleSupportedCoreContractRemoved
-      file: ./src/mapping-v3-core.ts
+      file: ./src/dependency-registry.ts
   {{/iDependencyRegistryV0Contracts}}
+  {{#ownableUpgradeableDependencyRegistryContracts}}
+  - kind: ethereum/contract
+    name: 'OwnableUpgradeable{{#address}}-{{address}}{{/address}}'
+    network: {{network}}
+    source:
+      address: "{{#address}}{{address}}{{/address}}{{^address}}0x0000000000000000000000000000000000000000{{/address}}"
+      abi: OwnableUpgradeable
+      {{#startBlock}}startBlock: {{startBlock}}{{/startBlock}}
+    mapping:
+      kind: ethereum/events
+      apiVersion: 0.0.5
+      language: wasm/assemblyscript
+      entities:
+        - DependencyRegistry
+      abis:
+        - name: OwnableUpgradeable
+          file: ./abis/OwnableUpgradeable.json
+      eventHandlers:
+        - event: OwnershipTransferred(indexed address,indexed address)
+          handler: handleOwnershipTransferred
+      file: ./src/dependency-registry.ts
+  {{/ownableUpgradeableDependencyRegistryContracts}}
   {{#openSeaContractV1}}
   - kind: ethereum/contract
     name: WyvernExchange

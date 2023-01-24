@@ -23,7 +23,7 @@ export class DependencyAdded__Params {
     this._event = event;
   }
 
-  get _dependencyTypeId(): Bytes {
+  get _dependencyType(): Bytes {
     return this._event.parameters[0].value.toBytes();
   }
 
@@ -35,7 +35,7 @@ export class DependencyAdded__Params {
     return this._event.parameters[2].value.toString();
   }
 
-  get _projectWebsite(): string {
+  get _referenceWebsite(): string {
     return this._event.parameters[3].value.toString();
   }
 }
@@ -53,7 +53,7 @@ export class DependencyAdditionalCDNRemoved__Params {
     this._event = event;
   }
 
-  get _dependencyTypeId(): Bytes {
+  get _dependencyType(): Bytes {
     return this._event.parameters[0].value.toBytes();
   }
 
@@ -75,7 +75,7 @@ export class DependencyAdditionalCDNUpdated__Params {
     this._event = event;
   }
 
-  get _dependencyTypeId(): Bytes {
+  get _dependencyType(): Bytes {
     return this._event.parameters[0].value.toBytes();
   }
 
@@ -101,7 +101,7 @@ export class DependencyAdditionalRepositoryRemoved__Params {
     this._event = event;
   }
 
-  get _dependencyTypeId(): Bytes {
+  get _dependencyType(): Bytes {
     return this._event.parameters[0].value.toBytes();
   }
 
@@ -123,7 +123,7 @@ export class DependencyAdditionalRepositoryUpdated__Params {
     this._event = event;
   }
 
-  get _dependencyTypeId(): Bytes {
+  get _dependencyType(): Bytes {
     return this._event.parameters[0].value.toBytes();
   }
 
@@ -149,7 +149,7 @@ export class DependencyPreferredCDNUpdated__Params {
     this._event = event;
   }
 
-  get _dependencyTypeId(): Bytes {
+  get _dependencyType(): Bytes {
     return this._event.parameters[0].value.toBytes();
   }
 
@@ -171,7 +171,7 @@ export class DependencyPreferredRepositoryUpdated__Params {
     this._event = event;
   }
 
-  get _dependencyTypeId(): Bytes {
+  get _dependencyType(): Bytes {
     return this._event.parameters[0].value.toBytes();
   }
 
@@ -193,11 +193,11 @@ export class DependencyReferenceWebsiteUpdated__Params {
     this._event = event;
   }
 
-  get _dependencyTypeId(): Bytes {
+  get _dependencyType(): Bytes {
     return this._event.parameters[0].value.toBytes();
   }
 
-  get _projectWebsite(): string {
+  get _referenceWebsite(): string {
     return this._event.parameters[1].value.toString();
   }
 }
@@ -215,7 +215,7 @@ export class DependencyRemoved__Params {
     this._event = event;
   }
 
-  get _dependencyTypeId(): Bytes {
+  get _dependencyType(): Bytes {
     return this._event.parameters[0].value.toBytes();
   }
 }
@@ -233,7 +233,7 @@ export class DependencyScriptUpdated__Params {
     this._event = event;
   }
 
-  get _dependencyTypeId(): Bytes {
+  get _dependencyType(): Bytes {
     return this._event.parameters[0].value.toBytes();
   }
 }
@@ -259,7 +259,7 @@ export class ProjectDependencyTypeOverrideAdded__Params {
     return this._event.parameters[1].value.toBigInt();
   }
 
-  get _dependencyTypeId(): Bytes {
+  get _dependencyType(): Bytes {
     return this._event.parameters[2].value.toBytes();
   }
 }
@@ -327,12 +327,12 @@ export class IDependencyRegistryV0 extends ethereum.SmartContract {
     return new IDependencyRegistryV0("IDependencyRegistryV0", address);
   }
 
-  getDependencyScriptAtIndex(_dependencyTypeId: Bytes, _index: BigInt): string {
+  getDependencyScriptAtIndex(_dependencyType: Bytes, _index: BigInt): string {
     let result = super.call(
       "getDependencyScriptAtIndex",
       "getDependencyScriptAtIndex(bytes32,uint256):(string)",
       [
-        ethereum.Value.fromFixedBytes(_dependencyTypeId),
+        ethereum.Value.fromFixedBytes(_dependencyType),
         ethereum.Value.fromUnsignedBigInt(_index)
       ]
     );
@@ -341,14 +341,14 @@ export class IDependencyRegistryV0 extends ethereum.SmartContract {
   }
 
   try_getDependencyScriptAtIndex(
-    _dependencyTypeId: Bytes,
+    _dependencyType: Bytes,
     _index: BigInt
   ): ethereum.CallResult<string> {
     let result = super.tryCall(
       "getDependencyScriptAtIndex",
       "getDependencyScriptAtIndex(bytes32,uint256):(string)",
       [
-        ethereum.Value.fromFixedBytes(_dependencyTypeId),
+        ethereum.Value.fromFixedBytes(_dependencyType),
         ethereum.Value.fromUnsignedBigInt(_index)
       ]
     );
@@ -360,14 +360,14 @@ export class IDependencyRegistryV0 extends ethereum.SmartContract {
   }
 
   getDependencyScriptBytecodeAddressAtIndex(
-    _dependencyTypeId: Bytes,
+    _dependencyType: Bytes,
     _index: BigInt
   ): Address {
     let result = super.call(
       "getDependencyScriptBytecodeAddressAtIndex",
       "getDependencyScriptBytecodeAddressAtIndex(bytes32,uint256):(address)",
       [
-        ethereum.Value.fromFixedBytes(_dependencyTypeId),
+        ethereum.Value.fromFixedBytes(_dependencyType),
         ethereum.Value.fromUnsignedBigInt(_index)
       ]
     );
@@ -376,14 +376,14 @@ export class IDependencyRegistryV0 extends ethereum.SmartContract {
   }
 
   try_getDependencyScriptBytecodeAddressAtIndex(
-    _dependencyTypeId: Bytes,
+    _dependencyType: Bytes,
     _index: BigInt
   ): ethereum.CallResult<Address> {
     let result = super.tryCall(
       "getDependencyScriptBytecodeAddressAtIndex",
       "getDependencyScriptBytecodeAddressAtIndex(bytes32,uint256):(address)",
       [
-        ethereum.Value.fromFixedBytes(_dependencyTypeId),
+        ethereum.Value.fromFixedBytes(_dependencyType),
         ethereum.Value.fromUnsignedBigInt(_index)
       ]
     );

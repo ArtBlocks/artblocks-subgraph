@@ -9,7 +9,7 @@
         {
           "indexed": true,
           "internalType": "bytes32",
-          "name": "_dependencyTypeId",
+          "name": "_dependencyType",
           "type": "bytes32"
         },
         {
@@ -27,7 +27,7 @@
         {
           "indexed": false,
           "internalType": "string",
-          "name": "_projectWebsite",
+          "name": "_referenceWebsite",
           "type": "string"
         }
       ],
@@ -40,7 +40,7 @@
         {
           "indexed": true,
           "internalType": "bytes32",
-          "name": "_dependencyTypeId",
+          "name": "_dependencyType",
           "type": "bytes32"
         },
         {
@@ -59,7 +59,7 @@
         {
           "indexed": true,
           "internalType": "bytes32",
-          "name": "_dependencyTypeId",
+          "name": "_dependencyType",
           "type": "bytes32"
         },
         {
@@ -84,7 +84,7 @@
         {
           "indexed": true,
           "internalType": "bytes32",
-          "name": "_dependencyTypeId",
+          "name": "_dependencyType",
           "type": "bytes32"
         },
         {
@@ -103,7 +103,7 @@
         {
           "indexed": true,
           "internalType": "bytes32",
-          "name": "_dependencyTypeId",
+          "name": "_dependencyType",
           "type": "bytes32"
         },
         {
@@ -128,7 +128,7 @@
         {
           "indexed": true,
           "internalType": "bytes32",
-          "name": "_dependencyTypeId",
+          "name": "_dependencyType",
           "type": "bytes32"
         },
         {
@@ -147,7 +147,7 @@
         {
           "indexed": true,
           "internalType": "bytes32",
-          "name": "_dependencyTypeId",
+          "name": "_dependencyType",
           "type": "bytes32"
         },
         {
@@ -166,13 +166,13 @@
         {
           "indexed": true,
           "internalType": "bytes32",
-          "name": "_dependencyTypeId",
+          "name": "_dependencyType",
           "type": "bytes32"
         },
         {
           "indexed": false,
           "internalType": "string",
-          "name": "_projectWebsite",
+          "name": "_referenceWebsite",
           "type": "string"
         }
       ],
@@ -185,7 +185,7 @@
         {
           "indexed": true,
           "internalType": "bytes32",
-          "name": "_dependencyTypeId",
+          "name": "_dependencyType",
           "type": "bytes32"
         }
       ],
@@ -198,7 +198,7 @@
         {
           "indexed": true,
           "internalType": "bytes32",
-          "name": "_dependencyTypeId",
+          "name": "_dependencyType",
           "type": "bytes32"
         }
       ],
@@ -223,7 +223,7 @@
         {
           "indexed": false,
           "internalType": "bytes32",
-          "name": "_dependencyTypeId",
+          "name": "_dependencyType",
           "type": "bytes32"
         }
       ],
@@ -279,7 +279,7 @@
       "inputs": [
         {
           "internalType": "bytes32",
-          "name": "_dependencyTypeId",
+          "name": "_dependencyType",
           "type": "bytes32"
         },
         {
@@ -303,7 +303,7 @@
       "inputs": [
         {
           "internalType": "bytes32",
-          "name": "_dependencyTypeId",
+          "name": "_dependencyType",
           "type": "bytes32"
         },
         {

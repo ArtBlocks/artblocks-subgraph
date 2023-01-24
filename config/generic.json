@@ -159,5 +159,10 @@
     {
       "address": ""
     }
+  ],
+  "ownableUpgradeableDependencyRegistryContracts": [
+    {
+      "address": ""
+    }
   ]
 }

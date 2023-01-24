@@ -210,7 +210,7 @@ type Contract @entity {
   curationRegistry: Bytes
 
   "Dependency registry contract address"
-  dependencyRegistry: Bytes
+  dependencyRegistry: DependencyRegistry
 
   nextProjectId: BigInt!
 
@@ -553,32 +553,65 @@ type Transfer @entity(immutable: true) {
 }
 
 type Dependency @entity {
+  "Unique identifier made up of dependency name and version separated by an @ symbol (e.g. p5js@1.0.0)"
   id: ID!
+  "Preffered CDN for this dependency"
   preferredCDN: String!
+  "Additional CDNs for this dependency"
   additionalCDNs: [DependencyAdditionalCDN!]! @derivedFrom(field: "dependency")
+  "Number of additional CDNs for this dependency"
   additionalCDNCount: BigInt!
+  "Preffered repository for this dependency"
   preferredRepository: String!
+  "Additional repositories for this dependency"
   additionalRepositoryCount: BigInt!
+  "Number of additional repositories for this dependency"
   additionalRepositories: [DependencyAdditionalRepository!]! @derivedFrom(field: "dependency")
+  "List of on-chain scripts that for this dependency"
   scripts: [DependencyScript!]! @derivedFrom(field: "dependency")
+  "Number of on-chain scripts for this dependency"
   scriptCount: BigInt!
+  "Concatenated string of all scripts for this dependency"
+  script: String
+  "Reference website for this dependency (e.g. https://p5js.org)"
   referenceWebsite: String!
+  "Depenency registry contract that this dependency is registered on"
+  dependencyRegistry: DependencyRegistry!
+  "Timestamp of last update"
+  updatedAt: BigInt!
+}
+
+type DependencyRegistry @entity {
+  "Unique identifier made up of dependency registry address"
+  id: Bytes!
+  supportedCoreContracts: [Contract!]! @derivedFrom(field: "dependencyRegistry")
+  dependencies: [Dependency!] @derivedFrom(field: "dependencyRegistry")
+  owner: Bytes!
+  updatedAt: BigInt!
 }
 
 type DependencyAdditionalCDN @entity {
+  "Unique identifier made up of dependency id and index"
   id: ID!
   dependency: Dependency!
+  cdn: String!
+  index: BigInt!
 }
 
 type DependencyAdditionalRepository @entity {
+  "Unique identifier made up of dependency id and index"
   id: ID!
   dependency: Dependency!
+  repository: String!
+  index: BigInt!
 }
 
 type DependencyScript @entity {
+  "Unique identifier made up of dependency id and index"
   id: ID!
   dependency: Dependency!
   index: BigInt!
+  script: String!
   address: Bytes!
 }
 

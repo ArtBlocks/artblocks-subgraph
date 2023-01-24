@@ -2545,6 +2545,23 @@ export class Dependency extends Entity {
     this.set("scriptCount", Value.fromBigInt(value));
   }
 
+  get script(): string | null {
+    let value = this.get("script");
+    if (!value || value.kind == ValueKind.NULL) {
+      return null;
+    } else {
+      return value.toString();
+    }
+  }
+
+  set script(value: string | null) {
+    if (!value) {
+      this.unset("script");
+    } else {
+      this.set("script", Value.fromString(<string>value));
+    }
+  }
+
   get referenceWebsite(): string {
     let value = this.get("referenceWebsite");
     return value!.toString();
@@ -2552,6 +2569,102 @@ export class Dependency extends Entity {
 
   set referenceWebsite(value: string) {
     this.set("referenceWebsite", Value.fromString(value));
+  }
+
+  get dependencyRegistry(): Bytes {
+    let value = this.get("dependencyRegistry");
+    return value!.toBytes();
+  }
+
+  set dependencyRegistry(value: Bytes) {
+    this.set("dependencyRegistry", Value.fromBytes(value));
+  }
+
+  get updatedAt(): BigInt {
+    let value = this.get("updatedAt");
+    return value!.toBigInt();
+  }
+
+  set updatedAt(value: BigInt) {
+    this.set("updatedAt", Value.fromBigInt(value));
+  }
+}
+
+export class DependencyRegistry extends Entity {
+  constructor(id: Bytes) {
+    super();
+    this.set("id", Value.fromBytes(id));
+  }
+
+  save(): void {
+    let id = this.get("id");
+    assert(id != null, "Cannot save DependencyRegistry entity without an ID");
+    if (id) {
+      assert(
+        id.kind == ValueKind.BYTES,
+        `Entities of type DependencyRegistry must have an ID of type Bytes but the id '${id.displayData()}' is of type ${id.displayKind()}`
+      );
+      store.set("DependencyRegistry", id.toBytes().toHexString(), this);
+    }
+  }
+
+  static load(id: Bytes): DependencyRegistry | null {
+    return changetype<DependencyRegistry | null>(
+      store.get("DependencyRegistry", id.toHexString())
+    );
+  }
+
+  get id(): Bytes {
+    let value = this.get("id");
+    return value!.toBytes();
+  }
+
+  set id(value: Bytes) {
+    this.set("id", Value.fromBytes(value));
+  }
+
+  get supportedCoreContracts(): Array<string> {
+    let value = this.get("supportedCoreContracts");
+    return value!.toStringArray();
+  }
+
+  set supportedCoreContracts(value: Array<string>) {
+    this.set("supportedCoreContracts", Value.fromStringArray(value));
+  }
+
+  get dependencies(): Array<string> | null {
+    let value = this.get("dependencies");
+    if (!value || value.kind == ValueKind.NULL) {
+      return null;
+    } else {
+      return value.toStringArray();
+    }
+  }
+
+  set dependencies(value: Array<string> | null) {
+    if (!value) {
+      this.unset("dependencies");
+    } else {
+      this.set("dependencies", Value.fromStringArray(<Array<string>>value));
+    }
+  }
+
+  get owner(): Bytes {
+    let value = this.get("owner");
+    return value!.toBytes();
+  }
+
+  set owner(value: Bytes) {
+    this.set("owner", Value.fromBytes(value));
+  }
+
+  get updatedAt(): BigInt {
+    let value = this.get("updatedAt");
+    return value!.toBigInt();
+  }
+
+  set updatedAt(value: BigInt) {
+    this.set("updatedAt", Value.fromBigInt(value));
   }
 }
 
@@ -2599,6 +2712,24 @@ export class DependencyAdditionalCDN extends Entity {
   set dependency(value: string) {
     this.set("dependency", Value.fromString(value));
   }
+
+  get cdn(): string {
+    let value = this.get("cdn");
+    return value!.toString();
+  }
+
+  set cdn(value: string) {
+    this.set("cdn", Value.fromString(value));
+  }
+
+  get index(): BigInt {
+    let value = this.get("index");
+    return value!.toBigInt();
+  }
+
+  set index(value: BigInt) {
+    this.set("index", Value.fromBigInt(value));
+  }
 }
 
 export class DependencyAdditionalRepository extends Entity {
@@ -2644,6 +2775,24 @@ export class DependencyAdditionalRepository extends Entity {
 
   set dependency(value: string) {
     this.set("dependency", Value.fromString(value));
+  }
+
+  get repository(): string {
+    let value = this.get("repository");
+    return value!.toString();
+  }
+
+  set repository(value: string) {
+    this.set("repository", Value.fromString(value));
+  }
+
+  get index(): BigInt {
+    let value = this.get("index");
+    return value!.toBigInt();
+  }
+
+  set index(value: BigInt) {
+    this.set("index", Value.fromBigInt(value));
   }
 }
 
@@ -2696,6 +2845,15 @@ export class DependencyScript extends Entity {
 
   set index(value: BigInt) {
     this.set("index", Value.fromBigInt(value));
+  }
+
+  get script(): string {
+    let value = this.get("script");
+    return value!.toString();
+  }
+
+  set script(value: string) {
+    this.set("script", Value.fromString(value));
   }
 
   get address(): Bytes {
