@@ -180,121 +180,107 @@
       "startBlock": 7723580
     }
   ],
-  "minterSetPriceV1Contracts": [
+  "minterSetPriceContracts": [
     {
       "address": "0x7d7571E8D507e8AEB61a6484c42a98e50894Aa80",
-      "name": "Flagship Minter for V1 core",
+      "name": "V1 Flagship Minter for V1 core",
       "startBlock": 7011002
     },
     {
       "address": "0x3851b8f754E77f07e0a08425d280c1B4fe4e3363",
-      "name": "Art Blocks x Pace",
+      "name": "V1 Art Blocks x Pace",
       "startBlock": 7011002
-    }
-  ],
-  "minterSetPriceV2Contracts": [
+    },
     {
       "address": "0x3CB6381203f6c9d75B70F0af70E905cC67d68437",
-      "name": "Flagship Minter for V3 core",
+      "name": "V2 Flagship Minter for V3 core",
       "startBlock": 7723582
     }
   ],
-  "minterSetPriceERC20V1Contracts": [
+  "minterSetPriceERC20Contracts": [
     {
       "address": "0x67688F11ccf152B3baC51e0256245467AfEE60DB",
-      "name": "Flagship Minter for V1 core",
+      "name": "V1 Flagship Minter for V1 core",
       "startBlock": 7011002
     },
     {
       "address": "0x5749E012767FDA174389d77Adc032e3e880b166c",
-      "name": "Art Blocks x Pace",
-      "startBlock": 7011002
-    }
-  ],
-  "minterSetPriceERC20V2Contracts": [
-    {
-      "address": "0x37007e0561E219e77dAF24Ef0984a5488239512A",
-      "name": "Flagship Minter for V3 core",
-      "startBlock": 7723584
-    }
-  ],
-  "minterDALinV1Contracts": [
-    {
-      "address": "0xc96cBfb0E378a2474E176da4D41DF3d04f17aCa6",
-      "name": "Flagship Minter for V1 core",
+      "name": "V1 Art Blocks x Pace",
       "startBlock": 7011002
     },
     {
-      "address": "0xd125111461557f2d8A52848f55Ac4651d2426f88",
-      "name": "Art Blocks x Pace",
-      "startBlock": 7011002
+      "address": "0x37007e0561E219e77dAF24Ef0984a5488239512A",
+      "name": "V2 Flagship Minter for V3 core",
+      "startBlock": 7723584
     }
   ],
-  "minterDALinV2Contracts": [
-    {
-      "address": "0xb228C4dce0929D3d1dC7C386ba3cC2c0671e1751",
-      "name": "Flagship Minter for V3 core",
-      "startBlock": 7723585
-    }
-  ],
-  "minterDAExpV1Contracts": [
+  "minterDAExpContracts": [
     {
       "address": "0xDBB6e9443afC40104B319F51AFD82B38f3c87BA0",
-      "name": "Flagship Minter for V1 core",
+      "name": "V1 Flagship Minter for V1 core",
       "startBlock": 7011002
     },
     {
       "address": "0xf4015573db8f9E80206296e53a32E20B87Ab1578",
-      "name": "Art Blocks x Pace",
+      "name": "V1 Art Blocks x Pace",
       "startBlock": 7011002
-    }
-  ],
-  "minterDAExpV2Contracts": [
+    },
     {
       "address": "0xb61ABA1c6b4079c976Fb664F27a0D9C47b81a05B",
-      "name": "Flagship Minter for V3 core",
+      "name": "V2 Flagship Minter for V3 core",
       "startBlock": 7723587
     }
   ],
-  "minterDAExpSettlementV0Contracts": [
+  "minterDALinContracts": [
+    {
+      "address": "0xc96cBfb0E378a2474E176da4D41DF3d04f17aCa6",
+      "name": "V1 Flagship Minter for V1 core",
+      "startBlock": 7011002
+    },
+    {
+      "address": "0xd125111461557f2d8A52848f55Ac4651d2426f88",
+      "name": "V1 Art Blocks x Pace",
+      "startBlock": 7011002
+    },
+    {
+      "address": "0xb228C4dce0929D3d1dC7C386ba3cC2c0671e1751",
+      "name": "V2 Flagship Minter for V3 core",
+      "startBlock": 7723585
+    }
+  ],
+  "minterDAExpSettlementContracts": [
     {
       "address": "0x1D5E143CDf39ed1c50adF400e7c6c1E7da7c43A7",
-      "name": "Flagship Minter for V3 core",
+      "name": "V0 Flagship Minter for V3 core",
       "startBlock": 8339496
     }
   ],
-  "minterMerkleV0Contracts": [
+  "minterMerkleContracts": [
     {
       "address": "0x9b452ea5692b732E724AaCAe461F902f58F8fe74",
-      "name": "Flagship Minter for V1 core",
+      "name": "V0 Flagship Minter for V1 core",
       "startBlock": 7705061
-    }
-  ],
-  "minterMerkleV1Contracts": [
+    },
     {
       "address": "0x0c4Fad825042f84D0Bcc1734829104F951BDFf05",
-      "name": "Flagship Minter for V3 core",
+      "name": "V1 Flagship Minter for V3 core",
       "startBlock": 7723588
-    }
-  ],
-  "minterMerkleV3Contracts": [
+    },
     {
       "address": "0xD3241C7101D5BDD0A8cC6f866D2d8b7AF1fF1962",
-      "name": "Flagship Minter for V3 core",
+      "name": "V3 Flagship Minter for V3 core",
       "startBlock": 8136221
     }
   ],
-  "minterHolderV1Contracts": [
+  "minterHolderContracts": [
     {
       "address": "0x3e8d9D70906d39225bDcb14002cAFD8a652aD97A",
-      "name": "Flagship Minter for V3 core",
+      "name": "V1 Flagship Minter for V3 core",
       "startBlock": 7723589
-    }
-  ],
-  "minterHolderV2Contracts": [
+    },
     {
       "address": "0x6f9953e06675904AAE18568b1697544778616DAA",
-      "name": "Flagship Minter for V3 core",
+      "name": "V2 Flagship Minter for V3 core",
       "startBlock": 8136182
     }
   ],

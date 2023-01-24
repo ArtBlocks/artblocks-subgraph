@@ -40,132 +40,37 @@
       "address": ""
     }
   ],
-  "minterSetPriceV0Contracts": [
+  "minterSetPriceContracts": [
     {
       "address": ""
     }
   ],
-  "minterSetPriceERC20V0Contracts": [
+  "minterSetPriceERC20Contracts": [
     {
       "address": ""
     }
   ],
-  "minterDALinV0Contracts": [
+  "minterDAExpContracts": [
     {
       "address": ""
     }
   ],
-  "minterDAExpV0Contracts": [
+  "minterDALinContracts": [
     {
       "address": ""
     }
   ],
-  "minterSetPriceV1Contracts": [
+  "minterDAExpSettlementContracts": [
     {
       "address": ""
     }
   ],
-  "minterSetPriceERC20V1Contracts": [
+  "minterMerkleContracts": [
     {
       "address": ""
     }
   ],
-  "minterDALinV1Contracts": [
-    {
-      "address": ""
-    }
-  ],
-  "minterDAExpV1Contracts": [
-    {
-      "address": ""
-    }
-  ],
-  "minterSetPriceV2Contracts": [
-    {
-      "address": ""
-    }
-  ],
-  "minterSetPriceV3Contracts": [
-    {
-      "address": ""
-    }
-  ],
-  "minterSetPriceERC20V2Contracts": [
-    {
-      "address": ""
-    }
-  ],
-  "minterSetPriceERC20V3Contracts": [
-    {
-      "address": ""
-    }
-  ],
-  "minterDALinV2Contracts": [
-    {
-      "address": ""
-    }
-  ],
-  "minterDALinV3Contracts": [
-    {
-      "address": ""
-    }
-  ],
-  "minterDAExpV2Contracts": [
-    {
-      "address": ""
-    }
-  ],
-  "minterDAExpV3Contracts": [
-    {
-      "address": ""
-    }
-  ],
-  "minterDAExpSettlementV0Contracts": [
-    {
-      "address": ""
-    }
-  ],
-  "minterMerkleV0Contracts": [
-    {
-      "address": ""
-    }
-  ],
-  "minterMerkleV1Contracts": [
-    {
-      "address": ""
-    }
-  ],
-  "minterMerkleV2Contracts": [
-    {
-      "address": ""
-    }
-  ],
-  "minterMerkleV3Contracts": [
-    {
-      "address": ""
-    }
-  ],
-  "minterMerkleV4Contracts": [
-    {
-      "address": ""
-    }
-  ],
-  "minterHolderV0Contracts": [
-    {
-      "address": ""
-    }
-  ],
-  "minterHolderV1Contracts": [
-    {
-      "address": ""
-    }
-  ],
-  "minterHolderV2Contracts": [
-    {
-      "address": ""
-    }
-  ],
-  "minterHolderV3Contracts": [
+  "minterHolderContracts": [
     {
       "address": ""
     }
