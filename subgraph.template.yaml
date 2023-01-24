@@ -1316,7 +1316,7 @@ dataSources:
         - event: AuctionHalfLifeRangeSecondsUpdated(uint256,uint256)
           handler: handleAuctionHalfLifeRangeSecondsUpdated
         - event: SetAuctionDetails(indexed uint256,uint256,uint256,uint256,uint256)
-          handler: handleSetAuctionDetails
+          handler: handleDAExpSetAuctionDetails
         - event: ResetAuctionDetails(indexed uint256,uint256,uint256)
           handler: handleDAExpSettlementResetAuctionDetails
         - event: SelloutPriceUpdated(indexed uint256,uint256)
