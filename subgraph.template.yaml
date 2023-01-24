@@ -1475,6 +1475,83 @@ dataSources:
           handler: handleIAdminACLV0SuperAdminTransferred
       file: ./src/mapping-v3-core.ts
   {{/adminACLV0Contracts}}
+  {{#iDependencyRegistryV0Contracts}}
+  - kind: ethereum/contract
+    name: 'IDependencyRegistryV0{{#address}}-{{address}}{{/address}}'
+    network: {{network}}
+    source:
+      address: "{{#address}}{{address}}{{/address}}{{^address}}0x0000000000000000000000000000000000000000{{/address}}"
+      abi: IDependencyRegistryV0
+      {{#startBlock}}startBlock: {{startBlock}}{{/startBlock}}
+    mapping:
+      kind: ethereum/events
+      apiVersion: 0.0.5
+      language: wasm/assemblyscript
+      entities:
+        - DependencyRegistry
+        - Dependency
+        - DependencyAdditionalCDN
+        - DependencyAdditionalRepository
+        - Project
+        - Contract
+      abis:
+        - name: IDependencyRegistryV0
+          file: ./abis/IDependencyRegistryV0.json
+        - name: IDependencyRegistryCompatibleV0
+          file: ./abis/IDependencyRegistryCompatibleV0.json
+      eventHandlers:
+        - event: DependencyAdded(indexed bytes32,string,string,string)
+          handler: handleDependencyAdded
+        - event: DependencyAdditionalCDNRemoved(indexed bytes32,indexed uint256)
+          handler: handleDependencyAdditionalCDNRemoved
+        - event: DependencyAdditionalCDNUpdated(indexed bytes32,string,uint256)
+          handler: handleDependencyAdditionalCDNUpdated
+        - event: DependencyAdditionalRepositoryRemoved(indexed bytes32,indexed uint256)
+          handler: handleDependencyAdditionalRepositoryRemoved
+        - event: DependencyAdditionalRepositoryUpdated(indexed bytes32,string,uint256)
+          handler: handleDependencyAdditionalRepositoryUpdated
+        - event: DependencyPreferredCDNUpdated(indexed bytes32,string)
+          handler: handleDependencyPreferredCDNUpdated
+        - event: DependencyPreferredRepositoryUpdated(indexed bytes32,string)
+          handler: handleDependencyPreferredRepositoryUpdated
+        - event: DependencyReferenceWebsiteUpdated(indexed bytes32,string)
+          handler: handleDependencyReferenceWebsiteUpdated
+        - event: DependencyRemoved(indexed bytes32)
+          handler: handleDependencyRemoved
+        - event: DependencyScriptUpdated(indexed bytes32)
+          handler: handleDependencyScriptUpdated
+        - event: ProjectDependencyTypeOverrideAdded(indexed address,indexed uint256,bytes32)
+          handler: handleProjectDependencyTypeOverrideAdded
+        - event: ProjectDependencyTypeOverrideRemoved(indexed address,indexed uint256)
+          handler: handleProjectDependencyTypeOverrideRemoved
+        - event: SupportedCoreContractAdded(indexed address)
+          handler: handleSupportedCoreContractAdded
+        - event: SupportedCoreContractRemoved(indexed address)
+          handler: handleSupportedCoreContractRemoved
+      file: ./src/dependency-registry.ts
+  {{/iDependencyRegistryV0Contracts}}
+  {{#ownableUpgradeableDependencyRegistryContracts}}
+  - kind: ethereum/contract
+    name: 'OwnableUpgradeable{{#address}}-{{address}}{{/address}}'
+    network: {{network}}
+    source:
+      address: "{{#address}}{{address}}{{/address}}{{^address}}0x0000000000000000000000000000000000000000{{/address}}"
+      abi: OwnableUpgradeable
+      {{#startBlock}}startBlock: {{startBlock}}{{/startBlock}}
+    mapping:
+      kind: ethereum/events
+      apiVersion: 0.0.5
+      language: wasm/assemblyscript
+      entities:
+        - DependencyRegistry
+      abis:
+        - name: OwnableUpgradeable
+          file: ./abis/OwnableUpgradeable.json
+      eventHandlers:
+        - event: OwnershipTransferred(indexed address,indexed address)
+          handler: handleOwnershipTransferred
+      file: ./src/dependency-registry.ts
+  {{/ownableUpgradeableDependencyRegistryContracts}}
   {{#openSeaContractV1}}
   - kind: ethereum/contract
     name: WyvernExchange

@@ -2442,6 +2442,430 @@ export class Transfer extends Entity {
   }
 }
 
+export class Dependency extends Entity {
+  constructor(id: string) {
+    super();
+    this.set("id", Value.fromString(id));
+  }
+
+  save(): void {
+    let id = this.get("id");
+    assert(id != null, "Cannot save Dependency entity without an ID");
+    if (id) {
+      assert(
+        id.kind == ValueKind.STRING,
+        `Entities of type Dependency must have an ID of type String but the id '${id.displayData()}' is of type ${id.displayKind()}`
+      );
+      store.set("Dependency", id.toString(), this);
+    }
+  }
+
+  static load(id: string): Dependency | null {
+    return changetype<Dependency | null>(store.get("Dependency", id));
+  }
+
+  get id(): string {
+    let value = this.get("id");
+    return value!.toString();
+  }
+
+  set id(value: string) {
+    this.set("id", Value.fromString(value));
+  }
+
+  get preferredCDN(): string {
+    let value = this.get("preferredCDN");
+    return value!.toString();
+  }
+
+  set preferredCDN(value: string) {
+    this.set("preferredCDN", Value.fromString(value));
+  }
+
+  get additionalCDNs(): Array<string> {
+    let value = this.get("additionalCDNs");
+    return value!.toStringArray();
+  }
+
+  set additionalCDNs(value: Array<string>) {
+    this.set("additionalCDNs", Value.fromStringArray(value));
+  }
+
+  get additionalCDNCount(): BigInt {
+    let value = this.get("additionalCDNCount");
+    return value!.toBigInt();
+  }
+
+  set additionalCDNCount(value: BigInt) {
+    this.set("additionalCDNCount", Value.fromBigInt(value));
+  }
+
+  get preferredRepository(): string {
+    let value = this.get("preferredRepository");
+    return value!.toString();
+  }
+
+  set preferredRepository(value: string) {
+    this.set("preferredRepository", Value.fromString(value));
+  }
+
+  get additionalRepositoryCount(): BigInt {
+    let value = this.get("additionalRepositoryCount");
+    return value!.toBigInt();
+  }
+
+  set additionalRepositoryCount(value: BigInt) {
+    this.set("additionalRepositoryCount", Value.fromBigInt(value));
+  }
+
+  get additionalRepositories(): Array<string> {
+    let value = this.get("additionalRepositories");
+    return value!.toStringArray();
+  }
+
+  set additionalRepositories(value: Array<string>) {
+    this.set("additionalRepositories", Value.fromStringArray(value));
+  }
+
+  get scripts(): Array<string> {
+    let value = this.get("scripts");
+    return value!.toStringArray();
+  }
+
+  set scripts(value: Array<string>) {
+    this.set("scripts", Value.fromStringArray(value));
+  }
+
+  get scriptCount(): BigInt {
+    let value = this.get("scriptCount");
+    return value!.toBigInt();
+  }
+
+  set scriptCount(value: BigInt) {
+    this.set("scriptCount", Value.fromBigInt(value));
+  }
+
+  get script(): string | null {
+    let value = this.get("script");
+    if (!value || value.kind == ValueKind.NULL) {
+      return null;
+    } else {
+      return value.toString();
+    }
+  }
+
+  set script(value: string | null) {
+    if (!value) {
+      this.unset("script");
+    } else {
+      this.set("script", Value.fromString(<string>value));
+    }
+  }
+
+  get referenceWebsite(): string {
+    let value = this.get("referenceWebsite");
+    return value!.toString();
+  }
+
+  set referenceWebsite(value: string) {
+    this.set("referenceWebsite", Value.fromString(value));
+  }
+
+  get dependencyRegistry(): Bytes {
+    let value = this.get("dependencyRegistry");
+    return value!.toBytes();
+  }
+
+  set dependencyRegistry(value: Bytes) {
+    this.set("dependencyRegistry", Value.fromBytes(value));
+  }
+
+  get updatedAt(): BigInt {
+    let value = this.get("updatedAt");
+    return value!.toBigInt();
+  }
+
+  set updatedAt(value: BigInt) {
+    this.set("updatedAt", Value.fromBigInt(value));
+  }
+}
+
+export class DependencyRegistry extends Entity {
+  constructor(id: Bytes) {
+    super();
+    this.set("id", Value.fromBytes(id));
+  }
+
+  save(): void {
+    let id = this.get("id");
+    assert(id != null, "Cannot save DependencyRegistry entity without an ID");
+    if (id) {
+      assert(
+        id.kind == ValueKind.BYTES,
+        `Entities of type DependencyRegistry must have an ID of type Bytes but the id '${id.displayData()}' is of type ${id.displayKind()}`
+      );
+      store.set("DependencyRegistry", id.toBytes().toHexString(), this);
+    }
+  }
+
+  static load(id: Bytes): DependencyRegistry | null {
+    return changetype<DependencyRegistry | null>(
+      store.get("DependencyRegistry", id.toHexString())
+    );
+  }
+
+  get id(): Bytes {
+    let value = this.get("id");
+    return value!.toBytes();
+  }
+
+  set id(value: Bytes) {
+    this.set("id", Value.fromBytes(value));
+  }
+
+  get supportedCoreContracts(): Array<string> {
+    let value = this.get("supportedCoreContracts");
+    return value!.toStringArray();
+  }
+
+  set supportedCoreContracts(value: Array<string>) {
+    this.set("supportedCoreContracts", Value.fromStringArray(value));
+  }
+
+  get dependencies(): Array<string> | null {
+    let value = this.get("dependencies");
+    if (!value || value.kind == ValueKind.NULL) {
+      return null;
+    } else {
+      return value.toStringArray();
+    }
+  }
+
+  set dependencies(value: Array<string> | null) {
+    if (!value) {
+      this.unset("dependencies");
+    } else {
+      this.set("dependencies", Value.fromStringArray(<Array<string>>value));
+    }
+  }
+
+  get owner(): Bytes {
+    let value = this.get("owner");
+    return value!.toBytes();
+  }
+
+  set owner(value: Bytes) {
+    this.set("owner", Value.fromBytes(value));
+  }
+
+  get updatedAt(): BigInt {
+    let value = this.get("updatedAt");
+    return value!.toBigInt();
+  }
+
+  set updatedAt(value: BigInt) {
+    this.set("updatedAt", Value.fromBigInt(value));
+  }
+}
+
+export class DependencyAdditionalCDN extends Entity {
+  constructor(id: string) {
+    super();
+    this.set("id", Value.fromString(id));
+  }
+
+  save(): void {
+    let id = this.get("id");
+    assert(
+      id != null,
+      "Cannot save DependencyAdditionalCDN entity without an ID"
+    );
+    if (id) {
+      assert(
+        id.kind == ValueKind.STRING,
+        `Entities of type DependencyAdditionalCDN must have an ID of type String but the id '${id.displayData()}' is of type ${id.displayKind()}`
+      );
+      store.set("DependencyAdditionalCDN", id.toString(), this);
+    }
+  }
+
+  static load(id: string): DependencyAdditionalCDN | null {
+    return changetype<DependencyAdditionalCDN | null>(
+      store.get("DependencyAdditionalCDN", id)
+    );
+  }
+
+  get id(): string {
+    let value = this.get("id");
+    return value!.toString();
+  }
+
+  set id(value: string) {
+    this.set("id", Value.fromString(value));
+  }
+
+  get dependency(): string {
+    let value = this.get("dependency");
+    return value!.toString();
+  }
+
+  set dependency(value: string) {
+    this.set("dependency", Value.fromString(value));
+  }
+
+  get cdn(): string {
+    let value = this.get("cdn");
+    return value!.toString();
+  }
+
+  set cdn(value: string) {
+    this.set("cdn", Value.fromString(value));
+  }
+
+  get index(): BigInt {
+    let value = this.get("index");
+    return value!.toBigInt();
+  }
+
+  set index(value: BigInt) {
+    this.set("index", Value.fromBigInt(value));
+  }
+}
+
+export class DependencyAdditionalRepository extends Entity {
+  constructor(id: string) {
+    super();
+    this.set("id", Value.fromString(id));
+  }
+
+  save(): void {
+    let id = this.get("id");
+    assert(
+      id != null,
+      "Cannot save DependencyAdditionalRepository entity without an ID"
+    );
+    if (id) {
+      assert(
+        id.kind == ValueKind.STRING,
+        `Entities of type DependencyAdditionalRepository must have an ID of type String but the id '${id.displayData()}' is of type ${id.displayKind()}`
+      );
+      store.set("DependencyAdditionalRepository", id.toString(), this);
+    }
+  }
+
+  static load(id: string): DependencyAdditionalRepository | null {
+    return changetype<DependencyAdditionalRepository | null>(
+      store.get("DependencyAdditionalRepository", id)
+    );
+  }
+
+  get id(): string {
+    let value = this.get("id");
+    return value!.toString();
+  }
+
+  set id(value: string) {
+    this.set("id", Value.fromString(value));
+  }
+
+  get dependency(): string {
+    let value = this.get("dependency");
+    return value!.toString();
+  }
+
+  set dependency(value: string) {
+    this.set("dependency", Value.fromString(value));
+  }
+
+  get repository(): string {
+    let value = this.get("repository");
+    return value!.toString();
+  }
+
+  set repository(value: string) {
+    this.set("repository", Value.fromString(value));
+  }
+
+  get index(): BigInt {
+    let value = this.get("index");
+    return value!.toBigInt();
+  }
+
+  set index(value: BigInt) {
+    this.set("index", Value.fromBigInt(value));
+  }
+}
+
+export class DependencyScript extends Entity {
+  constructor(id: string) {
+    super();
+    this.set("id", Value.fromString(id));
+  }
+
+  save(): void {
+    let id = this.get("id");
+    assert(id != null, "Cannot save DependencyScript entity without an ID");
+    if (id) {
+      assert(
+        id.kind == ValueKind.STRING,
+        `Entities of type DependencyScript must have an ID of type String but the id '${id.displayData()}' is of type ${id.displayKind()}`
+      );
+      store.set("DependencyScript", id.toString(), this);
+    }
+  }
+
+  static load(id: string): DependencyScript | null {
+    return changetype<DependencyScript | null>(
+      store.get("DependencyScript", id)
+    );
+  }
+
+  get id(): string {
+    let value = this.get("id");
+    return value!.toString();
+  }
+
+  set id(value: string) {
+    this.set("id", Value.fromString(value));
+  }
+
+  get dependency(): string {
+    let value = this.get("dependency");
+    return value!.toString();
+  }
+
+  set dependency(value: string) {
+    this.set("dependency", Value.fromString(value));
+  }
+
+  get index(): BigInt {
+    let value = this.get("index");
+    return value!.toBigInt();
+  }
+
+  set index(value: BigInt) {
+    this.set("index", Value.fromBigInt(value));
+  }
+
+  get script(): string {
+    let value = this.get("script");
+    return value!.toString();
+  }
+
+  set script(value: string) {
+    this.set("script", Value.fromString(value));
+  }
+
+  get address(): Bytes {
+    let value = this.get("address");
+    return value!.toBytes();
+  }
+
+  set address(value: Bytes) {
+    this.set("address", Value.fromBytes(value));
+  }
+}
+
 export class ProjectExternalAssetDependency extends Entity {
   constructor(id: string) {
     super();

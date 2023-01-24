@@ -154,5 +154,15 @@
     {
       "address": ""
     }
+  ],
+  "iDependencyRegistryV0Contracts": [
+    {
+      "address": ""
+    }
+  ],
+  "ownableUpgradeableDependencyRegistryContracts": [
+    {
+      "address": ""
+    }
   ]
 }
