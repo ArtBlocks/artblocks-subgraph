@@ -6,7 +6,7 @@ orbs:
 jobs:
   test:
     docker:
-      - image: 'cimg/base:stable'
+      - image: "cimg/base:stable"
     steps:
       - checkout
       - node/install:
@@ -17,7 +17,7 @@ jobs:
       - run: node --version
       - run:
           name: prepare
-          command: yarn prepare:mainnet-with-secondary
+          command: yarn prepare:generic
       - run:
           name: codegen
           command: yarn codegen
