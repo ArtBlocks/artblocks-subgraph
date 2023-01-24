@@ -292,21 +292,21 @@ export class ConfigValueSet3__Params {
   }
 }
 
-export class MinimumAuctionLengthSecondsUpdated extends ethereum.Event {
-  get params(): MinimumAuctionLengthSecondsUpdated__Params {
-    return new MinimumAuctionLengthSecondsUpdated__Params(this);
+export class ConfiguredIsEngine extends ethereum.Event {
+  get params(): ConfiguredIsEngine__Params {
+    return new ConfiguredIsEngine__Params(this);
   }
 }
 
-export class MinimumAuctionLengthSecondsUpdated__Params {
-  _event: MinimumAuctionLengthSecondsUpdated;
+export class ConfiguredIsEngine__Params {
+  _event: ConfiguredIsEngine;
 
-  constructor(event: MinimumAuctionLengthSecondsUpdated) {
+  constructor(event: ConfiguredIsEngine) {
     this._event = event;
   }
 
-  get _minimumAuctionLengthSeconds(): BigInt {
-    return this._event.parameters[0].value.toBigInt();
+  get isEngine(): boolean {
+    return this._event.parameters[0].value.toBoolean();
   }
 }
 
@@ -402,59 +402,7 @@ export class PurchaseToDisabledUpdated__Params {
   }
 }
 
-export class ResetAuctionDetails extends ethereum.Event {
-  get params(): ResetAuctionDetails__Params {
-    return new ResetAuctionDetails__Params(this);
-  }
-}
-
-export class ResetAuctionDetails__Params {
-  _event: ResetAuctionDetails;
-
-  constructor(event: ResetAuctionDetails) {
-    this._event = event;
-  }
-
-  get projectId(): BigInt {
-    return this._event.parameters[0].value.toBigInt();
-  }
-}
-
-export class SetAuctionDetails extends ethereum.Event {
-  get params(): SetAuctionDetails__Params {
-    return new SetAuctionDetails__Params(this);
-  }
-}
-
-export class SetAuctionDetails__Params {
-  _event: SetAuctionDetails;
-
-  constructor(event: SetAuctionDetails) {
-    this._event = event;
-  }
-
-  get projectId(): BigInt {
-    return this._event.parameters[0].value.toBigInt();
-  }
-
-  get _auctionTimestampStart(): BigInt {
-    return this._event.parameters[1].value.toBigInt();
-  }
-
-  get _auctionTimestampEnd(): BigInt {
-    return this._event.parameters[2].value.toBigInt();
-  }
-
-  get _startPrice(): BigInt {
-    return this._event.parameters[3].value.toBigInt();
-  }
-
-  get _basePrice(): BigInt {
-    return this._event.parameters[4].value.toBigInt();
-  }
-}
-
-export class IFilteredMinterDALinV1__getPriceInfoResult {
+export class IFilteredMinterV3__getPriceInfoResult {
   value0: boolean;
   value1: BigInt;
   value2: string;
@@ -498,9 +446,9 @@ export class IFilteredMinterDALinV1__getPriceInfoResult {
   }
 }
 
-export class IFilteredMinterDALinV1 extends ethereum.SmartContract {
-  static bind(address: Address): IFilteredMinterDALinV1 {
-    return new IFilteredMinterDALinV1("IFilteredMinterDALinV1", address);
+export class IFilteredMinterV3 extends ethereum.SmartContract {
+  static bind(address: Address): IFilteredMinterV3 {
+    return new IFilteredMinterV3("IFilteredMinterV3", address);
   }
 
   genArt721CoreAddress(): Address {
@@ -526,14 +474,14 @@ export class IFilteredMinterDALinV1 extends ethereum.SmartContract {
     return ethereum.CallResult.fromValue(value[0].toAddress());
   }
 
-  getPriceInfo(_projectId: BigInt): IFilteredMinterDALinV1__getPriceInfoResult {
+  getPriceInfo(_projectId: BigInt): IFilteredMinterV3__getPriceInfoResult {
     let result = super.call(
       "getPriceInfo",
       "getPriceInfo(uint256):(bool,uint256,string,address)",
       [ethereum.Value.fromUnsignedBigInt(_projectId)]
     );
 
-    return new IFilteredMinterDALinV1__getPriceInfoResult(
+    return new IFilteredMinterV3__getPriceInfoResult(
       result[0].toBoolean(),
       result[1].toBigInt(),
       result[2].toString(),
@@ -543,7 +491,7 @@ export class IFilteredMinterDALinV1 extends ethereum.SmartContract {
 
   try_getPriceInfo(
     _projectId: BigInt
-  ): ethereum.CallResult<IFilteredMinterDALinV1__getPriceInfoResult> {
+  ): ethereum.CallResult<IFilteredMinterV3__getPriceInfoResult> {
     let result = super.tryCall(
       "getPriceInfo",
       "getPriceInfo(uint256):(bool,uint256,string,address)",
@@ -554,7 +502,7 @@ export class IFilteredMinterDALinV1 extends ethereum.SmartContract {
     }
     let value = result.value;
     return ethereum.CallResult.fromValue(
-      new IFilteredMinterDALinV1__getPriceInfoResult(
+      new IFilteredMinterV3__getPriceInfoResult(
         value[0].toBoolean(),
         value[1].toBigInt(),
         value[2].toString(),
@@ -563,27 +511,19 @@ export class IFilteredMinterDALinV1 extends ethereum.SmartContract {
     );
   }
 
-  minimumAuctionLengthSeconds(): BigInt {
-    let result = super.call(
-      "minimumAuctionLengthSeconds",
-      "minimumAuctionLengthSeconds():(uint256)",
-      []
-    );
+  isEngine(): boolean {
+    let result = super.call("isEngine", "isEngine():(bool)", []);
 
-    return result[0].toBigInt();
+    return result[0].toBoolean();
   }
 
-  try_minimumAuctionLengthSeconds(): ethereum.CallResult<BigInt> {
-    let result = super.tryCall(
-      "minimumAuctionLengthSeconds",
-      "minimumAuctionLengthSeconds():(uint256)",
-      []
-    );
+  try_isEngine(): ethereum.CallResult<boolean> {
+    let result = super.tryCall("isEngine", "isEngine():(bool)", []);
     if (result.reverted) {
       return new ethereum.CallResult();
     }
     let value = result.value;
-    return ethereum.CallResult.fromValue(value[0].toBigInt());
+    return ethereum.CallResult.fromValue(value[0].toBoolean());
   }
 
   minterFilterAddress(): Address {
@@ -652,6 +592,36 @@ export class GenArt721CoreAddressCall__Outputs {
 
   get value0(): Address {
     return this._call.outputValues[0].value.toAddress();
+  }
+}
+
+export class IsEngineCall extends ethereum.Call {
+  get inputs(): IsEngineCall__Inputs {
+    return new IsEngineCall__Inputs(this);
+  }
+
+  get outputs(): IsEngineCall__Outputs {
+    return new IsEngineCall__Outputs(this);
+  }
+}
+
+export class IsEngineCall__Inputs {
+  _call: IsEngineCall;
+
+  constructor(call: IsEngineCall) {
+    this._call = call;
+  }
+}
+
+export class IsEngineCall__Outputs {
+  _call: IsEngineCall;
+
+  constructor(call: IsEngineCall) {
+    this._call = call;
+  }
+
+  get isEngine(): boolean {
+    return this._call.outputValues[0].value.toBoolean();
   }
 }
 
