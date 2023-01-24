@@ -1,8 +1,33 @@
 {
   "_format": "hh-sol-artifact-1",
-  "contractName": "IFilteredMinterDALinV1",
-  "sourceName": "contracts/interfaces/0.8.x/IFilteredMinterDALinV1.sol",
+  "contractName": "IFilteredMinterHolderV3",
+  "sourceName": "contracts/interfaces/0.8.x/IFilteredMinterHolderV3.sol",
   "abi": [
+    {
+      "anonymous": false,
+      "inputs": [
+        {
+          "indexed": true,
+          "internalType": "uint256",
+          "name": "_projectId",
+          "type": "uint256"
+        },
+        {
+          "indexed": false,
+          "internalType": "address[]",
+          "name": "_ownedNFTAddresses",
+          "type": "address[]"
+        },
+        {
+          "indexed": false,
+          "internalType": "uint256[]",
+          "name": "_ownedNFTProjectIds",
+          "type": "uint256[]"
+        }
+      ],
+      "name": "AllowedHoldersOfProjects",
+      "type": "event"
+    },
     {
       "anonymous": false,
       "inputs": [
@@ -276,13 +301,26 @@
       "anonymous": false,
       "inputs": [
         {
-          "indexed": false,
-          "internalType": "uint256",
-          "name": "_minimumAuctionLengthSeconds",
-          "type": "uint256"
+          "indexed": true,
+          "internalType": "bool",
+          "name": "isEngine",
+          "type": "bool"
         }
       ],
-      "name": "MinimumAuctionLengthSecondsUpdated",
+      "name": "ConfiguredIsEngine",
+      "type": "event"
+    },
+    {
+      "anonymous": false,
+      "inputs": [
+        {
+          "indexed": false,
+          "internalType": "address",
+          "name": "delegationRegistryAddress",
+          "type": "address"
+        }
+      ],
+      "name": "DelegationRegistryUpdated",
       "type": "event"
     },
     {
@@ -372,12 +410,12 @@
       "inputs": [
         {
           "indexed": true,
-          "internalType": "uint256",
-          "name": "projectId",
-          "type": "uint256"
+          "internalType": "address",
+          "name": "_NFTAddress",
+          "type": "address"
         }
       ],
-      "name": "ResetAuctionDetails",
+      "name": "RegisteredNFTAddress",
       "type": "event"
     },
     {
@@ -386,35 +424,36 @@
         {
           "indexed": true,
           "internalType": "uint256",
-          "name": "projectId",
+          "name": "_projectId",
           "type": "uint256"
         },
         {
           "indexed": false,
-          "internalType": "uint256",
-          "name": "_auctionTimestampStart",
-          "type": "uint256"
+          "internalType": "address[]",
+          "name": "_ownedNFTAddresses",
+          "type": "address[]"
         },
         {
           "indexed": false,
-          "internalType": "uint256",
-          "name": "_auctionTimestampEnd",
-          "type": "uint256"
-        },
-        {
-          "indexed": false,
-          "internalType": "uint256",
-          "name": "_startPrice",
-          "type": "uint256"
-        },
-        {
-          "indexed": false,
-          "internalType": "uint256",
-          "name": "_basePrice",
-          "type": "uint256"
+          "internalType": "uint256[]",
+          "name": "_ownedNFTProjectIds",
+          "type": "uint256[]"
         }
       ],
-      "name": "SetAuctionDetails",
+      "name": "RemovedHoldersOfProjects",
+      "type": "event"
+    },
+    {
+      "anonymous": false,
+      "inputs": [
+        {
+          "indexed": true,
+          "internalType": "address",
+          "name": "_NFTAddress",
+          "type": "address"
+        }
+      ],
+      "name": "UnregisteredNFTAddress",
       "type": "event"
     },
     {
@@ -465,6 +504,19 @@
       "type": "function"
     },
     {
+      "inputs": [],
+      "name": "isEngine",
+      "outputs": [
+        {
+          "internalType": "bool",
+          "name": "isEngine",
+          "type": "bool"
+        }
+      ],
+      "stateMutability": "nonpayable",
+      "type": "function"
+    },
+    {
       "inputs": [
         {
           "internalType": "uint256",
@@ -480,19 +532,6 @@
       "name": "manuallyLimitProjectMaxInvocations",
       "outputs": [],
       "stateMutability": "nonpayable",
-      "type": "function"
-    },
-    {
-      "inputs": [],
-      "name": "minimumAuctionLengthSeconds",
-      "outputs": [
-        {
-          "internalType": "uint256",
-          "name": "",
-          "type": "uint256"
-        }
-      ],
-      "stateMutability": "view",
       "type": "function"
     },
     {
@@ -527,6 +566,35 @@
           "internalType": "uint256",
           "name": "_projectId",
           "type": "uint256"
+        },
+        {
+          "internalType": "address",
+          "name": "_ownedNftAddress",
+          "type": "address"
+        },
+        {
+          "internalType": "uint256",
+          "name": "_ownedNftTokenId",
+          "type": "uint256"
+        }
+      ],
+      "name": "purchase",
+      "outputs": [
+        {
+          "internalType": "uint256",
+          "name": "tokenId",
+          "type": "uint256"
+        }
+      ],
+      "stateMutability": "payable",
+      "type": "function"
+    },
+    {
+      "inputs": [
+        {
+          "internalType": "uint256",
+          "name": "_projectId",
+          "type": "uint256"
         }
       ],
       "name": "purchase",
@@ -550,6 +618,40 @@
         {
           "internalType": "uint256",
           "name": "_projectId",
+          "type": "uint256"
+        }
+      ],
+      "name": "purchaseTo",
+      "outputs": [
+        {
+          "internalType": "uint256",
+          "name": "tokenId",
+          "type": "uint256"
+        }
+      ],
+      "stateMutability": "payable",
+      "type": "function"
+    },
+    {
+      "inputs": [
+        {
+          "internalType": "address",
+          "name": "_to",
+          "type": "address"
+        },
+        {
+          "internalType": "uint256",
+          "name": "_projectId",
+          "type": "uint256"
+        },
+        {
+          "internalType": "address",
+          "name": "_ownedNftAddress",
+          "type": "address"
+        },
+        {
+          "internalType": "uint256",
+          "name": "_ownedNftTokenId",
           "type": "uint256"
         }
       ],

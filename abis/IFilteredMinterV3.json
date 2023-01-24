@@ -1,7 +1,7 @@
 {
   "_format": "hh-sol-artifact-1",
-  "contractName": "IFilteredMinterV1",
-  "sourceName": "contracts/interfaces/0.8.x/IFilteredMinterV1.sol",
+  "contractName": "IFilteredMinterV3",
+  "sourceName": "contracts/interfaces/0.8.x/IFilteredMinterV3.sol",
   "abi": [
     {
       "anonymous": false,
@@ -277,6 +277,19 @@
       "inputs": [
         {
           "indexed": true,
+          "internalType": "bool",
+          "name": "isEngine",
+          "type": "bool"
+        }
+      ],
+      "name": "ConfiguredIsEngine",
+      "type": "event"
+    },
+    {
+      "anonymous": false,
+      "inputs": [
+        {
+          "indexed": true,
           "internalType": "uint256",
           "name": "_projectId",
           "type": "uint256"
@@ -314,6 +327,25 @@
         }
       ],
       "name": "ProjectCurrencyInfoUpdated",
+      "type": "event"
+    },
+    {
+      "anonymous": false,
+      "inputs": [
+        {
+          "indexed": true,
+          "internalType": "uint256",
+          "name": "_projectId",
+          "type": "uint256"
+        },
+        {
+          "indexed": false,
+          "internalType": "uint256",
+          "name": "_maxInvocations",
+          "type": "uint256"
+        }
+      ],
+      "name": "ProjectMaxInvocationsLimitUpdated",
       "type": "event"
     },
     {
@@ -380,6 +412,37 @@
         }
       ],
       "stateMutability": "view",
+      "type": "function"
+    },
+    {
+      "inputs": [],
+      "name": "isEngine",
+      "outputs": [
+        {
+          "internalType": "bool",
+          "name": "isEngine",
+          "type": "bool"
+        }
+      ],
+      "stateMutability": "nonpayable",
+      "type": "function"
+    },
+    {
+      "inputs": [
+        {
+          "internalType": "uint256",
+          "name": "_projectId",
+          "type": "uint256"
+        },
+        {
+          "internalType": "uint256",
+          "name": "_maxInvocations",
+          "type": "uint256"
+        }
+      ],
+      "name": "manuallyLimitProjectMaxInvocations",
+      "outputs": [],
+      "stateMutability": "nonpayable",
       "type": "function"
     },
     {
