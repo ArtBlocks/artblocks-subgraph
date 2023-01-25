@@ -5,7 +5,8 @@ import {
   test,
   newMockEvent,
   describe,
-  createMockedFunction
+  createMockedFunction,
+  beforeEach
 } from "matchstick-as/assembly/index";
 import { ProjectMinterConfiguration, Receipt } from "../../../generated/schema";
 import {
@@ -3180,9 +3181,10 @@ describe("MinterHolder-specific tests", () => {
 });
 
 describe("handleProjectMaxInvocationsLimitUpdated", () => {
-  test("should do nothing if project is not in store", () => {
+  beforeEach(() => {
     clearStore();
-
+  });
+  test("should do nothing if project is not in store", () => {
     const minterType = "MinterSetPriceV3";
     const minter = addNewMinterToStore(minterType);
     const minterAddress: Address = changetype<Address>(
@@ -3218,77 +3220,11 @@ describe("handleProjectMaxInvocationsLimitUpdated", () => {
 
     assert.notInStore(PROJECT_MINTER_CONFIGURATION_ENTITY_TYPE, fullProjectId);
   });
-
-  test("should do nothing if event maxInvocations are greater than core contract project maxInvocations", () => {
-    clearStore();
-    const minter = addNewMinterToStore("MinterSetPriceV3");
-    const minterAddress: Address = changetype<Address>(
-      Address.fromHexString(minter.id)
-    );
-    const minterType = minter.type;
-
-    const projectId = BigInt.fromI32(0);
-    const project = addNewProjectToStore(
-      TEST_CONTRACT_ADDRESS,
-      projectId,
-      "project 0",
-      randomAddressGenerator.generateRandomAddress(),
-      ONE_ETH_IN_WEI.div(BigInt.fromI32(10)),
-      CURRENT_BLOCK_TIMESTAMP.minus(BigInt.fromI32(10))
-    );
-
-    const projectMinterConfig = new ProjectMinterConfiguration(
-      getProjectMinterConfigId(minterAddress.toHexString(), project.id)
-    );
-    projectMinterConfig.minter = minterAddress.toHexString();
-    projectMinterConfig.project = project.id;
-    projectMinterConfig.extraMinterDetails = "{}";
-    projectMinterConfig.basePrice = ONE_ETH_IN_WEI.div(BigInt.fromI32(10));
-    projectMinterConfig.priceIsConfigured = false;
-    projectMinterConfig.currencyAddress = Address.zero();
-    projectMinterConfig.currencySymbol = "ETH";
-    projectMinterConfig.purchaseToDisabled = false;
-    projectMinterConfig.maxInvocations = null;
-    projectMinterConfig.save();
-
-    const event: ProjectMaxInvocationsLimitUpdated = changetype<
-      ProjectMaxInvocationsLimitUpdated
-    >(newMockEvent());
-    event.address = minterAddress;
-    event.parameters = [
-      new ethereum.EventParam(
-        "_projectId",
-        ethereum.Value.fromUnsignedBigInt(projectId)
-      ),
-      new ethereum.EventParam(
-        "_maxInvocations",
-        ethereum.Value.fromUnsignedBigInt(BigInt.fromI32(ONE_MILLION * 2))
-      )
-    ];
-
-    event.block.timestamp = CURRENT_BLOCK_TIMESTAMP;
-
-    handleProjectMaxInvocationsLimitUpdated(
-      changetype<ProjectMaxInvocationsLimitUpdated>(event)
-    );
-
-    const projectMinterConfigPostEvent = new ProjectMinterConfiguration(
-      getProjectMinterConfigId(minterAddress.toHexString(), project.id)
-    );
-    assert.fieldEquals(
-      PROJECT_MINTER_CONFIGURATION_ENTITY_TYPE,
-      getProjectMinterConfigId(minterAddress.toHexString(), project.id),
-      "maxInvocations",
-      "null"
-    );
-  });
   test("should update project minter config maxInvocations", () => {
-    clearStore();
     const minter = addNewMinterToStore("MinterSetPriceV3");
     const minterAddress: Address = changetype<Address>(
       Address.fromHexString(minter.id)
     );
-    const minterType = minter.type;
 
     const projectId = BigInt.fromI32(0);
     const project = addNewProjectToStore(
@@ -3299,9 +3235,13 @@ describe("handleProjectMaxInvocationsLimitUpdated", () => {
       ONE_ETH_IN_WEI.div(BigInt.fromI32(10)),
       CURRENT_BLOCK_TIMESTAMP.minus(BigInt.fromI32(10))
     );
+    const projectMinterConfigId = getProjectMinterConfigId(
+      minterAddress.toHexString(),
+      project.id
+    );
 
     const projectMinterConfig = new ProjectMinterConfiguration(
-      getProjectMinterConfigId(minterAddress.toHexString(), project.id)
+      projectMinterConfigId
     );
     projectMinterConfig.minter = minterAddress.toHexString();
     projectMinterConfig.project = project.id;
@@ -3337,7 +3277,7 @@ describe("handleProjectMaxInvocationsLimitUpdated", () => {
 
     assert.fieldEquals(
       PROJECT_MINTER_CONFIGURATION_ENTITY_TYPE,
-      getProjectMinterConfigId(minterAddress.toHexString(), project.id),
+      projectMinterConfigId,
       "maxInvocations",
       "100"
     );

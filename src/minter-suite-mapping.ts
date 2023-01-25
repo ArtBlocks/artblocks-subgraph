@@ -156,6 +156,8 @@ export function handlePurchaseToDisabledUpdated(
 }
 
 // IFilteredMinterV2 events
+// @dev - Note that the contracts enforce event.params._maxInvocations being less than or equal
+// to the project's maxInvocations value set on the core contract
 export function handleProjectMaxInvocationsLimitUpdated(
   event: ProjectMaxInvocationsLimitUpdated
 ): void {
@@ -171,14 +173,6 @@ export function handleProjectMaxInvocationsLimitUpdated(
 
   let project = minterProjectAndConfig.project;
   let projectMinterConfig = minterProjectAndConfig.projectMinterConfiguration;
-
-  if (event.params._maxInvocations > project.maxInvocations) {
-    log.warning(
-      "Project max invocations on minter cannot be greater than project max invocations on the core contract.",
-      []
-    );
-    return;
-  }
 
   projectMinterConfig.maxInvocations = event.params._maxInvocations;
   projectMinterConfig.save();
