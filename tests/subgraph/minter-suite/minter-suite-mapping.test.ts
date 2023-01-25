@@ -3248,6 +3248,7 @@ describe("handleProjectMaxInvocationsLimitUpdated", () => {
     projectMinterConfig.currencyAddress = Address.zero();
     projectMinterConfig.currencySymbol = "ETH";
     projectMinterConfig.purchaseToDisabled = false;
+    projectMinterConfig.maxInvocations = null;
     projectMinterConfig.save();
 
     const event: ProjectMaxInvocationsLimitUpdated = changetype<
@@ -3278,9 +3279,8 @@ describe("handleProjectMaxInvocationsLimitUpdated", () => {
       PROJECT_MINTER_CONFIGURATION_ENTITY_TYPE,
       getProjectMinterConfigId(minterAddress.toHexString(), project.id),
       "maxInvocations",
-      ""
+      "null"
     );
-    assert.assertNull(projectMinterConfigPostEvent.maxInvocations);
   });
   test("should update project minter config maxInvocations", () => {
     clearStore();
@@ -3311,6 +3311,7 @@ describe("handleProjectMaxInvocationsLimitUpdated", () => {
     projectMinterConfig.currencyAddress = Address.zero();
     projectMinterConfig.currencySymbol = "ETH";
     projectMinterConfig.purchaseToDisabled = false;
+    projectMinterConfig.maxInvocations = null;
     projectMinterConfig.save();
 
     const event: ProjectMaxInvocationsLimitUpdated = changetype<
