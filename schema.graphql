@@ -64,7 +64,7 @@ type Project @entity {
   "For V3 and-on, this field is null, and projects lock 4 weeks after `completedAt`. Once the project is locked its script may never be updated again."
   locked: Boolean
 
-  "Maximum number of invocations allowed for the project"
+  "Maximum number of invocations allowed for the project. Note that minter contracts may additionally limit a project's maxInvocations on a specific minter."
   maxInvocations: BigInt!
 
   "Project name"
@@ -258,7 +258,7 @@ type Contract @entity {
   preferredIPFSGateway: String
 
   preferredArweaveGateway: String
-  
+
   "New projects forbidden (can only be true on V3+ contracts)"
   newProjectsForbidden: Boolean!
 
@@ -423,7 +423,7 @@ type ProjectMinterConfiguration @entity {
   "Configuration details used by specific minter project configurations (json string)"
   extraMinterDetails: String!
 
-  "Maximum number of invocations allowed for the project (on the minter)"
+  "Maximum number of invocations allowed for the project (on the minter). If less than than a project's maximum invocations defined on a core contract, the minter contract will limit this project's maximum invocations"
   maxInvocations: BigInt
 }
 

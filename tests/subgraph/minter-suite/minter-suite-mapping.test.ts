@@ -3105,7 +3105,6 @@ describe("handleProjectMaxInvocationsLimitUpdated", () => {
     projectMinterConfig.currencyAddress = Address.zero();
     projectMinterConfig.currencySymbol = "ETH";
     projectMinterConfig.purchaseToDisabled = false;
-    projectMinterConfig.maxInvocations = null;
     projectMinterConfig.save();
 
     const event: ProjectMaxInvocationsLimitUpdated = changetype<
