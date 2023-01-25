@@ -3179,7 +3179,45 @@ describe("MinterHolder-specific tests", () => {
 });
 
 describe("handleProjectMaxInvocationsLimitUpdated", () => {
-  test("handleProjectMaxInvocationsLimitUpdated updates the maxInvocationsLimit for the project", () => {
+  test("should do nothing if project is not in store", () => {
+    clearStore();
+
+    const minterType = "MinterSetPriceV3";
+    const minter = addNewMinterToStore(minterType);
+    const minterAddress: Address = changetype<Address>(
+      Address.fromHexString(minter.id)
+    );
+
+    const projectId = BigInt.fromI32(0);
+    const fullProjectId = generateContractSpecificId(
+      TEST_CONTRACT_ADDRESS,
+      projectId
+    );
+    
+    const event: ProjectMaxInvocationsLimitUpdated = changetype<
+      ProjectMaxInvocationsLimitUpdated
+    >(newMockEvent());
+    event.address = minterAddress;
+    event.parameters = [
+      new ethereum.EventParam(
+        "_projectId",
+        ethereum.Value.fromUnsignedBigInt(projectId)
+      ),
+      new ethereum.EventParam(
+        "_maxInvocations",
+        ethereum.Value.fromUnsignedBigInt(BigInt.fromI32(100))
+      )
+    ];
+
+    event.block.timestamp = CURRENT_BLOCK_TIMESTAMP;
+
+    assert.notInStore(PROJECT_ENTITY_TYPE, fullProjectId);
+
+    handleProjectMaxInvocationsLimitUpdated(event);
+
+    assert.notInStore(PROJECT_MINTER_CONFIGURATION_ENTITY_TYPE, fullProjectId);
+  });
+  test("should update project minter config maxInvocations", () => {
     // mock, pass event to handler, etc
     clearStore();
     const minter = addNewMinterToStore("MinterSetPriceV3");
