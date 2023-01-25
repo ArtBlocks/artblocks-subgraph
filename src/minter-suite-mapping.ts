@@ -172,6 +172,14 @@ export function handleProjectMaxInvocationsLimitUpdated(
   let project = minterProjectAndConfig.project;
   let projectMinterConfig = minterProjectAndConfig.projectMinterConfiguration;
 
+  if (event.params._maxInvocations > project.maxInvocations) {
+    log.warning(
+      "Project max invocations on minter cannot be greater than project max invocations on the core contract.",
+      []
+    );
+    return;
+  }
+
   projectMinterConfig.maxInvocations = event.params._maxInvocations;
   projectMinterConfig.save();
 
