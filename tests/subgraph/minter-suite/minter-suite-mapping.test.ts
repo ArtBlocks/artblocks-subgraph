@@ -77,6 +77,8 @@ import {
   ArtistAndAdminRevenuesWithdrawn
 } from "../../../generated/MinterDAExpSettlementV0/IFilteredMinterDAExpSettlementV0";
 
+import { ProjectMaxInvocationsLimitUpdated } from "../../../generated/MinterSetPriceV3/IFilteredMinterV2";
+
 // import handlers from minter-suite-mapping
 import {
   handleAddManyAddressValueProjectConfig as handleAddManyAddressValue,
@@ -107,7 +109,8 @@ import {
   handleDAExpSettlementResetAuctionDetails,
   handleSelloutPriceUpdated,
   handleReceiptUpdated,
-  handleArtistAndAdminRevenuesWithdrawn
+  handleArtistAndAdminRevenuesWithdrawn,
+  handleProjectMaxInvocationsLimitUpdated
 } from "../../../src/minter-suite-mapping";
 
 import {
@@ -3171,6 +3174,69 @@ describe("MinterHolder-specific tests", () => {
       minter.id,
       "extraMinterDetails",
       '{"delegationRegistryAddress":' + '"' + testAddy.toHexString() + '"' + "}"
+    );
+  });
+});
+
+describe("handleProjectMaxInvocationsLimitUpdated", () => {
+  test("handleProjectMaxInvocationsLimitUpdated updates the maxInvocationsLimit for the project", () => {
+    // mock, pass event to handler, etc
+    clearStore();
+    const minter = addNewMinterToStore("MinterSetPriceV3");
+    const minterAddress: Address = changetype<Address>(
+      Address.fromHexString(minter.id)
+    );
+    const minterType = minter.type;
+
+    const projectId = BigInt.fromI32(0);
+    const project = addNewProjectToStore(
+      TEST_CONTRACT_ADDRESS,
+      projectId,
+      "project 0",
+      randomAddressGenerator.generateRandomAddress(),
+      ONE_ETH_IN_WEI.div(BigInt.fromI32(10)),
+      CURRENT_BLOCK_TIMESTAMP.minus(BigInt.fromI32(10))
+    );
+
+    const projectMinterConfig = new ProjectMinterConfiguration(
+      getProjectMinterConfigId(minterAddress.toHexString(), project.id)
+    );
+    projectMinterConfig.minter = minterAddress.toHexString();
+    projectMinterConfig.project = project.id;
+    projectMinterConfig.extraMinterDetails = "{}";
+    projectMinterConfig.basePrice = ONE_ETH_IN_WEI.div(BigInt.fromI32(10));
+    projectMinterConfig.priceIsConfigured = false;
+    projectMinterConfig.currencyAddress = Address.zero();
+    projectMinterConfig.currencySymbol = "ETH";
+    projectMinterConfig.purchaseToDisabled = false;
+    projectMinterConfig.save();
+
+    const event: ProjectMaxInvocationsLimitUpdated = changetype<
+      ProjectMaxInvocationsLimitUpdated
+    >(newMockEvent());
+    event.address = minterAddress;
+    event.parameters = [
+      new ethereum.EventParam(
+        "_projectId",
+        ethereum.Value.fromUnsignedBigInt(projectId)
+      ),
+      new ethereum.EventParam(
+        "_maxInvocations",
+        ethereum.Value.fromUnsignedBigInt(BigInt.fromI32(100))
+      )
+    ];
+
+    event.block.timestamp = CURRENT_BLOCK_TIMESTAMP;
+
+    handleProjectMaxInvocationsLimitUpdated(
+      changetype<ProjectMaxInvocationsLimitUpdated>(event)
+    );
+
+    assert.fieldEquals(
+      PROJECT_MINTER_CONFIGURATION_ENTITY_TYPE,
+      getProjectMinterConfigId(minterAddress.toHexString(), project.id),
+      "maxInvocations",
+      "100"
     );
   });
 });
