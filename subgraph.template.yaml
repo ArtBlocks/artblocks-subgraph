@@ -1169,6 +1169,38 @@ dataSources:
           handler: handleProjectCurrencyInfoUpdated
       file: ./src/minter-suite-mapping.ts
   {{/minterSetPriceERC20V2Contracts}}
+  {{#minterSetPriceERC20V3Contracts}}
+  - kind: ethereum/contract
+    name: 'MinterSetPriceERC20V3{{#address}}-{{address}}{{/address}}'
+    network: {{network}}
+    source:
+      address: "{{#address}}{{address}}{{/address}}{{^address}}0x0000000000000000000000000000000000000000{{/address}}"
+      abi: MinterSetPriceERC20V3
+      {{#startBlock}}startBlock: {{startBlock}}{{/startBlock}}
+    mapping:
+      kind: ethereum/events
+      apiVersion: 0.0.5
+      language: wasm/assemblyscript
+      entities:
+        - Project
+        - Contract
+        - MinterFilter
+        - Minter
+        - ProjectMinterConfiguration
+      abis:
+        - name: MinterSetPriceERC20V3
+          file: ./abis/MinterSetPriceERC20V3.json
+        - name: IFilteredMinterV2
+          file: ./abis/IFilteredMinterV2.json
+      eventHandlers:
+        - event: PricePerTokenInWeiUpdated(indexed uint256,indexed uint256)
+          handler: handlePricePerTokenInWeiUpdated
+        - event: ProjectCurrencyInfoUpdated(indexed uint256,indexed address,string)
+          handler: handleProjectCurrencyInfoUpdated
+        - event: ProjectMaxInvocationsLimitUpdated(indexed uint256,uint256)
+          handler: handleProjectMaxInvocationsLimitUpdated
+      file: ./src/minter-suite-mapping.ts
+  {{/minterSetPriceERC20V3Contracts}}
   {{#minterSetPriceV2Contracts}}
   - kind: ethereum/contract
     name: 'MinterSetPriceV2{{#address}}-{{address}}{{/address}}'
@@ -1204,6 +1236,43 @@ dataSources:
           handler: handleProjectCurrencyInfoUpdated
       file: ./src/minter-suite-mapping.ts
   {{/minterSetPriceV2Contracts}}
+  {{#minterSetPriceV3Contracts}}
+  - kind: ethereum/contract
+    name: 'MinterSetPriceV3{{#address}}-{{address}}{{/address}}'
+    network: {{network}}
+    source:
+      address: "{{#address}}{{address}}{{/address}}{{^address}}0x0000000000000000000000000000000000000000{{/address}}"
+      abi: MinterSetPriceV3
+      {{#startBlock}}startBlock: {{startBlock}}{{/startBlock}}
+    mapping:
+      kind: ethereum/events
+      apiVersion: 0.0.5
+      language: wasm/assemblyscript
+      entities:
+        - Project
+        - ProjectScript
+        - Token
+        - Contract
+        - Account
+        - AccountProject
+        - Whitelisting
+        - MinterFilter
+        - Minter
+        - ProjectMinterConfiguration
+      abis:
+        - name: MinterSetPriceV3
+          file: ./abis/MinterSetPriceV3.json
+        - name: IFilteredMinterV2
+          file: ./abis/IFilteredMinterV2.json
+      eventHandlers:
+        - event: PricePerTokenInWeiUpdated(indexed uint256,indexed uint256)
+          handler: handlePricePerTokenInWeiUpdated
+        - event: ProjectCurrencyInfoUpdated(indexed uint256,indexed address,string)
+          handler: handleProjectCurrencyInfoUpdated
+        - event: ProjectMaxInvocationsLimitUpdated(indexed uint256,uint256)
+          handler: handleProjectMaxInvocationsLimitUpdated
+      file: ./src/minter-suite-mapping.ts
+  {{/minterSetPriceV3Contracts}}
   {{#minterDALinV2Contracts}}
   - kind: ethereum/contract
     name: 'MinterDALinV2{{#address}}-{{address}}{{/address}}'
@@ -1242,6 +1311,44 @@ dataSources:
           handler: handleDALinSetAuctionDetails
       file: ./src/minter-suite-mapping.ts
   {{/minterDALinV2Contracts}}
+  {{#minterDALinV3Contracts}}
+  - kind: ethereum/contract
+    name: 'MinterDALinV3{{#address}}-{{address}}{{/address}}'
+    network: {{network}}
+    source:
+      address: "{{#address}}{{address}}{{/address}}{{^address}}0x0000000000000000000000000000000000000000{{/address}}"
+      abi: MinterDALinV3
+      {{#startBlock}}startBlock: {{startBlock}}{{/startBlock}}
+    mapping:
+      kind: ethereum/events
+      apiVersion: 0.0.5
+      language: wasm/assemblyscript
+      entities:
+        - Project
+        - Contract
+        - MinterFilter
+        - Minter
+        - ProjectMinterConfiguration
+      abis:
+        - name: MinterDALinV3
+          file: ./abis/MinterDALinV3.json
+        - name: IFilteredMinterDALinV1
+          file: ./abis/IFilteredMinterDALinV1.json
+      eventHandlers:
+        - event: MinimumAuctionLengthSecondsUpdated(uint256)
+          handler: handleMinimumAuctionLengthSecondsUpdated
+        - event: PricePerTokenInWeiUpdated(indexed uint256,indexed uint256)
+          handler: handlePricePerTokenInWeiUpdated
+        - event: ProjectCurrencyInfoUpdated(indexed uint256,indexed address,string)
+          handler: handleProjectCurrencyInfoUpdated
+        - event: ResetAuctionDetails(indexed uint256)
+          handler: handleDALinResetAuctionDetails
+        - event: SetAuctionDetails(indexed uint256,uint256,uint256,uint256,uint256)
+          handler: handleDALinSetAuctionDetails
+        - event: ProjectMaxInvocationsLimitUpdated(indexed uint256,uint256)
+          handler: handleProjectMaxInvocationsLimitUpdated
+      file: ./src/minter-suite-mapping.ts
+  {{/minterDALinV3Contracts}}
   {{#minterDAExpV2Contracts}}
   - kind: ethereum/contract
     name: 'MinterDAExpV2{{#address}}-{{address}}{{/address}}'
@@ -1280,6 +1387,44 @@ dataSources:
           handler: handleDAExpSetAuctionDetails
       file: ./src/minter-suite-mapping.ts
   {{/minterDAExpV2Contracts}}
+  {{#minterDAExpV3Contracts}}
+  - kind: ethereum/contract
+    name: 'MinterDAExpV3{{#address}}-{{address}}{{/address}}'
+    network: {{network}}
+    source:
+      address: "{{#address}}{{address}}{{/address}}{{^address}}0x0000000000000000000000000000000000000000{{/address}}"
+      abi: MinterDAExpV3
+      {{#startBlock}}startBlock: {{startBlock}}{{/startBlock}}
+    mapping:
+      kind: ethereum/events
+      apiVersion: 0.0.5
+      language: wasm/assemblyscript
+      entities:
+        - Project
+        - Contract
+        - MinterFilter
+        - Minter
+        - ProjectMinterConfiguration
+      abis:
+        - name: MinterDAExpV3
+          file: ./abis/MinterDAExpV3.json
+        - name: IFilteredMinterDAExpV1
+          file: ./abis/IFilteredMinterDAExpV1.json
+      eventHandlers:
+        - event: AuctionHalfLifeRangeSecondsUpdated(uint256,uint256)
+          handler: handleAuctionHalfLifeRangeSecondsUpdated
+        - event: PricePerTokenInWeiUpdated(indexed uint256,indexed uint256)
+          handler: handlePricePerTokenInWeiUpdated
+        - event: ProjectCurrencyInfoUpdated(indexed uint256,indexed address,string)
+          handler: handleProjectCurrencyInfoUpdated
+        - event: ResetAuctionDetails(indexed uint256)
+          handler: handleDAExpResetAuctionDetails
+        - event: SetAuctionDetails(indexed uint256,uint256,uint256,uint256,uint256)
+          handler: handleDAExpSetAuctionDetails
+        - event: ProjectMaxInvocationsLimitUpdated(indexed uint256,uint256)
+          handler: handleProjectMaxInvocationsLimitUpdated
+      file: ./src/minter-suite-mapping.ts
+  {{/minterDAExpV3Contracts}}
   {{#minterDAExpSettlementV0Contracts}}
   - kind: ethereum/contract
     name: 'MinterDAExpSettlementV0{{#address}}-{{address}}{{/address}}'
@@ -1411,6 +1556,48 @@ dataSources:
           handler: handleHolderDelegationRegistryUpdated
       file: ./src/minter-suite-mapping.ts
   {{/minterHolderV2Contracts}}
+  {{#minterHolderV3Contracts}}
+  - kind: ethereum/contract
+    name: 'MinterHolderV3{{#address}}-{{address}}{{/address}}'
+    network: {{network}}
+    source:
+      address: "{{#address}}{{address}}{{/address}}{{^address}}0x0000000000000000000000000000000000000000{{/address}}"
+      abi: MinterHolderV3
+      {{#startBlock}}startBlock: {{startBlock}}{{/startBlock}}
+    mapping:
+      kind: ethereum/events
+      apiVersion: 0.0.5
+      language: wasm/assemblyscript
+      entities:
+        - Project
+        - Contract
+        - MinterFilter
+        - Minter
+        - ProjectMinterConfiguration
+      abis:
+        - name: MinterHolderV3
+          file: ./abis/MinterHolderV3.json
+        - name: IFilteredMinterHolderV2
+          file: ./abis/IFilteredMinterHolderV2.json
+      eventHandlers:
+        - event: PricePerTokenInWeiUpdated(indexed uint256,indexed uint256)
+          handler: handlePricePerTokenInWeiUpdated
+        - event: ProjectCurrencyInfoUpdated(indexed uint256,indexed address,string)
+          handler: handleProjectCurrencyInfoUpdated
+        - event: RegisteredNFTAddress(indexed address)
+          handler: handleRegisteredNFTAddress
+        - event: UnregisteredNFTAddress(indexed address)
+          handler: handleUnregisteredNFTAddress
+        - event: AllowedHoldersOfProjects(indexed uint256,address[],uint256[])
+          handler: handleAllowHoldersOfProjects
+        - event: RemovedHoldersOfProjects(indexed uint256,address[],uint256[])
+          handler: handleRemoveHoldersOfProjects
+        - event: DelegationRegistryUpdated(address)
+          handler: handleHolderDelegationRegistryUpdated
+        - event: ProjectMaxInvocationsLimitUpdated(indexed uint256,uint256)
+          handler: handleProjectMaxInvocationsLimitUpdated
+      file: ./src/minter-suite-mapping.ts
+  {{/minterHolderV3Contracts}}
   {{#minterMerkleV1Contracts}}
   - kind: ethereum/contract
     name: 'MinterMerkleV1{{#address}}-{{address}}{{/address}}'
@@ -1527,6 +1714,46 @@ dataSources:
           handler: handleMerkleDelegationRegistryUpdated
       file: ./src/minter-suite-mapping.ts
   {{/minterMerkleV3Contracts}}
+  {{#minterMerkleV4Contracts}}
+  - kind: ethereum/contract
+    name: 'MinterMerkleV4{{#address}}-{{address}}{{/address}}'
+    network: {{network}}
+    source:
+      address: "{{#address}}{{address}}{{/address}}{{^address}}0x0000000000000000000000000000000000000000{{/address}}"
+      abi: MinterMerkleV4
+      {{#startBlock}}startBlock: {{startBlock}}{{/startBlock}}
+    mapping:
+      kind: ethereum/events
+      apiVersion: 0.0.5
+      language: wasm/assemblyscript
+      entities:
+        - Project
+        - Contract
+        - MinterFilter
+        - Minter
+        - ProjectMinterConfiguration
+      abis:
+        - name: MinterMerkleV4
+          file: ./abis/MinterMerkleV4.json
+        - name: IFilteredMinterMerkleV2
+          file: ./abis/IFilteredMinterMerkleV2.json
+      eventHandlers:
+        - event: PricePerTokenInWeiUpdated(indexed uint256,indexed uint256)
+          handler: handlePricePerTokenInWeiUpdated
+        - event: ProjectCurrencyInfoUpdated(indexed uint256,indexed address,string)
+          handler: handleProjectCurrencyInfoUpdated
+        - event: ConfigValueSet(indexed uint256,bytes32,bytes32)
+          handler: handleSetBytesValueProjectConfig
+        - event: ConfigValueSet(indexed uint256,bytes32,bool)
+          handler: handleSetBooleanValueProjectConfig
+        - event: ConfigValueSet(indexed uint256,bytes32,uint256)
+          handler: handleSetBigIntValueProjectConfig
+        - event: DelegationRegistryUpdated(address)
+          handler: handleMerkleDelegationRegistryUpdated
+        - event: ProjectMaxInvocationsLimitUpdated(indexed uint256,uint256)
+          handler: handleProjectMaxInvocationsLimitUpdated
+      file: ./src/minter-suite-mapping.ts
+  {{/minterMerkleV4Contracts}}
   {{#adminACLV0Contracts}}
   - kind: ethereum/contract
     name: 'AdminACLV0{{#address}}-{{address}}{{/address}}'

@@ -18,6 +18,8 @@ import {
   PurchaseToDisabledUpdated
 } from "../generated/MinterSetPriceV0/IFilteredMinterV0";
 
+import { ProjectMaxInvocationsLimitUpdated } from "../generated/MinterSetPriceV3/IFilteredMinterV2";
+
 import {
   MinimumAuctionLengthSecondsUpdated,
   ResetAuctionDetails as DALinResetAuctionDetails,
@@ -147,6 +149,32 @@ export function handlePurchaseToDisabledUpdated(
   let projectMinterConfig = minterProjectAndConfig.projectMinterConfiguration;
 
   projectMinterConfig.purchaseToDisabled = event.params._purchaseToDisabled;
+  projectMinterConfig.save();
+
+  project.updatedAt = event.block.timestamp;
+  project.save();
+}
+
+// IFilteredMinterV2 events
+// @dev - Note that the contracts enforce event.params._maxInvocations being less than or equal
+// to the project's maxInvocations value set on the core contract
+export function handleProjectMaxInvocationsLimitUpdated(
+  event: ProjectMaxInvocationsLimitUpdated
+): void {
+  let minterProjectAndConfig = loadMinterProjectAndConfig(
+    event.address,
+    event.params._projectId,
+    event.block.timestamp
+  );
+
+  if (!minterProjectAndConfig) {
+    return;
+  }
+
+  let project = minterProjectAndConfig.project;
+  let projectMinterConfig = minterProjectAndConfig.projectMinterConfiguration;
+
+  projectMinterConfig.maxInvocations = event.params._maxInvocations;
   projectMinterConfig.save();
 
   project.updatedAt = event.block.timestamp;
