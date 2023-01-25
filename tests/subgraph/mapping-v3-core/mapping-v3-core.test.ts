@@ -208,19 +208,19 @@ test(`${coreType}: Can handle transfer`, () => {
     generateTransferId(TEST_TX_HASH, logIndex),
     "blockHash",
     event.block.hash.toHexString()
-  )
+  );
   assert.fieldEquals(
     TRANSFER_ENTITY_TYPE,
     generateTransferId(TEST_TX_HASH, logIndex),
     "blockNumber",
     event.block.number.toString()
-  )
+  );
   assert.fieldEquals(
     TRANSFER_ENTITY_TYPE,
     generateTransferId(TEST_TX_HASH, logIndex),
     "blockTimestamp",
     event.block.timestamp.toString()
-  )
+  );
 });
 
 test("GenArt721CoreV3: Can handle mint transfer", () => {
@@ -274,19 +274,19 @@ test("GenArt721CoreV3: Can handle mint transfer", () => {
     generateTransferId(TEST_TX_HASH, logIndex),
     "blockHash",
     event.block.hash.toHexString()
-  )
+  );
   assert.fieldEquals(
     TRANSFER_ENTITY_TYPE,
     generateTransferId(TEST_TX_HASH, logIndex),
     "blockNumber",
     event.block.number.toString()
-  )
+  );
   assert.fieldEquals(
     TRANSFER_ENTITY_TYPE,
     generateTransferId(TEST_TX_HASH, logIndex),
     "blockTimestamp",
     event.block.timestamp.toString()
-  )
+  );
 });
 
 test(`${coreType}: Handles OwnershipTransferred to new address and zero address, when Contract not in store`, () => {
@@ -906,12 +906,14 @@ test(`${coreType}: Handles PlatformUpdated::dependencyRegistryAddress - changed 
   // handle event
   handlePlatformUpdated(event);
 
-  // value in store should be updated
+  // value in store should not be updated
+  // We allow the dependency registry to control this field
+  // and not the engine contract so nothing should change.
   assert.fieldEquals(
     CONTRACT_ENTITY_TYPE,
     TEST_CONTRACT_ADDRESS.toHexString(),
     "dependencyRegistry",
-    newAddress.toHexString()
+    Address.zero().toHexString()
   );
 });
 

@@ -1064,8 +1064,6 @@ function refreshContract<T>(contract: T, timestamp: BigInt): Contract | null {
     contractEntity.mintWhitelisted = [];
   }
   contractEntity.newProjectsForbidden = contract.newProjectsForbidden();
-  contractEntity.dependencyRegistry = contract.artblocksDependencyRegistryAddress();
-
   contractEntity.updatedAt = timestamp;
 
   contractEntity.save();
