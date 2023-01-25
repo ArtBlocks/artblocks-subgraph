@@ -3,7 +3,11 @@ import { BigInt, store, log, Address, Bytes } from "@graphprotocol/graph-ts";
 import { refreshContractAtAddress } from "./mapping-v3-core";
 
 import { EngineRegistry, Contract } from "../generated/schema";
-import { GenArt721CoreV3_Dynamic } from "../generated/templates";
+import {
+  IGenArt721CoreV3_Base_Template,
+  OwnableGenArt721CoreV3Contract_Template,
+  IERC721GenArt721CoreV3Contract_Template
+} from "../generated/templates";
 
 import {
   ContractRegistered,
@@ -22,7 +26,10 @@ export function handleContractRegistered(event: ContractRegistered): void {
   // state to ensure it is up to date
   let contractEntity = Contract.load(coreAddress.toHexString());
   if (!contractEntity) {
-    GenArt721CoreV3_Dynamic.create(coreAddress);
+    // dynamically track the new contract via its required templates
+    IGenArt721CoreV3_Base_Template.create(coreAddress);
+    OwnableGenArt721CoreV3Contract_Template.create(coreAddress);
+    IERC721GenArt721CoreV3Contract_Template.create(coreAddress);
     refreshContractAtAddress(coreAddress, event.block.timestamp);
   }
   // set this engine registry as the contract's registeredOn field
