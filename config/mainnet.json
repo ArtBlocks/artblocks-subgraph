@@ -1,6 +1,30 @@
 {
   "network": "mainnet",
-  "genArt721CoreV3Contracts": [
+  "iGenArt721CoreContractV3_BaseContracts": [
+    {
+      "address": "0x99a9B7c1116f9ceEB1652de04d5969CcE509B069",
+      "name": "Art Blocks Flagship (V3)",
+      "startBlock": 15726705
+    },
+    {
+      "address": "0x942BC2d3e7a589FE5bd4A5C6eF9727DFd82F5C8a",
+      "name": "Art Blocks Explorations",
+      "startBlock": 15791056
+    }
+  ],
+  "ownableGenArt721CoreV3Contracts": [
+    {
+      "address": "0x99a9B7c1116f9ceEB1652de04d5969CcE509B069",
+      "name": "Art Blocks Flagship (V3)",
+      "startBlock": 15726705
+    },
+    {
+      "address": "0x942BC2d3e7a589FE5bd4A5C6eF9727DFd82F5C8a",
+      "name": "Art Blocks Explorations",
+      "startBlock": 15791056
+    }
+  ],
+  "iERC721GenArt721CoreV3Contracts": [
     {
       "address": "0x99a9B7c1116f9ceEB1652de04d5969CcE509B069",
       "name": "Art Blocks Flagship (V3)",

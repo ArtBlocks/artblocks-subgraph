@@ -1,6 +1,16 @@
 {
   "network": "goerli",
-  "genArt721CoreV3Contracts": [
+  "iGenArt721CoreContractV3_BaseContracts": [
+    {
+      "address": ""
+    }
+  ],
+  "ownableGenArt721CoreV3Contracts": [
+    {
+      "address": ""
+    }
+  ],
+  "iERC721GenArt721CoreV3Contracts": [
     {
       "address": ""
     }
