@@ -165,6 +165,16 @@
       "address": ""
     }
   ],
+  "iDependencyRegistryV0Contracts": [
+    {
+      "address": ""
+    }
+  ],
+  "ownableUpgradeableDependencyRegistryContracts": [
+    {
+      "address": ""
+    }
+  ],
   "engineRegistryV0Contracts": [
     {
       "address": ""
