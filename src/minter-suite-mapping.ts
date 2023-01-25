@@ -1,5 +1,13 @@
-// We're importing these event types from MinterSetPriceV0
-// but the signature should be the same for all filtered minters
+/**
+ * @dev - This file contains the event handlers for the Minter suite of contracts.
+ * When modifying handlers when adding new contracts, it is important to note that
+ * functions on the codegen'd interfaces reflect the latest version of the interface,
+ * not the version of the interface that the contract implements (for earlier minter
+ * versions). This means that the function may not exist on the contract, and will
+ * throw an error if called. To avoid this, it is important to be careful and concise
+ * when binding to and calling functions on minters via the codegen'd interfaces.
+ */
+
 import {
   Address,
   BigInt,
