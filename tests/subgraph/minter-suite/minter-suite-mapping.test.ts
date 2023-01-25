@@ -78,7 +78,7 @@ import {
   ArtistAndAdminRevenuesWithdrawn
 } from "../../../generated/MinterDAExpSettlement/IFilteredMinterDAExpSettlementV1";
 
-import { ProjectMaxInvocationsLimitUpdated } from "../../../generated/MinterSetPrice/IFilteredMinterV2";
+import { ProjectMaxInvocationsLimitUpdated } from "../../../generated/MinterSetPrice/IFilteredMinterV3";
 
 // import handlers from minter-suite-mapping
 import {
