@@ -54,6 +54,27 @@ export function generateContractSpecificId(
   return contractAddress.toHexString() + "-" + entityId.toString();
 }
 
+export function generateDependencyAdditionalCDNId(
+  dependencyId: string,
+  index: BigInt
+): string {
+  return dependencyId + "-" + index.toString();
+}
+
+export function generateDependencyAdditionalRepositoryId(
+  dependencyId: string,
+  index: BigInt
+): string {
+  return dependencyId + "-" + index.toString();
+}
+
+export function generateDependencyScriptId(
+  dependencyId: string,
+  index: BigInt
+): string {
+  return dependencyId + "-" + index.toString();
+}
+
 // returns new whitelisting id
 export function addWhitelisting(contractId: string, accountId: string): void {
   let account = new Account(accountId);

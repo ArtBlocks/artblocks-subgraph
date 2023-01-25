@@ -156,6 +156,8 @@ export function handlePurchaseToDisabledUpdated(
 }
 
 // IFilteredMinterV2 events
+// @dev - Note that the contracts enforce event.params._maxInvocations being less than or equal
+// to the project's maxInvocations value set on the core contract
 export function handleProjectMaxInvocationsLimitUpdated(
   event: ProjectMaxInvocationsLimitUpdated
 ): void {

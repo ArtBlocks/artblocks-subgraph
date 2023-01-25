@@ -279,9 +279,9 @@
       "startBlock": 7723589
     },
     {
-      "address": "0x6f9953e06675904AAE18568b1697544778616DAA",
+      "address": "0xdCe333bEdFc584E43d7D494393AD4bd990479844",
       "name": "V2 Flagship Minter for V3 core",
-      "startBlock": 8136182
+      "startBlock": 8369991
     }
   ],
   "adminACLV0Contracts": [
