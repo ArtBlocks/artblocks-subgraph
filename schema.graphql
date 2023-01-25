@@ -64,7 +64,7 @@ type Project @entity {
   "For V3 and-on, this field is null, and projects lock 4 weeks after `completedAt`. Once the project is locked its script may never be updated again."
   locked: Boolean
 
-  "Maximum number of invocations allowed for the project"
+  "Maximum number of invocations allowed for the project. Note that minter contracts may additionally limit a project's maxInvocations on a specific minter."
   maxInvocations: BigInt!
 
   "Project name"
@@ -235,7 +235,7 @@ type Contract @entity {
   curationRegistry: Bytes
 
   "Dependency registry contract address"
-  dependencyRegistry: Bytes
+  dependencyRegistry: DependencyRegistry
 
   nextProjectId: BigInt!
 
@@ -258,7 +258,7 @@ type Contract @entity {
   preferredIPFSGateway: String
 
   preferredArweaveGateway: String
-  
+
   "New projects forbidden (can only be true on V3+ contracts)"
   newProjectsForbidden: Boolean!
 
@@ -423,7 +423,7 @@ type ProjectMinterConfiguration @entity {
   "Configuration details used by specific minter project configurations (json string)"
   extraMinterDetails: String!
 
-  "Maximum number of invocations allowed for the project (on the minter)"
+  "Maximum number of invocations allowed for the project (on the minter). If less than than a project's maximum invocations defined on a core contract, the minter contract will limit this project's maximum invocations"
   maxInvocations: BigInt
 }
 
@@ -564,6 +564,83 @@ type Transfer @entity(immutable: true) {
   blockHash: Bytes!
   blockNumber: BigInt!
   blockTimestamp: BigInt!
+}
+
+type Dependency @entity {
+  "Unique identifier made up of dependency name and version separated by an @ symbol (e.g. p5js@1.0.0)"
+  id: ID!
+  "Preffered CDN for this dependency"
+  preferredCDN: String!
+  "Additional CDNs for this dependency"
+  additionalCDNs: [DependencyAdditionalCDN!]! @derivedFrom(field: "dependency")
+  "Number of additional CDNs for this dependency"
+  additionalCDNCount: BigInt!
+  "Preffered repository for this dependency"
+  preferredRepository: String!
+  "Additional repositories for this dependency"
+  additionalRepositoryCount: BigInt!
+  "Number of additional repositories for this dependency"
+  additionalRepositories: [DependencyAdditionalRepository!]! @derivedFrom(field: "dependency")
+  "List of on-chain scripts that for this dependency"
+  scripts: [DependencyScript!]! @derivedFrom(field: "dependency")
+  "Number of on-chain scripts for this dependency"
+  scriptCount: BigInt!
+  "Concatenated string of all scripts for this dependency"
+  script: String
+  "Reference website for this dependency (e.g. https://p5js.org)"
+  referenceWebsite: String!
+  "Depenency registry contract that this dependency is registered on"
+  dependencyRegistry: DependencyRegistry!
+  "Timestamp of last update"
+  updatedAt: BigInt!
+}
+
+type DependencyRegistry @entity {
+  "Unique identifier made up of dependency registry contract address"
+  id: Bytes!
+  "Core contracts that this registry can provide dependeny overrides for"
+  supportedCoreContracts: [Contract!]! @derivedFrom(field: "dependencyRegistry")
+  "List of dependencies that are registered on this registry contract"
+  dependencies: [Dependency!] @derivedFrom(field: "dependencyRegistry")
+  "Current owner of this contract"
+  owner: Bytes!
+  "Timestamp of last update"
+  updatedAt: BigInt!
+}
+
+type DependencyAdditionalCDN @entity {
+  "Unique identifier made up of dependency id and index"
+  id: ID!
+  "Dependency this additional CDN belongs to"
+  dependency: Dependency!
+  "URL of the CDN"
+  cdn: String!
+  "Index of this additional CDN"
+  index: BigInt!
+}
+
+type DependencyAdditionalRepository @entity {
+  "Unique identifier made up of dependency id and index"
+  id: ID!
+  "Dependency this additional repository belongs to"
+  dependency: Dependency!
+  "URL of the repository"
+  repository: String!
+  "Index of this additional repository"
+  index: BigInt!
+}
+
+type DependencyScript @entity {
+  "Unique identifier made up of dependency id and index"
+  id: ID!
+  "Dependency this script belongs to"
+  dependency: Dependency!
+  "Index of this script"
+  index: BigInt!
+  "Contents of script"
+  script: String!
+  "Address of the bytecode storage contract for this script"
+  address: Bytes!
 }
 
 enum ProjectExternalAssetDependencyType {
