@@ -6,14 +6,48 @@ import {
   DataSourceContext
 } from "@graphprotocol/graph-ts";
 
-export class GenArt721CoreV3_Dynamic extends DataSourceTemplate {
+export class IGenArt721CoreV3_Base_Template extends DataSourceTemplate {
   static create(address: Address): void {
-    DataSourceTemplate.create("GenArt721CoreV3_Dynamic", [address.toHex()]);
+    DataSourceTemplate.create("IGenArt721CoreV3_Base_Template", [
+      address.toHex()
+    ]);
   }
 
   static createWithContext(address: Address, context: DataSourceContext): void {
     DataSourceTemplate.createWithContext(
-      "GenArt721CoreV3_Dynamic",
+      "IGenArt721CoreV3_Base_Template",
+      [address.toHex()],
+      context
+    );
+  }
+}
+
+export class OwnableGenArt721CoreV3Contract_Template extends DataSourceTemplate {
+  static create(address: Address): void {
+    DataSourceTemplate.create("OwnableGenArt721CoreV3Contract_Template", [
+      address.toHex()
+    ]);
+  }
+
+  static createWithContext(address: Address, context: DataSourceContext): void {
+    DataSourceTemplate.createWithContext(
+      "OwnableGenArt721CoreV3Contract_Template",
+      [address.toHex()],
+      context
+    );
+  }
+}
+
+export class IERC721GenArt721CoreV3Contract_Template extends DataSourceTemplate {
+  static create(address: Address): void {
+    DataSourceTemplate.create("IERC721GenArt721CoreV3Contract_Template", [
+      address.toHex()
+    ]);
+  }
+
+  static createWithContext(address: Address, context: DataSourceContext): void {
+    DataSourceTemplate.createWithContext(
+      "IERC721GenArt721CoreV3Contract_Template",
       [address.toHex()],
       context
     );
