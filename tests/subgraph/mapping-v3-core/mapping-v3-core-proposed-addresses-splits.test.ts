@@ -62,7 +62,7 @@ import {
 import {
   ProposedArtistAddressesAndSplits,
   AcceptedArtistAddressesAndSplits
-} from "../../../generated/GenArt721CoreV3/IGenArt721CoreContractV3_Base";
+} from "../../../generated/IGenArt721CoreV3_Base/IGenArt721CoreContractV3_Base";
 import {
   handleProposedArtistAddressesAndSplits,
   handleAcceptedArtistAddressesAndSplits

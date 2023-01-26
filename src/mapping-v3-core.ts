@@ -7,14 +7,14 @@ import {
   MinterUpdated,
   ProposedArtistAddressesAndSplits as ProposedArtistAddressesAndSplitsEvent,
   AcceptedArtistAddressesAndSplits
-} from "../generated/GenArt721CoreV3/IGenArt721CoreContractV3_Base";
+} from "../generated/IGenArt721CoreV3_Base/IGenArt721CoreContractV3_Base";
 
-import { GenArt721CoreV3 } from "../generated/GenArt721CoreV3/GenArt721CoreV3";
-import { GenArt721CoreV3_Engine } from "../generated/GenArt721CoreV3/GenArt721CoreV3_Engine";
+import { GenArt721CoreV3 } from "../generated/IGenArt721CoreV3_Base/GenArt721CoreV3";
+import { GenArt721CoreV3_Engine } from "../generated/IGenArt721CoreV3_Base/GenArt721CoreV3_Engine";
 
-import { Transfer } from "../generated/GenArt721CoreV3/IERC721";
+import { Transfer } from "../generated/IERC721GenArt721CoreV3Contract/IERC721";
 
-import { OwnershipTransferred } from "../generated/GenArt721CoreV3/Ownable";
+import { OwnershipTransferred } from "../generated/OwnableGenArt721CoreV3Contract/Ownable";
 
 import {
   IAdminACLV0,

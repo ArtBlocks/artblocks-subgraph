@@ -34,7 +34,7 @@ import {
 import { mockGetProjectAndMinterInfoAt } from "../minter-suite/helpers";
 
 import { ProjectMinterConfiguration } from "../../../generated/schema";
-import { MinterUpdated } from "../../../generated/GenArt721CoreV3/IGenArt721CoreContractV3_Base";
+import { MinterUpdated } from "../../../generated/IGenArt721CoreV3_Base/IGenArt721CoreContractV3_Base";
 import { handleMinterUpdated } from "../../../src/mapping-v3-core";
 import { getProjectMinterConfigId } from "../../../src/helpers";
 
