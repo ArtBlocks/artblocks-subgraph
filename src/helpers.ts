@@ -9,7 +9,7 @@ import {
   store,
   ethereum
 } from "@graphprotocol/graph-ts";
-import { IFilteredMinterV2 } from "../generated/MinterSetPrice/IFilteredMinterV2";
+import { IFilteredMinterV3 } from "../generated/MinterSetPrice/IFilteredMinterV3";
 import {
   Minter,
   ProjectMinterConfiguration,
@@ -17,8 +17,8 @@ import {
   Whitelisting,
   Receipt
 } from "../generated/schema";
-import { IFilteredMinterDALinV1 } from "../generated/MinterDALin/IFilteredMinterDALinV1";
-import { IFilteredMinterDAExpV1 } from "../generated/MinterDAExp/IFilteredMinterDAExpV1";
+import { IFilteredMinterDALinV2 } from "../generated/MinterDALin/IFilteredMinterDALinV2";
+import { IFilteredMinterDAExpV2 } from "../generated/MinterDAExp/IFilteredMinterDAExpV2";
 
 export function generateProjectExternalAssetDependencyId(
   projectId: string,
@@ -180,7 +180,7 @@ export function loadOrCreateMinter(
    * constructor is not necessary.
    */
   minter = new Minter(minterAddress.toHexString());
-  let filteredMinterContract = IFilteredMinterV2.bind(minterAddress);
+  let filteredMinterContract = IFilteredMinterV3.bind(minterAddress);
 
   // values assigned in contract constructors
   minter.minterFilter = filteredMinterContract
@@ -197,10 +197,10 @@ export function loadOrCreateMinter(
     minter.type = minterType.value;
     // populate any minter-specific values
     if (minter.type.startsWith("MinterDALin")) {
-      const contract = IFilteredMinterDALinV1.bind(minterAddress);
+      const contract = IFilteredMinterDALinV2.bind(minterAddress);
       minter.minimumAuctionLengthInSeconds = contract.minimumAuctionLengthSeconds();
     } else if (minter.type.startsWith("MinterDAExp")) {
-      const contract = IFilteredMinterDAExpV1.bind(minterAddress);
+      const contract = IFilteredMinterDAExpV2.bind(minterAddress);
       minter.minimumHalfLifeInSeconds = contract.minimumPriceDecayHalfLifeSeconds();
       minter.maximumHalfLifeInSeconds = contract.maximumPriceDecayHalfLifeSeconds();
     }

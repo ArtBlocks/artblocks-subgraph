@@ -10,6 +10,32 @@ import {
   BigInt
 } from "@graphprotocol/graph-ts";
 
+export class AllowedHoldersOfProjects extends ethereum.Event {
+  get params(): AllowedHoldersOfProjects__Params {
+    return new AllowedHoldersOfProjects__Params(this);
+  }
+}
+
+export class AllowedHoldersOfProjects__Params {
+  _event: AllowedHoldersOfProjects;
+
+  constructor(event: AllowedHoldersOfProjects) {
+    this._event = event;
+  }
+
+  get _projectId(): BigInt {
+    return this._event.parameters[0].value.toBigInt();
+  }
+
+  get _ownedNFTAddresses(): Array<Address> {
+    return this._event.parameters[1].value.toAddressArray();
+  }
+
+  get _ownedNFTProjectIds(): Array<BigInt> {
+    return this._event.parameters[2].value.toBigIntArray();
+  }
+}
+
 export class ConfigKeyRemoved extends ethereum.Event {
   get params(): ConfigKeyRemoved__Params {
     return new ConfigKeyRemoved__Params(this);
@@ -292,21 +318,21 @@ export class ConfigValueSet3__Params {
   }
 }
 
-export class DefaultMaxInvocationsPerAddress extends ethereum.Event {
-  get params(): DefaultMaxInvocationsPerAddress__Params {
-    return new DefaultMaxInvocationsPerAddress__Params(this);
+export class ConfiguredIsEngine extends ethereum.Event {
+  get params(): ConfiguredIsEngine__Params {
+    return new ConfiguredIsEngine__Params(this);
   }
 }
 
-export class DefaultMaxInvocationsPerAddress__Params {
-  _event: DefaultMaxInvocationsPerAddress;
+export class ConfiguredIsEngine__Params {
+  _event: ConfiguredIsEngine;
 
-  constructor(event: DefaultMaxInvocationsPerAddress) {
+  constructor(event: ConfiguredIsEngine) {
     this._event = event;
   }
 
-  get defaultMaxInvocationsPerAddress(): BigInt {
-    return this._event.parameters[0].value.toBigInt();
+  get isEngine(): boolean {
+    return this._event.parameters[0].value.toBoolean();
   }
 }
 
@@ -420,7 +446,69 @@ export class PurchaseToDisabledUpdated__Params {
   }
 }
 
-export class IFilteredMinterMerkleV2__getPriceInfoResult {
+export class RegisteredNFTAddress extends ethereum.Event {
+  get params(): RegisteredNFTAddress__Params {
+    return new RegisteredNFTAddress__Params(this);
+  }
+}
+
+export class RegisteredNFTAddress__Params {
+  _event: RegisteredNFTAddress;
+
+  constructor(event: RegisteredNFTAddress) {
+    this._event = event;
+  }
+
+  get _NFTAddress(): Address {
+    return this._event.parameters[0].value.toAddress();
+  }
+}
+
+export class RemovedHoldersOfProjects extends ethereum.Event {
+  get params(): RemovedHoldersOfProjects__Params {
+    return new RemovedHoldersOfProjects__Params(this);
+  }
+}
+
+export class RemovedHoldersOfProjects__Params {
+  _event: RemovedHoldersOfProjects;
+
+  constructor(event: RemovedHoldersOfProjects) {
+    this._event = event;
+  }
+
+  get _projectId(): BigInt {
+    return this._event.parameters[0].value.toBigInt();
+  }
+
+  get _ownedNFTAddresses(): Array<Address> {
+    return this._event.parameters[1].value.toAddressArray();
+  }
+
+  get _ownedNFTProjectIds(): Array<BigInt> {
+    return this._event.parameters[2].value.toBigIntArray();
+  }
+}
+
+export class UnregisteredNFTAddress extends ethereum.Event {
+  get params(): UnregisteredNFTAddress__Params {
+    return new UnregisteredNFTAddress__Params(this);
+  }
+}
+
+export class UnregisteredNFTAddress__Params {
+  _event: UnregisteredNFTAddress;
+
+  constructor(event: UnregisteredNFTAddress) {
+    this._event = event;
+  }
+
+  get _NFTAddress(): Address {
+    return this._event.parameters[0].value.toAddress();
+  }
+}
+
+export class IFilteredMinterHolderV3__getPriceInfoResult {
   value0: boolean;
   value1: BigInt;
   value2: string;
@@ -464,9 +552,9 @@ export class IFilteredMinterMerkleV2__getPriceInfoResult {
   }
 }
 
-export class IFilteredMinterMerkleV2 extends ethereum.SmartContract {
-  static bind(address: Address): IFilteredMinterMerkleV2 {
-    return new IFilteredMinterMerkleV2("IFilteredMinterMerkleV2", address);
+export class IFilteredMinterHolderV3 extends ethereum.SmartContract {
+  static bind(address: Address): IFilteredMinterHolderV3 {
+    return new IFilteredMinterHolderV3("IFilteredMinterHolderV3", address);
   }
 
   genArt721CoreAddress(): Address {
@@ -494,14 +582,14 @@ export class IFilteredMinterMerkleV2 extends ethereum.SmartContract {
 
   getPriceInfo(
     _projectId: BigInt
-  ): IFilteredMinterMerkleV2__getPriceInfoResult {
+  ): IFilteredMinterHolderV3__getPriceInfoResult {
     let result = super.call(
       "getPriceInfo",
       "getPriceInfo(uint256):(bool,uint256,string,address)",
       [ethereum.Value.fromUnsignedBigInt(_projectId)]
     );
 
-    return new IFilteredMinterMerkleV2__getPriceInfoResult(
+    return new IFilteredMinterHolderV3__getPriceInfoResult(
       result[0].toBoolean(),
       result[1].toBigInt(),
       result[2].toString(),
@@ -511,7 +599,7 @@ export class IFilteredMinterMerkleV2 extends ethereum.SmartContract {
 
   try_getPriceInfo(
     _projectId: BigInt
-  ): ethereum.CallResult<IFilteredMinterMerkleV2__getPriceInfoResult> {
+  ): ethereum.CallResult<IFilteredMinterHolderV3__getPriceInfoResult> {
     let result = super.tryCall(
       "getPriceInfo",
       "getPriceInfo(uint256):(bool,uint256,string,address)",
@@ -522,13 +610,28 @@ export class IFilteredMinterMerkleV2 extends ethereum.SmartContract {
     }
     let value = result.value;
     return ethereum.CallResult.fromValue(
-      new IFilteredMinterMerkleV2__getPriceInfoResult(
+      new IFilteredMinterHolderV3__getPriceInfoResult(
         value[0].toBoolean(),
         value[1].toBigInt(),
         value[2].toString(),
         value[3].toAddress()
       )
     );
+  }
+
+  isEngine(): boolean {
+    let result = super.call("isEngine", "isEngine():(bool)", []);
+
+    return result[0].toBoolean();
+  }
+
+  try_isEngine(): ethereum.CallResult<boolean> {
+    let result = super.tryCall("isEngine", "isEngine():(bool)", []);
+    if (result.reverted) {
+      return new ethereum.CallResult();
+    }
+    let value = result.value;
+    return ethereum.CallResult.fromValue(value[0].toBoolean());
   }
 
   minterFilterAddress(): Address {
@@ -597,6 +700,36 @@ export class GenArt721CoreAddressCall__Outputs {
 
   get value0(): Address {
     return this._call.outputValues[0].value.toAddress();
+  }
+}
+
+export class IsEngineCall extends ethereum.Call {
+  get inputs(): IsEngineCall__Inputs {
+    return new IsEngineCall__Inputs(this);
+  }
+
+  get outputs(): IsEngineCall__Outputs {
+    return new IsEngineCall__Outputs(this);
+  }
+}
+
+export class IsEngineCall__Inputs {
+  _call: IsEngineCall;
+
+  constructor(call: IsEngineCall) {
+    this._call = call;
+  }
+}
+
+export class IsEngineCall__Outputs {
+  _call: IsEngineCall;
+
+  constructor(call: IsEngineCall) {
+    this._call = call;
+  }
+
+  get isEngine(): boolean {
+    return this._call.outputValues[0].value.toBoolean();
   }
 }
 
@@ -685,8 +818,12 @@ export class PurchaseCall__Inputs {
     return this._call.inputValues[0].value.toBigInt();
   }
 
-  get _proof(): Array<Bytes> {
-    return this._call.inputValues[1].value.toBytesArray();
+  get _ownedNftAddress(): Address {
+    return this._call.inputValues[1].value.toAddress();
+  }
+
+  get _ownedNftTokenId(): BigInt {
+    return this._call.inputValues[2].value.toBigInt();
   }
 }
 
@@ -760,10 +897,6 @@ export class PurchaseToCall__Inputs {
   get _projectId(): BigInt {
     return this._call.inputValues[1].value.toBigInt();
   }
-
-  get _proof(): Array<Bytes> {
-    return this._call.inputValues[2].value.toBytesArray();
-  }
 }
 
 export class PurchaseToCall__Outputs {
@@ -801,6 +934,14 @@ export class PurchaseTo1Call__Inputs {
 
   get _projectId(): BigInt {
     return this._call.inputValues[1].value.toBigInt();
+  }
+
+  get _ownedNftAddress(): Address {
+    return this._call.inputValues[2].value.toAddress();
+  }
+
+  get _ownedNftTokenId(): BigInt {
+    return this._call.inputValues[3].value.toBigInt();
   }
 }
 

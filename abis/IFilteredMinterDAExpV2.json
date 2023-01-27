@@ -1,7 +1,7 @@
 {
   "_format": "hh-sol-artifact-1",
-  "contractName": "IFilteredMinterDAExpV1",
-  "sourceName": "contracts/interfaces/0.8.x/IFilteredMinterDAExpV1.sol",
+  "contractName": "IFilteredMinterDAExpV2",
+  "sourceName": "contracts/interfaces/0.8.x/IFilteredMinterDAExpV2.sol",
   "abi": [
     {
       "anonymous": false,
@@ -296,6 +296,19 @@
       "inputs": [
         {
           "indexed": true,
+          "internalType": "bool",
+          "name": "isEngine",
+          "type": "bool"
+        }
+      ],
+      "name": "ConfiguredIsEngine",
+      "type": "event"
+    },
+    {
+      "anonymous": false,
+      "inputs": [
+        {
+          "indexed": true,
           "internalType": "uint256",
           "name": "_projectId",
           "type": "uint256"
@@ -468,6 +481,19 @@
         }
       ],
       "stateMutability": "view",
+      "type": "function"
+    },
+    {
+      "inputs": [],
+      "name": "isEngine",
+      "outputs": [
+        {
+          "internalType": "bool",
+          "name": "isEngine",
+          "type": "bool"
+        }
+      ],
+      "stateMutability": "nonpayable",
       "type": "function"
     },
     {

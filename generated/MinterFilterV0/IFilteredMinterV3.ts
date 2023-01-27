@@ -292,6 +292,24 @@ export class ConfigValueSet3__Params {
   }
 }
 
+export class ConfiguredIsEngine extends ethereum.Event {
+  get params(): ConfiguredIsEngine__Params {
+    return new ConfiguredIsEngine__Params(this);
+  }
+}
+
+export class ConfiguredIsEngine__Params {
+  _event: ConfiguredIsEngine;
+
+  constructor(event: ConfiguredIsEngine) {
+    this._event = event;
+  }
+
+  get isEngine(): boolean {
+    return this._event.parameters[0].value.toBoolean();
+  }
+}
+
 export class PricePerTokenInWeiUpdated extends ethereum.Event {
   get params(): PricePerTokenInWeiUpdated__Params {
     return new PricePerTokenInWeiUpdated__Params(this);
@@ -384,7 +402,7 @@ export class PurchaseToDisabledUpdated__Params {
   }
 }
 
-export class IFilteredMinterV2__getPriceInfoResult {
+export class IFilteredMinterV3__getPriceInfoResult {
   value0: boolean;
   value1: BigInt;
   value2: string;
@@ -428,9 +446,9 @@ export class IFilteredMinterV2__getPriceInfoResult {
   }
 }
 
-export class IFilteredMinterV2 extends ethereum.SmartContract {
-  static bind(address: Address): IFilteredMinterV2 {
-    return new IFilteredMinterV2("IFilteredMinterV2", address);
+export class IFilteredMinterV3 extends ethereum.SmartContract {
+  static bind(address: Address): IFilteredMinterV3 {
+    return new IFilteredMinterV3("IFilteredMinterV3", address);
   }
 
   genArt721CoreAddress(): Address {
@@ -456,14 +474,14 @@ export class IFilteredMinterV2 extends ethereum.SmartContract {
     return ethereum.CallResult.fromValue(value[0].toAddress());
   }
 
-  getPriceInfo(_projectId: BigInt): IFilteredMinterV2__getPriceInfoResult {
+  getPriceInfo(_projectId: BigInt): IFilteredMinterV3__getPriceInfoResult {
     let result = super.call(
       "getPriceInfo",
       "getPriceInfo(uint256):(bool,uint256,string,address)",
       [ethereum.Value.fromUnsignedBigInt(_projectId)]
     );
 
-    return new IFilteredMinterV2__getPriceInfoResult(
+    return new IFilteredMinterV3__getPriceInfoResult(
       result[0].toBoolean(),
       result[1].toBigInt(),
       result[2].toString(),
@@ -473,7 +491,7 @@ export class IFilteredMinterV2 extends ethereum.SmartContract {
 
   try_getPriceInfo(
     _projectId: BigInt
-  ): ethereum.CallResult<IFilteredMinterV2__getPriceInfoResult> {
+  ): ethereum.CallResult<IFilteredMinterV3__getPriceInfoResult> {
     let result = super.tryCall(
       "getPriceInfo",
       "getPriceInfo(uint256):(bool,uint256,string,address)",
@@ -484,13 +502,28 @@ export class IFilteredMinterV2 extends ethereum.SmartContract {
     }
     let value = result.value;
     return ethereum.CallResult.fromValue(
-      new IFilteredMinterV2__getPriceInfoResult(
+      new IFilteredMinterV3__getPriceInfoResult(
         value[0].toBoolean(),
         value[1].toBigInt(),
         value[2].toString(),
         value[3].toAddress()
       )
     );
+  }
+
+  isEngine(): boolean {
+    let result = super.call("isEngine", "isEngine():(bool)", []);
+
+    return result[0].toBoolean();
+  }
+
+  try_isEngine(): ethereum.CallResult<boolean> {
+    let result = super.tryCall("isEngine", "isEngine():(bool)", []);
+    if (result.reverted) {
+      return new ethereum.CallResult();
+    }
+    let value = result.value;
+    return ethereum.CallResult.fromValue(value[0].toBoolean());
   }
 
   minterFilterAddress(): Address {
@@ -559,6 +592,36 @@ export class GenArt721CoreAddressCall__Outputs {
 
   get value0(): Address {
     return this._call.outputValues[0].value.toAddress();
+  }
+}
+
+export class IsEngineCall extends ethereum.Call {
+  get inputs(): IsEngineCall__Inputs {
+    return new IsEngineCall__Inputs(this);
+  }
+
+  get outputs(): IsEngineCall__Outputs {
+    return new IsEngineCall__Outputs(this);
+  }
+}
+
+export class IsEngineCall__Inputs {
+  _call: IsEngineCall;
+
+  constructor(call: IsEngineCall) {
+    this._call = call;
+  }
+}
+
+export class IsEngineCall__Outputs {
+  _call: IsEngineCall;
+
+  constructor(call: IsEngineCall) {
+    this._call = call;
+  }
+
+  get isEngine(): boolean {
+    return this._call.outputValues[0].value.toBoolean();
   }
 }
 

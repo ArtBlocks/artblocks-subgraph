@@ -1,8 +1,40 @@
 {
   "_format": "hh-sol-artifact-1",
-  "contractName": "IFilteredMinterMerkleV0",
-  "sourceName": "contracts/interfaces/0.8.x/IFilteredMinterMerkleV0.sol",
+  "contractName": "IFilteredMinterDAExpSettlementV1",
+  "sourceName": "contracts/interfaces/0.8.x/IFilteredMinterDAExpSettlementV1.sol",
   "abi": [
+    {
+      "anonymous": false,
+      "inputs": [
+        {
+          "indexed": true,
+          "internalType": "uint256",
+          "name": "_projectId",
+          "type": "uint256"
+        }
+      ],
+      "name": "ArtistAndAdminRevenuesWithdrawn",
+      "type": "event"
+    },
+    {
+      "anonymous": false,
+      "inputs": [
+        {
+          "indexed": false,
+          "internalType": "uint256",
+          "name": "_minimumPriceDecayHalfLifeSeconds",
+          "type": "uint256"
+        },
+        {
+          "indexed": false,
+          "internalType": "uint256",
+          "name": "_maximumPriceDecayHalfLifeSeconds",
+          "type": "uint256"
+        }
+      ],
+      "name": "AuctionHalfLifeRangeSecondsUpdated",
+      "type": "event"
+    },
     {
       "anonymous": false,
       "inputs": [
@@ -276,13 +308,13 @@
       "anonymous": false,
       "inputs": [
         {
-          "indexed": false,
-          "internalType": "uint256",
-          "name": "defaultMaxInvocationsPerAddress",
-          "type": "uint256"
+          "indexed": true,
+          "internalType": "bool",
+          "name": "isEngine",
+          "type": "bool"
         }
       ],
-      "name": "DefaultMaxInvocationsPerAddress",
+      "name": "ConfiguredIsEngine",
       "type": "event"
     },
     {
@@ -349,6 +381,131 @@
       "type": "event"
     },
     {
+      "anonymous": false,
+      "inputs": [
+        {
+          "indexed": true,
+          "internalType": "address",
+          "name": "_purchaser",
+          "type": "address"
+        },
+        {
+          "indexed": true,
+          "internalType": "uint256",
+          "name": "_projectId",
+          "type": "uint256"
+        },
+        {
+          "indexed": false,
+          "internalType": "uint256",
+          "name": "_numPurchased",
+          "type": "uint256"
+        },
+        {
+          "indexed": false,
+          "internalType": "uint256",
+          "name": "_netPosted",
+          "type": "uint256"
+        }
+      ],
+      "name": "ReceiptUpdated",
+      "type": "event"
+    },
+    {
+      "anonymous": false,
+      "inputs": [
+        {
+          "indexed": true,
+          "internalType": "uint256",
+          "name": "projectId",
+          "type": "uint256"
+        }
+      ],
+      "name": "ResetAuctionDetails",
+      "type": "event"
+    },
+    {
+      "anonymous": false,
+      "inputs": [
+        {
+          "indexed": true,
+          "internalType": "uint256",
+          "name": "projectId",
+          "type": "uint256"
+        },
+        {
+          "indexed": false,
+          "internalType": "uint256",
+          "name": "numPurchases",
+          "type": "uint256"
+        },
+        {
+          "indexed": false,
+          "internalType": "uint256",
+          "name": "latestPurchasePrice",
+          "type": "uint256"
+        }
+      ],
+      "name": "ResetAuctionDetails",
+      "type": "event"
+    },
+    {
+      "anonymous": false,
+      "inputs": [
+        {
+          "indexed": true,
+          "internalType": "uint256",
+          "name": "_projectId",
+          "type": "uint256"
+        },
+        {
+          "indexed": false,
+          "internalType": "uint256",
+          "name": "_selloutPrice",
+          "type": "uint256"
+        }
+      ],
+      "name": "SelloutPriceUpdated",
+      "type": "event"
+    },
+    {
+      "anonymous": false,
+      "inputs": [
+        {
+          "indexed": true,
+          "internalType": "uint256",
+          "name": "projectId",
+          "type": "uint256"
+        },
+        {
+          "indexed": false,
+          "internalType": "uint256",
+          "name": "_auctionTimestampStart",
+          "type": "uint256"
+        },
+        {
+          "indexed": false,
+          "internalType": "uint256",
+          "name": "_priceDecayHalfLifeSeconds",
+          "type": "uint256"
+        },
+        {
+          "indexed": false,
+          "internalType": "uint256",
+          "name": "_startPrice",
+          "type": "uint256"
+        },
+        {
+          "indexed": false,
+          "internalType": "uint256",
+          "name": "_basePrice",
+          "type": "uint256"
+        }
+      ],
+      "name": "SetAuctionDetails",
+      "type": "event"
+    },
+    {
       "inputs": [],
       "name": "genArt721CoreAddress",
       "outputs": [
@@ -359,6 +516,25 @@
         }
       ],
       "stateMutability": "nonpayable",
+      "type": "function"
+    },
+    {
+      "inputs": [
+        {
+          "internalType": "uint256",
+          "name": "_projectId",
+          "type": "uint256"
+        }
+      ],
+      "name": "getNumSettleableInvocations",
+      "outputs": [
+        {
+          "internalType": "uint256",
+          "name": "numSettleableInvocations",
+          "type": "uint256"
+        }
+      ],
+      "stateMutability": "view",
       "type": "function"
     },
     {
@@ -396,6 +572,88 @@
       "type": "function"
     },
     {
+      "inputs": [
+        {
+          "internalType": "uint256",
+          "name": "_projectId",
+          "type": "uint256"
+        },
+        {
+          "internalType": "address",
+          "name": "_walletAddress",
+          "type": "address"
+        }
+      ],
+      "name": "getProjectExcessSettlementFunds",
+      "outputs": [
+        {
+          "internalType": "uint256",
+          "name": "excessSettlementFundsInWei",
+          "type": "uint256"
+        }
+      ],
+      "stateMutability": "view",
+      "type": "function"
+    },
+    {
+      "inputs": [
+        {
+          "internalType": "uint256",
+          "name": "_projectId",
+          "type": "uint256"
+        }
+      ],
+      "name": "getProjectLatestPurchasePrice",
+      "outputs": [
+        {
+          "internalType": "uint256",
+          "name": "latestPurchasePrice",
+          "type": "uint256"
+        }
+      ],
+      "stateMutability": "view",
+      "type": "function"
+    },
+    {
+      "inputs": [],
+      "name": "isEngine",
+      "outputs": [
+        {
+          "internalType": "bool",
+          "name": "isEngine",
+          "type": "bool"
+        }
+      ],
+      "stateMutability": "nonpayable",
+      "type": "function"
+    },
+    {
+      "inputs": [],
+      "name": "maximumPriceDecayHalfLifeSeconds",
+      "outputs": [
+        {
+          "internalType": "uint256",
+          "name": "",
+          "type": "uint256"
+        }
+      ],
+      "stateMutability": "view",
+      "type": "function"
+    },
+    {
+      "inputs": [],
+      "name": "minimumPriceDecayHalfLifeSeconds",
+      "outputs": [
+        {
+          "internalType": "uint256",
+          "name": "",
+          "type": "uint256"
+        }
+      ],
+      "stateMutability": "view",
+      "type": "function"
+    },
+    {
       "inputs": [],
       "name": "minterFilterAddress",
       "outputs": [
@@ -427,62 +685,9 @@
           "internalType": "uint256",
           "name": "_projectId",
           "type": "uint256"
-        },
-        {
-          "internalType": "bytes32[]",
-          "name": "_proof",
-          "type": "bytes32[]"
         }
       ],
       "name": "purchase",
-      "outputs": [
-        {
-          "internalType": "uint256",
-          "name": "tokenId",
-          "type": "uint256"
-        }
-      ],
-      "stateMutability": "payable",
-      "type": "function"
-    },
-    {
-      "inputs": [
-        {
-          "internalType": "uint256",
-          "name": "_projectId",
-          "type": "uint256"
-        }
-      ],
-      "name": "purchase",
-      "outputs": [
-        {
-          "internalType": "uint256",
-          "name": "tokenId",
-          "type": "uint256"
-        }
-      ],
-      "stateMutability": "payable",
-      "type": "function"
-    },
-    {
-      "inputs": [
-        {
-          "internalType": "address",
-          "name": "_to",
-          "type": "address"
-        },
-        {
-          "internalType": "uint256",
-          "name": "_projectId",
-          "type": "uint256"
-        },
-        {
-          "internalType": "bytes32[]",
-          "name": "_proof",
-          "type": "bytes32[]"
-        }
-      ],
-      "name": "purchaseTo",
       "outputs": [
         {
           "internalType": "uint256",

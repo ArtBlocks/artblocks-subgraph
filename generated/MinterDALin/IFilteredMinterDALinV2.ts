@@ -10,46 +10,6 @@ import {
   BigInt
 } from "@graphprotocol/graph-ts";
 
-export class ArtistAndAdminRevenuesWithdrawn extends ethereum.Event {
-  get params(): ArtistAndAdminRevenuesWithdrawn__Params {
-    return new ArtistAndAdminRevenuesWithdrawn__Params(this);
-  }
-}
-
-export class ArtistAndAdminRevenuesWithdrawn__Params {
-  _event: ArtistAndAdminRevenuesWithdrawn;
-
-  constructor(event: ArtistAndAdminRevenuesWithdrawn) {
-    this._event = event;
-  }
-
-  get _projectId(): BigInt {
-    return this._event.parameters[0].value.toBigInt();
-  }
-}
-
-export class AuctionHalfLifeRangeSecondsUpdated extends ethereum.Event {
-  get params(): AuctionHalfLifeRangeSecondsUpdated__Params {
-    return new AuctionHalfLifeRangeSecondsUpdated__Params(this);
-  }
-}
-
-export class AuctionHalfLifeRangeSecondsUpdated__Params {
-  _event: AuctionHalfLifeRangeSecondsUpdated;
-
-  constructor(event: AuctionHalfLifeRangeSecondsUpdated) {
-    this._event = event;
-  }
-
-  get _minimumPriceDecayHalfLifeSeconds(): BigInt {
-    return this._event.parameters[0].value.toBigInt();
-  }
-
-  get _maximumPriceDecayHalfLifeSeconds(): BigInt {
-    return this._event.parameters[1].value.toBigInt();
-  }
-}
-
 export class ConfigKeyRemoved extends ethereum.Event {
   get params(): ConfigKeyRemoved__Params {
     return new ConfigKeyRemoved__Params(this);
@@ -332,6 +292,42 @@ export class ConfigValueSet3__Params {
   }
 }
 
+export class ConfiguredIsEngine extends ethereum.Event {
+  get params(): ConfiguredIsEngine__Params {
+    return new ConfiguredIsEngine__Params(this);
+  }
+}
+
+export class ConfiguredIsEngine__Params {
+  _event: ConfiguredIsEngine;
+
+  constructor(event: ConfiguredIsEngine) {
+    this._event = event;
+  }
+
+  get isEngine(): boolean {
+    return this._event.parameters[0].value.toBoolean();
+  }
+}
+
+export class MinimumAuctionLengthSecondsUpdated extends ethereum.Event {
+  get params(): MinimumAuctionLengthSecondsUpdated__Params {
+    return new MinimumAuctionLengthSecondsUpdated__Params(this);
+  }
+}
+
+export class MinimumAuctionLengthSecondsUpdated__Params {
+  _event: MinimumAuctionLengthSecondsUpdated;
+
+  constructor(event: MinimumAuctionLengthSecondsUpdated) {
+    this._event = event;
+  }
+
+  get _minimumAuctionLengthSeconds(): BigInt {
+    return this._event.parameters[0].value.toBigInt();
+  }
+}
+
 export class PricePerTokenInWeiUpdated extends ethereum.Event {
   get params(): PricePerTokenInWeiUpdated__Params {
     return new PricePerTokenInWeiUpdated__Params(this);
@@ -380,6 +376,28 @@ export class ProjectCurrencyInfoUpdated__Params {
   }
 }
 
+export class ProjectMaxInvocationsLimitUpdated extends ethereum.Event {
+  get params(): ProjectMaxInvocationsLimitUpdated__Params {
+    return new ProjectMaxInvocationsLimitUpdated__Params(this);
+  }
+}
+
+export class ProjectMaxInvocationsLimitUpdated__Params {
+  _event: ProjectMaxInvocationsLimitUpdated;
+
+  constructor(event: ProjectMaxInvocationsLimitUpdated) {
+    this._event = event;
+  }
+
+  get _projectId(): BigInt {
+    return this._event.parameters[0].value.toBigInt();
+  }
+
+  get _maxInvocations(): BigInt {
+    return this._event.parameters[1].value.toBigInt();
+  }
+}
+
 export class PurchaseToDisabledUpdated extends ethereum.Event {
   get params(): PurchaseToDisabledUpdated__Params {
     return new PurchaseToDisabledUpdated__Params(this);
@@ -402,36 +420,6 @@ export class PurchaseToDisabledUpdated__Params {
   }
 }
 
-export class ReceiptUpdated extends ethereum.Event {
-  get params(): ReceiptUpdated__Params {
-    return new ReceiptUpdated__Params(this);
-  }
-}
-
-export class ReceiptUpdated__Params {
-  _event: ReceiptUpdated;
-
-  constructor(event: ReceiptUpdated) {
-    this._event = event;
-  }
-
-  get _purchaser(): Address {
-    return this._event.parameters[0].value.toAddress();
-  }
-
-  get _projectId(): BigInt {
-    return this._event.parameters[1].value.toBigInt();
-  }
-
-  get _numPurchased(): BigInt {
-    return this._event.parameters[2].value.toBigInt();
-  }
-
-  get _netPosted(): BigInt {
-    return this._event.parameters[3].value.toBigInt();
-  }
-}
-
 export class ResetAuctionDetails extends ethereum.Event {
   get params(): ResetAuctionDetails__Params {
     return new ResetAuctionDetails__Params(this);
@@ -447,54 +435,6 @@ export class ResetAuctionDetails__Params {
 
   get projectId(): BigInt {
     return this._event.parameters[0].value.toBigInt();
-  }
-
-  get numPurchases(): BigInt {
-    return this._event.parameters[1].value.toBigInt();
-  }
-
-  get latestPurchasePrice(): BigInt {
-    return this._event.parameters[2].value.toBigInt();
-  }
-}
-
-export class ResetAuctionDetails1 extends ethereum.Event {
-  get params(): ResetAuctionDetails1__Params {
-    return new ResetAuctionDetails1__Params(this);
-  }
-}
-
-export class ResetAuctionDetails1__Params {
-  _event: ResetAuctionDetails1;
-
-  constructor(event: ResetAuctionDetails1) {
-    this._event = event;
-  }
-
-  get projectId(): BigInt {
-    return this._event.parameters[0].value.toBigInt();
-  }
-}
-
-export class SelloutPriceUpdated extends ethereum.Event {
-  get params(): SelloutPriceUpdated__Params {
-    return new SelloutPriceUpdated__Params(this);
-  }
-}
-
-export class SelloutPriceUpdated__Params {
-  _event: SelloutPriceUpdated;
-
-  constructor(event: SelloutPriceUpdated) {
-    this._event = event;
-  }
-
-  get _projectId(): BigInt {
-    return this._event.parameters[0].value.toBigInt();
-  }
-
-  get _selloutPrice(): BigInt {
-    return this._event.parameters[1].value.toBigInt();
   }
 }
 
@@ -519,7 +459,7 @@ export class SetAuctionDetails__Params {
     return this._event.parameters[1].value.toBigInt();
   }
 
-  get _priceDecayHalfLifeSeconds(): BigInt {
+  get _auctionTimestampEnd(): BigInt {
     return this._event.parameters[2].value.toBigInt();
   }
 
@@ -532,7 +472,7 @@ export class SetAuctionDetails__Params {
   }
 }
 
-export class IFilteredMinterDAExpSettlementV0__getPriceInfoResult {
+export class IFilteredMinterDALinV2__getPriceInfoResult {
   value0: boolean;
   value1: BigInt;
   value2: string;
@@ -576,12 +516,9 @@ export class IFilteredMinterDAExpSettlementV0__getPriceInfoResult {
   }
 }
 
-export class IFilteredMinterDAExpSettlementV0 extends ethereum.SmartContract {
-  static bind(address: Address): IFilteredMinterDAExpSettlementV0 {
-    return new IFilteredMinterDAExpSettlementV0(
-      "IFilteredMinterDAExpSettlementV0",
-      address
-    );
+export class IFilteredMinterDALinV2 extends ethereum.SmartContract {
+  static bind(address: Address): IFilteredMinterDALinV2 {
+    return new IFilteredMinterDALinV2("IFilteredMinterDALinV2", address);
   }
 
   genArt721CoreAddress(): Address {
@@ -607,41 +544,14 @@ export class IFilteredMinterDAExpSettlementV0 extends ethereum.SmartContract {
     return ethereum.CallResult.fromValue(value[0].toAddress());
   }
 
-  getNumSettleableInvocations(_projectId: BigInt): BigInt {
-    let result = super.call(
-      "getNumSettleableInvocations",
-      "getNumSettleableInvocations(uint256):(uint256)",
-      [ethereum.Value.fromUnsignedBigInt(_projectId)]
-    );
-
-    return result[0].toBigInt();
-  }
-
-  try_getNumSettleableInvocations(
-    _projectId: BigInt
-  ): ethereum.CallResult<BigInt> {
-    let result = super.tryCall(
-      "getNumSettleableInvocations",
-      "getNumSettleableInvocations(uint256):(uint256)",
-      [ethereum.Value.fromUnsignedBigInt(_projectId)]
-    );
-    if (result.reverted) {
-      return new ethereum.CallResult();
-    }
-    let value = result.value;
-    return ethereum.CallResult.fromValue(value[0].toBigInt());
-  }
-
-  getPriceInfo(
-    _projectId: BigInt
-  ): IFilteredMinterDAExpSettlementV0__getPriceInfoResult {
+  getPriceInfo(_projectId: BigInt): IFilteredMinterDALinV2__getPriceInfoResult {
     let result = super.call(
       "getPriceInfo",
       "getPriceInfo(uint256):(bool,uint256,string,address)",
       [ethereum.Value.fromUnsignedBigInt(_projectId)]
     );
 
-    return new IFilteredMinterDAExpSettlementV0__getPriceInfoResult(
+    return new IFilteredMinterDALinV2__getPriceInfoResult(
       result[0].toBoolean(),
       result[1].toBigInt(),
       result[2].toString(),
@@ -651,7 +561,7 @@ export class IFilteredMinterDAExpSettlementV0 extends ethereum.SmartContract {
 
   try_getPriceInfo(
     _projectId: BigInt
-  ): ethereum.CallResult<IFilteredMinterDAExpSettlementV0__getPriceInfoResult> {
+  ): ethereum.CallResult<IFilteredMinterDALinV2__getPriceInfoResult> {
     let result = super.tryCall(
       "getPriceInfo",
       "getPriceInfo(uint256):(bool,uint256,string,address)",
@@ -662,7 +572,7 @@ export class IFilteredMinterDAExpSettlementV0 extends ethereum.SmartContract {
     }
     let value = result.value;
     return ethereum.CallResult.fromValue(
-      new IFilteredMinterDAExpSettlementV0__getPriceInfoResult(
+      new IFilteredMinterDALinV2__getPriceInfoResult(
         value[0].toBoolean(),
         value[1].toBigInt(),
         value[2].toString(),
@@ -671,103 +581,35 @@ export class IFilteredMinterDAExpSettlementV0 extends ethereum.SmartContract {
     );
   }
 
-  getProjectExcessSettlementFunds(
-    _projectId: BigInt,
-    _walletAddress: Address
-  ): BigInt {
-    let result = super.call(
-      "getProjectExcessSettlementFunds",
-      "getProjectExcessSettlementFunds(uint256,address):(uint256)",
-      [
-        ethereum.Value.fromUnsignedBigInt(_projectId),
-        ethereum.Value.fromAddress(_walletAddress)
-      ]
-    );
+  isEngine(): boolean {
+    let result = super.call("isEngine", "isEngine():(bool)", []);
 
-    return result[0].toBigInt();
+    return result[0].toBoolean();
   }
 
-  try_getProjectExcessSettlementFunds(
-    _projectId: BigInt,
-    _walletAddress: Address
-  ): ethereum.CallResult<BigInt> {
-    let result = super.tryCall(
-      "getProjectExcessSettlementFunds",
-      "getProjectExcessSettlementFunds(uint256,address):(uint256)",
-      [
-        ethereum.Value.fromUnsignedBigInt(_projectId),
-        ethereum.Value.fromAddress(_walletAddress)
-      ]
-    );
+  try_isEngine(): ethereum.CallResult<boolean> {
+    let result = super.tryCall("isEngine", "isEngine():(bool)", []);
     if (result.reverted) {
       return new ethereum.CallResult();
     }
     let value = result.value;
-    return ethereum.CallResult.fromValue(value[0].toBigInt());
+    return ethereum.CallResult.fromValue(value[0].toBoolean());
   }
 
-  getProjectLatestPurchasePrice(_projectId: BigInt): BigInt {
+  minimumAuctionLengthSeconds(): BigInt {
     let result = super.call(
-      "getProjectLatestPurchasePrice",
-      "getProjectLatestPurchasePrice(uint256):(uint256)",
-      [ethereum.Value.fromUnsignedBigInt(_projectId)]
-    );
-
-    return result[0].toBigInt();
-  }
-
-  try_getProjectLatestPurchasePrice(
-    _projectId: BigInt
-  ): ethereum.CallResult<BigInt> {
-    let result = super.tryCall(
-      "getProjectLatestPurchasePrice",
-      "getProjectLatestPurchasePrice(uint256):(uint256)",
-      [ethereum.Value.fromUnsignedBigInt(_projectId)]
-    );
-    if (result.reverted) {
-      return new ethereum.CallResult();
-    }
-    let value = result.value;
-    return ethereum.CallResult.fromValue(value[0].toBigInt());
-  }
-
-  maximumPriceDecayHalfLifeSeconds(): BigInt {
-    let result = super.call(
-      "maximumPriceDecayHalfLifeSeconds",
-      "maximumPriceDecayHalfLifeSeconds():(uint256)",
+      "minimumAuctionLengthSeconds",
+      "minimumAuctionLengthSeconds():(uint256)",
       []
     );
 
     return result[0].toBigInt();
   }
 
-  try_maximumPriceDecayHalfLifeSeconds(): ethereum.CallResult<BigInt> {
+  try_minimumAuctionLengthSeconds(): ethereum.CallResult<BigInt> {
     let result = super.tryCall(
-      "maximumPriceDecayHalfLifeSeconds",
-      "maximumPriceDecayHalfLifeSeconds():(uint256)",
-      []
-    );
-    if (result.reverted) {
-      return new ethereum.CallResult();
-    }
-    let value = result.value;
-    return ethereum.CallResult.fromValue(value[0].toBigInt());
-  }
-
-  minimumPriceDecayHalfLifeSeconds(): BigInt {
-    let result = super.call(
-      "minimumPriceDecayHalfLifeSeconds",
-      "minimumPriceDecayHalfLifeSeconds():(uint256)",
-      []
-    );
-
-    return result[0].toBigInt();
-  }
-
-  try_minimumPriceDecayHalfLifeSeconds(): ethereum.CallResult<BigInt> {
-    let result = super.tryCall(
-      "minimumPriceDecayHalfLifeSeconds",
-      "minimumPriceDecayHalfLifeSeconds():(uint256)",
+      "minimumAuctionLengthSeconds",
+      "minimumAuctionLengthSeconds():(uint256)",
       []
     );
     if (result.reverted) {
@@ -843,6 +685,70 @@ export class GenArt721CoreAddressCall__Outputs {
 
   get value0(): Address {
     return this._call.outputValues[0].value.toAddress();
+  }
+}
+
+export class IsEngineCall extends ethereum.Call {
+  get inputs(): IsEngineCall__Inputs {
+    return new IsEngineCall__Inputs(this);
+  }
+
+  get outputs(): IsEngineCall__Outputs {
+    return new IsEngineCall__Outputs(this);
+  }
+}
+
+export class IsEngineCall__Inputs {
+  _call: IsEngineCall;
+
+  constructor(call: IsEngineCall) {
+    this._call = call;
+  }
+}
+
+export class IsEngineCall__Outputs {
+  _call: IsEngineCall;
+
+  constructor(call: IsEngineCall) {
+    this._call = call;
+  }
+
+  get isEngine(): boolean {
+    return this._call.outputValues[0].value.toBoolean();
+  }
+}
+
+export class ManuallyLimitProjectMaxInvocationsCall extends ethereum.Call {
+  get inputs(): ManuallyLimitProjectMaxInvocationsCall__Inputs {
+    return new ManuallyLimitProjectMaxInvocationsCall__Inputs(this);
+  }
+
+  get outputs(): ManuallyLimitProjectMaxInvocationsCall__Outputs {
+    return new ManuallyLimitProjectMaxInvocationsCall__Outputs(this);
+  }
+}
+
+export class ManuallyLimitProjectMaxInvocationsCall__Inputs {
+  _call: ManuallyLimitProjectMaxInvocationsCall;
+
+  constructor(call: ManuallyLimitProjectMaxInvocationsCall) {
+    this._call = call;
+  }
+
+  get _projectId(): BigInt {
+    return this._call.inputValues[0].value.toBigInt();
+  }
+
+  get _maxInvocations(): BigInt {
+    return this._call.inputValues[1].value.toBigInt();
+  }
+}
+
+export class ManuallyLimitProjectMaxInvocationsCall__Outputs {
+  _call: ManuallyLimitProjectMaxInvocationsCall;
+
+  constructor(call: ManuallyLimitProjectMaxInvocationsCall) {
+    this._call = call;
   }
 }
 
