@@ -53,9 +53,9 @@ import {
   Mint,
   ProjectUpdated,
   PlatformUpdated
-} from "../../../generated/GenArt721CoreV3/IGenArt721CoreContractV3_Base";
-import { Transfer } from "../../../generated/GenArt721CoreV3/IERC721";
-import { OwnershipTransferred } from "../../../generated/GenArt721CoreV3/Ownable";
+} from "../../../generated/IGenArt721CoreV3_Base/IGenArt721CoreContractV3_Base";
+import { Transfer } from "../../../generated/IERC721GenArt721CoreV3Contract/IERC721";
+import { OwnershipTransferred } from "../../../generated/OwnableGenArt721CoreV3Contract/Ownable";
 import { SuperAdminTransferred } from "../../../generated/AdminACLV0/IAdminACLV0";
 import {
   FIELD_PROJECT_ACTIVE,

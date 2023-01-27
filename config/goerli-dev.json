@@ -1,6 +1,30 @@
 {
   "network": "goerli",
-  "genArt721CoreV3Contracts": [
+  "iGenArt721CoreContractV3_BaseContracts": [
+    {
+      "address": "0xF396C180bb2f92EE28535D23F5224A5b9425ceca",
+      "name": "Dev Goerli Flagship Core V3 Contract",
+      "startBlock": 7111111
+    },
+    {
+      "address": "0x7244352F6C7aFbB74D4b63Bd7e8189e84a83f179",
+      "name": "Dev Goerli V3 Explorations Contract",
+      "startBlock": 7799143
+    }
+  ],
+  "ownableGenArt721CoreV3Contracts": [
+    {
+      "address": "0xF396C180bb2f92EE28535D23F5224A5b9425ceca",
+      "name": "Dev Goerli Flagship Core V3 Contract",
+      "startBlock": 7111111
+    },
+    {
+      "address": "0x7244352F6C7aFbB74D4b63Bd7e8189e84a83f179",
+      "name": "Dev Goerli V3 Explorations Contract",
+      "startBlock": 7799143
+    }
+  ],
+  "iERC721GenArt721CoreV3Contracts": [
     {
       "address": "0xF396C180bb2f92EE28535D23F5224A5b9425ceca",
       "name": "Dev Goerli Flagship Core V3 Contract",
