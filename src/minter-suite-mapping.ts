@@ -1,5 +1,13 @@
-// We're importing these event types from MinterSetPriceV0
-// but the signature should be the same for all filtered minters
+/**
+ * @dev - This file contains the event handlers for the Minter suite of contracts.
+ * When modifying handlers when adding new contracts, it is important to note that
+ * functions on the codegen'd interfaces reflect the latest version of the interface,
+ * not the version of the interface that the contract implements (for earlier minter
+ * versions). This means that the function may not exist on the contract, and will
+ * throw an error if called. To avoid this, it is important to be careful and concise
+ * when binding to and calling functions on minters via the codegen'd interfaces.
+ */
+
 import {
   Address,
   BigInt,
@@ -16,21 +24,21 @@ import {
   PricePerTokenInWeiUpdated,
   ProjectCurrencyInfoUpdated,
   PurchaseToDisabledUpdated
-} from "../generated/MinterSetPriceV0/IFilteredMinterV0";
+} from "../generated/MinterSetPrice/IFilteredMinterV2";
 
-import { ProjectMaxInvocationsLimitUpdated } from "../generated/MinterSetPriceV3/IFilteredMinterV2";
+import { ProjectMaxInvocationsLimitUpdated } from "../generated/MinterSetPrice/IFilteredMinterV2";
 
 import {
   MinimumAuctionLengthSecondsUpdated,
   ResetAuctionDetails as DALinResetAuctionDetails,
   SetAuctionDetails as DALinSetAuctionDetails
-} from "../generated/MinterDALinV0/IFilteredMinterDALinV0";
+} from "../generated/MinterDALin/IFilteredMinterDALinV1";
 
 import {
   AuctionHalfLifeRangeSecondsUpdated as DAExpHalfLifeRangeSecondsUpdated,
   ResetAuctionDetails as DAExpResetAuctionDetails,
   SetAuctionDetails as DAExpSetAuctionDetails
-} from "../generated/MinterDAExpV0/IFilteredMinterDAExpV0";
+} from "../generated/MinterDAExp/IFilteredMinterDAExpV1";
 
 import {
   ResetAuctionDetails as DAExpSettlementResetAuctionDetails,
@@ -38,7 +46,7 @@ import {
   SelloutPriceUpdated,
   ArtistAndAdminRevenuesWithdrawn,
   IFilteredMinterDAExpSettlementV0
-} from "../generated/MinterDAExpSettlementV0/IFilteredMinterDAExpSettlementV0";
+} from "../generated/MinterDAExpSettlement/IFilteredMinterDAExpSettlementV0";
 
 import {
   Minter,
@@ -77,10 +85,10 @@ import {
   RegisteredNFTAddress,
   UnregisteredNFTAddress,
   RemovedHoldersOfProjects
-} from "../generated/MinterHolderV0/IFilteredMinterHolderV0";
+} from "../generated/MinterHolder/IFilteredMinterHolderV2";
 
-import { DelegationRegistryUpdated as MinterHolderDelegationRegistryUpdated } from "../generated/MinterHolderV2/IFilteredMinterHolderV1";
-import { DelegationRegistryUpdated as MinterMerkleDelegationRegistryUpdated } from "../generated/MinterMerkleV3/IFilteredMinterMerkleV1";
+import { DelegationRegistryUpdated as MinterHolderDelegationRegistryUpdated } from "../generated/MinterHolder/IFilteredMinterHolderV2";
+import { DelegationRegistryUpdated as MinterMerkleDelegationRegistryUpdated } from "../generated/MinterMerkle/IFilteredMinterMerkleV2";
 import { MinterConfigSetAddressEvent } from "./util-types";
 
 // IFilteredMinterV0 events
