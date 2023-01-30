@@ -24,29 +24,29 @@ import {
   PricePerTokenInWeiUpdated,
   ProjectCurrencyInfoUpdated,
   PurchaseToDisabledUpdated
-} from "../generated/MinterSetPrice/IFilteredMinterV3";
+} from "../generated/MinterSetPrice/IFilteredMinterV2";
 
-import { ProjectMaxInvocationsLimitUpdated } from "../generated/MinterSetPrice/IFilteredMinterV3";
+import { ProjectMaxInvocationsLimitUpdated } from "../generated/MinterSetPrice/IFilteredMinterV2";
 
 import {
   MinimumAuctionLengthSecondsUpdated,
   ResetAuctionDetails as DALinResetAuctionDetails,
   SetAuctionDetails as DALinSetAuctionDetails
-} from "../generated/MinterDALin/IFilteredMinterDALinV2";
+} from "../generated/MinterDALin/IFilteredMinterDALinV1";
 
 import {
   AuctionHalfLifeRangeSecondsUpdated as DAExpHalfLifeRangeSecondsUpdated,
   ResetAuctionDetails as DAExpResetAuctionDetails,
   SetAuctionDetails as DAExpSetAuctionDetails
-} from "../generated/MinterDAExp/IFilteredMinterDAExpV2";
+} from "../generated/MinterDAExp/IFilteredMinterDAExpV1";
 
 import {
   ResetAuctionDetails as DAExpSettlementResetAuctionDetails,
   ReceiptUpdated,
   SelloutPriceUpdated,
   ArtistAndAdminRevenuesWithdrawn,
-  IFilteredMinterDAExpSettlementV1
-} from "../generated/MinterDAExpSettlement/IFilteredMinterDAExpSettlementV1";
+  IFilteredMinterDAExpSettlementV0
+} from "../generated/MinterDAExpSettlement/IFilteredMinterDAExpSettlementV0";
 
 import {
   Minter,
@@ -79,16 +79,16 @@ import {
   ConfigValueSet1 as ConfigValueSetBigInt,
   ConfigValueSet2 as ConfigValueSetAddress,
   ConfigValueSet3 as ConfigValueSetBytes
-} from "../generated/MinterFilterV0/IFilteredMinterV3";
+} from "../generated/MinterFilterV0/IFilteredMinterV2";
 import {
   AllowedHoldersOfProjects,
   RegisteredNFTAddress,
   UnregisteredNFTAddress,
   RemovedHoldersOfProjects,
   DelegationRegistryUpdated as MinterHolderDelegationRegistryUpdated
-} from "../generated/MinterHolder/IFilteredMinterHolderV3";
+} from "../generated/MinterHolder/IFilteredMinterHolderV2";
 
-import { DelegationRegistryUpdated as MinterMerkleDelegationRegistryUpdated } from "../generated/MinterMerkle/IFilteredMinterMerkleV3";
+import { DelegationRegistryUpdated as MinterMerkleDelegationRegistryUpdated } from "../generated/MinterMerkle/IFilteredMinterMerkleV2";
 import { MinterConfigSetAddressEvent } from "./util-types";
 
 // IFilteredMinterV0 events
@@ -1024,7 +1024,7 @@ function syncLatestPurchasePrice(
   projectId: BigInt,
   event: ethereum.Event
 ): void {
-  let settleableMinter = IFilteredMinterDAExpSettlementV1.bind(minterAddress);
+  let settleableMinter = IFilteredMinterDAExpSettlementV0.bind(minterAddress);
   let latestPurchasePrice = settleableMinter.getProjectLatestPurchasePrice(
     projectId
   );
@@ -1069,7 +1069,7 @@ function syncNumSettleableInvocations(
   projectId: BigInt,
   event: ethereum.Event
 ): void {
-  let settleableMinter = IFilteredMinterDAExpSettlementV1.bind(minterAddress);
+  let settleableMinter = IFilteredMinterDAExpSettlementV0.bind(minterAddress);
   let numSettleableInvocations = settleableMinter.getNumSettleableInvocations(
     projectId
   );
