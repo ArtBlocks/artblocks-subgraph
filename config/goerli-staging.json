@@ -14,13 +14,6 @@
       "startBlock": 7723578
     }
   ],
-  "genArt721CoreContracts": [
-    {
-      "address": "0xDa62f67BE7194775A75BE91CBF9FEeDcC5776D4b",
-      "name": "Artist Staging Goerli Flagship Core V1 Contract",
-      "startBlock": 7011002
-    }
-  ],
   "iERC721GenArt721CoreV3Contracts": [
     {
       "address": "0xB614C578062a62714c927CD8193F0b8Bfb90055C",
@@ -103,9 +96,9 @@
       "startBlock": 8268432
     },
     {
-      "address": "0xfB8fEc1DC1A54B7F9edB46Ab979998C9Bc175454",
+      "address": "0xbc734314FB15C77087D586E32A528eEe90fE6d4D",
       "name": "CoinDesk Deployer",
-      "startBlock": 8346661
+      "startBlock": 8407834
     },
     {
       "address": "0xe2bD5181D87ffC02815E96C35fE13A7726233500",
@@ -150,9 +143,9 @@
       "startBlock": 7917787
     },
     {
-      "address": "0xc8FA62D76fbbCD71482C603cae4a5ebfaD5c7C78",
+      "address": "0xa87a185E4B53d9FFca91545C9090dE1AF4A5Eadb",
       "name": "TRAMExCPG",
-      "startBlock": 8170848
+      "startBlock": 8407910
     },
     {
       "address": "0x9dF9dc3Fe9985aa4e1F93543f5a20688f49E6dCa",

@@ -73,7 +73,6 @@ function loadOrCreateEngineRegistry(address: Address): EngineRegistry {
     // @dev this means we must track engine registry contract events
     // immendiatly after deployment to ensure we have a complete list
     // of registered contracts
-    engineRegistryEntity.registeredContracts = [];
     engineRegistryEntity.save();
   }
   return engineRegistryEntity as EngineRegistry;

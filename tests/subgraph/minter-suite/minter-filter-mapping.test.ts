@@ -30,7 +30,6 @@ import {
   handleProjectMinterRegistered,
   handleProjectMinterRemoved
 } from "../../../src/minter-filter-mapping";
-import { _retrieveDecodedDataFromCallData } from "../../../src/secondary/opensea/os-v2-mapping";
 import {
   addNewMinterToStore,
   addNewProjectMinterConfigToStore,
