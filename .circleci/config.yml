@@ -16,12 +16,6 @@ jobs:
           pkg-manager: yarn
       - run: node --version
       - run:
-          name: prepare
-          command: yarn prepare:generic
-      - run:
-          name: codegen
-          command: yarn codegen
-      - run:
           name: Run tests
           command: yarn test
 
