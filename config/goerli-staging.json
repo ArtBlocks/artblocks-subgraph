@@ -14,13 +14,6 @@
       "startBlock": 7723578
     }
   ],
-  "genArt721CoreContracts": [
-    {
-      "address": "0xDa62f67BE7194775A75BE91CBF9FEeDcC5776D4b",
-      "name": "Artist Staging Goerli Flagship Core V1 Contract",
-      "startBlock": 7011002
-    }
-  ],
   "iERC721GenArt721CoreV3Contracts": [
     {
       "address": "0xB614C578062a62714c927CD8193F0b8Bfb90055C",
