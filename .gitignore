@@ -6,4 +6,4 @@ subgraph.yaml
 tests/.latest.json
 
 # Ignore codege generated for specific contract addresses
-generated/*-0x*
+generated/
