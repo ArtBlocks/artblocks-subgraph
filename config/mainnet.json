@@ -132,6 +132,11 @@
       "address": "0x7c3Ea2b7B3beFA1115aB51c09F0C9f245C500B18",
       "name": "Bright Moments Flex",
       "startBlock": 16186518
+    },
+    {
+      "address": "0x32D4BE5eE74376e08038d652d4dc26E62C67F436",
+      "name": "VerticalCrypto Gen Art",
+      "startBlock": 16525252
     }
   ],
   "minterFilterV0Contracts": [
