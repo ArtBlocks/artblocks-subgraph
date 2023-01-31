@@ -192,6 +192,21 @@
       "address": "0x6eA558Bb1A3C5437970AdA80f8c686448A9c31fC",
       "name": "Art Blocks Flagship Minter Filter for V3 core",
       "startBlock": 7723580
+    },
+    {
+      "address": "0x5E22FBBB6bb2C45aE060b4C96f5039efdF7Fb328",
+      "name": "Minter Filter for ABxPace core at 0x0eba0bd3702d850EEc7a8215EB53FFC293c42341",
+      "startBlock": 8178165
+    },
+    {
+      "address": "0x75b123eAcBf813804bAc83e1D6e5c3d1758746e6",
+      "name": "Minter Filter for ABxBMG core at 0x5112c52535449513c81bDF113b8DCC757d7f122b",
+      "startBlock": 8178172
+    },
+    {
+      "address": "0x9bC71a0380f2cc5C099e58b0d836bEddB1B5CE1C",
+      "name": "Minter Filter for AB Managed Engine core at 0xa504BF82Db6347165A39294FB0CaE761074661Ee",
+      "startBlock": 8178177
     }
   ],
   "minterSetPriceContracts": [
@@ -303,6 +318,11 @@
       "address": "0x94Cc7981227D9e644e153766C386eF47556C3147",
       "name": "Admin ACL V0 for V3 core",
       "startBlock": 7723576
+    },
+    {
+      "address": "0xEa698596b6009A622C3eD00dD5a8b5d1CAE4fC36",
+      "name": "Goerli staging Engine registry contract",
+      "startBlock": 8178162
     }
   ],
   "startBlock": 7011002
