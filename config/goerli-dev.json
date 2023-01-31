@@ -79,19 +79,24 @@
       "address": "0x6600e8d744aa7545A8757eF928117866cF431A26",
       "name": "Explorations Minter Filter",
       "startBlock": 7799145
+    },
+    {
+      "address": "0x5E22FBBB6bb2C45aE060b4C96f5039efdF7Fb328",
+      "name": "Flagship Minter Filter for ABxPace core at 0x0eba0bd3702d850EEc7a8215EB53FFC293c42341",
+      "startBlock": 8178165
+    },
+    {
+      "address": "0x75b123eAcBf813804bAc83e1D6e5c3d1758746e6",
+      "name": "Flagship Minter Filter for ABxBMG core at 0x5112c52535449513c81bDF113b8DCC757d7f122b",
+      "startBlock": 8178172
+    },
+    {
+      "address": "0xd4C74Ba7f65B4F13Fd09cDfB0DAA7154f9C0FAA2",
+      "name": "Minter Filter for AB V3 Engine Dev core at 0x849CfA68915f2a9adf34bD20dc62E6f56fad23Cc",
+      "startBlock": 8407450
     }
   ],
   "minterSetPriceContracts": [
-    {
-      "address": "0x6be72fd483Ee32F0B9FF18380999A3e444dC6c66",
-      "name": "V0 Flagship Minter",
-      "startBlock": 7010933
-    },
-    {
-      "address": "0x2c2E62967c5fDC4eD5Eb1342FA064E6413dADB2E",
-      "name": "V0 Art Blocks x Pace Minter",
-      "startBlock": 7010933
-    },
     {
       "address": "0x6be72fd483Ee32F0B9FF18380999A3e444dC6c66",
       "name": "V1 Flagship Minter",
@@ -111,6 +116,11 @@
       "address": "0x80d48579537d6D95B54375794a4BFE59a0FfE8aB",
       "name": "V2 Explorations Minter",
       "startBlock": 7799146
+    },
+    {
+      "address": "0xBF5F2541A34B406195dB6ae09C3d98979F1e5FC4",
+      "name": "V4 Minter for AB V3 Engine Dev core at 0x849CfA68915f2a9adf34bD20dc62E6f56fad23Cc",
+      "startBlock": 8407450
     }
   ],
   "minterSetPriceERC20Contracts": [
@@ -265,6 +275,28 @@
       "address": "0x8ADfF069C897383c107F95743b944f78e0BefC2D",
       "name": "Explorations Admin ACL V0",
       "startBlock": 7799141
+    },
+    {
+      "address": "0x50DB09A76E9B762d9161c1710102B8C407Fd3ae0",
+      "name": "Admin ACL V0 for ABxPace, ABxBMG, and AB Managed V3 Engine cores",
+      "startBlock": 8178161
+    },
+    {
+      "address": "0xCf54E0AD108Ec3b961190a402808FCc73dA7EbDf",
+      "name": "Admin ACL V0 for AB V3 Engine Dev Core",
+      "startBlock": 8407450
+    }
+  ],
+  "engineRegistryV0Contracts": [
+    {
+      "address": "0xEa698596b6009A622C3eD00dD5a8b5d1CAE4fC36",
+      "name": "Goerli dev engine registry contract",
+      "startBlock": 8178162
+    },
+    {
+      "address": "0x2A39132E8d594d2c840D6656327fB26d900C05bA",
+      "name": "Goerli dev engine registry contract, AB Dev Wallet as Deployer",
+      "startBlock": 8407450
     }
   ]
 }
