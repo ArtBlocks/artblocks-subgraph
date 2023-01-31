@@ -84,6 +84,11 @@
       "address": "0xd4C74Ba7f65B4F13Fd09cDfB0DAA7154f9C0FAA2",
       "name": "Minter Filter for AB V3 Engine Dev core at 0x849CfA68915f2a9adf34bD20dc62E6f56fad23Cc",
       "startBlock": 8407450
+    },
+    {
+      "address": "0xBc86F31413AE950FC732A923284D5c74045878C3",
+      "name": "Minter Filter for AB V3 Engine Dev #2 core at 0xd47A017282E3a67D17421C6d98655eFb7D5ED1E6",
+      "startBlock": 8411115
     }
   ],
   "minterSetPriceContracts": [
