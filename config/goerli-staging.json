@@ -423,5 +423,12 @@
       "startBlock": 8178162
     }
   ],
+  "engineRegistryV0Contracts": [
+    {
+      "address": "0xEa698596b6009A622C3eD00dD5a8b5d1CAE4fC36",
+      "name": "Goerli staging engine registry contract",
+      "startBlock": 8178162
+    }
+  ],
   "startBlock": 7011002
 }

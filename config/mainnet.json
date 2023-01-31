@@ -433,5 +433,12 @@
       "name": "Admin ACL V1 for V3 core and Explorations core, treated as an AdminACLV0 for subgraph indexing purposes",
       "startBlock": 15799761
     }
+  ],
+  "engineRegistryV0Contracts": [
+    {
+      "address": "0x652490c8BB6e7ec3Fd798537D2F348D7904BBbc2",
+      "name": "Mainnet Engine registry contract",
+      "startBlock": 16237184
+    }
   ]
 }
