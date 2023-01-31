@@ -77,6 +77,7 @@ const randomAddressGenerator = new RandomAddressGenerator();
 export const ACCOUNT_ENTITY_TYPE = "Account";
 export const PROJECT_ENTITY_TYPE = "Project";
 export const CONTRACT_ENTITY_TYPE = "Contract";
+export const ADMIN_ACL_ENTITY_TYPE = "AdminACL";
 export const ENGINE_REGISTRY_TYPE = "EngineRegistry";
 export const WHITELISTING_ENTITY_TYPE = "Whitelisting";
 export const PROJECT_EXTERNAL_ASSET_DEPENDENCY_ENTITY_TYPE =

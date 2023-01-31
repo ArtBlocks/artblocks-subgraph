@@ -275,16 +275,6 @@
       "address": "0x8ADfF069C897383c107F95743b944f78e0BefC2D",
       "name": "Explorations Admin ACL V0",
       "startBlock": 7799141
-    },
-    {
-      "address": "0x50DB09A76E9B762d9161c1710102B8C407Fd3ae0",
-      "name": "Admin ACL V0 for ABxPace, ABxBMG, and AB Managed V3 Engine cores",
-      "startBlock": 8178161
-    },
-    {
-      "address": "0xCf54E0AD108Ec3b961190a402808FCc73dA7EbDf",
-      "name": "Admin ACL V0 for AB V3 Engine Dev Core",
-      "startBlock": 8407450
     }
   ],
   "engineRegistryV0Contracts": [

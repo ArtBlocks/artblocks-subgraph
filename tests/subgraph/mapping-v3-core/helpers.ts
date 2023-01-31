@@ -50,6 +50,13 @@ export function mockRefreshContractCalls(
     "admin():(address)"
   ).returns([ethereum.Value.fromAddress(TEST_CONTRACT.admin)]);
 
+  // for V3, owner() also returns admin address
+  createMockedFunction(
+    TEST_CONTRACT_ADDRESS,
+    "owner",
+    "owner():(address)"
+  ).returns([ethereum.Value.fromAddress(TEST_CONTRACT.admin)]);
+
   createMockedFunction(
     TEST_CONTRACT.admin,
     "superAdmin",

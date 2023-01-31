@@ -6,13 +6,16 @@ import { EngineRegistry, Contract } from "../generated/schema";
 import {
   IGenArt721CoreV3_Base_Template,
   OwnableGenArt721CoreV3Contract_Template,
-  IERC721GenArt721CoreV3Contract_Template
+  IERC721GenArt721CoreV3Contract_Template,
+  AdminACLV0_Template
 } from "../generated/templates";
 
 import {
   ContractRegistered,
   ContractUnregistered
 } from "../generated/EngineRegistryV0/IEngineRegistryV0";
+
+import { Ownable } from "../generated/OwnableGenArt721CoreV3Contract/Ownable";
 
 /*** EVENT HANDLERS ***/
 // Registered contracts are tracked dynamically, and the contract's `registeredOn`
@@ -30,6 +33,12 @@ export function handleContractRegistered(event: ContractRegistered): void {
     IGenArt721CoreV3_Base_Template.create(coreAddress);
     OwnableGenArt721CoreV3Contract_Template.create(coreAddress);
     IERC721GenArt721CoreV3Contract_Template.create(coreAddress);
+    // also track the new contract's Admin ACL contract to enable indexing if admin changes
+    // @dev for V3 core contracts, the admin acl contract is the core contract's owner
+    const ownableV3Core = Ownable.bind(coreAddress);
+    const adminACLAddress = ownableV3Core.owner();
+    AdminACLV0_Template.create(adminACLAddress);
+    // refresh contract
     refreshContractAtAddress(coreAddress, event.block.timestamp);
   }
   // set this engine registry as the contract's registeredOn field
