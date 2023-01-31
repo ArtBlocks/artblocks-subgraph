@@ -111,6 +111,11 @@
       "address": "0xBF5F2541A34B406195dB6ae09C3d98979F1e5FC4",
       "name": "V4 Minter for AB V3 Engine Dev core at 0x849CfA68915f2a9adf34bD20dc62E6f56fad23Cc",
       "startBlock": 8407450
+    },
+    {
+      "address": "0x6e8f18DAA4cec615d6997631118483179696225c",
+      "name": "V4 Minter for AB V3 Engine Dev #2 core at 0xd47A017282E3a67D17421C6d98655eFb7D5ED1E6",
+      "startBlock": 8411116
     }
   ],
   "minterSetPriceERC20Contracts": [
