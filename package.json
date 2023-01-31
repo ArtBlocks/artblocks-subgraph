@@ -22,7 +22,7 @@
     "prepare:palm-testnet": "yarn codegen:generic && mustache config/palm-testnet.json subgraph.template.yaml > subgraph.yaml",
     "prepare:local": "yarn codegen:generic && mustache config/local.json subgraph.template.yaml > subgraph.yaml",
     "prepare:generic": "yarn codegen:generic",
-    "codegen:generic": "rm -r ./generated && mustache config/generic.json subgraph.template.yaml > subgraph.yaml && graph codegen"
+    "codegen:generic": "mkdir -p ./generated && rm -r ./generated && mustache config/generic.json subgraph.template.yaml > subgraph.yaml && graph codegen"
   },
   "dependencies": {
     "@assemblyscript/loader": "^0.19.22",
