@@ -161,6 +161,21 @@
       "address": "0x3F4bbde879F9BB0E95AEa08fF12F55E171495C8f",
       "name": "Art Blocks Explorations Minter Filter",
       "startBlock": 15791057
+    },
+    {
+      "address": "0xc89c6dfDE92AacD293AF930bD8D290a33D35eEf0",
+      "name": "Minter Filter for ABxPace core at 0xEa698596b6009A622C3eD00dD5a8b5d1CAE4fC36",
+      "startBlock": 16237201
+    },
+    {
+      "address": "0x6E522449C1642E7cB0B12a2889CcBf79b51C69f8",
+      "name": "Minter Filter for ABxBMG core at 0x145789247973C5D612bF121e9E4Eef84b63Eb707",
+      "startBlock": 16237496
+    },
+    {
+      "address": "0x3BB525024093b3ba5a6C7803Fa1718Fc6fc27a37",
+      "name": "Minter Filter for AB Managed Engine core at 0x73b4797E2FD04fA42a9F3c9bCfbcEe19374A9060",
+      "startBlock": 16237571
     }
   ],
   "minterSetPriceContracts": [
