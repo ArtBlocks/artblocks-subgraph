@@ -103,9 +103,9 @@
       "startBlock": 8268432
     },
     {
-      "address": "0xfB8fEc1DC1A54B7F9edB46Ab979998C9Bc175454",
+      "address": "0xbc734314FB15C77087D586E32A528eEe90fE6d4D",
       "name": "CoinDesk Deployer",
-      "startBlock": 8346661
+      "startBlock": 8407834
     },
     {
       "address": "0xe2bD5181D87ffC02815E96C35fE13A7726233500",
@@ -150,9 +150,9 @@
       "startBlock": 7917787
     },
     {
-      "address": "0xc8FA62D76fbbCD71482C603cae4a5ebfaD5c7C78",
+      "address": "0xa87a185E4B53d9FFca91545C9090dE1AF4A5Eadb",
       "name": "TRAMExCPG",
-      "startBlock": 8170848
+      "startBlock": 8407910
     },
     {
       "address": "0x9dF9dc3Fe9985aa4e1F93543f5a20688f49E6dCa",
@@ -209,6 +209,11 @@
       "address": "0x3CB6381203f6c9d75B70F0af70E905cC67d68437",
       "name": "V2 Flagship Minter for V3 core",
       "startBlock": 7723582
+    },
+    {
+      "address": "0xb5629f232cE932E214Fb548Ed049795b04e58FB9",
+      "name": "V4 minter for V3 Flagship core",
+      "startBlock": 8405833
     }
   ],
   "minterSetPriceERC20Contracts": [
@@ -226,6 +231,11 @@
       "address": "0x37007e0561E219e77dAF24Ef0984a5488239512A",
       "name": "V2 Flagship Minter for V3 core",
       "startBlock": 7723584
+    },
+    {
+      "address": "0x7a1Ee96dCAF0b65Abc68D78D12b81523360838E1",
+      "name": "V4 minter for V3 Flagship core",
+      "startBlock": 8405834
     }
   ],
   "minterDAExpContracts": [
@@ -243,6 +253,11 @@
       "address": "0xb61ABA1c6b4079c976Fb664F27a0D9C47b81a05B",
       "name": "V2 Flagship Minter for V3 core",
       "startBlock": 7723587
+    },
+    {
+      "address": "0x6FBbfbdbF71D319c5F007C9DF1c2ae63b3F463a6",
+      "name": "V4 minter for V3 Flagship core",
+      "startBlock": 8405827
     }
   ],
   "minterDALinContracts": [
@@ -260,6 +275,11 @@
       "address": "0xb228C4dce0929D3d1dC7C386ba3cC2c0671e1751",
       "name": "V2 Flagship Minter for V3 core",
       "startBlock": 7723585
+    },
+    {
+      "address": "0x99980fEa1397a33E7058E01A73099bfF81d310d2",
+      "name": "V4 minter for V3 Flagship core",
+      "startBlock": 8405830
     }
   ],
   "minterDAExpSettlementContracts": [
@@ -267,6 +287,11 @@
       "address": "0x1D5E143CDf39ed1c50adF400e7c6c1E7da7c43A7",
       "name": "V0 Flagship Minter for V3 core",
       "startBlock": 8339496
+    },
+    {
+      "address": "0xCee138625d669b49bDde0Bf1600A2EaF29C2C9C8",
+      "name": "V1 minter for V3 Flagship core",
+      "startBlock": 8405829
     }
   ],
   "minterMerkleContracts": [
@@ -284,6 +309,11 @@
       "address": "0xD3241C7101D5BDD0A8cC6f866D2d8b7AF1fF1962",
       "name": "V3 Flagship Minter for V3 core",
       "startBlock": 8136221
+    },
+    {
+      "address": "0x8632212Fca423fe868C6C93c59DCcAdAB59f4e41",
+      "name": "V5 minter for V3 Flagship core",
+      "startBlock": 8405832
     }
   ],
   "minterHolderContracts": [
@@ -296,6 +326,11 @@
       "address": "0xdCe333bEdFc584E43d7D494393AD4bd990479844",
       "name": "V2 Flagship Minter for V3 core",
       "startBlock": 8369991
+    },
+    {
+      "address": "0x0EA91da0C3338f88510cBB2a3cf20Cd1863551a8",
+      "name": "V4 minter for V3 Flagship core",
+      "startBlock": 8405831
     }
   ],
   "adminACLV0Contracts": [

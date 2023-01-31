@@ -132,6 +132,11 @@
       "address": "0x7c3Ea2b7B3beFA1115aB51c09F0C9f245C500B18",
       "name": "Bright Moments Flex",
       "startBlock": 16186518
+    },
+    {
+      "address": "0x32D4BE5eE74376e08038d652d4dc26E62C67F436",
+      "name": "VerticalCrypto Gen Art",
+      "startBlock": 16525252
     }
   ],
   "minterFilterV0Contracts": [
@@ -183,6 +188,11 @@
       "address": "0x6FB3104B0b3Cd665c7B8506b23eE833eA44d8E91",
       "name": "V2 Explorations Minter",
       "startBlock": 15799084
+    },
+    {
+      "address": "0x234B25288011081817B5cC199C3754269cCb76D2",
+      "name": "V4 minter for V3 Flagship core",
+      "startBlock": 16523001
     }
   ],
   "minterSetPriceERC20Contracts": [
@@ -205,6 +215,11 @@
       "address": "0xe4c6EeF13649e9C4Ad8ae8A9C7fA9A7F26B4287a",
       "name": "V2 Flagship Minter for V3 core",
       "startBlock": 15726709
+    },
+    {
+      "address": "0x9fEcd2FbC6D890fB93632DcE9b1a01c4090A7E2d",
+      "name": "V4 minter for V3 Flagship core",
+      "startBlock": 16523002
     }
   ],
   "minterDAExpContracts": [
@@ -227,6 +242,11 @@
       "address": "0x706d6C6ef700a3c1C3a727f0c46492492E0A72b5",
       "name": "V2 Flagship Minter for V3 core",
       "startBlock": 15726712
+    },
+    {
+      "address": "0x47e2df2723238f913741Cc6b1963e76fdfD19B94",
+      "name": "V4 minter for V3 Flagship core",
+      "startBlock": 16522995
     }
   ],
   "minterDALinContracts": [
@@ -249,6 +269,11 @@
       "address": "0xdaa6D1e224f4B9f7c4f1368C362C4333A8e385A6",
       "name": "V2 Flagship Minter for V3 core",
       "startBlock": 15726710
+    },
+    {
+      "address": "0x419501DD208BFf237e3E32C40D074065e12DfF4d",
+      "name": "V4 minter for V3 Flagship core",
+      "startBlock": 16522997
     }
   ],
   "minterMerkleContracts": [
@@ -281,6 +306,11 @@
       "address": "0xD06A5109bEdEf92696B29FcC0F6184640b19c310",
       "name": "DO NOT USE | V2 Explorations Minter",
       "startBlock": 15822393
+    },
+    {
+      "address": "0xB8Bd1D2836C466DB149f665F777928bEE267304d",
+      "name": "V5 minter for V3 Flagship core",
+      "startBlock": 16523000
     }
   ],
   "minterHolderContracts": [
@@ -288,6 +318,18 @@
       "address": "0xa198E22C32879f4214a37eB3051525bD9aff9145",
       "name": "V1 Flagship Minter for V3 core",
       "startBlock": 15726716
+    },
+    {
+      "address": "0xCCFF562017bdAAa064184b3Eb9bd892d8Acce7d6",
+      "name": "V4 minter for V3 Flagship core",
+      "startBlock": 16522999
+    }
+  ],
+  "minterDAExpSettlementContracts": [
+    {
+      "address": "0xfdE58c821D1c226b4a45c22904de20b114EDe7E7",
+      "name": "V1 minter for V3 Flagship core",
+      "startBlock": 16522996
     }
   ],
   "adminACLV0Contracts": [
