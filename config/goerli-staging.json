@@ -185,6 +185,21 @@
       "address": "0x6eA558Bb1A3C5437970AdA80f8c686448A9c31fC",
       "name": "Art Blocks Flagship Minter Filter for V3 core",
       "startBlock": 7723580
+    },
+    {
+      "address": "0x5E22FBBB6bb2C45aE060b4C96f5039efdF7Fb328",
+      "name": "Minter Filter for ABxPace core at 0x0eba0bd3702d850EEc7a8215EB53FFC293c42341",
+      "startBlock": 8178165
+    },
+    {
+      "address": "0x75b123eAcBf813804bAc83e1D6e5c3d1758746e6",
+      "name": "Minter Filter for ABxBMG core at 0x5112c52535449513c81bDF113b8DCC757d7f122b",
+      "startBlock": 8178172
+    },
+    {
+      "address": "0x9bC71a0380f2cc5C099e58b0d836bEddB1B5CE1C",
+      "name": "Minter Filter for AB Managed Engine core at 0xa504BF82Db6347165A39294FB0CaE761074661Ee",
+      "startBlock": 8178177
     }
   ],
   "minterSetPriceContracts": [
@@ -207,6 +222,16 @@
       "address": "0xb5629f232cE932E214Fb548Ed049795b04e58FB9",
       "name": "V4 minter for V3 Flagship core",
       "startBlock": 8405833
+    },
+    {
+      "address": "0xde6DCA519049473Da8826c57B4F45f6dE7f22a73",
+      "name": "V4 minter for ABxPace V3 Engine core",
+      "startBlock": 8411200
+    },
+    {
+      "address": "0xcBA628BcF6f458f6F929d875B69FE5f0F3fB99b6",
+      "name": "V4 minter for ABxBMG V3 Engine core",
+      "startBlock": 8411200
     }
   ],
   "minterSetPriceERC20Contracts": [
@@ -229,6 +254,16 @@
       "address": "0x7a1Ee96dCAF0b65Abc68D78D12b81523360838E1",
       "name": "V4 minter for V3 Flagship core",
       "startBlock": 8405834
+    },
+    {
+      "address": "0x0D4BeE9AfbB364cF32F37912845C770A4badd83E",
+      "name": "V4 minter for ABxPace V3 Engine core",
+      "startBlock": 8411200
+    },
+    {
+      "address": "0xdADB127c1565156C3Ce004E11db7E1ba626267E7",
+      "name": "V4 minter for ABxBMG V3 Engine core",
+      "startBlock": 8411200
     }
   ],
   "minterDAExpContracts": [
@@ -251,6 +286,16 @@
       "address": "0x6FBbfbdbF71D319c5F007C9DF1c2ae63b3F463a6",
       "name": "V4 minter for V3 Flagship core",
       "startBlock": 8405827
+    },
+    {
+      "address": "0x5d292CFfD4e3EA08049760D42F8F67bcde4E9260",
+      "name": "V4 minter for ABxPace V3 Engine core",
+      "startBlock": 8411200
+    },
+    {
+      "address": "0x10BD2A01996711b0A66d8D5203a919463383701A",
+      "name": "V4 minter for ABxBMG V3 Engine core",
+      "startBlock": 8411200
     }
   ],
   "minterDALinContracts": [
@@ -273,6 +318,16 @@
       "address": "0x99980fEa1397a33E7058E01A73099bfF81d310d2",
       "name": "V4 minter for V3 Flagship core",
       "startBlock": 8405830
+    },
+    {
+      "address": "0x1353fd9d3dC70d1a18149C8FB2ADB4FB906DE4E8",
+      "name": "V4 minter for ABxPace V3 Engine core",
+      "startBlock": 8411200
+    },
+    {
+      "address": "0xD00495689D5161C511882364E0C342e12Dcc5f08",
+      "name": "V4 minter for ABxBMG V3 Engine core",
+      "startBlock": 8411200
     }
   ],
   "minterDAExpSettlementContracts": [
@@ -285,6 +340,16 @@
       "address": "0xCee138625d669b49bDde0Bf1600A2EaF29C2C9C8",
       "name": "V1 minter for V3 Flagship core",
       "startBlock": 8405829
+    },
+    {
+      "address": "0x8ABdb5c40BB6593550ff0027d15D8B6BEc416a24",
+      "name": "V1 minter for ABxPace V3 Engine core",
+      "startBlock": 8411200
+    },
+    {
+      "address": "0x9e05816E151708Efc1C52243a18A0cC804b33819",
+      "name": "V1 minter for ABxBMG V3 Engine core",
+      "startBlock": 8411200
     }
   ],
   "minterMerkleContracts": [
@@ -307,6 +372,16 @@
       "address": "0x8632212Fca423fe868C6C93c59DCcAdAB59f4e41",
       "name": "V5 minter for V3 Flagship core",
       "startBlock": 8405832
+    },
+    {
+      "address": "0x8F7DbE58B34710510E44FE9d513e54F01729c686",
+      "name": "V5 minter for ABxPace V3 Engine core",
+      "startBlock": 8411200
+    },
+    {
+      "address": "0x7a67130593A161124686EA55484D1A64d99eefc9",
+      "name": "V5 minter for ABxBMG V3 Engine core",
+      "startBlock": 8411200
     }
   ],
   "minterHolderContracts": [
@@ -324,6 +399,16 @@
       "address": "0x0EA91da0C3338f88510cBB2a3cf20Cd1863551a8",
       "name": "V4 minter for V3 Flagship core",
       "startBlock": 8405831
+    },
+    {
+      "address": "0xA3ae49B0fE17A0735dBc9f11Fb51122687DbC27E",
+      "name": "V4 minter for ABxPace V3 Engine core",
+      "startBlock": 8411200
+    },
+    {
+      "address": "0xB64116A7D5D84fE9795DD022ea191217A2e32076",
+      "name": "V4 minter for ABxBMG V3 Engine core",
+      "startBlock": 8411200
     }
   ],
   "adminACLV0Contracts": [
@@ -331,6 +416,18 @@
       "address": "0x94Cc7981227D9e644e153766C386eF47556C3147",
       "name": "Admin ACL V0 for V3 core",
       "startBlock": 7723576
+    },
+    {
+      "address": "0xEa698596b6009A622C3eD00dD5a8b5d1CAE4fC36",
+      "name": "Goerli staging Engine registry contract",
+      "startBlock": 8178162
+    }
+  ],
+  "engineRegistryV0Contracts": [
+    {
+      "address": "0xEa698596b6009A622C3eD00dD5a8b5d1CAE4fC36",
+      "name": "Goerli staging engine registry contract",
+      "startBlock": 8178162
     }
   ],
   "startBlock": 7011002
