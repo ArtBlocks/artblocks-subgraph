@@ -696,21 +696,24 @@ function _handleMinterUpdated<T>(contract: T, event: MinterUpdated): void {
     // this should never happen
     return;
   }
-  if (contract instanceof GenArt721CoreV3_Engine) {
-    // For Engine contracts, only index minter filters that are in the config
-    // and actively being indexed
-    let minterFilter = MinterFilter.load(
-      event.params._currentMinter.toHexString()
-    );
-    if (!minterFilter) {
-      // minter filter is not in config, set minterFilter to null
-      contractEntity.minterFilter = null;
-      contractEntity.save();
-      // refresh contract to update mintWhitelisted
-      refreshContract(contract, event.block.timestamp);
-      return;
-    }
-  }
+  // @dev this logic is temporarily disabled until we can determine the best way
+  // to handle determining if we should index an Engine contract's minter
+  // suite. For now, we will index all minter filters on Engine contracts.
+  // if (contract instanceof GenArt721CoreV3_Engine) {
+  //   // For Engine contracts, only index minter filters that are in the config
+  //   // and actively being indexed
+  //   let minterFilter = MinterFilter.load(
+  //     event.params._currentMinter.toHexString()
+  //   );
+  //   if (!minterFilter) {
+  //     // minter filter is not in config, set minterFilter to null
+  //     contractEntity.minterFilter = null;
+  //     contractEntity.save();
+  //     // refresh contract to update mintWhitelisted
+  //     refreshContract(contract, event.block.timestamp);
+  //     return;
+  //   }
+  // }
 
   // Clear the minter config for all projects on core contract when a new
   // minter filter is set
