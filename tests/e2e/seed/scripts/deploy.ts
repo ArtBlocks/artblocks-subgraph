@@ -1,7 +1,7 @@
 // SPDX-License-Identifier: LGPL-3.0-only
 // Created By: Art Blocks Inc.
 
-import { ethers, config } from "hardhat";
+import { ethers } from "ethers";
 // flagship
 import { GenArt721CoreV3__factory } from "../contracts/factories/GenArt721CoreV3__factory";
 import { AdminACLV0__factory } from "../contracts/factories/AdminACLV0__factory";
@@ -16,8 +16,7 @@ import { MinterMerkleV2__factory } from "../contracts/factories/MinterMerkleV2__
 import { MinterHolderV1__factory } from "../contracts/factories/MinterHolderV1__factory";
 
 import fs from "fs";
-import { HardhatNetworkHDAccountsConfig } from "hardhat/types";
-import { Wallet } from "ethers";
+import { JsonRpcProvider } from "@ethersproject/providers";
 
 //////////////////////////////////////////////////////////////////////////////
 // CONFIG BEGINS HERE
@@ -36,11 +35,21 @@ const initialProjectArtistAddress = undefined;
 // CONFIG ENDS HERE
 //////////////////////////////////////////////////////////////////////////////
 
-async function main() {
-  const subgraphConfig: Record<string, { address: string }[]> = {};
+type SubgraphConfig = {
+  network: string;
+  [key: string]: { address: string }[] | string;
+};
 
-  const [deployer] = await ethers.getSigners();
-  const network = await ethers.provider.getNetwork();
+async function main() {
+  const subgraphConfig: SubgraphConfig = { network: "mainnet" };
+
+  const accounts = JSON.parse(
+    fs.readFileSync("./shared/accounts.json", "utf8")
+  );
+  const deployer = ethers.Wallet.fromMnemonic(accounts.mnemonic).connect(
+    new JsonRpcProvider("http://hardhat:8545")
+  );
+
   //////////////////////////////////////////////////////////////////////////////
   // DEPLOYMENT BEGINS HERE
   //////////////////////////////////////////////////////////////////////////////

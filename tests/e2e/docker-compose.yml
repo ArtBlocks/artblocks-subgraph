@@ -1,21 +1,18 @@
-version: '3'
+version: "3.8"
 services:
   hardhat:
     build: hardhat
+    volumes:
+      - shared-data:/usr/hardhat/shared
   seed:
     build: seed
     volumes:
       - shared-data:/usr/seed/shared
+      - ./setup-scripts:/usr/seed/setup-scripts
     depends_on:
       - hardhat
   graph-node:
     image: graphprotocol/graph-node
-    ports:
-      - '8000:8000'
-      - '8001:8001'
-      - '8020:8020'
-      - '8030:8030'
-      - '8040:8040'
     depends_on:
       - ipfs
       - postgres
@@ -32,14 +29,10 @@ services:
       GRAPH_LOG: info
   ipfs:
     image: ipfs/go-ipfs:v0.10.0
-    ports:
-      - '5001:5001'
     volumes:
-      - ./data/ipfs:/data/ipfs
+      - ipfs:/data/ipfs
   postgres:
     image: postgres
-    ports:
-      - '5432:5432'
     command:
       [
         "postgres",
@@ -54,18 +47,28 @@ services:
       # workaround for https://github.com/docker/for-mac/issues/6270?
       PGDATA: "/var/lib/postgresql/data"
       POSTGRES_INITDB_ARGS: "-E UTF8 --locale=C"
-    volumes:
-      - ./data/postgres:/var/lib/postgresql/data
+    volumes: 
+      - postgres:/var/lib/postgresql/data
   subgraph:
-    build: subgraph
+    build:
+      context: ../../
+      dockerfile: ./docker/Dockerfile
     depends_on:
       - graph-node
     environment:
       GRAPH_NODE: 'http://graph-node:8020'
-      GRAPH_NODE_WS: 'ws://graph-node:8020'
-      ETHEREUM_RPC: 'http://hardhat:8545'
-      ETHEREUM_WS: 'ws://hardhat:8545'
+      IPFS: 'http://ipfs:5001'
     volumes:
       - shared-data:/usr/subgraph/shared
+      - ./setup-scripts:/usr/subgraph/setup-scripts
+    command: ./setup-scripts/wait-for-it.sh -h graph-node -p 8020 --timeout=0 -- ./setup-scripts/setup-subgraph.sh
 volumes:
   shared-data:
+  postgres:
+    driver_opts:
+      type: tmpfs
+      device: tmpfs
+  ipfs:
+    driver_opts:
+      type: tmpfs
+      device: tmpfs
