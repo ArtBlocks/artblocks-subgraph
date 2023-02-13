@@ -8,6 +8,7 @@ import {
 
 import {
   IMinterFilterV0,
+  Deployed,
   MinterApproved,
   MinterRevoked,
   ProjectMinterRegistered,
@@ -97,6 +98,13 @@ export function handleIsCanonicalMinterFilter(
   coreContract.minterFilter = event.address.toHexString();
   coreContract.updatedAt = event.block.timestamp;
   coreContract.save();
+}
+
+export function handleDeployed(event: Deployed): void {
+  // we simply create a new MinterFilter entity to ensure that it is in the
+  // store. This enables us to determine if a MinterFilter is in our subgraph
+  // configuration by checking if it is in the store.
+  loadOrCreateMinterFilter(event.address, event.block.timestamp);
 }
 
 export function handleMinterApproved(event: MinterApproved): void {
