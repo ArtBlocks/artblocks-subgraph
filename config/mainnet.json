@@ -110,6 +110,21 @@
       "address": "0x4d928ab507bf633dd8e68024a1fb4c99316bbdf3",
       "name": "Tennis Art",
       "startBlock": 16000534
+    },
+    {
+      "address": "0xFF124D975c7792E706552b18ec9DA24781751CAb",
+      "name": "Modern Muse",
+      "startBlock": 16622055
+    },
+    {
+      "address": "0x68C01Cb4733a82A58D5e7bB31BdDBFF26A3A35d5",
+      "name": "Rafael Rozendaal",
+      "startBlock": 16621467
+    },
+    {
+      "address": "0x2b3c48Be4fB33B0724214aFF12b086B0214f8F15",
+      "name": "CoinDesk",
+      "startBlock": 16621998
     }
   ],
   "engineFlexContracts": [
@@ -137,6 +152,11 @@
       "address": "0x32D4BE5eE74376e08038d652d4dc26E62C67F436",
       "name": "VerticalCrypto Gen Art",
       "startBlock": 16525252
+    },
+    {
+      "address": "0x1D0977e86c70EAbb5c8fD98DB1B08C6d60caa0C1",
+      "name": "TRAME x CPG",
+      "startBlock": 16621592
     }
   ],
   "minterFilterV0Contracts": [
