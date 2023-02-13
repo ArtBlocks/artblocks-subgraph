@@ -135,18 +135,12 @@ test(`${coreType}/MinterUpdated: should list invalid MinterFilter with different
     "updatedAt",
     updateCallBlockTimestamp.toString()
   );
-  // patch: minter filter should be added for all engine contracts, temporarily
-  assert.fieldEquals(
+
+  // minter filter should NOT be added to store for engine contracts
+  assert.notInStore(
     MINTER_FILTER_ENTITY_TYPE,
-    TEST_MINTER_FILTER_ADDRESS.toHexString(),
-    "id",
     TEST_MINTER_FILTER_ADDRESS.toHexString()
   );
-  // // minter filter should NOT be added to store for engine contracts
-  // assert.notInStore(
-  //   MINTER_FILTER_ENTITY_TYPE,
-  //   TEST_MINTER_FILTER_ADDRESS.toHexString()
-  // );
 });
 
 test(`${coreType}/MinterUpdated: should create Contract but NOT MinterFilter entities when not yet created, and NOT assign minterFilter`, () => {
@@ -178,19 +172,12 @@ test(`${coreType}/MinterUpdated: should create Contract but NOT MinterFilter ent
   // handle event
   handleMinterUpdated(event);
   // assertions
-  // patch: minter filter should be added for all engine contracts, temporarily
   assert.fieldEquals(
     CONTRACT_ENTITY_TYPE,
     TEST_CONTRACT_ADDRESS.toHexString(),
     "minterFilter",
-    TEST_MINTER_FILTER_ADDRESS.toHexString()
+    "null"
   );
-  // assert.fieldEquals(
-  //   CONTRACT_ENTITY_TYPE,
-  //   TEST_CONTRACT_ADDRESS.toHexString(),
-  //   "minterFilter",
-  //   "null"
-  // );
   assert.fieldEquals(
     CONTRACT_ENTITY_TYPE,
     TEST_CONTRACT_ADDRESS.toHexString(),
@@ -203,17 +190,10 @@ test(`${coreType}/MinterUpdated: should create Contract but NOT MinterFilter ent
     "updatedAt",
     updateCallBlockTimestamp.toString()
   );
-  // patch: minter filter should be added for all engine contracts, temporarily
-  assert.fieldEquals(
+  assert.notInStore(
     MINTER_FILTER_ENTITY_TYPE,
-    TEST_MINTER_FILTER_ADDRESS.toHexString(),
-    "id",
     TEST_MINTER_FILTER_ADDRESS.toHexString()
   );
-  // assert.notInStore(
-  //   MINTER_FILTER_ENTITY_TYPE,
-  //   TEST_MINTER_FILTER_ADDRESS.toHexString()
-  // );
 });
 
 test(`${coreType}/MinterUpdated: should populate project minter configurations for all projects preconfigured on existing minter filter`, () => {
