@@ -823,6 +823,8 @@ dataSources:
         - name: IFilteredMinterDAExpV1
           file: ./abis/IFilteredMinterDAExpV1.json
       eventHandlers:
+        - event: Deployed()
+          handler: handleDeployed
         - event: MinterApproved(indexed address,string)
           handler: handleMinterApproved
         - event: MinterRevoked(indexed address)
