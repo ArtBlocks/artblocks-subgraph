@@ -1,7 +1,7 @@
 {
   "_format": "hh-sol-artifact-1",
-  "contractName": "IFilteredMinterDAExpSettlementV0",
-  "sourceName": "contracts/interfaces/0.8.x/IFilteredMinterDAExpSettlementV0.sol",
+  "contractName": "IFilteredMinterDAExpSettlementV1",
+  "sourceName": "contracts/interfaces/0.8.x/IFilteredMinterDAExpSettlementV1.sol",
   "abi": [
     {
       "anonymous": false,
@@ -359,6 +359,25 @@
         },
         {
           "indexed": false,
+          "internalType": "uint256",
+          "name": "_maxInvocations",
+          "type": "uint256"
+        }
+      ],
+      "name": "ProjectMaxInvocationsLimitUpdated",
+      "type": "event"
+    },
+    {
+      "anonymous": false,
+      "inputs": [
+        {
+          "indexed": true,
+          "internalType": "uint256",
+          "name": "_projectId",
+          "type": "uint256"
+        },
+        {
+          "indexed": false,
           "internalType": "bool",
           "name": "_purchaseToDisabled",
           "type": "bool"
@@ -599,6 +618,24 @@
         }
       ],
       "stateMutability": "view",
+      "type": "function"
+    },
+    {
+      "inputs": [
+        {
+          "internalType": "uint256",
+          "name": "_projectId",
+          "type": "uint256"
+        },
+        {
+          "internalType": "uint256",
+          "name": "_maxInvocations",
+          "type": "uint256"
+        }
+      ],
+      "name": "manuallyLimitProjectMaxInvocations",
+      "outputs": [],
+      "stateMutability": "nonpayable",
       "type": "function"
     },
     {
