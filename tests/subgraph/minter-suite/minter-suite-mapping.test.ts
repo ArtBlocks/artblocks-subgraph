@@ -76,7 +76,7 @@ import {
   SelloutPriceUpdated,
   ReceiptUpdated,
   ArtistAndAdminRevenuesWithdrawn
-} from "../../../generated/MinterDAExpSettlement/IFilteredMinterDAExpSettlementV0";
+} from "../../../generated/MinterDAExpSettlement/IFilteredMinterDAExpSettlementV1";
 
 import { ProjectMaxInvocationsLimitUpdated } from "../../../generated/MinterSetPrice/IFilteredMinterV2";
 

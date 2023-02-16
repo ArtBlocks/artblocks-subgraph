@@ -45,8 +45,8 @@ import {
   ReceiptUpdated,
   SelloutPriceUpdated,
   ArtistAndAdminRevenuesWithdrawn,
-  IFilteredMinterDAExpSettlementV0
-} from "../generated/MinterDAExpSettlement/IFilteredMinterDAExpSettlementV0";
+  IFilteredMinterDAExpSettlementV1
+} from "../generated/MinterDAExpSettlement/IFilteredMinterDAExpSettlementV1";
 
 import {
   Minter,
@@ -1024,7 +1024,7 @@ function syncLatestPurchasePrice(
   projectId: BigInt,
   event: ethereum.Event
 ): void {
-  let settleableMinter = IFilteredMinterDAExpSettlementV0.bind(minterAddress);
+  let settleableMinter = IFilteredMinterDAExpSettlementV1.bind(minterAddress);
   let latestPurchasePrice = settleableMinter.getProjectLatestPurchasePrice(
     projectId
   );
@@ -1069,7 +1069,7 @@ function syncNumSettleableInvocations(
   projectId: BigInt,
   event: ethereum.Event
 ): void {
-  let settleableMinter = IFilteredMinterDAExpSettlementV0.bind(minterAddress);
+  let settleableMinter = IFilteredMinterDAExpSettlementV1.bind(minterAddress);
   let numSettleableInvocations = settleableMinter.getNumSettleableInvocations(
     projectId
   );
