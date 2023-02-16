@@ -225,6 +225,11 @@
       "name": "V1 Minter for AB V3 Engine Dev C core at 0x5702797Ff45FCb0a70eB6AE1E4563299dCFa9Dd6",
       "startBlock": 8458567
     }
+    {
+      "address": "0x1732eA26A4dbA4863527F7Eee4a9272607fE9db6",
+      "name": "V2 Minter for AB V3 Engine Dev C core at 0x5702797Ff45FCb0a70eB6AE1E4563299dCFa9Dd6",
+      "startBlock": 8498764
+    }
   ],
   "minterMerkleContracts": [
     {
