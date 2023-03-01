@@ -1,6 +1,6 @@
 {
   "scripts": {
-    "start": "node -r ts-node/register scripts/deploy.ts",
+    "start": "node -r ts-node/register scripts/deploy.ts && tail -f /dev/null",
     "generate:typechain": "typechain --target ethers-v5 --out-dir ./contracts './node_modules/@artblocks/contracts/artifacts/**/*.json'"
   },
   "devDependencies": {

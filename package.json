@@ -5,6 +5,7 @@
     "codegen": "graph codegen",
     "build": "graph build",
     "test": "graph test -r",
+    "test:e2e": "cd tests/e2e && docker compose up --exit-code-from runner",
     "coverage": "graph test -- -c",
     "deploy:mainnet-hosted": "yarn prepare:mainnet && graph deploy --product hosted-service --ac --node https://api.thegraph.com/deploy/ --ipfs https://api.thegraph.com/ipfs/ artblocks/art-blocks",
     "deploy:mainnet-with-secondary-hosted": "yarn prepare:mainnet-with-secondary && graph deploy --product hosted-service --ac --node https://api.thegraph.com/deploy/ --ipfs https://api.thegraph.com/ipfs/ artblocks/art-blocks-with-secondary",
@@ -32,7 +33,6 @@
     "matchstick-as": "^0.5.0"
   },
   "devDependencies": {
-    "@types/node": "^18.13.0",
     "assemblyscript": "^0.19.22",
     "mustache": "^4.1.0"
   }

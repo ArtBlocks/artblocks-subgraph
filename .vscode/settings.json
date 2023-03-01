@@ -7,4 +7,6 @@
     "editor.defaultFormatter": "esbenp.prettier-vscode",
     "editor.formatOnSave": true
   },
+  "graphql-config.load.rootDir": "./tests/e2e/runner",
+  "graphql-config.dotEnvPath": "./tests/e2e/runner/.env",
 }

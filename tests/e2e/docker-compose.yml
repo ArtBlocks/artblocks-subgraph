@@ -62,8 +62,35 @@ services:
       - shared-data:/usr/subgraph/shared
       - ./setup-scripts:/usr/subgraph/setup-scripts
     command: ./setup-scripts/wait-for-it.sh -h graph-node -p 8020 --timeout=0 -- ./setup-scripts/setup-subgraph.sh
+    # We create an empty file called `subgraph-complete` in the shared
+    # volume when the subgraph is deployed. We use this file as a
+    # healthcheck to ensure that the subgraph is deployed before
+    # running the e2e tests.
+    healthcheck:
+      test: ["CMD-SHELL", "cat ./shared/subgraph-complete"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 120s
+  runner:
+    build: runner
+    environment:
+      - SUBGRAPH_GRAPHQL_URL=http://graph-node:8000/subgraphs/name/artblocks/art-blocks
+    depends_on:
+      subgraph:
+        condition: service_healthy
+    volumes:
+      - shared-data:/usr/runner/shared
+      - ./runner/__tests__:/usr/runner/__tests__
 volumes:
+# By setting all of the volumes to be tmpfs, we can avoid the need to
+# clean up the volumes after each run. In this way our e2e test suite
+# can be run in a CI environment without needing to worry about the
+# state of the volumes between runs.
   shared-data:
+    driver_opts:
+      type: tmpfs
+      device: tmpfs
   postgres:
     driver_opts:
       type: tmpfs

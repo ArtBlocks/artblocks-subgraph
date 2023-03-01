@@ -292,7 +292,7 @@ async function main() {
 
   // write subgraph config
   fs.writeFileSync(
-    "/usr/seed/shared/testConfig.json",
+    "/usr/seed/shared/test-config.json",
     JSON.stringify(subgraphConfig)
   );
 
