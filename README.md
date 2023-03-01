@@ -77,6 +77,12 @@ To write to & read from the in-memory data store, use .save() and .load(). You c
 
 If a handler triggers a contract call, that contract's abi needs to be in the subgraph manifest entry. This will not be caught until the subgraph is deployed and syncing, only if the handler is triggered and cannot find the contract's abi. (This is an issue we are working on with the Graph team.)
 
+## End To End Testing
+
+While matchstick tests do a decent job of ensuring our handlers work as expected they don't work quite like an actual subgraph and can fail to surface certain types of errors. Within the tests/e2e directory we have a docker compose file that sets up a number of containers to more precisely replicate the subgraph runtime environment. End to end tests should be added under tests/e2e/runner/\_\_tests\_\_. 
+
+In order to run these tests you must have docker installed on your machine. If running with an M1 machine you may need to rebuild the graph-node image as described [here](https://github.com/graphprotocol/graph-node/tree/master/docker#running-graph-node-on-an-macbook-m1).
+
 ## Hosted Subgraph Publish Checklist
 
 > slightly less involved than publishing to the decentralized graph network
