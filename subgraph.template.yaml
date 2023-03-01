@@ -823,6 +823,8 @@ dataSources:
         - name: IFilteredMinterDAExpV1
           file: ./abis/IFilteredMinterDAExpV1.json
       eventHandlers:
+        - event: Deployed()
+          handler: handleDeployed
         - event: MinterApproved(indexed address,string)
           handler: handleMinterApproved
         - event: MinterRevoked(indexed address)
@@ -863,8 +865,8 @@ dataSources:
           file: ./abis/IFilteredMinterDALinV1.json
         - name: IFilteredMinterDAExpV1
           file: ./abis/IFilteredMinterDAExpV1.json
-        - name: IFilteredMinterDAExpSettlementV0
-          file: ./abis/IFilteredMinterDAExpSettlementV0.json
+        - name: IFilteredMinterDAExpSettlementV1
+          file: ./abis/IFilteredMinterDAExpSettlementV1.json
         - name: IFilteredMinterV2
           file: ./abis/IFilteredMinterV2.json
         - name: IFilteredMinterHolderV2
@@ -907,8 +909,8 @@ dataSources:
           file: ./abis/IFilteredMinterDALinV1.json
         - name: IFilteredMinterDAExpV1
           file: ./abis/IFilteredMinterDAExpV1.json
-        - name: IFilteredMinterDAExpSettlementV0
-          file: ./abis/IFilteredMinterDAExpSettlementV0.json
+        - name: IFilteredMinterDAExpSettlementV1
+          file: ./abis/IFilteredMinterDAExpSettlementV1.json
         - name: IFilteredMinterV2
           file: ./abis/IFilteredMinterV2.json
         - name: IFilteredMinterHolderV2
@@ -951,8 +953,8 @@ dataSources:
           file: ./abis/IFilteredMinterDALinV1.json
         - name: IFilteredMinterDAExpV1
           file: ./abis/IFilteredMinterDAExpV1.json
-        - name: IFilteredMinterDAExpSettlementV0
-          file: ./abis/IFilteredMinterDAExpSettlementV0.json
+        - name: IFilteredMinterDAExpSettlementV1
+          file: ./abis/IFilteredMinterDAExpSettlementV1.json
         - name: IFilteredMinterV2
           file: ./abis/IFilteredMinterV2.json
         - name: IFilteredMinterHolderV2
@@ -1001,8 +1003,8 @@ dataSources:
           file: ./abis/IFilteredMinterDALinV1.json
         - name: IFilteredMinterDAExpV1
           file: ./abis/IFilteredMinterDAExpV1.json
-        - name: IFilteredMinterDAExpSettlementV0
-          file: ./abis/IFilteredMinterDAExpSettlementV0.json
+        - name: IFilteredMinterDAExpSettlementV1
+          file: ./abis/IFilteredMinterDAExpSettlementV1.json
         - name: IFilteredMinterV2
           file: ./abis/IFilteredMinterV2.json
         - name: IFilteredMinterHolderV2
@@ -1032,7 +1034,7 @@ dataSources:
     network: {{network}}
     source:
       address: "{{#address}}{{address}}{{/address}}{{^address}}0x0000000000000000000000000000000000000000{{/address}}"
-      abi: IFilteredMinterDAExpSettlementV0
+      abi: IFilteredMinterDAExpSettlementV1
       {{#startBlock}}startBlock: {{startBlock}}{{/startBlock}}
     mapping:
       kind: ethereum/events
@@ -1052,8 +1054,8 @@ dataSources:
           file: ./abis/IFilteredMinterDALinV1.json
         - name: IFilteredMinterDAExpV1
           file: ./abis/IFilteredMinterDAExpV1.json
-        - name: IFilteredMinterDAExpSettlementV0
-          file: ./abis/IFilteredMinterDAExpSettlementV0.json
+        - name: IFilteredMinterDAExpSettlementV1
+          file: ./abis/IFilteredMinterDAExpSettlementV1.json
         - name: IFilteredMinterV2
           file: ./abis/IFilteredMinterV2.json
         - name: IFilteredMinterHolderV2
@@ -1077,6 +1079,8 @@ dataSources:
           handler: handleReceiptUpdated
         - event: ArtistAndAdminRevenuesWithdrawn(indexed uint256)
           handler: handleArtistAndAdminRevenuesWithdrawn
+        - event: ProjectMaxInvocationsLimitUpdated(indexed uint256,uint256)
+          handler: handleProjectMaxInvocationsLimitUpdated
       file: ./src/minter-suite-mapping.ts
   {{/minterDAExpSettlementContracts}}
   {{#minterMerkleContracts}}
@@ -1104,8 +1108,8 @@ dataSources:
           file: ./abis/IFilteredMinterDALinV1.json
         - name: IFilteredMinterDAExpV1
           file: ./abis/IFilteredMinterDAExpV1.json
-        - name: IFilteredMinterDAExpSettlementV0
-          file: ./abis/IFilteredMinterDAExpSettlementV0.json
+        - name: IFilteredMinterDAExpSettlementV1
+          file: ./abis/IFilteredMinterDAExpSettlementV1.json
         - name: IFilteredMinterV2
           file: ./abis/IFilteredMinterV2.json
         - name: IFilteredMinterHolderV2
@@ -1154,8 +1158,8 @@ dataSources:
           file: ./abis/IFilteredMinterDALinV1.json
         - name: IFilteredMinterDAExpV1
           file: ./abis/IFilteredMinterDAExpV1.json
-        - name: IFilteredMinterDAExpSettlementV0
-          file: ./abis/IFilteredMinterDAExpSettlementV0.json
+        - name: IFilteredMinterDAExpSettlementV1
+          file: ./abis/IFilteredMinterDAExpSettlementV1.json
         - name: IFilteredMinterV2
           file: ./abis/IFilteredMinterV2.json
         - name: IFilteredMinterHolderV2

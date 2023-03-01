@@ -5,6 +5,12 @@
   "abi": [
     {
       "anonymous": false,
+      "inputs": [],
+      "name": "Deployed",
+      "type": "event"
+    },
+    {
+      "anonymous": false,
       "inputs": [
         {
           "indexed": true,

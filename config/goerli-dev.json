@@ -89,6 +89,11 @@
       "address": "0xBc86F31413AE950FC732A923284D5c74045878C3",
       "name": "Minter Filter for AB V3 Engine Dev #2 core at 0xd47A017282E3a67D17421C6d98655eFb7D5ED1E6",
       "startBlock": 8411115
+    },
+    {
+      "address": "0x72AE7160A580893Fb1049D17Fbd736Ad39Ea7FbD",
+      "name": "Minter Filter for AB V3 Engine Dev C core at 0x5702797Ff45FCb0a70eB6AE1E4563299dCFa9Dd6",
+      "startBlock": 8458567
     }
   ],
   "minterSetPriceContracts": [
@@ -121,6 +126,11 @@
       "address": "0x6e8f18DAA4cec615d6997631118483179696225c",
       "name": "V4 Minter for AB V3 Engine Dev #2 core at 0xd47A017282E3a67D17421C6d98655eFb7D5ED1E6",
       "startBlock": 8411116
+    },
+    {
+      "address": "0x293293BCb2f18D02EB4C451ecf39d7f5c1BD55f9",
+      "name": "V4 Minter for AB V3 Engine Dev C core at 0x5702797Ff45FCb0a70eB6AE1E4563299dCFa9Dd6",
+      "startBlock": 8458567
     }
   ],
   "minterSetPriceERC20Contracts": [
@@ -143,6 +153,11 @@
       "address": "0x1ee2902F883C9b37DD26f6071453Ab1AB68eF7b7",
       "name": "V2 Explorations Minter",
       "startBlock": 7799148
+    },
+    {
+      "address": "0xa6c7eEB30b0FFB04e87080093c77629A147bA4fB",
+      "name": "V4 Minter for AB V3 Engine Dev C core at 0x5702797Ff45FCb0a70eB6AE1E4563299dCFa9Dd6",
+      "startBlock": 8458567
     }
   ],
   "minterDAExpContracts": [
@@ -165,6 +180,11 @@
       "address": "0x73302603552432d5c8F4ac935B73dA6D428033BE",
       "name": "V2 Explorations Minter",
       "startBlock": 7799152
+    },
+    {
+      "address": "0x7eaC47C4e712e3A2094F453C35f3Ef9ef73e8986",
+      "name": "V4 Minter for AB V3 Engine Dev C core at 0x5702797Ff45FCb0a70eB6AE1E4563299dCFa9Dd6",
+      "startBlock": 8458567
     }
   ],
   "minterDALinContracts": [
@@ -187,6 +207,11 @@
       "address": "0xD21Ab04F0c1515253A22CE3A96349456059Fc90B",
       "name": "V2 Explorations Minter",
       "startBlock": 7799150
+    },
+    {
+      "address": "0x2f7174b0c780adaD89f1deA0D41BE31A1F578a38",
+      "name": "V4 Minter for AB V3 Engine Dev C core at 0x5702797Ff45FCb0a70eB6AE1E4563299dCFa9Dd6",
+      "startBlock": 8458567
     }
   ],
   "minterDAExpSettlementContracts": [
@@ -194,6 +219,16 @@
       "address": "0xaC85613A8C8b39a713175bC0F54630199A40D2D8",
       "name": "V0 Flagship Minter for V3 core",
       "startBlock": 7000000
+    },
+    {
+      "address": "0xaBEDC313274eFF4895cbbE35d29f054d00352e0a",
+      "name": "V1 Minter for AB V3 Engine Dev C core at 0x5702797Ff45FCb0a70eB6AE1E4563299dCFa9Dd6",
+      "startBlock": 8458567
+    },
+    {
+      "address": "0x1732eA26A4dbA4863527F7Eee4a9272607fE9db6",
+      "name": "V2 Minter for AB V3 Engine Dev C core at 0x5702797Ff45FCb0a70eB6AE1E4563299dCFa9Dd6",
+      "startBlock": 8498764
     }
   ],
   "minterMerkleContracts": [
@@ -231,6 +266,11 @@
       "address": "0x3D7278b1Cb7132f6DFed5e301a0E4552C5d02769",
       "name": "V3 Explorations Minter",
       "startBlock": 7976933
+    },
+    {
+      "address": "0xcab32b53DA814659A6B36F29768F30ea4f5B4F3F",
+      "name": "V5 Minter for AB V3 Engine Dev C core at 0x5702797Ff45FCb0a70eB6AE1E4563299dCFa9Dd6",
+      "startBlock": 8458567
     }
   ],
   "minterHolderContracts": [
@@ -258,6 +298,11 @@
       "address": "0x86D1678312a5782F2B9222B050D608251329Fe7e",
       "name": "V2 Explorations Minter",
       "startBlock": 7976903
+    },
+    {
+      "address": "0x98aAd1504420219f95486feF1f7A00E901043cfB",
+      "name": "V4 Minter for AB V3 Engine Dev C core at 0x5702797Ff45FCb0a70eB6AE1E4563299dCFa9Dd6",
+      "startBlock": 8458567
     }
   ],
   "adminACLV0Contracts": [
@@ -275,6 +320,11 @@
       "address": "0x8ADfF069C897383c107F95743b944f78e0BefC2D",
       "name": "Explorations Admin ACL V0",
       "startBlock": 7799141
+    },
+    {
+      "address": "0x8CD0035E53816EED79aA96aB1442114400731D74",
+      "name": "Dev Test C AdminACLV1 (cast as AdminACLV0 is okay)",
+      "startBlock": 8458567
     }
   ],
   "engineRegistryV0Contracts": [
@@ -288,7 +338,7 @@
     {
       "address": "0x32CAA016dd6e8d5750517D5777e2EB70287B023e",
       "name": "Dependency Registry V0",
-      "startBlock": 8417575 
+      "startBlock": 8417575
     }
   ],
   "ownableUpgradeableDependencyRegistryContracts": [

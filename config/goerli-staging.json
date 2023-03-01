@@ -173,6 +173,16 @@
       "address": "0xBCb1343e7ef0C25d6BFB78BA5B4DA9200946aaf8",
       "name": "Venus Over Manhattan",
       "startBlock": 8346719
+    },
+    {
+      "address": "0x0eB38A2666A74a8d4a8cb4E718B699E1651a4893",
+      "name": "Unit London",
+      "startBlock": 8485960
+    },
+    {
+      "address": "0x0e1568b7651f257401ebc5A4ff2B14Bc8797dC3c",
+      "name": "Flex Test (Doodle Labs)",
+      "startBlock": 8470477
     }
   ],
   "minterFilterV0Contracts": [

@@ -5,7 +5,7 @@ subgraph.yaml
 .bin
 tests/.latest.json
 
-# Ignore codege generated for specific contract addresses
+# Ignore generated files
 generated/
 contracts
 tests/e2e/data

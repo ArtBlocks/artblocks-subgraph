@@ -11,6 +11,7 @@ import {
 import { IsCanonicalMinterFilter } from "../../../generated/MinterFilterV0/MinterFilterV0";
 // IMinterFilterV0 is the interface for MinterFilterV0 and MinterFilterV1
 import {
+  Deployed,
   MinterApproved,
   MinterRevoked,
   ProjectMinterRegistered,
@@ -24,6 +25,7 @@ import {
 } from "../../../generated/schema";
 import { getProjectMinterConfigId } from "../../../src/helpers";
 import {
+  handleDeployed,
   handleIsCanonicalMinterFilter,
   handleMinterApproved,
   handleMinterRevoked,
@@ -61,7 +63,51 @@ import {
 
 const randomAddressGenerator = new RandomAddressGenerator();
 
+test("handleDeployed should add MinterFilter to the store", () => {
+  clearStore();
+  addTestContractToStore(BigInt.fromI32(0));
+
+  const updateCallBlockTimestamp = CURRENT_BLOCK_TIMESTAMP.plus(
+    BigInt.fromI32(10)
+  );
+  const minterFilterAddress = randomAddressGenerator.generateRandomAddress();
+  const deployedEvent: Deployed = changetype<Deployed>(newMockEvent());
+  deployedEvent.address = minterFilterAddress;
+  deployedEvent.parameters = [];
+  deployedEvent.block.timestamp = updateCallBlockTimestamp;
+
+  // mock function called when adding a new minter
+  createMockedFunction(
+    minterFilterAddress,
+    "genArt721CoreAddress",
+    "genArt721CoreAddress():(address)"
+  ).returns([ethereum.Value.fromAddress(TEST_CONTRACT_ADDRESS)]);
+
+  assert.notInStore(
+    MINTER_FILTER_ENTITY_TYPE,
+    minterFilterAddress.toHexString()
+  );
+
+  handleDeployed(deployedEvent);
+
+  assert.fieldEquals(
+    MINTER_FILTER_ENTITY_TYPE,
+    minterFilterAddress.toHexString(),
+    "id",
+    minterFilterAddress.toHexString()
+  );
+
+  assert.fieldEquals(
+    MINTER_FILTER_ENTITY_TYPE,
+    minterFilterAddress.toHexString(),
+    "coreContract",
+    TEST_CONTRACT_ADDRESS.toHexString()
+  );
+  clearStore();
+});
+
 test("handleIsCanonicalMinterFilter should do nothing if the core contract for the minter filter emitting the event has not been indexed", () => {
+  clearStore();
   const coreContractAddress = randomAddressGenerator.generateRandomAddress();
   const minterFilterAddress = randomAddressGenerator.generateRandomAddress();
 
