@@ -65,7 +65,8 @@ import {
   stringToJSONString,
   stringToJSONValue,
   typedMapToJSONString,
-  loadOrCreateReceipt
+  loadOrCreateReceipt,
+  generateProjectIdNumberFromTokenIdNumber
 } from "./helpers";
 import {
   ConfigKeyRemoved,
@@ -617,6 +618,54 @@ export function handleResetAuctionDetails(event: ResetAuctionDetails): void {
     // clear project minter configuration extraMinterDetails json field
     handleRemoveMinterDetailsGeneric(
       "projectAuctionDurationSeconds",
+      projectMinterConfig
+    );
+
+    // update project updatedAt to sync new projectMinterConfiguration changes
+    let project = minterProjectAndConfig.project;
+    project.updatedAt = event.block.timestamp;
+    project.save();
+  }
+}
+
+export function handleAuctionInitialized(event: AuctionInitialized): void {
+  const projectIdNumber = generateProjectIdNumberFromTokenIdNumber(
+    event.params.tokenId
+  );
+  let minterProjectAndConfig = loadMinterProjectAndConfig(
+    event.address,
+    projectIdNumber,
+    event.block.timestamp
+  );
+
+  if (minterProjectAndConfig) {
+    let projectMinterConfig = minterProjectAndConfig.projectMinterConfiguration;
+    // update all auction details in project minter configuration extraMinterDetails json field
+    handleSetMinterDetailsGeneric(
+      "auctionTokenId",
+      event.params.tokenId,
+      projectMinterConfig
+    );
+    handleSetMinterDetailsGeneric(
+      "auctionCurrentBid",
+      event.params.bidAmount,
+      projectMinterConfig
+    );
+    handleSetMinterDetailsGeneric(
+      "auctionCurrentBidder",
+      event.params.bidder,
+      projectMinterConfig
+    );
+    handleSetMinterDetailsGeneric(
+      "auctionEndTime",
+      event.params.endTime,
+      projectMinterConfig
+    );
+    // reset the token auction settled state, and set the auction as initialized
+    handleSetMinterDetailsGeneric("auctionSettled", false, projectMinterConfig);
+    handleSetMinterDetailsGeneric(
+      "auctionInitialized",
+      true,
       projectMinterConfig
     );
 
