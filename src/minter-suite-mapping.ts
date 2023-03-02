@@ -89,6 +89,18 @@ import {
 } from "../generated/MinterHolder/IFilteredMinterHolderV2";
 
 import { DelegationRegistryUpdated as MinterMerkleDelegationRegistryUpdated } from "../generated/MinterMerkle/IFilteredMinterMerkleV2";
+
+import {
+  AuctionDurationSecondsRangeUpdated,
+  MinterMinBidIncrementPercentageUpdated,
+  MinterTimeBufferUpdated,
+  ConfiguredFutureAuctions,
+  ResetAuctionDetails,
+  AuctionInitialized,
+  AuctionBid,
+  AuctionSettled
+} from "../generated/MinterSEA/IFilteredMinterSEAV0";
+
 import { MinterConfigSetAddressEvent } from "./util-types";
 
 // IFilteredMinterV0 events
@@ -488,6 +500,32 @@ export function handleDelegationRegistryUpdatedGeneric<T>(event: T): void {
     event.params.delegationRegistryAddress,
     minter
   );
+  minter.updatedAt = event.block.timestamp;
+  minter.save();
+}
+
+// MinterSEA specific handlers
+export function handleAuctionDurationSecondsRangeUpdated(
+  event: AuctionDurationSecondsRangeUpdated
+): void {
+  let minter = loadOrCreateMinter(event.address, event.block.timestamp);
+
+  if (!minter) {
+    return;
+  }
+
+  // update Minter.extraMinterDetails with new values
+  handleSetMinterDetailsGeneric(
+    "minAuctionDurationSeconds",
+    event.params.minAuctionDurationSeconds,
+    minter
+  );
+  handleSetMinterDetailsGeneric(
+    "maxAuctionDurationSeconds",
+    event.params.maxAuctionDurationSeconds,
+    minter
+  );
+
   minter.updatedAt = event.block.timestamp;
   minter.save();
 }

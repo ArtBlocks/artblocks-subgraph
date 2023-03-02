@@ -78,6 +78,8 @@ import {
   ArtistAndAdminRevenuesWithdrawn
 } from "../../../generated/MinterDAExpSettlement/IFilteredMinterDAExpSettlementV1";
 
+import { AuctionDurationSecondsRangeUpdated } from "../../../generated/MinterSEA/IFilteredMinterSEAV0";
+
 import { ProjectMaxInvocationsLimitUpdated } from "../../../generated/MinterSetPrice/IFilteredMinterV2";
 
 // import handlers from minter-suite-mapping
@@ -111,7 +113,8 @@ import {
   handleSelloutPriceUpdated,
   handleReceiptUpdated,
   handleArtistAndAdminRevenuesWithdrawn,
-  handleProjectMaxInvocationsLimitUpdated
+  handleProjectMaxInvocationsLimitUpdated,
+  handleAuctionDurationSecondsRangeUpdated
 } from "../../../src/minter-suite-mapping";
 
 import {
@@ -1949,6 +1952,51 @@ describe("DAExpSettlementMinters", () => {
           '"'},"auctionRevenuesCollected":${true}}`
       );
     });
+  });
+});
+
+describe("MinterSEAV tests", () => {
+  test("handleAuctionDurationSecondsRangeUpdated updates store", () => {
+    // mock, pass event to handler, etc
+    clearStore();
+    const minter = addNewMinterToStore("MinterSEAV0");
+    const minterAddress: Address = changetype<Address>(
+      Address.fromHexString(minter.id)
+    );
+    minter.save();
+
+    const testMinAuctionDurationSeconds = BigInt.fromI32(100);
+    const testMaxAuctionDurationSeconds = BigInt.fromI32(200);
+
+    const event: AuctionDurationSecondsRangeUpdated = changetype<
+      AuctionDurationSecondsRangeUpdated
+    >(newMockEvent());
+    event.address = minterAddress;
+    event.parameters = [
+      new ethereum.EventParam(
+        "minAuctionDurationSeconds",
+        ethereum.Value.fromUnsignedBigInt(testMinAuctionDurationSeconds)
+      ),
+      new ethereum.EventParam(
+        "maxAuctionDurationSeconds",
+        ethereum.Value.fromUnsignedBigInt(testMaxAuctionDurationSeconds)
+      )
+    ];
+
+    event.block.timestamp = CURRENT_BLOCK_TIMESTAMP;
+
+    handleAuctionDurationSecondsRangeUpdated(event);
+
+    assert.fieldEquals(
+      MINTER_ENTITY_TYPE,
+      minter.id,
+      "extraMinterDetails",
+      '{"minAuctionDurationSeconds":' +
+        testMinAuctionDurationSeconds.toString() +
+        ',"maxAuctionDurationSeconds":' +
+        testMaxAuctionDurationSeconds.toString() +
+        "}"
+    );
   });
 });
 

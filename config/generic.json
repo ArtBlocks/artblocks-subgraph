@@ -85,6 +85,11 @@
       "address": ""
     }
   ],
+  "minterSEAContracts": [
+    {
+      "address": ""
+    }
+  ],
   "adminACLV0Contracts": [
     {
       "address": ""
