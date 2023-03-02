@@ -600,6 +600,33 @@ export function handleConfiguredFutureAuctions(
   }
 }
 
+export function handleResetAuctionDetails(event: ResetAuctionDetails): void {
+  let minterProjectAndConfig = loadMinterProjectAndConfig(
+    event.address,
+    event.params.projectId,
+    event.block.timestamp
+  );
+
+  if (minterProjectAndConfig) {
+    let projectMinterConfig = minterProjectAndConfig.projectMinterConfiguration;
+    // reset project minter configuration fields
+    projectMinterConfig.priceIsConfigured = false;
+    projectMinterConfig.basePrice = BigInt.fromI32(0);
+    projectMinterConfig.startTime = BigInt.fromI32(0);
+    projectMinterConfig.save();
+    // clear project minter configuration extraMinterDetails json field
+    handleRemoveMinterDetailsGeneric(
+      "projectAuctionDurationSeconds",
+      projectMinterConfig
+    );
+
+    // update project updatedAt to sync new projectMinterConfiguration changes
+    let project = minterProjectAndConfig.project;
+    project.updatedAt = event.block.timestamp;
+    project.save();
+  }
+}
+
 // Generic Handlers
 // Below is all logic pertaining to generic handlers used for maintaining JSON config stores on both the ProjectMinterConfiguration and Minter entities.
 // Most logic is shared and bubbled up each respective handler for each action. We utilize ducktype to allow these to work on either a Minter or ProjectMinterConfiguration
@@ -707,6 +734,35 @@ export function handleSetBytesValueProjectConfig(
   event: ConfigValueSetBytes
 ): void {
   handleSetValueProjectConfig(event);
+}
+
+export function handleRemoveMinterDetailsGeneric<C>(
+  key: string,
+  config: C
+): void {
+  if (
+    !(config instanceof Minter || config instanceof ProjectMinterConfiguration)
+  ) {
+    log.warning(
+      "[WARN] Generic property attempted to be set on something not a Minter or ProjectMinterConfiguration",
+      []
+    );
+    return;
+  }
+
+  let minterDetails = getMinterDetails(config);
+
+  const withRemovedTypedMap: TypedMap<string, JSONValue> = new TypedMap();
+
+  for (let i = 0; i < minterDetails.entries.length; i++) {
+    let entry = minterDetails.entries[i];
+    if (entry.key != key) {
+      withRemovedTypedMap.set(entry.key, entry.value);
+    }
+  }
+  config.extraMinterDetails = typedMapToJSONString(withRemovedTypedMap);
+
+  config.save();
 }
 
 export function handleRemoveValueGeneric<T>(
