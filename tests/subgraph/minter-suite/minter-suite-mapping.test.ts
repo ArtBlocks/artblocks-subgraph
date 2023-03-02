@@ -78,7 +78,16 @@ import {
   ArtistAndAdminRevenuesWithdrawn
 } from "../../../generated/MinterDAExpSettlement/IFilteredMinterDAExpSettlementV1";
 
-import { AuctionDurationSecondsRangeUpdated } from "../../../generated/MinterSEA/IFilteredMinterSEAV0";
+import {
+  AuctionDurationSecondsRangeUpdated,
+  MinterMinBidIncrementPercentageUpdated,
+  MinterTimeBufferUpdated,
+  ConfiguredFutureAuctions,
+  ResetAuctionDetails,
+  AuctionInitialized,
+  AuctionBid,
+  AuctionSettled
+} from "../../../generated/MinterSEA/IFilteredMinterSEAV0";
 
 import { ProjectMaxInvocationsLimitUpdated } from "../../../generated/MinterSetPrice/IFilteredMinterV2";
 
@@ -114,7 +123,10 @@ import {
   handleReceiptUpdated,
   handleArtistAndAdminRevenuesWithdrawn,
   handleProjectMaxInvocationsLimitUpdated,
-  handleAuctionDurationSecondsRangeUpdated
+  handleAuctionDurationSecondsRangeUpdated,
+  handleMinterMinBidIncrementPercentageUpdated,
+  handleMinterTimeBufferUpdated,
+  handleConfiguredFutureAuctions
 } from "../../../src/minter-suite-mapping";
 
 import {
@@ -1987,6 +1999,7 @@ describe("MinterSEAV tests", () => {
 
     handleAuctionDurationSecondsRangeUpdated(event);
 
+    // assert store is updated
     assert.fieldEquals(
       MINTER_ENTITY_TYPE,
       minter.id,
@@ -1995,6 +2008,189 @@ describe("MinterSEAV tests", () => {
         testMinAuctionDurationSeconds.toString() +
         ',"maxAuctionDurationSeconds":' +
         testMaxAuctionDurationSeconds.toString() +
+        "}"
+    );
+    assert.fieldEquals(
+      MINTER_ENTITY_TYPE,
+      minter.id,
+      "updatedAt",
+      CURRENT_BLOCK_TIMESTAMP.toString()
+    );
+  });
+
+  test("handleMinterMinBidIncrementPercentageUpdated updates store", () => {
+    // mock, pass event to handler, etc
+    clearStore();
+    const minter = addNewMinterToStore("MinterSEAV0");
+    const minterAddress: Address = changetype<Address>(
+      Address.fromHexString(minter.id)
+    );
+    minter.save();
+
+    const testMinterMinBidIncrementPercentage = BigInt.fromI32(6);
+
+    const event: MinterMinBidIncrementPercentageUpdated = changetype<
+      MinterMinBidIncrementPercentageUpdated
+    >(newMockEvent());
+    event.address = minterAddress;
+    event.parameters = [
+      new ethereum.EventParam(
+        "minterMinBidIncrementPercentage",
+        ethereum.Value.fromUnsignedBigInt(testMinterMinBidIncrementPercentage)
+      )
+    ];
+
+    event.block.timestamp = CURRENT_BLOCK_TIMESTAMP;
+
+    handleMinterMinBidIncrementPercentageUpdated(event);
+
+    // assert store is updated
+    assert.fieldEquals(
+      MINTER_ENTITY_TYPE,
+      minter.id,
+      "extraMinterDetails",
+      '{"minterMinBidIncrementPercentage":' +
+        testMinterMinBidIncrementPercentage.toString() +
+        "}"
+    );
+    assert.fieldEquals(
+      MINTER_ENTITY_TYPE,
+      minter.id,
+      "updatedAt",
+      CURRENT_BLOCK_TIMESTAMP.toString()
+    );
+  });
+
+  test("handleMinterTimeBufferUpdated updates store", () => {
+    // mock, pass event to handler, etc
+    clearStore();
+    const minter = addNewMinterToStore("MinterSEAV0");
+    const minterAddress: Address = changetype<Address>(
+      Address.fromHexString(minter.id)
+    );
+    minter.save();
+
+    const testMinterTimeBuffer = BigInt.fromI32(300);
+
+    const event: MinterTimeBufferUpdated = changetype<MinterTimeBufferUpdated>(
+      newMockEvent()
+    );
+    event.address = minterAddress;
+    event.parameters = [
+      new ethereum.EventParam(
+        "minterTimeBufferSeconds",
+        ethereum.Value.fromUnsignedBigInt(testMinterTimeBuffer)
+      )
+    ];
+
+    event.block.timestamp = CURRENT_BLOCK_TIMESTAMP;
+
+    handleMinterTimeBufferUpdated(event);
+
+    // assert store is updated
+    assert.fieldEquals(
+      MINTER_ENTITY_TYPE,
+      minter.id,
+      "extraMinterDetails",
+      '{"minterTimeBufferSeconds":' + testMinterTimeBuffer.toString() + "}"
+    );
+    assert.fieldEquals(
+      MINTER_ENTITY_TYPE,
+      minter.id,
+      "updatedAt",
+      CURRENT_BLOCK_TIMESTAMP.toString()
+    );
+  });
+
+  test("handleConfiguredFutureAuctions updates store", () => {
+    // mock, pass event to handler, etc
+    clearStore();
+    const minter = addNewMinterToStore("MinterSEAV0");
+    const testProjectId = BigInt.fromI32(42);
+    const project = addNewProjectToStore(
+      TEST_CONTRACT_ADDRESS,
+      testProjectId,
+      "Test Project",
+      randomAddressGenerator.generateRandomAddress(),
+      BigInt.fromI32(0),
+      null
+    );
+    const minterAddress: Address = changetype<Address>(
+      Address.fromHexString(minter.id)
+    );
+    minter.save();
+
+    // update values
+    const testTimestampStart = BigInt.fromI32(999);
+    const testAuctionDurationSeconds = BigInt.fromI32(10000);
+    const testBasePrice = ONE_ETH_IN_WEI.div(BigInt.fromI32(10));
+
+    const event: ConfiguredFutureAuctions = changetype<
+      ConfiguredFutureAuctions
+    >(newMockEvent());
+    event.address = minterAddress;
+    event.parameters = [
+      new ethereum.EventParam(
+        "projectId",
+        ethereum.Value.fromUnsignedBigInt(testProjectId)
+      ),
+      new ethereum.EventParam(
+        "timestampStart",
+        ethereum.Value.fromUnsignedBigInt(testTimestampStart)
+      ),
+      new ethereum.EventParam(
+        "auctionDurationSeconds",
+        ethereum.Value.fromUnsignedBigInt(testAuctionDurationSeconds)
+      ),
+      new ethereum.EventParam(
+        "basePrice",
+        ethereum.Value.fromUnsignedBigInt(testBasePrice)
+      )
+    ];
+
+    event.block.timestamp = CURRENT_BLOCK_TIMESTAMP;
+
+    handleConfiguredFutureAuctions(event);
+
+    // assert store is updated
+    const projectEntityId = generateContractSpecificId(
+      TEST_CONTRACT_ADDRESS,
+      testProjectId
+    );
+    assert.fieldEquals(
+      PROJECT_ENTITY_TYPE,
+      projectEntityId,
+      "updatedAt",
+      CURRENT_BLOCK_TIMESTAMP.toString()
+    );
+    const projectMinterConfigEntityId = getProjectMinterConfigId(
+      minter.id,
+      projectEntityId
+    );
+    assert.fieldEquals(
+      PROJECT_MINTER_CONFIGURATION_ENTITY_TYPE,
+      projectMinterConfigEntityId,
+      "priceIsConfigured",
+      "true"
+    );
+    assert.fieldEquals(
+      PROJECT_MINTER_CONFIGURATION_ENTITY_TYPE,
+      projectMinterConfigEntityId,
+      "basePrice",
+      testBasePrice.toString()
+    );
+    assert.fieldEquals(
+      PROJECT_MINTER_CONFIGURATION_ENTITY_TYPE,
+      projectMinterConfigEntityId,
+      "startTime",
+      testTimestampStart.toString()
+    );
+    assert.fieldEquals(
+      PROJECT_MINTER_CONFIGURATION_ENTITY_TYPE,
+      projectMinterConfigEntityId,
+      "extraMinterDetails",
+      '{"projectAuctionDurationSeconds":' +
+        testAuctionDurationSeconds.toString() +
         "}"
     );
   });

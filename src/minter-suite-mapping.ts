@@ -530,6 +530,76 @@ export function handleAuctionDurationSecondsRangeUpdated(
   minter.save();
 }
 
+export function handleMinterMinBidIncrementPercentageUpdated(
+  event: MinterMinBidIncrementPercentageUpdated
+): void {
+  let minter = loadOrCreateMinter(event.address, event.block.timestamp);
+
+  if (!minter) {
+    return;
+  }
+
+  // update Minter.extraMinterDetails with new value
+  handleSetMinterDetailsGeneric(
+    "minterMinBidIncrementPercentage",
+    BigInt.fromI32(event.params.minterMinBidIncrementPercentage),
+    minter
+  );
+
+  minter.updatedAt = event.block.timestamp;
+  minter.save();
+}
+
+export function handleMinterTimeBufferUpdated(
+  event: MinterTimeBufferUpdated
+): void {
+  let minter = loadOrCreateMinter(event.address, event.block.timestamp);
+
+  if (!minter) {
+    return;
+  }
+
+  // update Minter.extraMinterDetails with new value
+  handleSetMinterDetailsGeneric(
+    "minterTimeBufferSeconds",
+    event.params.minterTimeBufferSeconds,
+    minter
+  );
+
+  minter.updatedAt = event.block.timestamp;
+  minter.save();
+}
+
+export function handleConfiguredFutureAuctions(
+  event: ConfiguredFutureAuctions
+): void {
+  let minterProjectAndConfig = loadMinterProjectAndConfig(
+    event.address,
+    event.params.projectId,
+    event.block.timestamp
+  );
+
+  if (minterProjectAndConfig) {
+    let projectMinterConfig = minterProjectAndConfig.projectMinterConfiguration;
+    // update project minter configuration fields
+    projectMinterConfig.priceIsConfigured = true;
+    projectMinterConfig.basePrice = event.params.basePrice;
+    projectMinterConfig.startTime = event.params.timestampStart;
+    projectMinterConfig.save();
+    // update project minter configuration extraMinterDetails json field
+    handleSetMinterDetailsGeneric(
+      "projectAuctionDurationSeconds",
+      event.params.auctionDurationSeconds,
+      projectMinterConfig
+    );
+
+    // update project updatedAt to sync new projectMinterConfiguration changes
+    let project = minterProjectAndConfig.project;
+    project.updatedAt = event.block.timestamp;
+    project.save();
+  }
+}
+
 // Generic Handlers
 // Below is all logic pertaining to generic handlers used for maintaining JSON config stores on both the ProjectMinterConfiguration and Minter entities.
 // Most logic is shared and bubbled up each respective handler for each action. We utilize ducktype to allow these to work on either a Minter or ProjectMinterConfiguration
