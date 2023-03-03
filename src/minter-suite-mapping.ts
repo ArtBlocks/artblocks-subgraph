@@ -676,6 +676,62 @@ export function handleAuctionInitialized(event: AuctionInitialized): void {
   }
 }
 
+export function handleAuctionBid(event: AuctionBid): void {
+  const projectIdNumber = generateProjectIdNumberFromTokenIdNumber(
+    event.params.tokenId
+  );
+  let minterProjectAndConfig = loadMinterProjectAndConfig(
+    event.address,
+    projectIdNumber,
+    event.block.timestamp
+  );
+
+  if (minterProjectAndConfig) {
+    let projectMinterConfig = minterProjectAndConfig.projectMinterConfiguration;
+    // update relevant auction details in project minter configuration extraMinterDetails json field
+    handleSetMinterDetailsGeneric(
+      "auctionCurrentBid",
+      event.params.bidAmount,
+      projectMinterConfig
+    );
+    handleSetMinterDetailsGeneric(
+      "auctionCurrentBidder",
+      event.params.bidder,
+      projectMinterConfig
+    );
+    // determine if auction end time needs to be updated
+    let minterDetails = getMinterDetails(minterProjectAndConfig.minter);
+    const bufferTimeSecondsJSON = minterDetails.get("minterTimeBufferSeconds");
+    // @dev: treat null value as zero, even though we will never encounter it, but we check to keep AS happy.
+    let bufferTimeSeconds = BigInt.fromI32(0);
+    if (bufferTimeSecondsJSON instanceof JSONValue) {
+      bufferTimeSeconds = bufferTimeSecondsJSON.toBigInt();
+    }
+    let earliestAuctionEndTime = event.block.timestamp.plus(bufferTimeSeconds);
+    let projectMinterConfigDetails = getMinterDetails(
+      minterProjectAndConfig.projectMinterConfiguration
+    );
+    const currentEndTimeJSON = projectMinterConfigDetails.get("auctionEndTime");
+    // @dev: treat null value as zero, even though we will never encounter it, but we check to keep AS happy.
+    let currentEndTime = BigInt.fromI32(0);
+    if (currentEndTimeJSON instanceof JSONValue) {
+      currentEndTime = currentEndTimeJSON.toBigInt();
+    }
+    if (currentEndTime.lt(earliestAuctionEndTime)) {
+      handleSetMinterDetailsGeneric(
+        "auctionEndTime",
+        earliestAuctionEndTime,
+        projectMinterConfig
+      );
+    }
+
+    // update project updatedAt to sync new projectMinterConfiguration changes
+    let project = minterProjectAndConfig.project;
+    project.updatedAt = event.block.timestamp;
+    project.save();
+  }
+}
+
 // Generic Handlers
 // Below is all logic pertaining to generic handlers used for maintaining JSON config stores on both the ProjectMinterConfiguration and Minter entities.
 // Most logic is shared and bubbled up each respective handler for each action. We utilize ducktype to allow these to work on either a Minter or ProjectMinterConfiguration

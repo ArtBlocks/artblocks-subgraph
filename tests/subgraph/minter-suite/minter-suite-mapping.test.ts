@@ -128,7 +128,8 @@ import {
   handleMinterTimeBufferUpdated,
   handleConfiguredFutureAuctions,
   handleResetAuctionDetails,
-  handleAuctionInitialized
+  handleAuctionInitialized,
+  handleAuctionBid
 } from "../../../src/minter-suite-mapping";
 
 import {
@@ -2465,6 +2466,201 @@ describe("MinterSEAV tests", () => {
         ',"auctionSettled":false,"auctionTokenId":' +
         testTokenId.toString() +
         ',"auctionInitialized":true}'
+    );
+  });
+
+  test("handleAuctionBid updates store", () => {
+    // mock, pass event to handler, etc
+    const minter = addNewMinterToStore("MinterSEAV0");
+    const minterAddress: Address = changetype<Address>(
+      Address.fromHexString(minter.id)
+    );
+    minter.save();
+
+    const blockTimestamp1 = BigInt.fromI32(100);
+
+    // ADMIN CONFIGURES BUFFER TIME
+
+    const testMinterTimeBuffer = BigInt.fromI32(100);
+
+    const event: MinterTimeBufferUpdated = changetype<MinterTimeBufferUpdated>(
+      newMockEvent()
+    );
+    event.address = minterAddress;
+    event.parameters = [
+      new ethereum.EventParam(
+        "minterTimeBufferSeconds",
+        ethereum.Value.fromUnsignedBigInt(testMinterTimeBuffer)
+      )
+    ];
+
+    event.block.timestamp = blockTimestamp1;
+
+    handleMinterTimeBufferUpdated(event);
+
+    assert.fieldEquals(
+      MINTER_ENTITY_TYPE,
+      minter.id,
+      "extraMinterDetails",
+      '{"minterTimeBufferSeconds":' + testMinterTimeBuffer.toString() + "}"
+    );
+
+    // INITIALIZE AUCTION
+    const testProjectId = BigInt.fromI32(42);
+    const project = addNewProjectToStore(
+      TEST_CONTRACT_ADDRESS,
+      testProjectId,
+      "Test Project",
+      randomAddressGenerator.generateRandomAddress(),
+      BigInt.fromI32(0),
+      null
+    );
+
+    // configure values
+    const testTokenId = BigInt.fromI32(42000001);
+    const testBidderAddress = randomAddressGenerator.generateRandomAddress();
+    const testBidAmount = ONE_ETH_IN_WEI.div(BigInt.fromI32(10));
+    const testAuctionEndTime = BigInt.fromI32(500);
+
+    const event2: AuctionInitialized = changetype<AuctionInitialized>(
+      newMockEvent()
+    );
+    event2.address = minterAddress;
+    event2.parameters = [
+      new ethereum.EventParam(
+        "tokenId",
+        ethereum.Value.fromUnsignedBigInt(testTokenId)
+      ),
+      new ethereum.EventParam(
+        "bidder",
+        ethereum.Value.fromAddress(testBidderAddress)
+      ),
+      new ethereum.EventParam(
+        "bidAmount",
+        ethereum.Value.fromUnsignedBigInt(testBidAmount)
+      ),
+      new ethereum.EventParam(
+        "endTime",
+        ethereum.Value.fromUnsignedBigInt(testAuctionEndTime)
+      )
+    ];
+
+    const blockTimestamp2 = blockTimestamp1.plus(BigInt.fromI32(1));
+    event2.block.timestamp = blockTimestamp2;
+
+    handleAuctionInitialized(event2);
+
+    // assert store is updated as expected
+    const projectEntityId = generateContractSpecificId(
+      TEST_CONTRACT_ADDRESS,
+      testProjectId
+    );
+    const projectMinterConfigEntityId = getProjectMinterConfigId(
+      minter.id,
+      projectEntityId
+    );
+    assert.fieldEquals(
+      PROJECT_ENTITY_TYPE,
+      projectEntityId,
+      "updatedAt",
+      blockTimestamp2.toString()
+    );
+
+    // HANDLE SUBSEQUENT BID that does NOT extend auction
+    const testBidderAddress2 = randomAddressGenerator.generateRandomAddress();
+    const testBidAmount2 = ONE_ETH_IN_WEI.div(BigInt.fromI32(2));
+    const blockTimestamp3 = BigInt.fromI32(200); // not within buffer time
+
+    const event3: AuctionBid = changetype<AuctionBid>(newMockEvent());
+    event3.address = minterAddress;
+    event3.parameters = [
+      new ethereum.EventParam(
+        "tokenId",
+        ethereum.Value.fromUnsignedBigInt(testTokenId)
+      ),
+      new ethereum.EventParam(
+        "bidder",
+        ethereum.Value.fromAddress(testBidderAddress2)
+      ),
+      new ethereum.EventParam(
+        "bidAmount",
+        ethereum.Value.fromUnsignedBigInt(testBidAmount2)
+      )
+    ];
+
+    event3.block.timestamp = blockTimestamp3;
+
+    handleAuctionBid(event3);
+
+    // store should be updated, but auctionEndTime should not change since bid not in buffer time
+    assert.fieldEquals(
+      PROJECT_ENTITY_TYPE,
+      projectEntityId,
+      "updatedAt",
+      blockTimestamp3.toString()
+    );
+    assert.fieldEquals(
+      PROJECT_MINTER_CONFIGURATION_ENTITY_TYPE,
+      projectMinterConfigEntityId,
+      "extraMinterDetails",
+      '{"auctionCurrentBid":' +
+        testBidAmount2.toString() +
+        ',"auctionCurrentBidder":"' +
+        testBidderAddress2.toHexString() +
+        '","auctionEndTime":' +
+        testAuctionEndTime.toString() +
+        ',"auctionInitialized":true,"auctionSettled":false,"auctionTokenId":' +
+        testTokenId.toString() +
+        "}"
+    );
+
+    // HANDLE SUBSEQUENT BID that DOES extend auction
+    const testBidderAddress3 = randomAddressGenerator.generateRandomAddress();
+    const testBidAmount3 = ONE_ETH_IN_WEI;
+    const blockTimestamp4 = BigInt.fromI32(450); // not within buffer time
+
+    const event4: AuctionBid = changetype<AuctionBid>(newMockEvent());
+    event4.address = minterAddress;
+    event4.parameters = [
+      new ethereum.EventParam(
+        "tokenId",
+        ethereum.Value.fromUnsignedBigInt(testTokenId)
+      ),
+      new ethereum.EventParam(
+        "bidder",
+        ethereum.Value.fromAddress(testBidderAddress3)
+      ),
+      new ethereum.EventParam(
+        "bidAmount",
+        ethereum.Value.fromUnsignedBigInt(testBidAmount3)
+      )
+    ];
+
+    event4.block.timestamp = blockTimestamp4;
+
+    handleAuctionBid(event4);
+
+    // store should be updated, including the newly extended auction end time
+    const targetAuctionEndTime = blockTimestamp4.plus(testMinterTimeBuffer);
+    assert.fieldEquals(
+      PROJECT_ENTITY_TYPE,
+      projectEntityId,
+      "updatedAt",
+      blockTimestamp4.toString()
+    );
+    assert.fieldEquals(
+      PROJECT_MINTER_CONFIGURATION_ENTITY_TYPE,
+      projectMinterConfigEntityId,
+      "extraMinterDetails",
+      '{"auctionCurrentBid":' +
+        testBidAmount3.toString() +
+        ',"auctionCurrentBidder":"' +
+        testBidderAddress3.toHexString() +
+        '","auctionEndTime":' +
+        targetAuctionEndTime.toString() +
+        ',"auctionInitialized":true,"auctionSettled":false,"auctionTokenId":' +
+        testTokenId.toString() +
+        "}"
     );
   });
 });
