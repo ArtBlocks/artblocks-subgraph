@@ -732,6 +732,28 @@ export function handleAuctionBid(event: AuctionBid): void {
   }
 }
 
+export function handleAuctionSettled(event: AuctionSettled): void {
+  const projectIdNumber = generateProjectIdNumberFromTokenIdNumber(
+    event.params.tokenId
+  );
+  let minterProjectAndConfig = loadMinterProjectAndConfig(
+    event.address,
+    projectIdNumber,
+    event.block.timestamp
+  );
+
+  if (minterProjectAndConfig) {
+    let projectMinterConfig = minterProjectAndConfig.projectMinterConfiguration;
+    // update relevant auction details in project minter configuration extraMinterDetails json field
+    handleSetMinterDetailsGeneric("auctionSettled", true, projectMinterConfig);
+
+    // update project updatedAt to sync new projectMinterConfiguration changes
+    let project = minterProjectAndConfig.project;
+    project.updatedAt = event.block.timestamp;
+    project.save();
+  }
+}
+
 // Generic Handlers
 // Below is all logic pertaining to generic handlers used for maintaining JSON config stores on both the ProjectMinterConfiguration and Minter entities.
 // Most logic is shared and bubbled up each respective handler for each action. We utilize ducktype to allow these to work on either a Minter or ProjectMinterConfiguration

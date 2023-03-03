@@ -129,7 +129,8 @@ import {
   handleConfiguredFutureAuctions,
   handleResetAuctionDetails,
   handleAuctionInitialized,
-  handleAuctionBid
+  handleAuctionBid,
+  handleAuctionSettled
 } from "../../../src/minter-suite-mapping";
 
 import {
@@ -2661,6 +2662,74 @@ describe("MinterSEAV tests", () => {
         ',"auctionInitialized":true,"auctionSettled":false,"auctionTokenId":' +
         testTokenId.toString() +
         "}"
+    );
+  });
+
+  test("handleAuctionSettled updates store", () => {
+    // mock, pass event to handler, etc
+    const minter = addNewMinterToStore("MinterSEAV0");
+    const testProjectId = BigInt.fromI32(42);
+    const project = addNewProjectToStore(
+      TEST_CONTRACT_ADDRESS,
+      testProjectId,
+      "Test Project",
+      randomAddressGenerator.generateRandomAddress(),
+      BigInt.fromI32(0),
+      null
+    );
+    const minterAddress: Address = changetype<Address>(
+      Address.fromHexString(minter.id)
+    );
+    minter.save();
+
+    // update values
+    const testTokenId = BigInt.fromI32(42000001);
+
+    // handle auction settled event
+    const testWinnerAddress = randomAddressGenerator.generateRandomAddress();
+    const testWinnerBidAmount = ONE_ETH_IN_WEI;
+
+    const event: AuctionSettled = changetype<AuctionSettled>(newMockEvent());
+    event.address = minterAddress;
+    event.parameters = [
+      new ethereum.EventParam(
+        "tokenId",
+        ethereum.Value.fromUnsignedBigInt(testTokenId)
+      ),
+      new ethereum.EventParam(
+        "winner",
+        ethereum.Value.fromAddress(testWinnerAddress)
+      ),
+      new ethereum.EventParam(
+        "price",
+        ethereum.Value.fromUnsignedBigInt(testWinnerBidAmount)
+      )
+    ];
+
+    event.block.timestamp = CURRENT_BLOCK_TIMESTAMP;
+
+    handleAuctionSettled(event);
+
+    // store should be updated to reflect settled auction
+    const projectEntityId = generateContractSpecificId(
+      TEST_CONTRACT_ADDRESS,
+      testProjectId
+    );
+    const projectMinterConfigEntityId = getProjectMinterConfigId(
+      minter.id,
+      projectEntityId
+    );
+    assert.fieldEquals(
+      PROJECT_ENTITY_TYPE,
+      projectEntityId,
+      "updatedAt",
+      CURRENT_BLOCK_TIMESTAMP.toString()
+    );
+    assert.fieldEquals(
+      PROJECT_MINTER_CONFIGURATION_ENTITY_TYPE,
+      projectMinterConfigEntityId,
+      "extraMinterDetails",
+      '{"auctionSettled":true}'
     );
   });
 });
