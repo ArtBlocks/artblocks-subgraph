@@ -580,7 +580,8 @@ type Dependency @entity {
   "Additional repositories for this dependency"
   additionalRepositoryCount: BigInt!
   "Number of additional repositories for this dependency"
-  additionalRepositories: [DependencyAdditionalRepository!]! @derivedFrom(field: "dependency")
+  additionalRepositories: [DependencyAdditionalRepository!]!
+    @derivedFrom(field: "dependency")
   "List of on-chain scripts that for this dependency"
   scripts: [DependencyScript!]! @derivedFrom(field: "dependency")
   "Number of on-chain scripts for this dependency"
@@ -648,6 +649,8 @@ enum ProjectExternalAssetDependencyType {
   IPFS
   "Asset hosted on Arweave"
   ARWEAVE
+  "Asset hosted on chain"
+  ONCHAIN
 }
 
 type ProjectExternalAssetDependency @entity {
@@ -665,4 +668,10 @@ type ProjectExternalAssetDependency @entity {
 
   "The dependency index"
   index: BigInt!
+
+  "Address of the bytecode storage contract for this asset if it is onchain"
+  bytecodeAddress: Bytes
+
+  "The asset data if it is onchain"
+  data: String
 }
