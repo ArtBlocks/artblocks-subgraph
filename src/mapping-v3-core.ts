@@ -935,7 +935,7 @@ export function handleExternalAssetDependencyUpdated(
 function _handleExternalAssetDependencyUpdated<T>(
   contract: T,
   event: ExternalAssetDependencyUpdated
-) {
+): void {
   if (!(contract instanceof GenArt721CoreV3_Engine_Flex)) {
     return null;
   }
@@ -1002,9 +1002,9 @@ export function handleExternalAssetDependencyRemoved(
 function _handleExternalAssetDependencyRemoved<T>(
   contract: T,
   event: ExternalAssetDependencyRemoved
-) {
+): void {
   if (!(contract instanceof GenArt721CoreV3_Engine_Flex)) {
-    return null;
+    return;
   }
 
   let project = Project.load(
@@ -1079,9 +1079,9 @@ export function handleGatewayUpdated(event: GatewayUpdated): void {
   ]);
 }
 
-function _handleGatewayUpdated<T>(contract: T, event: GatewayUpdated) {
+function _handleGatewayUpdated<T>(contract: T, event: GatewayUpdated): void {
   if (!(contract instanceof GenArt721CoreV3_Engine_Flex)) {
-    return null;
+    return;
   }
 
   let contractEntity = Contract.load(event.address.toHexString());
@@ -1117,9 +1117,9 @@ export function handleProjectExternalAssetDependenciesLocked(
 function _handleProjectExternalAssetDependenciesLocked<T>(
   contract: T,
   event: ProjectExternalAssetDependenciesLocked
-) {
+): void {
   if (!(contract instanceof GenArt721CoreV3_Engine_Flex)) {
-    return null;
+    return;
   }
   let project = Project.load(
     generateContractSpecificId(event.address, event.params._projectId)
