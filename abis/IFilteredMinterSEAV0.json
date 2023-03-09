@@ -633,7 +633,7 @@
           "type": "uint256"
         }
       ],
-      "name": "getTokenToBidOrInitialize",
+      "name": "getTokenToBid",
       "outputs": [
         {
           "internalType": "uint256",
@@ -642,19 +642,6 @@
         }
       ],
       "stateMutability": "view",
-      "type": "function"
-    },
-    {
-      "inputs": [
-        {
-          "internalType": "uint256",
-          "name": "_targetTokenId",
-          "type": "uint256"
-        }
-      ],
-      "name": "initializeAuction",
-      "outputs": [],
-      "stateMutability": "payable",
       "type": "function"
     },
     {
@@ -929,11 +916,11 @@
         },
         {
           "internalType": "uint256",
-          "name": "_initializeTokenId",
+          "name": "_bidTokenId",
           "type": "uint256"
         }
       ],
-      "name": "settleAndInitializeAuction",
+      "name": "settleAndCreateBid",
       "outputs": [],
       "stateMutability": "payable",
       "type": "function"
