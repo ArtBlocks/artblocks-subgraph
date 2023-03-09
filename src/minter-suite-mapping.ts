@@ -492,10 +492,6 @@ export function handleDelegationRegistryUpdatedGeneric<T>(event: T): void {
 
   let minter = loadOrCreateMinter(event.address, event.block.timestamp);
 
-  if (!minter) {
-    return;
-  }
-
   handleSetMinterDetailsGeneric(
     "delegationRegistryAddress",
     event.params.delegationRegistryAddress,
@@ -510,10 +506,6 @@ export function handleAuctionDurationSecondsRangeUpdated(
   event: AuctionDurationSecondsRangeUpdated
 ): void {
   let minter = loadOrCreateMinter(event.address, event.block.timestamp);
-
-  if (!minter) {
-    return;
-  }
 
   // update Minter.extraMinterDetails with new values
   handleSetMinterDetailsGeneric(
@@ -536,10 +528,6 @@ export function handleMinterMinBidIncrementPercentageUpdated(
 ): void {
   let minter = loadOrCreateMinter(event.address, event.block.timestamp);
 
-  if (!minter) {
-    return;
-  }
-
   // update Minter.extraMinterDetails with new value
   handleSetMinterDetailsGeneric(
     "minterMinBidIncrementPercentage",
@@ -555,10 +543,6 @@ export function handleMinterTimeBufferUpdated(
   event: MinterTimeBufferUpdated
 ): void {
   let minter = loadOrCreateMinter(event.address, event.block.timestamp);
-
-  if (!minter) {
-    return;
-  }
 
   // update Minter.extraMinterDetails with new value
   handleSetMinterDetailsGeneric(
@@ -1061,9 +1045,7 @@ export function handleAddManyMinterConfig<T>(event: T): void {
   }
 
   let minter = loadOrCreateMinter(event.address, event.block.timestamp);
-  if (minter) {
-    handleAddManyValueGeneric(event, minter, null);
-  }
+  handleAddManyValueGeneric(event, minter, null);
 }
 
 export function handleAddManyBigIntValueProjectConfig(
@@ -1201,9 +1183,7 @@ export function handleRemoveManyMinterConfig<T>(event: T): void {
     return;
   }
   let minter = loadOrCreateMinter(event.address, event.block.timestamp);
-  if (minter) {
-    handleRemoveManyValueGeneric(event, minter, null);
-  }
+  handleRemoveManyValueGeneric(event, minter, null);
 }
 
 export function handleRemoveBigIntManyValueProjectConfig(
