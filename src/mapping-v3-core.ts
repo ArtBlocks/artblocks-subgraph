@@ -983,7 +983,7 @@ function _handleExternalAssetDependencyUpdated<T>(
 }
 
 export function handleExternalAssetDependencyRemoved(
-  event: ExternalAssetDependencyUpdated
+  event: ExternalAssetDependencyRemoved
 ): void {
   const engineFlexContract = getV3EngineFlexContract(event.address);
   if (engineFlexContract) {
