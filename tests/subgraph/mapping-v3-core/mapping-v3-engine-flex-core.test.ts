@@ -2,11 +2,13 @@ import {
   assert,
   clearStore,
   test,
+  log,
   newMockEvent,
   describe,
   beforeEach,
   createMockedFunction
 } from "matchstick-as/assembly/index";
+
 import {
   BigInt,
   Bytes,
@@ -41,7 +43,7 @@ import {
   WHITELISTING_ENTITY_TYPE,
   IPFS_CID,
   PROJECT_EXTERNAL_ASSET_DEPENDENCY_ENTITY_TYPE,
-  IPFS_CID2
+  IPFS_CID2,
 } from "../shared-helpers";
 import {
   mockProjectScriptDetailsCall,
@@ -69,7 +71,7 @@ import {
   ExternalAssetDependencyRemoved,
   GatewayUpdated,
   ProjectExternalAssetDependenciesLocked
-} from "../../../generated/IGenArt721CoreV3_Engine_Flex/GenArt721CoreV3_Engine_Flex";
+} from "../../../generated/IGenArt721CoreV3_Engine_Flex/IGenArt721CoreContractV3_Engine_Flex";
 import {
   FIELD_PROJECT_ACTIVE,
   FIELD_PROJECT_ARTIST_ADDRESS,
@@ -113,6 +115,7 @@ test(`${coreType} Can add/update a project external asset dependency`, () => {
   clearStore();
   // Add project to store
   const projectId = BigInt.fromI32(0);
+  mockCoreType(TEST_CONTRACT_ADDRESS, `${coreType}`);
   const fullProjectId = generateContractSpecificId(
     TEST_CONTRACT_ADDRESS,
     projectId
@@ -200,7 +203,7 @@ test(`${coreType} Can add/update a project external asset dependency`, () => {
     "project",
     fullProjectId
   );
-
+  
   const updateEvent: ExternalAssetDependencyUpdated = changetype<
     ExternalAssetDependencyUpdated
   >(newMockEvent());
@@ -252,18 +255,17 @@ test(`${coreType} Can add/update a project external asset dependency`, () => {
     "externalAssetDependencyCount",
     _externalAssetDependencyCount1.toString()
   );
-  //////////////////////////////////
-
+  
   const updateEvent2: ExternalAssetDependencyUpdated = changetype<
     ExternalAssetDependencyUpdated
   >(newMockEvent());
-  updateEvent.address = TEST_CONTRACT_ADDRESS;
-  updateEvent.block.timestamp = CURRENT_BLOCK_TIMESTAMP;
+  updateEvent2.address = TEST_CONTRACT_ADDRESS;
+  updateEvent2.block.timestamp = CURRENT_BLOCK_TIMESTAMP;
 
   const _dependencyType2 = BigInt.fromI32(2);
   const _externalAssetDependencyCount2 = BigInt.fromI32(2);
   const _index2 = BigInt.fromI32(1);
-  updateEvent.parameters = [
+  updateEvent2.parameters = [
     new ethereum.EventParam(
       "_projectId",
       ethereum.Value.fromUnsignedBigInt(projectId)
@@ -302,7 +304,6 @@ test(`${coreType} Can add/update a project external asset dependency`, () => {
       ethereum.Value.fromUnsignedBigInt(BigInt.fromI32(1))
     ])
     .returns([ethereum.Value.fromTuple(tuple)]);
-
   handleExternalAssetDependencyUpdated(updateEvent2);
 
   // checks project external asset dependency cid
@@ -406,6 +407,7 @@ test(`${coreType} Can remove a project external asset dependency`, () => {
   event2.block.timestamp = CURRENT_BLOCK_TIMESTAMP;
 
   const _externalAssetDependencyCount1 = BigInt.fromI32(2);
+  const _dependencyType1 = BigInt.fromI32(1);
   const _index1 = BigInt.fromI32(1);
 
   event2.parameters = [
@@ -417,10 +419,10 @@ test(`${coreType} Can remove a project external asset dependency`, () => {
       "_index",
       ethereum.Value.fromUnsignedBigInt(_index1)
     ),
-    new ethereum.EventParam("_cid", ethereum.Value.fromString(IPFS_CID2)),
+    new ethereum.EventParam("_cid", ethereum.Value.fromString("")),
     new ethereum.EventParam(
       "_dependencyType",
-      ethereum.Value.fromUnsignedBigInt(_dependencyType0)
+      ethereum.Value.fromUnsignedBigInt(_dependencyType1)
     ),
     new ethereum.EventParam(
       "_externalAssetDependencyCount",
@@ -459,15 +461,19 @@ test(`${coreType} Can remove a project external asset dependency`, () => {
     )
   ];
 
+  const randomAddress = randomAddressGenerator.generateRandomAddress();
+  const sampleData = "randomData";
   let tupleArray: Array<ethereum.Value> = [
-    ethereum.Value.fromString(IPFS_CID2),
-    ethereum.Value.fromUnsignedBigInt(_dependencyType0)
+    ethereum.Value.fromString(""),
+    ethereum.Value.fromUnsignedBigInt(_dependencyType1),
+    ethereum.Value.fromAddress(randomAddress),
+    ethereum.Value.fromString(sampleData)
   ];
   let tuple: ethereum.Tuple = changetype<ethereum.Tuple>(tupleArray);
   createMockedFunction(
     TEST_CONTRACT_ADDRESS,
     "projectExternalAssetDependencyByIndex",
-    "projectExternalAssetDependencyByIndex(uint256,uint256):((string,uint8))"
+    "projectExternalAssetDependencyByIndex(uint256,uint256):((string,uint8,address,string))"
   )
     .withArgs([
       ethereum.Value.fromUnsignedBigInt(projectId),
@@ -497,13 +503,13 @@ test(`${coreType} Can remove a project external asset dependency`, () => {
     PROJECT_EXTERNAL_ASSET_DEPENDENCY_ENTITY_TYPE,
     fullProjectId + "-" + _index0.toString(),
     "cid",
-    IPFS_CID2
+    ""
   );
   assert.fieldEquals(
     PROJECT_EXTERNAL_ASSET_DEPENDENCY_ENTITY_TYPE,
     fullProjectId + "-" + _index0.toString(),
     "dependencyType",
-    FLEX_CONTRACT_EXTERNAL_ASSET_DEP_TYPES[_dependencyType0.toI32()]
+    FLEX_CONTRACT_EXTERNAL_ASSET_DEP_TYPES[_dependencyType1.toI32()]
   );
 
   // checks that entity count is correct

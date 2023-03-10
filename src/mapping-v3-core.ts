@@ -937,7 +937,7 @@ function _handleExternalAssetDependencyUpdated<T>(
   event: ExternalAssetDependencyUpdated
 ): void {
   if (!(contract instanceof GenArt721CoreV3_Engine_Flex)) {
-    return null;
+    return;
   }
   let project = Project.load(
     generateContractSpecificId(event.address, event.params._projectId)
