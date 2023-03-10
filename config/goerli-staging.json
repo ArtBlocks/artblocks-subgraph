@@ -183,6 +183,16 @@
       "address": "0x0e1568b7651f257401ebc5A4ff2B14Bc8797dC3c",
       "name": "Flex Test (Doodle Labs)",
       "startBlock": 8470477
+    },
+    {
+      "address": "0x7C6EFC1255206F92696fde7502aaCEd2B461C383",
+      "name": "HODLERSCollective Flex",
+      "startBlock": 8608217
+    },
+    {
+      "address": "0x29816c40Af7eDadFEae679a5e8d5876382bfa12D",
+      "name": "Outland Flex",
+      "startBlock": 8608211
     }
   ],
   "minterFilterV0Contracts": [

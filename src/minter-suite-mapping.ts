@@ -65,7 +65,8 @@ import {
   stringToJSONString,
   stringToJSONValue,
   typedMapToJSONString,
-  loadOrCreateReceipt
+  loadOrCreateReceipt,
+  generateProjectIdNumberFromTokenIdNumber
 } from "./helpers";
 import {
   ConfigKeyRemoved,
@@ -89,6 +90,18 @@ import {
 } from "../generated/MinterHolder/IFilteredMinterHolderV2";
 
 import { DelegationRegistryUpdated as MinterMerkleDelegationRegistryUpdated } from "../generated/MinterMerkle/IFilteredMinterMerkleV2";
+
+import {
+  AuctionDurationSecondsRangeUpdated,
+  MinterMinBidIncrementPercentageUpdated,
+  MinterTimeBufferUpdated,
+  ConfiguredFutureAuctions,
+  ResetAuctionDetails,
+  AuctionInitialized,
+  AuctionBid,
+  AuctionSettled
+} from "../generated/MinterSEA/IFilteredMinterSEAV0";
+
 import { MinterConfigSetAddressEvent } from "./util-types";
 
 // IFilteredMinterV0 events
@@ -479,10 +492,6 @@ export function handleDelegationRegistryUpdatedGeneric<T>(event: T): void {
 
   let minter = loadOrCreateMinter(event.address, event.block.timestamp);
 
-  if (!minter) {
-    return;
-  }
-
   handleSetMinterDetailsGeneric(
     "delegationRegistryAddress",
     event.params.delegationRegistryAddress,
@@ -490,6 +499,243 @@ export function handleDelegationRegistryUpdatedGeneric<T>(event: T): void {
   );
   minter.updatedAt = event.block.timestamp;
   minter.save();
+}
+
+// MinterSEA specific handlers
+export function handleAuctionDurationSecondsRangeUpdated(
+  event: AuctionDurationSecondsRangeUpdated
+): void {
+  let minter = loadOrCreateMinter(event.address, event.block.timestamp);
+
+  // update Minter.extraMinterDetails with new values
+  handleSetMinterDetailsGeneric(
+    "minAuctionDurationSeconds",
+    event.params.minAuctionDurationSeconds,
+    minter
+  );
+  handleSetMinterDetailsGeneric(
+    "maxAuctionDurationSeconds",
+    event.params.maxAuctionDurationSeconds,
+    minter
+  );
+
+  minter.updatedAt = event.block.timestamp;
+  minter.save();
+}
+
+export function handleMinterMinBidIncrementPercentageUpdated(
+  event: MinterMinBidIncrementPercentageUpdated
+): void {
+  let minter = loadOrCreateMinter(event.address, event.block.timestamp);
+
+  // update Minter.extraMinterDetails with new value
+  handleSetMinterDetailsGeneric(
+    "minterMinBidIncrementPercentage",
+    BigInt.fromI32(event.params.minterMinBidIncrementPercentage),
+    minter
+  );
+
+  minter.updatedAt = event.block.timestamp;
+  minter.save();
+}
+
+export function handleMinterTimeBufferUpdated(
+  event: MinterTimeBufferUpdated
+): void {
+  let minter = loadOrCreateMinter(event.address, event.block.timestamp);
+
+  // update Minter.extraMinterDetails with new value
+  handleSetMinterDetailsGeneric(
+    "minterTimeBufferSeconds",
+    event.params.minterTimeBufferSeconds,
+    minter
+  );
+
+  minter.updatedAt = event.block.timestamp;
+  minter.save();
+}
+
+export function handleConfiguredFutureAuctions(
+  event: ConfiguredFutureAuctions
+): void {
+  let minterProjectAndConfig = loadMinterProjectAndConfig(
+    event.address,
+    event.params.projectId,
+    event.block.timestamp
+  );
+
+  if (minterProjectAndConfig) {
+    let projectMinterConfig = minterProjectAndConfig.projectMinterConfiguration;
+    // update project minter configuration fields
+    projectMinterConfig.priceIsConfigured = true;
+    projectMinterConfig.basePrice = event.params.basePrice;
+    projectMinterConfig.startTime = event.params.timestampStart;
+    projectMinterConfig.save();
+    // update project minter configuration extraMinterDetails json field
+    handleSetMinterDetailsGeneric(
+      "projectAuctionDurationSeconds",
+      event.params.auctionDurationSeconds,
+      projectMinterConfig
+    );
+
+    // update project updatedAt to sync new projectMinterConfiguration changes
+    let project = minterProjectAndConfig.project;
+    project.updatedAt = event.block.timestamp;
+    project.save();
+  }
+}
+
+export function handleResetAuctionDetails(event: ResetAuctionDetails): void {
+  let minterProjectAndConfig = loadMinterProjectAndConfig(
+    event.address,
+    event.params.projectId,
+    event.block.timestamp
+  );
+
+  if (minterProjectAndConfig) {
+    let projectMinterConfig = minterProjectAndConfig.projectMinterConfiguration;
+    // reset project minter configuration fields
+    projectMinterConfig.priceIsConfigured = false;
+    projectMinterConfig.basePrice = BigInt.fromI32(0);
+    projectMinterConfig.startTime = BigInt.fromI32(0);
+    projectMinterConfig.save();
+    // clear project minter configuration extraMinterDetails json field
+    handleRemoveMinterDetailsGeneric(
+      "projectAuctionDurationSeconds",
+      projectMinterConfig
+    );
+
+    // update project updatedAt to sync new projectMinterConfiguration changes
+    let project = minterProjectAndConfig.project;
+    project.updatedAt = event.block.timestamp;
+    project.save();
+  }
+}
+
+export function handleAuctionInitialized(event: AuctionInitialized): void {
+  const projectIdNumber = generateProjectIdNumberFromTokenIdNumber(
+    event.params.tokenId
+  );
+  let minterProjectAndConfig = loadMinterProjectAndConfig(
+    event.address,
+    projectIdNumber,
+    event.block.timestamp
+  );
+
+  if (minterProjectAndConfig) {
+    let projectMinterConfig = minterProjectAndConfig.projectMinterConfiguration;
+    // update all auction details in project minter configuration extraMinterDetails json field
+    handleSetMinterDetailsGeneric(
+      "auctionTokenId",
+      event.params.tokenId,
+      projectMinterConfig
+    );
+    handleSetMinterDetailsGeneric(
+      "auctionCurrentBid",
+      event.params.bidAmount,
+      projectMinterConfig
+    );
+    handleSetMinterDetailsGeneric(
+      "auctionCurrentBidder",
+      event.params.bidder,
+      projectMinterConfig
+    );
+    handleSetMinterDetailsGeneric(
+      "auctionEndTime",
+      event.params.endTime,
+      projectMinterConfig
+    );
+    // reset the token auction settled state, and set the auction as initialized
+    handleSetMinterDetailsGeneric("auctionSettled", false, projectMinterConfig);
+    handleSetMinterDetailsGeneric(
+      "auctionInitialized",
+      true,
+      projectMinterConfig
+    );
+
+    // update project updatedAt to sync new projectMinterConfiguration changes
+    let project = minterProjectAndConfig.project;
+    project.updatedAt = event.block.timestamp;
+    project.save();
+  }
+}
+
+export function handleAuctionBid(event: AuctionBid): void {
+  const projectIdNumber = generateProjectIdNumberFromTokenIdNumber(
+    event.params.tokenId
+  );
+  let minterProjectAndConfig = loadMinterProjectAndConfig(
+    event.address,
+    projectIdNumber,
+    event.block.timestamp
+  );
+
+  if (minterProjectAndConfig) {
+    let projectMinterConfig = minterProjectAndConfig.projectMinterConfiguration;
+    // update relevant auction details in project minter configuration extraMinterDetails json field
+    handleSetMinterDetailsGeneric(
+      "auctionCurrentBid",
+      event.params.bidAmount,
+      projectMinterConfig
+    );
+    handleSetMinterDetailsGeneric(
+      "auctionCurrentBidder",
+      event.params.bidder,
+      projectMinterConfig
+    );
+    // determine if auction end time needs to be updated
+    let minterDetails = getMinterDetails(minterProjectAndConfig.minter);
+    const bufferTimeSecondsJSON = minterDetails.get("minterTimeBufferSeconds");
+    // @dev: treat null value as zero, even though we will never encounter it, but we check to keep AS happy.
+    let bufferTimeSeconds = BigInt.fromI32(0);
+    if (bufferTimeSecondsJSON instanceof JSONValue) {
+      bufferTimeSeconds = bufferTimeSecondsJSON.toBigInt();
+    }
+    let earliestAuctionEndTime = event.block.timestamp.plus(bufferTimeSeconds);
+    let projectMinterConfigDetails = getMinterDetails(
+      minterProjectAndConfig.projectMinterConfiguration
+    );
+    const currentEndTimeJSON = projectMinterConfigDetails.get("auctionEndTime");
+    // @dev: treat null value as zero, even though we will never encounter it, but we check to keep AS happy.
+    let currentEndTime = BigInt.fromI32(0);
+    if (currentEndTimeJSON instanceof JSONValue) {
+      currentEndTime = currentEndTimeJSON.toBigInt();
+    }
+    if (currentEndTime.lt(earliestAuctionEndTime)) {
+      handleSetMinterDetailsGeneric(
+        "auctionEndTime",
+        earliestAuctionEndTime,
+        projectMinterConfig
+      );
+    }
+
+    // update project updatedAt to sync new projectMinterConfiguration changes
+    let project = minterProjectAndConfig.project;
+    project.updatedAt = event.block.timestamp;
+    project.save();
+  }
+}
+
+export function handleAuctionSettled(event: AuctionSettled): void {
+  const projectIdNumber = generateProjectIdNumberFromTokenIdNumber(
+    event.params.tokenId
+  );
+  let minterProjectAndConfig = loadMinterProjectAndConfig(
+    event.address,
+    projectIdNumber,
+    event.block.timestamp
+  );
+
+  if (minterProjectAndConfig) {
+    let projectMinterConfig = minterProjectAndConfig.projectMinterConfiguration;
+    // update relevant auction details in project minter configuration extraMinterDetails json field
+    handleSetMinterDetailsGeneric("auctionSettled", true, projectMinterConfig);
+
+    // update project updatedAt to sync new projectMinterConfiguration changes
+    let project = minterProjectAndConfig.project;
+    project.updatedAt = event.block.timestamp;
+    project.save();
+  }
 }
 
 // Generic Handlers
@@ -599,6 +845,35 @@ export function handleSetBytesValueProjectConfig(
   event: ConfigValueSetBytes
 ): void {
   handleSetValueProjectConfig(event);
+}
+
+export function handleRemoveMinterDetailsGeneric<C>(
+  key: string,
+  config: C
+): void {
+  if (
+    !(config instanceof Minter || config instanceof ProjectMinterConfiguration)
+  ) {
+    log.warning(
+      "[WARN] Generic property attempted to be set on something not a Minter or ProjectMinterConfiguration",
+      []
+    );
+    return;
+  }
+
+  let minterDetails = getMinterDetails(config);
+
+  const withRemovedTypedMap: TypedMap<string, JSONValue> = new TypedMap();
+
+  for (let i = 0; i < minterDetails.entries.length; i++) {
+    let entry = minterDetails.entries[i];
+    if (entry.key != key) {
+      withRemovedTypedMap.set(entry.key, entry.value);
+    }
+  }
+  config.extraMinterDetails = typedMapToJSONString(withRemovedTypedMap);
+
+  config.save();
 }
 
 export function handleRemoveValueGeneric<T>(
@@ -770,9 +1045,7 @@ export function handleAddManyMinterConfig<T>(event: T): void {
   }
 
   let minter = loadOrCreateMinter(event.address, event.block.timestamp);
-  if (minter) {
-    handleAddManyValueGeneric(event, minter, null);
-  }
+  handleAddManyValueGeneric(event, minter, null);
 }
 
 export function handleAddManyBigIntValueProjectConfig(
@@ -910,9 +1183,7 @@ export function handleRemoveManyMinterConfig<T>(event: T): void {
     return;
   }
   let minter = loadOrCreateMinter(event.address, event.block.timestamp);
-  if (minter) {
-    handleRemoveManyValueGeneric(event, minter, null);
-  }
+  handleRemoveManyValueGeneric(event, minter, null);
 }
 
 export function handleRemoveBigIntManyValueProjectConfig(
