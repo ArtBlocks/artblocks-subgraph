@@ -123,6 +123,8 @@ dataSources:
           file: ./abis/IFilteredMinterDALinV1.json
         - name: IFilteredMinterDAExpV1
           file: ./abis/IFilteredMinterDAExpV1.json
+        - name: IFilteredMinterSEAV0
+          file: ./abis/IFilteredMinterSEAV0.json
       eventHandlers:
         - event: Mint(indexed address,indexed uint256)
           handler: handleMint
@@ -191,6 +193,8 @@ dataSources:
           file: ./abis/IFilteredMinterDALinV1.json
         - name: IFilteredMinterDAExpV1
           file: ./abis/IFilteredMinterDAExpV1.json
+        - name: IFilteredMinterSEAV0
+          file: ./abis/IFilteredMinterSEAV0.json
       eventHandlers:
         - event: OwnershipTransferred(indexed address,indexed address)
           handler: handleOwnershipTransferred
@@ -249,6 +253,8 @@ dataSources:
           file: ./abis/IFilteredMinterDALinV1.json
         - name: IFilteredMinterDAExpV1
           file: ./abis/IFilteredMinterDAExpV1.json
+        - name: IFilteredMinterSEAV0
+          file: ./abis/IFilteredMinterSEAV0.json
       eventHandlers:
         - event: Transfer(indexed address,indexed address,indexed uint256)
           handler: handleTransfer
@@ -810,6 +816,8 @@ dataSources:
           file: ./abis/IFilteredMinterDALinV1.json
         - name: IFilteredMinterDAExpV1
           file: ./abis/IFilteredMinterDAExpV1.json
+        - name: IFilteredMinterSEAV0
+          file: ./abis/IFilteredMinterSEAV0.json
       eventHandlers:
         - event: ContractRegistered(indexed address,bytes32,bytes32)
           handler: handleContractRegistered
@@ -846,6 +854,8 @@ dataSources:
           file: ./abis/IFilteredMinterDALinV1.json
         - name: IFilteredMinterDAExpV1
           file: ./abis/IFilteredMinterDAExpV1.json
+        - name: IFilteredMinterSEAV0
+          file: ./abis/IFilteredMinterSEAV0.json
       eventHandlers:
         - event: IsCanonicalMinterFilter(indexed address)
           handler: handleIsCanonicalMinterFilter
@@ -890,6 +900,8 @@ dataSources:
           file: ./abis/IFilteredMinterDALinV1.json
         - name: IFilteredMinterDAExpV1
           file: ./abis/IFilteredMinterDAExpV1.json
+        - name: IFilteredMinterSEAV0
+          file: ./abis/IFilteredMinterSEAV0.json
       eventHandlers:
         - event: Deployed()
           handler: handleDeployed
@@ -941,6 +953,8 @@ dataSources:
           file: ./abis/IFilteredMinterHolderV2.json
         - name: IFilteredMinterMerkleV2
           file: ./abis/IFilteredMinterMerkleV2.json
+        - name: IFilteredMinterSEAV0
+          file: ./abis/IFilteredMinterSEAV0.json
       eventHandlers:
         - event: PricePerTokenInWeiUpdated(indexed uint256,indexed uint256)
           handler: handlePricePerTokenInWeiUpdated
@@ -985,6 +999,8 @@ dataSources:
           file: ./abis/IFilteredMinterHolderV2.json
         - name: IFilteredMinterMerkleV2
           file: ./abis/IFilteredMinterMerkleV2.json
+        - name: IFilteredMinterSEAV0
+          file: ./abis/IFilteredMinterSEAV0.json
       eventHandlers:
         - event: PricePerTokenInWeiUpdated(indexed uint256,indexed uint256)
           handler: handlePricePerTokenInWeiUpdated
@@ -1029,6 +1045,8 @@ dataSources:
           file: ./abis/IFilteredMinterHolderV2.json
         - name: IFilteredMinterMerkleV2
           file: ./abis/IFilteredMinterMerkleV2.json
+        - name: IFilteredMinterSEAV0
+          file: ./abis/IFilteredMinterSEAV0.json
       eventHandlers:
         - event: AuctionHalfLifeRangeSecondsUpdated(uint256,uint256)
           handler: handleAuctionHalfLifeRangeSecondsUpdated
@@ -1079,6 +1097,8 @@ dataSources:
           file: ./abis/IFilteredMinterHolderV2.json
         - name: IFilteredMinterMerkleV2
           file: ./abis/IFilteredMinterMerkleV2.json
+        - name: IFilteredMinterSEAV0
+          file: ./abis/IFilteredMinterSEAV0.json
       eventHandlers:
         - event: MinimumAuctionLengthSecondsUpdated(uint256)
           handler: handleMinimumAuctionLengthSecondsUpdated
@@ -1130,6 +1150,8 @@ dataSources:
           file: ./abis/IFilteredMinterHolderV2.json
         - name: IFilteredMinterMerkleV2
           file: ./abis/IFilteredMinterMerkleV2.json
+        - name: IFilteredMinterSEAV0
+          file: ./abis/IFilteredMinterSEAV0.json
       eventHandlers:
         - event: PricePerTokenInWeiUpdated(indexed uint256,indexed uint256)
           handler: handlePricePerTokenInWeiUpdated
@@ -1184,6 +1206,8 @@ dataSources:
           file: ./abis/IFilteredMinterHolderV2.json
         - name: IFilteredMinterMerkleV2
           file: ./abis/IFilteredMinterMerkleV2.json
+        - name: IFilteredMinterSEAV0
+          file: ./abis/IFilteredMinterSEAV0.json
       eventHandlers:
         - event: PricePerTokenInWeiUpdated(indexed uint256,indexed uint256)
           handler: handlePricePerTokenInWeiUpdated
@@ -1234,6 +1258,8 @@ dataSources:
           file: ./abis/IFilteredMinterHolderV2.json
         - name: IFilteredMinterMerkleV2
           file: ./abis/IFilteredMinterMerkleV2.json
+        - name: IFilteredMinterSEAV0
+          file: ./abis/IFilteredMinterSEAV0.json
       eventHandlers:
         - event: PricePerTokenInWeiUpdated(indexed uint256,indexed uint256)
           handler: handlePricePerTokenInWeiUpdated
@@ -1253,6 +1279,66 @@ dataSources:
           handler: handleProjectMaxInvocationsLimitUpdated
       file: ./src/minter-suite-mapping.ts
   {{/minterHolderContracts}}
+  {{#minterSEAContracts}}
+  - kind: ethereum/contract
+    name: 'MinterSEA{{#address}}-{{address}}{{/address}}'
+    network: {{network}}
+    source:
+      address: "{{#address}}{{address}}{{/address}}{{^address}}0x0000000000000000000000000000000000000000{{/address}}"
+      abi: IFilteredMinterSEAV0
+      {{#startBlock}}startBlock: {{startBlock}}{{/startBlock}}
+    mapping:
+      kind: ethereum/events
+      apiVersion: 0.0.5
+      language: wasm/assemblyscript
+      entities:
+        - Project
+        - Contract
+        - MinterFilter
+        - Minter
+        - ProjectMinterConfiguration
+      abis:
+        - name: IFilteredMinterV2
+          file: ./abis/IFilteredMinterV2.json
+        - name: IFilteredMinterDALinV1
+          file: ./abis/IFilteredMinterDALinV1.json
+        - name: IFilteredMinterDAExpV1
+          file: ./abis/IFilteredMinterDAExpV1.json
+        - name: IFilteredMinterDAExpSettlementV1
+          file: ./abis/IFilteredMinterDAExpSettlementV1.json
+        - name: IFilteredMinterV2
+          file: ./abis/IFilteredMinterV2.json
+        - name: IFilteredMinterHolderV2
+          file: ./abis/IFilteredMinterHolderV2.json
+        - name: IFilteredMinterMerkleV2
+          file: ./abis/IFilteredMinterMerkleV2.json
+        - name: IFilteredMinterSEAV0
+          file: ./abis/IFilteredMinterSEAV0.json
+      eventHandlers:
+        - event: PricePerTokenInWeiUpdated(indexed uint256,indexed uint256)
+          handler: handlePricePerTokenInWeiUpdated
+        - event: ProjectCurrencyInfoUpdated(indexed uint256,indexed address,string)
+          handler: handleProjectCurrencyInfoUpdated
+        - event: ProjectMaxInvocationsLimitUpdated(indexed uint256,uint256)
+          handler: handleProjectMaxInvocationsLimitUpdated
+        - event: AuctionDurationSecondsRangeUpdated(uint32,uint32)
+          handler: handleAuctionDurationSecondsRangeUpdated
+        - event: MinterMinBidIncrementPercentageUpdated(uint8)
+          handler: handleMinterMinBidIncrementPercentageUpdated
+        - event: MinterTimeBufferUpdated(uint32)
+          handler: handleMinterTimeBufferUpdated
+        - event: ConfiguredFutureAuctions(indexed uint256,uint64,uint32,uint256)
+          handler: handleConfiguredFutureAuctions
+        - event: ResetAuctionDetails(indexed uint256)
+          handler: handleResetAuctionDetails
+        - event: AuctionInitialized(indexed uint256,indexed address,uint256,uint64)
+          handler: handleAuctionInitialized
+        - event: AuctionBid(indexed uint256,indexed address,uint256)
+          handler: handleAuctionBid
+        - event: AuctionSettled(indexed uint256,indexed address,uint256)
+          handler: handleAuctionSettled
+      file: ./src/minter-suite-mapping.ts
+  {{/minterSEAContracts}}
   {{#adminACLV0Contracts}}
   - kind: ethereum/contract
     name: 'AdminACLV0{{#address}}-{{address}}{{/address}}'
@@ -1299,6 +1385,8 @@ dataSources:
           file: ./abis/IFilteredMinterDALinV1.json
         - name: IFilteredMinterDAExpV1
           file: ./abis/IFilteredMinterDAExpV1.json
+        - name: IFilteredMinterSEAV0
+          file: ./abis/IFilteredMinterSEAV0.json
       eventHandlers:
         - event: SuperAdminTransferred(indexed address,indexed address,address[])
           handler: handleIAdminACLV0SuperAdminTransferred
@@ -1436,6 +1524,8 @@ templates:
           file: ./abis/IFilteredMinterDALinV1.json
         - name: IFilteredMinterDAExpV1
           file: ./abis/IFilteredMinterDAExpV1.json
+        - name: IFilteredMinterSEAV0
+          file: ./abis/IFilteredMinterSEAV0.json
       eventHandlers:
         - event: Mint(indexed address,indexed uint256)
           handler: handleMint
@@ -1501,6 +1591,8 @@ templates:
           file: ./abis/IFilteredMinterDALinV1.json
         - name: IFilteredMinterDAExpV1
           file: ./abis/IFilteredMinterDAExpV1.json
+        - name: IFilteredMinterSEAV0
+          file: ./abis/IFilteredMinterSEAV0.json
       eventHandlers:
         - event: OwnershipTransferred(indexed address,indexed address)
           handler: handleOwnershipTransferred
@@ -1556,6 +1648,8 @@ templates:
           file: ./abis/IFilteredMinterDALinV1.json
         - name: IFilteredMinterDAExpV1
           file: ./abis/IFilteredMinterDAExpV1.json
+        - name: IFilteredMinterSEAV0
+          file: ./abis/IFilteredMinterSEAV0.json
       eventHandlers:
         - event: Transfer(indexed address,indexed address,indexed uint256)
           handler: handleTransfer
@@ -1604,6 +1698,8 @@ templates:
           file: ./abis/IFilteredMinterDALinV1.json
         - name: IFilteredMinterDAExpV1
           file: ./abis/IFilteredMinterDAExpV1.json
+        - name: IFilteredMinterSEAV0
+          file: ./abis/IFilteredMinterSEAV0.json
       eventHandlers:
         - event: SuperAdminTransferred(indexed address,indexed address,address[])
           handler: handleIAdminACLV0SuperAdminTransferred
