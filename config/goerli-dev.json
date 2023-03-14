@@ -131,6 +131,11 @@
       "address": "0x293293BCb2f18D02EB4C451ecf39d7f5c1BD55f9",
       "name": "V4 Minter for AB V3 Engine Dev C core at 0x5702797Ff45FCb0a70eB6AE1E4563299dCFa9Dd6",
       "startBlock": 8458567
+    },
+    {
+      "address": "0x4C10A27863FBE991B35659F7C98124A62EDac0c6",
+      "name": "V4 Flagship Minter for V3 core",
+      "startBlock": 8655366
     }
   ],
   "minterSetPriceERC20Contracts": [
@@ -158,6 +163,11 @@
       "address": "0xa6c7eEB30b0FFB04e87080093c77629A147bA4fB",
       "name": "V4 Minter for AB V3 Engine Dev C core at 0x5702797Ff45FCb0a70eB6AE1E4563299dCFa9Dd6",
       "startBlock": 8458567
+    },
+    {
+      "address": "0xAF96E72FF6896B35c54b76Be9E248F01D5487397",
+      "name": "V4 Flagship Minter for V3 core",
+      "startBlock": 8655367
     }
   ],
   "minterDAExpContracts": [
@@ -185,6 +195,11 @@
       "address": "0x7eaC47C4e712e3A2094F453C35f3Ef9ef73e8986",
       "name": "V4 Minter for AB V3 Engine Dev C core at 0x5702797Ff45FCb0a70eB6AE1E4563299dCFa9Dd6",
       "startBlock": 8458567
+    },
+    {
+      "address": "0x9FF63446D56C608252fB8CB5772C849860843A46",
+      "name": "V4 Flagship Minter for V3 core",
+      "startBlock": 8655360
     }
   ],
   "minterDALinContracts": [
@@ -212,6 +227,11 @@
       "address": "0x2f7174b0c780adaD89f1deA0D41BE31A1F578a38",
       "name": "V4 Minter for AB V3 Engine Dev C core at 0x5702797Ff45FCb0a70eB6AE1E4563299dCFa9Dd6",
       "startBlock": 8458567
+    },
+    {
+      "address": "0x21998750F23CAFb4EA5d1300C8ac9B11283C1780",
+      "name": "V4 Flagship Minter for V3 core",
+      "startBlock": 8655363
     }
   ],
   "minterDAExpSettlementContracts": [
@@ -229,6 +249,11 @@
       "address": "0x1732eA26A4dbA4863527F7Eee4a9272607fE9db6",
       "name": "V2 Minter for AB V3 Engine Dev C core at 0x5702797Ff45FCb0a70eB6AE1E4563299dCFa9Dd6",
       "startBlock": 8498764
+    },
+    {
+      "address": "0x9e78e00b4AfE0AfE241608aC03F69e484a4c4f17",
+      "name": "V1 Flagship Minter for V3 core",
+      "startBlock": 8655361
     }
   ],
   "minterMerkleContracts": [
@@ -271,6 +296,11 @@
       "address": "0xcab32b53DA814659A6B36F29768F30ea4f5B4F3F",
       "name": "V5 Minter for AB V3 Engine Dev C core at 0x5702797Ff45FCb0a70eB6AE1E4563299dCFa9Dd6",
       "startBlock": 8458567
+    },
+    {
+      "address": "0xBC6C0c6cF8Fc7939880EB2243681Ad6507dea169",
+      "name": "V5 Flagship Minter for V3 core",
+      "startBlock": 8655365
     }
   ],
   "minterHolderContracts": [
@@ -303,6 +333,11 @@
       "address": "0x98aAd1504420219f95486feF1f7A00E901043cfB",
       "name": "V4 Minter for AB V3 Engine Dev C core at 0x5702797Ff45FCb0a70eB6AE1E4563299dCFa9Dd6",
       "startBlock": 8458567
+    },
+    {
+      "address": "0x64df8D9f818bCf0e74AF4EC9a98fb94D8d5E1513",
+      "name": "V4 Flagship Minter for V3 core",
+      "startBlock": 8655364
     }
   ],
   "adminACLV0Contracts": [
