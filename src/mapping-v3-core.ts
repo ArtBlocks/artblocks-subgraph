@@ -964,13 +964,13 @@ function _handleExternalAssetDependencyUpdated<T>(
     FLEX_CONTRACT_EXTERNAL_ASSET_DEP_TYPES[event.params._dependencyType];
 
   if (assetEntity.dependencyType === "ONCHAIN") {
-    const projextExternalAssetDependency = contract.try_projectExternalAssetDependencyByIndex(
+    const projextExternalAssetDependency = contract.projectExternalAssetDependencyByIndex(
       event.params._projectId,
       event.params._index
     );
     assetEntity.bytecodeAddress =
-      projextExternalAssetDependency.value.bytecodeAddress;
-    assetEntity.data = projextExternalAssetDependency.value.data;
+      projextExternalAssetDependency.bytecodeAddress;
+    assetEntity.data = projextExternalAssetDependency.data;
   }
 
   assetEntity.save();
@@ -1044,25 +1044,26 @@ function _handleExternalAssetDependencyRemoved<T>(
       generateProjectExternalAssetDependencyId(project.id, index.toString())
     );
 
-    const contractExternalAsset = contract.try_projectExternalAssetDependencyByIndex(
+    const contractExternalAsset = contract.projectExternalAssetDependencyByIndex(
       project.projectId,
       index
     );
 
-    assetEntity.cid = contractExternalAsset.value.cid;
+    assetEntity.cid = contractExternalAsset.cid;
     assetEntity.project = project.id;
     assetEntity.index = index;
     assetEntity.dependencyType =
       FLEX_CONTRACT_EXTERNAL_ASSET_DEP_TYPES[
-        contractExternalAsset.value.dependencyType
+        contractExternalAsset.dependencyType
       ];
     if (assetEntity.dependencyType === "ONCHAIN") {
-      assetEntity.bytecodeAddress = contractExternalAsset.value.bytecodeAddress;
-      assetEntity.data = contractExternalAsset.value.data;
+      assetEntity.bytecodeAddress = contractExternalAsset.bytecodeAddress;
+      assetEntity.data = contractExternalAsset.data;
     }
     assetEntity.save();
   }
 
+  // lastEntityIndex is previous external asset dependecy count - 1
   project.externalAssetDependencyCount = lastEntityIndex;
   project.updatedAt = event.block.timestamp;
   project.save();
@@ -1310,6 +1311,7 @@ function refreshContract<T>(contract: T, timestamp: BigInt): Contract | null {
     // flagship never auto approves artist split proposals for all changes
     contractEntity.autoApproveArtistSplitProposals = false;
   } else if (isEngineOrEngineFlex) {
+    // flex specific fields are not refreshed here due to flex specific handlers updating all relevant fields on their own
     // render provider address and percentage are called renderProvider* on engine
     contractEntity.renderProviderAddress = contract.renderProviderPrimarySalesAddress();
     contractEntity.renderProviderPercentage = contract.renderProviderPrimarySalesPercentage();

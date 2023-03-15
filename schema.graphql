@@ -663,13 +663,13 @@ type ProjectExternalAssetDependency @entity {
   "The dependency type"
   dependencyType: ProjectExternalAssetDependencyType!
 
-  "The dependency cid"
+  "The dependency cid. This will be an empty string assets of type ONCHAIN."
   cid: String!
 
   "The dependency index"
   index: BigInt!
 
-  "Address of the bytecode storage contract for this asset if it is onchain"
+  "Address of the bytecode storage contract for this asset if it is of type ONCHAIN"
   bytecodeAddress: Bytes
 
   "The asset data if it is onchain"

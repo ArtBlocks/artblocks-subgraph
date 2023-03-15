@@ -101,6 +101,10 @@ dataSources:
           file: ./abis/IGenArt721CoreContractV3.json
         - name: IGenArt721CoreContractV3_Engine
           file: ./abis/IGenArt721CoreContractV3_Engine.json
+        - name: IGenArt721CoreContractV3_Engine_Flex
+          file: ./abis/IGenArt721CoreContractV3_Engine_Flex.json
+        - name: GenArt721CoreV3_Engine_Flex
+          file: ./abis/GenArt721CoreV3_Engine_Flex.json
         - name: GenArt721CoreV3
           file: ./abis/GenArt721CoreV3.json
         - name: GenArt721CoreV3_Engine
@@ -171,6 +175,10 @@ dataSources:
           file: ./abis/IGenArt721CoreContractV3.json
         - name: IGenArt721CoreContractV3_Engine
           file: ./abis/IGenArt721CoreContractV3_Engine.json
+        - name: IGenArt721CoreContractV3_Engine_Flex
+          file: ./abis/IGenArt721CoreContractV3_Engine_Flex.json
+        - name: GenArt721CoreV3_Engine_Flex
+          file: ./abis/GenArt721CoreV3_Engine_Flex.json
         - name: GenArt721CoreV3
           file: ./abis/GenArt721CoreV3.json
         - name: GenArt721CoreV3_Engine
@@ -231,6 +239,10 @@ dataSources:
           file: ./abis/IGenArt721CoreContractV3.json
         - name: IGenArt721CoreContractV3_Engine
           file: ./abis/IGenArt721CoreContractV3_Engine.json
+        - name: IGenArt721CoreContractV3_Engine_Flex
+          file: ./abis/IGenArt721CoreContractV3_Engine_Flex.json
+        - name: GenArt721CoreV3_Engine_Flex
+          file: ./abis/GenArt721CoreV3_Engine_Flex.json
         - name: GenArt721CoreV3
           file: ./abis/GenArt721CoreV3.json
         - name: GenArt721CoreV3_Engine
@@ -1502,6 +1514,10 @@ templates:
           file: ./abis/IGenArt721CoreContractV3.json
         - name: IGenArt721CoreContractV3_Engine
           file: ./abis/IGenArt721CoreContractV3_Engine.json
+        - name: IGenArt721CoreContractV3_Engine_Flex
+          file: ./abis/IGenArt721CoreContractV3_Engine_Flex.json
+        - name: GenArt721CoreV3_Engine_Flex
+          file: ./abis/GenArt721CoreV3_Engine_Flex.json
         - name: GenArt721CoreV3
           file: ./abis/GenArt721CoreV3.json
         - name: GenArt721CoreV3_Engine
@@ -1569,6 +1585,10 @@ templates:
           file: ./abis/IGenArt721CoreContractV3.json
         - name: IGenArt721CoreContractV3_Engine
           file: ./abis/IGenArt721CoreContractV3_Engine.json
+        - name: IGenArt721CoreContractV3_Engine_Flex
+          file: ./abis/IGenArt721CoreContractV3_Engine_Flex.json
+        - name: GenArt721CoreV3_Engine_Flex
+          file: ./abis/GenArt721CoreV3_Engine_Flex.json
         - name: GenArt721CoreV3
           file: ./abis/GenArt721CoreV3.json
         - name: GenArt721CoreV3_Engine
@@ -1626,6 +1646,10 @@ templates:
           file: ./abis/IGenArt721CoreContractV3.json
         - name: IGenArt721CoreContractV3_Engine
           file: ./abis/IGenArt721CoreContractV3_Engine.json
+        - name: IGenArt721CoreContractV3_Engine_Flex
+          file: ./abis/IGenArt721CoreContractV3_Engine_Flex.json
+        - name: GenArt721CoreV3_Engine_Flex
+          file: ./abis/GenArt721CoreV3_Engine_Flex.json
         - name: GenArt721CoreV3
           file: ./abis/GenArt721CoreV3.json
         - name: GenArt721CoreV3_Engine
@@ -1678,6 +1702,10 @@ templates:
           file: ./abis/IGenArt721CoreContractV3.json
         - name: IGenArt721CoreContractV3_Engine
           file: ./abis/IGenArt721CoreContractV3_Engine.json
+        - name: IGenArt721CoreContractV3_Engine_Flex
+          file: ./abis/IGenArt721CoreContractV3_Engine_Flex.json
+        - name: GenArt721CoreV3_Engine_Flex
+          file: ./abis/GenArt721CoreV3_Engine_Flex.json
         - name: GenArt721CoreV3
           file: ./abis/GenArt721CoreV3.json
         - name: GenArt721CoreV3_Engine
