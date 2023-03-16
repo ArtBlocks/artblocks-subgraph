@@ -923,20 +923,11 @@ export function handleExternalAssetDependencyUpdated(
   event: ExternalAssetDependencyUpdated
 ): void {
   const engineFlexContract = getV3EngineFlexContract(event.address);
-  if (engineFlexContract) {
-    _handleExternalAssetDependencyUpdated(engineFlexContract, event);
-    return;
-  }
-  log.warning("[WARN] Unknown V3 coreType for contract at address {}.", [
-    event.address.toHexString()
-  ]);
-}
 
-function _handleExternalAssetDependencyUpdated<T>(
-  contract: T,
-  event: ExternalAssetDependencyUpdated
-): void {
-  if (!(contract instanceof GenArt721CoreV3_Engine_Flex)) {
+  if (!engineFlexContract) {
+    log.warning("[WARN] Unknown V3 coreType for contract at address {}.", [
+      event.address.toHexString()
+    ]);
     return;
   }
   let project = Project.load(
@@ -964,7 +955,7 @@ function _handleExternalAssetDependencyUpdated<T>(
     FLEX_CONTRACT_EXTERNAL_ASSET_DEP_TYPES[event.params._dependencyType];
 
   if (assetEntity.dependencyType === "ONCHAIN") {
-    const projextExternalAssetDependency = contract.projectExternalAssetDependencyByIndex(
+    const projextExternalAssetDependency = engineFlexContract.projectExternalAssetDependencyByIndex(
       event.params._projectId,
       event.params._index
     );
@@ -982,28 +973,19 @@ function _handleExternalAssetDependencyUpdated<T>(
   project.save();
 }
 
-export function handleExternalAssetDependencyRemoved(
-  event: ExternalAssetDependencyRemoved
-): void {
-  const engineFlexContract = getV3EngineFlexContract(event.address);
-  if (engineFlexContract) {
-    _handleExternalAssetDependencyRemoved(engineFlexContract, event);
-    return;
-  }
-  log.warning("[WARN] Unknown V3 coreType for contract at address {}.", [
-    event.address.toHexString()
-  ]);
-}
-
 /**
  * Based on the way external asset dependency removal is implement on the contract
  * we can always assume that the last index is the one being removed.
  */
-function _handleExternalAssetDependencyRemoved<T>(
-  contract: T,
+export function handleExternalAssetDependencyRemoved(
   event: ExternalAssetDependencyRemoved
 ): void {
-  if (!(contract instanceof GenArt721CoreV3_Engine_Flex)) {
+  const engineFlexContract = getV3EngineFlexContract(event.address);
+
+  if (!engineFlexContract) {
+    log.warning("[WARN] Unknown V3 coreType for contract at address {}.", [
+      event.address.toHexString()
+    ]);
     return;
   }
 
@@ -1044,7 +1026,7 @@ function _handleExternalAssetDependencyRemoved<T>(
       generateProjectExternalAssetDependencyId(project.id, index.toString())
     );
 
-    const contractExternalAsset = contract.projectExternalAssetDependencyByIndex(
+    const contractExternalAsset = engineFlexContract.projectExternalAssetDependencyByIndex(
       project.projectId,
       index
     );
@@ -1071,17 +1053,11 @@ function _handleExternalAssetDependencyRemoved<T>(
 
 export function handleGatewayUpdated(event: GatewayUpdated): void {
   const engineFlexContract = getV3EngineFlexContract(event.address);
-  if (engineFlexContract) {
-    _handleGatewayUpdated(engineFlexContract, event);
-    return;
-  }
-  log.warning("[WARN] Unknown V3 coreType for contract at address {}.", [
-    event.address.toHexString()
-  ]);
-}
 
-function _handleGatewayUpdated<T>(contract: T, event: GatewayUpdated): void {
-  if (!(contract instanceof GenArt721CoreV3_Engine_Flex)) {
+  if (!engineFlexContract) {
+    log.warning("[WARN] Unknown V3 coreType for contract at address {}.", [
+      event.address.toHexString()
+    ]);
     return;
   }
 
@@ -1106,22 +1082,14 @@ export function handleProjectExternalAssetDependenciesLocked(
   event: ProjectExternalAssetDependenciesLocked
 ): void {
   const engineFlexContract = getV3EngineFlexContract(event.address);
-  if (engineFlexContract) {
-    _handleProjectExternalAssetDependenciesLocked(engineFlexContract, event);
-    return;
-  }
-  log.warning("[WARN] Unknown V3 coreType for contract at address {}.", [
-    event.address.toHexString()
-  ]);
-}
 
-function _handleProjectExternalAssetDependenciesLocked<T>(
-  contract: T,
-  event: ProjectExternalAssetDependenciesLocked
-): void {
-  if (!(contract instanceof GenArt721CoreV3_Engine_Flex)) {
+  if (!engineFlexContract) {
+    log.warning("[WARN] Unknown V3 coreType for contract at address {}.", [
+      event.address.toHexString()
+    ]);
     return;
   }
+
   let project = Project.load(
     generateContractSpecificId(event.address, event.params._projectId)
   );
