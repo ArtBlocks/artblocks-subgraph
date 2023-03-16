@@ -96,6 +96,13 @@ export function handleMint(event: Mint): void {
     _handleMint(engineContract, event);
     return;
   }
+
+  const engineFlexContract = getV3EngineFlexContract(event.address);
+  if (engineFlexContract) {
+    _handleMint(engineFlexContract, event);
+    return;
+  }
+
   log.warning("[WARN] Unknown V3 coreType for contract at address {}.", [
     event.address.toHexString()
   ]);
@@ -262,6 +269,11 @@ export function handleProjectUpdated(event: ProjectUpdated): void {
   const engineContract = getV3EngineContract(event.address);
   if (engineContract) {
     _handleProjectUpdated(engineContract, event);
+    return;
+  }
+  const engineFlexContract = getV3EngineFlexContract(event.address);
+  if (engineFlexContract) {
+    _handleProjectUpdated(engineFlexContract, event);
     return;
   }
   log.warning("[WARN] Unknown V3 coreType for contract at address {}.", [
@@ -671,6 +683,11 @@ export function handlePlatformUpdated(event: PlatformUpdated): void {
     _handlePlatformUpdated(engineContract, event);
     return;
   }
+  const engineFlexContract = getV3EngineFlexContract(event.address);
+  if (engineFlexContract) {
+    _handlePlatformUpdated(engineFlexContract, event);
+    return;
+  }
   log.warning("[WARN] Unknown V3 coreType for contract at address {}.", [
     event.address.toHexString()
   ]);
@@ -696,6 +713,11 @@ export function handleMinterUpdated(event: MinterUpdated): void {
   const engineContract = getV3EngineContract(event.address);
   if (engineContract) {
     _handleMinterUpdated(engineContract, event);
+    return;
+  }
+  const engineFlexContract = getV3EngineFlexContract(event.address);
+  if (engineFlexContract) {
+    _handleMinterUpdated(engineFlexContract, event);
     return;
   }
   log.warning("[WARN] Unknown V3 coreType for contract at address {}.", [
@@ -903,6 +925,11 @@ export function handleOwnershipTransferred(event: OwnershipTransferred): void {
   const engineContract = getV3EngineContract(event.address);
   if (engineContract) {
     _handleOwnershipTransferred(engineContract, event);
+    return;
+  }
+  const engineFlexContract = getV3EngineFlexContract(event.address);
+  if (engineFlexContract) {
+    _handleOwnershipTransferred(engineFlexContract, event);
     return;
   }
   log.warning("[WARN] Unknown V3 coreType for contract at address {}.", [
@@ -1210,6 +1237,12 @@ export function refreshContractAtAddress(
   const engineContract = getV3EngineContract(contractAddress);
   if (engineContract) {
     refreshContract(engineContract, timestamp);
+    return;
+  }
+
+  const engineFlexContract = getV3EngineFlexContract(contractAddress);
+  if (engineFlexContract) {
+    refreshContract(engineFlexContract, timestamp);
     return;
   }
   log.warning("[WARN] Unknown V3 coreType for contract at address {}.", [
