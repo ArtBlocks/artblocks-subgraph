@@ -498,6 +498,38 @@
         {
           "indexed": true,
           "internalType": "uint256",
+          "name": "projectId",
+          "type": "uint256"
+        }
+      ],
+      "name": "ProjectNextTokenEjected",
+      "type": "event"
+    },
+    {
+      "anonymous": false,
+      "inputs": [
+        {
+          "indexed": true,
+          "internalType": "uint256",
+          "name": "projectId",
+          "type": "uint256"
+        },
+        {
+          "indexed": false,
+          "internalType": "uint256",
+          "name": "tokenId",
+          "type": "uint256"
+        }
+      ],
+      "name": "ProjectNextTokenUpdated",
+      "type": "event"
+    },
+    {
+      "anonymous": false,
+      "inputs": [
+        {
+          "indexed": true,
+          "internalType": "uint256",
           "name": "_projectId",
           "type": "uint256"
         },
@@ -573,7 +605,7 @@
           "type": "uint256"
         }
       ],
-      "name": "createBid_4cM",
+      "name": "createBid_l34",
       "outputs": [],
       "stateMutability": "payable",
       "type": "function"
@@ -798,6 +830,16 @@
           "type": "uint256"
         },
         {
+          "internalType": "bool",
+          "name": "nextTokenNumberIsPopulated",
+          "type": "bool"
+        },
+        {
+          "internalType": "uint24",
+          "name": "nextTokenNumber",
+          "type": "uint24"
+        },
+        {
           "components": [
             {
               "internalType": "uint256",
@@ -911,24 +953,6 @@
       "inputs": [
         {
           "internalType": "uint256",
-          "name": "_settleTokenId",
-          "type": "uint256"
-        },
-        {
-          "internalType": "uint256",
-          "name": "_bidTokenId",
-          "type": "uint256"
-        }
-      ],
-      "name": "settleAndCreateBid",
-      "outputs": [],
-      "stateMutability": "payable",
-      "type": "function"
-    },
-    {
-      "inputs": [
-        {
-          "internalType": "uint256",
           "name": "_tokenId",
           "type": "uint256"
         }
@@ -942,11 +966,42 @@
       "inputs": [
         {
           "internalType": "uint256",
+          "name": "_settleTokenId",
+          "type": "uint256"
+        },
+        {
+          "internalType": "uint256",
+          "name": "_bidTokenId",
+          "type": "uint256"
+        }
+      ],
+      "name": "settleAuctionAndCreateBid",
+      "outputs": [],
+      "stateMutability": "payable",
+      "type": "function"
+    },
+    {
+      "inputs": [
+        {
+          "internalType": "uint256",
           "name": "_projectId",
           "type": "uint256"
         }
       ],
       "name": "togglePurchaseToDisabled",
+      "outputs": [],
+      "stateMutability": "nonpayable",
+      "type": "function"
+    },
+    {
+      "inputs": [
+        {
+          "internalType": "uint256",
+          "name": "_projectId",
+          "type": "uint256"
+        }
+      ],
+      "name": "tryPopulateNextToken",
       "outputs": [],
       "stateMutability": "nonpayable",
       "type": "function"
