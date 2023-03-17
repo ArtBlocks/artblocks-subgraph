@@ -540,29 +540,8 @@ function refreshProjectScript(
 // the `refreshContract` helper function.
 export function handlePlatformUpdated(event: PlatformUpdated): void {
   log.info("handleProjectUpdated", []);
-  const flagshipContract = getV3FlagshipContract(event.address);
-  if (flagshipContract) {
-    _handlePlatformUpdated(flagshipContract, event);
-    return;
-  }
-  const engineContract = getV3EngineContract(event.address);
-  if (engineContract) {
-    _handlePlatformUpdated(engineContract, event);
-    return;
-  }
-  const engineFlexContract = getV3EngineFlexContract(event.address);
-  if (engineFlexContract) {
-    _handlePlatformUpdated(engineFlexContract, event);
-    return;
-  }
-  log.warning("[WARN] Unknown V3 coreType for contract at address {}.", [
-    event.address.toHexString()
-  ]);
-}
-
-// helper function for `handlePlatformUpdated`
-function _handlePlatformUpdated<T>(contract: T, event: PlatformUpdated): void {
-  refreshContract(contract, event.block.timestamp);
+  // refresh the contract
+  refreshContractAtAddress(event.address, event.block.timestamp);
 }
 
 // Handle minter updated
@@ -784,33 +763,8 @@ export function handleAcceptedArtistAddressesAndSplits(
 // Handle OwnershipTransferred event, emitted by the Ownable contract.
 // This event is updated whenever an admin address is changed.
 export function handleOwnershipTransferred(event: OwnershipTransferred): void {
-  const flagshipContract = getV3FlagshipContract(event.address);
-  if (flagshipContract) {
-    _handleOwnershipTransferred(flagshipContract, event);
-    return;
-  }
-  const engineContract = getV3EngineContract(event.address);
-  if (engineContract) {
-    _handleOwnershipTransferred(engineContract, event);
-    return;
-  }
-  const engineFlexContract = getV3EngineFlexContract(event.address);
-  if (engineFlexContract) {
-    _handleOwnershipTransferred(engineFlexContract, event);
-    return;
-  }
-  log.warning("[WARN] Unknown V3 coreType for contract at address {}.", [
-    event.address.toHexString()
-  ]);
-}
-
-// helper function for `handleOwnershipTransferred`
-function _handleOwnershipTransferred<T>(
-  contract: T,
-  event: OwnershipTransferred
-): void {
   // refresh the contract to get the latest admin address
-  refreshContract(contract, event.block.timestamp);
+  refreshContractAtAddress(event.address, event.block.timestamp);
 }
 
 export function handleExternalAssetDependencyUpdated(
