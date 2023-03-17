@@ -6,7 +6,8 @@ import {
   PlatformUpdated,
   MinterUpdated,
   ProposedArtistAddressesAndSplits as ProposedArtistAddressesAndSplitsEvent,
-  AcceptedArtistAddressesAndSplits
+  AcceptedArtistAddressesAndSplits,
+  IGenArt721CoreContractV3_Base
 } from "../generated/IGenArt721CoreV3_Base/IGenArt721CoreContractV3_Base";
 
 import {
@@ -86,39 +87,7 @@ export function handleIAdminACLV0SuperAdminTransferred(
 }
 
 export function handleMint(event: Mint): void {
-  const flagshipContract = getV3FlagshipContract(event.address);
-  if (flagshipContract) {
-    _handleMint(flagshipContract, event);
-    return;
-  }
-  const engineContract = getV3EngineContract(event.address);
-  if (engineContract) {
-    _handleMint(engineContract, event);
-    return;
-  }
-
-  const engineFlexContract = getV3EngineFlexContract(event.address);
-  if (engineFlexContract) {
-    _handleMint(engineFlexContract, event);
-    return;
-  }
-
-  log.warning("[WARN] Unknown V3 coreType for contract at address {}.", [
-    event.address.toHexString()
-  ]);
-}
-
-// helper function for `handleMint`
-function _handleMint<T>(contract: T, event: Mint): void {
-  if (
-    !(
-      contract instanceof GenArt721CoreV3 ||
-      contract instanceof GenArt721CoreV3_Engine ||
-      contract instanceof GenArt721CoreV3_Engine_Flex
-    )
-  ) {
-    return;
-  }
+  const contract = getIGenArt721CoreContractV3_BaseContract(event.address);
   let token = new Token(
     generateContractSpecificId(event.address, event.params._tokenId)
   );
@@ -1186,6 +1155,16 @@ function loadOrCreateMinterFilter(
     minterFilter.save();
   }
   return minterFilter;
+}
+
+// Returns an IGenArt721CoreContractV3_Base contract
+// @dev assumes the contract conforms to the IGenArt721CoreContractV3_Base
+// interface
+function getIGenArt721CoreContractV3_BaseContract(
+  contractAddress: Address
+): IGenArt721CoreContractV3_Base {
+  const contract = IGenArt721CoreContractV3_Base.bind(contractAddress);
+  return contract;
 }
 
 // Returns a V3 flagship contract if the contract type is GenArt721CoreV3,
