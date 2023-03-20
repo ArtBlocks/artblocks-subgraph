@@ -34,7 +34,7 @@ export function handleContractRegistered(event: ContractRegistered): void {
     IGenArt721CoreV3_Base_Template.create(coreAddress);
     OwnableGenArt721CoreV3Contract_Template.create(coreAddress);
     IERC721GenArt721CoreV3Contract_Template.create(coreAddress);
-    // okay to create this template even if the contract is not engine flex as event handlers do not overlap
+    // @dev okay to create this template even if the contract is not engine flex as event handlers do not overlap
     IGenArt721CoreContractV3_Engine_Flex_Template.create(coreAddress);
     // also track the new contract's Admin ACL contract to enable indexing if admin changes
     // @dev for V3 core contracts, the admin acl contract is the core contract's owner
