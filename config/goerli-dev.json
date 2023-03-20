@@ -36,6 +36,13 @@
       "startBlock": 7799143
     }
   ],
+  "iGenArt721CoreContractV3_Engine_FlexContracts": [
+    {
+      "address": "0xd2363Acbf8CdF01A5FdfcB8f0295e0a5dF94518D",
+      "name": "Dev Goerli V3 Engine Flex Contract",
+      "startBlock": 8538323
+    }
+  ],
   "genArt721CoreContracts": [
     {
       "address": "0x1Bf03F29c4FEFFFe4eE26704aaA31d85c026aCE6",
