@@ -2,6 +2,74 @@ specVersion: 0.0.2
 schema:
   file: ./schema.graphql
 dataSources:
+  {{#iGenArt721CoreContractV3_Engine_FlexContracts}}
+  - kind: ethereum/contract
+    name: 'IGenArt721CoreV3_Engine_Flex{{#address}}-{{address}}{{/address}}'
+    network: {{network}}
+    source:
+      address: "{{#address}}{{address}}{{/address}}{{^address}}0x0000000000000000000000000000000000000000{{/address}}"
+      abi: IGenArt721CoreContractV3_Engine_Flex
+      {{#startBlock}}startBlock: {{startBlock}}{{/startBlock}}
+    mapping:
+      kind: ethereum/events
+      apiVersion: 0.0.5
+      language: wasm/assemblyscript
+      entities:
+        - Project
+        - ProjectScript
+        - Token
+        - Contract
+        - Account
+        - AccountProject
+        - Whitelisting
+        - Payment
+        - Sale
+        - SaleLookupTable
+        - ProposedArtistAddressesAndSplit
+      abis:
+        - name: IGenArt721CoreContractV3_Base
+          file: ./abis/IGenArt721CoreContractV3_Base.json
+        - name: IGenArt721CoreContractV3
+          file: ./abis/IGenArt721CoreContractV3.json
+        - name: IGenArt721CoreContractV3_Engine
+          file: ./abis/IGenArt721CoreContractV3_Engine.json
+        - name: IGenArt721CoreContractV3_Engine_Flex
+          file: ./abis/IGenArt721CoreContractV3_Engine_Flex.json
+        - name: GenArt721CoreV3_Engine_Flex
+          file: ./abis/GenArt721CoreV3_Engine_Flex.json
+        - name: GenArt721CoreV3
+          file: ./abis/GenArt721CoreV3.json
+        - name: GenArt721CoreV3_Engine
+          file: ./abis/GenArt721CoreV3_Engine.json
+        - name: IERC721
+          file: ./abis/IERC721.json
+        - name: Ownable
+          file: ./abis/Ownable.json
+        - name: IAdminACLV0
+          file: ./abis/IAdminACLV0.json
+        - name: IMinterFilterV0
+          file: ./abis/IMinterFilterV0.json
+        - name: MinterFilterV0
+          file: ./abis/MinterFilterV0.json
+        - name: MinterFilterV1
+          file: ./abis/MinterFilterV1.json
+        - name: IFilteredMinterV2
+          file: ./abis/IFilteredMinterV2.json
+        - name: IFilteredMinterDALinV1
+          file: ./abis/IFilteredMinterDALinV1.json
+        - name: IFilteredMinterDAExpV1
+          file: ./abis/IFilteredMinterDAExpV1.json
+      eventHandlers:
+        - event: ExternalAssetDependencyUpdated(indexed uint256,indexed uint256,string,uint8,uint24)
+          handler: handleExternalAssetDependencyUpdated
+        - event: ExternalAssetDependencyRemoved(indexed uint256,indexed uint256)
+          handler: handleExternalAssetDependencyRemoved
+        - event: GatewayUpdated(indexed uint8,string)
+          handler: handleGatewayUpdated
+        - event: ProjectExternalAssetDependenciesLocked(indexed uint256)
+          handler: handleProjectExternalAssetDependenciesLocked
+      file: ./src/mapping-v3-core.ts
+  {{/iGenArt721CoreContractV3_Engine_FlexContracts}}
   {{#iGenArt721CoreContractV3_BaseContracts}}
   - kind: ethereum/contract
     name: 'IGenArt721CoreV3_Base{{#address}}-{{address}}{{/address}}'
@@ -33,6 +101,10 @@ dataSources:
           file: ./abis/IGenArt721CoreContractV3.json
         - name: IGenArt721CoreContractV3_Engine
           file: ./abis/IGenArt721CoreContractV3_Engine.json
+        - name: IGenArt721CoreContractV3_Engine_Flex
+          file: ./abis/IGenArt721CoreContractV3_Engine_Flex.json
+        - name: GenArt721CoreV3_Engine_Flex
+          file: ./abis/GenArt721CoreV3_Engine_Flex.json
         - name: GenArt721CoreV3
           file: ./abis/GenArt721CoreV3.json
         - name: GenArt721CoreV3_Engine
@@ -103,6 +175,10 @@ dataSources:
           file: ./abis/IGenArt721CoreContractV3.json
         - name: IGenArt721CoreContractV3_Engine
           file: ./abis/IGenArt721CoreContractV3_Engine.json
+        - name: IGenArt721CoreContractV3_Engine_Flex
+          file: ./abis/IGenArt721CoreContractV3_Engine_Flex.json
+        - name: GenArt721CoreV3_Engine_Flex
+          file: ./abis/GenArt721CoreV3_Engine_Flex.json
         - name: GenArt721CoreV3
           file: ./abis/GenArt721CoreV3.json
         - name: GenArt721CoreV3_Engine
@@ -163,6 +239,10 @@ dataSources:
           file: ./abis/IGenArt721CoreContractV3.json
         - name: IGenArt721CoreContractV3_Engine
           file: ./abis/IGenArt721CoreContractV3_Engine.json
+        - name: IGenArt721CoreContractV3_Engine_Flex
+          file: ./abis/IGenArt721CoreContractV3_Engine_Flex.json
+        - name: GenArt721CoreV3_Engine_Flex
+          file: ./abis/GenArt721CoreV3_Engine_Flex.json
         - name: GenArt721CoreV3
           file: ./abis/GenArt721CoreV3.json
         - name: GenArt721CoreV3_Engine
@@ -1438,6 +1518,10 @@ templates:
           file: ./abis/IGenArt721CoreContractV3.json
         - name: IGenArt721CoreContractV3_Engine
           file: ./abis/IGenArt721CoreContractV3_Engine.json
+        - name: IGenArt721CoreContractV3_Engine_Flex
+          file: ./abis/IGenArt721CoreContractV3_Engine_Flex.json
+        - name: GenArt721CoreV3_Engine_Flex
+          file: ./abis/GenArt721CoreV3_Engine_Flex.json
         - name: GenArt721CoreV3
           file: ./abis/GenArt721CoreV3.json
         - name: GenArt721CoreV3_Engine
@@ -1505,6 +1589,10 @@ templates:
           file: ./abis/IGenArt721CoreContractV3.json
         - name: IGenArt721CoreContractV3_Engine
           file: ./abis/IGenArt721CoreContractV3_Engine.json
+        - name: IGenArt721CoreContractV3_Engine_Flex
+          file: ./abis/IGenArt721CoreContractV3_Engine_Flex.json
+        - name: GenArt721CoreV3_Engine_Flex
+          file: ./abis/GenArt721CoreV3_Engine_Flex.json
         - name: GenArt721CoreV3
           file: ./abis/GenArt721CoreV3.json
         - name: GenArt721CoreV3_Engine
@@ -1562,6 +1650,10 @@ templates:
           file: ./abis/IGenArt721CoreContractV3.json
         - name: IGenArt721CoreContractV3_Engine
           file: ./abis/IGenArt721CoreContractV3_Engine.json
+        - name: IGenArt721CoreContractV3_Engine_Flex
+          file: ./abis/IGenArt721CoreContractV3_Engine_Flex.json
+        - name: GenArt721CoreV3_Engine_Flex
+          file: ./abis/GenArt721CoreV3_Engine_Flex.json
         - name: GenArt721CoreV3
           file: ./abis/GenArt721CoreV3.json
         - name: GenArt721CoreV3_Engine
@@ -1590,7 +1682,72 @@ templates:
         - event: Transfer(indexed address,indexed address,indexed uint256)
           handler: handleTransfer
       file: ./src/mapping-v3-core.ts
-    
+
+  - name: IGenArt721CoreContractV3_Engine_Flex_Template
+    kind: ethereum/contract
+    network: {{network}}
+    source:
+      abi: IGenArt721CoreContractV3_Engine_Flex
+    mapping:
+      kind: ethereum/events
+      apiVersion: 0.0.5
+      language: wasm/assemblyscript
+      entities:
+        - Project
+        - ProjectScript
+        - Token
+        - Contract
+        - Account
+        - AccountProject
+        - Whitelisting
+        - Payment
+        - Sale
+        - SaleLookupTable
+        - ProposedArtistAddressesAndSplit
+      abis:
+        - name: IGenArt721CoreContractV3_Base
+          file: ./abis/IGenArt721CoreContractV3_Base.json
+        - name: IGenArt721CoreContractV3
+          file: ./abis/IGenArt721CoreContractV3.json
+        - name: IGenArt721CoreContractV3_Engine
+          file: ./abis/IGenArt721CoreContractV3_Engine.json
+        - name: IGenArt721CoreContractV3_Engine_Flex
+          file: ./abis/IGenArt721CoreContractV3_Engine_Flex.json
+        - name: GenArt721CoreV3_Engine_Flex
+          file: ./abis/GenArt721CoreV3_Engine_Flex.json
+        - name: GenArt721CoreV3
+          file: ./abis/GenArt721CoreV3.json
+        - name: GenArt721CoreV3_Engine
+          file: ./abis/GenArt721CoreV3_Engine.json
+        - name: IERC721
+          file: ./abis/IERC721.json
+        - name: Ownable
+          file: ./abis/Ownable.json
+        - name: IAdminACLV0
+          file: ./abis/IAdminACLV0.json
+        - name: IMinterFilterV0
+          file: ./abis/IMinterFilterV0.json
+        - name: MinterFilterV0
+          file: ./abis/MinterFilterV0.json
+        - name: MinterFilterV1
+          file: ./abis/MinterFilterV1.json
+        - name: IFilteredMinterV2
+          file: ./abis/IFilteredMinterV2.json
+        - name: IFilteredMinterDALinV1
+          file: ./abis/IFilteredMinterDALinV1.json
+        - name: IFilteredMinterDAExpV1
+          file: ./abis/IFilteredMinterDAExpV1.json
+      eventHandlers:
+        - event: ExternalAssetDependencyUpdated(indexed uint256,indexed uint256,string,uint8,uint24)
+          handler: handleExternalAssetDependencyUpdated
+        - event: ExternalAssetDependencyRemoved(indexed uint256,indexed uint256)
+          handler: handleExternalAssetDependencyRemoved
+        - event: GatewayUpdated(indexed uint8,string)
+          handler: handleGatewayUpdated
+        - event: ProjectExternalAssetDependenciesLocked(indexed uint256)
+          handler: handleProjectExternalAssetDependenciesLocked
+      file: ./src/mapping-v3-core.ts
+
   - name: AdminACLV0_Template
     kind: ethereum/contract
     network: {{network}}
@@ -1614,6 +1771,10 @@ templates:
           file: ./abis/IGenArt721CoreContractV3.json
         - name: IGenArt721CoreContractV3_Engine
           file: ./abis/IGenArt721CoreContractV3_Engine.json
+        - name: IGenArt721CoreContractV3_Engine_Flex
+          file: ./abis/IGenArt721CoreContractV3_Engine_Flex.json
+        - name: GenArt721CoreV3_Engine_Flex
+          file: ./abis/GenArt721CoreV3_Engine_Flex.json
         - name: GenArt721CoreV3
           file: ./abis/GenArt721CoreV3.json
         - name: GenArt721CoreV3_Engine
