@@ -190,6 +190,8 @@ enum CoreType {
   GenArt721CoreV3
   "V3 Derivative - Art Blocks Engine core"
   GenArt721CoreV3_Engine
+  "V3 Derivative - Art Blocks Engine Flex core"
+  GenArt721CoreV3_Engine_Flex
 }
 
 type Contract @entity {

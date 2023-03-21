@@ -10,6 +10,11 @@
       "address": "0x7244352F6C7aFbB74D4b63Bd7e8189e84a83f179",
       "name": "Dev Goerli V3 Explorations Contract",
       "startBlock": 7799143
+    },
+    {
+      "address": "0xd2363Acbf8CdF01A5FdfcB8f0295e0a5dF94518D",
+      "name": "Dev Goerli V3 Engine Flex Contract",
+      "startBlock": 8538323
     }
   ],
   "ownableGenArt721CoreV3Contracts": [
@@ -22,6 +27,11 @@
       "address": "0x7244352F6C7aFbB74D4b63Bd7e8189e84a83f179",
       "name": "Dev Goerli V3 Explorations Contract",
       "startBlock": 7799143
+    },
+    {
+      "address": "0xd2363Acbf8CdF01A5FdfcB8f0295e0a5dF94518D",
+      "name": "Dev Goerli V3 Engine Flex Contract",
+      "startBlock": 8538323
     }
   ],
   "iERC721GenArt721CoreV3Contracts": [
@@ -34,6 +44,11 @@
       "address": "0x7244352F6C7aFbB74D4b63Bd7e8189e84a83f179",
       "name": "Dev Goerli V3 Explorations Contract",
       "startBlock": 7799143
+    },
+    {
+      "address": "0xd2363Acbf8CdF01A5FdfcB8f0295e0a5dF94518D",
+      "name": "Dev Goerli V3 Engine Flex Contract",
+      "startBlock": 8538323
     }
   ],
   "iGenArt721CoreContractV3_Engine_FlexContracts": [
