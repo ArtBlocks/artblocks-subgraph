@@ -1349,6 +1349,10 @@ dataSources:
           handler: handleAuctionBid
         - event: AuctionSettled(indexed uint256,indexed address,uint256)
           handler: handleAuctionSettled
+        - event: ProjectNextTokenUpdated(indexed uint256,uint256)
+          handler: handleProjectNextTokenUpdated
+        - event: ProjectNextTokenEjected(indexed uint256)
+          handler: handleProjectNextTokenEjected
       file: ./src/minter-suite-mapping.ts
   {{/minterSEAContracts}}
   {{#adminACLV0Contracts}}
