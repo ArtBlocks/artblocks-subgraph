@@ -99,7 +99,9 @@ import {
   ResetAuctionDetails,
   AuctionInitialized,
   AuctionBid,
-  AuctionSettled
+  AuctionSettled,
+  ProjectNextTokenUpdated,
+  ProjectNextTokenEjected
 } from "../generated/MinterSEA/IFilteredMinterSEAV0";
 
 import { MinterConfigSetAddressEvent } from "./util-types";
@@ -622,42 +624,49 @@ export function handleAuctionInitialized(event: AuctionInitialized): void {
     event.block.timestamp
   );
 
-  if (minterProjectAndConfig) {
-    let projectMinterConfig = minterProjectAndConfig.projectMinterConfiguration;
-    // update all auction details in project minter configuration extraMinterDetails json field
-    handleSetMinterDetailsGeneric(
-      "auctionTokenId",
-      event.params.tokenId,
-      projectMinterConfig
+  if (!minterProjectAndConfig) {
+    log.warning(
+      "[WARN] Error while trying to load minter project and config for auction initialized event.",
+      []
     );
-    handleSetMinterDetailsGeneric(
-      "auctionCurrentBid",
-      event.params.bidAmount,
-      projectMinterConfig
-    );
-    handleSetMinterDetailsGeneric(
-      "auctionCurrentBidder",
-      event.params.bidder,
-      projectMinterConfig
-    );
-    handleSetMinterDetailsGeneric(
-      "auctionEndTime",
-      event.params.endTime,
-      projectMinterConfig
-    );
-    // reset the token auction settled state, and set the auction as initialized
-    handleSetMinterDetailsGeneric("auctionSettled", false, projectMinterConfig);
-    handleSetMinterDetailsGeneric(
-      "auctionInitialized",
-      true,
-      projectMinterConfig
-    );
-
-    // update project updatedAt to sync new projectMinterConfiguration changes
-    let project = minterProjectAndConfig.project;
-    project.updatedAt = event.block.timestamp;
-    project.save();
+    return;
   }
+  let projectMinterConfig = minterProjectAndConfig.projectMinterConfiguration;
+  // update all auction details in project minter configuration extraMinterDetails json field
+  handleSetMinterDetailsGeneric(
+    "auctionTokenId",
+    event.params.tokenId,
+    projectMinterConfig
+  );
+  handleSetMinterDetailsGeneric(
+    "auctionCurrentBid",
+    event.params.bidAmount,
+    projectMinterConfig
+  );
+  handleSetMinterDetailsGeneric(
+    "auctionCurrentBidder",
+    event.params.bidder,
+    projectMinterConfig
+  );
+  handleSetMinterDetailsGeneric(
+    "auctionEndTime",
+    event.params.endTime,
+    projectMinterConfig
+  );
+  // reset the token auction settled state, and set the auction as initialized
+  handleSetMinterDetailsGeneric("auctionSettled", false, projectMinterConfig);
+  handleSetMinterDetailsGeneric(
+    "auctionInitialized",
+    true,
+    projectMinterConfig
+  );
+  // remove the next token id, since the auction is initialized with that token id
+  handleRemoveMinterDetailsGeneric("projectNextTokenId", projectMinterConfig);
+
+  // update project updatedAt to sync new projectMinterConfiguration changes
+  let project = minterProjectAndConfig.project;
+  project.updatedAt = event.block.timestamp;
+  project.save();
 }
 
 export function handleAuctionBid(event: AuctionBid): void {
@@ -736,6 +745,63 @@ export function handleAuctionSettled(event: AuctionSettled): void {
     project.updatedAt = event.block.timestamp;
     project.save();
   }
+}
+
+export function handleProjectNextTokenUpdated(
+  event: ProjectNextTokenUpdated
+): void {
+  const projectIdNumber = generateProjectIdNumberFromTokenIdNumber(
+    event.params.tokenId
+  );
+  let minterProjectAndConfig = loadMinterProjectAndConfig(
+    event.address,
+    projectIdNumber,
+    event.block.timestamp
+  );
+  if (!minterProjectAndConfig) {
+    log.warning(
+      "[WARN] Error while trying to load minter project and config for project next token updated event.",
+      []
+    );
+    return;
+  }
+  let projectMinterConfig = minterProjectAndConfig.projectMinterConfiguration;
+  // update project next token id in project minter configuration extraMinterDetails json field
+  handleSetMinterDetailsGeneric(
+    "projectNextTokenId",
+    event.params.tokenId,
+    projectMinterConfig
+  );
+
+  // update project updatedAt to sync new projectMinterConfiguration changes
+  let project = minterProjectAndConfig.project;
+  project.updatedAt = event.block.timestamp;
+  project.save();
+}
+
+export function handleProjectNextTokenEjected(
+  event: ProjectNextTokenEjected
+): void {
+  let minterProjectAndConfig = loadMinterProjectAndConfig(
+    event.address,
+    event.params.projectId,
+    event.block.timestamp
+  );
+  if (!minterProjectAndConfig) {
+    log.warning(
+      "[WARN] Error while trying to load minter project and config for project next token ejected event.",
+      []
+    );
+    return;
+  }
+  let projectMinterConfig = minterProjectAndConfig.projectMinterConfiguration;
+  // update project next token id in project minter configuration extraMinterDetails json field
+  handleRemoveMinterDetailsGeneric("projectNextTokenId", projectMinterConfig);
+
+  // update project updatedAt to sync new projectMinterConfiguration changes
+  let project = minterProjectAndConfig.project;
+  project.updatedAt = event.block.timestamp;
+  project.save();
 }
 
 // Generic Handlers
