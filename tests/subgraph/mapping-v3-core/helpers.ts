@@ -132,7 +132,7 @@ export function mockRefreshContractCalls(
       "artblocksCurationRegistryAddress",
       "artblocksCurationRegistryAddress():(address)"
     ).returns([ethereum.Value.fromAddress(TEST_CONTRACT.curationRegistry)]);
-  } else if (coreType == "GenArt721CoreV3_Engine") {
+  } else if (coreType == "GenArt721CoreV3_Engine" || coreType == "GenArt721CoreV3_Engine_Flex") {
     // engine contract functions
     createMockedFunction(
       TEST_CONTRACT_ADDRESS,

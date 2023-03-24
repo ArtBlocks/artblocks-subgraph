@@ -190,6 +190,8 @@ enum CoreType {
   GenArt721CoreV3
   "V3 Derivative - Art Blocks Engine core"
   GenArt721CoreV3_Engine
+  "V3 Derivative - Art Blocks Engine Flex core"
+  GenArt721CoreV3_Engine_Flex
 }
 
 type Contract @entity {
@@ -580,7 +582,8 @@ type Dependency @entity {
   "Additional repositories for this dependency"
   additionalRepositoryCount: BigInt!
   "Number of additional repositories for this dependency"
-  additionalRepositories: [DependencyAdditionalRepository!]! @derivedFrom(field: "dependency")
+  additionalRepositories: [DependencyAdditionalRepository!]!
+    @derivedFrom(field: "dependency")
   "List of on-chain scripts that for this dependency"
   scripts: [DependencyScript!]! @derivedFrom(field: "dependency")
   "Number of on-chain scripts for this dependency"
@@ -648,6 +651,8 @@ enum ProjectExternalAssetDependencyType {
   IPFS
   "Asset hosted on Arweave"
   ARWEAVE
+  "Asset hosted on chain"
+  ONCHAIN
 }
 
 type ProjectExternalAssetDependency @entity {
@@ -660,9 +665,15 @@ type ProjectExternalAssetDependency @entity {
   "The dependency type"
   dependencyType: ProjectExternalAssetDependencyType!
 
-  "The dependency cid"
+  "The dependency cid. This will be an empty string assets of type ONCHAIN."
   cid: String!
 
   "The dependency index"
   index: BigInt!
+
+  "Address of the bytecode storage contract for this asset if it is of type ONCHAIN"
+  bytecodeAddress: Bytes
+
+  "The asset data if it is onchain"
+  data: String
 }
