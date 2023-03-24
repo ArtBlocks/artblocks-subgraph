@@ -1,0 +1,7 @@
+query GetCurrentBlockNumber {
+  _meta {
+    block {
+      number
+    }
+  }
+}
