@@ -4,15 +4,21 @@ services:
     build: hardhat
     volumes:
       - shared-data:/usr/hardhat/shared
+    healthcheck:
+      test: ["CMD-SHELL", "curl --fail http://localhost:8545 || exit 1"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
   seed:
     build: seed
     volumes:
       - shared-data:/usr/seed/shared
       - ./setup-scripts:/usr/seed/setup-scripts
     depends_on:
-      - hardhat
+      hardhat:
+        condition: service_healthy
   graph-node:
-    image: graphprotocol/graph-node
+    build: graph-node
     depends_on:
       - ipfs
       - postgres
@@ -27,6 +33,11 @@ services:
       ethereum: 'mainnet:http://hardhat:8545'
       fork_base: 'https://api.thegraph.com/subgraphs/id/'
       GRAPH_LOG: info
+    healthcheck:
+      test: ["CMD-SHELL", "curl -X POST -H 'Content-Type: application/json' -H 'Accept: application/json' http://localhost:8020 || exit 1"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
   ipfs:
     image: ipfs/go-ipfs:v0.10.0
     volumes:
@@ -54,14 +65,15 @@ services:
       context: ../../
       dockerfile: ./docker/Dockerfile
     depends_on:
-      - graph-node
+      graph-node:
+        condition: service_healthy
     environment:
       GRAPH_NODE: 'http://graph-node:8020'
       IPFS: 'http://ipfs:5001'
     volumes:
       - shared-data:/usr/subgraph/shared
       - ./setup-scripts:/usr/subgraph/setup-scripts
-    command: ./setup-scripts/wait-for-it.sh -h graph-node -p 8020 --timeout=0 -- ./setup-scripts/setup-subgraph.sh
+    command: ./setup-scripts/subgraph.sh
     # We create an empty file called `subgraph-complete` in the shared
     # volume when the subgraph is deployed. We use this file as a
     # healthcheck to ensure that the subgraph is deployed before
@@ -72,16 +84,6 @@ services:
       timeout: 5s
       retries: 5
       start_period: 120s
-  runner:
-    build: runner
-    environment:
-      - SUBGRAPH_GRAPHQL_URL=http://graph-node:8000/subgraphs/name/artblocks/art-blocks
-    depends_on:
-      subgraph:
-        condition: service_healthy
-    volumes:
-      - shared-data:/usr/runner/shared
-      - ./runner/__tests__:/usr/runner/__tests__
 volumes:
 # By setting all of the volumes to be tmpfs, we can avoid the need to
 # clean up the volumes after each run. In this way our e2e test suite

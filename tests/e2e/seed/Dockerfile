@@ -4,4 +4,4 @@ WORKDIR /usr/seed
 COPY . .
 RUN ["yarn"]
 RUN ["yarn", "generate:typechain"]
-CMD ["./setup-scripts/wait-for-it.sh", "-h", "hardhat", "-p", "8545", "--", "yarn", "start"]
+CMD ["yarn", "start"]
