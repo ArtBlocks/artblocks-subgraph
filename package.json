@@ -24,9 +24,11 @@
     "prepare:palm-testnet": "yarn codegen:generic && mustache config/palm-testnet.json subgraph.template.yaml > subgraph.yaml",
     "prepare:local": "yarn codegen:generic && mustache config/local.json subgraph.template.yaml > subgraph.yaml",
     "prepare:generic": "yarn codegen:generic",
-    "codegen:generic": "mkdir -p ./generated && rm -r ./generated && mustache config/generic.json subgraph.template.yaml > subgraph.yaml && graph codegen"
+    "codegen:generic": "yarn generate:abis && mkdir -p ./generated && rm -r ./generated && mustache config/generic.json subgraph.template.yaml > subgraph.yaml && graph codegen",
+    "generate:abis": "mkdir -p ./abis && rm -r ./abis && mkdir ./abis && find './node_modules/@artblocks/contracts/artifacts/contracts' -regex '.*.json' | xargs -I {} cp {} ./abis"
   },
   "dependencies": {
+    "@artblocks/contracts": "^1.0.1",
     "@assemblyscript/loader": "^0.19.22",
     "@graphprotocol/graph-cli": "^0.37.1",
     "@graphprotocol/graph-ts": "^0.27.0",
