@@ -2,7 +2,7 @@
 # yarn lockfile v1
 
 
-"@artblocks/contracts@^1.0.2":
+"@artblocks/contracts@1.0.2":
   version "1.0.2"
   resolved "https://registry.yarnpkg.com/@artblocks/contracts/-/contracts-1.0.2.tgz#aa8bc4fc600e6ed1e61172780cd0ab42c2ff3e0f"
   integrity sha512-B/7uJNiFVDYpwAqFtctsrpDKtaK234gT5zGqkGwR4kKsL1q2uDrj1kp1AWdwLnf3C0NpkARbGmouCliT3187RA==
@@ -291,6 +291,7 @@
   integrity sha512-UXmAjKARsXORHlHZu5GCD7ZbRKm6nU8UHnbuT/QJJa2JEOEcbvV/X8w/sUk62Sl9VZuuljM1akrZLyAtzUgsxw==
 
 "@openzeppelin-4.8/contracts-upgradeable@npm:@openzeppelin/contracts-upgradeable@4.8.0", "@openzeppelin/contracts-upgradeable@4.8.0":
+  name "@openzeppelin-4.8/contracts-upgradeable"
   version "4.8.0"
   resolved "https://registry.yarnpkg.com/@openzeppelin/contracts-upgradeable/-/contracts-upgradeable-4.8.0.tgz#26688982f46969018e3ed3199e72a07c8d114275"
   integrity sha512-5GeFgqMiDlqGT8EdORadp1ntGF0qzWZLmEY7Wbp/yVhN7/B3NNzCxujuI77ktlyG81N3CUZP8cZe3ZAQ/cW10w==
