@@ -11,4 +11,4 @@ contracts
 tests/e2e/data
 
 # Ignore imported abi files
-abis/
+abis/*.json

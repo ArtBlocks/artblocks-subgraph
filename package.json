@@ -25,7 +25,7 @@
     "prepare:local": "yarn codegen:generic && mustache config/local.json subgraph.template.yaml > subgraph.yaml",
     "prepare:generic": "yarn codegen:generic",
     "codegen:generic": "yarn generate:abis && mkdir -p ./generated && rm -r ./generated && mustache config/generic.json subgraph.template.yaml > subgraph.yaml && graph codegen",
-    "generate:abis": "mkdir -p ./abis && rm -r ./abis && mkdir ./abis && find './node_modules/@artblocks/contracts/artifacts/contracts' -regex '.*.json' | xargs -I {} cp {} ./abis"
+    "generate:abis": "cd ./abis && ./_generate-abis.sh && cd ../"
   },
   "dependencies": {
     "@artblocks/contracts": "^1.0.2",
@@ -35,6 +35,8 @@
     "matchstick-as": "^0.5.0"
   },
   "devDependencies": {
+    "@openzeppelin/contracts": "4.7.1",
+    "@openzeppelin/contracts-upgradeable": "4.8.0",
     "assemblyscript": "^0.19.22",
     "mustache": "^4.1.0"
   }
