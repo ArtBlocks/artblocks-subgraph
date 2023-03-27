@@ -806,6 +806,10 @@ dataSources:
           file: ./abis/IGenArt721CoreContractV3.json
         - name: IGenArt721CoreContractV3_Engine
           file: ./abis/IGenArt721CoreContractV3_Engine.json
+        - name: IGenArt721CoreContractV3_Engine_Flex
+          file: ./abis/IGenArt721CoreContractV3_Engine_Flex.json
+        - name: GenArt721CoreV3_Engine_Flex
+          file: ./abis/GenArt721CoreV3_Engine_Flex.json
         - name: GenArt721CoreV3
           file: ./abis/GenArt721CoreV3.json
         - name: GenArt721CoreV3_Engine
@@ -1349,6 +1353,10 @@ dataSources:
           handler: handleAuctionBid
         - event: AuctionSettled(indexed uint256,indexed address,uint256)
           handler: handleAuctionSettled
+        - event: ProjectNextTokenUpdated(indexed uint256,uint256)
+          handler: handleProjectNextTokenUpdated
+        - event: ProjectNextTokenEjected(indexed uint256)
+          handler: handleProjectNextTokenEjected
       file: ./src/minter-suite-mapping.ts
   {{/minterSEAContracts}}
   {{#adminACLV0Contracts}}

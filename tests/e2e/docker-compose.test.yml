@@ -1,0 +1,12 @@
+version: "3.8"
+services:
+  runner:
+    build: runner
+    environment:
+      - SUBGRAPH_GRAPHQL_URL=http://graph-node:8000/subgraphs/name/artblocks/art-blocks
+    depends_on:
+      subgraph:
+        condition: service_healthy
+    volumes:
+      - shared-data:/usr/runner/shared
+      - ./runner/__tests__:/usr/runner/__tests__
