@@ -362,6 +362,13 @@
       "startBlock": 8655364
     }
   ],
+  "minterSEAContracts": [
+    {
+      "address": "0x39d97fbcCC17b1c7c09aBc6F0fdFC3403D5d9A2F",
+      "name": "V0 Minter for AB V3 Engine Dev C core at 0x5702797Ff45FCb0a70eB6AE1E4563299dCFa9Dd6",
+      "startBlock": 8729319
+    }
+  ],
   "adminACLV0Contracts": [
     {
       "address": "0x4Cbf3805011f0f4d4daeDa710b2215fBF37288Ad",
