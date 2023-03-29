@@ -1116,8 +1116,9 @@ function refreshContract<T>(contract: T, timestamp: BigInt): Contract | null {
     contractEntity.admin = Bytes.fromHexString(NULL_ADDRESS);
   } else {
     let adminACLContract = IAdminACLV0.bind(_admin);
-    if (adminACLContract) {
-      let superAdminAddress = adminACLContract.superAdmin();
+    const superAdmingResult = adminACLContract.try_superAdmin();
+    if (!superAdmingResult.reverted) {
+      const superAdminAddress = superAdmingResult.value;
       contractEntity.admin = superAdminAddress;
       addWhitelisting(contractEntity.id, superAdminAddress.toHexString());
     } else {
