@@ -6,7 +6,8 @@ import {
   PlatformUpdated,
   MinterUpdated,
   ProposedArtistAddressesAndSplits as ProposedArtistAddressesAndSplitsEvent,
-  AcceptedArtistAddressesAndSplits
+  AcceptedArtistAddressesAndSplits,
+  IGenArt721CoreContractV3_Base
 } from "../generated/IGenArt721CoreV3_Base/IGenArt721CoreContractV3_Base";
 
 import {
@@ -86,39 +87,7 @@ export function handleIAdminACLV0SuperAdminTransferred(
 }
 
 export function handleMint(event: Mint): void {
-  const flagshipContract = getV3FlagshipContract(event.address);
-  if (flagshipContract) {
-    _handleMint(flagshipContract, event);
-    return;
-  }
-  const engineContract = getV3EngineContract(event.address);
-  if (engineContract) {
-    _handleMint(engineContract, event);
-    return;
-  }
-
-  const engineFlexContract = getV3EngineFlexContract(event.address);
-  if (engineFlexContract) {
-    _handleMint(engineFlexContract, event);
-    return;
-  }
-
-  log.warning("[WARN] Unknown V3 coreType for contract at address {}.", [
-    event.address.toHexString()
-  ]);
-}
-
-// helper function for `handleMint`
-function _handleMint<T>(contract: T, event: Mint): void {
-  if (
-    !(
-      contract instanceof GenArt721CoreV3 ||
-      contract instanceof GenArt721CoreV3_Engine ||
-      contract instanceof GenArt721CoreV3_Engine_Flex
-    )
-  ) {
-    return;
-  }
+  const contract = getIGenArt721CoreContractV3_BaseContract(event.address);
   let token = new Token(
     generateContractSpecificId(event.address, event.params._tokenId)
   );
@@ -261,37 +230,7 @@ export const FIELD_PROJECT_WEBSITE = "website";
 
 export function handleProjectUpdated(event: ProjectUpdated): void {
   log.info("handleProjectUpdated", []);
-  const flagshipContract = getV3FlagshipContract(event.address);
-  if (flagshipContract) {
-    _handleProjectUpdated(flagshipContract, event);
-    return;
-  }
-  const engineContract = getV3EngineContract(event.address);
-  if (engineContract) {
-    _handleProjectUpdated(engineContract, event);
-    return;
-  }
-  const engineFlexContract = getV3EngineFlexContract(event.address);
-  if (engineFlexContract) {
-    _handleProjectUpdated(engineFlexContract, event);
-    return;
-  }
-  log.warning("[WARN] Unknown V3 coreType for contract at address {}.", [
-    event.address.toHexString()
-  ]);
-}
-
-// helper function for `handleProjectUpdated`
-function _handleProjectUpdated<T>(contract: T, event: ProjectUpdated): void {
-  if (
-    !(
-      contract instanceof GenArt721CoreV3 ||
-      contract instanceof GenArt721CoreV3_Engine ||
-      contract instanceof GenArt721CoreV3_Engine_Flex
-    )
-  ) {
-    return;
-  }
+  const contract = getIGenArt721CoreContractV3_BaseContract(event.address);
 
   const update = event.params._update.toString();
   const timestamp = event.block.timestamp;
@@ -355,20 +294,11 @@ function _handleProjectUpdated<T>(contract: T, event: ProjectUpdated): void {
 }
 
 /*** PROJECT UPDATED FUNCTIONS ***/
-function handleProjectStateDataUpdated<T>(
-  contract: T,
+function handleProjectStateDataUpdated(
+  contract: IGenArt721CoreContractV3_Base,
   project: Project,
   timestamp: BigInt
 ): void {
-  if (
-    !(
-      contract instanceof GenArt721CoreV3 ||
-      contract instanceof GenArt721CoreV3_Engine ||
-      contract instanceof GenArt721CoreV3_Engine_Flex
-    )
-  ) {
-    return;
-  }
   const projectStateData = contract.try_projectStateData(project.projectId);
   if (!projectStateData.reverted) {
     project.active = projectStateData.value.getActive();
@@ -379,20 +309,11 @@ function handleProjectStateDataUpdated<T>(
   }
 }
 
-function handleProjectArtistAddressUpdated<T>(
-  contract: T,
+function handleProjectArtistAddressUpdated(
+  contract: IGenArt721CoreContractV3_Base,
   project: Project,
   timestamp: BigInt
 ): void {
-  if (
-    !(
-      contract instanceof GenArt721CoreV3 ||
-      contract instanceof GenArt721CoreV3_Engine ||
-      contract instanceof GenArt721CoreV3_Engine_Flex
-    )
-  ) {
-    return;
-  }
   const projectArtistAddress = contract.try_projectIdToArtistAddress(
     project.projectId
   );
@@ -403,20 +324,11 @@ function handleProjectArtistAddressUpdated<T>(
   }
 }
 
-function handleProjectDetailsUpdated<T>(
-  contract: T,
+function handleProjectDetailsUpdated(
+  contract: IGenArt721CoreContractV3_Base,
   project: Project,
   timestamp: BigInt
 ): void {
-  if (
-    !(
-      contract instanceof GenArt721CoreV3 ||
-      contract instanceof GenArt721CoreV3_Engine ||
-      contract instanceof GenArt721CoreV3_Engine_Flex
-    )
-  ) {
-    return;
-  }
   const projectDetails = contract.try_projectDetails(project.projectId);
   if (!projectDetails.reverted) {
     project.artistName = projectDetails.value.getArtist();
@@ -429,20 +341,11 @@ function handleProjectDetailsUpdated<T>(
   }
 }
 
-function handleProjectScriptDetailsUpdated<T>(
-  contract: T,
+function handleProjectScriptDetailsUpdated(
+  contract: IGenArt721CoreContractV3_Base,
   project: Project,
   timestamp: BigInt
 ): void {
-  if (
-    !(
-      contract instanceof GenArt721CoreV3 ||
-      contract instanceof GenArt721CoreV3_Engine ||
-      contract instanceof GenArt721CoreV3_Engine_Flex
-    )
-  ) {
-    return;
-  }
   const projectScriptDetails = contract.try_projectScriptDetails(
     project.projectId
   );
@@ -454,20 +357,11 @@ function handleProjectScriptDetailsUpdated<T>(
   }
 }
 
-function handleProjectBaseURIUpdated<T>(
-  contract: T,
+function handleProjectBaseURIUpdated(
+  contract: IGenArt721CoreContractV3_Base,
   project: Project,
   timestamp: BigInt
 ): void {
-  if (
-    !(
-      contract instanceof GenArt721CoreV3 ||
-      contract instanceof GenArt721CoreV3_Engine ||
-      contract instanceof GenArt721CoreV3_Engine_Flex
-    )
-  ) {
-    return;
-  }
   const projectBaseURI = contract.try_projectURIInfo(project.projectId);
   if (!projectBaseURI.reverted) {
     project.baseUri = projectBaseURI.value;
@@ -483,20 +377,11 @@ function handleProjectCompleted(project: Project, timestamp: BigInt): void {
   project.save();
 }
 
-function handleProjectSecondaryMarketRoyaltyPercentageUpdated<T>(
-  contract: T,
+function handleProjectSecondaryMarketRoyaltyPercentageUpdated(
+  contract: IGenArt721CoreContractV3_Base,
   project: Project,
   timestamp: BigInt
 ): void {
-  if (
-    !(
-      contract instanceof GenArt721CoreV3 ||
-      contract instanceof GenArt721CoreV3_Engine ||
-      contract instanceof GenArt721CoreV3_Engine_Flex
-    )
-  ) {
-    return;
-  }
   const projectSecondaryMarketRoyaltyPercentage = contract.try_projectIdToSecondaryMarketRoyaltyPercentage(
     project.projectId
   );
@@ -507,20 +392,11 @@ function handleProjectSecondaryMarketRoyaltyPercentageUpdated<T>(
   }
 }
 
-function createProject<T>(
-  contract: T,
+function createProject(
+  contract: IGenArt721CoreContractV3_Base,
   projectId: BigInt,
   timestamp: BigInt
 ): Project | null {
-  if (
-    !(
-      contract instanceof GenArt721CoreV3 ||
-      contract instanceof GenArt721CoreV3_Engine ||
-      contract instanceof GenArt721CoreV3_Engine_Flex
-    )
-  ) {
-    return null;
-  }
   const contractAddress = contract._address.toHexString();
   let contractEntity = Contract.load(contractAddress);
   // Starting with v3, the contract entity should always exists
@@ -600,20 +476,11 @@ function createProject<T>(
   return project;
 }
 
-function refreshProjectScript<T>(
-  contract: T,
+function refreshProjectScript(
+  contract: IGenArt721CoreContractV3_Base,
   project: Project,
   timestamp: BigInt
 ): void {
-  if (
-    !(
-      contract instanceof GenArt721CoreV3 ||
-      contract instanceof GenArt721CoreV3_Engine ||
-      contract instanceof GenArt721CoreV3_Engine_Flex
-    )
-  ) {
-    return;
-  }
   let scriptDetails = contract.try_projectScriptDetails(project.projectId);
   if (scriptDetails.reverted) {
     log.warning("Could not retrive script info for project {}", [project.id]);
@@ -673,29 +540,8 @@ function refreshProjectScript<T>(
 // the `refreshContract` helper function.
 export function handlePlatformUpdated(event: PlatformUpdated): void {
   log.info("handleProjectUpdated", []);
-  const flagshipContract = getV3FlagshipContract(event.address);
-  if (flagshipContract) {
-    _handlePlatformUpdated(flagshipContract, event);
-    return;
-  }
-  const engineContract = getV3EngineContract(event.address);
-  if (engineContract) {
-    _handlePlatformUpdated(engineContract, event);
-    return;
-  }
-  const engineFlexContract = getV3EngineFlexContract(event.address);
-  if (engineFlexContract) {
-    _handlePlatformUpdated(engineFlexContract, event);
-    return;
-  }
-  log.warning("[WARN] Unknown V3 coreType for contract at address {}.", [
-    event.address.toHexString()
-  ]);
-}
-
-// helper function for `handlePlatformUpdated`
-function _handlePlatformUpdated<T>(contract: T, event: PlatformUpdated): void {
-  refreshContract(contract, event.block.timestamp);
+  // refresh the contract
+  refreshContractAtAddress(event.address, event.block.timestamp);
 }
 
 // Handle minter updated
@@ -917,33 +763,8 @@ export function handleAcceptedArtistAddressesAndSplits(
 // Handle OwnershipTransferred event, emitted by the Ownable contract.
 // This event is updated whenever an admin address is changed.
 export function handleOwnershipTransferred(event: OwnershipTransferred): void {
-  const flagshipContract = getV3FlagshipContract(event.address);
-  if (flagshipContract) {
-    _handleOwnershipTransferred(flagshipContract, event);
-    return;
-  }
-  const engineContract = getV3EngineContract(event.address);
-  if (engineContract) {
-    _handleOwnershipTransferred(engineContract, event);
-    return;
-  }
-  const engineFlexContract = getV3EngineFlexContract(event.address);
-  if (engineFlexContract) {
-    _handleOwnershipTransferred(engineFlexContract, event);
-    return;
-  }
-  log.warning("[WARN] Unknown V3 coreType for contract at address {}.", [
-    event.address.toHexString()
-  ]);
-}
-
-// helper function for `handleOwnershipTransferred`
-function _handleOwnershipTransferred<T>(
-  contract: T,
-  event: OwnershipTransferred
-): void {
   // refresh the contract to get the latest admin address
-  refreshContract(contract, event.block.timestamp);
+  refreshContractAtAddress(event.address, event.block.timestamp);
 }
 
 export function handleExternalAssetDependencyUpdated(
@@ -1186,6 +1007,16 @@ function loadOrCreateMinterFilter(
     minterFilter.save();
   }
   return minterFilter;
+}
+
+// Returns an IGenArt721CoreContractV3_Base contract
+// @dev assumes the contract conforms to the IGenArt721CoreContractV3_Base
+// interface
+function getIGenArt721CoreContractV3_BaseContract(
+  contractAddress: Address
+): IGenArt721CoreContractV3_Base {
+  const contract = IGenArt721CoreContractV3_Base.bind(contractAddress);
+  return contract;
 }
 
 // Returns a V3 flagship contract if the contract type is GenArt721CoreV3,
