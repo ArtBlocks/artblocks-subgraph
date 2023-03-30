@@ -36,7 +36,7 @@
   },
   "devDependencies": {
     "@openzeppelin/contracts": "4.7.1",
-    "@openzeppelin/contracts-upgradeable": "4.8.0",
+    "@openzeppelin/contracts-upgradeable": "4.8.2",
     "assemblyscript": "^0.19.22",
     "mustache": "^4.1.0"
   }
