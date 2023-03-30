@@ -365,15 +365,6 @@ type Minter @entity {
   "Associated Minter Filter"
   minterFilter: MinterFilter!
 
-  "Minimum allowed auction length in seconds (linear Dutch auction minters)"
-  minimumAuctionLengthInSeconds: BigInt
-
-  "Minimum allowed half life in seconds (exponential Dutch auction minters)"
-  minimumHalfLifeInSeconds: BigInt
-
-  "Maximum allowed half life in seconds (exponential Dutch auction minters)"
-  maximumHalfLifeInSeconds: BigInt
-
   "Configuration details used by specific minters (json string)"
   extraMinterDetails: String!
 
@@ -407,20 +398,8 @@ type ProjectMinterConfiguration @entity {
   "Defines if purchasing token to another is allowed"
   purchaseToDisabled: Boolean!
 
-  "price of token or resting price of Duch auction, in wei"
+  "price, or resting price of Duch auction, or minimum bid price in English auction, in wei"
   basePrice: BigInt
-
-  "Dutch auction start price, in wei"
-  startPrice: BigInt
-
-  "Half life for exponential decay Dutch auction, in seconds"
-  halfLifeSeconds: BigInt
-
-  "Dutch auction start time (unix timestamp)"
-  startTime: BigInt
-
-  "Linear Dutch auction end time (unix timestamp)"
-  endTime: BigInt
 
   "Configuration details used by specific minter project configurations (json string)"
   extraMinterDetails: String!
