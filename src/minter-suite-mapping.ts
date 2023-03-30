@@ -842,10 +842,6 @@ export function handleSetMinterDetailsGeneric<T, C>(
   value: T,
   config: C
 ): void {
-  let minterDetails = getMinterDetails(config);
-  let jsonKey = key;
-  let jsonValue: JSONValue;
-
   if (
     !(config instanceof Minter || config instanceof ProjectMinterConfiguration)
   ) {
@@ -855,6 +851,9 @@ export function handleSetMinterDetailsGeneric<T, C>(
     );
     return;
   }
+  let minterDetails = getMinterDetails(config);
+  let jsonKey = key;
+  let jsonValue: JSONValue;
 
   if (isBoolean(value)) {
     jsonValue = json.fromString(booleanToString(value));
