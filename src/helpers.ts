@@ -20,6 +20,8 @@ import {
 import { IFilteredMinterDALinV1 } from "../generated/MinterDALin/IFilteredMinterDALinV1";
 import { IFilteredMinterDAExpV1 } from "../generated/MinterDAExp/IFilteredMinterDAExpV1";
 
+import { handleSetMinterDetailsGeneric } from "./minter-suite-mapping";
+
 export function generateProjectExternalAssetDependencyId(
   projectId: string,
   index: string
@@ -192,17 +194,31 @@ export function loadOrCreateMinter(
   minter.extraMinterDetails = "{}";
 
   // values assigned during contract deployments
+  // @dev not required in more recent minters (e.g. MinterSEA) by emitting
+  // events during deployment that communicate default minter config values
   let minterType = filteredMinterContract.try_minterType();
   if (!minterType.reverted) {
     minter.type = minterType.value;
     // populate any minter-specific values
     if (minter.type.startsWith("MinterDALin")) {
       const contract = IFilteredMinterDALinV1.bind(minterAddress);
-      minter.minimumAuctionLengthInSeconds = contract.minimumAuctionLengthSeconds();
+      handleSetMinterDetailsGeneric(
+        "minimumAuctionLengthInSeconds",
+        contract.minimumAuctionLengthSeconds(),
+        minter
+      );
     } else if (minter.type.startsWith("MinterDAExp")) {
       const contract = IFilteredMinterDAExpV1.bind(minterAddress);
-      minter.minimumHalfLifeInSeconds = contract.minimumPriceDecayHalfLifeSeconds();
-      minter.maximumHalfLifeInSeconds = contract.maximumPriceDecayHalfLifeSeconds();
+      handleSetMinterDetailsGeneric(
+        "minimumHalfLifeInSeconds",
+        contract.minimumPriceDecayHalfLifeSeconds(),
+        minter
+      );
+      handleSetMinterDetailsGeneric(
+        "maximumHalfLifeInSeconds",
+        contract.maximumPriceDecayHalfLifeSeconds(),
+        minter
+      );
     }
   } else {
     // if minterType() reverts, then the minter is not as expected and is
