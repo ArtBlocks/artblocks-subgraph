@@ -9,3 +9,6 @@ tests/.latest.json
 generated/
 contracts
 tests/e2e/data
+
+# Ignore imported abi files
+abis/*.json

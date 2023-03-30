@@ -2,6 +2,19 @@
 # yarn lockfile v1
 
 
+"@artblocks/contracts@1.0.2":
+  version "1.0.2"
+  resolved "https://registry.yarnpkg.com/@artblocks/contracts/-/contracts-1.0.2.tgz#aa8bc4fc600e6ed1e61172780cd0ab42c2ff3e0f"
+  integrity sha512-B/7uJNiFVDYpwAqFtctsrpDKtaK234gT5zGqkGwR4kKsL1q2uDrj1kp1AWdwLnf3C0NpkARbGmouCliT3187RA==
+  dependencies:
+    "@openzeppelin-0.5/contracts" "npm:@openzeppelin/contracts@2.5.1"
+    "@openzeppelin-4.5/contracts" "npm:@openzeppelin/contracts@4.5.0"
+    "@openzeppelin-4.7/contracts" "npm:@openzeppelin/contracts@4.7.1"
+    "@openzeppelin-4.8/contracts-upgradeable" "npm:@openzeppelin/contracts-upgradeable@4.8.0"
+    "@urql/exchange-retry" "^1.0.0"
+    graphql "^16.6.0"
+    urql "^3.0.3"
+
 "@assemblyscript/loader@^0.19.22":
   version "0.19.23"
   resolved "https://registry.yarnpkg.com/@assemblyscript/loader/-/loader-0.19.23.tgz#7fccae28d0a2692869f1d1219d36093bc24d5e72"
@@ -261,6 +274,28 @@
   dependencies:
     assemblyscript "0.19.10"
 
+"@openzeppelin-0.5/contracts@npm:@openzeppelin/contracts@2.5.1":
+  version "2.5.1"
+  resolved "https://registry.yarnpkg.com/@openzeppelin/contracts/-/contracts-2.5.1.tgz#c76e3fc57aa224da3718ec351812a4251289db31"
+  integrity sha512-qIy6tLx8rtybEsIOAlrM4J/85s2q2nPkDqj/Rx46VakBZ0LwtFhXIVub96LXHczQX0vaqmAueDqNPXtbSXSaYQ==
+
+"@openzeppelin-4.5/contracts@npm:@openzeppelin/contracts@4.5.0":
+  version "4.5.0"
+  resolved "https://registry.yarnpkg.com/@openzeppelin/contracts/-/contracts-4.5.0.tgz#3fd75d57de172b3743cdfc1206883f56430409cc"
+  integrity sha512-fdkzKPYMjrRiPK6K4y64e6GzULR7R7RwxSigHS8DDp7aWDeoReqsQI+cxHV1UuhAqX69L1lAaWDxenfP+xiqzA==
+
+"@openzeppelin-4.7/contracts@npm:@openzeppelin/contracts@4.7.1", "@openzeppelin/contracts@4.7.1":
+  name "@openzeppelin-4.7/contracts"
+  version "4.7.1"
+  resolved "https://registry.yarnpkg.com/@openzeppelin/contracts/-/contracts-4.7.1.tgz#33d0a857b76b18d313e6bb6ed28cdaf367e90cfe"
+  integrity sha512-UXmAjKARsXORHlHZu5GCD7ZbRKm6nU8UHnbuT/QJJa2JEOEcbvV/X8w/sUk62Sl9VZuuljM1akrZLyAtzUgsxw==
+
+"@openzeppelin-4.8/contracts-upgradeable@npm:@openzeppelin/contracts-upgradeable@4.8.0", "@openzeppelin/contracts-upgradeable@4.8.0":
+  name "@openzeppelin-4.8/contracts-upgradeable"
+  version "4.8.0"
+  resolved "https://registry.yarnpkg.com/@openzeppelin/contracts-upgradeable/-/contracts-upgradeable-4.8.0.tgz#26688982f46969018e3ed3199e72a07c8d114275"
+  integrity sha512-5GeFgqMiDlqGT8EdORadp1ntGF0qzWZLmEY7Wbp/yVhN7/B3NNzCxujuI77ktlyG81N3CUZP8cZe3ZAQ/cW10w==
+
 "@rescript/std@9.0.0":
   version "9.0.0"
   resolved "https://registry.yarnpkg.com/@rescript/std/-/std-9.0.0.tgz#df53f3fa5911cb4e85bd66b92e9e58ddf3e4a7e1"
@@ -363,6 +398,21 @@
   integrity sha512-JQbbmxZTZehdc2iszGKs5oC3NFnjeay7mtAWrdt7qNtAVK0g19muApzAy4bm9byz79xa2ZnO/BOBC2R8RC5Lww==
   dependencies:
     "@types/node" "*"
+
+"@urql/core@>=3.0.0", "@urql/core@^3.2.0":
+  version "3.2.2"
+  resolved "https://registry.yarnpkg.com/@urql/core/-/core-3.2.2.tgz#2a44015b536d72981822f715c96393d8e0ddc576"
+  integrity sha512-i046Cz8cZ4xIzGMTyHZrbdgzcFMcKD7+yhCAH5FwWBRjcKrc+RjEOuR9X5AMuBvr8c6IAaE92xAqa4wmlGfWTQ==
+  dependencies:
+    wonka "^6.1.2"
+
+"@urql/exchange-retry@^1.0.0":
+  version "1.0.0"
+  resolved "https://registry.yarnpkg.com/@urql/exchange-retry/-/exchange-retry-1.0.0.tgz#25a48ef0c2f6854f5617e2ca4ea25ae240f1fcbc"
+  integrity sha512-UGyyGAMXzop9C/fIoe7Ij63DkPSy1uMw2jipB5dnB8R3kl80za7LYzVnA1HvBEt2ZPWfMuwez/VGLOQ7XX4bTA==
+  dependencies:
+    "@urql/core" ">=3.0.0"
+    wonka "^6.0.0"
 
 JSONStream@1.3.2:
   version "1.3.2"
@@ -3360,6 +3410,14 @@ uri-js@^4.2.2:
   dependencies:
     punycode "^2.1.0"
 
+urql@^3.0.3:
+  version "3.0.4"
+  resolved "https://registry.yarnpkg.com/urql/-/urql-3.0.4.tgz#f73dbd2e5b134b7328c14d5b8ab1f93f93db8990"
+  integrity sha512-okmQKQ9pF4t8O8iCC5gH9acqfFji5lkhW3nLBjx8WKDd2zZG7PXoUpUK19VQEMK87L6VFBOO/XZ52MMKFEI0AA==
+  dependencies:
+    "@urql/core" "^3.2.0"
+    wonka "^6.0.0"
+
 ursa-optional@~0.10.0:
   version "0.10.2"
   resolved "https://registry.yarnpkg.com/ursa-optional/-/ursa-optional-0.10.2.tgz#bd74e7d60289c22ac2a69a3c8dea5eb2817f9681"
@@ -3454,6 +3512,11 @@ which@2.0.2, which@^2.0.0, which@^2.0.1:
   integrity sha512-BLI3Tl1TW3Pvl70l3yq3Y64i+awpwXqsGBYWkkqMtnbXgrMD+yj7rhW0kuEDxzJaYXGjEW5ogapKNMEKNMjibA==
   dependencies:
     isexe "^2.0.0"
+
+wonka@^6.0.0, wonka@^6.1.2:
+  version "6.3.0"
+  resolved "https://registry.yarnpkg.com/wonka/-/wonka-6.3.0.tgz#dd508dc9ef8588e5bbb10b96f2388bd9d4a1f17b"
+  integrity sha512-7np+Kj4OnDQeEN0kafYLkPFKj1Qo+k7mNgyMHSgOeg+9AEvJbL8ipTBgSCTQfGcgVo6TPNU4T5+AZ2rAOyVrAw==
 
 wordwrap@~0.0.2:
   version "0.0.3"
