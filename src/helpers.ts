@@ -248,7 +248,7 @@ export function getMinterDetails<T>(config: T): TypedMap<string, JSONValue> {
     !(config instanceof ProjectMinterConfiguration || config instanceof Minter)
   ) {
     throw new Error(
-      "cannot find extra minter details on minter or project minter config"
+      "cannot find extra minter details on generic that is not a Minter or ProjectMinterConfiguration"
     );
   }
   let jsonResult = json.try_fromString(config.extraMinterDetails);
