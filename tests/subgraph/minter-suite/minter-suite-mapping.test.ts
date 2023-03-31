@@ -8,7 +8,7 @@ import {
   createMockedFunction,
   beforeEach
 } from "matchstick-as/assembly/index";
-import { ProjectMinterConfiguration, Receipt } from "../../../generated/schema";
+import { ProjectMinterConfiguration, Minter } from "../../../generated/schema";
 import {
   addNewMinterToStore,
   addNewProjectMinterConfigToStore,
@@ -21,7 +21,8 @@ import {
   RECEIPT_ENTITY_TYPE,
   RandomAddressGenerator,
   TEST_CONTRACT_ADDRESS,
-  ONE_MILLION
+  assertJsonFieldEquals,
+  getJsonStringFromInputs
 } from "../shared-helpers";
 import {
   generateContractSpecificId,
@@ -488,7 +489,10 @@ describe("MinterDALin-related tests", () => {
           Address.fromHexString(minter.id)
         );
         const minterType = minter.type;
-        minter.minimumAuctionLengthInSeconds = BigInt.fromI32(300);
+        minter.extraMinterDetails = getJsonStringFromInputs(
+          ["minimumAuctionLengthInSeconds"],
+          [BigInt.fromI32(300).toString()]
+        );
         minter.updatedAt = CURRENT_BLOCK_TIMESTAMP.minus(BigInt.fromI32(10));
         minter.save();
 
@@ -507,12 +511,18 @@ describe("MinterDALin-related tests", () => {
           changetype<MinimumAuctionLengthSecondsUpdated>(event)
         );
 
-        assert.fieldEquals(
-          MINTER_ENTITY_TYPE,
-          minterAddress.toHexString(),
+        // assert expected updates to extraMinterDetails
+        let updatedMinter = Minter.load(minterAddress.toHexString());
+        if (updatedMinter == null) {
+          throw new Error("minter config should not be null");
+        }
+
+        assertJsonFieldEquals(
+          updatedMinter.extraMinterDetails,
           "minimumAuctionLengthInSeconds",
           newMinimumAuctionLengthSeconds.toString()
         );
+
         assert.fieldEquals(
           MINTER_ENTITY_TYPE,
           minterAddress.toHexString(),
@@ -635,21 +645,26 @@ describe("MinterDALin-related tests", () => {
           "basePrice",
           basePrice.toString()
         );
-        assert.fieldEquals(
-          PROJECT_MINTER_CONFIGURATION_ENTITY_TYPE,
-          getProjectMinterConfigId(minterAddress.toHexString(), project.id),
+
+        // assert expected updates to extraMinterDetails
+        let updatedProjectMinterConfig = ProjectMinterConfiguration.load(
+          getProjectMinterConfigId(minterAddress.toHexString(), project.id)
+        );
+        if (updatedProjectMinterConfig == null) {
+          throw new Error("project minter config should not be null");
+        }
+        assertJsonFieldEquals(
+          updatedProjectMinterConfig.extraMinterDetails,
           "startPrice",
           startPrice.toString()
         );
-        assert.fieldEquals(
-          PROJECT_MINTER_CONFIGURATION_ENTITY_TYPE,
-          getProjectMinterConfigId(minterAddress.toHexString(), project.id),
+        assertJsonFieldEquals(
+          updatedProjectMinterConfig.extraMinterDetails,
           "startTime",
           startTime.toString()
         );
-        assert.fieldEquals(
-          PROJECT_MINTER_CONFIGURATION_ENTITY_TYPE,
-          getProjectMinterConfigId(minterAddress.toHexString(), project.id),
+        assertJsonFieldEquals(
+          updatedProjectMinterConfig.extraMinterDetails,
           "endTime",
           endTime.toString()
         );
@@ -728,14 +743,19 @@ describe("MinterDALin-related tests", () => {
           );
           projectMinterConfig.minter = minterAddress.toHexString();
           projectMinterConfig.project = project.id;
-          projectMinterConfig.extraMinterDetails = "{}";
-          projectMinterConfig.startTime = CURRENT_BLOCK_TIMESTAMP.plus(
+
+          const _startTime = CURRENT_BLOCK_TIMESTAMP.plus(
             BigInt.fromI32(100)
-          );
-          projectMinterConfig.endTime = CURRENT_BLOCK_TIMESTAMP.plus(
+          ).toString();
+          const _endTime = CURRENT_BLOCK_TIMESTAMP.plus(
             BigInt.fromI32(200)
+          ).toString();
+          const _startPrice = ONE_ETH_IN_WEI.toString();
+          projectMinterConfig.extraMinterDetails = getJsonStringFromInputs(
+            ["startPrice", "startTime", "endTime"],
+            [_startPrice, _startTime, _endTime]
           );
-          projectMinterConfig.startPrice = ONE_ETH_IN_WEI;
+
           projectMinterConfig.basePrice = ONE_ETH_IN_WEI.div(
             BigInt.fromI32(10)
           );
@@ -764,9 +784,9 @@ describe("MinterDALin-related tests", () => {
           >(ProjectMinterConfiguration.load(projectMinterConfig.id));
 
           assert.assertTrue(updatedProjectMinterConfig.basePrice === null);
-          assert.assertTrue(updatedProjectMinterConfig.startPrice === null);
-          assert.assertTrue(updatedProjectMinterConfig.startTime === null);
-          assert.assertTrue(updatedProjectMinterConfig.endTime === null);
+          assert.assertTrue(
+            updatedProjectMinterConfig.extraMinterDetails == "{}"
+          );
 
           assert.fieldEquals(
             PROJECT_MINTER_CONFIGURATION_ENTITY_TYPE,
@@ -807,9 +827,10 @@ describe("MinterDAExp-related tests", () => {
         const minterAddress: Address = changetype<Address>(
           Address.fromHexString(minter.id)
         );
-        const minterType = minter.type;
-        minter.minimumHalfLifeInSeconds = BigInt.fromI32(300);
-        minter.maximumHalfLifeInSeconds = BigInt.fromI32(5000);
+        minter.extraMinterDetails = getJsonStringFromInputs(
+          ["minimumHalfLifeInSeconds", "maximumHalfLifeInSeconds"],
+          ["300", "5000"]
+        );
         minter.updatedAt = CURRENT_BLOCK_TIMESTAMP.minus(BigInt.fromI32(10));
         minter.save();
 
@@ -833,15 +854,18 @@ describe("MinterDAExp-related tests", () => {
           changetype<AuctionHalfLifeRangeSecondsUpdated>(event)
         );
 
-        assert.fieldEquals(
-          MINTER_ENTITY_TYPE,
-          minterAddress.toHexString(),
+        // assert expected updates to extraMinterDetails
+        let updatedMinter = Minter.load(minterAddress.toHexString());
+        if (updatedMinter == null) {
+          throw new Error("minter config should not be null");
+        }
+        assertJsonFieldEquals(
+          updatedMinter.extraMinterDetails,
           "minimumHalfLifeInSeconds",
           newMinimumHalfLifeInSeconds.toString()
         );
-        assert.fieldEquals(
-          MINTER_ENTITY_TYPE,
-          minterAddress.toHexString(),
+        assertJsonFieldEquals(
+          updatedMinter.extraMinterDetails,
           "maximumHalfLifeInSeconds",
           newMaximumHalfLifeInSeconds.toString()
         );
@@ -964,21 +988,26 @@ describe("MinterDAExp-related tests", () => {
           "basePrice",
           basePrice.toString()
         );
-        assert.fieldEquals(
-          PROJECT_MINTER_CONFIGURATION_ENTITY_TYPE,
-          getProjectMinterConfigId(minterAddress.toHexString(), project.id),
+
+        // assert expected updates to extraMinterDetails
+        let updatedProjectMinterConfig = ProjectMinterConfiguration.load(
+          getProjectMinterConfigId(minterAddress.toHexString(), project.id)
+        );
+        if (updatedProjectMinterConfig == null) {
+          throw new Error("project minter config should not be null");
+        }
+        assertJsonFieldEquals(
+          updatedProjectMinterConfig.extraMinterDetails,
           "startPrice",
           startPrice.toString()
         );
-        assert.fieldEquals(
-          PROJECT_MINTER_CONFIGURATION_ENTITY_TYPE,
-          getProjectMinterConfigId(minterAddress.toHexString(), project.id),
+        assertJsonFieldEquals(
+          updatedProjectMinterConfig.extraMinterDetails,
           "startTime",
           startTime.toString()
         );
-        assert.fieldEquals(
-          PROJECT_MINTER_CONFIGURATION_ENTITY_TYPE,
-          getProjectMinterConfigId(minterAddress.toHexString(), project.id),
+        assertJsonFieldEquals(
+          updatedProjectMinterConfig.extraMinterDetails,
           "halfLifeSeconds",
           halfLifeSeconds.toString()
         );
@@ -1069,21 +1098,25 @@ describe("MinterDAExp-related tests", () => {
           "basePrice",
           basePrice.toString()
         );
-        assert.fieldEquals(
-          PROJECT_MINTER_CONFIGURATION_ENTITY_TYPE,
-          getProjectMinterConfigId(minterAddress.toHexString(), project.id),
+        // assert expected updates to extraMinterDetails
+        let updatedProjectMinterConfig = ProjectMinterConfiguration.load(
+          getProjectMinterConfigId(minterAddress.toHexString(), project.id)
+        );
+        if (updatedProjectMinterConfig == null) {
+          throw new Error("project minter config should not be null");
+        }
+        assertJsonFieldEquals(
+          updatedProjectMinterConfig.extraMinterDetails,
           "startPrice",
           startPrice.toString()
         );
-        assert.fieldEquals(
-          PROJECT_MINTER_CONFIGURATION_ENTITY_TYPE,
-          getProjectMinterConfigId(minterAddress.toHexString(), project.id),
+        assertJsonFieldEquals(
+          updatedProjectMinterConfig.extraMinterDetails,
           "startTime",
           startTime.toString()
         );
-        assert.fieldEquals(
-          PROJECT_MINTER_CONFIGURATION_ENTITY_TYPE,
-          getProjectMinterConfigId(minterAddress.toHexString(), project.id),
+        assertJsonFieldEquals(
+          updatedProjectMinterConfig.extraMinterDetails,
           "halfLifeSeconds",
           halfLifeSeconds.toString()
         );
@@ -1189,14 +1222,15 @@ describe("MinterDAExp-related tests", () => {
         );
         projectMinterConfig.minter = minterAddress.toHexString();
         projectMinterConfig.project = project.id;
-        projectMinterConfig.extraMinterDetails = "{}";
-        projectMinterConfig.startTime = CURRENT_BLOCK_TIMESTAMP.plus(
+        const _startTime = CURRENT_BLOCK_TIMESTAMP.plus(
           BigInt.fromI32(100)
+        ).toString();
+        const _halfLifeSeconds = BigInt.fromI32(300).toString();
+        const _startPrice = ONE_ETH_IN_WEI.toString();
+        projectMinterConfig.extraMinterDetails = getJsonStringFromInputs(
+          ["startPrice", "startTime", "halfLifeSeconds"],
+          [_startPrice, _startTime, _halfLifeSeconds]
         );
-        projectMinterConfig.halfLifeSeconds = CURRENT_BLOCK_TIMESTAMP.plus(
-          BigInt.fromI32(300)
-        );
-        projectMinterConfig.startPrice = ONE_ETH_IN_WEI;
         projectMinterConfig.basePrice = ONE_ETH_IN_WEI.div(BigInt.fromI32(10));
         projectMinterConfig.priceIsConfigured = true;
         projectMinterConfig.currencyAddress = Address.zero();
@@ -1243,9 +1277,9 @@ describe("MinterDAExp-related tests", () => {
         >(ProjectMinterConfiguration.load(projectMinterConfig.id));
 
         assert.assertTrue(updatedProjectMinterConfig.basePrice === null);
-        assert.assertTrue(updatedProjectMinterConfig.startPrice === null);
-        assert.assertTrue(updatedProjectMinterConfig.startTime === null);
-        assert.assertTrue(updatedProjectMinterConfig.halfLifeSeconds === null);
+        assert.assertTrue(
+          updatedProjectMinterConfig.extraMinterDetails == "{}"
+        );
 
         assert.fieldEquals(
           PROJECT_MINTER_CONFIGURATION_ENTITY_TYPE,
@@ -1300,14 +1334,15 @@ describe("MinterDAExp-related tests", () => {
         );
         projectMinterConfig.minter = minterAddress.toHexString();
         projectMinterConfig.project = project.id;
-        projectMinterConfig.extraMinterDetails = "{}";
-        projectMinterConfig.startTime = CURRENT_BLOCK_TIMESTAMP.plus(
+        const _startTime = CURRENT_BLOCK_TIMESTAMP.plus(
           BigInt.fromI32(100)
+        ).toString();
+        const _halfLifeSeconds = BigInt.fromI32(300).toString();
+        const _startPrice = ONE_ETH_IN_WEI.toString();
+        projectMinterConfig.extraMinterDetails = getJsonStringFromInputs(
+          ["startPrice", "startTime", "halfLifeSeconds"],
+          [_startPrice, _startTime, _halfLifeSeconds]
         );
-        projectMinterConfig.halfLifeSeconds = CURRENT_BLOCK_TIMESTAMP.plus(
-          BigInt.fromI32(300)
-        );
-        projectMinterConfig.startPrice = ONE_ETH_IN_WEI;
         projectMinterConfig.basePrice = ONE_ETH_IN_WEI.div(BigInt.fromI32(10));
         projectMinterConfig.priceIsConfigured = true;
         projectMinterConfig.currencyAddress = Address.zero();
@@ -1354,9 +1389,9 @@ describe("MinterDAExp-related tests", () => {
         >(ProjectMinterConfiguration.load(projectMinterConfig.id));
 
         assert.assertTrue(updatedProjectMinterConfig.basePrice === null);
-        assert.assertTrue(updatedProjectMinterConfig.startPrice === null);
-        assert.assertTrue(updatedProjectMinterConfig.startTime === null);
-        assert.assertTrue(updatedProjectMinterConfig.halfLifeSeconds === null);
+        assert.assertTrue(
+          updatedProjectMinterConfig.extraMinterDetails == "{}"
+        );
 
         assert.fieldEquals(
           PROJECT_MINTER_CONFIGURATION_ENTITY_TYPE,
@@ -1413,14 +1448,15 @@ describe("DAExpSettlementMinters", () => {
       );
       projectMinterConfig.minter = minterAddress.toHexString();
       projectMinterConfig.project = project.id;
-      projectMinterConfig.extraMinterDetails = "{}";
-      projectMinterConfig.startTime = CURRENT_BLOCK_TIMESTAMP.plus(
+      const _startTime = CURRENT_BLOCK_TIMESTAMP.plus(
         BigInt.fromI32(100)
+      ).toString();
+      const _halfLifeSeconds = BigInt.fromI32(300).toString();
+      const _startPrice = ONE_ETH_IN_WEI.toString();
+      projectMinterConfig.extraMinterDetails = getJsonStringFromInputs(
+        ["startPrice", "startTime", "halfLifeSeconds"],
+        [_startPrice, _startTime, _halfLifeSeconds]
       );
-      projectMinterConfig.halfLifeSeconds = CURRENT_BLOCK_TIMESTAMP.plus(
-        BigInt.fromI32(300)
-      );
-      projectMinterConfig.startPrice = ONE_ETH_IN_WEI;
       projectMinterConfig.basePrice = ONE_ETH_IN_WEI.div(BigInt.fromI32(10));
       projectMinterConfig.priceIsConfigured = true;
       projectMinterConfig.currencyAddress = Address.zero();
@@ -1477,14 +1513,24 @@ describe("DAExpSettlementMinters", () => {
       // handle settlement minter event
       handleReceiptUpdated(changetype<ReceiptUpdated>(event));
 
-      assert.fieldEquals(
-        PROJECT_MINTER_CONFIGURATION_ENTITY_TYPE,
-        getProjectMinterConfigId(minterAddress.toHexString(), project.id),
-        "extraMinterDetails",
-        `{"currentSettledPrice":${'"' +
-          actualPurchasePrice.toString() +
-          '"'},"numSettleableInvocations":${1}}`
+      // assert expected updates to extraMinterDetails
+      let updatedProjectMinterConfig = ProjectMinterConfiguration.load(
+        getProjectMinterConfigId(minterAddress.toHexString(), project.id)
       );
+      if (updatedProjectMinterConfig == null) {
+        throw new Error("project minter config should not be null");
+      }
+      assertJsonFieldEquals(
+        updatedProjectMinterConfig.extraMinterDetails,
+        "currentSettledPrice",
+        actualPurchasePrice.toString()
+      );
+      assertJsonFieldEquals(
+        updatedProjectMinterConfig.extraMinterDetails,
+        "numSettleableInvocations",
+        "1"
+      );
+
       assert.fieldEquals(
         RECEIPT_ENTITY_TYPE,
         getReceiptId(minterAddress.toHexString(), project.projectId, purchaser),
@@ -1552,14 +1598,15 @@ describe("DAExpSettlementMinters", () => {
       );
       projectMinterConfig.minter = minterAddress.toHexString();
       projectMinterConfig.project = project.id;
-      projectMinterConfig.extraMinterDetails = "{}";
-      projectMinterConfig.startTime = CURRENT_BLOCK_TIMESTAMP.plus(
+      const _startTime = CURRENT_BLOCK_TIMESTAMP.plus(
         BigInt.fromI32(100)
+      ).toString();
+      const _halfLifeSeconds = BigInt.fromI32(300).toString();
+      const _startPrice = ONE_ETH_IN_WEI.toString();
+      projectMinterConfig.extraMinterDetails = getJsonStringFromInputs(
+        ["startPrice", "startTime", "halfLifeSeconds"],
+        [_startPrice, _startTime, _halfLifeSeconds]
       );
-      projectMinterConfig.halfLifeSeconds = CURRENT_BLOCK_TIMESTAMP.plus(
-        BigInt.fromI32(300)
-      );
-      projectMinterConfig.startPrice = ONE_ETH_IN_WEI;
       projectMinterConfig.basePrice = ONE_ETH_IN_WEI.div(BigInt.fromI32(10));
       projectMinterConfig.priceIsConfigured = true;
       projectMinterConfig.currencyAddress = Address.zero();
@@ -1663,13 +1710,22 @@ describe("DAExpSettlementMinters", () => {
       // handle settleable minter event
       handleReceiptUpdated(changetype<ReceiptUpdated>(event));
 
-      assert.fieldEquals(
-        PROJECT_MINTER_CONFIGURATION_ENTITY_TYPE,
-        getProjectMinterConfigId(minterAddress.toHexString(), project.id),
-        "extraMinterDetails",
-        `{"currentSettledPrice":${'"' +
-          actualPurchasePrice.toString() +
-          '"'},"numSettleableInvocations":${numPurchased.toString()}}`
+      // assert expected updates
+      let updatedProjectMinterConfig = ProjectMinterConfiguration.load(
+        getProjectMinterConfigId(minterAddress.toHexString(), project.id)
+      );
+      if (updatedProjectMinterConfig == null) {
+        throw new Error("project minter config should not be null");
+      }
+      assertJsonFieldEquals(
+        updatedProjectMinterConfig.extraMinterDetails,
+        "currentSettledPrice",
+        actualPurchasePrice.toString()
+      );
+      assertJsonFieldEquals(
+        updatedProjectMinterConfig.extraMinterDetails,
+        "numSettleableInvocations",
+        numPurchased.toString()
       );
       assert.fieldEquals(
         RECEIPT_ENTITY_TYPE,
@@ -1740,14 +1796,15 @@ describe("DAExpSettlementMinters", () => {
       );
       projectMinterConfig.minter = minterAddress.toHexString();
       projectMinterConfig.project = project.id;
-      projectMinterConfig.extraMinterDetails = "{}";
-      projectMinterConfig.startTime = CURRENT_BLOCK_TIMESTAMP.plus(
+      const _startTime = CURRENT_BLOCK_TIMESTAMP.plus(
         BigInt.fromI32(100)
+      ).toString();
+      const _halfLifeSeconds = BigInt.fromI32(300).toString();
+      const _startPrice = ONE_ETH_IN_WEI.toString();
+      projectMinterConfig.extraMinterDetails = getJsonStringFromInputs(
+        ["startPrice", "startTime", "halfLifeSeconds"],
+        [_startPrice, _startTime, _halfLifeSeconds]
       );
-      projectMinterConfig.halfLifeSeconds = CURRENT_BLOCK_TIMESTAMP.plus(
-        BigInt.fromI32(300)
-      );
-      projectMinterConfig.startPrice = ONE_ETH_IN_WEI;
       projectMinterConfig.basePrice = ONE_ETH_IN_WEI.div(BigInt.fromI32(10));
       projectMinterConfig.priceIsConfigured = true;
       projectMinterConfig.currencyAddress = Address.zero();
@@ -1785,11 +1842,18 @@ describe("DAExpSettlementMinters", () => {
       // handle settlement minter event
       handleSelloutPriceUpdated(changetype<SelloutPriceUpdated>(event));
 
-      assert.fieldEquals(
-        PROJECT_MINTER_CONFIGURATION_ENTITY_TYPE,
-        getProjectMinterConfigId(minterAddress.toHexString(), project.id),
-        "extraMinterDetails",
-        `{"currentSettledPrice":${'"' + selloutPrice.toString() + '"'}}`
+      // assert expected updates
+      let updatedProjectMinterConfig = ProjectMinterConfiguration.load(
+        getProjectMinterConfigId(minterAddress.toHexString(), project.id)
+      );
+      if (updatedProjectMinterConfig == null) {
+        throw new Error("project minter config should not be null");
+      }
+
+      assertJsonFieldEquals(
+        updatedProjectMinterConfig.extraMinterDetails,
+        "currentSettledPrice",
+        selloutPrice.toString()
       );
     });
 
@@ -1816,14 +1880,15 @@ describe("DAExpSettlementMinters", () => {
       );
       projectMinterConfig.minter = minterAddress.toHexString();
       projectMinterConfig.project = project.id;
-      projectMinterConfig.extraMinterDetails = "{}";
-      projectMinterConfig.startTime = CURRENT_BLOCK_TIMESTAMP.plus(
+      const _startTime = CURRENT_BLOCK_TIMESTAMP.plus(
         BigInt.fromI32(100)
+      ).toString();
+      const _halfLifeSeconds = BigInt.fromI32(300).toString();
+      const _startPrice = ONE_ETH_IN_WEI.toString();
+      projectMinterConfig.extraMinterDetails = getJsonStringFromInputs(
+        ["startPrice", "startTime", "halfLifeSeconds"],
+        [_startPrice, _startTime, _halfLifeSeconds]
       );
-      projectMinterConfig.halfLifeSeconds = CURRENT_BLOCK_TIMESTAMP.plus(
-        BigInt.fromI32(300)
-      );
-      projectMinterConfig.startPrice = ONE_ETH_IN_WEI;
       projectMinterConfig.basePrice = ONE_ETH_IN_WEI.div(BigInt.fromI32(10));
       projectMinterConfig.priceIsConfigured = true;
       projectMinterConfig.currencyAddress = Address.zero();
@@ -1884,11 +1949,32 @@ describe("DAExpSettlementMinters", () => {
       handleSelloutPriceUpdated(changetype<SelloutPriceUpdated>(event));
 
       // assert settlement net price reflects the second event's value
-      assert.fieldEquals(
-        PROJECT_MINTER_CONFIGURATION_ENTITY_TYPE,
-        getProjectMinterConfigId(minterAddress.toHexString(), project.id),
-        "extraMinterDetails",
-        `{"currentSettledPrice":${'"' + selloutPrice.toString() + '"'}}`
+      let updatedProjectMinterConfig = ProjectMinterConfiguration.load(
+        getProjectMinterConfigId(minterAddress.toHexString(), project.id)
+      );
+      if (updatedProjectMinterConfig == null) {
+        throw new Error("project minter config should not be null");
+      }
+
+      assertJsonFieldEquals(
+        updatedProjectMinterConfig.extraMinterDetails,
+        "currentSettledPrice",
+        selloutPrice.toString()
+      );
+      assertJsonFieldEquals(
+        updatedProjectMinterConfig.extraMinterDetails,
+        "halfLifeSeconds",
+        _halfLifeSeconds.toString()
+      );
+      assertJsonFieldEquals(
+        updatedProjectMinterConfig.extraMinterDetails,
+        "startPrice",
+        _startPrice.toString()
+      );
+      assertJsonFieldEquals(
+        updatedProjectMinterConfig.extraMinterDetails,
+        "startTime",
+        _startTime.toString()
       );
     });
   });
@@ -1917,14 +2003,15 @@ describe("DAExpSettlementMinters", () => {
       );
       projectMinterConfig.minter = minterAddress.toHexString();
       projectMinterConfig.project = project.id;
-      projectMinterConfig.extraMinterDetails = "{}";
-      projectMinterConfig.startTime = CURRENT_BLOCK_TIMESTAMP.plus(
+      const _startTime = CURRENT_BLOCK_TIMESTAMP.plus(
         BigInt.fromI32(100)
+      ).toString();
+      const _halfLifeSeconds = BigInt.fromI32(300).toString();
+      const _startPrice = ONE_ETH_IN_WEI.toString();
+      projectMinterConfig.extraMinterDetails = getJsonStringFromInputs(
+        ["startPrice", "startTime", "halfLifeSeconds"],
+        [_startPrice, _startTime, _halfLifeSeconds]
       );
-      projectMinterConfig.halfLifeSeconds = CURRENT_BLOCK_TIMESTAMP.plus(
-        BigInt.fromI32(300)
-      );
-      projectMinterConfig.startPrice = ONE_ETH_IN_WEI;
       projectMinterConfig.basePrice = ONE_ETH_IN_WEI.div(BigInt.fromI32(10));
       projectMinterConfig.priceIsConfigured = true;
       projectMinterConfig.currencyAddress = Address.zero();
@@ -1963,13 +2050,23 @@ describe("DAExpSettlementMinters", () => {
         changetype<ArtistAndAdminRevenuesWithdrawn>(event)
       );
 
-      assert.fieldEquals(
-        PROJECT_MINTER_CONFIGURATION_ENTITY_TYPE,
-        getProjectMinterConfigId(minterAddress.toHexString(), project.id),
-        "extraMinterDetails",
-        `{"currentSettledPrice":${'"' +
-          updatedLatestPurchasePrice.toString() +
-          '"'},"auctionRevenuesCollected":${true}}`
+      // assert expected updates
+      let updatedProjectMinterConfig = ProjectMinterConfiguration.load(
+        getProjectMinterConfigId(minterAddress.toHexString(), project.id)
+      );
+      if (updatedProjectMinterConfig == null) {
+        throw new Error("project minter config should not be null");
+      }
+
+      assertJsonFieldEquals(
+        updatedProjectMinterConfig.extraMinterDetails,
+        "currentSettledPrice",
+        updatedLatestPurchasePrice.toString()
+      );
+      assertJsonFieldEquals(
+        updatedProjectMinterConfig.extraMinterDetails,
+        "auctionRevenuesCollected",
+        "true"
       );
     });
   });
@@ -2187,19 +2284,22 @@ describe("MinterSEAV tests", () => {
       "basePrice",
       testBasePrice.toString()
     );
-    assert.fieldEquals(
-      PROJECT_MINTER_CONFIGURATION_ENTITY_TYPE,
-      projectMinterConfigEntityId,
+    // assert expected extra minter details
+    let updatedProjectMinterConfig = ProjectMinterConfiguration.load(
+      projectMinterConfigEntityId
+    );
+    if (updatedProjectMinterConfig == null) {
+      throw new Error("project minter config should not be null");
+    }
+    assertJsonFieldEquals(
+      updatedProjectMinterConfig.extraMinterDetails,
       "startTime",
       testTimestampStart.toString()
     );
-    assert.fieldEquals(
-      PROJECT_MINTER_CONFIGURATION_ENTITY_TYPE,
-      projectMinterConfigEntityId,
-      "extraMinterDetails",
-      '{"projectAuctionDurationSeconds":' +
-        testAuctionDurationSeconds.toString() +
-        "}"
+    assertJsonFieldEquals(
+      updatedProjectMinterConfig.extraMinterDetails,
+      "projectAuctionDurationSeconds",
+      testAuctionDurationSeconds.toString()
     );
   });
 
@@ -2261,12 +2361,6 @@ describe("MinterSEAV tests", () => {
       PROJECT_MINTER_CONFIGURATION_ENTITY_TYPE,
       projectMinterConfigEntityId,
       "basePrice",
-      "0"
-    );
-    assert.fieldEquals(
-      PROJECT_MINTER_CONFIGURATION_ENTITY_TYPE,
-      projectMinterConfigEntityId,
-      "startTime",
       "0"
     );
     assert.fieldEquals(
@@ -2376,12 +2470,6 @@ describe("MinterSEAV tests", () => {
       PROJECT_MINTER_CONFIGURATION_ENTITY_TYPE,
       projectMinterConfigEntityId,
       "basePrice",
-      "0"
-    );
-    assert.fieldEquals(
-      PROJECT_MINTER_CONFIGURATION_ENTITY_TYPE,
-      projectMinterConfigEntityId,
-      "startTime",
       "0"
     );
     assert.fieldEquals(

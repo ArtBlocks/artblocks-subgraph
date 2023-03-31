@@ -46,7 +46,9 @@ import {
   PROJECT_ENTITY_TYPE,
   PROJECT_MINTER_CONFIGURATION_ENTITY_TYPE,
   RandomAddressGenerator,
-  TEST_CONTRACT_ADDRESS
+  TEST_CONTRACT_ADDRESS,
+  assertJsonFieldEquals,
+  getJsonStringFromInputs
 } from "../shared-helpers";
 import {
   mockCoreContract,
@@ -353,11 +355,14 @@ test("handleIsCanonicalMinterFilter should populate project minter configuration
   previousMinterConfig2.currencyAddress = project2CurrencyAddress;
   previousMinterConfig2.currencySymbol = project2CurrencySymbol;
   previousMinterConfig2.purchaseToDisabled = project2PurchaseToDisabled;
-  previousMinterConfig2.startTime = project2StartTime;
-  previousMinterConfig2.endTime = project2EndTime;
-  previousMinterConfig2.startPrice = project2StartPrice;
-  previousMinterConfig2.extraMinterDetails = "{}";
-
+  previousMinterConfig2.extraMinterDetails = getJsonStringFromInputs(
+    ["startTime", "endTime", "startPrice"],
+    [
+      project2StartTime.toString(),
+      project2EndTime.toString(),
+      project2StartPrice.toString()
+    ]
+  );
   previousMinterConfig2.save();
 
   mockGetProjectAndMinterInfoAt(
@@ -398,11 +403,14 @@ test("handleIsCanonicalMinterFilter should populate project minter configuration
   previousMinterConfig3.currencyAddress = project3CurrencyAddress;
   previousMinterConfig3.currencySymbol = project3CurrencySymbol;
   previousMinterConfig3.purchaseToDisabled = project3PurchaseToDisabled;
-  previousMinterConfig3.halfLifeSeconds = project3HalfLifeSeconds;
-  previousMinterConfig3.startTime = project3StartTime;
-  previousMinterConfig3.startPrice = project3StartPrice;
-  previousMinterConfig3.extraMinterDetails = "{}";
-
+  previousMinterConfig3.extraMinterDetails = getJsonStringFromInputs(
+    ["halfLifeSeconds", "startTime", "startPrice"],
+    [
+      project3HalfLifeSeconds.toString(),
+      project3StartTime.toString(),
+      project3StartPrice.toString()
+    ]
+  );
   previousMinterConfig3.save();
 
   mockGetProjectAndMinterInfoAt(
@@ -640,21 +648,24 @@ test("handleIsCanonicalMinterFilter should populate project minter configuration
     "purchaseToDisabled",
     booleanToString(project2PurchaseToDisabled)
   );
-  assert.fieldEquals(
-    PROJECT_MINTER_CONFIGURATION_ENTITY_TYPE,
-    configId2,
+
+  // assert expected updates to extraMinterDetails
+  let updatedProjectMinterConfig2 = ProjectMinterConfiguration.load(configId2);
+  if (updatedProjectMinterConfig2 == null) {
+    throw new Error("project minter config should not be null");
+  }
+  assertJsonFieldEquals(
+    updatedProjectMinterConfig2.extraMinterDetails,
     "startTime",
     project2StartTime.toString()
   );
-  assert.fieldEquals(
-    PROJECT_MINTER_CONFIGURATION_ENTITY_TYPE,
-    configId2,
+  assertJsonFieldEquals(
+    updatedProjectMinterConfig2.extraMinterDetails,
     "endTime",
     project2EndTime.toString()
   );
-  assert.fieldEquals(
-    PROJECT_MINTER_CONFIGURATION_ENTITY_TYPE,
-    configId2,
+  assertJsonFieldEquals(
+    updatedProjectMinterConfig2.extraMinterDetails,
     "startPrice",
     project2StartPrice.toString()
   );
@@ -720,21 +731,23 @@ test("handleIsCanonicalMinterFilter should populate project minter configuration
     "purchaseToDisabled",
     booleanToString(project3PurchaseToDisabled)
   );
-  assert.fieldEquals(
-    PROJECT_MINTER_CONFIGURATION_ENTITY_TYPE,
-    configId3,
+  // assert expected updates to extraMinterDetails
+  let updatedProjectMinterConfig3 = ProjectMinterConfiguration.load(configId3);
+  if (updatedProjectMinterConfig3 == null) {
+    throw new Error("project minter config should not be null");
+  }
+  assertJsonFieldEquals(
+    updatedProjectMinterConfig3.extraMinterDetails,
     "startTime",
     project3StartTime.toString()
   );
-  assert.fieldEquals(
-    PROJECT_MINTER_CONFIGURATION_ENTITY_TYPE,
-    configId3,
+  assertJsonFieldEquals(
+    updatedProjectMinterConfig3.extraMinterDetails,
     "halfLifeSeconds",
     project3HalfLifeSeconds.toString()
   );
-  assert.fieldEquals(
-    PROJECT_MINTER_CONFIGURATION_ENTITY_TYPE,
-    configId3,
+  assertJsonFieldEquals(
+    updatedProjectMinterConfig3.extraMinterDetails,
     "startPrice",
     project3StartPrice.toString()
   );
@@ -979,15 +992,18 @@ test("handleMinterApproved should populate DA Exp default half life ranges", () 
       "updatedAt",
       CURRENT_BLOCK_TIMESTAMP.toString()
     );
-    assert.fieldEquals(
-      MINTER_ENTITY_TYPE,
-      minterToBeApprovedAddress.toHexString(),
+    // assert expected updates to extraMinterDetails
+    let updatedMinter = Minter.load(minterToBeApprovedAddress.toHexString());
+    if (updatedMinter == null) {
+      throw new Error("minter config should not be null");
+    }
+    assertJsonFieldEquals(
+      updatedMinter.extraMinterDetails,
       "minimumHalfLifeInSeconds",
       "300"
     );
-    assert.fieldEquals(
-      MINTER_ENTITY_TYPE,
-      minterToBeApprovedAddress.toHexString(),
+    assertJsonFieldEquals(
+      updatedMinter.extraMinterDetails,
       "maximumHalfLifeInSeconds",
       "3600"
     );
@@ -1044,9 +1060,13 @@ test("handleMinterApproved should populate DA Lin min auction time", () => {
       "updatedAt",
       CURRENT_BLOCK_TIMESTAMP.toString()
     );
-    assert.fieldEquals(
-      MINTER_ENTITY_TYPE,
-      minterToBeApprovedAddress.toHexString(),
+    // assert expected updates to extraMinterDetails
+    let updatedMinter = Minter.load(minterToBeApprovedAddress.toHexString());
+    if (updatedMinter == null) {
+      throw new Error("minter config should not be null");
+    }
+    assertJsonFieldEquals(
+      updatedMinter.extraMinterDetails,
       "minimumAuctionLengthInSeconds",
       "3600"
     );

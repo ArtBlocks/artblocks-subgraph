@@ -1,15 +1,15 @@
-import {
-  assert,
-  createMockedFunction,
-  log
-} from "matchstick-as/assembly/index";
+import { assert, createMockedFunction } from "matchstick-as/assembly/index";
 import {
   Address,
   BigInt,
   ethereum,
   crypto,
   ByteArray,
-  Bytes
+  Bytes,
+  json,
+  JSONValueKind,
+  JSONValue,
+  TypedMap
 } from "@graphprotocol/graph-ts";
 import {
   Contract,
@@ -22,7 +22,8 @@ import {
 } from "../../generated/schema";
 import {
   generateContractSpecificId,
-  getProjectMinterConfigId
+  getProjectMinterConfigId,
+  typedMapToJSONString
 } from "../../src/helpers";
 
 // Utils
@@ -637,4 +638,69 @@ export function assertTestContractFields(
     "nextProjectId",
     nextProjectId.toString()
   );
+}
+
+// @dev does not support expected value types of NULL, OBJECT, or ARRAY
+export function assertJsonFieldEquals(
+  jsonString: string,
+  key: string,
+  expectedValue: string
+): void {
+  let jsonResult = json.try_fromString(jsonString);
+  let jsonMapping: TypedMap<string, JSONValue>;
+  if (jsonResult.isOk && jsonResult.value.kind == JSONValueKind.OBJECT) {
+    jsonMapping = jsonResult.value.toObject();
+  } else {
+    throw new Error(
+      `Expected string to be valid json but was not: ${jsonString}`
+    );
+  }
+  let _val = jsonMapping.get(key);
+  // handle null case
+  if (_val == null) {
+    throw new Error(`Expected json to contain key ${key}, but not found`);
+  }
+  // assert that the value is equal to the expected value
+  // @dev using != instead of !== okay because strict typing rules apply in AS
+  if (_val.kind == JSONValueKind.STRING) {
+    if (_val.toString() != expectedValue) {
+      throw new Error(
+        `Expected json value ${_val.toString()} == ${expectedValue}, but did not`
+      );
+    }
+  } else if (_val.kind == JSONValueKind.NUMBER) {
+    if (_val.toBigInt().toString() != expectedValue) {
+      throw new Error(
+        `Expected json value ${_val
+          .toBigInt()
+          .toString()} == ${expectedValue}, but did not`
+      );
+    }
+  } else if (_val.kind == JSONValueKind.BOOL) {
+    if (_val.toBool().toString() != expectedValue) {
+      throw new Error(
+        `Expected json value ${_val
+          .toBool()
+          .toString()} == ${expectedValue}, but did not`
+      );
+    }
+  } else {
+    throw new Error(
+      `Unsupported type for helper function. Expected json value to be a string, number, or boolean, but was not.`
+    );
+  }
+}
+
+// helper function to convert from an aligned key/value pair of arrays to a json string
+// @dev only supports string inputs/outputs
+export function getJsonStringFromInputs(
+  keys: Array<string>,
+  values: Array<string>
+): string {
+  let jsonMapping = new TypedMap<string, JSONValue>();
+  for (let i = 0; i < keys.length; i++) {
+    jsonMapping.set(keys[i], json.fromString(values[i]));
+  }
+  // use helper function to convert from typed map to json string
+  return typedMapToJSONString(jsonMapping);
 }
