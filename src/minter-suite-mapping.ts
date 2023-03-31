@@ -209,6 +209,9 @@ export function handleMinimumAuctionLengthSecondsUpdated(
   event: MinimumAuctionLengthSecondsUpdated
 ): void {
   let minter = loadOrCreateMinter(event.address, event.block.timestamp);
+  // @dev deprecated field minter.minimumAuctionLengthInSeconds
+  minter.minimumAuctionLengthInSeconds =
+    event.params._minimumAuctionLengthSeconds;
   handleSetMinterDetailsGeneric(
     "minimumAuctionLengthInSeconds",
     event.params._minimumAuctionLengthSeconds,
@@ -231,6 +234,12 @@ export function handleDALinSetAuctionDetails(
     let projectMinterConfig = minterProjectAndConfig.projectMinterConfiguration;
     let project = minterProjectAndConfig.project;
     projectMinterConfig.basePrice = event.params._basePrice;
+    // @dev deprecated field projectMinterConfig.startPrice
+    projectMinterConfig.startPrice = event.params._startPrice;
+    // @dev deprecated field projectMinterConfig.startTime
+    projectMinterConfig.startTime = event.params._auctionTimestampStart;
+    // @dev deprecated field projectMinterConfig.endTime
+    projectMinterConfig.endTime = event.params._auctionTimestampEnd;
     handleSetMinterDetailsGeneric(
       "startPrice",
       event.params._startPrice,
@@ -268,6 +277,12 @@ export function handleDALinResetAuctionDetails(
     let project = minterProjectAndConfig.project;
 
     projectMinterConfig.basePrice = null;
+    // @dev deprecated field projectMinterConfig.startPrice
+    projectMinterConfig.startPrice = null;
+    // @dev deprecated field projectMinterConfig.startTime
+    projectMinterConfig.startTime = null;
+    // @dev deprecated field projectMinterConfig.endTime
+    projectMinterConfig.endTime = null;
     handleRemoveMinterDetailsGeneric("startPrice", projectMinterConfig);
     handleRemoveMinterDetailsGeneric("startTime", projectMinterConfig);
     handleRemoveMinterDetailsGeneric("endTime", projectMinterConfig);
@@ -284,6 +299,12 @@ export function handleAuctionHalfLifeRangeSecondsUpdated(
   event: DAExpHalfLifeRangeSecondsUpdated
 ): void {
   let minter = loadOrCreateMinter(event.address, event.block.timestamp);
+  // @dev deprecated field minter.minimumHalfLifeInSeconds
+  minter.minimumHalfLifeInSeconds =
+    event.params._minimumPriceDecayHalfLifeSeconds;
+  // @dev deprecated field minter.maximumHalfLifeInSeconds
+  minter.maximumHalfLifeInSeconds =
+    event.params._maximumPriceDecayHalfLifeSeconds;
   handleSetMinterDetailsGeneric(
     "minimumHalfLifeInSeconds",
     event.params._minimumPriceDecayHalfLifeSeconds,
@@ -312,6 +333,13 @@ export function handleDAExpSetAuctionDetails(
     let project = minterProjectAndConfig.project;
 
     projectMinterConfig.basePrice = event.params._basePrice;
+    // @dev deprecated field projectMinterConfig.startPrice
+    projectMinterConfig.startPrice = event.params._startPrice;
+    // @dev deprecated field projectMinterConfig._auctionTimestampStart
+    projectMinterConfig.startTime = event.params._auctionTimestampStart;
+    // @dev deprecated field projectMinterConfig.halfLifeSeconds
+    projectMinterConfig.halfLifeSeconds =
+      event.params._priceDecayHalfLifeSeconds;
     handleSetMinterDetailsGeneric(
       "startPrice",
       event.params._startPrice,
@@ -368,6 +396,12 @@ export function handleDAExpResetAuctionDetailsGeneric<T>(event: T): void {
     let project = minterProjectAndConfig.project;
 
     projectMinterConfig.basePrice = null;
+    // @dev deprecated field projectMinterConfig.startPrice
+    projectMinterConfig.startPrice = null;
+    // @dev deprecated field projectMinterConfig.startTime
+    projectMinterConfig.startTime = null;
+    // @dev deprecated field projectMinterConfig.halfLifeSeconds
+    projectMinterConfig.halfLifeSeconds = null;
     handleRemoveMinterDetailsGeneric("startPrice", projectMinterConfig);
     handleRemoveMinterDetailsGeneric("startTime", projectMinterConfig);
     handleRemoveMinterDetailsGeneric("halfLifeSeconds", projectMinterConfig);
@@ -594,8 +628,10 @@ export function handleConfiguredFutureAuctions(
     let projectMinterConfig = minterProjectAndConfig.projectMinterConfiguration;
     // update project minter configuration fields
     projectMinterConfig.priceIsConfigured = true;
-    // update project minter configuration extraMinterDetails json field
     projectMinterConfig.basePrice = event.params.basePrice;
+    // @dev deprecated field projectMinterConfig.startTime
+    projectMinterConfig.startTime = event.params.timestampStart;
+    // update project minter configuration extraMinterDetails json field
     handleSetMinterDetailsGeneric(
       "startTime",
       event.params.timestampStart,
@@ -626,6 +662,8 @@ export function handleResetAuctionDetails(event: ResetAuctionDetails): void {
     // reset project minter configuration fields
     projectMinterConfig.priceIsConfigured = false;
     projectMinterConfig.basePrice = BigInt.fromI32(0);
+    // @dev deprecated field projectMinterConfig.startTime
+    projectMinterConfig.startTime = BigInt.fromI32(0);
     // clear project minter configuration extraMinterDetails json field
     handleRemoveMinterDetailsGeneric("startTime", projectMinterConfig);
     handleRemoveMinterDetailsGeneric(
