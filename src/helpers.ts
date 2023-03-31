@@ -192,6 +192,8 @@ export function loadOrCreateMinter(
     .genArt721CoreAddress()
     .toHexString();
   minter.extraMinterDetails = "{}";
+  // @dev must populate updatedAt before calling handleSetMinterDetailsGeneric
+  // to avoid saving an entity with a null updatedAt value (non-nullable field)
   minter.updatedAt = timestamp;
 
   // values assigned during contract deployments
