@@ -192,6 +192,7 @@ export function loadOrCreateMinter(
     .genArt721CoreAddress()
     .toHexString();
   minter.extraMinterDetails = "{}";
+  minter.updatedAt = timestamp;
 
   // values assigned during contract deployments
   // @dev not required in more recent minters (e.g. MinterSEA) by emitting
@@ -226,7 +227,6 @@ export function loadOrCreateMinter(
     minter.type = "";
   }
 
-  minter.updatedAt = timestamp;
   minter.save();
   return minter;
 }
