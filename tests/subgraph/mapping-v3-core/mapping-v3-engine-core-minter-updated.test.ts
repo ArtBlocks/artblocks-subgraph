@@ -21,7 +21,9 @@ import {
   addNewProjectToStore,
   MINTER_FILTER_ENTITY_TYPE,
   ONE_ETH_IN_WEI,
-  booleanToString
+  booleanToString,
+  assertJsonFieldEquals,
+  getJsonStringFromInputs
 } from "../shared-helpers";
 
 import {
@@ -34,7 +36,7 @@ import {
 
 import { mockGetProjectAndMinterInfoAt } from "../minter-suite/helpers";
 
-import { ProjectMinterConfiguration } from "../../../generated/schema";
+import { ProjectMinterConfiguration, Minter } from "../../../generated/schema";
 import { MinterUpdated } from "../../../generated/IGenArt721CoreV3_Base/IGenArt721CoreContractV3_Base";
 import { handleMinterUpdated } from "../../../src/mapping-v3-core";
 import { getProjectMinterConfigId } from "../../../src/helpers";
@@ -366,11 +368,19 @@ test(`${coreType}/MinterUpdated: should populate project minter configurations f
   previousMinterConfig2.currencyAddress = project2CurrencyAddress;
   previousMinterConfig2.currencySymbol = project2CurrencySymbol;
   previousMinterConfig2.purchaseToDisabled = project2PurchaseToDisabled;
+  // @dev Deprecated fields ----------------
   previousMinterConfig2.startTime = project2StartTime;
   previousMinterConfig2.endTime = project2EndTime;
   previousMinterConfig2.startPrice = project2StartPrice;
-  previousMinterConfig2.extraMinterDetails = "{}";
-
+  // ---------------------------------------
+  previousMinterConfig2.extraMinterDetails = getJsonStringFromInputs(
+    ["startTime", "endTime", "startPrice"],
+    [
+      project2StartTime.toString(),
+      project2EndTime.toString(),
+      project2StartPrice.toString()
+    ]
+  );
   previousMinterConfig2.save();
 
   mockGetProjectAndMinterInfoAt(
@@ -411,11 +421,19 @@ test(`${coreType}/MinterUpdated: should populate project minter configurations f
   previousMinterConfig3.currencyAddress = project3CurrencyAddress;
   previousMinterConfig3.currencySymbol = project3CurrencySymbol;
   previousMinterConfig3.purchaseToDisabled = project3PurchaseToDisabled;
+  // @dev Deprecated fields ----------------
   previousMinterConfig3.halfLifeSeconds = project3HalfLifeSeconds;
   previousMinterConfig3.startTime = project3StartTime;
   previousMinterConfig3.startPrice = project3StartPrice;
-  previousMinterConfig3.extraMinterDetails = "{}";
-
+  // ---------------------------------------
+  previousMinterConfig3.extraMinterDetails = getJsonStringFromInputs(
+    ["startTime", "halfLifeSeconds", "startPrice"],
+    [
+      project3StartTime.toString(),
+      project3HalfLifeSeconds.toString(),
+      project3StartPrice.toString()
+    ]
+  );
   previousMinterConfig3.save();
 
   mockGetProjectAndMinterInfoAt(
@@ -654,6 +672,28 @@ test(`${coreType}/MinterUpdated: should populate project minter configurations f
     "purchaseToDisabled",
     booleanToString(project2PurchaseToDisabled)
   );
+
+  // assert expected updates to extraMinterDetails
+  let updatedProjectMinterConfig = ProjectMinterConfiguration.load(configId2);
+  if (updatedProjectMinterConfig == null) {
+    throw new Error("project minter config should not be null");
+  }
+  assertJsonFieldEquals(
+    updatedProjectMinterConfig.extraMinterDetails,
+    "startTime",
+    project2StartTime.toString()
+  );
+  assertJsonFieldEquals(
+    updatedProjectMinterConfig.extraMinterDetails,
+    "endTime",
+    project2EndTime.toString()
+  );
+  assertJsonFieldEquals(
+    updatedProjectMinterConfig.extraMinterDetails,
+    "startPrice",
+    project2StartPrice.toString()
+  );
+  // @dev Deprecated fields ----------------
   assert.fieldEquals(
     PROJECT_MINTER_CONFIGURATION_ENTITY_TYPE,
     configId2,
@@ -672,6 +712,7 @@ test(`${coreType}/MinterUpdated: should populate project minter configurations f
     "startPrice",
     project2StartPrice.toString()
   );
+  // ---------------------------------------
 
   // Project 3 asserts
 
@@ -734,6 +775,28 @@ test(`${coreType}/MinterUpdated: should populate project minter configurations f
     "purchaseToDisabled",
     booleanToString(project3PurchaseToDisabled)
   );
+
+  // assert expected updates to extraMinterDetails
+  let updatedProjectMinterConfig3 = ProjectMinterConfiguration.load(configId3);
+  if (updatedProjectMinterConfig3 == null) {
+    throw new Error("project minter config should not be null");
+  }
+  assertJsonFieldEquals(
+    updatedProjectMinterConfig3.extraMinterDetails,
+    "startTime",
+    project3StartTime.toString()
+  );
+  assertJsonFieldEquals(
+    updatedProjectMinterConfig3.extraMinterDetails,
+    "halfLifeSeconds",
+    project3HalfLifeSeconds.toString()
+  );
+  assertJsonFieldEquals(
+    updatedProjectMinterConfig3.extraMinterDetails,
+    "startPrice",
+    project3StartPrice.toString()
+  );
+  // @dev Deprecated fields ----------------
   assert.fieldEquals(
     PROJECT_MINTER_CONFIGURATION_ENTITY_TYPE,
     configId3,
@@ -752,6 +815,7 @@ test(`${coreType}/MinterUpdated: should populate project minter configurations f
     "startPrice",
     project3StartPrice.toString()
   );
+  // ---------------------------------------
 });
 
 // export handlers for test coverage https://github.com/LimeChain/demo-subgraph#test-coverage

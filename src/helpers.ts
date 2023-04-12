@@ -20,6 +20,8 @@ import {
 import { IFilteredMinterDALinV1 } from "../generated/MinterDALin/IFilteredMinterDALinV1";
 import { IFilteredMinterDAExpV1 } from "../generated/MinterDAExp/IFilteredMinterDAExpV1";
 
+import { handleSetMinterDetailsGeneric } from "./minter-suite-mapping";
+
 export function generateProjectExternalAssetDependencyId(
   projectId: string,
   index: string
@@ -190,19 +192,42 @@ export function loadOrCreateMinter(
     .genArt721CoreAddress()
     .toHexString();
   minter.extraMinterDetails = "{}";
+  // @dev must populate updatedAt before calling handleSetMinterDetailsGeneric
+  // to avoid saving an entity with a null updatedAt value (non-nullable field)
+  minter.updatedAt = timestamp;
 
   // values assigned during contract deployments
+  // @dev not required in more recent minters (e.g. MinterSEA) by emitting
+  // events during deployment that communicate default minter config values
   let minterType = filteredMinterContract.try_minterType();
   if (!minterType.reverted) {
     minter.type = minterType.value;
     // populate any minter-specific values
     if (minter.type.startsWith("MinterDALin")) {
       const contract = IFilteredMinterDALinV1.bind(minterAddress);
+      // @dev deprecated minter.minimumAuctionLengthInSeconds
       minter.minimumAuctionLengthInSeconds = contract.minimumAuctionLengthSeconds();
+      handleSetMinterDetailsGeneric(
+        "minimumAuctionLengthInSeconds",
+        contract.minimumAuctionLengthSeconds(),
+        minter
+      );
     } else if (minter.type.startsWith("MinterDAExp")) {
       const contract = IFilteredMinterDAExpV1.bind(minterAddress);
+      // @dev deprecated minter.minimumHalfLifeInSeconds
       minter.minimumHalfLifeInSeconds = contract.minimumPriceDecayHalfLifeSeconds();
+      // @dev deprecated minter.maximumHalfLifeInSeconds
       minter.maximumHalfLifeInSeconds = contract.maximumPriceDecayHalfLifeSeconds();
+      handleSetMinterDetailsGeneric(
+        "minimumHalfLifeInSeconds",
+        contract.minimumPriceDecayHalfLifeSeconds(),
+        minter
+      );
+      handleSetMinterDetailsGeneric(
+        "maximumHalfLifeInSeconds",
+        contract.maximumPriceDecayHalfLifeSeconds(),
+        minter
+      );
     }
   } else {
     // if minterType() reverts, then the minter is not as expected and is
@@ -210,7 +235,6 @@ export function loadOrCreateMinter(
     minter.type = "";
   }
 
-  minter.updatedAt = timestamp;
   minter.save();
   return minter;
 }
@@ -223,7 +247,9 @@ export function getMinterDetails<T>(config: T): TypedMap<string, JSONValue> {
   if (
     !(config instanceof ProjectMinterConfiguration || config instanceof Minter)
   ) {
-    throw new Error("cannot find extra minter details on " + config);
+    throw new Error(
+      "cannot find extra minter details on generic that is not a Minter or ProjectMinterConfiguration"
+    );
   }
   let jsonResult = json.try_fromString(config.extraMinterDetails);
 
