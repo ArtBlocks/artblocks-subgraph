@@ -1076,6 +1076,13 @@ describe("MinterDAExp-related tests", () => {
           "halfLifeSeconds",
           halfLifeSeconds.toString()
         );
+        // approx DA length calculated separately via calculator
+        const approxDAExpLength = BigInt.fromI32(1360);
+        assertJsonFieldEquals(
+          updatedProjectMinterConfig.extraMinterDetails,
+          "approximateDAExpEndTime",
+          startTime.plus(approxDAExpLength).toString()
+        );
 
         // @dev Deprecated fields ----------------
         assert.fieldEquals(
