@@ -364,6 +364,8 @@ export function handleDAExpSetAuctionDetails(
     const completedHalfLives = BigInt.fromString(
       u8(Math.floor(Math.log(priceRatio) / Math.log(2))).toString()
     );
+    // @dev max possible completedHalfLives is 255 due to on-chain use of uint256,
+    // so this is safe
     const completedHalfLivesU8: u8 = u8(
       Number.parseInt(completedHalfLives.toString())
     );
