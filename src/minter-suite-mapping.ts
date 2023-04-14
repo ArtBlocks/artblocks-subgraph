@@ -439,6 +439,10 @@ export function handleDAExpResetAuctionDetailsGeneric<T>(event: T): void {
     handleRemoveMinterDetailsGeneric("startPrice", projectMinterConfig);
     handleRemoveMinterDetailsGeneric("startTime", projectMinterConfig);
     handleRemoveMinterDetailsGeneric("halfLifeSeconds", projectMinterConfig);
+    handleRemoveMinterDetailsGeneric(
+      "approximateDAExpEndTime",
+      projectMinterConfig
+    );
     projectMinterConfig.priceIsConfigured = false;
     projectMinterConfig.save();
     // update project.updatedAt to queue sync of projectMinterConfig changes
