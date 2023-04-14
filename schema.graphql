@@ -227,7 +227,7 @@ type Contract @entity {
   "Basis points of secondary sales allocated to the platform, only for V3_Engine contracts"
   enginePlatformProviderSecondarySalesBPS: BigInt
 
-  "List of contracts that are allowed to mint"
+  "List of contracts that are allowed to mint, equal to the single minterFilter address for V3 contracts"
   mintWhitelisted: [Bytes!]!
 
   "Randomizer contract used to generate token hashes"
@@ -254,7 +254,7 @@ type Contract @entity {
 
   updatedAt: BigInt!
 
-  "Associated minter filter (if being indexed) - not always indexed for Engine contracts"
+  "Associated minter filter contract, if any"
   minterFilter: MinterFilter
 
   preferredIPFSGateway: String
@@ -343,14 +343,37 @@ type MinterFilter @entity {
   "Unique identifier made up of minter filter contract address"
   id: ID!
 
-  "Associated core contract"
-  coreContract: Contract!
+  "Associated core contract, only used for MinterFilterV0 & MinterFilterV1 (null for MinterFilterV2+)"
+  coreContract: Contract
 
-  "Minters allowlisted on MinterFilter"
+  "Minters allowlisted globally on this MinterFilter"
   minterAllowlist: [Minter!]!
+
+  "Minters allowlisted at a contract-level on this MinterFilter, only used for MinterFilterV2+"
+  minterFilterContractAllowlists: [MinterFilterContractAllowlist!]!
+    @derivedFrom(field: "minterFilter")
 
   "Minters associated with MinterFilter"
   associatedMinters: [Minter!]! @derivedFrom(field: "minterFilter")
+
+  "Engine registry used by this MinterFilter, only used for MinterFilterV2+"
+  engineRegistry: EngineRegistry
+
+  updatedAt: BigInt!
+}
+
+type MinterFilterContractAllowlist @entity {
+  "Unique identifier made up of {minter filter contract address}-{core contract address}"
+  id: ID!
+
+  "MinterFilter contract"
+  minterFilter: MinterFilter!
+
+  "Core contract"
+  contract: Contract!
+
+  "Minter contract addresses allowed at the contract level (extending global MinterFilter allowlist)"
+  minterContractAllowlist: [Bytes!]!
 
   updatedAt: BigInt!
 }
@@ -368,7 +391,8 @@ type Minter @entity {
   "Configuration details used by specific minters (json string)"
   extraMinterDetails: String!
 
-  coreContract: Contract!
+  "Associated core contract, only used before Minter Suite V2"
+  coreContract: Contract
 
   "Receipts for this minter, only for minters with settlement"
   receipts: [Receipt!] @derivedFrom(field: "minter")
@@ -386,7 +410,7 @@ type Minter @entity {
 }
 
 type ProjectMinterConfiguration @entity {
-  "Unique identifier made up of minter contract address-projectId"
+  "Unique identifier made up of {minter contract address}-{core contract address}-{project number}"
   id: ID!
 
   "The associated project"
@@ -430,7 +454,7 @@ type ProjectMinterConfiguration @entity {
 }
 
 type Receipt @entity {
-  "Unique identifier made up of minter contract address-projectId-accountAddress"
+  "Unique identifier made up of {minter contract address}-{core contract address}-{project number}-{account address}"
   id: ID!
 
   "The associated project"
