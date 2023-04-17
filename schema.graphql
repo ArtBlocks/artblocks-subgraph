@@ -388,6 +388,9 @@ type Minter @entity {
   "Associated Minter Filter"
   minterFilter: MinterFilter!
 
+  "Boolean representing if the Mitner is globally allowed on its associated minter filter"
+  isGloballyAllowlistedOnMinterFilter: Boolean
+
   "Configuration details used by specific minters (json string)"
   extraMinterDetails: String!
 
