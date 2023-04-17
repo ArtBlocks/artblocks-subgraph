@@ -171,11 +171,11 @@ type ProposedArtistAddressesAndSplit @entity {
   createdAt: BigInt!
 }
 
-type EngineRegistry @entity {
-  "Unique identifier made up of the Engine Registry's contract address"
+type CoreRegistry @entity {
+  "Unique identifier made up of the Core Registry's contract address (legacy name was Engine Registry)"
   id: ID!
 
-  "Core contracts that are registered on this Engine Registry, when this is most recent Engine Registry to add the contract"
+  "All core contracts that are registered on this CoreRegistry, when this is most recent Core Registry to add the contract"
   registeredContracts: [Contract!] @derivedFrom(field: "registeredOn")
 }
 
@@ -267,8 +267,8 @@ type Contract @entity {
   "Automatically approve all artist split proposals (used on V3 Engine contracts)"
   autoApproveArtistSplitProposals: Boolean
 
-  "Latest engine registry that this contract is registered with, if any (used for indexing purposes)"
-  registeredOn: EngineRegistry
+  "Latest core registry that this contract is registered with, if any (used for indexing purposes)"
+  registeredOn: CoreRegistry
 }
 
 type Whitelisting @entity {
@@ -356,8 +356,8 @@ type MinterFilter @entity {
   "Minters associated with MinterFilter"
   associatedMinters: [Minter!]! @derivedFrom(field: "minterFilter")
 
-  "Engine registry used by this MinterFilter, only used for MinterFilterV2+"
-  engineRegistry: EngineRegistry
+  "Core contract registry used by this MinterFilter, only used for MinterFilterV2+"
+  coreRegistry: CoreRegistry
 
   updatedAt: BigInt!
 }
