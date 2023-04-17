@@ -665,7 +665,7 @@ export function assertJsonFieldEquals(
   if (_val.kind == JSONValueKind.STRING) {
     if (_val.toString() != expectedValue) {
       throw new Error(
-        `Expected json value ${_val.toString()} == ${expectedValue}, but did not`
+        `Expected json value for key ${key} to be ${expectedValue}, but was ${_val.toString()}`
       );
     }
   } else if (_val.kind == JSONValueKind.NUMBER) {

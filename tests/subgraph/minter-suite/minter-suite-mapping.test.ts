@@ -1076,6 +1076,13 @@ describe("MinterDAExp-related tests", () => {
           "halfLifeSeconds",
           halfLifeSeconds.toString()
         );
+        // approx DA length calculated separately via calculator
+        const approxDAExpLength = BigInt.fromI32(1360);
+        assertJsonFieldEquals(
+          updatedProjectMinterConfig.extraMinterDetails,
+          "approximateDAExpEndTime",
+          startTime.plus(approxDAExpLength).toString()
+        );
 
         // @dev Deprecated fields ----------------
         assert.fieldEquals(
@@ -1336,9 +1343,19 @@ describe("MinterDAExp-related tests", () => {
         ).toString();
         const _halfLifeSeconds = BigInt.fromI32(300).toString();
         const _startPrice = ONE_ETH_IN_WEI.toString();
+        const _approximateDAExpEndTime = CURRENT_BLOCK_TIMESTAMP.plus(
+          BigInt.fromI32(100)
+        )
+          .plus(BigInt.fromI32(1360))
+          .toString();
         projectMinterConfig.extraMinterDetails = getJsonStringFromInputs(
-          ["startPrice", "startTime", "halfLifeSeconds"],
-          [_startPrice, _startTime, _halfLifeSeconds]
+          [
+            "startPrice",
+            "startTime",
+            "halfLifeSeconds",
+            "approximateDAExpEndTime"
+          ],
+          [_startPrice, _startTime, _halfLifeSeconds, _approximateDAExpEndTime]
         );
         // @dev Deprecated fields ----------------
         projectMinterConfig.startTime = CURRENT_BLOCK_TIMESTAMP.plus(
