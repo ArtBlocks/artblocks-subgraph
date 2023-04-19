@@ -22,87 +22,17 @@ import {
 } from "@graphprotocol/graph-ts";
 import { booleanToString } from "./helpers";
 
-export function typedMapToJSONString(map: TypedMap<string, JSONValue>): string {
-  let jsonString = "{";
-  for (let i = 0; i < map.entries.length; i++) {
-    let entry = map.entries[i];
-    let val = entry.value;
-    let newVal = "";
-    let quoted = "";
-    if (JSONValueKind.BOOL == val.kind) {
-      newVal = booleanToString(val.toBool());
-    } else if (JSONValueKind.NUMBER == val.kind) {
-      newVal = val.toBigInt().toString();
-    } else if (JSONValueKind.STRING == val.kind) {
-      newVal = val.toString();
-      quoted = '"';
-    } else if (JSONValueKind.ARRAY == val.kind) {
-      newVal =
-        "[" +
-        val
-          .toArray()
-          .map<string>((v: JSONValue) => {
-            let mapped = "";
-            if (JSONValueKind.BOOL == v.kind) {
-              mapped = booleanToString(v.toBool());
-            } else if (JSONValueKind.STRING == v.kind) {
-              mapped = '"' + v.toString() + '"';
-            } else if (JSONValueKind.NUMBER == v.kind) {
-              mapped = v.toBigInt().toString();
-            }
-            return mapped;
-          })
-          .toString() +
-        "]";
-    }
+/*** Utils for converting values to JSONValue ***/
 
-    jsonString +=
-      stringToJSONString(entry.key.toString()) +
-      ":" +
-      quoted +
-      newVal +
-      quoted +
-      (i == map.entries.length - 1 ? "" : ",");
-  }
-  jsonString += "}";
-  return jsonString;
-}
-
-export function indexOfValueInArray<ValueType>(
-  array: JSONValue[],
-  value: ValueType
-): i32 {
-  const jsonValue = toJSONValue(value);
-  for (let i = 0; i < array.length; i++) {
-    if (
-      jsonValue.kind === JSONValueKind.STRING &&
-      array[i].kind === JSONValueKind.STRING &&
-      // Note the double equals here, this is intentional
-      // as assemblyscript checks for reference equality
-      // with triple equals and we want to check for value
-      // equality
-      jsonValue.toString() == array[i].toString()
-    ) {
-      return i;
-    }
-    if (
-      jsonValue.kind === JSONValueKind.NUMBER &&
-      array[i].kind === JSONValueKind.NUMBER &&
-      jsonValue.toBigInt().equals(array[i].toBigInt())
-    ) {
-      return i;
-    }
-    if (
-      jsonValue.kind === JSONValueKind.BOOL &&
-      array[i].kind === JSONValueKind.BOOL &&
-      jsonValue.toBool() === array[i].toBool()
-    ) {
-      return i;
-    }
-  }
-  return -1;
-}
-
+/**
+ * @dev note that this function is not exhaustive and only supports a subset of types.
+ * Note, specifically, that it does not support arrays. This is because AssemblyScript
+ * can't iterate over generic arrays of objects because the memory layout of the array
+ * is not known at compile time. This means that we can't iterate over the array to
+ * convert each element to a JSONValue. If you need to convert an array, you can manually
+ * iterate over the array in context and convert each element to a JSONValue before
+ * converting it with the jsonValueArrayToJSONValue.
+ */
 export function toJSONValue<ValueType>(value: ValueType): JSONValue {
   if (isBoolean(value)) {
     return json.fromString(booleanToString(value as boolean));
@@ -114,11 +44,14 @@ export function toJSONValue<ValueType>(value: ValueType): JSONValue {
     return bytesToJSONValue(value);
   } else if (value instanceof String) {
     return stringToJSONValue(value.toString());
+  } else if (isTypedMapOfStringJSONValue(value)) {
+    return typedMapToJSONValue(changetype<TypedMap<string, JSONValue>>(value));
+  } else if (value instanceof JSONValue) {
+    return value;
   } else if (!value) {
     return json.fromString("null");
   } else {
-    log.warning("Unexpected value type provided, returning null JSONValue", []);
-    return json.fromString("null");
+    throw Error("Unsupported type for JSONValue conversion");
   }
 }
 
@@ -126,8 +59,14 @@ export function stringToJSONValue(value: string): JSONValue {
   return json.fromString('["' + value + '"]').toArray()[0];
 }
 
-export function arrayToJSONValue(value: string): JSONValue {
-  return json.fromString("[" + value + "]");
+export function jsonValueArrayToJSONValue(arr: JSONValue[]): JSONValue {
+  return json.fromString("[" + jsonValueArrayToCommaSeparatedString(arr) + "]");
+}
+
+export function typedMapToJSONValue(
+  value: TypedMap<string, JSONValue>
+): JSONValue {
+  return json.fromString(typedMapToJSONString(value));
 }
 
 // If byte data is parseable to a valid unicode string then do so
@@ -152,25 +91,7 @@ export function bytesToJSONValue(value: Bytes): JSONValue {
   return result.value.toArray()[0];
 }
 
-export function stringToJSONString(value: string): string {
-  return '"' + value + '"';
-}
-
-export class TypedMapEntry {
-  key: string;
-  value: JSONValue;
-}
-
-export function createTypedMapFromEntries(
-  entries: TypedMapEntry[]
-): TypedMap<string, JSONValue> {
-  let map = new TypedMap<string, JSONValue>();
-  for (let i = 0; i < entries.length; i++) {
-    map.set(entries[i].key, entries[i].value);
-  }
-  return map;
-}
-
+/*** Utils for creating and updating TypedMap<string, JSONValue> objects ***/
 export function createUpdatedTypedMapWithEntryAdded<ValueType>(
   object: TypedMap<string, JSONValue>,
   key: string,
@@ -200,80 +121,18 @@ export function createUpdatedTypedMapWithEntryRemoved(
   return withRemovedTypedMap;
 }
 
-enum ArrayOperation {
-  Add,
-  Remove
-}
-
-// Helper function to modify the array based on the value type and operation (add or remove)
-// Note: this function does not mutate the original array
-function createModifiedArray<ValueType>(
-  arr: JSONValue[],
-  value: ValueType,
-  operation: ArrayOperation
-): JSONValue[] {
-  const updated = arr.slice();
-  if (value instanceof BigInt) {
-    const index = indexOfValueInArray(updated, value);
-
-    if (operation === ArrayOperation.Add && index === -1) {
-      updated.push(toJSONValue(value));
-    } else if (operation === ArrayOperation.Remove && index !== -1) {
-      updated.splice(index, 1);
-    }
-
-    return updated;
-  } else if (
-    value instanceof Address ||
-    value instanceof Bytes ||
-    typeof value === "string"
-  ) {
-    const jsonValue = toJSONValue(value);
-    const stringValue = jsonValue.toString();
-    const index = indexOfValueInArray(updated, stringValue);
-
-    if (operation === ArrayOperation.Add && index === -1) {
-      updated.push(jsonValue);
-    } else if (operation === ArrayOperation.Remove && index !== -1) {
-      updated.splice(index, 1);
-    }
-
-    return updated;
-  }
-
-  log.warning("Unexpected type, returning unmodified array", []);
-  return updated;
-}
-
-export function jsonValueArrayToCommaSeparatedString(
-  jsonValueArray: JSONValue[]
-): string {
-  let stringArray = jsonValueArray.map<string>((v: JSONValue) => {
-    let mapped = "";
-    if (JSONValueKind.BOOL == v.kind) {
-      mapped = booleanToString(v.toBool());
-    } else if (JSONValueKind.NUMBER == v.kind) {
-      mapped = v.toBigInt().toString();
-    } else if (JSONValueKind.STRING == v.kind) {
-      mapped = stringToJSONString(v.toString());
-    } else if (JSONValueKind.ARRAY == v.kind) {
-      mapped = jsonValueArrayToCommaSeparatedString(v.toArray());
-    } else if (JSONValueKind.NULL == v.kind) {
-      mapped = "null";
-    } else if (JSONValueKind.OBJECT == v.kind) {
-      mapped = typedMapToJSONString(v.toObject());
-    }
-    return mapped;
-  });
-  return stringArray.join(",");
-}
-
+/**
+ * @dev note this function will overwrite the value at the given key if
+ * it already exists and is not an array.
+ */
 export function createUpdatedTypedMapWithArrayValueAdded<ValueType>(
   object: TypedMap<string, JSONValue>,
   key: string,
   value: ValueType
 ): TypedMap<string, JSONValue> {
-  const updated = json.fromString(typedMapToJSONString(object)).toObject();
+  const stringified = typedMapToJSONString(object);
+  const updated = json.fromString(stringified).toObject();
+
   let currentValue = object.get(key);
 
   // Convert json value to array so we can add the new value
@@ -282,15 +141,18 @@ export function createUpdatedTypedMapWithArrayValueAdded<ValueType>(
       ? currentValue.toArray()
       : [];
 
-  let modifiedArray = createModifiedArray(arr, value, ArrayOperation.Add);
-  let newValue = arrayToJSONValue(
-    jsonValueArrayToCommaSeparatedString(modifiedArray)
-  );
+  let modifiedArray = createModifiedArray(arr, value, ArrayOperation.ADD);
+  let newValue = jsonValueArrayToJSONValue(modifiedArray);
+
   updated.set(key, newValue);
 
   return updated;
 }
 
+/**
+ * @dev note this function will overwrite the value at the given key if
+ * it already exists and is not an array.
+ */
 export function createUpdatedTypedMapWithArrayValueRemoved<ValueType>(
   object: TypedMap<string, JSONValue>,
   key: string,
@@ -303,13 +165,95 @@ export function createUpdatedTypedMapWithArrayValueRemoved<ValueType>(
     currentValue && currentValue.kind === JSONValueKind.ARRAY
       ? currentValue.toArray()
       : [];
-  let modifiedArray = createModifiedArray(arr, value, ArrayOperation.Remove);
-  let newValue = arrayToJSONValue(
-    jsonValueArrayToCommaSeparatedString(modifiedArray)
-  );
+  let modifiedArray = createModifiedArray(arr, value, ArrayOperation.REMOVE);
+  let newValue = jsonValueArrayToJSONValue(modifiedArray);
   updated.set(key, newValue);
 
   return updated;
+}
+
+// Helper function to modify the array based on the value type and operation (add or remove)
+// Note: this function does not mutate the original array
+export enum ArrayOperation {
+  ADD,
+  REMOVE
+}
+
+export function createModifiedArray<ValueType>(
+  arr: JSONValue[],
+  value: ValueType,
+  operation: ArrayOperation
+): JSONValue[] {
+  const updated = arr.slice();
+  const index = indexOfValueInArray(arr, value);
+  const jsonValue = toJSONValue(value);
+
+  if (operation === ArrayOperation.ADD && index === -1) {
+    updated.push(jsonValue);
+  } else if (operation === ArrayOperation.REMOVE && index !== -1) {
+    updated.splice(index, 1);
+  }
+
+  return updated;
+}
+
+export function jsonValueEquals(a: JSONValue, b: JSONValue): boolean {
+  if (a.kind !== b.kind) {
+    return false;
+  }
+
+  switch (a.kind) {
+    case JSONValueKind.NULL:
+      return true;
+    case JSONValueKind.BOOL:
+      return a.toBool() == b.toBool();
+    case JSONValueKind.NUMBER:
+      return a.toBigInt() == b.toBigInt();
+    case JSONValueKind.STRING:
+      return a.toString() == b.toString();
+    case JSONValueKind.ARRAY: {
+      return (
+        jsonValueArrayToCommaSeparatedString(a.toArray()) ==
+        jsonValueArrayToCommaSeparatedString(b.toArray())
+      );
+    }
+    case JSONValueKind.OBJECT: {
+      return (
+        typedMapToJSONString(a.toObject()) == typedMapToJSONString(b.toObject())
+      );
+    }
+    default:
+      return false;
+  }
+}
+
+// Helper function to find the index of a value in an array
+// of JSONValue objects. This is used to find the index of a
+// a value of arbitrary type in an array of JSONValue objects
+export function indexOfValueInArray<ValueType>(
+  array: JSONValue[],
+  value: ValueType
+): i32 {
+  const jsonValue = toJSONValue(value);
+  for (let i = 0; i < array.length; i++) {
+    if (jsonValueEquals(array[i], jsonValue)) return i;
+  }
+  return -1;
+}
+
+export class TypedMapEntry {
+  key: string;
+  value: JSONValue;
+}
+
+export function createTypedMapFromEntries(
+  entries: TypedMapEntry[]
+): TypedMap<string, JSONValue> {
+  let map = new TypedMap<string, JSONValue>();
+  for (let i = 0; i < entries.length; i++) {
+    map.set(entries[i].key, entries[i].value);
+  }
+  return map;
 }
 
 export function createMergedTypedMap(
@@ -341,4 +285,71 @@ export function createTypedMapFromJSONString(
     typedMap = new TypedMap();
   }
   return typedMap;
+}
+
+/*** Helper functions to stringify values to be included in JSON strings ***/
+
+export function typedMapToJSONString(map: TypedMap<string, JSONValue>): string {
+  let jsonString = "{";
+  for (let i = 0; i < map.entries.length; i++) {
+    const entry = map.entries[i];
+    const newVal = jsonValueToJSONString(entry.value);
+
+    jsonString +=
+      stringToJSONString(entry.key.toString()) +
+      ":" +
+      newVal +
+      (i == map.entries.length - 1 ? "" : ",");
+  }
+  jsonString += "}";
+  return jsonString;
+}
+
+export function stringToJSONString(value: string): string {
+  return '"' + value + '"';
+}
+
+export function jsonValueArrayToCommaSeparatedString(
+  jsonValueArray: JSONValue[]
+): string {
+  let stringArray = jsonValueArray.map<string>((v: JSONValue) => {
+    return jsonValueToJSONString(v);
+  });
+  return stringArray.join(",");
+}
+
+export function jsonValueToJSONString(value: JSONValue): string {
+  let jsonString = "";
+  if (JSONValueKind.BOOL == value.kind) {
+    jsonString = booleanToString(value.toBool());
+  } else if (JSONValueKind.NUMBER == value.kind) {
+    jsonString = value.toBigInt().toString();
+  } else if (JSONValueKind.STRING == value.kind) {
+    jsonString = stringToJSONString(value.toString());
+  } else if (JSONValueKind.ARRAY == value.kind) {
+    jsonString =
+      "[" + jsonValueArrayToCommaSeparatedString(value.toArray()) + "]";
+  } else if (JSONValueKind.OBJECT == value.kind) {
+    jsonString = typedMapToJSONString(value.toObject());
+  } else if (JSONValueKind.NULL == value.kind) {
+    jsonString = "null";
+  }
+  return jsonString;
+}
+
+export function isTypedMapOfStringJSONValue<ValueType>(
+  value: ValueType
+): boolean {
+  if (!(value instanceof TypedMap)) {
+    return false;
+  }
+
+  for (let i = 0; i < value.entries.length; i++) {
+    let entry = value.entries[i];
+    if (!(entry.key instanceof String) || !(entry.value instanceof JSONValue)) {
+      return false;
+    }
+  }
+
+  return true;
 }

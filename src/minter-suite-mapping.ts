@@ -400,7 +400,7 @@ export function handleDAExpSetAuctionDetails(
         .times(event.params._basePrice.minus(y1))
         .div(y2.minus(y1))
     );
-    handleSetMinterDetailsGeneric(
+    setProjectMinterConfigExtraMinterDetailsValue(
       "approximateDAExpEndTime",
       event.params._auctionTimestampStart.plus(totalAuctionTime),
       projectMinterConfig
@@ -463,6 +463,10 @@ export function handleDAExpResetAuctionDetailsGeneric<T>(event: T): void {
     );
     removeProjectMinterConfigExtraMinterDetailsEntry(
       "halfLifeSeconds",
+      projectMinterConfig
+    );
+    removeProjectMinterConfigExtraMinterDetailsEntry(
+      "approximateDAExpEndTime",
       projectMinterConfig
     );
     projectMinterConfig.priceIsConfigured = false;
@@ -660,9 +664,6 @@ export function handleMinterTimeBufferUpdated(
 ): void {
   let minter = loadOrCreateMinter(event.address, event.block.timestamp);
 
-  log.info("MinterTimeBufferUpdated event: {}", [
-    event.params.minterTimeBufferSeconds.toString()
-  ]);
   // update Minter.extraMinterDetails with new value
   setMinterExtraMinterDetailsValue(
     "minterTimeBufferSeconds",
@@ -670,7 +671,6 @@ export function handleMinterTimeBufferUpdated(
     minter
   );
 
-  log.info("emd: {}", [minter.extraMinterDetails]);
   minter.updatedAt = event.block.timestamp;
   minter.save();
 }
@@ -833,9 +833,6 @@ export function handleAuctionBid(event: AuctionBid): void {
       currentEndTime = currentEndTimeJSON.toBigInt();
     }
     if (currentEndTime.lt(earliestAuctionEndTime)) {
-      log.info("Updating auction end time to {}", [
-        earliestAuctionEndTime.toString()
-      ]);
       setProjectMinterConfigExtraMinterDetailsValue(
         "auctionEndTime",
         earliestAuctionEndTime,
@@ -955,8 +952,6 @@ export function setProjectMinterConfigExtraMinterDetailsValue<ValueType>(
     key,
     value
   );
-
-  log.info("UPDATE JSON: {}", [typedMapToJSONString(minterDetails)]);
 
   // minterDetails.set(jsonKey, jsonValue);
   config.extraMinterDetails = typedMapToJSONString(minterDetails);

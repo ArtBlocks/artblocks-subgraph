@@ -1,4 +1,4 @@
-import { Address, BigInt, Bytes, ethereum } from "@graphprotocol/graph-ts";
+import { Address, BigInt, Bytes, ethereum, log } from "@graphprotocol/graph-ts";
 import {
   assert,
   clearStore,
@@ -1313,7 +1313,7 @@ describe("MinterDAExp-related tests", () => {
       }
     });
 
-    test("should reset project minter config auction details", () => {
+    test("should reset project minter config auction details DAExp", () => {
       for (let i = 0; i < DAExpMintersToTest.length; i++) {
         clearStore();
 
@@ -1413,6 +1413,7 @@ describe("MinterDAExp-related tests", () => {
         assert.assertTrue(
           updatedProjectMinterConfig.extraMinterDetails == "{}"
         );
+
         // @dev Deprecated fields ----------------
         assert.assertTrue(updatedProjectMinterConfig.startPrice === null);
         assert.assertTrue(updatedProjectMinterConfig.startTime === null);
