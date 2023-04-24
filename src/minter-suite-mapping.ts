@@ -953,7 +953,6 @@ export function setProjectMinterConfigExtraMinterDetailsValue<ValueType>(
     value
   );
 
-  // minterDetails.set(jsonKey, jsonValue);
   config.extraMinterDetails = typedMapToJSONString(minterDetails);
   config.save();
 }
