@@ -171,8 +171,8 @@ export function createUpdatedTypedMapWithArrayValueAdded<ValueType>(
 }
 
 /**
- * @dev note this function will overwrite the value at the given key if
- * it already exists and is not an array.
+ * Creates a new TypedMap with a value removed from an array at a given key. If the key does not
+ * exist or is not an array, it will be set to an empty array.
  */
 export function createUpdatedTypedMapWithArrayValueRemoved<ValueType>(
   object: TypedMap<string, JSONValue>,
