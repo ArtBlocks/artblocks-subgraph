@@ -25,6 +25,9 @@ import { booleanToString } from "./helpers";
 /*** Utils for converting values to JSONValue ***/
 
 /**
+ * Converts a given value to a JSONValue. Note that this function only supports a subset of types
+ * and does not support arrays. For arrays, manually iterate over the array in context and convert
+ * each element to a JSONValue before converting it with the jsonValueArrayToJSONValue.
  * @dev note that this function is not exhaustive and only supports a subset of types.
  * Note, specifically, that it does not support arrays. This is because AssemblyScript
  * can't iterate over generic arrays of objects because the memory layout of the array
@@ -55,22 +58,33 @@ export function toJSONValue<ValueType>(value: ValueType): JSONValue {
   }
 }
 
+/**
+ * Converts a single string value to a JSONValue.
+ */
 export function stringToJSONValue(value: string): JSONValue {
   return json.fromString('["' + value + '"]').toArray()[0];
 }
 
+/**
+ * Converts an array of JSONValues to a single JSONValue.
+ */
 export function jsonValueArrayToJSONValue(arr: JSONValue[]): JSONValue {
   return json.fromString("[" + jsonValueArrayToCommaSeparatedString(arr) + "]");
 }
 
+/**
+ * Converts a TypedMap<string, JSONValue> to a JSONValue.
+ */
 export function typedMapToJSONValue(
   value: TypedMap<string, JSONValue>
 ): JSONValue {
   return json.fromString(typedMapToJSONString(value));
 }
 
-// If byte data is parseable to a valid unicode string then do so
-// otherwise parse the byte data to a hex string
+/**
+ * Converts a Bytes value to a JSONValue. If the byte data is parseable to a valid unicode string,
+ * it is parsed as such; otherwise, the byte data is parsed to a hex string.
+ */
 export function bytesToJSONValue(value: Bytes): JSONValue {
   // fallback - assume the data is a hex string (always valid)
   let result = json.try_fromString('["' + value.toHexString() + '"]');
@@ -92,6 +106,10 @@ export function bytesToJSONValue(value: Bytes): JSONValue {
 }
 
 /*** Utils for creating and updating TypedMap<string, JSONValue> objects ***/
+
+/**
+ * Creates a new TypedMap with an entry added or updated.
+ */
 export function createUpdatedTypedMapWithEntryAdded<ValueType>(
   object: TypedMap<string, JSONValue>,
   key: string,
@@ -105,6 +123,9 @@ export function createUpdatedTypedMapWithEntryAdded<ValueType>(
   return updated;
 }
 
+/**
+ * Creates a new TypedMap with an entry removed.
+ */
 export function createUpdatedTypedMapWithEntryRemoved(
   object: TypedMap<string, JSONValue>,
   key: string
@@ -122,8 +143,8 @@ export function createUpdatedTypedMapWithEntryRemoved(
 }
 
 /**
- * @dev note this function will overwrite the value at the given key if
- * it already exists and is not an array.
+ * Creates a new TypedMap with a value added to an array at a given key. If the key does not exist
+ * or is not an array, a new array is created.
  */
 export function createUpdatedTypedMapWithArrayValueAdded<ValueType>(
   object: TypedMap<string, JSONValue>,
@@ -172,13 +193,18 @@ export function createUpdatedTypedMapWithArrayValueRemoved<ValueType>(
   return updated;
 }
 
-// Helper function to modify the array based on the value type and operation (add or remove)
-// Note: this function does not mutate the original array
+/**
+ * Enum for array operations (add or remove).
+ */
 export enum ArrayOperation {
   ADD,
   REMOVE
 }
 
+/**
+ * Helper that returns a new array with a value added or removed based on the specified operation.
+ * @dev note that this function does not mutate the original array.
+ */
 export function createModifiedArray<ValueType>(
   arr: JSONValue[],
   value: ValueType,
@@ -197,6 +223,9 @@ export function createModifiedArray<ValueType>(
   return updated;
 }
 
+/**
+ * Determines if two JSONValues are equal.
+ */
 export function jsonValueEquals(a: JSONValue, b: JSONValue): boolean {
   if (a.kind !== b.kind) {
     return false;
@@ -227,9 +256,10 @@ export function jsonValueEquals(a: JSONValue, b: JSONValue): boolean {
   }
 }
 
-// Helper function to find the index of a value in an array
-// of JSONValue objects. This is used to find the index of a
-// a value of arbitrary type in an array of JSONValue objects
+/**
+ * Helper that returns the index of a value in an array of JSONValues or -1 if not found.
+ * This is used to find the index of a value of arbitrary type in an array of JSONValue objects.
+ */
 export function indexOfValueInArray<ValueType>(
   array: JSONValue[],
   value: ValueType
@@ -241,11 +271,17 @@ export function indexOfValueInArray<ValueType>(
   return -1;
 }
 
+/**
+ * Class representing a TypedMap entry with a key and a JSONValue.
+ */
 export class TypedMapEntry {
   key: string;
   value: JSONValue;
 }
 
+/**
+ * Creates a TypedMap from an array of TypedMapEntry objects.
+ */
 export function createTypedMapFromEntries(
   entries: TypedMapEntry[]
 ): TypedMap<string, JSONValue> {
@@ -256,6 +292,9 @@ export function createTypedMapFromEntries(
   return map;
 }
 
+/**
+ * Creates a new TypedMap by merging the source TypedMap into the target TypedMap.
+ */
 export function createMergedTypedMap(
   target: TypedMap<string, JSONValue>,
   source: TypedMap<string, JSONValue>
@@ -274,6 +313,9 @@ export function createMergedTypedMap(
   return updated;
 }
 
+/**
+ * Creates a TypedMap from a JSON string.
+ */
 export function createTypedMapFromJSONString(
   jsonString: string
 ): TypedMap<string, JSONValue> {
@@ -289,6 +331,9 @@ export function createTypedMapFromJSONString(
 
 /*** Helper functions to stringify values to be included in JSON strings ***/
 
+/**
+ * Converts a TypedMap<string, JSONValue> to a JSON string.
+ */
 export function typedMapToJSONString(map: TypedMap<string, JSONValue>): string {
   let jsonString = "{";
   for (let i = 0; i < map.entries.length; i++) {
@@ -305,10 +350,16 @@ export function typedMapToJSONString(map: TypedMap<string, JSONValue>): string {
   return jsonString;
 }
 
+/**
+ * Converts a string value to a JSON-formatted string.
+ */
 export function stringToJSONString(value: string): string {
   return '"' + value + '"';
 }
 
+/**
+ * Converts an array of JSONValues to a comma-separated string.
+ */
 export function jsonValueArrayToCommaSeparatedString(
   jsonValueArray: JSONValue[]
 ): string {
@@ -318,6 +369,9 @@ export function jsonValueArrayToCommaSeparatedString(
   return stringArray.join(",");
 }
 
+/**
+ * Converts a JSONValue to a JSON-formatted string.
+ */
 export function jsonValueToJSONString(value: JSONValue): string {
   let jsonString = "";
   if (JSONValueKind.BOOL == value.kind) {
@@ -337,6 +391,9 @@ export function jsonValueToJSONString(value: JSONValue): string {
   return jsonString;
 }
 
+/**
+ * Determines if a given value is a TypedMap<string, JSONValue>.
+ */
 export function isTypedMapOfStringJSONValue<ValueType>(
   value: ValueType
 ): boolean {
