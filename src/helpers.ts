@@ -244,7 +244,7 @@ export function booleanToString(b: boolean): string {
   return b ? "true" : "false";
 }
 
-export function getProjectMinterConfigExtraMinterDetails(
+export function getProjectMinterConfigExtraMinterDetailsTypedMap(
   config: ProjectMinterConfiguration
 ): TypedMap<string, JSONValue> {
   return createTypedMapFromJSONString(config.extraMinterDetails);

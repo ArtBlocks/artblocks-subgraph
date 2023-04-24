@@ -57,7 +57,7 @@ import {
 
 import {
   generateContractSpecificId,
-  getProjectMinterConfigExtraMinterDetails,
+  getProjectMinterConfigExtraMinterDetailsTypedMap,
   getProjectMinterConfigId,
   loadOrCreateMinter,
   loadOrCreateReceipt,
@@ -823,7 +823,7 @@ export function handleAuctionBid(event: AuctionBid): void {
       bufferTimeSeconds = bufferTimeSecondsJSON.toBigInt();
     }
     let earliestAuctionEndTime = event.block.timestamp.plus(bufferTimeSeconds);
-    let projectMinterConfigDetails = getProjectMinterConfigExtraMinterDetails(
+    let projectMinterConfigDetails = getProjectMinterConfigExtraMinterDetailsTypedMap(
       minterProjectAndConfig.projectMinterConfiguration
     );
     const currentEndTimeJSON = projectMinterConfigDetails.get("auctionEndTime");
@@ -945,7 +945,7 @@ export function setProjectMinterConfigExtraMinterDetailsValue<ValueType>(
   value: ValueType,
   config: ProjectMinterConfiguration
 ): void {
-  let minterDetails = getProjectMinterConfigExtraMinterDetails(config);
+  let minterDetails = getProjectMinterConfigExtraMinterDetailsTypedMap(config);
 
   minterDetails = createUpdatedTypedMapWithEntryAdded(
     minterDetails,
@@ -979,7 +979,7 @@ export function removeProjectMinterConfigExtraMinterDetailsEntry(
   key: string,
   config: ProjectMinterConfiguration
 ): void {
-  let minterDetails = getProjectMinterConfigExtraMinterDetails(config);
+  let minterDetails = getProjectMinterConfigExtraMinterDetailsTypedMap(config);
   minterDetails = createUpdatedTypedMapWithEntryRemoved(minterDetails, key);
 
   config.extraMinterDetails = typedMapToJSONString(minterDetails);
@@ -1002,7 +1002,7 @@ export function addProjectMinterConfigExtraMinterDetailsManyValue<ValueType>(
   key: string,
   value: ValueType
 ): void {
-  let minterDetails = getProjectMinterConfigExtraMinterDetails(config);
+  let minterDetails = getProjectMinterConfigExtraMinterDetailsTypedMap(config);
   minterDetails = createUpdatedTypedMapWithArrayValueAdded(
     minterDetails,
     key,
@@ -1032,7 +1032,7 @@ export function removeProjectMinterConfigExtraMinterDetailsManyValue<ValueType>(
   key: string,
   value: ValueType
 ): void {
-  let minterDetails = getProjectMinterConfigExtraMinterDetails(config);
+  let minterDetails = getProjectMinterConfigExtraMinterDetailsTypedMap(config);
   minterDetails = createUpdatedTypedMapWithArrayValueRemoved(
     minterDetails,
     key,
@@ -1127,7 +1127,7 @@ export function handleRemoveValueProjectMinterConfig(
     event.block.timestamp
   );
   if (minterProjectAndConfig) {
-    let extraMinterDetails = getProjectMinterConfigExtraMinterDetails(
+    let extraMinterDetails = getProjectMinterConfigExtraMinterDetailsTypedMap(
       minterProjectAndConfig.projectMinterConfiguration
     );
 
