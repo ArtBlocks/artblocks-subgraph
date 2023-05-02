@@ -353,8 +353,8 @@ type MinterFilter @entity {
   minterFilterContractAllowlists: [MinterFilterContractAllowlist!]!
     @derivedFrom(field: "minterFilter")
 
-  "Minters associated with MinterFilter"
-  associatedMinters: [Minter!]! @derivedFrom(field: "minterFilter")
+  "Known minters that are tied to this MinterFilter, but are not necessarily approved on this MinterFilter"
+  knownMinters: [Minter!]! @derivedFrom(field: "minterFilter")
 
   "Core contract registry used by this MinterFilter, only used for MinterFilterV2+"
   coreRegistry: CoreRegistry
