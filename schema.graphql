@@ -347,7 +347,7 @@ type MinterFilter @entity {
   coreContract: Contract
 
   "Minters allowlisted globally on this MinterFilter"
-  minterAllowlist: [Minter!]!
+  minterGlobalAllowlist: [Minter!]!
 
   "Minters allowlisted at a contract-level on this MinterFilter, only used for MinterFilterV2+"
   minterFilterContractAllowlists: [MinterFilterContractAllowlist!]!
