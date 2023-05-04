@@ -2765,9 +2765,9 @@ describe("MinterSEAV tests", () => {
       PROJECT_MINTER_CONFIGURATION_ENTITY_TYPE,
       projectMinterConfigEntityId,
       "extraMinterDetails",
-      '{"auctionCurrentBid":' +
+      '{"auctionCurrentBid":"' +
         testBidAmount.toString() +
-        ',"auctionCurrentBidder":"' +
+        '","auctionCurrentBidder":"' +
         testBidderAddress.toHexString() +
         '","auctionEndTime":' +
         testAuctionEndTime.toString() +
@@ -2911,9 +2911,9 @@ describe("MinterSEAV tests", () => {
       PROJECT_MINTER_CONFIGURATION_ENTITY_TYPE,
       projectMinterConfigEntityId,
       "extraMinterDetails",
-      '{"auctionCurrentBid":' +
+      '{"auctionCurrentBid":"' +
         testBidAmount2.toString() +
-        ',"auctionCurrentBidder":"' +
+        '","auctionCurrentBidder":"' +
         testBidderAddress2.toHexString() +
         '","auctionEndTime":' +
         testAuctionEndTime.toString() +
@@ -2960,9 +2960,9 @@ describe("MinterSEAV tests", () => {
       PROJECT_MINTER_CONFIGURATION_ENTITY_TYPE,
       projectMinterConfigEntityId,
       "extraMinterDetails",
-      '{"auctionCurrentBid":' +
+      '{"auctionCurrentBid":"' +
         testBidAmount3.toString() +
-        ',"auctionCurrentBidder":"' +
+        '","auctionCurrentBidder":"' +
         testBidderAddress3.toHexString() +
         '","auctionEndTime":' +
         targetAuctionEndTime.toString() +
