@@ -117,7 +117,8 @@ export function getProjectMinterConfigId(
   minterId: string,
   projectId: string
 ): string {
-  return minterId + "-" + projectId.split("-")[1];
+  // projectId is the contract-specific id, not the number of the project
+  return minterId + "-" + projectId;
 }
 
 // @dev projectId is the number of the project, contract-specific id is not required

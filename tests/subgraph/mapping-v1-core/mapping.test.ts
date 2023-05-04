@@ -47,7 +47,6 @@ import {
   Contract,
   MinterFilter,
   Project,
-  ProjectMinterConfiguration,
   ProjectScript,
   Token,
   Whitelisting
@@ -2371,19 +2370,19 @@ test("GenArt721Core: Can handle transfer", () => {
     generateTransferId(hash, logIndex),
     "blockHash",
     event.block.hash.toHexString()
-  )
+  );
   assert.fieldEquals(
     TRANSFER_ENTITY_TYPE,
     generateTransferId(hash, logIndex),
     "blockNumber",
     event.block.number.toString()
-  )
+  );
   assert.fieldEquals(
     TRANSFER_ENTITY_TYPE,
     generateTransferId(hash, logIndex),
     "blockTimestamp",
     event.block.timestamp.toString()
-  )
+  );
 });
 
 test("GenArt721Core: Can handle mint transfer", () => {
@@ -2440,19 +2439,19 @@ test("GenArt721Core: Can handle mint transfer", () => {
     generateTransferId(hash, logIndex),
     "blockHash",
     event.block.hash.toHexString()
-  )
+  );
   assert.fieldEquals(
     TRANSFER_ENTITY_TYPE,
     generateTransferId(hash, logIndex),
     "blockNumber",
     event.block.number.toString()
-  )
+  );
   assert.fieldEquals(
     TRANSFER_ENTITY_TYPE,
     generateTransferId(hash, logIndex),
     "blockTimestamp",
     event.block.timestamp.toString()
-  )
+  );
 });
 
 // export handlers for test coverage https://github.com/LimeChain/demo-subgraph#test-coverage

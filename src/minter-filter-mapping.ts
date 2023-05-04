@@ -273,13 +273,18 @@ export function loadOrCreateAndSetProjectMinterConfiguration(
   // Bootstrap minter if it doesn't exist already
   loadOrCreateMinter(minterAddress, timestamp);
 
+  const targetProjectMinterConfigId = getProjectMinterConfigId(
+    minterAddress.toHexString(),
+    project.id
+  );
+
   let projectMinterConfig = ProjectMinterConfiguration.load(
-    getProjectMinterConfigId(minterAddress.toHexString(), project.id)
+    targetProjectMinterConfigId
   );
 
   if (!projectMinterConfig) {
     projectMinterConfig = new ProjectMinterConfiguration(
-      getProjectMinterConfigId(minterAddress.toHexString(), project.id)
+      targetProjectMinterConfigId
     );
     projectMinterConfig.project = project.id;
     projectMinterConfig.minter = minterAddress.toHexString();

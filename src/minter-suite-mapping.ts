@@ -118,7 +118,7 @@ import {
 export function handlePricePerTokenInWeiUpdated(
   event: PricePerTokenInWeiUpdated
 ): void {
-  let minterProjectAndConfig = loadMinterProjectAndConfig(
+  let minterProjectAndConfig = loadMinterProjectAndConfigLegacyMinters(
     event.address,
     event.params._projectId,
     event.block.timestamp
@@ -142,7 +142,7 @@ export function handlePricePerTokenInWeiUpdated(
 export function handleProjectCurrencyInfoUpdated(
   event: ProjectCurrencyInfoUpdated
 ): void {
-  let minterProjectAndConfig = loadMinterProjectAndConfig(
+  let minterProjectAndConfig = loadMinterProjectAndConfigLegacyMinters(
     event.address,
     event.params._projectId,
     event.block.timestamp
@@ -166,7 +166,7 @@ export function handleProjectCurrencyInfoUpdated(
 export function handlePurchaseToDisabledUpdated(
   event: PurchaseToDisabledUpdated
 ): void {
-  let minterProjectAndConfig = loadMinterProjectAndConfig(
+  let minterProjectAndConfig = loadMinterProjectAndConfigLegacyMinters(
     event.address,
     event.params._projectId,
     event.block.timestamp
@@ -192,7 +192,7 @@ export function handlePurchaseToDisabledUpdated(
 export function handleProjectMaxInvocationsLimitUpdated(
   event: ProjectMaxInvocationsLimitUpdated
 ): void {
-  let minterProjectAndConfig = loadMinterProjectAndConfig(
+  let minterProjectAndConfig = loadMinterProjectAndConfigLegacyMinters(
     event.address,
     event.params._projectId,
     event.block.timestamp
@@ -232,7 +232,7 @@ export function handleMinimumAuctionLengthSecondsUpdated(
 export function handleDALinSetAuctionDetails(
   event: DALinSetAuctionDetails
 ): void {
-  let minterProjectAndConfig = loadMinterProjectAndConfig(
+  let minterProjectAndConfig = loadMinterProjectAndConfigLegacyMinters(
     event.address,
     event.params.projectId,
     event.block.timestamp
@@ -274,7 +274,7 @@ export function handleDALinSetAuctionDetails(
 export function handleDALinResetAuctionDetails(
   event: DALinResetAuctionDetails
 ): void {
-  let minterProjectAndConfig = loadMinterProjectAndConfig(
+  let minterProjectAndConfig = loadMinterProjectAndConfigLegacyMinters(
     event.address,
     event.params.projectId,
     event.block.timestamp
@@ -339,7 +339,7 @@ export function handleAuctionHalfLifeRangeSecondsUpdated(
 export function handleDAExpSetAuctionDetails(
   event: DAExpSetAuctionDetails
 ): void {
-  let minterProjectAndConfig = loadMinterProjectAndConfig(
+  let minterProjectAndConfig = loadMinterProjectAndConfigLegacyMinters(
     event.address,
     event.params.projectId,
     event.block.timestamp
@@ -436,7 +436,7 @@ export function handleDAExpResetAuctionDetailsGeneric<T>(event: T): void {
     return;
   }
 
-  let minterProjectAndConfig = loadMinterProjectAndConfig(
+  let minterProjectAndConfig = loadMinterProjectAndConfigLegacyMinters(
     event.address,
     event.params.projectId,
     event.block.timestamp
@@ -678,7 +678,7 @@ export function handleMinterTimeBufferUpdated(
 export function handleConfiguredFutureAuctions(
   event: ConfiguredFutureAuctions
 ): void {
-  let minterProjectAndConfig = loadMinterProjectAndConfig(
+  let minterProjectAndConfig = loadMinterProjectAndConfigLegacyMinters(
     event.address,
     event.params.projectId,
     event.block.timestamp
@@ -711,7 +711,7 @@ export function handleConfiguredFutureAuctions(
 }
 
 export function handleResetAuctionDetails(event: ResetAuctionDetails): void {
-  let minterProjectAndConfig = loadMinterProjectAndConfig(
+  let minterProjectAndConfig = loadMinterProjectAndConfigLegacyMinters(
     event.address,
     event.params.projectId,
     event.block.timestamp
@@ -745,7 +745,7 @@ export function handleAuctionInitialized(event: AuctionInitialized): void {
   const projectIdNumber = generateProjectIdNumberFromTokenIdNumber(
     event.params.tokenId
   );
-  let minterProjectAndConfig = loadMinterProjectAndConfig(
+  let minterProjectAndConfig = loadMinterProjectAndConfigLegacyMinters(
     event.address,
     projectIdNumber,
     event.block.timestamp
@@ -793,7 +793,7 @@ export function handleAuctionBid(event: AuctionBid): void {
   const projectIdNumber = generateProjectIdNumberFromTokenIdNumber(
     event.params.tokenId
   );
-  let minterProjectAndConfig = loadMinterProjectAndConfig(
+  let minterProjectAndConfig = loadMinterProjectAndConfigLegacyMinters(
     event.address,
     projectIdNumber,
     event.block.timestamp
@@ -851,7 +851,7 @@ export function handleAuctionSettled(event: AuctionSettled): void {
   const projectIdNumber = generateProjectIdNumberFromTokenIdNumber(
     event.params.tokenId
   );
-  let minterProjectAndConfig = loadMinterProjectAndConfig(
+  let minterProjectAndConfig = loadMinterProjectAndConfigLegacyMinters(
     event.address,
     projectIdNumber,
     event.block.timestamp
@@ -879,7 +879,7 @@ export function handleProjectNextTokenUpdated(
   const projectIdNumber = generateProjectIdNumberFromTokenIdNumber(
     event.params.tokenId
   );
-  let minterProjectAndConfig = loadMinterProjectAndConfig(
+  let minterProjectAndConfig = loadMinterProjectAndConfigLegacyMinters(
     event.address,
     projectIdNumber,
     event.block.timestamp
@@ -908,7 +908,7 @@ export function handleProjectNextTokenUpdated(
 export function handleProjectNextTokenEjected(
   event: ProjectNextTokenEjected
 ): void {
-  let minterProjectAndConfig = loadMinterProjectAndConfig(
+  let minterProjectAndConfig = loadMinterProjectAndConfigLegacyMinters(
     event.address,
     event.params.projectId,
     event.block.timestamp
@@ -1097,7 +1097,7 @@ export function handleSetValueProjectMinterConfig<EventType>(
     return;
   }
 
-  let minterProjectAndConfig = loadMinterProjectAndConfig(
+  let minterProjectAndConfig = loadMinterProjectAndConfigLegacyMinters(
     event.address,
     event.params._projectId,
     event.block.timestamp
@@ -1120,7 +1120,7 @@ export function handleSetValueProjectMinterConfig<EventType>(
 export function handleRemoveValueProjectMinterConfig(
   event: ConfigKeyRemoved
 ): void {
-  let minterProjectAndConfig = loadMinterProjectAndConfig(
+  let minterProjectAndConfig = loadMinterProjectAndConfigLegacyMinters(
     event.address,
     event.params._projectId,
     event.block.timestamp
@@ -1150,7 +1150,7 @@ export function handleAddManyProjectMinterConfig<T>(event: T): void {
   ) {
     return;
   }
-  let minterProjectAndConfig = loadMinterProjectAndConfig(
+  let minterProjectAndConfig = loadMinterProjectAndConfigLegacyMinters(
     event.address,
     event.params._projectId,
     event.block.timestamp
@@ -1179,7 +1179,7 @@ export function handleRemoveManyProjectMinterConfig<EventType>(
   ) {
     return;
   }
-  let minterProjectAndConfig = loadMinterProjectAndConfig(
+  let minterProjectAndConfig = loadMinterProjectAndConfigLegacyMinters(
     event.address,
     event.params._projectId,
     event.block.timestamp
@@ -1429,12 +1429,22 @@ class MinterProjectAndConfig {
   projectMinterConfiguration: ProjectMinterConfiguration;
 }
 
-function loadMinterProjectAndConfig(
+function loadMinterProjectAndConfigLegacyMinters(
   minterAddress: Address,
   projectId: BigInt,
   timestamp: BigInt
 ): MinterProjectAndConfig | null {
   let minter = loadOrCreateMinter(minterAddress, timestamp);
+
+  if (!minter.coreContract) {
+    // this is only possible on a V2+ minter, which this file is not intended
+    // to handle. We log a warning and return.
+    log.warning(
+      "[WARN] Legacy (non-shared) minter event handler encountered minter with null `coreContract` field, at address {}.",
+      [minterAddress.toHexString()]
+    );
+    return null;
+  }
 
   let project = Project.load(
     generateContractSpecificId(
