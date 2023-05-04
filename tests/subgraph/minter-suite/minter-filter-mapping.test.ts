@@ -1256,7 +1256,7 @@ test("handleMinterRevoke should remove minter from MinterFilter's minterAllowlis
   assert.fieldEquals(
     MINTER_FILTER_ENTITY_TYPE,
     minterFilterAddress.toHexString(),
-    "associatedMinters",
+    "knownMinters",
     `[${minterToBeRevokedAddress.toHexString()}]`
   );
   // MinterFilter should have been updated
@@ -1317,7 +1317,7 @@ test("handleMinterRevoke should handle revoking a minter more than once", () => 
   assert.fieldEquals(
     MINTER_FILTER_ENTITY_TYPE,
     minterFilterAddress.toHexString(),
-    "associatedMinters",
+    "knownMinters",
     `[${minterToBeRevokedAddress.toHexString()}]`
   );
   // MinterFilter should have been updated
