@@ -22,9 +22,9 @@ import {
 } from "../../generated/schema";
 import {
   generateContractSpecificId,
-  getProjectMinterConfigId,
-  typedMapToJSONString
+  getProjectMinterConfigId
 } from "../../src/helpers";
+import { typedMapToJSONString } from "../../src/json";
 
 // Utils
 // The built in assembly script Math.random() function does not work

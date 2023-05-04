@@ -1230,11 +1230,11 @@ dataSources:
         - event: ProjectCurrencyInfoUpdated(indexed uint256,indexed address,string)
           handler: handleProjectCurrencyInfoUpdated
         - event: ConfigValueSet(indexed uint256,bytes32,bytes32)
-          handler: handleSetBytesValueProjectConfig
+          handler: handleSetBytesValueProjectMinterConfig
         - event: ConfigValueSet(indexed uint256,bytes32,bool)
-          handler: handleSetBooleanValueProjectConfig
+          handler: handleSetBooleanValueProjectMinterConfig
         - event: ConfigValueSet(indexed uint256,bytes32,uint256)
-          handler: handleSetBigIntValueProjectConfig
+          handler: handleSetBigIntValueProjectMinterConfig
         - event: DelegationRegistryUpdated(address)
           handler: handleMerkleDelegationRegistryUpdated
         - event: ProjectMaxInvocationsLimitUpdated(indexed uint256,uint256)

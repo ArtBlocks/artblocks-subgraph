@@ -229,7 +229,6 @@ export const FIELD_PROJECT_SECONDARY_MARKET_ROYALTY_PERCENTAGE =
 export const FIELD_PROJECT_WEBSITE = "website";
 
 export function handleProjectUpdated(event: ProjectUpdated): void {
-  log.info("handleProjectUpdated", []);
   const contract = getIGenArt721CoreContractV3_BaseContract(event.address);
 
   const update = event.params._update.toString();
@@ -539,7 +538,6 @@ function refreshProjectScript(
 // contract state variables. All of the expected `_field` values are handled in
 // the `refreshContract` helper function.
 export function handlePlatformUpdated(event: PlatformUpdated): void {
-  log.info("handleProjectUpdated", []);
   // refresh the contract
   refreshContractAtAddress(event.address, event.block.timestamp);
 }

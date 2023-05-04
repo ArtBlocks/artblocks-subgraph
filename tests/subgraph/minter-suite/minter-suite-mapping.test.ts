@@ -1,4 +1,4 @@
-import { Address, BigInt, Bytes, ethereum } from "@graphprotocol/graph-ts";
+import { Address, BigInt, Bytes, ethereum, log } from "@graphprotocol/graph-ts";
 import {
   assert,
   clearStore,
@@ -96,9 +96,9 @@ import { ProjectMaxInvocationsLimitUpdated } from "../../../generated/MinterSetP
 
 // import handlers from minter-suite-mapping
 import {
-  handleAddManyAddressValueProjectConfig as handleAddManyAddressValue,
-  handleAddManyBigIntValueProjectConfig as handleAddManyBigIntValue,
-  handleAddManyBytesValueProjectConfig as handleAddManyBytesValue,
+  handleAddManyAddressValueProjectMinterConfig as handleAddManyAddressValue,
+  handleAddManyBigIntValueProjectMinterConfig as handleAddManyBigIntValue,
+  handleAddManyBytesValueProjectMinterConfig as handleAddManyBytesValue,
   handleAllowHoldersOfProjects,
   handleRemoveHoldersOfProjects,
   handleRegisteredNFTAddress,
@@ -114,13 +114,13 @@ import {
   handlePricePerTokenInWeiUpdated,
   handleProjectCurrencyInfoUpdated,
   handlePurchaseToDisabledUpdated,
-  handleRemoveBigIntManyValueProjectConfig as handleRemoveBigIntManyValue,
-  handleRemoveBytesManyValueProjectConfig as handleRemoveBytesManyValue,
-  handleRemoveValueProjectConfig as handleRemoveValue,
-  handleSetAddressValueProjectConfig as handleSetAddressValue,
-  handleSetBigIntValueProjectConfig as handleSetBigIntValue,
-  handleSetBooleanValueProjectConfig as handleSetBooleanValue,
-  handleSetBytesValueProjectConfig as handleSetBytesValue,
+  handleRemoveBigIntManyValueProjectMinterConfig as handleRemoveBigIntManyValue,
+  handleRemoveBytesManyValueProjectMinterConfig as handleRemoveBytesManyValue,
+  handleRemoveValueProjectMinterConfig as handleRemoveValue,
+  handleSetAddressValueProjectMinterConfig as handleSetAddressValue,
+  handleSetBigIntValueProjectMinterConfig as handleSetBigIntValue,
+  handleSetBooleanValueProjectMinterConfig as handleSetBooleanValue,
+  handleSetBytesValueProjectMinterConfig as handleSetBytesValue,
   handleDAExpSettlementResetAuctionDetails,
   handleSelloutPriceUpdated,
   handleReceiptUpdated,
@@ -1313,7 +1313,7 @@ describe("MinterDAExp-related tests", () => {
       }
     });
 
-    test("should reset project minter config auction details", () => {
+    test("should reset project minter config auction details DAExp", () => {
       for (let i = 0; i < DAExpMintersToTest.length; i++) {
         clearStore();
 
@@ -1413,6 +1413,7 @@ describe("MinterDAExp-related tests", () => {
         assert.assertTrue(
           updatedProjectMinterConfig.extraMinterDetails == "{}"
         );
+
         // @dev Deprecated fields ----------------
         assert.assertTrue(updatedProjectMinterConfig.startPrice === null);
         assert.assertTrue(updatedProjectMinterConfig.startTime === null);
@@ -2747,7 +2748,7 @@ describe("MinterSEAV tests", () => {
     if (projectMinterConfigEntity == null) {
       throw new Error("Project minter config entity not found");
     }
-    projectMinterConfigEntity.extraMinterDetails = "{projectNextTokenId:0}";
+    projectMinterConfigEntity.extraMinterDetails = '{"projectNextTokenId":0}';
     projectMinterConfigEntity.save();
 
     handleAuctionInitialized(event);
@@ -3596,13 +3597,17 @@ describe("Generic minter details", () => {
       '{"array":["im bytes"]}'
     );
 
+    configValueSetEvent.parameters[2] = new ethereum.EventParam(
+      "_value",
+      ethereum.Value.fromBytes(Bytes.fromUTF8("im also bytes"))
+    );
     handleAddManyBytesValue(configValueSetEvent);
 
     assert.fieldEquals(
       PROJECT_MINTER_CONFIGURATION_ENTITY_TYPE,
       getProjectMinterConfigId(minterAddress.toHexString(), project.id),
       "extraMinterDetails",
-      '{"array":["im bytes","im bytes"]}'
+      '{"array":["im bytes","im also bytes"]}'
     );
   });
 
