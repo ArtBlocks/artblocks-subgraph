@@ -44,7 +44,7 @@ import {
   WHITELISTING_ENTITY_TYPE
 } from "../shared-helpers";
 import { mockRefreshContractCalls } from "../mapping-v3-core/helpers";
-import { Contract, EngineRegistry } from "../../../generated/schema";
+import { Contract, CoreRegistry } from "../../../generated/schema";
 import {
   ContractRegistered,
   ContractUnregistered
@@ -52,7 +52,7 @@ import {
 import {
   handleContractRegistered,
   handleContractUnregistered
-} from "../../../src/engine-registry";
+} from "../../../src/core-registry";
 import {
   generateContractSpecificId,
   generateProjectScriptId,

@@ -839,7 +839,7 @@ dataSources:
           handler: handleContractRegistered
         - event: ContractUnregistered(indexed address)
           handler: handleContractUnregistered
-      file: ./src/engine-registry.ts
+      file: ./src/core-registry.ts
   {{/engineRegistryV0Contracts}}
   {{#minterFilterV0Contracts}}
   - kind: ethereum/contract
