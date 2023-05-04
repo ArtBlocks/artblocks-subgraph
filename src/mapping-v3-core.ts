@@ -1000,7 +1000,7 @@ function loadOrCreateMinterFilter(
     // assume the minter allowlist is empty If it was not empty, we would
     // have seen it when the minter filter was allowlisting a minter.
     // @dev this assumes the minter filter is in subgraph's config
-    minterFilter.minterAllowlist = [];
+    minterFilter.minterGlobalAllowlist = [];
     minterFilter.updatedAt = timestamp;
     minterFilter.save();
   }

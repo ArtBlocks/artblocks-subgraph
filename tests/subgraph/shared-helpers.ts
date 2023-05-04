@@ -393,7 +393,7 @@ export function addTestMinterFilterToStore(): MinterFilter {
   let minterFilter = new MinterFilter(TEST_MINTER_FILTER_ADDRESS.toHexString());
   minterFilter.coreContract = TEST_CONTRACT_ADDRESS.toHexString();
   minterFilter.updatedAt = CURRENT_BLOCK_TIMESTAMP.minus(BigInt.fromI32(10));
-  minterFilter.minterAllowlist = [];
+  minterFilter.minterGlobalAllowlist = [];
   minterFilter.save();
 
   return minterFilter;

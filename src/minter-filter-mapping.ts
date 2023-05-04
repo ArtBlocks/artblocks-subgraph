@@ -49,7 +49,7 @@ export function handleIsCanonicalMinterFilter(
   if (!minterFilter) {
     minterFilter = new MinterFilter(event.address.toHexString());
     minterFilter.coreContract = event.params._coreContractAddress.toHexString();
-    minterFilter.minterAllowlist = [];
+    minterFilter.minterGlobalAllowlist = [];
     minterFilter.updatedAt = event.block.timestamp;
     minterFilter.save();
   }
@@ -125,10 +125,10 @@ export function handleMinterApproved(event: MinterApproved): void {
   }
 
   // add minter to the list of allowlisted minters if it's not already there
-  if (!minterFilter.minterAllowlist.includes(minter.id)) {
-    minterFilter.minterAllowlist = minterFilter.minterAllowlist.concat([
-      minter.id
-    ]);
+  if (!minterFilter.minterGlobalAllowlist.includes(minter.id)) {
+    minterFilter.minterGlobalAllowlist = minterFilter.minterGlobalAllowlist.concat(
+      [minter.id]
+    );
     minterFilter.updatedAt = event.block.timestamp;
     minterFilter.save();
   }
@@ -160,13 +160,13 @@ export function handleMinterRevoked(event: MinterRevoked): void {
   // re-approved
 
   // remove the minter from the list of allowlisted minters
-  let newMinterAllowlist: string[] = [];
-  for (let i = 0; i < minterFilter.minterAllowlist.length; i++) {
-    if (minterFilter.minterAllowlist[i] != minter.id) {
-      newMinterAllowlist.push(minterFilter.minterAllowlist[i]);
+  let newMinterGlobalAllowlist: string[] = [];
+  for (let i = 0; i < minterFilter.minterGlobalAllowlist.length; i++) {
+    if (minterFilter.minterGlobalAllowlist[i] != minter.id) {
+      newMinterGlobalAllowlist.push(minterFilter.minterGlobalAllowlist[i]);
     }
   }
-  minterFilter.minterAllowlist = newMinterAllowlist;
+  minterFilter.minterGlobalAllowlist = newMinterGlobalAllowlist;
   minterFilter.updatedAt = event.block.timestamp;
   minterFilter.save();
 
@@ -304,7 +304,7 @@ export function loadOrCreateAndSetProjectMinterConfiguration(
 }
 
 // Helper function to load or create a minter filter.
-// Assumes that the minterAllowlist is empty when initializing a new minter
+// Assumes that the minterGlobalAllowlist is empty when initializing a new minter
 // filter.
 function loadOrCreateMinterFilter(
   minterFilterAddress: Address,
@@ -319,7 +319,7 @@ function loadOrCreateMinterFilter(
   let minterFilterContract = IMinterFilterV0.bind(minterFilterAddress);
   let coreContractAddress = minterFilterContract.genArt721CoreAddress();
   minterFilter.coreContract = coreContractAddress.toHexString();
-  minterFilter.minterAllowlist = [];
+  minterFilter.minterGlobalAllowlist = [];
   minterFilter.updatedAt = timestamp;
   minterFilter.save();
 

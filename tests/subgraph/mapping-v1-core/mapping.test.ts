@@ -449,7 +449,7 @@ test("GenArt721Core: Removing a whitelisted minter filter should leave existing 
   const minterFilterAddress = randomAddressGenerator.generateRandomAddress();
   const minterFilter = new MinterFilter(minterFilterAddress.toHexString());
   minterFilter.coreContract = TEST_CONTRACT_ADDRESS.toHexString();
-  minterFilter.minterAllowlist = [];
+  minterFilter.minterGlobalAllowlist = [];
   minterFilter.updatedAt = CURRENT_BLOCK_TIMESTAMP;
   minterFilter.save();
 

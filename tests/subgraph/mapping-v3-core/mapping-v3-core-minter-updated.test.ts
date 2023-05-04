@@ -193,7 +193,7 @@ test(`${coreType}/MinterUpdated: should create Contract and/or MinterFilter enti
   assert.fieldEquals(
     MINTER_FILTER_ENTITY_TYPE,
     TEST_MINTER_FILTER_ADDRESS.toHexString(),
-    "minterAllowlist",
+    "minterGlobalAllowlist",
     "[]"
   );
 });
