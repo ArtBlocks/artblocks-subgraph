@@ -1,4 +1,4 @@
-import { BigInt, store, Address } from "@graphprotocol/graph-ts";
+import { BigInt, log, Address } from "@graphprotocol/graph-ts";
 import { logStore } from "matchstick-as";
 
 import {
@@ -132,12 +132,19 @@ export function handleMinterApproved(event: MinterApproved): void {
     minterFilter.updatedAt = event.block.timestamp;
     minterFilter.save();
   }
+
+  // update minter's allowlisted state
+  minter.isGloballyAllowlistedOnMinterFilter = true;
+  minter.updatedAt = event.block.timestamp;
+  minter.save();
 }
 
 export function handleMinterRevoked(event: MinterRevoked): void {
-  // Note: there's a guard on the function that only allows a minter
-  // to be revoked if it is not set for any project. This means that
-  // we can avoid resetting any projects' minter configurations here.
+  // Note: We do not reset any project minter configurations here because
+  // we allow pre-configuring minter configurations on projects before the
+  // minter filter is set on the core contract. Frontends should check the
+  // minter's isGlobalAllowlistedOnMinterFilter field to determine if the
+  // minter is allowlisted on the associated minter filter.
   let minterFilter = loadOrCreateMinterFilter(
     event.address,
     event.block.timestamp
@@ -145,21 +152,28 @@ export function handleMinterRevoked(event: MinterRevoked): void {
 
   let minter = Minter.load(event.params._minterAddress.toHexString());
 
-  if (minter && minterFilter) {
-    // keep the Minter in the store to avoid having to re-populate it is
-    // re-approved
-
-    // remove the minter from the list of allowlisted minters
-    let newMinterAllowlist: string[] = [];
-    for (let i = 0; i < minterFilter.minterAllowlist.length; i++) {
-      if (minterFilter.minterAllowlist[i] != minter.id) {
-        newMinterAllowlist.push(minterFilter.minterAllowlist[i]);
-      }
-    }
-    minterFilter.minterAllowlist = newMinterAllowlist;
-    minterFilter.updatedAt = event.block.timestamp;
-    minterFilter.save();
+  // Only update state if the minter is allowlisted on this minter filter
+  if (!minter || !minterFilter || minter.minterFilter != minterFilter.id) {
+    return;
   }
+  // keep the Minter in the store to avoid having to re-populate it is
+  // re-approved
+
+  // remove the minter from the list of allowlisted minters
+  let newMinterAllowlist: string[] = [];
+  for (let i = 0; i < minterFilter.minterAllowlist.length; i++) {
+    if (minterFilter.minterAllowlist[i] != minter.id) {
+      newMinterAllowlist.push(minterFilter.minterAllowlist[i]);
+    }
+  }
+  minterFilter.minterAllowlist = newMinterAllowlist;
+  minterFilter.updatedAt = event.block.timestamp;
+  minterFilter.save();
+
+  // update minter's allowlisted state
+  minter.isGloballyAllowlistedOnMinterFilter = false;
+  minter.updatedAt = event.block.timestamp;
+  minter.save();
 }
 
 export function handleProjectMinterRegistered(
@@ -175,6 +189,16 @@ export function handleProjectMinterRegistered(
   // we didn't create it because its minter filter is different from
   // the minter filter it was approved on.
   let minter = Minter.load(event.params._minterAddress.toHexString());
+  if (!minterFilter.coreContract) {
+    // this is only possible on a V2+ minter, which this file is not intended
+    // to handle. We log a warning and return.
+    log.warning(
+      "[WARN] Legacy MinterFilter event handler was emitted by MinterFilter with non-null coreContract at address {}.",
+      [event.address.toHexString()]
+    );
+    return;
+  }
+  // Legacy minter filter handling (pre-V2)
   let coreContract = Contract.load(minterFilter.coreContract);
 
   if (
@@ -209,7 +233,15 @@ export function handleProjectMinterRemoved(event: ProjectMinterRemoved): void {
     event.address,
     event.block.timestamp
   );
-
+  if (!minterFilter.coreContract) {
+    // this is only possible on a V2+ minter, which this file is not intended
+    // to handle. We log a warning and return.
+    log.warning(
+      "[WARN] Legacy MinterFilter event handler was emitted by MinterFilter with non-null coreContract at address {}.",
+      [event.address.toHexString()]
+    );
+    return;
+  }
   let coreContract = Contract.load(minterFilter.coreContract);
 
   if (

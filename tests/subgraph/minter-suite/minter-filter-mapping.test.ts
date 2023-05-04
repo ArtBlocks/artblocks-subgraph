@@ -905,6 +905,12 @@ test("handleMinterApproved should add new minter to store", () => {
   assert.fieldEquals(
     MINTER_ENTITY_TYPE,
     minterToBeApprovedAddress.toHexString(),
+    "isGloballyAllowedOnMinterFilter",
+    "true"
+  );
+  assert.fieldEquals(
+    MINTER_ENTITY_TYPE,
+    minterToBeApprovedAddress.toHexString(),
     "updatedAt",
     CURRENT_BLOCK_TIMESTAMP.toString()
   );
@@ -1241,6 +1247,12 @@ test("handleMinterRevoke should remove minter from MinterFilter's minterAllowlis
   ];
 
   handleMinterApproved(minterApprovedEvent);
+  assert.fieldEquals(
+    MINTER_ENTITY_TYPE,
+    minterToBeApprovedAddress.toHexString(),
+    "isGloballyAllowedOnMinterFilter",
+    "true"
+  );
   handleMinterRevoked(minterRevokedEvent);
 
   // MinterFilter minterAllowlist should be empty array
@@ -1263,6 +1275,19 @@ test("handleMinterRevoke should remove minter from MinterFilter's minterAllowlis
   assert.fieldEquals(
     MINTER_FILTER_ENTITY_TYPE,
     minterFilterAddress.toHexString(),
+    "updatedAt",
+    CURRENT_BLOCK_TIMESTAMP.toString()
+  );
+  // Minter should have been updated
+  assert.fieldEquals(
+    MINTER_ENTITY_TYPE,
+    minterToBeApprovedAddress.toHexString(),
+    "isGloballyAllowedOnMinterFilter",
+    "false"
+  );
+  assert.fieldEquals(
+    MINTER_ENTITY_TYPE,
+    minterToBeApprovedAddress.toHexString(),
     "updatedAt",
     CURRENT_BLOCK_TIMESTAMP.toString()
   );
