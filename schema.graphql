@@ -354,7 +354,7 @@ type MinterFilter @entity {
   knownMinters: [Minter!]! @derivedFrom(field: "minterFilter")
 
   "Core contract registry used by this MinterFilter. Note that for MinterFilterV0 & MinterFilterV1, a dummy CoreRegistry is created in the subgraph that contains a single allowlisted core contract."
-  coreRegistry: CoreRegistry
+  coreRegistry: CoreRegistry!
 
   updatedAt: BigInt!
 }
