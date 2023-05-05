@@ -24,7 +24,14 @@ import {
   generateContractSpecificId,
   getProjectMinterConfigId
 } from "../../src/helpers";
-import { typedMapToJSONString } from "../../src/json";
+import {
+  jsonValueEquals,
+  jsonValueToJSONString,
+  toJSONValue,
+  typedMapToJSONString,
+  TypedMapEntry,
+  createTypedMapFromEntries
+} from "../../src/json";
 
 // Utils
 // The built in assembly script Math.random() function does not work
@@ -640,10 +647,10 @@ export function assertTestContractFields(
 }
 
 // @dev does not support expected value types of NULL, OBJECT, or ARRAY
-export function assertJsonFieldEquals(
+export function assertJsonFieldEquals<ValueType>(
   jsonString: string,
   key: string,
-  expectedValue: string
+  expectedValue: ValueType
 ): void {
   let jsonResult = json.try_fromString(jsonString);
   let jsonMapping: TypedMap<string, JSONValue>;
@@ -659,35 +666,20 @@ export function assertJsonFieldEquals(
   if (_val == null) {
     throw new Error(`Expected json to contain key ${key}, but not found`);
   }
-  // assert that the value is equal to the expected value
-  // @dev using != instead of !== okay because strict typing rules apply in AS
-  if (_val.kind == JSONValueKind.STRING) {
-    if (_val.toString() != expectedValue) {
-      throw new Error(
-        `Expected json value for key ${key} to be ${expectedValue}, but was ${_val.toString()}`
-      );
-    }
-  } else if (_val.kind == JSONValueKind.NUMBER) {
-    if (_val.toBigInt().toString() != expectedValue) {
-      throw new Error(
-        `Expected json value ${_val
-          .toBigInt()
-          .toString()} == ${expectedValue}, but did not`
-      );
-    }
-  } else if (_val.kind == JSONValueKind.BOOL) {
-    if (_val.toBool().toString() != expectedValue) {
-      throw new Error(
-        `Expected json value ${_val
-          .toBool()
-          .toString()} == ${expectedValue}, but did not`
-      );
-    }
-  } else {
+
+  const expectedJSONValue = toJSONValue(expectedValue);
+
+  if (!jsonValueEquals(_val, expectedJSONValue)) {
     throw new Error(
-      `Unsupported type for helper function. Expected json value to be a string, number, or boolean, but was not.`
+      `Expected json value for key ${key} to be ${jsonValueToJSONString(
+        expectedJSONValue
+      )}, but was ${jsonValueToJSONString(_val)}`
     );
   }
+}
+
+export function getJSONStringFromEntries(entries: TypedMapEntry[]): string {
+  return typedMapToJSONString(createTypedMapFromEntries(entries));
 }
 
 // helper function to convert from an aligned key/value pair of arrays to a json string
