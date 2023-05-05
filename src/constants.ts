@@ -1,3 +1,5 @@
+import { BigInt } from "@graphprotocol/graph-ts";
+
 export const NULL_ADDRESS = "0x0000000000000000000000000000000000000000";
 
 export const ARTBLOCKS_PLATFORM_ID = "ArtBlocks";
@@ -52,3 +54,5 @@ export const FLEX_CONTRACT_EXTERNAL_ASSET_DEP_TYPES = [
   "ARWEAVE",
   "ONCHAIN"
 ];
+
+export const JS_MAX_SAFE_INTEGER = BigInt.fromString("9007199254740991");

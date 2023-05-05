@@ -21,6 +21,7 @@ import {
   log
 } from "@graphprotocol/graph-ts";
 import { booleanToString } from "./helpers";
+import { JS_MAX_SAFE_INTEGER } from "./constants";
 
 /*** Utils for converting values to JSONValue ***/
 
@@ -40,6 +41,11 @@ export function toJSONValue<ValueType>(value: ValueType): JSONValue {
   if (isBoolean(value)) {
     return json.fromString(booleanToString(value as boolean));
   } else if (value instanceof BigInt) {
+    if (value.gt(JS_MAX_SAFE_INTEGER)) {
+      log.warning("BigInt {} value exceeds JS_MAX_SAFE_INTEGER", [
+        value.toString()
+      ]);
+    }
     return json.fromString(value.toString());
   } else if (value instanceof Address) {
     return stringToJSONValue(value.toHexString());
