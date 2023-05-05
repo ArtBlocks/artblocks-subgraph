@@ -415,6 +415,7 @@ export const addNewMinterToStore = (type: string): Minter => {
     .toHexString();
   minter.type = minterType;
   minter.extraMinterDetails = "{}";
+  minter.isGloballyAllowlistedOnMinterFilter = true;
   minter.updatedAt = CURRENT_BLOCK_TIMESTAMP;
   minter.save();
 

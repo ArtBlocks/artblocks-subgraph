@@ -7,6 +7,7 @@ import {
   JSONValueKind,
   TypedMap,
   store,
+  log,
   ethereum
 } from "@graphprotocol/graph-ts";
 import { IFilteredMinterV2 } from "../generated/MinterSetPrice/IFilteredMinterV2";
@@ -15,7 +16,9 @@ import {
   ProjectMinterConfiguration,
   Account,
   Whitelisting,
-  Receipt
+  Receipt,
+  MinterFilter,
+  CoreRegistry
 } from "../generated/schema";
 import { IFilteredMinterDALinV1 } from "../generated/MinterDALin/IFilteredMinterDALinV1";
 import { IFilteredMinterDAExpV1 } from "../generated/MinterDAExp/IFilteredMinterDAExpV1";
@@ -256,4 +259,48 @@ export function generateTransferId(
   logIndex: BigInt
 ): string {
   return transactionHash.toHexString() + "-" + logIndex.toString();
+}
+
+export function getCoreContractAddressFromLegacyMinter(
+  minter: Minter
+): Address | null {
+  // get associated core contract address through the minter filter
+  const minterFilter = MinterFilter.load(minter.minterFilter);
+  if (!minterFilter) {
+    log.warning("Error while loading minter filter with id {}", [
+      minter.minterFilter
+    ]);
+    return null;
+  }
+  return getCoreContractAddressFromLegacyMinterFilter(minterFilter);
+}
+
+export function getCoreContractAddressFromLegacyMinterFilter(
+  minterFilter: MinterFilter
+): Address | null {
+  // in the case of non-shared minterFilter, we may assume a single core is allowlisted
+  // on a dummy core registry, referenced by the minter filter
+  const coreRegistry = CoreRegistry.load(minterFilter.coreRegistry);
+  if (!coreRegistry) {
+    log.warning("Error while loading core registry with id {}", [
+      minterFilter.coreRegistry
+    ]);
+    return null;
+  }
+  const registeredContracts = coreRegistry.registeredContracts;
+  if (!registeredContracts) {
+    log.warning(
+      "Error while loading core registry's registered contracts with id {}",
+      [minterFilter.coreRegistry]
+    );
+    return null;
+  }
+  if (registeredContracts.length != 1) {
+    log.warning(
+      "Error while loading core registry with id {}, expected 1 registered contract, got {}",
+      [minterFilter.coreRegistry, registeredContracts.length.toString()]
+    );
+    return null;
+  }
+  return Address.fromString(registeredContracts[0]);
 }

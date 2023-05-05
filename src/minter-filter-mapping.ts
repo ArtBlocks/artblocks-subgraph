@@ -27,7 +27,8 @@ import {
 import {
   generateContractSpecificId,
   getProjectMinterConfigId,
-  loadOrCreateMinter
+  loadOrCreateMinter,
+  getCoreContractAddressFromLegacyMinterFilter
 } from "./helpers";
 
 // @dev - This event is ONLY emitted from a MinterFilterV0 contract, so we can
@@ -199,9 +200,10 @@ export function handleProjectMinterRegistered(
   // we didn't create it because its minter filter is different from
   // the minter filter it was approved on.
   let minter = Minter.load(event.params._minterAddress.toHexString());
-  if (!minterFilter.coreContract) {
-    // this is only possible on a V2+ minter, which this file is not intended
-    // to handle. We log a warning and return.
+  const coreContractAddress = getCoreContractAddressFromLegacyMinterFilter(
+    minterFilter
+  );
+  if (!coreContractAddress) {
     log.warning(
       "[WARN] Legacy MinterFilter event handler was emitted by MinterFilter with non-null coreContract at address {}.",
       [event.address.toHexString()]
@@ -209,7 +211,7 @@ export function handleProjectMinterRegistered(
     return;
   }
   // Legacy minter filter handling (pre-V2)
-  let coreContract = Contract.load(minterFilter.coreContract);
+  let coreContract = Contract.load(coreContractAddress.toHexString());
 
   if (
     !minter ||
@@ -220,10 +222,7 @@ export function handleProjectMinterRegistered(
   }
 
   let project = Project.load(
-    generateContractSpecificId(
-      Address.fromString(minterFilter.coreContract),
-      event.params._projectId
-    )
+    generateContractSpecificId(coreContractAddress, event.params._projectId)
   );
 
   if (project) {
@@ -243,16 +242,17 @@ export function handleProjectMinterRemoved(event: ProjectMinterRemoved): void {
     event.address,
     event.block.timestamp
   );
-  if (!minterFilter.coreContract) {
-    // this is only possible on a V2+ minter, which this file is not intended
-    // to handle. We log a warning and return.
+  const coreContractAddress = getCoreContractAddressFromLegacyMinterFilter(
+    minterFilter
+  );
+  if (!coreContractAddress) {
     log.warning(
       "[WARN] Legacy MinterFilter event handler was emitted by MinterFilter with non-null coreContract at address {}.",
       [event.address.toHexString()]
     );
     return;
   }
-  let coreContract = Contract.load(minterFilter.coreContract);
+  let coreContract = Contract.load(coreContractAddress.toHexString());
 
   if (
     !coreContract ||
@@ -262,10 +262,7 @@ export function handleProjectMinterRemoved(event: ProjectMinterRemoved): void {
   }
 
   let project = Project.load(
-    generateContractSpecificId(
-      Address.fromString(minterFilter.coreContract),
-      event.params._projectId
-    )
+    generateContractSpecificId(coreContractAddress, event.params._projectId)
   );
 
   if (project) {
@@ -359,7 +356,6 @@ function getOrCreateDummyCoreRegistryForLegacyMinterFilter(
   }
   // create new core registry if it didn't exist
   coreRegistry = new CoreRegistry(dummyCoreRegistryId);
-  coreRegistry.updatedAt = timestamp;
   coreRegistry.save();
   return coreRegistry;
 }

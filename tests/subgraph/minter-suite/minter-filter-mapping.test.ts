@@ -826,7 +826,6 @@ test("handleMinterApproved should not add minter to minterGlobalAllowlist if the
   const minterFilterUpdatedAt = CURRENT_BLOCK_TIMESTAMP.minus(
     BigInt.fromI32(10)
   );
-  minterFilter.coreContract = TEST_CONTRACT_ADDRESS.toHexString();
   minterFilter.updatedAt = minterFilterUpdatedAt;
   minterFilter.minterGlobalAllowlist = [];
   minterFilter.save();
@@ -882,7 +881,6 @@ test("handleMinterApproved should add new minter to store", () => {
   const minterFilterUpdatedAt = CURRENT_BLOCK_TIMESTAMP.minus(
     BigInt.fromI32(10)
   );
-  minterFilter.coreContract = TEST_CONTRACT_ADDRESS.toHexString();
   minterFilter.updatedAt = minterFilterUpdatedAt;
   minterFilter.minterGlobalAllowlist = [];
   minterFilter.save();
@@ -952,7 +950,6 @@ test("handleMinterApproved should handle the same minter being approved more tha
   const minterFilterUpdatedAt = CURRENT_BLOCK_TIMESTAMP.minus(
     BigInt.fromI32(10)
   );
-  minterFilter.coreContract = TEST_CONTRACT_ADDRESS.toHexString();
   minterFilter.updatedAt = minterFilterUpdatedAt;
   minterFilter.minterGlobalAllowlist = [];
   minterFilter.save();
@@ -1018,7 +1015,6 @@ test("handleMinterApproved should populate DA Exp default half life ranges", () 
     const minterFilterUpdatedAt = CURRENT_BLOCK_TIMESTAMP.minus(
       BigInt.fromI32(10)
     );
-    minterFilter.coreContract = TEST_CONTRACT_ADDRESS.toHexString();
     minterFilter.updatedAt = minterFilterUpdatedAt;
     minterFilter.minterGlobalAllowlist = [];
     minterFilter.save();
@@ -1105,7 +1101,6 @@ test("handleMinterApproved should populate DA Lin min auction time", () => {
     const minterFilterUpdatedAt = CURRENT_BLOCK_TIMESTAMP.minus(
       BigInt.fromI32(10)
     );
-    minterFilter.coreContract = TEST_CONTRACT_ADDRESS.toHexString();
     minterFilter.updatedAt = minterFilterUpdatedAt;
     minterFilter.minterGlobalAllowlist = [];
     minterFilter.save();
@@ -1176,7 +1171,6 @@ test("handleMinterRevoke should do nothing to MinterFilter if minter is not in s
   const minterFilterUpdatedAt = CURRENT_BLOCK_TIMESTAMP.minus(
     BigInt.fromI32(10)
   );
-  minterFilter.coreContract = TEST_CONTRACT_ADDRESS.toHexString();
   minterFilter.updatedAt = minterFilterUpdatedAt;
   minterFilter.minterGlobalAllowlist = [];
   minterFilter.save();
@@ -1216,7 +1210,6 @@ test("handleMinterRevoke should remove minter from MinterFilter's minterGlobalAl
     BigInt.fromI32(10)
   );
   minterFilter.minterGlobalAllowlist = [];
-  minterFilter.coreContract = TEST_CONTRACT_ADDRESS.toHexString();
   minterFilter.updatedAt = minterFilterUpdatedAt;
   minterFilter.save();
 
@@ -1227,7 +1220,6 @@ test("handleMinterRevoke should remove minter from MinterFilter's minterGlobalAl
   );
   const minterToBeRevokedAddress = minterToBeApprovedAddress;
   minter.minterFilter = minterFilterAddress.toHexString();
-  minter.coreContract = TEST_CONTRACT_ADDRESS.toHexString();
   minter.updatedAt = CURRENT_BLOCK_TIMESTAMP.minus(BigInt.fromI32(10));
   minter.save();
 
@@ -1316,7 +1308,6 @@ test("handleMinterRevoke should handle revoking a minter more than once", () => 
     BigInt.fromI32(10)
   );
   minterFilter.minterGlobalAllowlist = [];
-  minterFilter.coreContract = TEST_CONTRACT_ADDRESS.toHexString();
   minterFilter.updatedAt = minterFilterUpdatedAt;
   minterFilter.save();
 
@@ -1325,7 +1316,6 @@ test("handleMinterRevoke should handle revoking a minter more than once", () => 
     Address.fromHexString(minter.id)
   );
   minter.minterFilter = minterFilterAddress.toHexString();
-  minter.coreContract = TEST_CONTRACT_ADDRESS.toHexString();
   minter.updatedAt = CURRENT_BLOCK_TIMESTAMP.minus(BigInt.fromI32(10));
   minter.save();
 
@@ -1388,7 +1378,6 @@ test("handleProjectMinterRegistered should do nothing if the minter being regist
     BigInt.fromI32(10)
   );
   const minterFilter = new MinterFilter(minterFilterAddress.toHexString());
-  minterFilter.coreContract = TEST_CONTRACT_ADDRESS.toHexString();
   minterFilter.updatedAt = minterFilterUpdatedAt;
   minterFilter.minterGlobalAllowlist = [];
   minterFilter.save();
@@ -1447,7 +1436,6 @@ test("handleProjectMinterRegistered should do nothing if the minter filter's cor
     BigInt.fromI32(10)
   );
   const minterFilter = new MinterFilter(minterFilterAddress.toHexString());
-  minterFilter.coreContract = TEST_CONTRACT_ADDRESS.toHexString();
   minterFilter.updatedAt = minterFilterUpdatedAt;
   minterFilter.minterGlobalAllowlist = [];
   minterFilter.save();
@@ -1516,7 +1504,6 @@ test("handleProjectMinterRegistered should do nothing if the minter filter is no
     BigInt.fromI32(10)
   );
   const minterFilter = new MinterFilter(minterFilterAddress.toHexString());
-  minterFilter.coreContract = TEST_CONTRACT_ADDRESS.toHexString();
   minterFilter.updatedAt = minterFilterUpdatedAt;
   minterFilter.minterGlobalAllowlist = [];
   minterFilter.save();
@@ -1594,7 +1581,6 @@ test("handleProjectMinterRegistered should populate project from prior minter co
     BigInt.fromI32(10)
   );
   const minterFilter = new MinterFilter(minterFilterAddress.toHexString());
-  minterFilter.coreContract = TEST_CONTRACT_ADDRESS.toHexString();
   minterFilter.updatedAt = minterFilterUpdatedAt;
   minterFilter.minterGlobalAllowlist = [];
   minterFilter.save();
@@ -1731,7 +1717,6 @@ test("handleProjectMinterRegistered should populate project from scratch for pro
     BigInt.fromI32(10)
   );
   const minterFilter = new MinterFilter(minterFilterAddress.toHexString());
-  minterFilter.coreContract = TEST_CONTRACT_ADDRESS.toHexString();
   minterFilter.updatedAt = minterFilterUpdatedAt;
   minterFilter.minterGlobalAllowlist = [];
   minterFilter.save();
@@ -1829,7 +1814,6 @@ test("handleProjectMinterRemoved should do nothing if core contract is not in st
     BigInt.fromI32(10)
   );
   const minterFilter = new MinterFilter(minterFilterAddress.toHexString());
-  minterFilter.coreContract = TEST_CONTRACT_ADDRESS.toHexString();
   minterFilter.updatedAt = minterFilterUpdatedAt;
   minterFilter.minterGlobalAllowlist = [];
   minterFilter.save();
@@ -1883,7 +1867,6 @@ test("handleProjectMinterRemoved should do nothing if core contract does not hav
     BigInt.fromI32(10)
   );
   const minterFilter = new MinterFilter(minterFilterAddress.toHexString());
-  minterFilter.coreContract = TEST_CONTRACT_ADDRESS.toHexString();
   minterFilter.updatedAt = minterFilterUpdatedAt;
   minterFilter.minterGlobalAllowlist = [];
   minterFilter.save();
@@ -1891,9 +1874,6 @@ test("handleProjectMinterRemoved should do nothing if core contract does not hav
   const contract = addTestContractToStore(BigInt.fromI32(1));
 
   const minter = addNewMinterToStore("MinterSetPriceV0");
-  minter.coreContract = randomAddressGenerator
-    .generateRandomAddress()
-    .toHexString();
   minter.save();
 
   const projectMinterRemovedEvent: ProjectMinterRemoved = changetype<
@@ -1940,7 +1920,6 @@ test("handleProjectMinterRemoved should remove minter configuration from project
     BigInt.fromI32(10)
   );
   const minterFilter = new MinterFilter(minterFilterAddress.toHexString());
-  minterFilter.coreContract = TEST_CONTRACT_ADDRESS.toHexString();
   minterFilter.updatedAt = minterFilterUpdatedAt;
   minterFilter.minterGlobalAllowlist = [];
   minterFilter.save();
