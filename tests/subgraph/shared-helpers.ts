@@ -96,6 +96,7 @@ export const PROJECT_MINTER_CONFIGURATION_ENTITY_TYPE =
   "ProjectMinterConfiguration";
 export const RECEIPT_ENTITY_TYPE = "Receipt";
 export const MINTER_FILTER_ENTITY_TYPE = "MinterFilter";
+export const CORE_REGISTRY_TYPE = "CoreRegistry";
 export const MINTER_ENTITY_TYPE = "Minter";
 export const ONE_MILLION = 1000000;
 export const RANDOMIZER_ADDRESS = randomAddressGenerator.generateRandomAddress();
@@ -398,7 +399,6 @@ export function addArbitraryContractToStore(
 
 export function addTestMinterFilterToStore(): MinterFilter {
   let minterFilter = new MinterFilter(TEST_MINTER_FILTER_ADDRESS.toHexString());
-  minterFilter.coreContract = TEST_CONTRACT_ADDRESS.toHexString();
   minterFilter.updatedAt = CURRENT_BLOCK_TIMESTAMP.minus(BigInt.fromI32(10));
   minterFilter.minterGlobalAllowlist = [];
   minterFilter.save();
@@ -410,7 +410,6 @@ export const addNewMinterToStore = (type: string): Minter => {
   const minterAddress = randomAddressGenerator.generateRandomAddress();
   const minterType = type;
   const minter = new Minter(minterAddress.toHexString());
-  minter.coreContract = TEST_CONTRACT_ADDRESS.toHexString();
   minter.minterFilter = randomAddressGenerator
     .generateRandomAddress()
     .toHexString();

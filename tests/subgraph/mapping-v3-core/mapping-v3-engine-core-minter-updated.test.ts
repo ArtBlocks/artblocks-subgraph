@@ -482,11 +482,18 @@ test(`${coreType}/MinterUpdated: should populate project minter configurations f
     "id",
     minterFilterAddress.toHexString()
   );
+  const coreRegistryId = minterFilterAddress.toHexString();
   assert.fieldEquals(
     MINTER_FILTER_ENTITY_TYPE,
     minterFilterAddress.toHexString(),
-    "coreContract",
-    TEST_CONTRACT_ADDRESS.toHexString()
+    "coreRegistry",
+    coreRegistryId
+  );
+  assert.fieldEquals(
+    CONTRACT_ENTITY_TYPE,
+    TEST_CONTRACT_ADDRESS.toHexString(),
+    "registeredOn",
+    coreRegistryId
   );
 
   // Project 0 asserts

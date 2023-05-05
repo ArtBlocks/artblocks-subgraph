@@ -190,9 +190,6 @@ export function loadOrCreateMinter(
   minter.minterFilter = filteredMinterContract
     .minterFilterAddress()
     .toHexString();
-  minter.coreContract = filteredMinterContract
-    .genArt721CoreAddress()
-    .toHexString();
   minter.extraMinterDetails = "{}";
   // by default, we assume the minter is not allowlisted on its MinterFilter during
   // initialization, and we let the MinterFilter entity handle the allowlisting

@@ -99,12 +99,18 @@ test("handleDeployed should add MinterFilter to the store", () => {
     "id",
     minterFilterAddress.toHexString()
   );
-
+  const coreRegistryId = minterFilterAddress.toHexString();
   assert.fieldEquals(
     MINTER_FILTER_ENTITY_TYPE,
     minterFilterAddress.toHexString(),
-    "coreContract",
-    TEST_CONTRACT_ADDRESS.toHexString()
+    "coreRegistry",
+    coreRegistryId
+  );
+  assert.fieldEquals(
+    CONTRACT_ENTITY_TYPE,
+    TEST_CONTRACT_ADDRESS.toHexString(),
+    "registeredOn",
+    coreRegistryId
   );
   clearStore();
 });
@@ -174,14 +180,21 @@ test("handleIsCanonicalMinterFilter should create a minter filter and associate 
   assert.fieldEquals(
     MINTER_FILTER_ENTITY_TYPE,
     minterFilterAddress.toHexString(),
-    "coreContract",
-    TEST_CONTRACT_ADDRESS.toHexString()
+    "updatedAt",
+    updateCallBlockTimestamp.toString()
   );
+  const coreRegistryId = minterFilterAddress.toHexString();
   assert.fieldEquals(
     MINTER_FILTER_ENTITY_TYPE,
     minterFilterAddress.toHexString(),
-    "updatedAt",
-    updateCallBlockTimestamp.toString()
+    "coreRegistry",
+    coreRegistryId
+  );
+  assert.fieldEquals(
+    CONTRACT_ENTITY_TYPE,
+    TEST_CONTRACT_ADDRESS.toHexString(),
+    "registeredOn",
+    coreRegistryId
   );
 
   assert.fieldEquals(
@@ -451,14 +464,21 @@ test("handleIsCanonicalMinterFilter should populate project minter configuration
   assert.fieldEquals(
     MINTER_FILTER_ENTITY_TYPE,
     minterFilterAddress.toHexString(),
-    "coreContract",
-    TEST_CONTRACT_ADDRESS.toHexString()
+    "updatedAt",
+    updateCallBlockTimestamp.toString()
   );
+  const coreRegistryId = minterFilterAddress.toHexString();
   assert.fieldEquals(
     MINTER_FILTER_ENTITY_TYPE,
     minterFilterAddress.toHexString(),
-    "updatedAt",
-    updateCallBlockTimestamp.toString()
+    "coreRegistry",
+    coreRegistryId
+  );
+  assert.fieldEquals(
+    CONTRACT_ENTITY_TYPE,
+    TEST_CONTRACT_ADDRESS.toHexString(),
+    "registeredOn",
+    coreRegistryId
   );
 
   assert.fieldEquals(

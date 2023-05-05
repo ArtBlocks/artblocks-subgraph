@@ -19,6 +19,7 @@ import {
   addTestContractToStore,
   addNewProjectToStore,
   MINTER_FILTER_ENTITY_TYPE,
+  CORE_REGISTRY_TYPE,
   ONE_ETH_IN_WEI,
   booleanToString,
   assertJsonFieldEquals,
@@ -136,12 +137,21 @@ test(`${coreType}/MinterUpdated: should list invalid MinterFilter with different
     "updatedAt",
     updateCallBlockTimestamp.toString()
   );
+  const coreRegistryId = TEST_MINTER_FILTER_ADDRESS.toHexString();
   assert.fieldEquals(
     MINTER_FILTER_ENTITY_TYPE,
     TEST_MINTER_FILTER_ADDRESS.toHexString(),
-    "coreContract",
-    differentCoreAddress.toHexString()
+    "coreRegistry",
+    coreRegistryId
   );
+  // check that the core contract reflects being registered on the new core registry
+  assert.fieldEquals(
+    CONTRACT_ENTITY_TYPE,
+    differentCoreAddress.toHexString(),
+    "registeredOn",
+    coreRegistryId
+  );
+  assert.entityCount(CORE_REGISTRY_TYPE, 1);
 });
 
 test(`${coreType}/MinterUpdated: should create Contract and/or MinterFilter entities when not yet created, associate them`, () => {
@@ -188,14 +198,22 @@ test(`${coreType}/MinterUpdated: should create Contract and/or MinterFilter enti
   assert.fieldEquals(
     MINTER_FILTER_ENTITY_TYPE,
     TEST_MINTER_FILTER_ADDRESS.toHexString(),
-    "coreContract",
-    TEST_CONTRACT_ADDRESS.toHexString()
+    "minterGlobalAllowlist",
+    "[]"
   );
+  const coreRegistryId = TEST_MINTER_FILTER_ADDRESS.toHexString();
   assert.fieldEquals(
     MINTER_FILTER_ENTITY_TYPE,
     TEST_MINTER_FILTER_ADDRESS.toHexString(),
-    "minterGlobalAllowlist",
-    "[]"
+    "coreRegistry",
+    coreRegistryId
+  );
+  // check that the core contract reflects being registered on the new core registry
+  assert.fieldEquals(
+    CONTRACT_ENTITY_TYPE,
+    TEST_CONTRACT_ADDRESS.toHexString(),
+    "registeredOn",
+    coreRegistryId
   );
 });
 
@@ -480,11 +498,19 @@ test(`${coreType}/MinterUpdated: should populate project minter configurations f
     "id",
     minterFilterAddress.toHexString()
   );
+  const coreRegistryId = minterFilterAddress.toHexString();
   assert.fieldEquals(
     MINTER_FILTER_ENTITY_TYPE,
     minterFilterAddress.toHexString(),
-    "coreContract",
-    TEST_CONTRACT_ADDRESS.toHexString()
+    "coreRegistry",
+    coreRegistryId
+  );
+  // check that the core contract reflects being registered on the new core registry
+  assert.fieldEquals(
+    CONTRACT_ENTITY_TYPE,
+    TEST_CONTRACT_ADDRESS.toHexString(),
+    "registeredOn",
+    coreRegistryId
   );
 
   // Project 0 asserts

@@ -31,7 +31,10 @@ import {
 } from "../generated/AdminACLV0/IAdminACLV0";
 
 import { MinterFilterV1 } from "../generated/MinterFilterV1/MinterFilterV1";
-import { loadOrCreateAndSetProjectMinterConfiguration } from "./minter-filter-mapping";
+import {
+  loadOrCreateAndSetProjectMinterConfiguration,
+  loadOrCreateMinterFilter
+} from "./minter-filter-mapping";
 
 import {
   Project,
@@ -624,12 +627,17 @@ function _handleMinterUpdated<T>(contract: T, event: MinterUpdated): void {
     // update contract entity with null MinterFilter
     contractEntity.minterFilter = null;
     contractEntity.mintWhitelisted = [];
+    contractEntity.registeredOn = null;
   } else {
     // we can assume the minter is a MinterFilter contract.
+    // @dev This currently assues that this is a Legacy MinterFilter contract
     contractEntity.mintWhitelisted = [event.params._currentMinter];
     let minterFilterContract = MinterFilterV1.bind(event.params._currentMinter);
     // create and save minter filter entity if doesn't exist
-    loadOrCreateMinterFilter(minterFilterContract, event.block.timestamp);
+    loadOrCreateMinterFilter(
+      Address.fromString(newMinterFilterAddress),
+      event.block.timestamp
+    );
     // check that the MinterFilter's core contract is the contract that emitted
     // the event.
     if (
@@ -649,6 +657,8 @@ function _handleMinterUpdated<T>(contract: T, event: MinterUpdated): void {
     } else {
       // update contract entity with new valid MinterFilter ID
       contractEntity.minterFilter = newMinterFilterAddress;
+      // legacy MinterFilters have a dummy CoreRegistry with same id as MinterFilter
+      contractEntity.registeredOn = newMinterFilterAddress;
       // sync all pre-set projectMinterConfigurations
       populateAllExistingMinterConfigurations(
         minterFilterContract,
@@ -980,32 +990,32 @@ function loadOrCreateContract<T>(
   return contractEntity;
 }
 
-// loads or creates a MinterFilter entity and returns it.
-function loadOrCreateMinterFilter(
-  minterFilterContract: MinterFilterV1,
-  timestamp: BigInt
-): MinterFilter {
-  // load or create MinterFilter entity
-  let minterFilter = MinterFilter.load(
-    minterFilterContract._address.toHexString()
-  );
-  if (!minterFilter) {
-    minterFilter = new MinterFilter(
-      minterFilterContract._address.toHexString()
-    );
-    minterFilter.coreContract = minterFilterContract
-      .genArt721CoreAddress()
-      .toHexString();
-    // if this is the first time we have seen this minter filter, we can
-    // assume the minter allowlist is empty If it was not empty, we would
-    // have seen it when the minter filter was allowlisting a minter.
-    // @dev this assumes the minter filter is in subgraph's config
-    minterFilter.minterGlobalAllowlist = [];
-    minterFilter.updatedAt = timestamp;
-    minterFilter.save();
-  }
-  return minterFilter;
-}
+// // loads or creates a MinterFilter entity and returns it.
+// function loadOrCreateMinterFilter(
+//   minterFilterContract: MinterFilterV1,
+//   timestamp: BigInt
+// ): MinterFilter {
+//   // load or create MinterFilter entity
+//   let minterFilter = MinterFilter.load(
+//     minterFilterContract._address.toHexString()
+//   );
+//   if (!minterFilter) {
+//     minterFilter = new MinterFilter(
+//       minterFilterContract._address.toHexString()
+//     );
+//     minterFilter.coreContract = minterFilterContract
+//       .genArt721CoreAddress()
+//       .toHexString();
+//     // if this is the first time we have seen this minter filter, we can
+//     // assume the minter allowlist is empty If it was not empty, we would
+//     // have seen it when the minter filter was allowlisting a minter.
+//     // @dev this assumes the minter filter is in subgraph's config
+//     minterFilter.minterGlobalAllowlist = [];
+//     minterFilter.updatedAt = timestamp;
+//     minterFilter.save();
+//   }
+//   return minterFilter;
+// }
 
 // Returns an IGenArt721CoreContractV3_Base contract
 // @dev assumes the contract conforms to the IGenArt721CoreContractV3_Base

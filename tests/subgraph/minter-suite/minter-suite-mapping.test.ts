@@ -301,7 +301,6 @@ describe("handleProjectCurrencyInfoUpdated", () => {
     const minterAddress: Address = changetype<Address>(
       Address.fromHexString(minter.id)
     );
-    minter.coreContract = TEST_CONTRACT_ADDRESS.toHexString();
     minter.save();
 
     const projectId = BigInt.fromI32(0);
@@ -4141,7 +4140,6 @@ describe("MinterHolder-specific tests", () => {
       const minter = addNewMinterToStore(minterType);
       const minterAddress = Address.fromString(minter.id);
 
-      minter.coreContract = TEST_CONTRACT_ADDRESS.toHexString();
       minter.type = minterType;
       minter;
       const testAddy = randomAddressGenerator.generateRandomAddress();
