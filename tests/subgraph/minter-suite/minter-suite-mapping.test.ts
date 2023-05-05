@@ -1700,43 +1700,43 @@ describe("DAExpSettlementMinters", () => {
 
       assert.fieldEquals(
         RECEIPT_ENTITY_TYPE,
-        getReceiptId(minterAddress.toHexString(), project.projectId, purchaser),
+        getReceiptId(minterAddress.toHexString(), project.id, purchaser),
         "project",
         project.id
       );
       assert.fieldEquals(
         RECEIPT_ENTITY_TYPE,
-        getReceiptId(minterAddress.toHexString(), project.projectId, purchaser),
+        getReceiptId(minterAddress.toHexString(), project.id, purchaser),
         "project",
         project.id
       );
       assert.fieldEquals(
         RECEIPT_ENTITY_TYPE,
-        getReceiptId(minterAddress.toHexString(), project.projectId, purchaser),
+        getReceiptId(minterAddress.toHexString(), project.id, purchaser),
         "minter",
         minterAddress.toHexString()
       );
       assert.fieldEquals(
         RECEIPT_ENTITY_TYPE,
-        getReceiptId(minterAddress.toHexString(), project.projectId, purchaser),
+        getReceiptId(minterAddress.toHexString(), project.id, purchaser),
         "account",
         purchaser.toHexString()
       );
       assert.fieldEquals(
         RECEIPT_ENTITY_TYPE,
-        getReceiptId(minterAddress.toHexString(), project.projectId, purchaser),
+        getReceiptId(minterAddress.toHexString(), project.id, purchaser),
         "netPosted",
         netPosted.toString()
       );
       assert.fieldEquals(
         RECEIPT_ENTITY_TYPE,
-        getReceiptId(minterAddress.toHexString(), project.projectId, purchaser),
+        getReceiptId(minterAddress.toHexString(), project.id, purchaser),
         "numPurchased",
         numPurchased.toString()
       );
       assert.fieldEquals(
         RECEIPT_ENTITY_TYPE,
-        getReceiptId(minterAddress.toHexString(), project.projectId, purchaser),
+        getReceiptId(minterAddress.toHexString(), project.id, purchaser),
         "updatedAt",
         CURRENT_BLOCK_TIMESTAMP.toString()
       );
@@ -1905,43 +1905,43 @@ describe("DAExpSettlementMinters", () => {
       );
       assert.fieldEquals(
         RECEIPT_ENTITY_TYPE,
-        getReceiptId(minterAddress.toHexString(), project.projectId, purchaser),
+        getReceiptId(minterAddress.toHexString(), project.id, purchaser),
         "project",
         project.id
       );
       assert.fieldEquals(
         RECEIPT_ENTITY_TYPE,
-        getReceiptId(minterAddress.toHexString(), project.projectId, purchaser),
+        getReceiptId(minterAddress.toHexString(), project.id, purchaser),
         "project",
         project.id
       );
       assert.fieldEquals(
         RECEIPT_ENTITY_TYPE,
-        getReceiptId(minterAddress.toHexString(), project.projectId, purchaser),
+        getReceiptId(minterAddress.toHexString(), project.id, purchaser),
         "minter",
         minterAddress.toHexString()
       );
       assert.fieldEquals(
         RECEIPT_ENTITY_TYPE,
-        getReceiptId(minterAddress.toHexString(), project.projectId, purchaser),
+        getReceiptId(minterAddress.toHexString(), project.id, purchaser),
         "account",
         purchaser.toHexString()
       );
       assert.fieldEquals(
         RECEIPT_ENTITY_TYPE,
-        getReceiptId(minterAddress.toHexString(), project.projectId, purchaser),
+        getReceiptId(minterAddress.toHexString(), project.id, purchaser),
         "netPosted",
         netPosted.toString()
       );
       assert.fieldEquals(
         RECEIPT_ENTITY_TYPE,
-        getReceiptId(minterAddress.toHexString(), project.projectId, purchaser),
+        getReceiptId(minterAddress.toHexString(), project.id, purchaser),
         "numPurchased",
         numPurchased.toString()
       );
       assert.fieldEquals(
         RECEIPT_ENTITY_TYPE,
-        getReceiptId(minterAddress.toHexString(), project.projectId, purchaser),
+        getReceiptId(minterAddress.toHexString(), project.id, purchaser),
         "updatedAt",
         newBlockTimestamp.toString()
       );

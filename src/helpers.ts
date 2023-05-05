@@ -121,15 +121,13 @@ export function getProjectMinterConfigId(
   return minterId + "-" + projectId;
 }
 
-// @dev projectId is the number of the project, contract-specific id is not required
+// @dev projectId is the id of a Project entity, i.e. contract-specific id
 export function getReceiptId(
   minterId: string,
-  projectId: BigInt,
+  projectId: string,
   accountAddress: Address
 ): string {
-  return (
-    minterId + "-" + projectId.toString() + "-" + accountAddress.toHexString()
-  );
+  return minterId + "-" + projectId + "-" + accountAddress.toHexString();
 }
 
 // @dev projectId must be the contract-specific id
@@ -139,11 +137,7 @@ export function loadOrCreateReceipt(
   accountAddress: Address,
   timestamp: BigInt
 ): Receipt {
-  let receiptId = getReceiptId(
-    minterId,
-    BigInt.fromString(projectId.split("-")[1]),
-    accountAddress
-  );
+  let receiptId = getReceiptId(minterId, projectId, accountAddress);
   let receipt = Receipt.load(receiptId);
   if (receipt) {
     return receipt;
