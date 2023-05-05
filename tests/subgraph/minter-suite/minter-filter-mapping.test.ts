@@ -48,7 +48,7 @@ import {
   RandomAddressGenerator,
   TEST_CONTRACT_ADDRESS,
   assertJsonFieldEquals,
-  getJsonStringFromInputs
+  getJSONStringFromEntries
 } from "../shared-helpers";
 import {
   mockCoreContract,
@@ -62,6 +62,7 @@ import {
   DAExpMintersToTest,
   DALinMintersToTest
 } from "./helpers";
+import { toJSONValue } from "../../../src/json";
 
 const randomAddressGenerator = new RandomAddressGenerator();
 
@@ -360,14 +361,11 @@ test("handleIsCanonicalMinterFilter should populate project minter configuration
   previousMinterConfig2.endTime = project2EndTime;
   previousMinterConfig2.startPrice = project2StartPrice;
   // ---------------------------------------
-  previousMinterConfig2.extraMinterDetails = getJsonStringFromInputs(
-    ["startTime", "endTime", "startPrice"],
-    [
-      project2StartTime.toString(),
-      project2EndTime.toString(),
-      project2StartPrice.toString()
-    ]
-  );
+  previousMinterConfig2.extraMinterDetails = getJSONStringFromEntries([
+    { key: "startTime", value: toJSONValue(project2StartTime) },
+    { key: "endTime", value: toJSONValue(project2EndTime) },
+    { key: "startPrice", value: toJSONValue(project2StartPrice.toString()) }
+  ]);
   previousMinterConfig2.save();
 
   mockGetProjectAndMinterInfoAt(
@@ -413,14 +411,11 @@ test("handleIsCanonicalMinterFilter should populate project minter configuration
   previousMinterConfig3.startTime = project3StartTime;
   previousMinterConfig3.startPrice = project3StartPrice;
   // ---------------------------------------
-  previousMinterConfig3.extraMinterDetails = getJsonStringFromInputs(
-    ["halfLifeSeconds", "startTime", "startPrice"],
-    [
-      project3HalfLifeSeconds.toString(),
-      project3StartTime.toString(),
-      project3StartPrice.toString()
-    ]
-  );
+  previousMinterConfig3.extraMinterDetails = getJSONStringFromEntries([
+    { key: "halfLifeSeconds", value: toJSONValue(project3HalfLifeSeconds) },
+    { key: "startTime", value: toJSONValue(project3StartTime) },
+    { key: "startPrice", value: toJSONValue(project3StartPrice.toString()) }
+  ]);
   previousMinterConfig3.save();
 
   mockGetProjectAndMinterInfoAt(
@@ -667,12 +662,12 @@ test("handleIsCanonicalMinterFilter should populate project minter configuration
   assertJsonFieldEquals(
     updatedProjectMinterConfig2.extraMinterDetails,
     "startTime",
-    project2StartTime.toString()
+    project2StartTime
   );
   assertJsonFieldEquals(
     updatedProjectMinterConfig2.extraMinterDetails,
     "endTime",
-    project2EndTime.toString()
+    project2EndTime
   );
   assertJsonFieldEquals(
     updatedProjectMinterConfig2.extraMinterDetails,
@@ -769,12 +764,12 @@ test("handleIsCanonicalMinterFilter should populate project minter configuration
   assertJsonFieldEquals(
     updatedProjectMinterConfig3.extraMinterDetails,
     "startTime",
-    project3StartTime.toString()
+    project3StartTime
   );
   assertJsonFieldEquals(
     updatedProjectMinterConfig3.extraMinterDetails,
     "halfLifeSeconds",
-    project3HalfLifeSeconds.toString()
+    project3HalfLifeSeconds
   );
   assertJsonFieldEquals(
     updatedProjectMinterConfig3.extraMinterDetails,
@@ -1051,12 +1046,12 @@ test("handleMinterApproved should populate DA Exp default half life ranges", () 
     assertJsonFieldEquals(
       updatedMinter.extraMinterDetails,
       "minimumHalfLifeInSeconds",
-      "300"
+      BigInt.fromI32(300)
     );
     assertJsonFieldEquals(
       updatedMinter.extraMinterDetails,
       "maximumHalfLifeInSeconds",
-      "3600"
+      BigInt.fromI32(3600)
     );
 
     // @dev Deprecated fields ----------------
@@ -1134,7 +1129,7 @@ test("handleMinterApproved should populate DA Lin min auction time", () => {
     assertJsonFieldEquals(
       updatedMinter.extraMinterDetails,
       "minimumAuctionLengthInSeconds",
-      "3600"
+      BigInt.fromString("3600")
     );
 
     // @dev Deprecated fields ----------------

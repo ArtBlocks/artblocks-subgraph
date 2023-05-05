@@ -22,7 +22,7 @@ import {
   RandomAddressGenerator,
   TEST_CONTRACT_ADDRESS,
   assertJsonFieldEquals,
-  getJsonStringFromInputs
+  getJSONStringFromEntries
 } from "../shared-helpers";
 import {
   generateContractSpecificId,
@@ -143,6 +143,11 @@ import {
   DALinMintersToTest,
   HolderMintersToTest
 } from "./helpers";
+import {
+  createTypedMapFromEntries,
+  toJSONValue,
+  typedMapToJSONString
+} from "../../../src/json";
 
 const randomAddressGenerator = new RandomAddressGenerator();
 
@@ -491,10 +496,13 @@ describe("MinterDALin-related tests", () => {
         // @dev Deprecated fields ----------------
         minter.minimumAuctionLengthInSeconds = BigInt.fromI32(300);
         // ---------------------------------------
-        minter.extraMinterDetails = getJsonStringFromInputs(
-          ["minimumAuctionLengthInSeconds"],
-          [BigInt.fromI32(300).toString()]
-        );
+        minter.extraMinterDetails = getJSONStringFromEntries([
+          {
+            key: "minimumAuctionLengthInSeconds",
+            value: toJSONValue(BigInt.fromI32(300))
+          }
+        ]);
+
         minter.updatedAt = CURRENT_BLOCK_TIMESTAMP.minus(BigInt.fromI32(10));
         minter.save();
 
@@ -521,7 +529,7 @@ describe("MinterDALin-related tests", () => {
         assertJsonFieldEquals(
           updatedMinter.extraMinterDetails,
           "minimumAuctionLengthInSeconds",
-          newMinimumAuctionLengthSeconds.toString()
+          newMinimumAuctionLengthSeconds
         );
         // @dev Deprecated fields ----------------
         assert.fieldEquals(
@@ -670,12 +678,12 @@ describe("MinterDALin-related tests", () => {
         assertJsonFieldEquals(
           updatedProjectMinterConfig.extraMinterDetails,
           "startTime",
-          startTime.toString()
+          startTime
         );
         assertJsonFieldEquals(
           updatedProjectMinterConfig.extraMinterDetails,
           "endTime",
-          endTime.toString()
+          endTime
         );
 
         // @dev Deprecated fields ----------------
@@ -775,17 +783,14 @@ describe("MinterDALin-related tests", () => {
           projectMinterConfig.minter = minterAddress.toHexString();
           projectMinterConfig.project = project.id;
 
-          const _startTime = CURRENT_BLOCK_TIMESTAMP.plus(
-            BigInt.fromI32(100)
-          ).toString();
-          const _endTime = CURRENT_BLOCK_TIMESTAMP.plus(
-            BigInt.fromI32(200)
-          ).toString();
+          const _startTime = CURRENT_BLOCK_TIMESTAMP.plus(BigInt.fromI32(100));
+          const _endTime = CURRENT_BLOCK_TIMESTAMP.plus(BigInt.fromI32(200));
           const _startPrice = ONE_ETH_IN_WEI.toString();
-          projectMinterConfig.extraMinterDetails = getJsonStringFromInputs(
-            ["startPrice", "startTime", "endTime"],
-            [_startPrice, _startTime, _endTime]
-          );
+          projectMinterConfig.extraMinterDetails = getJSONStringFromEntries([
+            { key: "startPrice", value: toJSONValue(_startPrice) },
+            { key: "startTime", value: toJSONValue(_startTime) },
+            { key: "endTime", value: toJSONValue(_endTime) }
+          ]);
           // @dev Deprecated fields ----------------
           projectMinterConfig.startTime = CURRENT_BLOCK_TIMESTAMP.plus(
             BigInt.fromI32(100)
@@ -877,10 +882,16 @@ describe("MinterDAExp-related tests", () => {
         minter.minimumHalfLifeInSeconds = BigInt.fromI32(300);
         minter.maximumHalfLifeInSeconds = BigInt.fromI32(5000);
         // ---------------------------------------
-        minter.extraMinterDetails = getJsonStringFromInputs(
-          ["minimumHalfLifeInSeconds", "maximumHalfLifeInSeconds"],
-          ["300", "5000"]
-        );
+        minter.extraMinterDetails = getJSONStringFromEntries([
+          {
+            key: "minimumHalfLifeInSeconds",
+            value: toJSONValue(BigInt.fromI32(300))
+          },
+          {
+            key: "maximumHalfLifeInSeconds",
+            value: toJSONValue(BigInt.fromI32(5000))
+          }
+        ]);
         minter.updatedAt = CURRENT_BLOCK_TIMESTAMP.minus(BigInt.fromI32(10));
         minter.save();
 
@@ -912,12 +923,12 @@ describe("MinterDAExp-related tests", () => {
         assertJsonFieldEquals(
           updatedMinter.extraMinterDetails,
           "minimumHalfLifeInSeconds",
-          newMinimumHalfLifeInSeconds.toString()
+          newMinimumHalfLifeInSeconds
         );
         assertJsonFieldEquals(
           updatedMinter.extraMinterDetails,
           "maximumHalfLifeInSeconds",
-          newMaximumHalfLifeInSeconds.toString()
+          newMaximumHalfLifeInSeconds
         );
 
         // @dev Deprecated fields ----------------
@@ -1069,19 +1080,19 @@ describe("MinterDAExp-related tests", () => {
         assertJsonFieldEquals(
           updatedProjectMinterConfig.extraMinterDetails,
           "startTime",
-          startTime.toString()
+          startTime
         );
         assertJsonFieldEquals(
           updatedProjectMinterConfig.extraMinterDetails,
           "halfLifeSeconds",
-          halfLifeSeconds.toString()
+          halfLifeSeconds
         );
         // approx DA length calculated separately via calculator
         const approxDAExpLength = BigInt.fromI32(1360);
         assertJsonFieldEquals(
           updatedProjectMinterConfig.extraMinterDetails,
           "approximateDAExpEndTime",
-          startTime.plus(approxDAExpLength).toString()
+          startTime.plus(approxDAExpLength)
         );
 
         // @dev Deprecated fields ----------------
@@ -1207,12 +1218,12 @@ describe("MinterDAExp-related tests", () => {
         assertJsonFieldEquals(
           updatedProjectMinterConfig.extraMinterDetails,
           "startTime",
-          startTime.toString()
+          startTime
         );
         assertJsonFieldEquals(
           updatedProjectMinterConfig.extraMinterDetails,
           "halfLifeSeconds",
-          halfLifeSeconds.toString()
+          halfLifeSeconds
         );
 
         // @dev Deprecated fields ----------------
@@ -1338,25 +1349,24 @@ describe("MinterDAExp-related tests", () => {
         );
         projectMinterConfig.minter = minterAddress.toHexString();
         projectMinterConfig.project = project.id;
-        const _startTime = CURRENT_BLOCK_TIMESTAMP.plus(
-          BigInt.fromI32(100)
-        ).toString();
-        const _halfLifeSeconds = BigInt.fromI32(300).toString();
+        const _startTime = CURRENT_BLOCK_TIMESTAMP.plus(BigInt.fromI32(100));
+        const _halfLifeSeconds = BigInt.fromI32(300);
         const _startPrice = ONE_ETH_IN_WEI.toString();
         const _approximateDAExpEndTime = CURRENT_BLOCK_TIMESTAMP.plus(
           BigInt.fromI32(100)
-        )
-          .plus(BigInt.fromI32(1360))
-          .toString();
-        projectMinterConfig.extraMinterDetails = getJsonStringFromInputs(
-          [
-            "startPrice",
-            "startTime",
-            "halfLifeSeconds",
-            "approximateDAExpEndTime"
-          ],
-          [_startPrice, _startTime, _halfLifeSeconds, _approximateDAExpEndTime]
+        ).plus(BigInt.fromI32(1360));
+        projectMinterConfig.extraMinterDetails = typedMapToJSONString(
+          createTypedMapFromEntries([
+            { key: "startPrice", value: toJSONValue(_startPrice) },
+            { key: "startTime", value: toJSONValue(_startTime) },
+            { key: "halfLifeSeconds", value: toJSONValue(_halfLifeSeconds) },
+            {
+              key: "approximateDAExpEndTime",
+              value: toJSONValue(_approximateDAExpEndTime)
+            }
+          ])
         );
+
         // @dev Deprecated fields ----------------
         projectMinterConfig.startTime = CURRENT_BLOCK_TIMESTAMP.plus(
           BigInt.fromI32(100)
@@ -1473,15 +1483,14 @@ describe("MinterDAExp-related tests", () => {
         );
         projectMinterConfig.minter = minterAddress.toHexString();
         projectMinterConfig.project = project.id;
-        const _startTime = CURRENT_BLOCK_TIMESTAMP.plus(
-          BigInt.fromI32(100)
-        ).toString();
-        const _halfLifeSeconds = BigInt.fromI32(300).toString();
+        const _startTime = CURRENT_BLOCK_TIMESTAMP.plus(BigInt.fromI32(100));
+        const _halfLifeSeconds = BigInt.fromI32(300);
         const _startPrice = ONE_ETH_IN_WEI.toString();
-        projectMinterConfig.extraMinterDetails = getJsonStringFromInputs(
-          ["startPrice", "startTime", "halfLifeSeconds"],
-          [_startPrice, _startTime, _halfLifeSeconds]
-        );
+        projectMinterConfig.extraMinterDetails = getJSONStringFromEntries([
+          { key: "startPrice", value: toJSONValue(_startPrice) },
+          { key: "startTime", value: toJSONValue(_startTime) },
+          { key: "halfLifeSeconds", value: toJSONValue(_halfLifeSeconds) }
+        ]);
         // @dev Deprecated fields ----------------
         projectMinterConfig.startTime = CURRENT_BLOCK_TIMESTAMP.plus(
           BigInt.fromI32(100)
@@ -1599,15 +1608,15 @@ describe("DAExpSettlementMinters", () => {
       );
       projectMinterConfig.minter = minterAddress.toHexString();
       projectMinterConfig.project = project.id;
-      const _startTime = CURRENT_BLOCK_TIMESTAMP.plus(
-        BigInt.fromI32(100)
-      ).toString();
+      const _startTime = CURRENT_BLOCK_TIMESTAMP.plus(BigInt.fromI32(100));
       const _halfLifeSeconds = BigInt.fromI32(300).toString();
       const _startPrice = ONE_ETH_IN_WEI.toString();
-      projectMinterConfig.extraMinterDetails = getJsonStringFromInputs(
-        ["startPrice", "startTime", "halfLifeSeconds"],
-        [_startPrice, _startTime, _halfLifeSeconds]
-      );
+      projectMinterConfig.extraMinterDetails = getJSONStringFromEntries([
+        { key: "startPrice", value: toJSONValue(_startPrice) },
+        { key: "startTime", value: toJSONValue(_startTime) },
+        { key: "halfLifeSeconds", value: toJSONValue(_halfLifeSeconds) }
+      ]);
+
       // @dev Deprecated fields ----------------
       projectMinterConfig.startTime = CURRENT_BLOCK_TIMESTAMP.plus(
         BigInt.fromI32(100)
@@ -1687,7 +1696,7 @@ describe("DAExpSettlementMinters", () => {
       assertJsonFieldEquals(
         updatedProjectMinterConfig.extraMinterDetails,
         "numSettleableInvocations",
-        "1"
+        BigInt.fromI32(1)
       );
 
       assert.fieldEquals(
@@ -1762,9 +1771,11 @@ describe("DAExpSettlementMinters", () => {
       ).toString();
       const _halfLifeSeconds = BigInt.fromI32(300).toString();
       const _startPrice = ONE_ETH_IN_WEI.toString();
-      projectMinterConfig.extraMinterDetails = getJsonStringFromInputs(
-        ["startPrice", "startTime", "halfLifeSeconds"],
-        [_startPrice, _startTime, _halfLifeSeconds]
+      projectMinterConfig.extraMinterDetails = typedMapToJSONString(
+        createTypedMapFromEntries([
+          { key: "startPrice", value: toJSONValue(_startPrice) },
+          { key: "startTime", value: toJSONValue(_startTime) }
+        ])
       );
       // @dev Deprecated fields ----------------
       projectMinterConfig.startTime = CURRENT_BLOCK_TIMESTAMP.plus(
@@ -1891,7 +1902,7 @@ describe("DAExpSettlementMinters", () => {
       assertJsonFieldEquals(
         updatedProjectMinterConfig.extraMinterDetails,
         "numSettleableInvocations",
-        numPurchased.toString()
+        numPurchased
       );
       assert.fieldEquals(
         RECEIPT_ENTITY_TYPE,
@@ -1962,15 +1973,16 @@ describe("DAExpSettlementMinters", () => {
       );
       projectMinterConfig.minter = minterAddress.toHexString();
       projectMinterConfig.project = project.id;
-      const _startTime = CURRENT_BLOCK_TIMESTAMP.plus(
-        BigInt.fromI32(100)
-      ).toString();
-      const _halfLifeSeconds = BigInt.fromI32(300).toString();
+      const _startTime = CURRENT_BLOCK_TIMESTAMP.plus(BigInt.fromI32(100));
+      const _halfLifeSeconds = BigInt.fromI32(300);
       const _startPrice = ONE_ETH_IN_WEI.toString();
-      projectMinterConfig.extraMinterDetails = getJsonStringFromInputs(
-        ["startPrice", "startTime", "halfLifeSeconds"],
-        [_startPrice, _startTime, _halfLifeSeconds]
-      );
+
+      projectMinterConfig.extraMinterDetails = getJSONStringFromEntries([
+        { key: "startPrice", value: toJSONValue(_startPrice) },
+        { key: "startTime", value: toJSONValue(_startTime) },
+        { key: "halfLifeSeconds", value: toJSONValue(_halfLifeSeconds) }
+      ]);
+
       // @dev Deprecated fields ----------------
       projectMinterConfig.startTime = CURRENT_BLOCK_TIMESTAMP.plus(
         BigInt.fromI32(100)
@@ -2053,15 +2065,17 @@ describe("DAExpSettlementMinters", () => {
       );
       projectMinterConfig.minter = minterAddress.toHexString();
       projectMinterConfig.project = project.id;
-      const _startTime = CURRENT_BLOCK_TIMESTAMP.plus(
-        BigInt.fromI32(100)
-      ).toString();
-      const _halfLifeSeconds = BigInt.fromI32(300).toString();
+      const _startTime = CURRENT_BLOCK_TIMESTAMP.plus(BigInt.fromI32(100));
+      const _halfLifeSeconds = BigInt.fromI32(300);
       const _startPrice = ONE_ETH_IN_WEI.toString();
-      projectMinterConfig.extraMinterDetails = getJsonStringFromInputs(
-        ["startPrice", "startTime", "halfLifeSeconds"],
-        [_startPrice, _startTime, _halfLifeSeconds]
+      projectMinterConfig.extraMinterDetails = typedMapToJSONString(
+        createTypedMapFromEntries([
+          { key: "startPrice", value: toJSONValue(_startPrice) },
+          { key: "startTime", value: toJSONValue(_startTime) },
+          { key: "halfLifeSeconds", value: toJSONValue(_halfLifeSeconds) }
+        ])
       );
+
       // @dev Deprecated fields ----------------
       projectMinterConfig.startTime = CURRENT_BLOCK_TIMESTAMP.plus(
         BigInt.fromI32(100)
@@ -2144,7 +2158,7 @@ describe("DAExpSettlementMinters", () => {
       assertJsonFieldEquals(
         updatedProjectMinterConfig.extraMinterDetails,
         "halfLifeSeconds",
-        _halfLifeSeconds.toString()
+        _halfLifeSeconds
       );
       assertJsonFieldEquals(
         updatedProjectMinterConfig.extraMinterDetails,
@@ -2154,7 +2168,7 @@ describe("DAExpSettlementMinters", () => {
       assertJsonFieldEquals(
         updatedProjectMinterConfig.extraMinterDetails,
         "startTime",
-        _startTime.toString()
+        _startTime
       );
     });
   });
@@ -2183,15 +2197,15 @@ describe("DAExpSettlementMinters", () => {
       );
       projectMinterConfig.minter = minterAddress.toHexString();
       projectMinterConfig.project = project.id;
-      const _startTime = CURRENT_BLOCK_TIMESTAMP.plus(
-        BigInt.fromI32(100)
-      ).toString();
-      const _halfLifeSeconds = BigInt.fromI32(300).toString();
+      const _startTime = CURRENT_BLOCK_TIMESTAMP.plus(BigInt.fromI32(100));
+      const _halfLifeSeconds = BigInt.fromI32(300);
       const _startPrice = ONE_ETH_IN_WEI.toString();
-      projectMinterConfig.extraMinterDetails = getJsonStringFromInputs(
-        ["startPrice", "startTime", "halfLifeSeconds"],
-        [_startPrice, _startTime, _halfLifeSeconds]
-      );
+      projectMinterConfig.extraMinterDetails = getJSONStringFromEntries([
+        { key: "startPrice", value: toJSONValue(_startPrice) },
+        { key: "startTime", value: toJSONValue(_startTime) },
+        { key: "halfLifeSeconds", value: toJSONValue(_halfLifeSeconds) }
+      ]);
+
       // @dev Deprecated fields ----------------
       projectMinterConfig.startTime = CURRENT_BLOCK_TIMESTAMP.plus(
         BigInt.fromI32(100)
@@ -2253,7 +2267,7 @@ describe("DAExpSettlementMinters", () => {
       assertJsonFieldEquals(
         updatedProjectMinterConfig.extraMinterDetails,
         "auctionRevenuesCollected",
-        "true"
+        true
       );
     });
   });
@@ -2481,12 +2495,12 @@ describe("MinterSEAV tests", () => {
     assertJsonFieldEquals(
       updatedProjectMinterConfig.extraMinterDetails,
       "startTime",
-      testTimestampStart.toString()
+      testTimestampStart
     );
     assertJsonFieldEquals(
       updatedProjectMinterConfig.extraMinterDetails,
       "projectAuctionDurationSeconds",
-      testAuctionDurationSeconds.toString()
+      testAuctionDurationSeconds
     );
   });
 
