@@ -23,7 +23,7 @@ import {
   ONE_ETH_IN_WEI,
   booleanToString,
   assertJsonFieldEquals,
-  getJsonStringFromInputs
+  getJSONStringFromEntries
 } from "../shared-helpers";
 
 import {
@@ -40,6 +40,7 @@ import { ProjectMinterConfiguration, Minter } from "../../../generated/schema";
 import { MinterUpdated } from "../../../generated/IGenArt721CoreV3_Base/IGenArt721CoreContractV3_Base";
 import { handleMinterUpdated } from "../../../src/mapping-v3-core";
 import { getProjectMinterConfigId } from "../../../src/helpers";
+import { toJSONValue } from "../../../src/json";
 
 const randomAddressGenerator = new RandomAddressGenerator();
 
@@ -373,14 +374,12 @@ test(`${coreType}/MinterUpdated: should populate project minter configurations f
   previousMinterConfig2.endTime = project2EndTime;
   previousMinterConfig2.startPrice = project2StartPrice;
   // ---------------------------------------
-  previousMinterConfig2.extraMinterDetails = getJsonStringFromInputs(
-    ["startTime", "endTime", "startPrice"],
-    [
-      project2StartTime.toString(),
-      project2EndTime.toString(),
-      project2StartPrice.toString()
-    ]
-  );
+  previousMinterConfig2.extraMinterDetails = getJSONStringFromEntries([
+    { key: "startTime", value: toJSONValue(project2StartTime) },
+    { key: "endTime", value: toJSONValue(project2EndTime) },
+    { key: "startPrice", value: toJSONValue(project2StartPrice.toString()) }
+  ]);
+
   previousMinterConfig2.save();
 
   mockGetProjectAndMinterInfoAt(
@@ -426,14 +425,11 @@ test(`${coreType}/MinterUpdated: should populate project minter configurations f
   previousMinterConfig3.startTime = project3StartTime;
   previousMinterConfig3.startPrice = project3StartPrice;
   // ---------------------------------------
-  previousMinterConfig3.extraMinterDetails = getJsonStringFromInputs(
-    ["startTime", "halfLifeSeconds", "startPrice"],
-    [
-      project3StartTime.toString(),
-      project3HalfLifeSeconds.toString(),
-      project3StartPrice.toString()
-    ]
-  );
+  previousMinterConfig3.extraMinterDetails = getJSONStringFromEntries([
+    { key: "startTime", value: toJSONValue(project3StartTime) },
+    { key: "halfLifeSeconds", value: toJSONValue(project3HalfLifeSeconds) },
+    { key: "startPrice", value: toJSONValue(project3StartPrice.toString()) }
+  ]);
   previousMinterConfig3.save();
 
   mockGetProjectAndMinterInfoAt(
@@ -681,12 +677,12 @@ test(`${coreType}/MinterUpdated: should populate project minter configurations f
   assertJsonFieldEquals(
     updatedProjectMinterConfig.extraMinterDetails,
     "startTime",
-    project2StartTime.toString()
+    project2StartTime
   );
   assertJsonFieldEquals(
     updatedProjectMinterConfig.extraMinterDetails,
     "endTime",
-    project2EndTime.toString()
+    project2EndTime
   );
   assertJsonFieldEquals(
     updatedProjectMinterConfig.extraMinterDetails,
@@ -784,12 +780,12 @@ test(`${coreType}/MinterUpdated: should populate project minter configurations f
   assertJsonFieldEquals(
     updatedProjectMinterConfig3.extraMinterDetails,
     "startTime",
-    project3StartTime.toString()
+    project3StartTime
   );
   assertJsonFieldEquals(
     updatedProjectMinterConfig3.extraMinterDetails,
     "halfLifeSeconds",
-    project3HalfLifeSeconds.toString()
+    project3HalfLifeSeconds
   );
   assertJsonFieldEquals(
     updatedProjectMinterConfig3.extraMinterDetails,

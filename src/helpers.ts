@@ -20,7 +20,8 @@ import {
 import { IFilteredMinterDALinV1 } from "../generated/MinterDALin/IFilteredMinterDALinV1";
 import { IFilteredMinterDAExpV1 } from "../generated/MinterDAExp/IFilteredMinterDAExpV1";
 
-import { handleSetMinterDetailsGeneric } from "./minter-suite-mapping";
+import { setMinterExtraMinterDetailsValue } from "./minter-suite-mapping";
+import { createTypedMapFromJSONString } from "./json";
 
 export function generateProjectExternalAssetDependencyId(
   projectId: string,
@@ -207,7 +208,7 @@ export function loadOrCreateMinter(
       const contract = IFilteredMinterDALinV1.bind(minterAddress);
       // @dev deprecated minter.minimumAuctionLengthInSeconds
       minter.minimumAuctionLengthInSeconds = contract.minimumAuctionLengthSeconds();
-      handleSetMinterDetailsGeneric(
+      setMinterExtraMinterDetailsValue(
         "minimumAuctionLengthInSeconds",
         contract.minimumAuctionLengthSeconds(),
         minter
@@ -218,12 +219,12 @@ export function loadOrCreateMinter(
       minter.minimumHalfLifeInSeconds = contract.minimumPriceDecayHalfLifeSeconds();
       // @dev deprecated minter.maximumHalfLifeInSeconds
       minter.maximumHalfLifeInSeconds = contract.maximumPriceDecayHalfLifeSeconds();
-      handleSetMinterDetailsGeneric(
+      setMinterExtraMinterDetailsValue(
         "minimumHalfLifeInSeconds",
         contract.minimumPriceDecayHalfLifeSeconds(),
         minter
       );
-      handleSetMinterDetailsGeneric(
+      setMinterExtraMinterDetailsValue(
         "maximumHalfLifeInSeconds",
         contract.maximumPriceDecayHalfLifeSeconds(),
         minter
@@ -243,102 +244,16 @@ export function booleanToString(b: boolean): string {
   return b ? "true" : "false";
 }
 
-export function getMinterDetails<T>(config: T): TypedMap<string, JSONValue> {
-  if (
-    !(config instanceof ProjectMinterConfiguration || config instanceof Minter)
-  ) {
-    throw new Error(
-      "cannot find extra minter details on generic that is not a Minter or ProjectMinterConfiguration"
-    );
-  }
-  let jsonResult = json.try_fromString(config.extraMinterDetails);
-
-  let minterDetails: TypedMap<string, JSONValue>;
-  if (jsonResult.isOk && jsonResult.value.kind == JSONValueKind.OBJECT) {
-    minterDetails = jsonResult.value.toObject();
-  } else {
-    minterDetails = new TypedMap();
-  }
-  return minterDetails;
+export function getProjectMinterConfigExtraMinterDetailsTypedMap(
+  config: ProjectMinterConfiguration
+): TypedMap<string, JSONValue> {
+  return createTypedMapFromJSONString(config.extraMinterDetails);
 }
 
-export function typedMapToJSONString(map: TypedMap<String, JSONValue>): string {
-  let jsonString = "{";
-  for (let i = 0; i < map.entries.length; i++) {
-    let entry = map.entries[i];
-    let val = entry.value;
-    let newVal = "";
-    let quoted = "";
-    if (JSONValueKind.BOOL == val.kind) {
-      newVal = booleanToString(val.toBool());
-    } else if (JSONValueKind.NUMBER == val.kind) {
-      newVal = val.toBigInt().toString();
-    } else if (JSONValueKind.STRING == val.kind) {
-      newVal = val.toString();
-      quoted = '"';
-    } else if (JSONValueKind.ARRAY == val.kind) {
-      newVal =
-        "[" +
-        val
-          .toArray()
-          .map<string>((v: JSONValue) => {
-            let mapped = "";
-            if (JSONValueKind.BOOL == v.kind) {
-              mapped = booleanToString(v.toBool());
-            } else if (JSONValueKind.STRING == v.kind) {
-              mapped = '"' + v.toString() + '"';
-            } else if (JSONValueKind.NUMBER == v.kind) {
-              mapped = v.toBigInt().toString();
-            }
-            return mapped;
-          })
-          .toString() +
-        "]";
-    }
-
-    jsonString +=
-      stringToJSONString(entry.key.toString()) +
-      ":" +
-      quoted +
-      newVal +
-      quoted +
-      (i == map.entries.length - 1 ? "" : ",");
-  }
-  jsonString += "}";
-  return jsonString;
-}
-
-export function stringToJSONValue(value: string): JSONValue {
-  return json.fromString('["' + value + '"]').toArray()[0];
-}
-export function arrayToJSONValue(value: string): JSONValue {
-  return json.fromString("[" + value + "]");
-}
-
-// If byte data is parseable to a valid unicode string then do so
-// otherwise parse the byte data to a hex string
-export function bytesToJSONValue(value: Bytes): JSONValue {
-  // fallback - assume the data is a hex string (always valid)
-  let result = json.try_fromString('["' + value.toHexString() + '"]');
-  // If the bytes can be parsed as a string, then losslessly re-encoded into
-  // UTF-8 bytes, then consider a valid UTF-8 encoded string and store
-  // string value in json.
-  // note: Bytes.toString() uses WTF-8 encoding as opposed to UTF-8.  Solidity
-  // encodes UTF-8 strings, so safe assume any string data are UTF-8 encoded.
-  let stringValue: string = value.toString();
-  let reEncodedBytesValue: Bytes = Bytes.fromUTF8(stringValue);
-  if (reEncodedBytesValue.toHexString() == value.toHexString()) {
-    // if the bytes are the same then the string was valid UTF-8
-    let potentialResult = json.try_fromString('["' + stringValue + '"]');
-    if (potentialResult.isOk) {
-      result = potentialResult;
-    }
-  }
-  return result.value.toArray()[0];
-}
-
-export function stringToJSONString(value: string): string {
-  return '"' + value + '"';
+export function getMinterExtraMinterDetailsTypedMap(
+  minter: Minter
+): TypedMap<string, JSONValue> {
+  return createTypedMapFromJSONString(minter.extraMinterDetails);
 }
 
 export function generateTransferId(
