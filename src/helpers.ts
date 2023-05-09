@@ -23,7 +23,7 @@ import {
 import { IFilteredMinterDALinV1 } from "../generated/MinterDALin/IFilteredMinterDALinV1";
 import { IFilteredMinterDAExpV1 } from "../generated/MinterDAExp/IFilteredMinterDAExpV1";
 
-import { setMinterExtraMinterDetailsValue } from "./legacy-minter-suite-mapping";
+import { setMinterExtraMinterDetailsValue } from "./extra-minter-details-helpers";
 import { createTypedMapFromJSONString } from "./json";
 
 export function generateProjectExternalAssetDependencyId(
