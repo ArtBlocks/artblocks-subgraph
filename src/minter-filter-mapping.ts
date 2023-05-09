@@ -351,9 +351,9 @@ export function loadOrCreateMinterFilter(
 // If the core registry already exists, nothing is created.
 // This is needed to provide a relationship between the minter filter and the core contract
 // in a schema that doesn't have a core contract field on the minter filter.
-// In this case, we create a dummy core registry that has the id as the minter filter id,
-// and we never update it because legacy MinterFilters have a single core contract address
-// that never changes.
+// In this case, we create a dummy core registry that has the id of the associated core
+// contract address, and we never update it because legacy MinterFilters have a single core
+// contract address that never changes.
 function getOrCreateDummyCoreRegistryForLegacyMinterFilter(
   dummyCoreRegistryId: string,
   timestamp: BigInt

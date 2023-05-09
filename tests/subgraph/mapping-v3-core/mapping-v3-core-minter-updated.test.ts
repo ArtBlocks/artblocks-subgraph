@@ -137,7 +137,7 @@ test(`${coreType}/MinterUpdated: should list invalid MinterFilter with different
     "updatedAt",
     updateCallBlockTimestamp.toString()
   );
-  const coreRegistryId = TEST_MINTER_FILTER_ADDRESS.toHexString();
+  const coreRegistryId = TEST_CONTRACT_ADDRESS.toHexString();
   assert.fieldEquals(
     MINTER_FILTER_ENTITY_TYPE,
     TEST_MINTER_FILTER_ADDRESS.toHexString(),
@@ -201,7 +201,7 @@ test(`${coreType}/MinterUpdated: should create Contract and/or MinterFilter enti
     "minterGlobalAllowlist",
     "[]"
   );
-  const coreRegistryId = TEST_MINTER_FILTER_ADDRESS.toHexString();
+  const coreRegistryId = TEST_CONTRACT_ADDRESS.toHexString();
   assert.fieldEquals(
     MINTER_FILTER_ENTITY_TYPE,
     TEST_MINTER_FILTER_ADDRESS.toHexString(),
@@ -498,7 +498,7 @@ test(`${coreType}/MinterUpdated: should populate project minter configurations f
     "id",
     minterFilterAddress.toHexString()
   );
-  const coreRegistryId = minterFilterAddress.toHexString();
+  const coreRegistryId = TEST_CONTRACT_ADDRESS.toHexString();
   assert.fieldEquals(
     MINTER_FILTER_ENTITY_TYPE,
     minterFilterAddress.toHexString(),

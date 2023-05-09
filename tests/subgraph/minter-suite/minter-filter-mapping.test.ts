@@ -99,7 +99,7 @@ test("handleDeployed should add MinterFilter to the store", () => {
     "id",
     minterFilterAddress.toHexString()
   );
-  const coreRegistryId = minterFilterAddress.toHexString();
+  const coreRegistryId = TEST_CONTRACT_ADDRESS.toHexString();
   assert.fieldEquals(
     MINTER_FILTER_ENTITY_TYPE,
     minterFilterAddress.toHexString(),
@@ -183,7 +183,7 @@ test("handleIsCanonicalMinterFilter should create a minter filter and associate 
     "updatedAt",
     updateCallBlockTimestamp.toString()
   );
-  const coreRegistryId = minterFilterAddress.toHexString();
+  const coreRegistryId = TEST_CONTRACT_ADDRESS.toHexString();
   assert.fieldEquals(
     MINTER_FILTER_ENTITY_TYPE,
     minterFilterAddress.toHexString(),
@@ -467,7 +467,7 @@ test("handleIsCanonicalMinterFilter should populate project minter configuration
     "updatedAt",
     updateCallBlockTimestamp.toString()
   );
-  const coreRegistryId = minterFilterAddress.toHexString();
+  const coreRegistryId = TEST_CONTRACT_ADDRESS.toHexString();
   assert.fieldEquals(
     MINTER_FILTER_ENTITY_TYPE,
     minterFilterAddress.toHexString(),
