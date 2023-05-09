@@ -657,8 +657,8 @@ function _handleMinterUpdated<T>(contract: T, event: MinterUpdated): void {
     } else {
       // update contract entity with new valid MinterFilter ID
       contractEntity.minterFilter = newMinterFilterAddress;
-      // legacy MinterFilters have a dummy CoreRegistry with same id as MinterFilter
-      contractEntity.registeredOn = newMinterFilterAddress;
+      // legacy MinterFilters have a dummy CoreRegistry with same id as core contract
+      contractEntity.registeredOn = event.address.toHexString();
       // sync all pre-set projectMinterConfigurations
       populateAllExistingMinterConfigurations(
         minterFilterContract,

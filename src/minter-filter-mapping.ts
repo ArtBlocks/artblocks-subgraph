@@ -110,7 +110,7 @@ export function handleIsCanonicalMinterFilter(
 
   coreContract.minterFilter = event.address.toHexString();
   // update core contract as registered on the legacy MinterFilter's dummy core registry
-  coreContract.registeredOn = event.address.toHexString();
+  coreContract.registeredOn = event.params._coreContractAddress.toHexString();
   coreContract.updatedAt = event.block.timestamp;
   coreContract.save();
 }
