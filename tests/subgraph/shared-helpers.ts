@@ -399,6 +399,7 @@ export function addArbitraryContractToStore(
 
 export function addTestMinterFilterToStore(): MinterFilter {
   let minterFilter = new MinterFilter(TEST_MINTER_FILTER_ADDRESS.toHexString());
+  minterFilter.coreRegistry = TEST_CONTRACT_ADDRESS.toHexString();
   minterFilter.updatedAt = CURRENT_BLOCK_TIMESTAMP.minus(BigInt.fromI32(10));
   minterFilter.minterGlobalAllowlist = [];
   minterFilter.save();
@@ -410,19 +411,25 @@ export const addNewMinterToStore = (type: string): Minter => {
   const minterAddress = randomAddressGenerator.generateRandomAddress();
   const minterType = type;
   const minter = new Minter(minterAddress.toHexString());
-  minter.minterFilter = randomAddressGenerator
-    .generateRandomAddress()
-    .toHexString();
+  minter.minterFilter = TEST_MINTER_FILTER_ADDRESS.toHexString();
   minter.type = minterType;
   minter.extraMinterDetails = "{}";
   minter.isGloballyAllowlistedOnMinterFilter = true;
   minter.updatedAt = CURRENT_BLOCK_TIMESTAMP;
   minter.save();
 
+  // ensure a test minter filter exists (so the minter can find its core contract)
+  const existingMinterFilter = MinterFilter.load(
+    TEST_MINTER_FILTER_ADDRESS.toHexString()
+  );
+  if (!existingMinterFilter) {
+    addTestMinterFilterToStore();
+  }
+
   return minter;
 };
 
-export const addNewProjectMinterConfigToStore = (
+export const addNewLegacyProjectMinterConfigToStore = (
   projectId: string,
   minterAddress: Address
 ): ProjectMinterConfiguration => {
@@ -438,6 +445,14 @@ export const addNewProjectMinterConfigToStore = (
   projectMinterConfig.extraMinterDetails = "{}";
 
   projectMinterConfig.save();
+
+  // ensure a test minter filter exists (so the minter can find its core contract)
+  const existingMinterFilter = MinterFilter.load(
+    TEST_MINTER_FILTER_ADDRESS.toHexString()
+  );
+  if (!existingMinterFilter) {
+    addTestMinterFilterToStore();
+  }
 
   return projectMinterConfig;
 };

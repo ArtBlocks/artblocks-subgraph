@@ -11,7 +11,7 @@ import {
 import { ProjectMinterConfiguration, Minter } from "../../../generated/schema";
 import {
   addNewMinterToStore,
-  addNewProjectMinterConfigToStore,
+  addNewLegacyProjectMinterConfigToStore,
   addNewProjectToStore,
   CURRENT_BLOCK_TIMESTAMP,
   MINTER_ENTITY_TYPE,
@@ -22,7 +22,8 @@ import {
   RandomAddressGenerator,
   TEST_CONTRACT_ADDRESS,
   assertJsonFieldEquals,
-  getJSONStringFromEntries
+  getJSONStringFromEntries,
+  addTestMinterFilterToStore
 } from "../shared-helpers";
 import {
   generateContractSpecificId,
@@ -2754,7 +2755,7 @@ describe("MinterSEAV tests", () => {
       minter.id,
       projectEntityId
     );
-    addNewProjectMinterConfigToStore(projectEntityId, minterAddress);
+    addNewLegacyProjectMinterConfigToStore(projectEntityId, minterAddress);
     const projectMinterConfigEntity = ProjectMinterConfiguration.load(
       projectMinterConfigEntityId
     );
@@ -3145,7 +3146,7 @@ describe("MinterSEAV tests", () => {
       minter.id,
       projectEntityId
     );
-    addNewProjectMinterConfigToStore(projectEntityId, minterAddress);
+    addNewLegacyProjectMinterConfigToStore(projectEntityId, minterAddress);
     const projectMinterConfigEntity = ProjectMinterConfiguration.load(
       projectMinterConfigEntityId
     );
@@ -3206,7 +3207,7 @@ describe("Generic minter details", () => {
       CURRENT_BLOCK_TIMESTAMP.minus(BigInt.fromI32(10))
     );
 
-    const projectMinterConfig = addNewProjectMinterConfigToStore(
+    const projectMinterConfig = addNewLegacyProjectMinterConfigToStore(
       project.id,
       minterAddress
     );
@@ -3396,7 +3397,7 @@ describe("Generic minter details", () => {
       CURRENT_BLOCK_TIMESTAMP.minus(BigInt.fromI32(10))
     );
 
-    const projectMinterConfig = addNewProjectMinterConfigToStore(
+    const projectMinterConfig = addNewLegacyProjectMinterConfigToStore(
       project.id,
       minterAddress
     );
@@ -3462,7 +3463,7 @@ describe("Generic minter details", () => {
       CURRENT_BLOCK_TIMESTAMP.minus(BigInt.fromI32(10))
     );
 
-    const projectMinterConfig = addNewProjectMinterConfigToStore(
+    const projectMinterConfig = addNewLegacyProjectMinterConfigToStore(
       project.id,
       minterAddress
     );
@@ -3524,7 +3525,7 @@ describe("Generic minter details", () => {
       CURRENT_BLOCK_TIMESTAMP.minus(BigInt.fromI32(10))
     );
 
-    const projectMinterConfig = addNewProjectMinterConfigToStore(
+    const projectMinterConfig = addNewLegacyProjectMinterConfigToStore(
       project.id,
       minterAddress
     );
@@ -3576,7 +3577,7 @@ describe("Generic minter details", () => {
       CURRENT_BLOCK_TIMESTAMP.minus(BigInt.fromI32(10))
     );
 
-    const projectMinterConfig = addNewProjectMinterConfigToStore(
+    const projectMinterConfig = addNewLegacyProjectMinterConfigToStore(
       project.id,
       minterAddress
     );
@@ -3642,7 +3643,7 @@ describe("Generic minter details", () => {
       CURRENT_BLOCK_TIMESTAMP.minus(BigInt.fromI32(10))
     );
 
-    const projectMinterConfig = addNewProjectMinterConfigToStore(
+    const projectMinterConfig = addNewLegacyProjectMinterConfigToStore(
       project.id,
       minterAddress
     );
@@ -3694,7 +3695,7 @@ describe("Generic minter details", () => {
       CURRENT_BLOCK_TIMESTAMP.minus(BigInt.fromI32(10))
     );
 
-    const projectMinterConfig = addNewProjectMinterConfigToStore(
+    const projectMinterConfig = addNewLegacyProjectMinterConfigToStore(
       project.id,
       minterAddress
     );
@@ -3750,7 +3751,7 @@ describe("Generic minter details", () => {
       CURRENT_BLOCK_TIMESTAMP.minus(BigInt.fromI32(10))
     );
 
-    const projectMinterConfig = addNewProjectMinterConfigToStore(
+    const projectMinterConfig = addNewLegacyProjectMinterConfigToStore(
       project.id,
       minterAddress
     );
@@ -3809,7 +3810,7 @@ describe("MinterHolder-specific tests", () => {
         CURRENT_BLOCK_TIMESTAMP.minus(BigInt.fromI32(10))
       );
 
-      const projectMinterConfig = addNewProjectMinterConfigToStore(
+      const projectMinterConfig = addNewLegacyProjectMinterConfigToStore(
         project.id,
         minterAddress
       );
@@ -3882,7 +3883,7 @@ describe("MinterHolder-specific tests", () => {
         CURRENT_BLOCK_TIMESTAMP.minus(BigInt.fromI32(10))
       );
 
-      const projectMinterConfig = addNewProjectMinterConfigToStore(
+      const projectMinterConfig = addNewLegacyProjectMinterConfigToStore(
         project.id,
         minterAddress
       );
@@ -3957,7 +3958,7 @@ describe("MinterHolder-specific tests", () => {
 
       let testAddy = randomAddressGenerator.generateRandomAddress();
 
-      const projectMinterConfig = addNewProjectMinterConfigToStore(
+      const projectMinterConfig = addNewLegacyProjectMinterConfigToStore(
         project.id,
         minterAddress
       );
@@ -4028,7 +4029,7 @@ describe("MinterHolder-specific tests", () => {
         randomAddressGenerator.generateRandomAddress()
       ];
 
-      const projectMinterConfig = addNewProjectMinterConfigToStore(
+      const projectMinterConfig = addNewLegacyProjectMinterConfigToStore(
         project.id,
         minterAddress
       );

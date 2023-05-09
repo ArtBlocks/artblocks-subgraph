@@ -30,7 +30,7 @@ import {
   addTestContractToStore,
   addNewTokenToStore,
   TRANSFER_ENTITY_TYPE,
-  addNewProjectMinterConfigToStore
+  addNewLegacyProjectMinterConfigToStore
 } from "../shared-helpers";
 
 import {
@@ -448,6 +448,8 @@ test("GenArt721Core: Removing a whitelisted minter filter should leave existing 
   clearStore();
   const minterFilterAddress = randomAddressGenerator.generateRandomAddress();
   const minterFilter = new MinterFilter(minterFilterAddress.toHexString());
+  // dummy coreRegistry is set to core contract address
+  minterFilter.coreRegistry = TEST_CONTRACT_ADDRESS.toHexString();
   minterFilter.minterGlobalAllowlist = [];
   minterFilter.updatedAt = CURRENT_BLOCK_TIMESTAMP;
   minterFilter.save();
@@ -462,7 +464,7 @@ test("GenArt721Core: Removing a whitelisted minter filter should leave existing 
   );
 
   const project0MinterAddress = randomAddressGenerator.generateRandomAddress();
-  const project0MinterConfig = addNewProjectMinterConfigToStore(
+  const project0MinterConfig = addNewLegacyProjectMinterConfigToStore(
     project0.id,
     randomAddressGenerator.generateRandomAddress()
   );
@@ -490,7 +492,7 @@ test("GenArt721Core: Removing a whitelisted minter filter should leave existing 
   coreContract.save();
 
   const project1MinterAddress = randomAddressGenerator.generateRandomAddress();
-  const project1MinterConfig = addNewProjectMinterConfigToStore(
+  const project1MinterConfig = addNewLegacyProjectMinterConfigToStore(
     project1.id,
     project1MinterAddress
   );

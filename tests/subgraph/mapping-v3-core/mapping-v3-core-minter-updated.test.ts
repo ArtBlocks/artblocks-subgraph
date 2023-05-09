@@ -138,20 +138,13 @@ test(`${coreType}/MinterUpdated: should list invalid MinterFilter with different
     updateCallBlockTimestamp.toString()
   );
   const coreRegistryId = TEST_CONTRACT_ADDRESS.toHexString();
-  assert.fieldEquals(
-    MINTER_FILTER_ENTITY_TYPE,
-    TEST_MINTER_FILTER_ADDRESS.toHexString(),
-    "coreRegistry",
-    coreRegistryId
-  );
-  // check that the core contract reflects being registered on the new core registry
+  // check that the core contract does not reflect being registered on the new core registry
   assert.fieldEquals(
     CONTRACT_ENTITY_TYPE,
-    differentCoreAddress.toHexString(),
+    TEST_CONTRACT_ADDRESS.toHexString(),
     "registeredOn",
-    coreRegistryId
+    "null"
   );
-  assert.entityCount(CORE_REGISTRY_TYPE, 1);
 });
 
 test(`${coreType}/MinterUpdated: should create Contract and/or MinterFilter entities when not yet created, associate them`, () => {
