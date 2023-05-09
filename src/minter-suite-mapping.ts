@@ -752,7 +752,7 @@ export function handleAuctionInitialized(event: AuctionInitialized): void {
   > = createTypedMapFromEntries([
     {
       key: "auctionCurrentBid",
-      value: toJSONValue(event.params.bidAmount.toString())
+      value: toJSONValue(event.params.bidAmount.toString()) // Bid is likely to overflow js Number.MAX_SAFE_INTEGER so store as string
     },
     { key: "auctionCurrentBidder", value: toJSONValue(event.params.bidder) },
     { key: "auctionEndTime", value: toJSONValue(event.params.endTime) },
