@@ -883,7 +883,7 @@ dataSources:
           handler: handleProjectMinterRegistered
         - event: ProjectMinterRemoved(indexed uint256)
           handler: handleProjectMinterRemoved
-      file: ./src/minter-filter-mapping.ts
+      file: ./src/legacy-minter-filter-mapping.ts
   {{/minterFilterV0Contracts}}
   {{#minterFilterV1Contracts}}
   - kind: ethereum/contract
@@ -929,7 +929,7 @@ dataSources:
           handler: handleProjectMinterRegistered
         - event: ProjectMinterRemoved(indexed uint256)
           handler: handleProjectMinterRemoved
-      file: ./src/minter-filter-mapping.ts
+      file: ./src/legacy-minter-filter-mapping.ts
   {{/minterFilterV1Contracts}}
   {{#minterSetPriceContracts}}
   - kind: ethereum/contract
@@ -980,7 +980,7 @@ dataSources:
           handler: handlePurchaseToDisabledUpdated
         - event: ProjectMaxInvocationsLimitUpdated(indexed uint256,uint256)
           handler: handleProjectMaxInvocationsLimitUpdated
-      file: ./src/minter-suite-mapping.ts
+      file: ./src/legacy-minter-suite-mapping.ts
   {{/minterSetPriceContracts}}
   {{#minterSetPriceERC20Contracts}}
   - kind: ethereum/contract
@@ -1026,7 +1026,7 @@ dataSources:
           handler: handlePurchaseToDisabledUpdated
         - event: ProjectMaxInvocationsLimitUpdated(indexed uint256,uint256)
           handler: handleProjectMaxInvocationsLimitUpdated
-      file: ./src/minter-suite-mapping.ts
+      file: ./src/legacy-minter-suite-mapping.ts
   {{/minterSetPriceERC20Contracts}}
   {{#minterDAExpContracts}}
   - kind: ethereum/contract
@@ -1078,7 +1078,7 @@ dataSources:
           handler: handleDAExpSetAuctionDetails
         - event: ProjectMaxInvocationsLimitUpdated(indexed uint256,uint256)
           handler: handleProjectMaxInvocationsLimitUpdated
-      file: ./src/minter-suite-mapping.ts
+      file: ./src/legacy-minter-suite-mapping.ts
   {{/minterDAExpContracts}}
   {{#minterDALinContracts}}
   - kind: ethereum/contract
@@ -1130,7 +1130,7 @@ dataSources:
           handler: handleDALinSetAuctionDetails
         - event: ProjectMaxInvocationsLimitUpdated(indexed uint256,uint256)
           handler: handleProjectMaxInvocationsLimitUpdated
-      file: ./src/minter-suite-mapping.ts
+      file: ./src/legacy-minter-suite-mapping.ts
   {{/minterDALinContracts}}
   {{#minterDAExpSettlementContracts}}
   - kind: ethereum/contract
@@ -1187,7 +1187,7 @@ dataSources:
           handler: handleArtistAndAdminRevenuesWithdrawn
         - event: ProjectMaxInvocationsLimitUpdated(indexed uint256,uint256)
           handler: handleProjectMaxInvocationsLimitUpdated
-      file: ./src/minter-suite-mapping.ts
+      file: ./src/legacy-minter-suite-mapping.ts
   {{/minterDAExpSettlementContracts}}
   {{#minterMerkleContracts}}
   - kind: ethereum/contract
@@ -1239,7 +1239,7 @@ dataSources:
           handler: handleMerkleDelegationRegistryUpdated
         - event: ProjectMaxInvocationsLimitUpdated(indexed uint256,uint256)
           handler: handleProjectMaxInvocationsLimitUpdated
-      file: ./src/minter-suite-mapping.ts
+      file: ./src/legacy-minter-suite-mapping.ts
   {{/minterMerkleContracts}}
   {{#minterHolderContracts}}
   - kind: ethereum/contract
@@ -1293,7 +1293,7 @@ dataSources:
           handler: handleHolderDelegationRegistryUpdated
         - event: ProjectMaxInvocationsLimitUpdated(indexed uint256,uint256)
           handler: handleProjectMaxInvocationsLimitUpdated
-      file: ./src/minter-suite-mapping.ts
+      file: ./src/legacy-minter-suite-mapping.ts
   {{/minterHolderContracts}}
   {{#minterSEAContracts}}
   - kind: ethereum/contract
@@ -1357,7 +1357,7 @@ dataSources:
           handler: handleProjectNextTokenUpdated
         - event: ProjectNextTokenEjected(indexed uint256)
           handler: handleProjectNextTokenEjected
-      file: ./src/minter-suite-mapping.ts
+      file: ./src/legacy-minter-suite-mapping.ts
   {{/minterSEAContracts}}
   {{#adminACLV0Contracts}}
   - kind: ethereum/contract
