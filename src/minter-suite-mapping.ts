@@ -250,7 +250,7 @@ export function handleDALinSetAuctionDetails(
     projectMinterConfig.endTime = event.params._auctionTimestampEnd;
     setProjectMinterConfigExtraMinterDetailsValue(
       "startPrice",
-      event.params._startPrice,
+      event.params._startPrice.toString(), // Price is likely to overflow js Number.MAX_SAFE_INTEGER so store as string
       projectMinterConfig
     );
     setProjectMinterConfigExtraMinterDetailsValue(
@@ -359,7 +359,7 @@ export function handleDAExpSetAuctionDetails(
       event.params._priceDecayHalfLifeSeconds;
     setProjectMinterConfigExtraMinterDetailsValue(
       "startPrice",
-      event.params._startPrice,
+      event.params._startPrice.toString(), // Price is likely to overflow js Number.MAX_SAFE_INTEGER so store as string
       projectMinterConfig
     );
     setProjectMinterConfigExtraMinterDetailsValue(
@@ -500,55 +500,37 @@ export function handleHoldersOfProjectsGeneric<T>(event: T): void {
     return;
   }
 
+  const minterProjectAndConfig = loadMinterProjectAndConfig(
+    event.address,
+    event.params._projectId,
+    event.block.timestamp
+  );
+
+  if (!minterProjectAndConfig) {
+    return;
+  }
+
   for (let i = 0; i < event.params._ownedNFTAddresses.length; i++) {
     let address = event.params._ownedNFTAddresses[i].toHexString();
     let holderProjectId = event.params._ownedNFTProjectIds[i].toString();
     let bytesValueCombined = Bytes.fromUTF8(address + "-" + holderProjectId);
 
-    let newAddEvent: ConfigValueAddedToSetBytes;
-    let newRemoveEvent: ConfigValueRemovedFromSetBytes;
-    const parameters = [
-      new ethereum.EventParam(
-        "_projectId",
-        ethereum.Value.fromUnsignedBigInt(event.params._projectId)
-      ),
-      new ethereum.EventParam(
-        "_key",
-        ethereum.Value.fromBytes(
-          Bytes.fromUTF8("allowlistedAddressAndProjectId")
-        )
-      ),
-      new ethereum.EventParam(
-        "_value",
-        ethereum.Value.fromBytes(bytesValueCombined)
-      )
-    ];
-
     if (event instanceof AllowedHoldersOfProjects) {
-      newAddEvent = new ConfigValueAddedToSetBytes(
-        event.address,
-        event.logIndex,
-        event.transactionLogIndex,
-        event.logType,
-        event.block,
-        event.transaction,
-        parameters,
-        event.receipt
+      addProjectMinterConfigExtraMinterDetailsManyValue(
+        minterProjectAndConfig.projectMinterConfiguration,
+        "allowlistedAddressAndProjectId",
+        bytesValueCombined
       );
-      handleAddManyBytesValueProjectMinterConfig(newAddEvent);
     } else if (event instanceof RemovedHoldersOfProjects) {
-      newRemoveEvent = new ConfigValueRemovedFromSetBytes(
-        event.address,
-        event.logIndex,
-        event.transactionLogIndex,
-        event.logType,
-        event.block,
-        event.transaction,
-        parameters,
-        event.receipt
+      removeProjectMinterConfigExtraMinterDetailsManyValue(
+        minterProjectAndConfig.projectMinterConfiguration,
+        "allowlistedAddressAndProjectId",
+        bytesValueCombined
       );
-      handleRemoveBytesManyValueProjectMinterConfig(newRemoveEvent);
     }
+
+    minterProjectAndConfig.project.updatedAt = event.block.timestamp;
+    minterProjectAndConfig.project.save();
   }
 }
 
@@ -765,7 +747,10 @@ export function handleAuctionInitialized(event: AuctionInitialized): void {
     string,
     JSONValue
   > = createTypedMapFromEntries([
-    { key: "auctionCurrentBid", value: toJSONValue(event.params.bidAmount) },
+    {
+      key: "auctionCurrentBid",
+      value: toJSONValue(event.params.bidAmount.toString()) // Bid is likely to overflow js Number.MAX_SAFE_INTEGER so store as string
+    },
     { key: "auctionCurrentBidder", value: toJSONValue(event.params.bidder) },
     { key: "auctionEndTime", value: toJSONValue(event.params.endTime) },
     { key: "auctionInitialized", value: toJSONValue(true) },
@@ -804,7 +789,7 @@ export function handleAuctionBid(event: AuctionBid): void {
     // update relevant auction details in project minter configuration extraMinterDetails json field
     setProjectMinterConfigExtraMinterDetailsValue(
       "auctionCurrentBid",
-      event.params.bidAmount,
+      event.params.bidAmount.toString(), // Bid is likely to overflow js Number.MAX_SAFE_INTEGER so store as string
       projectMinterConfig
     );
     setProjectMinterConfigExtraMinterDetailsValue(
@@ -1313,23 +1298,28 @@ export function handleArtistAndAdminRevenuesWithdrawn(
 ): void {
   // the function that emits this event can affect latest purchase price, so sync it
   syncLatestPurchasePrice(event.address, event.params._projectId, event);
-  // update project extra minter details key `auctionRevenuesCollected` to true
-  let genericEvent: ConfigValueSetBool;
-  genericEvent = changetype<ConfigValueSetBool>(event);
-  genericEvent.parameters = [
-    new ethereum.EventParam(
-      "_projectId",
-      ethereum.Value.fromUnsignedBigInt(event.params._projectId)
-    ),
-    new ethereum.EventParam(
-      "_key",
-      ethereum.Value.fromBytes(Bytes.fromUTF8("auctionRevenuesCollected"))
-    ),
-    new ethereum.EventParam("_value", ethereum.Value.fromBoolean(true))
-  ];
 
-  // call generic handler to populate project's extraMinterDetails
-  handleSetValueProjectMinterConfig(genericEvent);
+  // It's important that we load the minterProjectAndConfig after syncing the
+  // latest purchase price, so that the loaded config is up to date
+  const minterProjectAndConfig = loadMinterProjectAndConfig(
+    event.address,
+    event.params._projectId,
+    event.block.timestamp
+  );
+
+  if (!minterProjectAndConfig) {
+    return;
+  }
+
+  // update project extra minter details key `auctionRevenuesCollected` to true
+  setProjectMinterConfigExtraMinterDetailsValue(
+    "auctionRevenuesCollected",
+    true,
+    minterProjectAndConfig.projectMinterConfiguration
+  );
+
+  minterProjectAndConfig.project.updatedAt = event.block.timestamp;
+  minterProjectAndConfig.project.save();
 }
 
 // Helpers
@@ -1345,37 +1335,29 @@ function syncLatestPurchasePrice(
   projectId: BigInt,
   event: ethereum.Event
 ): void {
+  const minterProjectAndConfig = loadMinterProjectAndConfig(
+    minterAddress,
+    projectId,
+    event.block.timestamp
+  );
+
+  if (!minterProjectAndConfig) {
+    return;
+  }
+
   let settleableMinter = IFilteredMinterDAExpSettlementV1.bind(minterAddress);
   let latestPurchasePrice = settleableMinter.getProjectLatestPurchasePrice(
     projectId
   );
   // update extraMinterDetails key `currentSettledPrice` to be latestPurchasePrice
-  let genericEvent: ConfigValueSetBytes = new ConfigValueSetBytes(
-    event.address,
-    event.logIndex,
-    event.transactionLogIndex,
-    event.logType,
-    event.block,
-    event.transaction,
-    [],
-    event.receipt
+  setProjectMinterConfigExtraMinterDetailsValue(
+    "currentSettledPrice",
+    latestPurchasePrice.toString(), // Price is likely to overflow js Number.MAX_SAFE_INTEGER, so store as string
+    minterProjectAndConfig.projectMinterConfiguration
   );
-  genericEvent.parameters = [
-    new ethereum.EventParam(
-      "_projectId",
-      ethereum.Value.fromUnsignedBigInt(projectId)
-    ),
-    new ethereum.EventParam(
-      "_key",
-      ethereum.Value.fromBytes(Bytes.fromUTF8("currentSettledPrice"))
-    ),
-    new ethereum.EventParam(
-      "_value",
-      ethereum.Value.fromBytes(Bytes.fromUTF8(latestPurchasePrice.toString()))
-    )
-  ];
-  // call generic handler to populate project's extraMinterDetails
-  handleSetValueProjectMinterConfig(genericEvent);
+
+  minterProjectAndConfig.project.updatedAt = event.block.timestamp;
+  minterProjectAndConfig.project.save();
 }
 
 /**
@@ -1395,32 +1377,24 @@ function syncNumSettleableInvocations(
     projectId
   );
   // update extraMinterDetails key `numSettleableInvocations` to be numSettleableInvocations
-  let genericEvent: ConfigValueSetBigInt = new ConfigValueSetBigInt(
-    event.address,
-    event.logIndex,
-    event.transactionLogIndex,
-    event.logType,
-    event.block,
-    event.transaction,
-    [],
-    event.receipt
+  const minterProjectAndConfig = loadMinterProjectAndConfig(
+    minterAddress,
+    projectId,
+    event.block.timestamp
   );
-  genericEvent.parameters = [
-    new ethereum.EventParam(
-      "_projectId",
-      ethereum.Value.fromUnsignedBigInt(projectId)
-    ),
-    new ethereum.EventParam(
-      "_key",
-      ethereum.Value.fromBytes(Bytes.fromUTF8("numSettleableInvocations"))
-    ),
-    new ethereum.EventParam(
-      "_value",
-      ethereum.Value.fromUnsignedBigInt(numSettleableInvocations)
-    )
-  ];
-  // call generic handler to populate project's extraMinterDetails
-  handleSetValueProjectMinterConfig(genericEvent);
+
+  if (!minterProjectAndConfig) {
+    return;
+  }
+
+  setProjectMinterConfigExtraMinterDetailsValue(
+    "numSettleableInvocations",
+    numSettleableInvocations,
+    minterProjectAndConfig.projectMinterConfiguration
+  );
+
+  minterProjectAndConfig.project.updatedAt = event.block.timestamp;
+  minterProjectAndConfig.project.save();
 }
 
 class MinterProjectAndConfig {
