@@ -53,8 +53,12 @@ export function handleIsCanonicalMinterFilter(
   let minterFilter = MinterFilter.load(event.address.toHexString());
   if (!minterFilter) {
     minterFilter = new MinterFilter(event.address.toHexString());
+    // dummy core registry has ID set to the associated core contract address
+    // @dev this is a trick to avoid having to create a nullable field to store
+    // the associated core contract address on the dummy core registry or
+    // minter filter.
     const coreRegistry = getOrCreateDummyCoreRegistryForLegacyMinterFilter(
-      event.address.toHexString(),
+      event.params._coreContractAddress.toHexString(),
       event.block.timestamp
     );
     minterFilter.coreRegistry = coreRegistry.id;
@@ -324,9 +328,13 @@ export function loadOrCreateMinterFilter(
 
   minterFilter = new MinterFilter(minterFilterAddress.toHexString());
   let minterFilterContract = IMinterFilterV0.bind(minterFilterAddress);
+  // dummy core registry has ID set to the associated core contract address
+  // @dev this is a trick to avoid having to create a nullable field to store
+  // the associated core contract address on the dummy core registry or
+  // minter filter.
   let coreContractAddress = minterFilterContract.genArt721CoreAddress();
   const coreRegistry = getOrCreateDummyCoreRegistryForLegacyMinterFilter(
-    minterFilterAddress.toHexString(),
+    coreContractAddress.toHexString(),
     timestamp
   );
   minterFilter.coreRegistry = coreRegistry.id;
