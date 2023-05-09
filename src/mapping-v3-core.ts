@@ -990,33 +990,6 @@ function loadOrCreateContract<T>(
   return contractEntity;
 }
 
-// // loads or creates a MinterFilter entity and returns it.
-// function loadOrCreateMinterFilter(
-//   minterFilterContract: MinterFilterV1,
-//   timestamp: BigInt
-// ): MinterFilter {
-//   // load or create MinterFilter entity
-//   let minterFilter = MinterFilter.load(
-//     minterFilterContract._address.toHexString()
-//   );
-//   if (!minterFilter) {
-//     minterFilter = new MinterFilter(
-//       minterFilterContract._address.toHexString()
-//     );
-//     minterFilter.coreContract = minterFilterContract
-//       .genArt721CoreAddress()
-//       .toHexString();
-//     // if this is the first time we have seen this minter filter, we can
-//     // assume the minter allowlist is empty If it was not empty, we would
-//     // have seen it when the minter filter was allowlisting a minter.
-//     // @dev this assumes the minter filter is in subgraph's config
-//     minterFilter.minterGlobalAllowlist = [];
-//     minterFilter.updatedAt = timestamp;
-//     minterFilter.save();
-//   }
-//   return minterFilter;
-// }
-
 // Returns an IGenArt721CoreContractV3_Base contract
 // @dev assumes the contract conforms to the IGenArt721CoreContractV3_Base
 // interface
