@@ -172,10 +172,10 @@ type ProposedArtistAddressesAndSplit @entity {
 }
 
 type CoreRegistry @entity {
-  "Unique identifier made up of the Core Registry's contract address (legacy name was Engine Registry)"
+  "Unique identifier made up of the Core Registry's contract address (legacy name was Engine Registry). Note: For legacy MinterFilters, this is a dummy ID, equal to the address of the single core contract associated with the minter filter."
   id: ID!
 
-  "Unique identifier made up of the Core Registry's contract address (legacy name was Engine Registry). Note: For legacy MinterFilters, this is a dummy ID, equal to the address of the single core contract associated with the minter filter."
+  "All core contracts that are registered on this CoreRegistry, when this is most recent Core Registry to add the contract"
   registeredContracts: [Contract!] @derivedFrom(field: "registeredOn")
 }
 
