@@ -172,7 +172,11 @@ type ProposedArtistAddressesAndSplit @entity {
 }
 
 type CoreRegistry @entity {
-  "Unique identifier made up of the Core Registry's contract address (legacy name was Engine Registry). Note: For legacy MinterFilters, this is a dummy ID, equal to the address of the single core contract associated with the minter filter."
+  """
+  Unique identifier made up of the Core Registry's contract address (legacy name was Engine Registry).
+  Note: For legacy MinterFilters, this is a dummy ID, equal to the address of the single core contract
+  associated with the minter filter.
+  """
   id: ID!
 
   "All core contracts that are registered on this CoreRegistry, when this is most recent Core Registry to add the contract"
@@ -346,14 +350,22 @@ type MinterFilter @entity {
   "Minters allowlisted globally on this MinterFilter"
   minterGlobalAllowlist: [Minter!]!
 
-  "Minters allowlisted at a contract-level on this MinterFilter, only used for MinterFilterV2+"
+  """
+  Minters allowlisted at a contract-level on this MinterFilter. In general, this allows a core contract to
+  extend the global minter allowlist to allow minters that are not globally allowlisted.
+  Note: only used for MinterFilterV2+
+  """
   minterFilterContractAllowlists: [MinterFilterContractAllowlist!]!
     @derivedFrom(field: "minterFilter")
 
   "Known minters that are tied to this MinterFilter, but are not necessarily approved on this MinterFilter"
   knownMinters: [Minter!]! @derivedFrom(field: "minterFilter")
 
-  "Core contract registry used by this MinterFilter. Note that for MinterFilterV0 & MinterFilterV1, a dummy CoreRegistry is created in the subgraph that contains a single allowlisted core contract."
+  """
+  Core contract registry used by this MinterFilter.
+  Note that for MinterFilterV0 & MinterFilterV1, a dummy CoreRegistry is created in the subgraph that
+  contains a single allowlisted core contract.
+  """
   coreRegistry: CoreRegistry!
 
   updatedAt: BigInt!
@@ -370,7 +382,7 @@ type MinterFilterContractAllowlist @entity {
   contract: Contract!
 
   "Minter contract addresses allowed at the contract level (extending global MinterFilter allowlist)"
-  minterContractAllowlist: [Bytes!]!
+  minterContractAllowlist: [Minter!]!
 
   updatedAt: BigInt!
 }
