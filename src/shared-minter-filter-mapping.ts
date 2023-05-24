@@ -1,4 +1,4 @@
-import { BigInt, log, Address } from "@graphprotocol/graph-ts";
+import { BigInt, log, Address, store } from "@graphprotocol/graph-ts";
 import {
   MinterFilter,
   MinterFilterContractAllowlist
@@ -136,6 +136,51 @@ export function handleMinterApprovedForContract(
     );
     contractAllowlist.updatedAt = event.block.timestamp;
     contractAllowlist.save();
+  }
+}
+
+export function handleMinterRevokedForContract(
+  event: MinterRevokedForContract
+): void {
+  let minterFilter = loadOrCreateSharedMinterFilter(
+    event.address,
+    event.block.timestamp
+  );
+
+  let minter = loadOrCreateMinter(event.params.minter, event.block.timestamp);
+
+  // log a warning if the minter's minter filter does not match the minter
+  // filter that emitted the MinterRevokedForContract event
+  if (minter.minterFilter != minterFilter.id) {
+    log.warning(
+      "[WARN] Contract allowlisted minter at {} does not match minter filter that emitted the MinterRevokedForContract event at {}",
+      [minter.minterFilter, minterFilter.id]
+    );
+  }
+
+  // load or create the contract-specific allowlist for the MinterFilter
+  let contractAllowlist = loadOrCreateMinterFilterContractAllowlist(
+    minterFilter,
+    event.params.coreContract,
+    event.block.timestamp
+  );
+
+  // remove minter from the list of contract allowlisted minters
+  let newMinterContractAllowlist: string[] = [];
+  for (let i = 0; i < contractAllowlist.minterContractAllowlist.length; i++) {
+    if (contractAllowlist.minterContractAllowlist[i] != minter.id) {
+      newMinterContractAllowlist.push(
+        contractAllowlist.minterContractAllowlist[i]
+      );
+    }
+  }
+  contractAllowlist.minterContractAllowlist = newMinterContractAllowlist;
+  contractAllowlist.updatedAt = event.block.timestamp;
+  contractAllowlist.save();
+
+  // if the contract allowlist is empty, delete the entity
+  if (contractAllowlist.minterContractAllowlist.length == 0) {
+    store.remove("MinterFilterContractAllowlist", contractAllowlist.id);
   }
 }
 
