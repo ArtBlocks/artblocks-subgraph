@@ -391,7 +391,7 @@
       "startBlock": 8458567
     }
   ],
-  "engineRegistryV0Contracts": [
+  "ICoreRegistryContracts": [
     {
       "address": "0x2A39132E8d594d2c840D6656327fB26d900C05bA",
       "name": "Goerli dev engine registry contract, AB Dev Wallet as Deployer",
