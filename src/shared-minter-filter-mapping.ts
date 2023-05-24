@@ -13,11 +13,49 @@ import {
   CoreRegistryUpdated
 } from "../generated/SharedMinterFilter/IMinterFilterV1";
 
+import { loadOrCreateMinter } from "./helpers";
+
 export function handleDeployed(event: Deployed): void {
   // we simply create a new MinterFilter entity to ensure that it is in the
   // store. This enables us to determine if a MinterFilter is in our subgraph
   // configuration by checking if it is in the store.
   loadOrCreateMinterFilter(event.address, event.block.timestamp);
+}
+
+export function handleMinterApprovedGlobally(
+  event: MinterApprovedGlobally
+): void {
+  let minterFilter = loadOrCreateMinterFilter(
+    event.address,
+    event.block.timestamp
+  );
+
+  let minter = loadOrCreateMinter(event.params.minter, event.block.timestamp);
+
+  // update minter's globally allowlisted state, or log a warning if the
+  // minter's minter filter does not match the minter filter that emitted the
+  // MinterApprovedGlobally event
+  if (minter.minterFilter == minterFilter.id) {
+    minter.isGloballyAllowlistedOnMinterFilter = true;
+    minter.updatedAt = event.block.timestamp;
+    minter.save();
+  } else {
+    log.warning(
+      "[WARN] Globally allowlisted minter at {} does not match minter filter that emitted the MinterApprovedGlobally event at {}",
+      [minter.minterFilter, minterFilter.id]
+    );
+  }
+
+  // add minter to the list of allowlisted minters if it's not already there
+  // @dev the smart contract is expected to not emit this event if the minter
+  // is already in the allowlist, but we check here just in case
+  if (!minterFilter.minterGlobalAllowlist.includes(minter.id)) {
+    minterFilter.minterGlobalAllowlist = minterFilter.minterGlobalAllowlist.concat(
+      [minter.id]
+    );
+    minterFilter.updatedAt = event.block.timestamp;
+    minterFilter.save();
+  }
 }
 
 ///////////////////////////////////////////////////////////////////////////////
