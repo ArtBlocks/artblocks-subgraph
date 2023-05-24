@@ -937,7 +937,7 @@ dataSources:
   {{/minterFilterV1Contracts}}
   {{#sharedMinterFilterContracts}}
   - kind: ethereum/contract
-    name: 'MinterFilterV2{{#address}}-{{address}}{{/address}}'
+    name: 'SharedMinterFilter{{#address}}-{{address}}{{/address}}'
     network: {{network}}
     source:
       address: "{{#address}}{{address}}{{/address}}{{^address}}0x0000000000000000000000000000000000000000{{/address}}"
@@ -967,7 +967,7 @@ dataSources:
           handler: handleMinterRevokedGlobally
         - event: MinterApprovedForContract(indexed address,indexed address,string)
           handler: handleMinterApprovedForContract
-        - event: MinterRevokedForContract(indexed address, indexed address)
+        - event: MinterRevokedForContract(indexed address,indexed address)
           handler: handleMinterRevokedForContract
         - event: ProjectMinterRegistered(indexed uint256,indexed address,indexed address,string)
           handler: handleProjectMinterRegistered
