@@ -1,5 +1,8 @@
 import { BigInt, log, Address } from "@graphprotocol/graph-ts";
-import { MinterFilter, CoreRegistry } from "../generated/schema";
+import {
+  MinterFilter,
+  MinterFilterContractAllowlist
+} from "../generated/schema";
 
 import {
   IMinterFilterV1,
@@ -13,19 +16,23 @@ import {
   CoreRegistryUpdated
 } from "../generated/SharedMinterFilter/IMinterFilterV1";
 
-import { loadOrCreateMinter } from "./helpers";
+import {
+  loadOrCreateSharedMinterFilter,
+  loadOrCreateMinter,
+  generateMinterFilterContractAllowlistId
+} from "./helpers";
 
 export function handleDeployed(event: Deployed): void {
   // we simply create a new MinterFilter entity to ensure that it is in the
   // store. This enables us to determine if a MinterFilter is in our subgraph
   // configuration by checking if it is in the store.
-  loadOrCreateMinterFilter(event.address, event.block.timestamp);
+  loadOrCreateSharedMinterFilter(event.address, event.block.timestamp);
 }
 
 export function handleMinterApprovedGlobally(
   event: MinterApprovedGlobally
 ): void {
-  let minterFilter = loadOrCreateMinterFilter(
+  let minterFilter = loadOrCreateSharedMinterFilter(
     event.address,
     event.block.timestamp
   );
@@ -61,7 +68,7 @@ export function handleMinterApprovedGlobally(
 export function handleMinterRevokedGlobally(
   event: MinterRevokedGlobally
 ): void {
-  let minterFilter = loadOrCreateMinterFilter(
+  let minterFilter = loadOrCreateSharedMinterFilter(
     event.address,
     event.block.timestamp
   );
@@ -94,65 +101,84 @@ export function handleMinterRevokedGlobally(
   minterFilter.save();
 }
 
+export function handleMinterApprovedForContract(
+  event: MinterApprovedForContract
+): void {
+  let minterFilter = loadOrCreateSharedMinterFilter(
+    event.address,
+    event.block.timestamp
+  );
+
+  let minter = loadOrCreateMinter(event.params.minter, event.block.timestamp);
+
+  // log a warning if the minter's minter filter does not match the minter
+  // filter that emitted the MinterApprovedForContract event
+  if (minter.minterFilter != minterFilter.id) {
+    log.warning(
+      "[WARN] Contract allowlisted minter at {} does not match minter filter that emitted the MinterApprovedForContract event at {}",
+      [minter.minterFilter, minterFilter.id]
+    );
+  }
+
+  // load or create the contract-specific allowlist for the MinterFilter
+  let contractAllowlist = loadOrCreateMinterFilterContractAllowlist(
+    minterFilter,
+    event.params.coreContract,
+    event.block.timestamp
+  );
+
+  // add minter to the list of allowlisted minters if it's not already there
+  // @dev the smart contract is expected to not emit this event if the minter
+  // is already in the allowlist, but we check here just in case
+  if (!contractAllowlist.minterContractAllowlist.includes(minter.id)) {
+    contractAllowlist.minterContractAllowlist = contractAllowlist.minterContractAllowlist.concat(
+      [minter.id]
+    );
+    contractAllowlist.updatedAt = event.block.timestamp;
+    contractAllowlist.save();
+  }
+}
+
 ///////////////////////////////////////////////////////////////////////////////
 // HELPER FUNCTIONS
 ///////////////////////////////////////////////////////////////////////////////
 
 /**
- * Helper function to load or create a shared minter filter.
- * Assumes:
- *  - the minter filter conforms to IMinterFilterV1 when creating a new minter
- * filter.
- *  - the minterGlobalAllowlist is empty when initializing a new minter filter
- * @returns MinterFilter entity (either loaded or created)
+ * Loads or creates a MinterFilterContractAllowlist entity for the given
+ * MinterFilter and core contract address.
+ * @dev Assumes an empty minterContractAllowlist if the entity is created.
+ * @param minterFilter The MinterFilter entity for which to load or create a
+ * MinterFilterContractAllowlist entity.
+ * @param coreContractAddress The address of the core contract for which to load
+ * or create a MinterFilterContractAllowlist entity.
+ * @param timestamp The timestamp at which the MinterFilterContractAllowlist
+ * entity is being loaded or created.
+ * @returns The loaded or created MinterFilterContractAllowlist entity.
  */
-function loadOrCreateMinterFilter(
-  minterFilterAddress: Address,
+function loadOrCreateMinterFilterContractAllowlist(
+  minterFilter: MinterFilter,
+  coreContractAddress: Address,
   timestamp: BigInt
-): MinterFilter {
-  let minterFilter = MinterFilter.load(minterFilterAddress.toHexString());
-  if (minterFilter) {
-    return minterFilter;
-  }
-  // target MinterFilter was not in store, so create new one
-  minterFilter = new MinterFilter(minterFilterAddress.toHexString());
-  minterFilter.minterGlobalAllowlist = [];
-  // safely retrieve the core registry address from the minter filter
-  let minterFilterContract = IMinterFilterV1.bind(minterFilterAddress);
-  const coreRegistryResult = minterFilterContract.try_coreRegistry();
-  let coreRegistryAddress: Address;
-  if (coreRegistryResult.reverted) {
-    // unexpected minter filter behavior - log a warning, and assign to a dummy
-    // core registry at zero address
-    log.warning(
-      "[WARN] Could not load core registry on MinterFilter contract at address {}, so set core registry to null address on entity.",
-      [minterFilterAddress.toHexString()]
-    );
-    coreRegistryAddress = Address.zero();
-  } else {
-    coreRegistryAddress = coreRegistryResult.value;
-  }
-  // load or create the core registry entity, and assign to the minter filter
-  const coreRegistry = loadOrCreateCoreRegistry(coreRegistryAddress);
-  minterFilter.coreRegistry = coreRegistry.id;
+): MinterFilterContractAllowlist {
+  let contractAllowlistId = generateMinterFilterContractAllowlistId(
+    minterFilter.id,
+    coreContractAddress.toHexString()
+  );
 
-  minterFilter.updatedAt = timestamp;
-  minterFilter.save();
+  let contractAllowlist = MinterFilterContractAllowlist.load(
+    contractAllowlistId
+  );
 
-  return minterFilter;
-}
-
-/**
- * helper function that loads or creates a CoreRegistry entity in the store.
- * @param address core registry address
- * @returns CoreRegistry entity (either loaded or created)
- */
-function loadOrCreateCoreRegistry(address: Address): CoreRegistry {
-  let coreRegistry = CoreRegistry.load(address.toHexString());
-  if (coreRegistry) {
-    return coreRegistry;
+  if (contractAllowlist) {
+    return contractAllowlist;
   }
-  coreRegistry = new CoreRegistry(address.toHexString());
-  coreRegistry.save();
-  return coreRegistry;
+  // if the contract allowlist does not exist, create it
+  contractAllowlist = new MinterFilterContractAllowlist(contractAllowlistId);
+  contractAllowlist.minterFilter = minterFilter.id;
+  contractAllowlist.contract = coreContractAddress.toHexString();
+  contractAllowlist.minterContractAllowlist = [];
+  contractAllowlist.updatedAt = timestamp;
+  contractAllowlist.save();
+
+  return contractAllowlist;
 }
