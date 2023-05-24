@@ -4,7 +4,8 @@ import {
   MinterFilterContractAllowlist,
   Minter,
   Project,
-  ProjectMinterConfiguration
+  ProjectMinterConfiguration,
+  Contract
 } from "../generated/schema";
 
 import {
@@ -208,6 +209,14 @@ export function handleProjectMinterRegistered(
     );
   }
 
+  // if the project's minter filter does not match the minter filter that
+  // emitted the ProjectMinterRemoved event, then this is a pre-configuring
+  // event, and we should return early and not update the project's minter
+  const coreContract = Contract.load(event.params.coreContract.toHexString());
+  if (!coreContract || coreContract.minterFilter != minterFilter.id) {
+    return;
+  }
+
   // update project's minter configuration
   let project = Project.load(
     generateContractSpecificId(
@@ -230,6 +239,40 @@ export function handleProjectMinterRegistered(
     minter,
     event.block.timestamp
   );
+}
+
+export function handleProjectMinterRemoved(event: ProjectMinterRemoved): void {
+  let minterFilter = loadOrCreateSharedMinterFilter(
+    event.address,
+    event.block.timestamp
+  );
+  // if the project's minter filter does not match the minter filter that
+  // emitted the ProjectMinterRemoved event, then this is a pre-configuring
+  // event, and we should return early and not update the project's minter
+  const coreContract = Contract.load(event.params.coreContract.toHexString());
+  if (!coreContract || coreContract.minterFilter != minterFilter.id) {
+    return;
+  }
+
+  let project = Project.load(
+    generateContractSpecificId(
+      event.params.coreContract,
+      event.params.projectId
+    )
+  );
+  // return early if the project does not exist
+  if (!project) {
+    log.warning(
+      "[WARN] Project at {} does not exist for ProjectMinterRemoved event",
+      [event.params.projectId.toHexString()]
+    );
+    return;
+  }
+
+  // clear the project's minter configuration
+  project.minterConfiguration = null;
+  project.updatedAt = event.block.timestamp;
+  project.save();
 }
 
 ///////////////////////////////////////////////////////////////////////////////
