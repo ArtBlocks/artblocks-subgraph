@@ -55,6 +55,11 @@
       "address": ""
     }
   ],
+  "sharedMinterFilterContracts": [
+    {
+      "address": ""
+    }
+  ],
   "minterSetPriceContracts": [
     {
       "address": ""

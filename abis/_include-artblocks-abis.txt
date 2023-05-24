@@ -29,3 +29,4 @@ MinterFilterV0
 MinterFilterV1
 Ownable
 OwnableUpgradeable
+IMinterFilterV1

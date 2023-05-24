@@ -935,6 +935,48 @@ dataSources:
           handler: handleProjectMinterRemoved
       file: ./src/legacy-minter-filter-mapping.ts
   {{/minterFilterV1Contracts}}
+  {{#sharedMinterFilterContracts}}
+  - kind: ethereum/contract
+    name: 'MinterFilterV2{{#address}}-{{address}}{{/address}}'
+    network: {{network}}
+    source:
+      address: "{{#address}}{{address}}{{/address}}{{^address}}0x0000000000000000000000000000000000000000{{/address}}"
+      abi: IMinterFilterV1
+      {{#startBlock}}startBlock: {{startBlock}}{{/startBlock}}
+    mapping:
+      kind: ethereum/events
+      apiVersion: 0.0.5
+      language: wasm/assemblyscript
+      entities:
+        - Project
+        - Contract
+        - MinterFilter
+        - Minter
+        - ProjectMinterConfiguration
+        - CoreRegistry
+        - MinterFilterContractAllowlist
+      abis:
+        - name: IMinterFilterV1
+          file: ./abis/IMinterFilterV1.json
+      eventHandlers:
+        - event: Deployed()
+          handler: handleDeployed
+        - event: MinterApprovedGlobally(indexed address,string)
+          handler: handleMinterApprovedGlobally
+        - event: MinterRevokedGlobally(indexed address)
+          handler: handleMinterRevokedGlobally
+        - event: MinterApprovedForContract(indexed address,indexed address,string)
+          handler: handleMinterApprovedForContract
+        - event: MinterRevokedForContract(indexed address, indexed address)
+          handler: handleMinterRevokedForContract
+        - event: ProjectMinterRegistered(indexed uint256,indexed address,indexed address,string)
+          handler: handleProjectMinterRegistered
+        - event: ProjectMinterRemoved(indexed uint256,indexed address)
+          handler: handleProjectMinterRemoved
+        - event: CoreRegistryUpdated(indexed address)
+          handler: handleCoreRegistryUpdated
+      file: ./src/shared-minter-filter-mapping.ts
+  {{/sharedMinterFilterContracts}}
   {{#minterSetPriceContracts}}
   - kind: ethereum/contract
     name: 'MinterSetPrice{{#address}}-{{address}}{{/address}}'
