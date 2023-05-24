@@ -23,6 +23,7 @@ import {
 import {
   loadOrCreateSharedMinterFilter,
   loadOrCreateMinter,
+  loadOrCreateCoreRegistry,
   generateMinterFilterContractAllowlistId,
   generateContractSpecificId,
   getProjectMinterConfigId
@@ -273,6 +274,20 @@ export function handleProjectMinterRemoved(event: ProjectMinterRemoved): void {
   project.minterConfiguration = null;
   project.updatedAt = event.block.timestamp;
   project.save();
+}
+
+export function handleCoreRegistryUpdated(event: CoreRegistryUpdated): void {
+  const minterFilter = loadOrCreateSharedMinterFilter(
+    event.address,
+    event.block.timestamp
+  );
+
+  const coreRegistry = loadOrCreateCoreRegistry(event.params.coreRegistry);
+
+  // assign the minter filter's core registry to core registry, and save
+  minterFilter.coreRegistry = coreRegistry.id;
+  minterFilter.updatedAt = event.block.timestamp;
+  minterFilter.save();
 }
 
 ///////////////////////////////////////////////////////////////////////////////
