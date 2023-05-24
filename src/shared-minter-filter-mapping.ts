@@ -58,6 +58,42 @@ export function handleMinterApprovedGlobally(
   }
 }
 
+export function handleMinterRevokedGlobally(
+  event: MinterRevokedGlobally
+): void {
+  let minterFilter = loadOrCreateMinterFilter(
+    event.address,
+    event.block.timestamp
+  );
+
+  let minter = loadOrCreateMinter(event.params.minter, event.block.timestamp);
+
+  // update minter's globally allowlisted state, or log a warning if the
+  // minter's minter filter does not match the minter filter that emitted the
+  // MinterRevokedGlobally event
+  if (minter.minterFilter == minterFilter.id) {
+    minter.isGloballyAllowlistedOnMinterFilter = false;
+    minter.updatedAt = event.block.timestamp;
+    minter.save();
+  } else {
+    log.warning(
+      "[WARN] Globally allowlisted minter at {} does not match minter filter that emitted the MinterRevokedGlobally event at {}",
+      [minter.minterFilter, minterFilter.id]
+    );
+  }
+
+  // remove minter from the list of globally allowlisted minters
+  let newMinterGlobalAllowlist: string[] = [];
+  for (let i = 0; i < minterFilter.minterGlobalAllowlist.length; i++) {
+    if (minterFilter.minterGlobalAllowlist[i] != minter.id) {
+      newMinterGlobalAllowlist.push(minterFilter.minterGlobalAllowlist[i]);
+    }
+  }
+  minterFilter.minterGlobalAllowlist = newMinterGlobalAllowlist;
+  minterFilter.updatedAt = event.block.timestamp;
+  minterFilter.save();
+}
+
 ///////////////////////////////////////////////////////////////////////////////
 // HELPER FUNCTIONS
 ///////////////////////////////////////////////////////////////////////////////
