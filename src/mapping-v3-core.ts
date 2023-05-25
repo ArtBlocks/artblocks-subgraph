@@ -33,10 +33,7 @@ import {
 } from "../generated/AdminACLV0/IAdminACLV0";
 
 import { MinterFilterV1 } from "../generated/MinterFilterV1/MinterFilterV1";
-import {
-  loadOrCreateAndSetProjectMinterConfiguration as legacyLoadOrCreateAndSetProjectMinterConfiguration,
-  loadOrCreateMinterFilter as legacyLoadOrCreateLegacyMinterFilter
-} from "./legacy-minter-filter-mapping";
+import { loadOrCreateMinterFilter as legacyLoadOrCreateLegacyMinterFilter } from "./legacy-minter-filter-mapping";
 
 import {
   loadOrCreateAndSetProjectMinterConfiguration,
@@ -635,68 +632,71 @@ function _handleMinterUpdated<T>(contract: T, event: MinterUpdated): void {
     // update contract entity with null MinterFilter
     contractEntity.minterFilter = null;
     contractEntity.mintWhitelisted = [];
-    contractEntity.registeredOn = null; // needed?
-  } else {
-    // we can assume the minter is a MinterFilter contract.
-    contractEntity.mintWhitelisted = [event.params._currentMinter];
-    // branch logic based on if the MinterFilter is a shared MinterFilter, or a
-    // legacy MinterFilter
-    if (getIsLegacyMinterFilter(newMinterFilterAddress)) {
-      // This is a legacy (non-shared) MinterFilter
-      let minterFilterContract = MinterFilterV1.bind(newMinterFilterAddress);
-      // create and save minter filter entity if doesn't exist
-      legacyLoadOrCreateLegacyMinterFilter(
-        newMinterFilterAddress,
-        event.block.timestamp
+    contractEntity.registeredOn = null;
+    // update contract entity and save
+    contractEntity.updatedAt = event.block.timestamp;
+    contractEntity.save();
+    return;
+  }
+  // we assume the minter is a MinterFilter contract.
+  contractEntity.mintWhitelisted = [event.params._currentMinter];
+  // branch logic based on if the MinterFilter is a shared MinterFilter, or a
+  // legacy MinterFilter
+  if (getIsLegacyMinterFilter(newMinterFilterAddress)) {
+    // This is a legacy (non-shared) MinterFilter
+    // create and save minter filter entity if doesn't exist
+    legacyLoadOrCreateLegacyMinterFilter(
+      newMinterFilterAddress,
+      event.block.timestamp
+    );
+    // safely check that the MinterFilter's core contract is the contract
+    // that emitted the event.
+    let minterFilterContract = MinterFilterV1.bind(newMinterFilterAddress);
+    const coreContractAddressResult = minterFilterContract.try_genArt721CoreAddress();
+    if (
+      coreContractAddressResult.reverted ||
+      coreContractAddressResult.value != event.address
+    ) {
+      // if the minter filter's core contract is not the contract that emitted
+      // the event, then we should null the core contract entity's minterFilter
+      // field (since invalid minter filter), keep mintWhitelisted as the
+      // new address (technically the new minter could mint) and warn because
+      // this is an unintended state.
+      contractEntity.minterFilter = null;
+      log.warning(
+        "[WARN] Invalid minter filter at address {} set on core contract {} - minter filter's core contract is not the contract that emitted the event.",
+        [newMinterFilterAddress.toHexString(), contractEntity.id]
       );
-      // check that the MinterFilter's core contract is the contract that emitted
-      // the event.
-      if (
-        // TODO - make this a try_
-        minterFilterContract.genArt721CoreAddress().toHexString() !=
-        event.address.toHexString()
-      ) {
-        // if the minter filter's core contract is not the contract that emitted
-        // the event, then we should null the core contract entity's minterFilter
-        // field (since invalid minter filter), keep mintWhitelisted as the
-        // new address (technically the new minter could mint) and warn because
-        // this is an unintended state.
-        contractEntity.minterFilter = null;
-        log.warning(
-          "[WARN] Invalid minter filter at address {} set on core contract {} - minter filter's core contract is not the contract that emitted the event.",
-          [newMinterFilterAddress.toHexString(), contractEntity.id]
-        );
-      } else {
-        // update contract entity with new valid MinterFilter ID
-        contractEntity.minterFilter = newMinterFilterAddress.toHexString();
-        // legacy MinterFilters have a dummy CoreRegistry with same id as core contract
-        contractEntity.registeredOn = event.address.toHexString();
-        // sync all pre-set projectMinterConfigurations
-        legacyPopulateAllExistingMinterConfigurations(
-          minterFilterContract,
-          contract,
-          event.block.timestamp
-        );
-      }
     } else {
-      // This is a shared MinterFilter
-      let minterFilterContract = IMinterFilterV1.bind(newMinterFilterAddress);
-      // create and save minter filter entity if doesn't exist
-      const sharedMinterFilter = loadOrCreateSharedMinterFilter(
-        newMinterFilterAddress,
-        event.block.timestamp
-      );
-      // update contract entity with new MinterFilter ID
-      contractEntity.minterFilter = sharedMinterFilter.id;
-      // shared MinterFilters have a non-nullable CoreRegistry
-      contractEntity.registeredOn = sharedMinterFilter.coreRegistry;
-      // sync all pre-existing projectMinterConfigurations
-      PopulateAllExistingMinterConfigurations(
+      // update contract entity with new valid MinterFilter ID
+      contractEntity.minterFilter = newMinterFilterAddress.toHexString();
+      // legacy MinterFilters have a dummy CoreRegistry with same id as core contract
+      contractEntity.registeredOn = event.address.toHexString();
+      // sync all pre-set projectMinterConfigurations
+      legacyPopulateAllExistingMinterConfigurations(
         minterFilterContract,
         contract,
         event.block.timestamp
       );
     }
+  } else {
+    // This is a shared MinterFilter
+    // create and save minter filter entity if doesn't exist
+    const sharedMinterFilter = loadOrCreateSharedMinterFilter(
+      newMinterFilterAddress,
+      event.block.timestamp
+    );
+    // update contract entity with new MinterFilter ID
+    contractEntity.minterFilter = sharedMinterFilter.id;
+    // shared MinterFilters have a non-nullable CoreRegistry
+    contractEntity.registeredOn = sharedMinterFilter.coreRegistry;
+    // sync all pre-existing projectMinterConfigurations
+    let minterFilterContract = IMinterFilterV1.bind(newMinterFilterAddress);
+    PopulateAllExistingMinterConfigurations(
+      minterFilterContract,
+      contract,
+      event.block.timestamp
+    );
   }
 
   // update contract entity and save
@@ -1235,34 +1235,51 @@ function legacyPopulateAllExistingMinterConfigurations<T>(
     return;
   }
   // Check the new minter filter for any pre-allowlisted minters and update Projects accordingly
-  let numProjectsWithMinters = minterFilterContract.getNumProjectsWithMinters();
+  const numProjectsWithMintersResult = minterFilterContract.try_getNumProjectsWithMinters();
+  if (numProjectsWithMintersResult.reverted) {
+    log.warning(
+      "[WARN] MinterFilter at address {} does not implement getNumProjectsWithMinters() function.",
+      [minterFilterContract._address.toHexString()]
+    );
+    return;
+  }
+  let numProjectsWithMinters = numProjectsWithMintersResult.value;
   for (
     let i = BigInt.fromI32(0);
     i.lt(numProjectsWithMinters);
     i = i.plus(BigInt.fromI32(1))
   ) {
-    let projectAndMinterInfo = minterFilterContract.getProjectAndMinterInfoAt(
+    const projectAndMinterInfoResult = minterFilterContract.try_getProjectAndMinterInfoAt(
       i
     );
-    let projectId = projectAndMinterInfo.value0;
-    let minterAddress = projectAndMinterInfo.value1;
+    if (projectAndMinterInfoResult.reverted) {
+      log.warning(
+        "[WARN] MinterFilter at address {} reverts getProjectAndMinterInfoAt(uint256) function for arg value {}.",
+        [i.toString()]
+      );
+      continue;
+    }
+    const projectAndMinterInfo = projectAndMinterInfoResult.value;
+    const projectId = projectAndMinterInfo.value0;
+    const minterAddress = projectAndMinterInfo.value1;
 
-    let project = Project.load(
+    const project = Project.load(
       generateContractSpecificId(contract._address, projectId)
     );
 
     if (project) {
-      legacyLoadOrCreateAndSetProjectMinterConfiguration(
-        project,
-        minterAddress,
-        timestamp
-      );
+      const minter = loadOrCreateMinter(minterAddress, timestamp);
+      loadOrCreateAndSetProjectMinterConfiguration(project, minter, timestamp);
     }
   }
 }
 
-// Populate all project minter configurations from a given shared MinterFilter
-// (e.g. IMinterFilterV1)
+/**
+ * Populate all project minter configurations from a given shared MinterFilter
+ * (e.g. IMinterFilterV1)
+ * @dev for legacy minter filters, use function
+ * legacyPopulateAllExistingMinterConfigurations
+ */
 function PopulateAllExistingMinterConfigurations<T>(
   minterFilterContract: IMinterFilterV1,
   contract: T,
@@ -1278,26 +1295,42 @@ function PopulateAllExistingMinterConfigurations<T>(
     return;
   }
   // Check the new minter filter for any pre-allowlisted minters and update Projects accordingly
-  let numProjectsWithMinters = minterFilterContract.getNumProjectsOnContractWithMinters(
+  const numProjectsWithMintersResult = minterFilterContract.try_getNumProjectsOnContractWithMinters(
     contract._address
   );
+  if (numProjectsWithMintersResult.reverted) {
+    log.warning(
+      "[WARN] MinterFilter at address {} does not implement getNumProjectsWithMinters() function.",
+      [minterFilterContract._address.toHexString()]
+    );
+    return;
+  }
+  const numProjectsWithMinters = numProjectsWithMintersResult.value;
   for (
     let i = BigInt.fromI32(0);
     i.lt(numProjectsWithMinters);
     i = i.plus(BigInt.fromI32(1))
   ) {
-    let projectAndMinterInfo = minterFilterContract.getProjectAndMinterInfoOnContractAt(
+    const projectAndMinterInfoResult = minterFilterContract.try_getProjectAndMinterInfoOnContractAt(
       contract._address,
       i
     );
-    let projectId = projectAndMinterInfo.value0;
+    if (projectAndMinterInfoResult.reverted) {
+      log.warning(
+        "[WARN] MinterFilter at address {} reverts getProjectAndMinterInfoOnContractAt(address,uint256) function for arg values {}, {}.",
+        [contract._address.toHexString(), i.toString()]
+      );
+      continue;
+    }
+    const projectAndMinterInfo = projectAndMinterInfoResult.value;
+    const projectId = projectAndMinterInfo.value0;
 
-    let project = Project.load(
+    const project = Project.load(
       generateContractSpecificId(contract._address, projectId)
     );
 
     if (project) {
-      let minterAddress = projectAndMinterInfo.value1;
+      const minterAddress = projectAndMinterInfo.value1;
       const minter = loadOrCreateMinter(minterAddress, timestamp);
       loadOrCreateAndSetProjectMinterConfiguration(project, minter, timestamp);
     }

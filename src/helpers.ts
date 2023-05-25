@@ -239,10 +239,7 @@ export function loadOrCreateCoreRegistry(address: Address): CoreRegistry {
  * and minter, and sets the project's minter configuration to the new or
  * existing ProjectMinterConfiguration entity.
  * Updates the project's updatedAt to the timestamp, and saves entity.
- * This is only for a shared minter filter.
- * @dev this is very similar to the loadOrCreateProjectMinterConfiguration
- * function in the legacy-minter-filter-mapping.ts file, but inputs are
- * slightly different for improved robustness.
+ * @dev this is intended to support legacy and shared minter filters/minters
  * @param project
  * @param minter
  * @param timestamp
@@ -262,8 +259,10 @@ export function loadOrCreateAndSetProjectMinterConfiguration(
     targetProjectMinterConfigId
   );
 
-  // create new project minter config if it doesn't exist
   if (!projectMinterConfig) {
+    // create new project minter config that assumes no pre-configuring
+    // @dev if minter data source templates are used, the no pre-configuring
+    // assumption must be revisited
     projectMinterConfig = new ProjectMinterConfiguration(
       targetProjectMinterConfigId
     );
