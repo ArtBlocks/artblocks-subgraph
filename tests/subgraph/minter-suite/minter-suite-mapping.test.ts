@@ -11,7 +11,7 @@ import {
 import { ProjectMinterConfiguration, Minter } from "../../../generated/schema";
 import {
   addNewMinterToStore,
-  addNewProjectMinterConfigToStore,
+  addNewLegacyProjectMinterConfigToStore,
   addNewProjectToStore,
   CURRENT_BLOCK_TIMESTAMP,
   MINTER_ENTITY_TYPE,
@@ -22,7 +22,8 @@ import {
   RandomAddressGenerator,
   TEST_CONTRACT_ADDRESS,
   assertJsonFieldEquals,
-  getJSONStringFromEntries
+  getJSONStringFromEntries,
+  addTestMinterFilterToStore
 } from "../shared-helpers";
 import {
   generateContractSpecificId,
@@ -301,7 +302,6 @@ describe("handleProjectCurrencyInfoUpdated", () => {
     const minterAddress: Address = changetype<Address>(
       Address.fromHexString(minter.id)
     );
-    minter.coreContract = TEST_CONTRACT_ADDRESS.toHexString();
     minter.save();
 
     const projectId = BigInt.fromI32(0);
@@ -1701,43 +1701,43 @@ describe("DAExpSettlementMinters", () => {
 
       assert.fieldEquals(
         RECEIPT_ENTITY_TYPE,
-        getReceiptId(minterAddress.toHexString(), project.projectId, purchaser),
+        getReceiptId(minterAddress.toHexString(), project.id, purchaser),
         "project",
         project.id
       );
       assert.fieldEquals(
         RECEIPT_ENTITY_TYPE,
-        getReceiptId(minterAddress.toHexString(), project.projectId, purchaser),
+        getReceiptId(minterAddress.toHexString(), project.id, purchaser),
         "project",
         project.id
       );
       assert.fieldEquals(
         RECEIPT_ENTITY_TYPE,
-        getReceiptId(minterAddress.toHexString(), project.projectId, purchaser),
+        getReceiptId(minterAddress.toHexString(), project.id, purchaser),
         "minter",
         minterAddress.toHexString()
       );
       assert.fieldEquals(
         RECEIPT_ENTITY_TYPE,
-        getReceiptId(minterAddress.toHexString(), project.projectId, purchaser),
+        getReceiptId(minterAddress.toHexString(), project.id, purchaser),
         "account",
         purchaser.toHexString()
       );
       assert.fieldEquals(
         RECEIPT_ENTITY_TYPE,
-        getReceiptId(minterAddress.toHexString(), project.projectId, purchaser),
+        getReceiptId(minterAddress.toHexString(), project.id, purchaser),
         "netPosted",
         netPosted.toString()
       );
       assert.fieldEquals(
         RECEIPT_ENTITY_TYPE,
-        getReceiptId(minterAddress.toHexString(), project.projectId, purchaser),
+        getReceiptId(minterAddress.toHexString(), project.id, purchaser),
         "numPurchased",
         numPurchased.toString()
       );
       assert.fieldEquals(
         RECEIPT_ENTITY_TYPE,
-        getReceiptId(minterAddress.toHexString(), project.projectId, purchaser),
+        getReceiptId(minterAddress.toHexString(), project.id, purchaser),
         "updatedAt",
         CURRENT_BLOCK_TIMESTAMP.toString()
       );
@@ -1906,43 +1906,43 @@ describe("DAExpSettlementMinters", () => {
       );
       assert.fieldEquals(
         RECEIPT_ENTITY_TYPE,
-        getReceiptId(minterAddress.toHexString(), project.projectId, purchaser),
+        getReceiptId(minterAddress.toHexString(), project.id, purchaser),
         "project",
         project.id
       );
       assert.fieldEquals(
         RECEIPT_ENTITY_TYPE,
-        getReceiptId(minterAddress.toHexString(), project.projectId, purchaser),
+        getReceiptId(minterAddress.toHexString(), project.id, purchaser),
         "project",
         project.id
       );
       assert.fieldEquals(
         RECEIPT_ENTITY_TYPE,
-        getReceiptId(minterAddress.toHexString(), project.projectId, purchaser),
+        getReceiptId(minterAddress.toHexString(), project.id, purchaser),
         "minter",
         minterAddress.toHexString()
       );
       assert.fieldEquals(
         RECEIPT_ENTITY_TYPE,
-        getReceiptId(minterAddress.toHexString(), project.projectId, purchaser),
+        getReceiptId(minterAddress.toHexString(), project.id, purchaser),
         "account",
         purchaser.toHexString()
       );
       assert.fieldEquals(
         RECEIPT_ENTITY_TYPE,
-        getReceiptId(minterAddress.toHexString(), project.projectId, purchaser),
+        getReceiptId(minterAddress.toHexString(), project.id, purchaser),
         "netPosted",
         netPosted.toString()
       );
       assert.fieldEquals(
         RECEIPT_ENTITY_TYPE,
-        getReceiptId(minterAddress.toHexString(), project.projectId, purchaser),
+        getReceiptId(minterAddress.toHexString(), project.id, purchaser),
         "numPurchased",
         numPurchased.toString()
       );
       assert.fieldEquals(
         RECEIPT_ENTITY_TYPE,
-        getReceiptId(minterAddress.toHexString(), project.projectId, purchaser),
+        getReceiptId(minterAddress.toHexString(), project.id, purchaser),
         "updatedAt",
         newBlockTimestamp.toString()
       );
@@ -2755,7 +2755,7 @@ describe("MinterSEAV tests", () => {
       minter.id,
       projectEntityId
     );
-    addNewProjectMinterConfigToStore(projectEntityId, minterAddress);
+    addNewLegacyProjectMinterConfigToStore(projectEntityId, minterAddress);
     const projectMinterConfigEntity = ProjectMinterConfiguration.load(
       projectMinterConfigEntityId
     );
@@ -3146,7 +3146,7 @@ describe("MinterSEAV tests", () => {
       minter.id,
       projectEntityId
     );
-    addNewProjectMinterConfigToStore(projectEntityId, minterAddress);
+    addNewLegacyProjectMinterConfigToStore(projectEntityId, minterAddress);
     const projectMinterConfigEntity = ProjectMinterConfiguration.load(
       projectMinterConfigEntityId
     );
@@ -3207,7 +3207,7 @@ describe("Generic minter details", () => {
       CURRENT_BLOCK_TIMESTAMP.minus(BigInt.fromI32(10))
     );
 
-    const projectMinterConfig = addNewProjectMinterConfigToStore(
+    const projectMinterConfig = addNewLegacyProjectMinterConfigToStore(
       project.id,
       minterAddress
     );
@@ -3397,7 +3397,7 @@ describe("Generic minter details", () => {
       CURRENT_BLOCK_TIMESTAMP.minus(BigInt.fromI32(10))
     );
 
-    const projectMinterConfig = addNewProjectMinterConfigToStore(
+    const projectMinterConfig = addNewLegacyProjectMinterConfigToStore(
       project.id,
       minterAddress
     );
@@ -3463,7 +3463,7 @@ describe("Generic minter details", () => {
       CURRENT_BLOCK_TIMESTAMP.minus(BigInt.fromI32(10))
     );
 
-    const projectMinterConfig = addNewProjectMinterConfigToStore(
+    const projectMinterConfig = addNewLegacyProjectMinterConfigToStore(
       project.id,
       minterAddress
     );
@@ -3525,7 +3525,7 @@ describe("Generic minter details", () => {
       CURRENT_BLOCK_TIMESTAMP.minus(BigInt.fromI32(10))
     );
 
-    const projectMinterConfig = addNewProjectMinterConfigToStore(
+    const projectMinterConfig = addNewLegacyProjectMinterConfigToStore(
       project.id,
       minterAddress
     );
@@ -3577,7 +3577,7 @@ describe("Generic minter details", () => {
       CURRENT_BLOCK_TIMESTAMP.minus(BigInt.fromI32(10))
     );
 
-    const projectMinterConfig = addNewProjectMinterConfigToStore(
+    const projectMinterConfig = addNewLegacyProjectMinterConfigToStore(
       project.id,
       minterAddress
     );
@@ -3643,7 +3643,7 @@ describe("Generic minter details", () => {
       CURRENT_BLOCK_TIMESTAMP.minus(BigInt.fromI32(10))
     );
 
-    const projectMinterConfig = addNewProjectMinterConfigToStore(
+    const projectMinterConfig = addNewLegacyProjectMinterConfigToStore(
       project.id,
       minterAddress
     );
@@ -3695,7 +3695,7 @@ describe("Generic minter details", () => {
       CURRENT_BLOCK_TIMESTAMP.minus(BigInt.fromI32(10))
     );
 
-    const projectMinterConfig = addNewProjectMinterConfigToStore(
+    const projectMinterConfig = addNewLegacyProjectMinterConfigToStore(
       project.id,
       minterAddress
     );
@@ -3751,7 +3751,7 @@ describe("Generic minter details", () => {
       CURRENT_BLOCK_TIMESTAMP.minus(BigInt.fromI32(10))
     );
 
-    const projectMinterConfig = addNewProjectMinterConfigToStore(
+    const projectMinterConfig = addNewLegacyProjectMinterConfigToStore(
       project.id,
       minterAddress
     );
@@ -3810,7 +3810,7 @@ describe("MinterHolder-specific tests", () => {
         CURRENT_BLOCK_TIMESTAMP.minus(BigInt.fromI32(10))
       );
 
-      const projectMinterConfig = addNewProjectMinterConfigToStore(
+      const projectMinterConfig = addNewLegacyProjectMinterConfigToStore(
         project.id,
         minterAddress
       );
@@ -3883,7 +3883,7 @@ describe("MinterHolder-specific tests", () => {
         CURRENT_BLOCK_TIMESTAMP.minus(BigInt.fromI32(10))
       );
 
-      const projectMinterConfig = addNewProjectMinterConfigToStore(
+      const projectMinterConfig = addNewLegacyProjectMinterConfigToStore(
         project.id,
         minterAddress
       );
@@ -3958,7 +3958,7 @@ describe("MinterHolder-specific tests", () => {
 
       let testAddy = randomAddressGenerator.generateRandomAddress();
 
-      const projectMinterConfig = addNewProjectMinterConfigToStore(
+      const projectMinterConfig = addNewLegacyProjectMinterConfigToStore(
         project.id,
         minterAddress
       );
@@ -4029,7 +4029,7 @@ describe("MinterHolder-specific tests", () => {
         randomAddressGenerator.generateRandomAddress()
       ];
 
-      const projectMinterConfig = addNewProjectMinterConfigToStore(
+      const projectMinterConfig = addNewLegacyProjectMinterConfigToStore(
         project.id,
         minterAddress
       );
@@ -4141,7 +4141,6 @@ describe("MinterHolder-specific tests", () => {
       const minter = addNewMinterToStore(minterType);
       const minterAddress = Address.fromString(minter.id);
 
-      minter.coreContract = TEST_CONTRACT_ADDRESS.toHexString();
       minter.type = minterType;
       minter;
       const testAddy = randomAddressGenerator.generateRandomAddress();
