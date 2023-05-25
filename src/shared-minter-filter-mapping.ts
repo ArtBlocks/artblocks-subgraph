@@ -26,7 +26,7 @@ import {
   loadOrCreateCoreRegistry,
   generateMinterFilterContractAllowlistId,
   generateContractSpecificId,
-  getProjectMinterConfigId
+  loadOrCreateAndSetProjectMinterConfiguration
 } from "./helpers";
 
 export function handleDeployed(event: Deployed): void {
@@ -332,53 +332,4 @@ function loadOrCreateMinterFilterContractAllowlist(
   contractAllowlist.save();
 
   return contractAllowlist;
-}
-
-/**
- * Loads or creates a ProjectMinterConfiguration entity for the given project
- * and minter, and sets the project's minter configuration to the new or
- * existing ProjectMinterConfiguration entity.
- * Updates the project's updatedAt to the timestamp, and saves entity.
- * @dev this is very similar to the loadOrCreateProjectMinterConfiguration
- * function in the legacy-minter-filter-mapping.ts file, but inputs are
- * slightly different for improved robustness.
- * @param project
- * @param minter
- * @param timestamp
- * @returns
- */
-export function loadOrCreateAndSetProjectMinterConfiguration(
-  project: Project,
-  minter: Minter,
-  timestamp: BigInt
-): ProjectMinterConfiguration {
-  const targetProjectMinterConfigId = getProjectMinterConfigId(
-    minter.id,
-    project.id
-  );
-
-  let projectMinterConfig = ProjectMinterConfiguration.load(
-    targetProjectMinterConfigId
-  );
-
-  // create new project minter config if it doesn't exist
-  if (!projectMinterConfig) {
-    projectMinterConfig = new ProjectMinterConfiguration(
-      targetProjectMinterConfigId
-    );
-    projectMinterConfig.project = project.id;
-    projectMinterConfig.minter = minter.id;
-    projectMinterConfig.priceIsConfigured = false;
-    projectMinterConfig.currencySymbol = "ETH";
-    projectMinterConfig.currencyAddress = Address.zero();
-    projectMinterConfig.purchaseToDisabled = false;
-    projectMinterConfig.extraMinterDetails = "{}";
-    projectMinterConfig.save();
-  }
-
-  project.updatedAt = timestamp;
-  project.minterConfiguration = projectMinterConfig.id;
-  project.save();
-
-  return projectMinterConfig;
 }

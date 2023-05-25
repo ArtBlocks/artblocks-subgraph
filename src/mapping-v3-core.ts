@@ -10,6 +10,8 @@ import {
   IGenArt721CoreContractV3_Base
 } from "../generated/IGenArt721CoreV3_Base/IGenArt721CoreContractV3_Base";
 
+import { IMinterFilterV1 } from "../generated/IGenArt721CoreV3_Base/IMinterFilterV1";
+
 import {
   ProjectExternalAssetDependenciesLocked,
   GatewayUpdated,
@@ -32,9 +34,14 @@ import {
 
 import { MinterFilterV1 } from "../generated/MinterFilterV1/MinterFilterV1";
 import {
-  loadOrCreateAndSetProjectMinterConfiguration,
-  loadOrCreateMinterFilter
+  loadOrCreateAndSetProjectMinterConfiguration as legacyLoadOrCreateAndSetProjectMinterConfiguration,
+  loadOrCreateMinterFilter as legacyLoadOrCreateLegacyMinterFilter
 } from "./legacy-minter-filter-mapping";
+
+import {
+  loadOrCreateAndSetProjectMinterConfiguration,
+  loadOrCreateMinter
+} from "./helpers";
 
 import {
   Project,
@@ -57,7 +64,8 @@ import {
   generateProjectScriptId,
   addWhitelisting,
   removeWhitelisting,
-  generateTransferId
+  generateTransferId,
+  loadOrCreateSharedMinterFilter
 } from "./helpers";
 
 import {
@@ -620,47 +628,70 @@ function _handleMinterUpdated<T>(contract: T, event: MinterUpdated): void {
   // minter filter is set
   clearAllMinterConfigurations(contract, event.block.timestamp);
 
-  let newMinterFilterAddress = event.params._currentMinter.toHexString();
-  if (newMinterFilterAddress == Address.zero().toHexString()) {
+  let newMinterFilterAddress = event.params._currentMinter;
+  if (newMinterFilterAddress.toHexString() == Address.zero().toHexString()) {
     // only when MinterFilter is zero address should we should assume
     // the  minter is not a MinterFilter contract
     // update contract entity with null MinterFilter
     contractEntity.minterFilter = null;
     contractEntity.mintWhitelisted = [];
-    contractEntity.registeredOn = null;
+    contractEntity.registeredOn = null; // needed?
   } else {
     // we can assume the minter is a MinterFilter contract.
-    // @dev This currently assues that this is a Legacy MinterFilter contract
     contractEntity.mintWhitelisted = [event.params._currentMinter];
-    let minterFilterContract = MinterFilterV1.bind(event.params._currentMinter);
-    // create and save minter filter entity if doesn't exist
-    loadOrCreateMinterFilter(
-      Address.fromString(newMinterFilterAddress),
-      event.block.timestamp
-    );
-    // check that the MinterFilter's core contract is the contract that emitted
-    // the event.
-    if (
-      minterFilterContract.genArt721CoreAddress().toHexString() !=
-      event.address.toHexString()
-    ) {
-      // if the minter filter's core contract is not the contract that emitted
-      // the event, then we should null the core contract entity's minterFilter
-      // field (since invalid minter filter), keep mintWhitelisted as the
-      // new address (technically the new minter could mint) and warn because
-      // this is an unintended state.
-      contractEntity.minterFilter = null;
-      log.warning(
-        "[WARN] Invalid minter filter at address {} set on core contract {} - minter filter's core contract is not the contract that emitted the event.",
-        [newMinterFilterAddress, contractEntity.id]
+    // branch logic based on if the MinterFilter is a shared MinterFilter, or a
+    // legacy MinterFilter
+    if (getIsLegacyMinterFilter(newMinterFilterAddress)) {
+      // This is a legacy (non-shared) MinterFilter
+      let minterFilterContract = MinterFilterV1.bind(newMinterFilterAddress);
+      // create and save minter filter entity if doesn't exist
+      legacyLoadOrCreateLegacyMinterFilter(
+        newMinterFilterAddress,
+        event.block.timestamp
       );
+      // check that the MinterFilter's core contract is the contract that emitted
+      // the event.
+      if (
+        // TODO - make this a try_
+        minterFilterContract.genArt721CoreAddress().toHexString() !=
+        event.address.toHexString()
+      ) {
+        // if the minter filter's core contract is not the contract that emitted
+        // the event, then we should null the core contract entity's minterFilter
+        // field (since invalid minter filter), keep mintWhitelisted as the
+        // new address (technically the new minter could mint) and warn because
+        // this is an unintended state.
+        contractEntity.minterFilter = null;
+        log.warning(
+          "[WARN] Invalid minter filter at address {} set on core contract {} - minter filter's core contract is not the contract that emitted the event.",
+          [newMinterFilterAddress.toHexString(), contractEntity.id]
+        );
+      } else {
+        // update contract entity with new valid MinterFilter ID
+        contractEntity.minterFilter = newMinterFilterAddress.toHexString();
+        // legacy MinterFilters have a dummy CoreRegistry with same id as core contract
+        contractEntity.registeredOn = event.address.toHexString();
+        // sync all pre-set projectMinterConfigurations
+        legacyPopulateAllExistingMinterConfigurations(
+          minterFilterContract,
+          contract,
+          event.block.timestamp
+        );
+      }
     } else {
-      // update contract entity with new valid MinterFilter ID
-      contractEntity.minterFilter = newMinterFilterAddress;
-      // legacy MinterFilters have a dummy CoreRegistry with same id as core contract
-      contractEntity.registeredOn = event.address.toHexString();
-      // sync all pre-set projectMinterConfigurations
-      populateAllExistingMinterConfigurations(
+      // This is a shared MinterFilter
+      let minterFilterContract = IMinterFilterV1.bind(newMinterFilterAddress);
+      // create and save minter filter entity if doesn't exist
+      const sharedMinterFilter = loadOrCreateSharedMinterFilter(
+        newMinterFilterAddress,
+        event.block.timestamp
+      );
+      // update contract entity with new MinterFilter ID
+      contractEntity.minterFilter = sharedMinterFilter.id;
+      // shared MinterFilters have a non-nullable CoreRegistry
+      contractEntity.registeredOn = sharedMinterFilter.coreRegistry;
+      // sync all pre-existing projectMinterConfigurations
+      PopulateAllExistingMinterConfigurations(
         minterFilterContract,
         contract,
         event.block.timestamp
@@ -1188,8 +1219,8 @@ function clearAllMinterConfigurations<T>(contract: T, timestamp: BigInt): void {
   }
 }
 
-// Populate all project minter configurations from a given minter filter
-function populateAllExistingMinterConfigurations<T>(
+// Populate all project minter configurations from a given MinterFilterV1
+function legacyPopulateAllExistingMinterConfigurations<T>(
   minterFilterContract: MinterFilterV1,
   contract: T,
   timestamp: BigInt
@@ -1221,13 +1252,82 @@ function populateAllExistingMinterConfigurations<T>(
     );
 
     if (project) {
-      loadOrCreateAndSetProjectMinterConfiguration(
+      legacyLoadOrCreateAndSetProjectMinterConfiguration(
         project,
         minterAddress,
         timestamp
       );
     }
   }
+}
+
+// Populate all project minter configurations from a given shared MinterFilter
+// (e.g. IMinterFilterV1)
+function PopulateAllExistingMinterConfigurations<T>(
+  minterFilterContract: IMinterFilterV1,
+  contract: T,
+  timestamp: BigInt
+): void {
+  if (
+    !(
+      contract instanceof GenArt721CoreV3 ||
+      contract instanceof GenArt721CoreV3_Engine ||
+      contract instanceof GenArt721CoreV3_Engine_Flex
+    )
+  ) {
+    return;
+  }
+  // Check the new minter filter for any pre-allowlisted minters and update Projects accordingly
+  let numProjectsWithMinters = minterFilterContract.getNumProjectsOnContractWithMinters(
+    contract._address
+  );
+  for (
+    let i = BigInt.fromI32(0);
+    i.lt(numProjectsWithMinters);
+    i = i.plus(BigInt.fromI32(1))
+  ) {
+    let projectAndMinterInfo = minterFilterContract.getProjectAndMinterInfoOnContractAt(
+      contract._address,
+      i
+    );
+    let projectId = projectAndMinterInfo.value0;
+
+    let project = Project.load(
+      generateContractSpecificId(contract._address, projectId)
+    );
+
+    if (project) {
+      let minterAddress = projectAndMinterInfo.value1;
+      const minter = loadOrCreateMinter(minterAddress, timestamp);
+      loadOrCreateAndSetProjectMinterConfiguration(project, minter, timestamp);
+    }
+  }
+}
+
+/**
+ * Helper function that determines if a minter filter at address `minterFilterAddress`
+ * is a legacy MinterFilter (non-shared) or not.
+ * @dev the logic in this function maneuvers around the fact that MinterFilterV0, and
+ * SOME MinterFilterV1 do not implement the `minterFilterType()` external function.
+ * behavior when called.
+ * @param minterFilterAddress
+ * @returns true if the minter filter is a legacy MinterFilter, false otherwise.
+ */
+function getIsLegacyMinterFilter(minterFilterAddress: Address): boolean {
+  // optimistically bind to IMinterFilterV1 and check the minterFilterType() function
+  // @dev MinterFilterV0 and V1 sometimes do not implement this function
+  let minterFilterContract = IMinterFilterV1.bind(minterFilterAddress);
+  let minterFilterTypeResult = minterFilterContract.try_minterFilterType();
+  if (minterFilterTypeResult.reverted) {
+    // only legacy MinterFilters don't implement the minterFilterType() function,
+    // so we can assume this is a legacy MinterFilter
+    return true;
+  }
+  // if the minter filter does implement the minterFilterType() function, then
+  // we can assume it is only a legacy minter filter if the minterFilterType()
+  // function returns "MinterFilterV1" (since MinterFilterV0 does not implement,
+  // and MinterFilterV1 SOMETIMES returns "MinterFilterV1")
+  return minterFilterTypeResult.value == "MinterFilterV1";
 }
 
 /** END HELPERS ***/

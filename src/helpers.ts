@@ -14,6 +14,7 @@ import { IFilteredMinterV2 } from "../generated/MinterSetPrice/IFilteredMinterV2
 import {
   Minter,
   ProjectMinterConfiguration,
+  Project,
   Account,
   Whitelisting,
   Receipt,
@@ -233,6 +234,58 @@ export function loadOrCreateCoreRegistry(address: Address): CoreRegistry {
   return coreRegistry;
 }
 
+/**
+ * Loads or creates a ProjectMinterConfiguration entity for the given project
+ * and minter, and sets the project's minter configuration to the new or
+ * existing ProjectMinterConfiguration entity.
+ * Updates the project's updatedAt to the timestamp, and saves entity.
+ * This is only for a shared minter filter.
+ * @dev this is very similar to the loadOrCreateProjectMinterConfiguration
+ * function in the legacy-minter-filter-mapping.ts file, but inputs are
+ * slightly different for improved robustness.
+ * @param project
+ * @param minter
+ * @param timestamp
+ * @returns
+ */
+export function loadOrCreateAndSetProjectMinterConfiguration(
+  project: Project,
+  minter: Minter,
+  timestamp: BigInt
+): ProjectMinterConfiguration {
+  const targetProjectMinterConfigId = getProjectMinterConfigId(
+    minter.id,
+    project.id
+  );
+
+  let projectMinterConfig = ProjectMinterConfiguration.load(
+    targetProjectMinterConfigId
+  );
+
+  // create new project minter config if it doesn't exist
+  if (!projectMinterConfig) {
+    projectMinterConfig = new ProjectMinterConfiguration(
+      targetProjectMinterConfigId
+    );
+    projectMinterConfig.project = project.id;
+    projectMinterConfig.minter = minter.id;
+    projectMinterConfig.priceIsConfigured = false;
+    projectMinterConfig.currencySymbol = "ETH";
+    projectMinterConfig.currencyAddress = Address.zero();
+    projectMinterConfig.purchaseToDisabled = false;
+    projectMinterConfig.extraMinterDetails = "{}";
+    projectMinterConfig.save();
+  }
+
+  project.updatedAt = timestamp;
+  project.minterConfiguration = projectMinterConfig.id;
+  project.save();
+
+  return projectMinterConfig;
+}
+
+// @dev this is intended to work with legacy (non-shared) and new (shared)
+// minters
 export function loadOrCreateMinter(
   minterAddress: Address,
   timestamp: BigInt
