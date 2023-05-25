@@ -31,7 +31,7 @@ import {
   handleMinterRevoked,
   handleProjectMinterRegistered,
   handleProjectMinterRemoved
-} from "../../../src/minter-filter-mapping";
+} from "../../../src/legacy-minter-filter-mapping";
 import {
   addNewMinterToStore,
   addNewLegacyProjectMinterConfigToStore,

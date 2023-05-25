@@ -34,7 +34,7 @@ import { MinterFilterV1 } from "../generated/MinterFilterV1/MinterFilterV1";
 import {
   loadOrCreateAndSetProjectMinterConfiguration,
   loadOrCreateMinterFilter
-} from "./minter-filter-mapping";
+} from "./legacy-minter-filter-mapping";
 
 import {
   Project,

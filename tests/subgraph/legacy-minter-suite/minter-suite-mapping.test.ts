@@ -137,7 +137,7 @@ import {
   handleAuctionSettled,
   handleProjectNextTokenUpdated,
   handleProjectNextTokenEjected
-} from "../../../src/minter-suite-mapping";
+} from "../../../src/legacy-minter-suite-mapping";
 
 import {
   DAExpMintersToTest,
