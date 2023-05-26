@@ -172,7 +172,7 @@ export function handleMinterRevoked(event: MinterRevoked): void {
   if (!minter || !minterFilter || minter.minterFilter != minterFilter.id) {
     return;
   }
-  // keep the Minter in the store to avoid having to re-populate it is
+  // keep the Minter in the store to avoid having to re-populate if it is
   // re-approved
 
   // remove the minter from the list of allowlisted minters
