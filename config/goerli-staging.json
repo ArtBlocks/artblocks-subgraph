@@ -1,10 +1,30 @@
 {
   "network": "goerli",
-  "genArt721CoreV3Contracts": [],
+  "iGenArt721CoreContractV3_BaseContracts": [
+    {
+      "address": "0xB614C578062a62714c927CD8193F0b8Bfb90055C",
+      "name": "Artist Staging Goerli Flagship Core V3 Contract",
+      "startBlock": 7723578
+    }
+  ],
+  "ownableGenArt721CoreV3Contracts": [
+    {
+      "address": "0xB614C578062a62714c927CD8193F0b8Bfb90055C",
+      "name": "Artist Staging Goerli Flagship Core V3 Contract",
+      "startBlock": 7723578
+    }
+  ],
+  "iERC721GenArt721CoreV3Contracts": [
+    {
+      "address": "0xB614C578062a62714c927CD8193F0b8Bfb90055C",
+      "name": "Artist Staging Goerli Flagship Core V3 Contract",
+      "startBlock": 7723578
+    }
+  ],
   "genArt721CoreContracts": [
     {
       "address": "0xDa62f67BE7194775A75BE91CBF9FEeDcC5776D4b",
-      "name": "Artist Staging Goerli Flagship Core Contract",
+      "name": "Artist Staging Goerli Flagship Core V1 Contract",
       "startBlock": 7011002
     }
   ],
@@ -56,98 +76,385 @@
     {
       "address": "0xCa40b3b63F7181aeC95F74dBEb477655a7B87EC0",
       "name": "Art Blocks x Pace"
+    },
+    {
+      "address": "0xD94C7060808f3c876824E57e685702f3834D2e13",
+      "name": "ITERATION-02",
+      "startBlock": 7917739
+    },
+    {
+      "address": "0xAbf9B1c2c14399CFD1753BE2090b7dA3c0A1434B",
+      "name": "VerticalCrypto Gen Art",
+      "startBlock": 8171667
+    },
+    {
+      "address": "0x437A628E93B2b7C6503B3F6695D83362A3910d9A",
+      "name": "Tender",
+      "startBlock": 8268110
+    },
+    {
+      "address": "0x47e2df2723238f913741Cc6b1963e76fdfD19B94",
+      "name": "fab DAO",
+      "startBlock": 8268387
+    },
+    {
+      "address": "0x84FB2A4Cf29425f77098f5fBFE1C12B35A6BBbbf",
+      "name": "Art Blocks Engine Test",
+      "startBlock": 8268432
+    },
+    {
+      "address": "0xbc734314FB15C77087D586E32A528eEe90fE6d4D",
+      "name": "CoinDesk Deployer",
+      "startBlock": 8407834
+    },
+    {
+      "address": "0xe2bD5181D87ffC02815E96C35fE13A7726233500",
+      "name": "newrafael.work",
+      "startBlock": 8346750
+    }
+  ],
+  "engineFlexContracts": [
+    {
+      "address": "0x7077e777C29ae870d6842B4D1E94511077c99825",
+      "name": "AB Engine Flex Demo, Goerli Staging",
+      "startBlock": 7665745
+    },
+    {
+      "address": "0x2146a41f2c1432895d6d0adf9c60bf0a226bac0e",
+      "name": "Bright Moments - Flex",
+      "startBlock": 7705830
+    },
+    {
+      "address": "0x9ff1079a71dD0C77336466a008A4bB817028613c",
+      "name": "VerseGen",
+      "startBlock": 7793537
+    },
+    {
+      "address": "0x088098F7438773182b703625C4128aFf85fcFfC4",
+      "name": "ATP Love",
+      "startBlock": 7793577
+    },
+    {
+      "address": "0x28b82AA5bb6d00363ae0FBC5ecaD689Ae49BC82B",
+      "name": "Endaoment Gallery for Good - Flex",
+      "startBlock": 7793596
+    },
+    {
+      "address": "0x48742D38a0809135EFd643c1150BfC13768C3907",
+      "name": "Plottables Flex",
+      "startBlock": 7793677
+    },
+    {
+      "address": "0xc2aeC8A571e8D40d3606fAD9Cd10EbB1731D2816",
+      "name": "GENCLO Flex",
+      "startBlock": 7917787
+    },
+    {
+      "address": "0xa87a185E4B53d9FFca91545C9090dE1AF4A5Eadb",
+      "name": "TRAMExCPG",
+      "startBlock": 8407910
+    },
+    {
+      "address": "0x9dF9dc3Fe9985aa4e1F93543f5a20688f49E6dCa",
+      "name": "XCORE",
+      "startBlock": 8165411
+    },
+    {
+      "address": "0x883eF3c3E22320c423D0eF8859454a36b5c8746d",
+      "name": "Art Blocks FLEX Engine Test",
+      "startBlock": 8268432
+    },
+    {
+      "address": "0x783D27cF1Ed18bEDf1360902ce80E44DC6F673B4",
+      "name": "VerticalCrypto Gen Art (Flex)",
+      "startBlock": 8346736
+    },
+    {
+      "address": "0xBCb1343e7ef0C25d6BFB78BA5B4DA9200946aaf8",
+      "name": "Venus Over Manhattan",
+      "startBlock": 8346719
+    },
+    {
+      "address": "0x0eB38A2666A74a8d4a8cb4E718B699E1651a4893",
+      "name": "Unit London",
+      "startBlock": 8485960
+    },
+    {
+      "address": "0x0e1568b7651f257401ebc5A4ff2B14Bc8797dC3c",
+      "name": "Flex Test (Doodle Labs)",
+      "startBlock": 8470477
+    },
+    {
+      "address": "0x7C6EFC1255206F92696fde7502aaCEd2B461C383",
+      "name": "HODLERSCollective Flex",
+      "startBlock": 8608217
+    },
+    {
+      "address": "0x29816c40Af7eDadFEae679a5e8d5876382bfa12D",
+      "name": "Outland Flex",
+      "startBlock": 8608211
     }
   ],
   "minterFilterV0Contracts": [
     {
       "address": "0xdB2f4B10Bb32D1E0cfD9468bE48C1C8c63Bc0DDD",
-      "name": "Art Blocks Flagship",
+      "name": "Art Blocks Flagship Minter Filter for V1 core",
       "startBlock": 7011002
     },
     {
       "address": "0x8aD21E9eebfDa9Af4D4384C747b74723E29FBB51",
       "name": "Art Blocks x Pace",
       "startBlock": 7011002
-    },
-    {
-      "address": "0x60c8DbC88A2BA176C99A53571bb1CfCdB946786F",
-      "name": "AB Engine Flex Demo",
-      "startBlock": 7410621
     }
   ],
-  "minterSetPriceV1Contracts": [
+  "minterFilterV1Contracts": [
+    {
+      "address": "0x6eA558Bb1A3C5437970AdA80f8c686448A9c31fC",
+      "name": "Art Blocks Flagship Minter Filter for V3 core",
+      "startBlock": 7723580
+    },
+    {
+      "address": "0x5E22FBBB6bb2C45aE060b4C96f5039efdF7Fb328",
+      "name": "Minter Filter for ABxPace core at 0x0eba0bd3702d850EEc7a8215EB53FFC293c42341",
+      "startBlock": 8178165
+    },
+    {
+      "address": "0x75b123eAcBf813804bAc83e1D6e5c3d1758746e6",
+      "name": "Minter Filter for ABxBMG core at 0x5112c52535449513c81bDF113b8DCC757d7f122b",
+      "startBlock": 8178172
+    },
+    {
+      "address": "0x9bC71a0380f2cc5C099e58b0d836bEddB1B5CE1C",
+      "name": "Minter Filter for AB Managed Engine core at 0xa504BF82Db6347165A39294FB0CaE761074661Ee",
+      "startBlock": 8178177
+    }
+  ],
+  "minterSetPriceContracts": [
     {
       "address": "0x7d7571E8D507e8AEB61a6484c42a98e50894Aa80",
-      "name": "Art Blocks Flagship",
+      "name": "V1 Flagship Minter for V1 core",
       "startBlock": 7011002
     },
     {
       "address": "0x3851b8f754E77f07e0a08425d280c1B4fe4e3363",
-      "name": "Art Blocks x Pace",
+      "name": "V1 Art Blocks x Pace",
       "startBlock": 7011002
     },
     {
-      "address": "0x6016f9360D178792A45DC69d937673382573f7c1",
-      "name": "AB Engine Flex Demo",
-      "startBlock": 7410621
+      "address": "0x3CB6381203f6c9d75B70F0af70E905cC67d68437",
+      "name": "V2 Flagship Minter for V3 core",
+      "startBlock": 7723582
+    },
+    {
+      "address": "0xb5629f232cE932E214Fb548Ed049795b04e58FB9",
+      "name": "V4 minter for V3 Flagship core",
+      "startBlock": 8405833
+    },
+    {
+      "address": "0xde6DCA519049473Da8826c57B4F45f6dE7f22a73",
+      "name": "V4 minter for ABxPace V3 Engine core",
+      "startBlock": 8411200
+    },
+    {
+      "address": "0xcBA628BcF6f458f6F929d875B69FE5f0F3fB99b6",
+      "name": "V4 minter for ABxBMG V3 Engine core",
+      "startBlock": 8411200
     }
   ],
-  "minterSetPriceERC20V1Contracts": [
+  "minterSetPriceERC20Contracts": [
     {
       "address": "0x67688F11ccf152B3baC51e0256245467AfEE60DB",
-      "name": "Art Blocks Flagship",
+      "name": "V1 Flagship Minter for V1 core",
       "startBlock": 7011002
     },
     {
       "address": "0x5749E012767FDA174389d77Adc032e3e880b166c",
-      "name": "Art Blocks x Pace",
+      "name": "V1 Art Blocks x Pace",
       "startBlock": 7011002
     },
     {
-      "address": "0x58dc1cAcFD5A5Ae0180e813b800cb7Bc9Bcb0c41",
-      "name": "AB Engine Flex Demo",
-      "startBlock": 7410621
+      "address": "0x37007e0561E219e77dAF24Ef0984a5488239512A",
+      "name": "V2 Flagship Minter for V3 core",
+      "startBlock": 7723584
+    },
+    {
+      "address": "0x7a1Ee96dCAF0b65Abc68D78D12b81523360838E1",
+      "name": "V4 minter for V3 Flagship core",
+      "startBlock": 8405834
+    },
+    {
+      "address": "0x0D4BeE9AfbB364cF32F37912845C770A4badd83E",
+      "name": "V4 minter for ABxPace V3 Engine core",
+      "startBlock": 8411200
+    },
+    {
+      "address": "0xdADB127c1565156C3Ce004E11db7E1ba626267E7",
+      "name": "V4 minter for ABxBMG V3 Engine core",
+      "startBlock": 8411200
     }
   ],
-  "minterDALinV1Contracts": [
-    {
-      "address": "0xc96cBfb0E378a2474E176da4D41DF3d04f17aCa6",
-      "name": "Art Blocks Flagship",
-      "startBlock": 7011002
-    },
-    {
-      "address": "0xd125111461557f2d8A52848f55Ac4651d2426f88",
-      "name": "Art Blocks x Pace",
-      "startBlock": 7011002
-    },
-    {
-      "address": "0xCc97f86dF835F6bFE8A425d85DEc7314Cc1C951d",
-      "name": "AB Engine Flex Demo",
-      "startBlock": 7410621
-    }
-  ],
-  "minterDAExpV1Contracts": [
+  "minterDAExpContracts": [
     {
       "address": "0xDBB6e9443afC40104B319F51AFD82B38f3c87BA0",
-      "name": "Art Blocks Flagship",
+      "name": "V1 Flagship Minter for V1 core",
       "startBlock": 7011002
     },
     {
       "address": "0xf4015573db8f9E80206296e53a32E20B87Ab1578",
-      "name": "Art Blocks x Pace",
+      "name": "V1 Art Blocks x Pace",
       "startBlock": 7011002
     },
     {
-      "address": "0xF011F938221e6D983733894e0Ca23b937467aa01",
-      "name": "AB Engine Flex Demo",
-      "startBlock": 7410621
+      "address": "0xb61ABA1c6b4079c976Fb664F27a0D9C47b81a05B",
+      "name": "V2 Flagship Minter for V3 core",
+      "startBlock": 7723587
+    },
+    {
+      "address": "0x6FBbfbdbF71D319c5F007C9DF1c2ae63b3F463a6",
+      "name": "V4 minter for V3 Flagship core",
+      "startBlock": 8405827
+    },
+    {
+      "address": "0x5d292CFfD4e3EA08049760D42F8F67bcde4E9260",
+      "name": "V4 minter for ABxPace V3 Engine core",
+      "startBlock": 8411200
+    },
+    {
+      "address": "0x10BD2A01996711b0A66d8D5203a919463383701A",
+      "name": "V4 minter for ABxBMG V3 Engine core",
+      "startBlock": 8411200
     }
   ],
-  "engineFlexContracts": [
+  "minterDALinContracts": [
     {
-      "address": "0x1f2904e50742c43949a912abCC3794F3052a40F7",
-      "name": "AB Engine Flex Demo",
-      "startBlock": 7410621
+      "address": "0xc96cBfb0E378a2474E176da4D41DF3d04f17aCa6",
+      "name": "V1 Flagship Minter for V1 core",
+      "startBlock": 7011002
+    },
+    {
+      "address": "0xd125111461557f2d8A52848f55Ac4651d2426f88",
+      "name": "V1 Art Blocks x Pace",
+      "startBlock": 7011002
+    },
+    {
+      "address": "0xb228C4dce0929D3d1dC7C386ba3cC2c0671e1751",
+      "name": "V2 Flagship Minter for V3 core",
+      "startBlock": 7723585
+    },
+    {
+      "address": "0x99980fEa1397a33E7058E01A73099bfF81d310d2",
+      "name": "V4 minter for V3 Flagship core",
+      "startBlock": 8405830
+    },
+    {
+      "address": "0x1353fd9d3dC70d1a18149C8FB2ADB4FB906DE4E8",
+      "name": "V4 minter for ABxPace V3 Engine core",
+      "startBlock": 8411200
+    },
+    {
+      "address": "0xD00495689D5161C511882364E0C342e12Dcc5f08",
+      "name": "V4 minter for ABxBMG V3 Engine core",
+      "startBlock": 8411200
+    }
+  ],
+  "minterDAExpSettlementContracts": [
+    {
+      "address": "0x1D5E143CDf39ed1c50adF400e7c6c1E7da7c43A7",
+      "name": "V0 Flagship Minter for V3 core",
+      "startBlock": 8339496
+    },
+    {
+      "address": "0xCee138625d669b49bDde0Bf1600A2EaF29C2C9C8",
+      "name": "V1 minter for V3 Flagship core",
+      "startBlock": 8405829
+    },
+    {
+      "address": "0x8ABdb5c40BB6593550ff0027d15D8B6BEc416a24",
+      "name": "V1 minter for ABxPace V3 Engine core",
+      "startBlock": 8411200
+    },
+    {
+      "address": "0x9e05816E151708Efc1C52243a18A0cC804b33819",
+      "name": "V1 minter for ABxBMG V3 Engine core",
+      "startBlock": 8411200
+    }
+  ],
+  "minterMerkleContracts": [
+    {
+      "address": "0x9b452ea5692b732E724AaCAe461F902f58F8fe74",
+      "name": "V0 Flagship Minter for V1 core",
+      "startBlock": 7705061
+    },
+    {
+      "address": "0x0c4Fad825042f84D0Bcc1734829104F951BDFf05",
+      "name": "V1 Flagship Minter for V3 core",
+      "startBlock": 7723588
+    },
+    {
+      "address": "0xD3241C7101D5BDD0A8cC6f866D2d8b7AF1fF1962",
+      "name": "V3 Flagship Minter for V3 core",
+      "startBlock": 8136221
+    },
+    {
+      "address": "0x8632212Fca423fe868C6C93c59DCcAdAB59f4e41",
+      "name": "V5 minter for V3 Flagship core",
+      "startBlock": 8405832
+    },
+    {
+      "address": "0x8F7DbE58B34710510E44FE9d513e54F01729c686",
+      "name": "V5 minter for ABxPace V3 Engine core",
+      "startBlock": 8411200
+    },
+    {
+      "address": "0x7a67130593A161124686EA55484D1A64d99eefc9",
+      "name": "V5 minter for ABxBMG V3 Engine core",
+      "startBlock": 8411200
+    }
+  ],
+  "minterHolderContracts": [
+    {
+      "address": "0x3e8d9D70906d39225bDcb14002cAFD8a652aD97A",
+      "name": "V1 Flagship Minter for V3 core",
+      "startBlock": 7723589
+    },
+    {
+      "address": "0xdCe333bEdFc584E43d7D494393AD4bd990479844",
+      "name": "V2 Flagship Minter for V3 core",
+      "startBlock": 8369991
+    },
+    {
+      "address": "0x0EA91da0C3338f88510cBB2a3cf20Cd1863551a8",
+      "name": "V4 minter for V3 Flagship core",
+      "startBlock": 8405831
+    },
+    {
+      "address": "0xA3ae49B0fE17A0735dBc9f11Fb51122687DbC27E",
+      "name": "V4 minter for ABxPace V3 Engine core",
+      "startBlock": 8411200
+    },
+    {
+      "address": "0xB64116A7D5D84fE9795DD022ea191217A2e32076",
+      "name": "V4 minter for ABxBMG V3 Engine core",
+      "startBlock": 8411200
+    }
+  ],
+  "adminACLV0Contracts": [
+    {
+      "address": "0x94Cc7981227D9e644e153766C386eF47556C3147",
+      "name": "Admin ACL V0 for V3 core",
+      "startBlock": 7723576
+    },
+    {
+      "address": "0xEa698596b6009A622C3eD00dD5a8b5d1CAE4fC36",
+      "name": "Goerli staging Engine registry contract",
+      "startBlock": 8178162
+    }
+  ],
+  "engineRegistryV0Contracts": [
+    {
+      "address": "0xEa698596b6009A622C3eD00dD5a8b5d1CAE4fC36",
+      "name": "Goerli staging engine registry contract",
+      "startBlock": 8178162
     }
   ],
   "startBlock": 7011002

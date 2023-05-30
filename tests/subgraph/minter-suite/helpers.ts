@@ -1,6 +1,30 @@
 import { Address, ethereum, BigInt } from "@graphprotocol/graph-ts";
 import { createMockedFunction } from "matchstick-as";
 
+export const DAExpMintersToTest: string[] = [
+  "MinterDAExpV0",
+  "MinterDAExpV1",
+  "MinterDAExpV2",
+  "MinterDAExpV3",
+  "MinterDAExpV4",
+  "MinterDAExpSettlementV0",
+  "MinterDAExpSettlementV1"
+];
+export const DALinMintersToTest: string[] = [
+  "MinterDALinV0",
+  "MinterDALinV1",
+  "MinterDALinV2",
+  "MinterDALinV3",
+  "MinterDALinV4"
+];
+export const HolderMintersToTest: string[] = [
+  "MinterHolderV0",
+  "MinterHolderV1",
+  "MinterHolderV2",
+  "MinterHolderV3",
+  "MinterHolderV4"
+];
+
 export function mockMinterType(
   minterAddress: Address,
   minterType: string
@@ -10,6 +34,34 @@ export function mockMinterType(
     "minterType",
     "minterType():(string)"
   ).returns([ethereum.Value.fromString(minterType)]);
+}
+
+export function mockDAExpHalfLifeMinMax(
+  minterAddress: Address,
+  halfLifeMin: BigInt,
+  halfLifeMax: BigInt
+): void {
+  createMockedFunction(
+    minterAddress,
+    "minimumPriceDecayHalfLifeSeconds",
+    "minimumPriceDecayHalfLifeSeconds():(uint256)"
+  ).returns([ethereum.Value.fromUnsignedBigInt(halfLifeMin)]);
+  createMockedFunction(
+    minterAddress,
+    "maximumPriceDecayHalfLifeSeconds",
+    "maximumPriceDecayHalfLifeSeconds():(uint256)"
+  ).returns([ethereum.Value.fromUnsignedBigInt(halfLifeMax)]);
+}
+
+export function mockDALinMinAuctionLength(
+  minterAddress: Address,
+  minAuctionLength: BigInt
+): void {
+  createMockedFunction(
+    minterAddress,
+    "minimumAuctionLengthSeconds",
+    "minimumAuctionLengthSeconds():(uint256)"
+  ).returns([ethereum.Value.fromUnsignedBigInt(minAuctionLength)]);
 }
 
 export function mockMinterFilterAddress(

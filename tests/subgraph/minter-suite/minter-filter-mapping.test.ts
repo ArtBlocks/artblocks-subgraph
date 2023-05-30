@@ -11,6 +11,7 @@ import {
 import { IsCanonicalMinterFilter } from "../../../generated/MinterFilterV0/MinterFilterV0";
 // IMinterFilterV0 is the interface for MinterFilterV0 and MinterFilterV1
 import {
+  Deployed,
   MinterApproved,
   MinterRevoked,
   ProjectMinterRegistered,
@@ -24,13 +25,13 @@ import {
 } from "../../../generated/schema";
 import { getProjectMinterConfigId } from "../../../src/helpers";
 import {
+  handleDeployed,
   handleIsCanonicalMinterFilter,
   handleMinterApproved,
   handleMinterRevoked,
   handleProjectMinterRegistered,
   handleProjectMinterRemoved
 } from "../../../src/minter-filter-mapping";
-import { _retrieveDecodedDataFromCallData } from "../../../src/secondary/opensea/os-v2-mapping";
 import {
   addNewMinterToStore,
   addNewProjectMinterConfigToStore,
@@ -45,7 +46,9 @@ import {
   PROJECT_ENTITY_TYPE,
   PROJECT_MINTER_CONFIGURATION_ENTITY_TYPE,
   RandomAddressGenerator,
-  TEST_CONTRACT_ADDRESS
+  TEST_CONTRACT_ADDRESS,
+  assertJsonFieldEquals,
+  getJSONStringFromEntries
 } from "../shared-helpers";
 import {
   mockCoreContract,
@@ -53,12 +56,61 @@ import {
   mockGetProjectAndMinterInfoAt,
   mockMinterFilterAddress,
   mockMinterType,
-  mockPurchaseToDisabled
+  mockDAExpHalfLifeMinMax,
+  mockDALinMinAuctionLength,
+  mockPurchaseToDisabled,
+  DAExpMintersToTest,
+  DALinMintersToTest
 } from "./helpers";
+import { toJSONValue } from "../../../src/json";
 
 const randomAddressGenerator = new RandomAddressGenerator();
 
+test("handleDeployed should add MinterFilter to the store", () => {
+  clearStore();
+  addTestContractToStore(BigInt.fromI32(0));
+
+  const updateCallBlockTimestamp = CURRENT_BLOCK_TIMESTAMP.plus(
+    BigInt.fromI32(10)
+  );
+  const minterFilterAddress = randomAddressGenerator.generateRandomAddress();
+  const deployedEvent: Deployed = changetype<Deployed>(newMockEvent());
+  deployedEvent.address = minterFilterAddress;
+  deployedEvent.parameters = [];
+  deployedEvent.block.timestamp = updateCallBlockTimestamp;
+
+  // mock function called when adding a new minter
+  createMockedFunction(
+    minterFilterAddress,
+    "genArt721CoreAddress",
+    "genArt721CoreAddress():(address)"
+  ).returns([ethereum.Value.fromAddress(TEST_CONTRACT_ADDRESS)]);
+
+  assert.notInStore(
+    MINTER_FILTER_ENTITY_TYPE,
+    minterFilterAddress.toHexString()
+  );
+
+  handleDeployed(deployedEvent);
+
+  assert.fieldEquals(
+    MINTER_FILTER_ENTITY_TYPE,
+    minterFilterAddress.toHexString(),
+    "id",
+    minterFilterAddress.toHexString()
+  );
+
+  assert.fieldEquals(
+    MINTER_FILTER_ENTITY_TYPE,
+    minterFilterAddress.toHexString(),
+    "coreContract",
+    TEST_CONTRACT_ADDRESS.toHexString()
+  );
+  clearStore();
+});
+
 test("handleIsCanonicalMinterFilter should do nothing if the core contract for the minter filter emitting the event has not been indexed", () => {
+  clearStore();
   const coreContractAddress = randomAddressGenerator.generateRandomAddress();
   const minterFilterAddress = randomAddressGenerator.generateRandomAddress();
 
@@ -304,11 +356,16 @@ test("handleIsCanonicalMinterFilter should populate project minter configuration
   previousMinterConfig2.currencyAddress = project2CurrencyAddress;
   previousMinterConfig2.currencySymbol = project2CurrencySymbol;
   previousMinterConfig2.purchaseToDisabled = project2PurchaseToDisabled;
+  // @dev Deprecated fields ----------------
   previousMinterConfig2.startTime = project2StartTime;
   previousMinterConfig2.endTime = project2EndTime;
   previousMinterConfig2.startPrice = project2StartPrice;
-  previousMinterConfig2.extraMinterDetails = "{}";
-
+  // ---------------------------------------
+  previousMinterConfig2.extraMinterDetails = getJSONStringFromEntries([
+    { key: "startTime", value: toJSONValue(project2StartTime) },
+    { key: "endTime", value: toJSONValue(project2EndTime) },
+    { key: "startPrice", value: toJSONValue(project2StartPrice.toString()) }
+  ]);
   previousMinterConfig2.save();
 
   mockGetProjectAndMinterInfoAt(
@@ -349,11 +406,16 @@ test("handleIsCanonicalMinterFilter should populate project minter configuration
   previousMinterConfig3.currencyAddress = project3CurrencyAddress;
   previousMinterConfig3.currencySymbol = project3CurrencySymbol;
   previousMinterConfig3.purchaseToDisabled = project3PurchaseToDisabled;
+  // @dev Deprecated fields ----------------
   previousMinterConfig3.halfLifeSeconds = project3HalfLifeSeconds;
   previousMinterConfig3.startTime = project3StartTime;
   previousMinterConfig3.startPrice = project3StartPrice;
-  previousMinterConfig3.extraMinterDetails = "{}";
-
+  // ---------------------------------------
+  previousMinterConfig3.extraMinterDetails = getJSONStringFromEntries([
+    { key: "halfLifeSeconds", value: toJSONValue(project3HalfLifeSeconds) },
+    { key: "startTime", value: toJSONValue(project3StartTime) },
+    { key: "startPrice", value: toJSONValue(project3StartPrice.toString()) }
+  ]);
   previousMinterConfig3.save();
 
   mockGetProjectAndMinterInfoAt(
@@ -591,6 +653,28 @@ test("handleIsCanonicalMinterFilter should populate project minter configuration
     "purchaseToDisabled",
     booleanToString(project2PurchaseToDisabled)
   );
+
+  // assert expected updates to extraMinterDetails
+  let updatedProjectMinterConfig2 = ProjectMinterConfiguration.load(configId2);
+  if (updatedProjectMinterConfig2 == null) {
+    throw new Error("project minter config should not be null");
+  }
+  assertJsonFieldEquals(
+    updatedProjectMinterConfig2.extraMinterDetails,
+    "startTime",
+    project2StartTime
+  );
+  assertJsonFieldEquals(
+    updatedProjectMinterConfig2.extraMinterDetails,
+    "endTime",
+    project2EndTime
+  );
+  assertJsonFieldEquals(
+    updatedProjectMinterConfig2.extraMinterDetails,
+    "startPrice",
+    project2StartPrice.toString()
+  );
+  // @dev Deprecated fields ----------------
   assert.fieldEquals(
     PROJECT_MINTER_CONFIGURATION_ENTITY_TYPE,
     configId2,
@@ -609,6 +693,7 @@ test("handleIsCanonicalMinterFilter should populate project minter configuration
     "startPrice",
     project2StartPrice.toString()
   );
+  // ---------------------------------------
 
   // Project 3 asserts
 
@@ -671,6 +756,28 @@ test("handleIsCanonicalMinterFilter should populate project minter configuration
     "purchaseToDisabled",
     booleanToString(project3PurchaseToDisabled)
   );
+  // assert expected updates to extraMinterDetails
+  let updatedProjectMinterConfig3 = ProjectMinterConfiguration.load(configId3);
+  if (updatedProjectMinterConfig3 == null) {
+    throw new Error("project minter config should not be null");
+  }
+  assertJsonFieldEquals(
+    updatedProjectMinterConfig3.extraMinterDetails,
+    "startTime",
+    project3StartTime
+  );
+  assertJsonFieldEquals(
+    updatedProjectMinterConfig3.extraMinterDetails,
+    "halfLifeSeconds",
+    project3HalfLifeSeconds
+  );
+  assertJsonFieldEquals(
+    updatedProjectMinterConfig3.extraMinterDetails,
+    "startPrice",
+    project3StartPrice.toString()
+  );
+
+  // @dev Deprecated fields ----------------
   assert.fieldEquals(
     PROJECT_MINTER_CONFIGURATION_ENTITY_TYPE,
     configId3,
@@ -689,6 +796,7 @@ test("handleIsCanonicalMinterFilter should populate project minter configuration
     "startPrice",
     project3StartPrice.toString()
   );
+  // ---------------------------------------
 });
 
 test("handleMinterApproved should not add minter to minterAllowlist if the approved minter has a different minter filter", () => {
@@ -874,6 +982,165 @@ test("handleMinterApproved should handle the same minter being approved more tha
     "updatedAt",
     CURRENT_BLOCK_TIMESTAMP.toString()
   );
+});
+
+test("handleMinterApproved should populate DA Exp default half life ranges", () => {
+  for (let i = 0; i < DAExpMintersToTest.length; i++) {
+    clearStore();
+    const minterFilterAddress = randomAddressGenerator.generateRandomAddress();
+    const minterFilter = new MinterFilter(minterFilterAddress.toHexString());
+    const minterFilterUpdatedAt = CURRENT_BLOCK_TIMESTAMP.minus(
+      BigInt.fromI32(10)
+    );
+    minterFilter.coreContract = TEST_CONTRACT_ADDRESS.toHexString();
+    minterFilter.updatedAt = minterFilterUpdatedAt;
+    minterFilter.minterAllowlist = [];
+    minterFilter.save();
+
+    const minterToBeApprovedAddress = randomAddressGenerator.generateRandomAddress();
+    const minterToBeApprovedType = DAExpMintersToTest[i];
+    mockMinterType(minterToBeApprovedAddress, minterToBeApprovedType);
+    mockDAExpHalfLifeMinMax(
+      minterToBeApprovedAddress,
+      BigInt.fromI32(300),
+      BigInt.fromI32(3600)
+    );
+    mockMinterFilterAddress(minterToBeApprovedAddress, minterFilterAddress);
+    mockCoreContract(minterToBeApprovedAddress, TEST_CONTRACT_ADDRESS);
+
+    const minterApprovedEvent: MinterApproved = changetype<MinterApproved>(
+      newMockEvent()
+    );
+    minterApprovedEvent.address = minterFilterAddress;
+    minterApprovedEvent.block.timestamp = CURRENT_BLOCK_TIMESTAMP;
+    minterApprovedEvent.parameters = [
+      new ethereum.EventParam(
+        "_minterAddress",
+        ethereum.Value.fromAddress(minterToBeApprovedAddress)
+      ),
+      new ethereum.EventParam(
+        "_minterType",
+        ethereum.Value.fromString(minterToBeApprovedType)
+      )
+    ];
+
+    handleMinterApproved(minterApprovedEvent);
+
+    assert.fieldEquals(
+      MINTER_ENTITY_TYPE,
+      minterToBeApprovedAddress.toHexString(),
+      "type",
+      minterToBeApprovedType
+    );
+    assert.fieldEquals(
+      MINTER_ENTITY_TYPE,
+      minterToBeApprovedAddress.toHexString(),
+      "updatedAt",
+      CURRENT_BLOCK_TIMESTAMP.toString()
+    );
+    // assert expected updates to extraMinterDetails
+    let updatedMinter = Minter.load(minterToBeApprovedAddress.toHexString());
+    if (updatedMinter == null) {
+      throw new Error("minter config should not be null");
+    }
+    assertJsonFieldEquals(
+      updatedMinter.extraMinterDetails,
+      "minimumHalfLifeInSeconds",
+      BigInt.fromI32(300)
+    );
+    assertJsonFieldEquals(
+      updatedMinter.extraMinterDetails,
+      "maximumHalfLifeInSeconds",
+      BigInt.fromI32(3600)
+    );
+
+    // @dev Deprecated fields ----------------
+    assert.fieldEquals(
+      MINTER_ENTITY_TYPE,
+      minterToBeApprovedAddress.toHexString(),
+      "minimumHalfLifeInSeconds",
+      "300"
+    );
+    assert.fieldEquals(
+      MINTER_ENTITY_TYPE,
+      minterToBeApprovedAddress.toHexString(),
+      "maximumHalfLifeInSeconds",
+      "3600"
+    );
+    // ---------------------------------------
+  }
+});
+
+test("handleMinterApproved should populate DA Lin min auction time", () => {
+  for (let i = 0; i < DALinMintersToTest.length; i++) {
+    clearStore();
+    const minterFilterAddress = randomAddressGenerator.generateRandomAddress();
+    const minterFilter = new MinterFilter(minterFilterAddress.toHexString());
+    const minterFilterUpdatedAt = CURRENT_BLOCK_TIMESTAMP.minus(
+      BigInt.fromI32(10)
+    );
+    minterFilter.coreContract = TEST_CONTRACT_ADDRESS.toHexString();
+    minterFilter.updatedAt = minterFilterUpdatedAt;
+    minterFilter.minterAllowlist = [];
+    minterFilter.save();
+
+    const minterToBeApprovedAddress = randomAddressGenerator.generateRandomAddress();
+    const minterToBeApprovedType = DALinMintersToTest[i];
+    mockMinterType(minterToBeApprovedAddress, minterToBeApprovedType);
+    mockDALinMinAuctionLength(minterToBeApprovedAddress, BigInt.fromI32(3600));
+    mockMinterFilterAddress(minterToBeApprovedAddress, minterFilterAddress);
+    mockCoreContract(minterToBeApprovedAddress, TEST_CONTRACT_ADDRESS);
+
+    const minterApprovedEvent: MinterApproved = changetype<MinterApproved>(
+      newMockEvent()
+    );
+    minterApprovedEvent.address = minterFilterAddress;
+    minterApprovedEvent.block.timestamp = CURRENT_BLOCK_TIMESTAMP;
+    minterApprovedEvent.parameters = [
+      new ethereum.EventParam(
+        "_minterAddress",
+        ethereum.Value.fromAddress(minterToBeApprovedAddress)
+      ),
+      new ethereum.EventParam(
+        "_minterType",
+        ethereum.Value.fromString(minterToBeApprovedType)
+      )
+    ];
+
+    handleMinterApproved(minterApprovedEvent);
+
+    assert.fieldEquals(
+      MINTER_ENTITY_TYPE,
+      minterToBeApprovedAddress.toHexString(),
+      "type",
+      minterToBeApprovedType
+    );
+    assert.fieldEquals(
+      MINTER_ENTITY_TYPE,
+      minterToBeApprovedAddress.toHexString(),
+      "updatedAt",
+      CURRENT_BLOCK_TIMESTAMP.toString()
+    );
+    // assert expected updates to extraMinterDetails
+    let updatedMinter = Minter.load(minterToBeApprovedAddress.toHexString());
+    if (updatedMinter == null) {
+      throw new Error("minter config should not be null");
+    }
+    assertJsonFieldEquals(
+      updatedMinter.extraMinterDetails,
+      "minimumAuctionLengthInSeconds",
+      BigInt.fromString("3600")
+    );
+
+    // @dev Deprecated fields ----------------
+    assert.fieldEquals(
+      MINTER_ENTITY_TYPE,
+      minterToBeApprovedAddress.toHexString(),
+      "minimumAuctionLengthInSeconds",
+      "3600"
+    );
+    // ---------------------------------------
+  }
 });
 
 test("handleMinterRevoke should do nothing to MinterFilter if minter is not in store", () => {

@@ -24,6 +24,7 @@ import {
   RandomAddressGenerator,
   mockProjectScriptByIndex,
   mockTokenIdToHash,
+  mockCoreType,
   TEST_CONTRACT_ADDRESS,
   TEST_TOKEN_HASH,
   TEST_TX_HASH,
@@ -51,10 +52,10 @@ import { Project } from "../../../generated/schema";
 import {
   Mint,
   ProjectUpdated,
-  Transfer,
-  PlatformUpdated,
-  OwnershipTransferred
-} from "../../../generated/GenArt721CoreV3/GenArt721CoreV3";
+  PlatformUpdated
+} from "../../../generated/IGenArt721CoreV3_Base/IGenArt721CoreContractV3_Base";
+import { Transfer } from "../../../generated/IERC721GenArt721CoreV3Contract/IERC721";
+import { OwnershipTransferred } from "../../../generated/OwnableGenArt721CoreV3Contract/Ownable";
 import { SuperAdminTransferred } from "../../../generated/AdminACLV0/IAdminACLV0";
 import {
   FIELD_PROJECT_ACTIVE,
@@ -83,18 +84,22 @@ import {
 import {
   generateContractSpecificId,
   generateProjectScriptId,
+  generateTransferId,
   generateWhitelistingId
 } from "../../../src/helpers";
 
 const randomAddressGenerator = new RandomAddressGenerator();
 
-test("GenArt721CoreV3: Can handle Mint", () => {
+const coreType = "GenArt721CoreV3";
+
+test(`${coreType}: Can handle Mint`, () => {
   clearStore();
   // add contract to store
   const projectId = BigInt.fromI32(1);
   const tokenId = BigInt.fromI32(1000001);
   addTestContractToStore(projectId);
   mockTokenIdToHash(TEST_CONTRACT_ADDRESS, tokenId, TEST_TOKEN_HASH);
+  mockCoreType(TEST_CONTRACT_ADDRESS, `${coreType}`);
   // add project to store
   const fullProjectId = generateContractSpecificId(
     TEST_CONTRACT_ADDRESS,
@@ -143,7 +148,7 @@ test("GenArt721CoreV3: Can handle Mint", () => {
   );
 });
 
-test("GenArt721CoreV3: Can handle transfer", () => {
+test(`${coreType}: Can handle transfer`, () => {
   clearStore();
   const tokenId = BigInt.fromI32(0);
   const projectId = BigInt.fromI32(0);
@@ -197,9 +202,94 @@ test("GenArt721CoreV3: Can handle transfer", () => {
     "token",
     fullTokenId
   );
+
+  assert.fieldEquals(
+    TRANSFER_ENTITY_TYPE,
+    generateTransferId(TEST_TX_HASH, logIndex),
+    "blockHash",
+    event.block.hash.toHexString()
+  );
+  assert.fieldEquals(
+    TRANSFER_ENTITY_TYPE,
+    generateTransferId(TEST_TX_HASH, logIndex),
+    "blockNumber",
+    event.block.number.toString()
+  );
+  assert.fieldEquals(
+    TRANSFER_ENTITY_TYPE,
+    generateTransferId(TEST_TX_HASH, logIndex),
+    "blockTimestamp",
+    event.block.timestamp.toString()
+  );
 });
 
-test("GenArt721CoreV3: Handles OwnershipTransferred to new address and zero address, when Contract not in store", () => {
+test("GenArt721CoreV3: Can handle mint transfer", () => {
+  clearStore();
+  const tokenId = BigInt.fromI32(0);
+  const fullTokenId = generateContractSpecificId(
+    TEST_CONTRACT_ADDRESS,
+    tokenId
+  );
+
+  const fromAddress = Address.zero();
+  const toAddress = randomAddressGenerator.generateRandomAddress();
+
+  const logIndex = BigInt.fromI32(0);
+  const event: Transfer = changetype<Transfer>(newMockEvent());
+  event.address = TEST_CONTRACT_ADDRESS;
+  event.transaction.hash = TEST_TX_HASH;
+  event.logIndex = logIndex;
+  event.parameters = [
+    new ethereum.EventParam("from", ethereum.Value.fromAddress(fromAddress)),
+    new ethereum.EventParam("to", ethereum.Value.fromAddress(toAddress)),
+    new ethereum.EventParam(
+      "tokenId",
+      ethereum.Value.fromUnsignedBigInt(tokenId)
+    )
+  ];
+
+  handleTransfer(event);
+
+  assert.fieldEquals(
+    TRANSFER_ENTITY_TYPE,
+    TEST_TX_HASH.toHex() + "-" + logIndex.toString(),
+    "to",
+    toAddress.toHexString()
+  );
+  assert.fieldEquals(
+    TRANSFER_ENTITY_TYPE,
+    TEST_TX_HASH.toHex() + "-" + logIndex.toString(),
+    "from",
+    fromAddress.toHexString()
+  );
+  assert.fieldEquals(
+    TRANSFER_ENTITY_TYPE,
+    TEST_TX_HASH.toHex() + "-" + logIndex.toString(),
+    "token",
+    fullTokenId
+  );
+
+  assert.fieldEquals(
+    TRANSFER_ENTITY_TYPE,
+    generateTransferId(TEST_TX_HASH, logIndex),
+    "blockHash",
+    event.block.hash.toHexString()
+  );
+  assert.fieldEquals(
+    TRANSFER_ENTITY_TYPE,
+    generateTransferId(TEST_TX_HASH, logIndex),
+    "blockNumber",
+    event.block.number.toString()
+  );
+  assert.fieldEquals(
+    TRANSFER_ENTITY_TYPE,
+    generateTransferId(TEST_TX_HASH, logIndex),
+    "blockTimestamp",
+    event.block.timestamp.toString()
+  );
+});
+
+test(`${coreType}: Handles OwnershipTransferred to new address and zero address, when Contract not in store`, () => {
   const newOwners = [
     Address.zero(),
     randomAddressGenerator.generateRandomAddress()
@@ -215,7 +305,7 @@ test("GenArt721CoreV3: Handles OwnershipTransferred to new address and zero addr
     // emitted by the V3 constructor, and we expect item may not be in store.
     // DO add mock contract calls, because we expect the contract to be called
     // during initial contract setup.
-    mockRefreshContractCalls(projectId, null);
+    mockRefreshContractCalls(projectId, coreType, null);
     // overwrite mock function to return the new admin
     createMockedFunction(
       TEST_CONTRACT_ADDRESS,
@@ -308,7 +398,7 @@ test("GenArt721CoreV3: Handles OwnershipTransferred to new address and zero addr
   }
 });
 
-test("GenArt721CoreV3: Handles OwnershipTransferred to new address and zero address, when already in store", () => {
+test(`${coreType}: Handles OwnershipTransferred to new address and zero address, when already in store`, () => {
   const newOwners = [
     randomAddressGenerator.generateRandomAddress(),
     Address.zero()
@@ -324,7 +414,7 @@ test("GenArt721CoreV3: Handles OwnershipTransferred to new address and zero addr
     // expect contract entity to be in store.
     addTestContractToStore(projectId);
     // also add mock contract calls, because that will always be available.
-    mockRefreshContractCalls(projectId, null);
+    mockRefreshContractCalls(projectId, coreType, null);
     // overwrite mock function to return the new admin
     createMockedFunction(
       TEST_CONTRACT_ADDRESS,
@@ -397,14 +487,14 @@ test("GenArt721CoreV3: Handles OwnershipTransferred to new address and zero addr
   }
 });
 
-test("GenArt721CoreV3: Handles PlatformUpdated::nextProjectId", () => {
+test(`${coreType}: Handles PlatformUpdated::nextProjectId`, () => {
   // test for nextProjectId of 0 and 1
   for (let i = 0; i < 2; i++) {
     clearStore();
     // add new contract to store
     const projectId = BigInt.fromI32(i);
     addTestContractToStore(projectId);
-    mockRefreshContractCalls(BigInt.fromI32(i), null);
+    mockRefreshContractCalls(BigInt.fromI32(i), coreType, null);
 
     const event: PlatformUpdated = changetype<PlatformUpdated>(newMockEvent());
     event.address = TEST_CONTRACT_ADDRESS;
@@ -428,13 +518,13 @@ test("GenArt721CoreV3: Handles PlatformUpdated::nextProjectId", () => {
   }
 });
 
-test("GenArt721CoreV3: Handles PlatformUpdated::newProjectsForbidden - default value", () => {
+test(`${coreType}: Handles PlatformUpdated::newProjectsForbidden - default value`, () => {
   // default value is false
   clearStore();
   // add new contract to store
   const projectId = BigInt.fromI32(0);
   addTestContractToStore(projectId);
-  mockRefreshContractCalls(BigInt.fromI32(0), null);
+  mockRefreshContractCalls(BigInt.fromI32(0), coreType, null);
 
   // default value should be false
   assert.fieldEquals(
@@ -445,12 +535,12 @@ test("GenArt721CoreV3: Handles PlatformUpdated::newProjectsForbidden - default v
   );
 });
 
-test("GenArt721CoreV3: Handles PlatformUpdated::newProjectsForbidden - changed value", () => {
+test(`${coreType}: Handles PlatformUpdated::newProjectsForbidden - changed value`, () => {
   clearStore();
   // add new contract to store
   const projectId = BigInt.fromI32(0);
   addTestContractToStore(projectId);
-  mockRefreshContractCalls(BigInt.fromI32(0), null);
+  mockRefreshContractCalls(BigInt.fromI32(0), coreType, null);
 
   // update mock function return value to true
   createMockedFunction(
@@ -482,14 +572,14 @@ test("GenArt721CoreV3: Handles PlatformUpdated::newProjectsForbidden - changed v
   );
 });
 
-test("GenArt721CoreV3: Handles PlatformUpdated::nextProjectId", () => {
+test(`${coreType}: Handles PlatformUpdated::nextProjectId`, () => {
   // test for nextProjectId of 0 and 1
   for (let i = 0; i < 2; i++) {
     clearStore();
     // add new contract to store
     const projectId = BigInt.fromI32(i);
     addTestContractToStore(projectId);
-    mockRefreshContractCalls(BigInt.fromI32(i), null);
+    mockRefreshContractCalls(BigInt.fromI32(i), coreType, null);
 
     const event: PlatformUpdated = changetype<PlatformUpdated>(newMockEvent());
     event.address = TEST_CONTRACT_ADDRESS;
@@ -513,13 +603,13 @@ test("GenArt721CoreV3: Handles PlatformUpdated::nextProjectId", () => {
   }
 });
 
-test("GenArt721CoreV3: Handles PlatformUpdated::artblocksPrimarySalesAddress - default value", () => {
+test(`${coreType}: Handles PlatformUpdated::artblocksPrimarySalesAddress - default value`, () => {
   // default value is false
   clearStore();
   // add new contract to store
   const projectId = BigInt.fromI32(0);
   addTestContractToStore(projectId);
-  mockRefreshContractCalls(BigInt.fromI32(0), null);
+  mockRefreshContractCalls(BigInt.fromI32(0), coreType, null);
 
   // default value should be false
   assert.fieldEquals(
@@ -530,12 +620,12 @@ test("GenArt721CoreV3: Handles PlatformUpdated::artblocksPrimarySalesAddress - d
   );
 });
 
-test("GenArt721CoreV3: Handles PlatformUpdated::artblocksPrimarySalesAddress - changed value", () => {
+test(`${coreType}: Handles PlatformUpdated::artblocksPrimarySalesAddress - changed value`, () => {
   clearStore();
   // add new contract to store
   const projectId = BigInt.fromI32(0);
   addTestContractToStore(projectId);
-  mockRefreshContractCalls(BigInt.fromI32(0), null);
+  mockRefreshContractCalls(BigInt.fromI32(0), coreType, null);
 
   // update mock function return value
   const newAddress = randomAddressGenerator.generateRandomAddress();
@@ -568,13 +658,13 @@ test("GenArt721CoreV3: Handles PlatformUpdated::artblocksPrimarySalesAddress - c
   );
 });
 
-test("GenArt721CoreV3: Handles PlatformUpdated::artblocksSecondarySalesAddress - default value", () => {
+test(`${coreType}: Handles PlatformUpdated::artblocksSecondarySalesAddress - default value`, () => {
   // default value is false
   clearStore();
   // add new contract to store
   const projectId = BigInt.fromI32(0);
   addTestContractToStore(projectId);
-  mockRefreshContractCalls(BigInt.fromI32(0), null);
+  mockRefreshContractCalls(BigInt.fromI32(0), coreType, null);
 
   // default value should be false
   assert.fieldEquals(
@@ -585,12 +675,12 @@ test("GenArt721CoreV3: Handles PlatformUpdated::artblocksSecondarySalesAddress -
   );
 });
 
-test("GenArt721CoreV3: Handles PlatformUpdated::artblocksSecondarySalesAddress - changed value", () => {
+test(`${coreType}: Handles PlatformUpdated::artblocksSecondarySalesAddress - changed value`, () => {
   clearStore();
   // add new contract to store
   const projectId = BigInt.fromI32(0);
   addTestContractToStore(projectId);
-  mockRefreshContractCalls(BigInt.fromI32(0), null);
+  mockRefreshContractCalls(BigInt.fromI32(0), coreType, null);
 
   // update mock function return value
   const newAddress = randomAddressGenerator.generateRandomAddress();
@@ -623,13 +713,13 @@ test("GenArt721CoreV3: Handles PlatformUpdated::artblocksSecondarySalesAddress -
   );
 });
 
-test("GenArt721CoreV3: Handles PlatformUpdated::randomizerAddress - default value", () => {
+test(`${coreType}: Handles PlatformUpdated::randomizerAddress - default value`, () => {
   // default value is false
   clearStore();
   // add new contract to store
   const projectId = BigInt.fromI32(0);
   addTestContractToStore(projectId);
-  mockRefreshContractCalls(BigInt.fromI32(0), null);
+  mockRefreshContractCalls(BigInt.fromI32(0), coreType, null);
 
   // default value should be false
   assert.fieldEquals(
@@ -640,12 +730,12 @@ test("GenArt721CoreV3: Handles PlatformUpdated::randomizerAddress - default valu
   );
 });
 
-test("GenArt721CoreV3: Handles PlatformUpdated::randomizerAddress - changed value", () => {
+test(`${coreType}: Handles PlatformUpdated::randomizerAddress - changed value`, () => {
   clearStore();
   // add new contract to store
   const projectId = BigInt.fromI32(0);
   addTestContractToStore(projectId);
-  mockRefreshContractCalls(BigInt.fromI32(0), null);
+  mockRefreshContractCalls(BigInt.fromI32(0), coreType, null);
 
   // update mock function return value
   const newAddress = randomAddressGenerator.generateRandomAddress();
@@ -678,13 +768,13 @@ test("GenArt721CoreV3: Handles PlatformUpdated::randomizerAddress - changed valu
   );
 });
 
-test("GenArt721CoreV3: Handles PlatformUpdated::curationRegistryAddress - default value", () => {
+test(`${coreType}: Handles PlatformUpdated::curationRegistryAddress - default value`, () => {
   // default value is false
   clearStore();
   // add new contract to store
   const projectId = BigInt.fromI32(0);
   addTestContractToStore(projectId);
-  mockRefreshContractCalls(BigInt.fromI32(0), null);
+  mockRefreshContractCalls(BigInt.fromI32(0), coreType, null);
 
   // default value should be false
   assert.fieldEquals(
@@ -695,12 +785,12 @@ test("GenArt721CoreV3: Handles PlatformUpdated::curationRegistryAddress - defaul
   );
 });
 
-test("GenArt721CoreV3: Handles PlatformUpdated::curationRegistryAddress - changed value", () => {
+test(`${coreType}: Handles PlatformUpdated::curationRegistryAddress - changed value`, () => {
   clearStore();
   // add new contract to store
   const projectId = BigInt.fromI32(0);
   addTestContractToStore(projectId);
-  mockRefreshContractCalls(BigInt.fromI32(0), null);
+  mockRefreshContractCalls(BigInt.fromI32(0), coreType, null);
 
   // update mock function return value
   const newAddress = randomAddressGenerator.generateRandomAddress();
@@ -733,13 +823,13 @@ test("GenArt721CoreV3: Handles PlatformUpdated::curationRegistryAddress - change
   );
 });
 
-test("GenArt721CoreV3: Handles PlatformUpdated::dependencyRegistryAddress - default value", () => {
+test(`${coreType}: Handles PlatformUpdated::dependencyRegistryAddress - default value`, () => {
   // default value is false
   clearStore();
   // add new contract to store
   const projectId = BigInt.fromI32(0);
   addTestContractToStore(projectId);
-  mockRefreshContractCalls(BigInt.fromI32(0), null);
+  mockRefreshContractCalls(BigInt.fromI32(0), coreType, null);
 
   // default value should be false
   assert.fieldEquals(
@@ -750,12 +840,49 @@ test("GenArt721CoreV3: Handles PlatformUpdated::dependencyRegistryAddress - defa
   );
 });
 
-test("GenArt721CoreV3: Handles PlatformUpdated::dependencyRegistryAddress - changed value", () => {
+test(`${coreType}: autoApproveAtistSplitProposals always false on Engine contract`, () => {
   clearStore();
   // add new contract to store
   const projectId = BigInt.fromI32(0);
   addTestContractToStore(projectId);
-  mockRefreshContractCalls(BigInt.fromI32(0), null);
+  mockRefreshContractCalls(BigInt.fromI32(0), coreType, null);
+
+  // update mock function for autoApproveArtistSplitProposals to revert
+  createMockedFunction(
+    TEST_CONTRACT_ADDRESS,
+    "autoApproveArtistSplitProposals",
+    "autoApproveArtistSplitProposals():(bool)"
+  ).reverts();
+
+  // create dummy event to induce contract sync
+  const event: PlatformUpdated = changetype<PlatformUpdated>(newMockEvent());
+  event.address = TEST_CONTRACT_ADDRESS;
+  event.transaction.hash = TEST_TX_HASH;
+  event.logIndex = BigInt.fromI32(0);
+  event.parameters = [
+    new ethereum.EventParam(
+      "_field",
+      ethereum.Value.fromBytes(Bytes.fromUTF8("dummyField"))
+    )
+  ];
+  // handle event
+  handlePlatformUpdated(event);
+
+  // value in store should always be false for Flagship contract
+  assert.fieldEquals(
+    CONTRACT_ENTITY_TYPE,
+    TEST_CONTRACT_ADDRESS.toHexString(),
+    "autoApproveArtistSplitProposals",
+    "false"
+  );
+});
+
+test(`${coreType}: Handles PlatformUpdated::dependencyRegistryAddress - changed value`, () => {
+  clearStore();
+  // add new contract to store
+  const projectId = BigInt.fromI32(0);
+  addTestContractToStore(projectId);
+  mockRefreshContractCalls(BigInt.fromI32(0), coreType, null);
 
   // update mock function return value
   const newAddress = randomAddressGenerator.generateRandomAddress();
@@ -779,22 +906,24 @@ test("GenArt721CoreV3: Handles PlatformUpdated::dependencyRegistryAddress - chan
   // handle event
   handlePlatformUpdated(event);
 
-  // value in store should be updated
+  // value in store should not be updated
+  // We allow the dependency registry to control this field
+  // and not the engine contract so nothing should change.
   assert.fieldEquals(
     CONTRACT_ENTITY_TYPE,
     TEST_CONTRACT_ADDRESS.toHexString(),
     "dependencyRegistry",
-    newAddress.toHexString()
+    Address.zero().toHexString()
   );
 });
 
-test("GenArt721CoreV3: Handles PlatformUpdated::artblocksPrimaryPercentage - default value", () => {
+test(`${coreType}: Handles PlatformUpdated::artblocksPrimaryPercentage - default value`, () => {
   // default value is false
   clearStore();
   // add new contract to store
   const projectId = BigInt.fromI32(0);
   addTestContractToStore(projectId);
-  mockRefreshContractCalls(BigInt.fromI32(0), null);
+  mockRefreshContractCalls(BigInt.fromI32(0), coreType, null);
 
   // default value should be false
   assert.fieldEquals(
@@ -805,12 +934,12 @@ test("GenArt721CoreV3: Handles PlatformUpdated::artblocksPrimaryPercentage - def
   );
 });
 
-test("GenArt721CoreV3: Handles PlatformUpdated::artblocksPrimaryPercentage - changed value", () => {
+test(`${coreType}: Handles PlatformUpdated::artblocksPrimaryPercentage - changed value`, () => {
   clearStore();
   // add new contract to store
   const projectId = BigInt.fromI32(0);
   addTestContractToStore(projectId);
-  mockRefreshContractCalls(BigInt.fromI32(0), null);
+  mockRefreshContractCalls(BigInt.fromI32(0), coreType, null);
 
   // update mock function return value
   const newValue = BigInt.fromI32(13);
@@ -843,13 +972,13 @@ test("GenArt721CoreV3: Handles PlatformUpdated::artblocksPrimaryPercentage - cha
   );
 });
 
-test("GenArt721CoreV3: Handles PlatformUpdated::artblocksSecondaryBPS - default value", () => {
+test(`${coreType}: Handles PlatformUpdated::artblocksSecondaryBPS - default value`, () => {
   // default value is false
   clearStore();
   // add new contract to store
   const projectId = BigInt.fromI32(0);
   addTestContractToStore(projectId);
-  mockRefreshContractCalls(BigInt.fromI32(0), null);
+  mockRefreshContractCalls(BigInt.fromI32(0), coreType, null);
 
   // default value should be false
   assert.fieldEquals(
@@ -860,12 +989,12 @@ test("GenArt721CoreV3: Handles PlatformUpdated::artblocksSecondaryBPS - default 
   );
 });
 
-test("GenArt721CoreV3: Handles PlatformUpdated::artblocksSecondaryBPS - changed value", () => {
+test(`${coreType}: Handles PlatformUpdated::artblocksSecondaryBPS - changed value`, () => {
   clearStore();
   // add new contract to store
   const projectId = BigInt.fromI32(0);
   addTestContractToStore(projectId);
-  mockRefreshContractCalls(BigInt.fromI32(0), null);
+  mockRefreshContractCalls(BigInt.fromI32(0), coreType, null);
 
   // update mock function return value
   const newValue = BigInt.fromI32(250);
@@ -898,13 +1027,13 @@ test("GenArt721CoreV3: Handles PlatformUpdated::artblocksSecondaryBPS - changed 
   );
 });
 
-describe("GenArt721CoreV3: handleIAdminACLV0SuperAdminTransferred", () => {
+describe(`${coreType}: handleIAdminACLV0SuperAdminTransferred`, () => {
   test("should update core when super admin is transferred", () => {
     clearStore();
     // add new contract to store
     const projectId = BigInt.fromI32(0);
     addTestContractToStore(projectId);
-    mockRefreshContractCalls(BigInt.fromI32(0), null);
+    mockRefreshContractCalls(BigInt.fromI32(0), coreType, null);
     // mock AdminACLV0 superAdmin
     const newOwnerSuperAdmin = randomAddressGenerator.generateRandomAddress();
     createMockedFunction(
@@ -954,7 +1083,7 @@ describe("GenArt721CoreV3: handleIAdminACLV0SuperAdminTransferred", () => {
   });
 });
 
-describe("GenArt721CoreV3: handleProjectUpdated", () => {
+describe(`${coreType}: handleProjectUpdated`, () => {
   describe("create", () => {
     beforeEach(() => {
       clearStore();

@@ -5,37 +5,11 @@ subgraph.yaml
 .bin
 tests/.latest.json
 
-# Ignore codege generated for specific contract addresses
-generated/*
+# Ignore generated files
+generated/
+contracts
+tests/e2e/data
+tests/subgraph/.latest.json
 
-# Track generic contract generated code
-!generated/schema.ts
-!generated/AdminACLV0
-!generated/GenArt721
-!generated/GenArt721Core
-!generated/GenArt721Core2
-!generated/GenArt721Core2PBAB
-!generated/GenArt721CorePlus
-!generated/GenArt721CoreV3
-!generated/MinterFilterV0
-!generated/MinterFilterV1
-!generated/MinterDAExpV0
-!generated/MinterDALinV0
-!generated/MinterSetPriceERC20V0
-!generated/MinterSetPriceV0
-!generated/MinterDAExpV1
-!generated/MinterDALinV1
-!generated/MinterSetPriceERC20V1
-!generated/MinterSetPriceV1
-!generated/MinterDAExpV2
-!generated/MinterDALinV2
-!generated/MinterSetPriceERC20V2
-!generated/MinterSetPriceV2
-!generated/MinterHolderV0
-!generated/MinterMerkleV0
-!generated/MinterHolderV1
-!generated/MinterMerkleV1
-!generated/SeaportExchange
-!generated/WyvernExchange
-!generated/LooksRareExchange
-!generated/GenArt721Core2EngineFlex
+# Ignore imported abi files
+abis/*.json

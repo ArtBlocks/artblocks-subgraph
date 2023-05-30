@@ -20,7 +20,9 @@ import {
   addNewProjectToStore,
   MINTER_FILTER_ENTITY_TYPE,
   ONE_ETH_IN_WEI,
-  booleanToString
+  booleanToString,
+  assertJsonFieldEquals,
+  getJSONStringFromEntries
 } from "../shared-helpers";
 
 import {
@@ -33,17 +35,19 @@ import {
 
 import { mockGetProjectAndMinterInfoAt } from "../minter-suite/helpers";
 
-import { ProjectMinterConfiguration } from "../../../generated/schema";
-import { MinterUpdated } from "../../../generated/GenArt721CoreV3/GenArt721CoreV3";
+import { ProjectMinterConfiguration, Minter } from "../../../generated/schema";
+import { MinterUpdated } from "../../../generated/IGenArt721CoreV3_Base/IGenArt721CoreContractV3_Base";
 import { handleMinterUpdated } from "../../../src/mapping-v3-core";
 import { getProjectMinterConfigId } from "../../../src/helpers";
+import { toJSONValue } from "../../../src/json";
 
 const randomAddressGenerator = new RandomAddressGenerator();
 
-test("GenArt721CoreV3/MinterUpdated: should handle setting minter to zero address", () => {
+const coreType = "GenArt721CoreV3";
+test(`${coreType}/MinterUpdated: should handle setting minter to zero address`, () => {
   clearStore();
   const startingProjectId = BigInt.fromI32(100);
-  mockRefreshContractCalls(startingProjectId, null);
+  mockRefreshContractCalls(startingProjectId, coreType, null);
   mockMinterUpdatedCallsNoPreconfiguredProjects(startingProjectId);
 
   const event: MinterUpdated = changetype<MinterUpdated>(newMockEvent());
@@ -75,10 +79,17 @@ test("GenArt721CoreV3/MinterUpdated: should handle setting minter to zero addres
   assert.entityCount(MINTER_FILTER_ENTITY_TYPE, 0);
 });
 
-test("GenArt721CoreV3/MinterUpdated: should list invalid MinterFilter with different core contract as minter, but null MinterFilter", () => {
+test(`${coreType}/MinterUpdated: should list invalid MinterFilter with different core contract as minter, but null MinterFilter`, () => {
   clearStore();
   const startingProjectId = BigInt.fromI32(100);
-  mockRefreshContractCalls(startingProjectId, null);
+  mockRefreshContractCalls(startingProjectId, coreType, null);
+  // override mocked minterContract to return new minter filter address
+  createMockedFunction(
+    TEST_CONTRACT_ADDRESS,
+    "minterContract",
+    "minterContract():(address)"
+  ).returns([ethereum.Value.fromAddress(TEST_MINTER_FILTER_ADDRESS)]);
+
   mockMinterUpdatedCallsNoPreconfiguredProjects(startingProjectId);
   const updateCallBlockTimestamp = CURRENT_BLOCK_TIMESTAMP.plus(
     BigInt.fromI32(10)
@@ -133,10 +144,10 @@ test("GenArt721CoreV3/MinterUpdated: should list invalid MinterFilter with diffe
   );
 });
 
-test("GenArt721CoreV3/MinterUpdated: should create Contract and/or MinterFilter entities when not yet created, associate them", () => {
+test(`${coreType}/MinterUpdated: should create Contract and/or MinterFilter entities when not yet created, associate them`, () => {
   clearStore();
   const startingProjectId = BigInt.fromI32(100);
-  mockRefreshContractCalls(startingProjectId, null);
+  mockRefreshContractCalls(startingProjectId, coreType, null);
   mockMinterUpdatedCallsNoPreconfiguredProjects(startingProjectId);
   const updateCallBlockTimestamp = CURRENT_BLOCK_TIMESTAMP.plus(
     BigInt.fromI32(10)
@@ -188,12 +199,12 @@ test("GenArt721CoreV3/MinterUpdated: should create Contract and/or MinterFilter 
   );
 });
 
-test("GenArt721CoreV3/MinterUpdated: should populate project minter configurations for all projects preconfigured on the minter filter", () => {
+test(`${coreType}/MinterUpdated: should populate project minter configurations for all projects preconfigured on the minter filter`, () => {
   clearStore();
   const startingProjectId = BigInt.fromI32(100);
   addTestContractToStore(startingProjectId);
 
-  mockRefreshContractCalls(startingProjectId, null);
+  mockRefreshContractCalls(startingProjectId, coreType, null);
   mockMinterUpdatedCallsNoPreconfiguredProjects(startingProjectId);
 
   const project0 = addNewProjectToStore(
@@ -357,11 +368,16 @@ test("GenArt721CoreV3/MinterUpdated: should populate project minter configuratio
   previousMinterConfig2.currencyAddress = project2CurrencyAddress;
   previousMinterConfig2.currencySymbol = project2CurrencySymbol;
   previousMinterConfig2.purchaseToDisabled = project2PurchaseToDisabled;
+  // @dev Deprecated fields ----------------
   previousMinterConfig2.startTime = project2StartTime;
   previousMinterConfig2.endTime = project2EndTime;
   previousMinterConfig2.startPrice = project2StartPrice;
-  previousMinterConfig2.extraMinterDetails = "{}";
-
+  // ---------------------------------------
+  previousMinterConfig2.extraMinterDetails = getJSONStringFromEntries([
+    { key: "startTime", value: toJSONValue(project2StartTime) },
+    { key: "endTime", value: toJSONValue(project2EndTime) },
+    { key: "startPrice", value: toJSONValue(project2StartPrice.toString()) }
+  ]);
   previousMinterConfig2.save();
 
   mockGetProjectAndMinterInfoAt(
@@ -402,11 +418,16 @@ test("GenArt721CoreV3/MinterUpdated: should populate project minter configuratio
   previousMinterConfig3.currencyAddress = project3CurrencyAddress;
   previousMinterConfig3.currencySymbol = project3CurrencySymbol;
   previousMinterConfig3.purchaseToDisabled = project3PurchaseToDisabled;
+  // @dev Deprecated fields ----------------
   previousMinterConfig3.halfLifeSeconds = project3HalfLifeSeconds;
   previousMinterConfig3.startTime = project3StartTime;
   previousMinterConfig3.startPrice = project3StartPrice;
-  previousMinterConfig3.extraMinterDetails = "{}";
-
+  // ---------------------------------------
+  previousMinterConfig3.extraMinterDetails = getJSONStringFromEntries([
+    { key: "startTime", value: toJSONValue(project3StartTime) },
+    { key: "halfLifeSeconds", value: toJSONValue(project3HalfLifeSeconds) },
+    { key: "startPrice", value: toJSONValue(project3StartPrice.toString()) }
+  ]);
   previousMinterConfig3.save();
 
   mockGetProjectAndMinterInfoAt(
@@ -645,6 +666,28 @@ test("GenArt721CoreV3/MinterUpdated: should populate project minter configuratio
     "purchaseToDisabled",
     booleanToString(project2PurchaseToDisabled)
   );
+
+  // assert expected updates to extraMinterDetails
+  let updatedProjectMinterConfig = ProjectMinterConfiguration.load(configId2);
+  if (updatedProjectMinterConfig == null) {
+    throw new Error("project minter config should not be null");
+  }
+  assertJsonFieldEquals(
+    updatedProjectMinterConfig.extraMinterDetails,
+    "startTime",
+    project2StartTime
+  );
+  assertJsonFieldEquals(
+    updatedProjectMinterConfig.extraMinterDetails,
+    "endTime",
+    project2EndTime
+  );
+  assertJsonFieldEquals(
+    updatedProjectMinterConfig.extraMinterDetails,
+    "startPrice",
+    project2StartPrice.toString()
+  );
+  // @dev Deprecated fields ----------------
   assert.fieldEquals(
     PROJECT_MINTER_CONFIGURATION_ENTITY_TYPE,
     configId2,
@@ -663,6 +706,7 @@ test("GenArt721CoreV3/MinterUpdated: should populate project minter configuratio
     "startPrice",
     project2StartPrice.toString()
   );
+  // ---------------------------------------
 
   // Project 3 asserts
 
@@ -725,6 +769,28 @@ test("GenArt721CoreV3/MinterUpdated: should populate project minter configuratio
     "purchaseToDisabled",
     booleanToString(project3PurchaseToDisabled)
   );
+
+  // assert expected updates to extraMinterDetails
+  let updatedProjectMinterConfig3 = ProjectMinterConfiguration.load(configId3);
+  if (updatedProjectMinterConfig3 == null) {
+    throw new Error("project minter config should not be null");
+  }
+  assertJsonFieldEquals(
+    updatedProjectMinterConfig3.extraMinterDetails,
+    "startTime",
+    project3StartTime
+  );
+  assertJsonFieldEquals(
+    updatedProjectMinterConfig3.extraMinterDetails,
+    "halfLifeSeconds",
+    project3HalfLifeSeconds
+  );
+  assertJsonFieldEquals(
+    updatedProjectMinterConfig3.extraMinterDetails,
+    "startPrice",
+    project3StartPrice.toString()
+  );
+  // @dev Deprecated fields ----------------
   assert.fieldEquals(
     PROJECT_MINTER_CONFIGURATION_ENTITY_TYPE,
     configId3,
@@ -743,6 +809,7 @@ test("GenArt721CoreV3/MinterUpdated: should populate project minter configuratio
     "startPrice",
     project3StartPrice.toString()
   );
+  // ---------------------------------------
 });
 
 // export handlers for test coverage https://github.com/LimeChain/demo-subgraph#test-coverage

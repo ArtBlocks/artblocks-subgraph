@@ -61,7 +61,7 @@ type Project @entity {
   "For V3 and-on, this field is null, and projects lock 4 weeks after `completedAt`. Once the project is locked its script may never be updated again."
   locked: Boolean
 
-  "Maximum number of invocations allowed for the project"
+  "Maximum number of invocations allowed for the project. Note that minter contracts may additionally limit a project's maxInvocations on a specific minter."
   maxInvocations: BigInt!
 
   "Project name"
@@ -112,10 +112,13 @@ type Project @entity {
   website: String
 
   "Proposed Artist addresses and payment split percentages"
-  proposedArtistAddressesAndSplits: ProposedArtistAddressesAndSplits
+  proposedArtistAddressesAndSplits: ProposedArtistAddressesAndSplit
 
   "Accounts that own tokens of the project"
   owners: [AccountProject!] @derivedFrom(field: "project")
+
+  "Receipts for this project, only on minters with settlement"
+  receipts: [Receipt!] @derivedFrom(field: "project")
 
   createdAt: BigInt!
   updatedAt: BigInt!
@@ -129,7 +132,8 @@ type Project @entity {
   "Lookup table to get the Sale history of the project"
   saleLookupTables: [SaleLookupTable!]! @derivedFrom(field: "project")
 
-  externalAssetDependencies: [ProjectExternalAssetDependency!]! @derivedFrom(field: "project")
+  externalAssetDependencies: [ProjectExternalAssetDependency!]!
+    @derivedFrom(field: "project")
 }
 
 type ProjectScript @entity {
@@ -139,7 +143,7 @@ type ProjectScript @entity {
   script: String!
 }
 
-type ProposedArtistAddressesAndSplits @entity {
+type ProposedArtistAddressesAndSplit @entity {
   "Unique identifier made up of contract address and project id"
   id: ID!
 
@@ -164,6 +168,14 @@ type ProposedArtistAddressesAndSplits @entity {
   createdAt: BigInt!
 }
 
+type EngineRegistry @entity {
+  "Unique identifier made up of the Engine Registry's contract address"
+  id: ID!
+
+  "Core contracts that are registered on this Engine Registry, when this is most recent Engine Registry to add the contract"
+  registeredContracts: [Contract!] @derivedFrom(field: "registeredOn")
+}
+
 enum CoreType {
   "First Art Blocks flagship core"
   GenArt721CoreV0
@@ -173,10 +185,16 @@ enum CoreType {
   GenArt721CoreV2
   "Third Art Blocks flagship core"
   GenArt721CoreV3
+  "V3 Derivative - Art Blocks Engine core"
+  GenArt721CoreV3_Engine
+  "V3 Derivative - Art Blocks Engine Flex core"
+  GenArt721CoreV3_Engine_Flex
 }
 
 type Contract @entity {
+  "Unique identifier made up of the contract address"
   id: ID!
+
   admin: Bytes!
 
   "Core contract type"
@@ -194,6 +212,18 @@ type Contract @entity {
   "Basis points of secondary sales allocated to the platform (null for pre-V3 contracts, check Royalty Registry)"
   renderProviderSecondarySalesBPS: BigInt
 
+  "Address that receives primary sales platform fees, only for V3_Engine contracts"
+  enginePlatformProviderAddress: Bytes
+
+  "Percentage of primary sales allocated to the platform, only for V3_Engine contracts"
+  enginePlatformProviderPercentage: BigInt
+
+  "Address that receives secondary sales platform royalties, only for V3_Engine contracts"
+  enginePlatformProviderSecondarySalesAddress: Bytes
+
+  "Basis points of secondary sales allocated to the platform, only for V3_Engine contracts"
+  enginePlatformProviderSecondarySalesBPS: BigInt
+
   "List of contracts that are allowed to mint"
   mintWhitelisted: [Bytes!]!
 
@@ -204,7 +234,7 @@ type Contract @entity {
   curationRegistry: Bytes
 
   "Dependency registry contract address"
-  dependencyRegistry: Bytes
+  dependencyRegistry: DependencyRegistry
 
   nextProjectId: BigInt!
 
@@ -221,14 +251,21 @@ type Contract @entity {
 
   updatedAt: BigInt!
 
-  "Associated minter filter (if applicable)"
+  "Associated minter filter (if being indexed) - not always indexed for Engine contracts"
   minterFilter: MinterFilter
 
   preferredIPFSGateway: String
 
   preferredArweaveGateway: String
+
   "New projects forbidden (can only be true on V3+ contracts)"
   newProjectsForbidden: Boolean!
+
+  "Automatically approve all artist split proposals (used on V3 Engine contracts)"
+  autoApproveArtistSplitProposals: Boolean
+
+  "Latest engine registry that this contract is registered with, if any (used for indexing purposes)"
+  registeredOn: EngineRegistry
 }
 
 type Whitelisting @entity {
@@ -246,6 +283,9 @@ type Account @entity {
 
   "Projects the account is listed as artist for"
   projectsCreated: [Project!] @derivedFrom(field: "artist")
+
+  "Receipts for the account, on minters with settlement"
+  receipts: [Receipt!] @derivedFrom(field: "account")
 
   "Contracts the account is whitelisted on"
   whitelistedOn: [Whitelisting!] @derivedFrom(field: "account")
@@ -312,50 +352,34 @@ type MinterFilter @entity {
   updatedAt: BigInt!
 }
 
-enum MinterType {
-  MinterSetPriceV0
-  MinterSetPriceERC20V0
-  MinterDALinV0
-  MinterDAExpV0
-  MinterSetPriceV1
-  MinterSetPriceERC20V1
-  MinterDALinV1
-  MinterDAExpV1
-  MinterHolderV0
-  MinterMerkleV0
-  MinterSetPriceV2
-  MinterSetPriceERC20V2
-  MinterDALinV2
-  MinterDAExpV2
-  MinterHolderV1
-  MinterMerkleV1
-}
-
 type Minter @entity {
   "Unique identifier made up of minter contract address"
   id: ID!
 
-  "Minter type"
-  type: MinterType!
+  "Minter type - String if minter returns it's type, empty string otherwise"
+  type: String!
 
   "Associated Minter Filter"
   minterFilter: MinterFilter!
-
-  "Minimum allowed auction length in seconds (linear Dutch auction minters)"
-  minimumAuctionLengthInSeconds: BigInt
-
-  "Minimum allowed half life in seconds (exponential Dutch auction minters)"
-  minimumHalfLifeInSeconds: BigInt
-
-  "Maximum allowed half life in seconds (exponential Dutch auction minters)"
-  maximumHalfLifeInSeconds: BigInt
 
   "Configuration details used by specific minters (json string)"
   extraMinterDetails: String!
 
   coreContract: Contract!
 
+  "Receipts for this minter, only for minters with settlement"
+  receipts: [Receipt!] @derivedFrom(field: "minter")
+
   updatedAt: BigInt!
+
+  "Deprecated (now in extraMinterDetails). Minimum allowed auction length in seconds (linear Dutch auction minters)"
+  minimumAuctionLengthInSeconds: BigInt
+
+  "Deprecated (now in extraMinterDetails). Minimum allowed half life in seconds (exponential Dutch auction minters)"
+  minimumHalfLifeInSeconds: BigInt
+
+  "Deprecated (now in extraMinterDetails). Maximum allowed half life in seconds (exponential Dutch auction minters)"
+  maximumHalfLifeInSeconds: BigInt
 }
 
 type ProjectMinterConfiguration @entity {
@@ -380,23 +404,48 @@ type ProjectMinterConfiguration @entity {
   "Defines if purchasing token to another is allowed"
   purchaseToDisabled: Boolean!
 
-  "price of token or resting price of Duch auction, in wei"
+  "price, or resting price of Duch auction, or minimum bid price in English auction, in wei"
   basePrice: BigInt
-
-  "Dutch auction start price, in wei"
-  startPrice: BigInt
-
-  "Half life for exponential decay Dutch auction, in seconds"
-  halfLifeSeconds: BigInt
-
-  "Dutch auction start time (unix timestamp)"
-  startTime: BigInt
-
-  "Linear Dutch auction end time (unix timestamp)"
-  endTime: BigInt
 
   "Configuration details used by specific minter project configurations (json string)"
   extraMinterDetails: String!
+
+  "Maximum number of invocations allowed for the project (on the minter). If less than than a project's maximum invocations defined on a core contract, the minter contract will limit this project's maximum invocations"
+  maxInvocations: BigInt
+
+  "Deprecated (now in extraMinterDetails). Dutch auction start price, in wei"
+  startPrice: BigInt
+
+  "Deprecated (now in extraMinterDetails). Half life for exponential decay Dutch auction, in seconds"
+  halfLifeSeconds: BigInt
+
+  "Deprecated (now in extraMinterDetails). Dutch auction start time (unix timestamp)"
+  startTime: BigInt
+
+  "Deprecated (now in extraMinterDetails). Linear Dutch auction end time (unix timestamp)"
+  endTime: BigInt
+}
+
+type Receipt @entity {
+  "Unique identifier made up of minter contract address-projectId-accountAddress"
+  id: ID!
+
+  "The associated project"
+  project: Project!
+
+  "The associated minter"
+  minter: Minter!
+
+  "The associated account"
+  account: Account!
+
+  "The total net amount posted (sent to settlement contract) for tokens"
+  netPosted: BigInt!
+
+  "The total quantity of tokens purchased on the project"
+  numPurchased: BigInt!
+
+  updatedAt: BigInt!
 }
 
 enum SaleType {
@@ -503,15 +552,95 @@ type SaleLookupTable @entity {
 type Transfer @entity(immutable: true) {
   id: ID!
 
-  transactionHash: Bytes!
-
   token: Token!
-
-  createdAt: BigInt!
 
   to: Bytes!
 
   from: Bytes!
+
+  transactionHash: Bytes!
+
+  blockHash: Bytes!
+  blockNumber: BigInt!
+  blockTimestamp: BigInt!
+}
+
+type Dependency @entity {
+  "Unique identifier made up of dependency name and version separated by an @ symbol (e.g. p5js@1.0.0)"
+  id: ID!
+  "Preffered CDN for this dependency"
+  preferredCDN: String!
+  "Additional CDNs for this dependency"
+  additionalCDNs: [DependencyAdditionalCDN!]! @derivedFrom(field: "dependency")
+  "Number of additional CDNs for this dependency"
+  additionalCDNCount: BigInt!
+  "Preffered repository for this dependency"
+  preferredRepository: String!
+  "Additional repositories for this dependency"
+  additionalRepositoryCount: BigInt!
+  "Number of additional repositories for this dependency"
+  additionalRepositories: [DependencyAdditionalRepository!]!
+    @derivedFrom(field: "dependency")
+  "List of on-chain scripts that for this dependency"
+  scripts: [DependencyScript!]! @derivedFrom(field: "dependency")
+  "Number of on-chain scripts for this dependency"
+  scriptCount: BigInt!
+  "Concatenated string of all scripts for this dependency"
+  script: String
+  "Reference website for this dependency (e.g. https://p5js.org)"
+  referenceWebsite: String!
+  "Depenency registry contract that this dependency is registered on"
+  dependencyRegistry: DependencyRegistry!
+  "Timestamp of last update"
+  updatedAt: BigInt!
+}
+
+type DependencyRegistry @entity {
+  "Unique identifier made up of dependency registry contract address"
+  id: Bytes!
+  "Core contracts that this registry can provide dependeny overrides for"
+  supportedCoreContracts: [Contract!]! @derivedFrom(field: "dependencyRegistry")
+  "List of dependencies that are registered on this registry contract"
+  dependencies: [Dependency!] @derivedFrom(field: "dependencyRegistry")
+  "Current owner of this contract"
+  owner: Bytes!
+  "Timestamp of last update"
+  updatedAt: BigInt!
+}
+
+type DependencyAdditionalCDN @entity {
+  "Unique identifier made up of dependency id and index"
+  id: ID!
+  "Dependency this additional CDN belongs to"
+  dependency: Dependency!
+  "URL of the CDN"
+  cdn: String!
+  "Index of this additional CDN"
+  index: BigInt!
+}
+
+type DependencyAdditionalRepository @entity {
+  "Unique identifier made up of dependency id and index"
+  id: ID!
+  "Dependency this additional repository belongs to"
+  dependency: Dependency!
+  "URL of the repository"
+  repository: String!
+  "Index of this additional repository"
+  index: BigInt!
+}
+
+type DependencyScript @entity {
+  "Unique identifier made up of dependency id and index"
+  id: ID!
+  "Dependency this script belongs to"
+  dependency: Dependency!
+  "Index of this script"
+  index: BigInt!
+  "Contents of script"
+  script: String!
+  "Address of the bytecode storage contract for this script"
+  address: Bytes!
 }
 
 enum ProjectExternalAssetDependencyType {
@@ -519,7 +648,10 @@ enum ProjectExternalAssetDependencyType {
   IPFS
   "Asset hosted on Arweave"
   ARWEAVE
+  "Asset hosted on chain"
+  ONCHAIN
 }
+
 type ProjectExternalAssetDependency @entity {
   "Unique identifier made up of projectId-index"
   id: ID!
@@ -530,9 +662,15 @@ type ProjectExternalAssetDependency @entity {
   "The dependency type"
   dependencyType: ProjectExternalAssetDependencyType!
 
-  "The dependency cid"
+  "The dependency cid. This will be an empty string assets of type ONCHAIN."
   cid: String!
 
   "The dependency index"
   index: BigInt!
+
+  "Address of the bytecode storage contract for this asset if it is of type ONCHAIN"
+  bytecodeAddress: Bytes
+
+  "The asset data if it is onchain"
+  data: String
 }

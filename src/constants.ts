@@ -1,3 +1,5 @@
+import { BigInt } from "@graphprotocol/graph-ts";
+
 export const NULL_ADDRESS = "0x0000000000000000000000000000000000000000";
 
 export const ARTBLOCKS_PLATFORM_ID = "ArtBlocks";
@@ -47,4 +49,10 @@ export const ERC721 = "ERC721";
 export const ERC1155 = "ERC1155";
 
 // This is directly tied to the ExternalAssetDependencyType enum on the Engine Flex Core contract
-export const FLEX_CONTRACT_EXTERNAL_ASSET_DEP_TYPES = ["IPFS", "ARWEAVE"];
+export const FLEX_CONTRACT_EXTERNAL_ASSET_DEP_TYPES = [
+  "IPFS",
+  "ARWEAVE",
+  "ONCHAIN"
+];
+
+export const JS_MAX_SAFE_INTEGER = BigInt.fromString("9007199254740991");

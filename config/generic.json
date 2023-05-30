@@ -1,0 +1,118 @@
+{
+  "network": "goerli",
+  "iGenArt721CoreContractV3_BaseContracts": [
+    {
+      "address": ""
+    }
+  ],
+  "ownableGenArt721CoreV3Contracts": [
+    {
+      "address": ""
+    }
+  ],
+  "iERC721GenArt721CoreV3Contracts": [
+    {
+      "address": ""
+    }
+  ],
+  "iGenArt721CoreContractV3_Engine_FlexContracts": [
+    {
+      "address": ""
+    }
+  ],
+  "genArt721CoreContracts": [
+    {
+      "address": ""
+    }
+  ],
+  "genArt721Core2Contracts": [
+    {
+      "address": ""
+    }
+  ],
+  "genArt721Contracts": [
+    {
+      "address": ""
+    }
+  ],
+  "pbabContracts": [
+    {
+      "address": ""
+    }
+  ],
+  "engineFlexContracts": [
+    {
+      "address": ""
+    }
+  ],
+  "minterFilterV0Contracts": [
+    {
+      "address": ""
+    }
+  ],
+  "minterFilterV1Contracts": [
+    {
+      "address": ""
+    }
+  ],
+  "minterSetPriceContracts": [
+    {
+      "address": ""
+    }
+  ],
+  "minterSetPriceERC20Contracts": [
+    {
+      "address": ""
+    }
+  ],
+  "minterDAExpContracts": [
+    {
+      "address": ""
+    }
+  ],
+  "minterDALinContracts": [
+    {
+      "address": ""
+    }
+  ],
+  "minterDAExpSettlementContracts": [
+    {
+      "address": ""
+    }
+  ],
+  "minterMerkleContracts": [
+    {
+      "address": ""
+    }
+  ],
+  "minterHolderContracts": [
+    {
+      "address": ""
+    }
+  ],
+  "minterSEAContracts": [
+    {
+      "address": ""
+    }
+  ],
+  "adminACLV0Contracts": [
+    {
+      "address": ""
+    }
+  ],
+  "iDependencyRegistryV0Contracts": [
+    {
+      "address": ""
+    }
+  ],
+  "ownableUpgradeableDependencyRegistryContracts": [
+    {
+      "address": ""
+    }
+  ],
+  "engineRegistryV0Contracts": [
+    {
+      "address": ""
+    }
+  ]
+}

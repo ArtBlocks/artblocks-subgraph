@@ -57,15 +57,12 @@ import {
   ProjectScript,
   Token,
   Whitelisting,
-  ProposedArtistAddressesAndSplits as ProposedArtistAddressesAndSplitsEntity
+  ProposedArtistAddressesAndSplit as ProposedArtistAddressesAndSplitEntity
 } from "../../../generated/schema";
 import {
-  Mint,
-  Transfer,
-  PlatformUpdated,
   ProposedArtistAddressesAndSplits,
   AcceptedArtistAddressesAndSplits
-} from "../../../generated/GenArt721CoreV3/GenArt721CoreV3";
+} from "../../../generated/IGenArt721CoreV3_Base/IGenArt721CoreContractV3_Base";
 import {
   handleProposedArtistAddressesAndSplits,
   handleAcceptedArtistAddressesAndSplits
@@ -75,7 +72,9 @@ import { generateContractSpecificId } from "../../../src/helpers";
 const randomAddressGenerator = new RandomAddressGenerator();
 const artistAddress = randomAddressGenerator.generateRandomAddress();
 
-describe("GenArt721CoreV3, artist propose/admin accept new payments", () => {
+const coreType = "GenArt721CoreV3";
+
+describe(`${coreType}, artist propose/admin accept new payments`, () => {
   beforeEach(() => {
     clearStore();
     // add project to store
@@ -83,7 +82,7 @@ describe("GenArt721CoreV3, artist propose/admin accept new payments", () => {
     const projectName = "Test Project";
     const pricePerTokenInWei = BigInt.fromI64(i64(1e18));
 
-    mockRefreshContractCalls(BigInt.fromI32(2), null);
+    mockRefreshContractCalls(BigInt.fromI32(2), coreType, null);
 
     addNewProjectToStore(
       TEST_CONTRACT_ADDRESS,
@@ -156,7 +155,7 @@ describe("GenArt721CoreV3, artist propose/admin accept new payments", () => {
       handleProposedArtistAddressesAndSplits(event);
 
       assert.entityCount(PROJECT_ENTITY_TYPE, 0);
-      assert.entityCount("ProposedArtistAddressesAndSplits", 0);
+      assert.entityCount("ProposedArtistAddressesAndSplit", 0);
     });
 
     test("should handle new artist proposal", () => {
@@ -218,49 +217,49 @@ describe("GenArt721CoreV3, artist propose/admin accept new payments", () => {
       handleProposedArtistAddressesAndSplits(event);
 
       assert.fieldEquals(
-        "ProposedArtistAddressesAndSplits",
+        "ProposedArtistAddressesAndSplit",
         fullProjectId,
         "id",
         fullProjectId
       );
       assert.fieldEquals(
-        "ProposedArtistAddressesAndSplits",
+        "ProposedArtistAddressesAndSplit",
         fullProjectId,
         "project",
         fullProjectId
       );
       assert.fieldEquals(
-        "ProposedArtistAddressesAndSplits",
+        "ProposedArtistAddressesAndSplit",
         fullProjectId,
         "artistAddress",
         newArtistAddress.toHexString()
       );
       assert.fieldEquals(
-        "ProposedArtistAddressesAndSplits",
+        "ProposedArtistAddressesAndSplit",
         fullProjectId,
         "additionalPayeePrimarySalesAddress",
         additionalPayeePrimarySalesAddress.toHexString()
       );
       assert.fieldEquals(
-        "ProposedArtistAddressesAndSplits",
+        "ProposedArtistAddressesAndSplit",
         fullProjectId,
         "additionalPayeePrimarySalesPercentage",
         additionalPayeePrimarySalesPercentage.toString()
       );
       assert.fieldEquals(
-        "ProposedArtistAddressesAndSplits",
+        "ProposedArtistAddressesAndSplit",
         fullProjectId,
         "additionalPayeeSecondarySalesAddress",
         additionalPayeeSecondarySalesAddress.toHexString()
       );
       assert.fieldEquals(
-        "ProposedArtistAddressesAndSplits",
+        "ProposedArtistAddressesAndSplit",
         fullProjectId,
         "additionalPayeeSecondarySalesPercentage",
         additionalPayeeSecondarySalesPercentage.toString()
       );
       assert.fieldEquals(
-        "ProposedArtistAddressesAndSplits",
+        "ProposedArtistAddressesAndSplit",
         fullProjectId,
         "createdAt",
         updatedEventBlockTimestamp.toString()
@@ -379,52 +378,52 @@ describe("GenArt721CoreV3, artist propose/admin accept new payments", () => {
       handleProposedArtistAddressesAndSplits(newEvent);
 
       // assert that the previous proposal is not in store
-      assert.entityCount("ProposedArtistAddressesAndSplits", 1);
+      assert.entityCount("ProposedArtistAddressesAndSplit", 1);
       // assert that the new proposal is stored
       assert.fieldEquals(
-        "ProposedArtistAddressesAndSplits",
+        "ProposedArtistAddressesAndSplit",
         fullProjectId,
         "id",
         fullProjectId
       );
       assert.fieldEquals(
-        "ProposedArtistAddressesAndSplits",
+        "ProposedArtistAddressesAndSplit",
         fullProjectId,
         "project",
         fullProjectId
       );
       assert.fieldEquals(
-        "ProposedArtistAddressesAndSplits",
+        "ProposedArtistAddressesAndSplit",
         fullProjectId,
         "artistAddress",
         newNewArtistAddress.toHexString()
       );
       assert.fieldEquals(
-        "ProposedArtistAddressesAndSplits",
+        "ProposedArtistAddressesAndSplit",
         fullProjectId,
         "additionalPayeePrimarySalesAddress",
         newAdditionalPayeePrimarySalesAddress.toHexString()
       );
       assert.fieldEquals(
-        "ProposedArtistAddressesAndSplits",
+        "ProposedArtistAddressesAndSplit",
         fullProjectId,
         "additionalPayeePrimarySalesPercentage",
         newAdditionalPayeePrimarySalesPercentage.toString()
       );
       assert.fieldEquals(
-        "ProposedArtistAddressesAndSplits",
+        "ProposedArtistAddressesAndSplit",
         fullProjectId,
         "additionalPayeeSecondarySalesAddress",
         newAdditionalPayeeSecondarySalesAddress.toHexString()
       );
       assert.fieldEquals(
-        "ProposedArtistAddressesAndSplits",
+        "ProposedArtistAddressesAndSplit",
         fullProjectId,
         "additionalPayeeSecondarySalesPercentage",
         newAdditionalPayeeSecondarySalesPercentage.toString()
       );
       assert.fieldEquals(
-        "ProposedArtistAddressesAndSplits",
+        "ProposedArtistAddressesAndSplit",
         fullProjectId,
         "createdAt",
         newUpdatedEventBlockTimestamp.toString()
@@ -449,7 +448,7 @@ describe("GenArt721CoreV3, artist propose/admin accept new payments", () => {
       const dummyProposalId = randomAddressGenerator
         .generateRandomAddress()
         .toHexString();
-      const dummyProposal = new ProposedArtistAddressesAndSplitsEntity(
+      const dummyProposal = new ProposedArtistAddressesAndSplitEntity(
         dummyProposalId
       );
       dummyProposal.project = fullProjectId;
@@ -487,7 +486,7 @@ describe("GenArt721CoreV3, artist propose/admin accept new payments", () => {
       handleAcceptedArtistAddressesAndSplits(acceptedEvent);
 
       // assert that the dummy proposal is still in store (i.e. was not removed)
-      assert.entityCount("ProposedArtistAddressesAndSplits", 1);
+      assert.entityCount("ProposedArtistAddressesAndSplit", 1);
     });
 
     test("should not accept proposal when no proposal found on project", () => {
@@ -549,27 +548,27 @@ describe("GenArt721CoreV3, artist propose/admin accept new payments", () => {
       handleProposedArtistAddressesAndSplits(event);
 
       // assert that the proposal is stored
-      assert.entityCount("ProposedArtistAddressesAndSplits", 1);
+      assert.entityCount("ProposedArtistAddressesAndSplit", 1);
       assert.fieldEquals(
-        "ProposedArtistAddressesAndSplits",
+        "ProposedArtistAddressesAndSplit",
         fullProjectId,
         "id",
         fullProjectId
       );
       assert.fieldEquals(
-        "ProposedArtistAddressesAndSplits",
+        "ProposedArtistAddressesAndSplit",
         fullProjectId,
         "project",
         fullProjectId
       );
       assert.fieldEquals(
-        "ProposedArtistAddressesAndSplits",
+        "ProposedArtistAddressesAndSplit",
         fullProjectId,
         "artistAddress",
         newArtistAddress.toHexString()
       );
       assert.fieldEquals(
-        "ProposedArtistAddressesAndSplits",
+        "ProposedArtistAddressesAndSplit",
         fullProjectId,
         "createdAt",
         updatedEventBlockTimestamp.toString()
@@ -607,7 +606,7 @@ describe("GenArt721CoreV3, artist propose/admin accept new payments", () => {
       handleAcceptedArtistAddressesAndSplits(acceptedEvent);
 
       // assert that the proposal is not removed
-      assert.entityCount("ProposedArtistAddressesAndSplits", 1);
+      assert.entityCount("ProposedArtistAddressesAndSplit", 1);
       // assert that the project is not updated
       assert.fieldEquals(
         PROJECT_ENTITY_TYPE,
@@ -676,51 +675,51 @@ describe("GenArt721CoreV3, artist propose/admin accept new payments", () => {
       handleProposedArtistAddressesAndSplits(event);
 
       // assert that the proposal is stored
-      assert.entityCount("ProposedArtistAddressesAndSplits", 1);
+      assert.entityCount("ProposedArtistAddressesAndSplit", 1);
       assert.fieldEquals(
-        "ProposedArtistAddressesAndSplits",
+        "ProposedArtistAddressesAndSplit",
         fullProjectId,
         "id",
         fullProjectId
       );
       assert.fieldEquals(
-        "ProposedArtistAddressesAndSplits",
+        "ProposedArtistAddressesAndSplit",
         fullProjectId,
         "project",
         fullProjectId
       );
       assert.fieldEquals(
-        "ProposedArtistAddressesAndSplits",
+        "ProposedArtistAddressesAndSplit",
         fullProjectId,
         "artistAddress",
         newArtistAddress.toHexString()
       );
       assert.fieldEquals(
-        "ProposedArtistAddressesAndSplits",
+        "ProposedArtistAddressesAndSplit",
         fullProjectId,
         "additionalPayeePrimarySalesAddress",
         additionalPayeePrimarySalesAddress.toHexString()
       );
       assert.fieldEquals(
-        "ProposedArtistAddressesAndSplits",
+        "ProposedArtistAddressesAndSplit",
         fullProjectId,
         "additionalPayeePrimarySalesPercentage",
         additionalPayeePrimarySalesPercentage.toString()
       );
       assert.fieldEquals(
-        "ProposedArtistAddressesAndSplits",
+        "ProposedArtistAddressesAndSplit",
         fullProjectId,
         "additionalPayeeSecondarySalesAddress",
         additionalPayeeSecondarySalesAddress.toHexString()
       );
       assert.fieldEquals(
-        "ProposedArtistAddressesAndSplits",
+        "ProposedArtistAddressesAndSplit",
         fullProjectId,
         "additionalPayeeSecondarySalesPercentage",
         additionalPayeeSecondarySalesPercentage.toString()
       );
       assert.fieldEquals(
-        "ProposedArtistAddressesAndSplits",
+        "ProposedArtistAddressesAndSplit",
         fullProjectId,
         "createdAt",
         updatedEventBlockTimestamp.toString()
@@ -749,8 +748,8 @@ describe("GenArt721CoreV3, artist propose/admin accept new payments", () => {
 
       // remove the proposal from store
       // note: this is expected to be an impossible state due to smart contract logic
-      store.remove("ProposedArtistAddressesAndSplits", fullProjectId);
-      assert.entityCount("ProposedArtistAddressesAndSplits", 0);
+      store.remove("ProposedArtistAddressesAndSplit", fullProjectId);
+      assert.entityCount("ProposedArtistAddressesAndSplit", 0);
 
       handleAcceptedArtistAddressesAndSplits(acceptedEvent);
 
@@ -770,7 +769,7 @@ describe("GenArt721CoreV3, artist propose/admin accept new payments", () => {
       );
     });
 
-    test("should update Project, and remove ProposedArtistAddressesAndSplits from store", () => {
+    test("should update Project, and remove ProposedArtistAddressesAndSplit from store", () => {
       const projectId = BigInt.fromI32(1);
       const fullProjectId = generateContractSpecificId(
         TEST_CONTRACT_ADDRESS,
@@ -829,51 +828,51 @@ describe("GenArt721CoreV3, artist propose/admin accept new payments", () => {
       handleProposedArtistAddressesAndSplits(event);
 
       // assert that the proposal is stored
-      assert.entityCount("ProposedArtistAddressesAndSplits", 1);
+      assert.entityCount("ProposedArtistAddressesAndSplit", 1);
       assert.fieldEquals(
-        "ProposedArtistAddressesAndSplits",
+        "ProposedArtistAddressesAndSplit",
         fullProjectId,
         "id",
         fullProjectId
       );
       assert.fieldEquals(
-        "ProposedArtistAddressesAndSplits",
+        "ProposedArtistAddressesAndSplit",
         fullProjectId,
         "project",
         fullProjectId
       );
       assert.fieldEquals(
-        "ProposedArtistAddressesAndSplits",
+        "ProposedArtistAddressesAndSplit",
         fullProjectId,
         "artistAddress",
         newArtistAddress.toHexString()
       );
       assert.fieldEquals(
-        "ProposedArtistAddressesAndSplits",
+        "ProposedArtistAddressesAndSplit",
         fullProjectId,
         "additionalPayeePrimarySalesAddress",
         additionalPayeePrimarySalesAddress.toHexString()
       );
       assert.fieldEquals(
-        "ProposedArtistAddressesAndSplits",
+        "ProposedArtistAddressesAndSplit",
         fullProjectId,
         "additionalPayeePrimarySalesPercentage",
         additionalPayeePrimarySalesPercentage.toString()
       );
       assert.fieldEquals(
-        "ProposedArtistAddressesAndSplits",
+        "ProposedArtistAddressesAndSplit",
         fullProjectId,
         "additionalPayeeSecondarySalesAddress",
         additionalPayeeSecondarySalesAddress.toHexString()
       );
       assert.fieldEquals(
-        "ProposedArtistAddressesAndSplits",
+        "ProposedArtistAddressesAndSplit",
         fullProjectId,
         "additionalPayeeSecondarySalesPercentage",
         additionalPayeeSecondarySalesPercentage.toString()
       );
       assert.fieldEquals(
-        "ProposedArtistAddressesAndSplits",
+        "ProposedArtistAddressesAndSplit",
         fullProjectId,
         "createdAt",
         updatedEventBlockTimestamp.toString()
@@ -903,7 +902,7 @@ describe("GenArt721CoreV3, artist propose/admin accept new payments", () => {
       handleAcceptedArtistAddressesAndSplits(acceptedEvent);
 
       // assert that the proposal is removed
-      assert.entityCount("ProposedArtistAddressesAndSplits", 0);
+      assert.entityCount("ProposedArtistAddressesAndSplit", 0);
       // assert that the project is updated
       assert.fieldEquals(
         PROJECT_ENTITY_TYPE,
