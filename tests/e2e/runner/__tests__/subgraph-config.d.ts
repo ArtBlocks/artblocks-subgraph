@@ -12,6 +12,7 @@ export type SubgraphConfig = Partial<{
   engineFlexContracts: { address: string }[];
   minterFilterV0Contracts: { address: string }[];
   minterFilterV1Contracts: { address: string }[];
+  sharedMinterFilterConracts: { address: string }[];
   minterSetPriceContracts: { address: string }[];
   minterSetPriceERC20Contracts: { address: string }[];
   minterDAExpContracts: { address: string }[];

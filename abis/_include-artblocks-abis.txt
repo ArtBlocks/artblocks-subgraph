@@ -25,6 +25,7 @@ IGenArt721CoreContractV3_Base
 IGenArt721CoreContractV3_Engine
 IGenArt721CoreContractV3_Engine_Flex
 IMinterFilterV0
+IMinterFilterV1
 MinterFilterV0
 MinterFilterV1
 Ownable

@@ -5,7 +5,7 @@
     "generate:typechain": "typechain --target ethers-v5 --out-dir ./contracts './node_modules/@artblocks/contracts/artifacts/**/*.json'"
   },
   "devDependencies": {
-    "@artblocks/contracts": "^1.0.0",
+    "@artblocks/contracts": "^1.0.3",
     "@graphql-codegen/cli": "^3.0.0",
     "@graphql-codegen/typescript": "^3.0.0",
     "@graphql-codegen/typescript-document-nodes": "^3.0.0",

@@ -3,3 +3,9 @@ query GetContracts {
     id
   }
 }
+
+query GetTargetContracts($targetId: ID!) {
+  contracts(where: { id: $targetId }) {
+    id
+  }
+}

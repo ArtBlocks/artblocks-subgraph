@@ -962,6 +962,8 @@ dataSources:
       abis:
         - name: IMinterFilterV1
           file: ./abis/IMinterFilterV1.json
+        - name: IFilteredMinterV2
+          file: ./abis/IFilteredMinterV2.json
       eventHandlers:
         - event: Deployed()
           handler: handleDeployed
