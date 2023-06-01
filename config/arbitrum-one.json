@@ -1,5 +1,5 @@
 {
-  "network": "arbitrum",
+  "network": "arbitrum-one",
   "iGenArt721CoreContractV3_BaseContracts": [
     {
       "address": "0x0000000000000000000000000000000000000000",
