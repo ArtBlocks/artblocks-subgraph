@@ -369,11 +369,6 @@ test(`${coreType}/MinterUpdated: should populate project minter configurations f
   previousMinterConfig2.currencyAddress = project2CurrencyAddress;
   previousMinterConfig2.currencySymbol = project2CurrencySymbol;
   previousMinterConfig2.purchaseToDisabled = project2PurchaseToDisabled;
-  // @dev Deprecated fields ----------------
-  previousMinterConfig2.startTime = project2StartTime;
-  previousMinterConfig2.endTime = project2EndTime;
-  previousMinterConfig2.startPrice = project2StartPrice;
-  // ---------------------------------------
   previousMinterConfig2.extraMinterDetails = getJSONStringFromEntries([
     { key: "startTime", value: toJSONValue(project2StartTime) },
     { key: "endTime", value: toJSONValue(project2EndTime) },
@@ -420,11 +415,6 @@ test(`${coreType}/MinterUpdated: should populate project minter configurations f
   previousMinterConfig3.currencyAddress = project3CurrencyAddress;
   previousMinterConfig3.currencySymbol = project3CurrencySymbol;
   previousMinterConfig3.purchaseToDisabled = project3PurchaseToDisabled;
-  // @dev Deprecated fields ----------------
-  previousMinterConfig3.halfLifeSeconds = project3HalfLifeSeconds;
-  previousMinterConfig3.startTime = project3StartTime;
-  previousMinterConfig3.startPrice = project3StartPrice;
-  // ---------------------------------------
   previousMinterConfig3.extraMinterDetails = getJSONStringFromEntries([
     { key: "startTime", value: toJSONValue(project3StartTime) },
     { key: "halfLifeSeconds", value: toJSONValue(project3HalfLifeSeconds) },
@@ -689,26 +679,6 @@ test(`${coreType}/MinterUpdated: should populate project minter configurations f
     "startPrice",
     project2StartPrice.toString()
   );
-  // @dev Deprecated fields ----------------
-  assert.fieldEquals(
-    PROJECT_MINTER_CONFIGURATION_ENTITY_TYPE,
-    configId2,
-    "startTime",
-    project2StartTime.toString()
-  );
-  assert.fieldEquals(
-    PROJECT_MINTER_CONFIGURATION_ENTITY_TYPE,
-    configId2,
-    "endTime",
-    project2EndTime.toString()
-  );
-  assert.fieldEquals(
-    PROJECT_MINTER_CONFIGURATION_ENTITY_TYPE,
-    configId2,
-    "startPrice",
-    project2StartPrice.toString()
-  );
-  // ---------------------------------------
 
   // Project 3 asserts
 
@@ -792,26 +762,6 @@ test(`${coreType}/MinterUpdated: should populate project minter configurations f
     "startPrice",
     project3StartPrice.toString()
   );
-  // @dev Deprecated fields ----------------
-  assert.fieldEquals(
-    PROJECT_MINTER_CONFIGURATION_ENTITY_TYPE,
-    configId3,
-    "startTime",
-    project3StartTime.toString()
-  );
-  assert.fieldEquals(
-    PROJECT_MINTER_CONFIGURATION_ENTITY_TYPE,
-    configId3,
-    "halfLifeSeconds",
-    project3HalfLifeSeconds.toString()
-  );
-  assert.fieldEquals(
-    PROJECT_MINTER_CONFIGURATION_ENTITY_TYPE,
-    configId3,
-    "startPrice",
-    project3StartPrice.toString()
-  );
-  // ---------------------------------------
 });
 
 // export handlers for test coverage https://github.com/LimeChain/demo-subgraph#test-coverage

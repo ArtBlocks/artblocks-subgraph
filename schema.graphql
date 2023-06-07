@@ -374,15 +374,6 @@ type Minter @entity {
   receipts: [Receipt!] @derivedFrom(field: "minter")
 
   updatedAt: BigInt!
-
-  "Deprecated (now in extraMinterDetails). Minimum allowed auction length in seconds (linear Dutch auction minters)"
-  minimumAuctionLengthInSeconds: BigInt
-
-  "Deprecated (now in extraMinterDetails). Minimum allowed half life in seconds (exponential Dutch auction minters)"
-  minimumHalfLifeInSeconds: BigInt
-
-  "Deprecated (now in extraMinterDetails). Maximum allowed half life in seconds (exponential Dutch auction minters)"
-  maximumHalfLifeInSeconds: BigInt
 }
 
 type ProjectMinterConfiguration @entity {
@@ -415,18 +406,6 @@ type ProjectMinterConfiguration @entity {
 
   "Maximum number of invocations allowed for the project (on the minter). If less than than a project's maximum invocations defined on a core contract, the minter contract will limit this project's maximum invocations"
   maxInvocations: BigInt
-
-  "Deprecated (now in extraMinterDetails). Dutch auction start price, in wei"
-  startPrice: BigInt
-
-  "Deprecated (now in extraMinterDetails). Half life for exponential decay Dutch auction, in seconds"
-  halfLifeSeconds: BigInt
-
-  "Deprecated (now in extraMinterDetails). Dutch auction start time (unix timestamp)"
-  startTime: BigInt
-
-  "Deprecated (now in extraMinterDetails). Linear Dutch auction end time (unix timestamp)"
-  endTime: BigInt
 }
 
 type Receipt @entity {
