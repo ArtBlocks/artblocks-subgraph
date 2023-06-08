@@ -204,8 +204,6 @@ export function loadOrCreateMinter(
     // populate any minter-specific values
     if (minter.type.startsWith("MinterDALin")) {
       const contract = IFilteredMinterDALinV1.bind(minterAddress);
-      // @dev deprecated minter.minimumAuctionLengthInSeconds
-      minter.minimumAuctionLengthInSeconds = contract.minimumAuctionLengthSeconds();
       setMinterExtraMinterDetailsValue(
         "minimumAuctionLengthInSeconds",
         contract.minimumAuctionLengthSeconds(),
@@ -213,10 +211,6 @@ export function loadOrCreateMinter(
       );
     } else if (minter.type.startsWith("MinterDAExp")) {
       const contract = IFilteredMinterDAExpV1.bind(minterAddress);
-      // @dev deprecated minter.minimumHalfLifeInSeconds
-      minter.minimumHalfLifeInSeconds = contract.minimumPriceDecayHalfLifeSeconds();
-      // @dev deprecated minter.maximumHalfLifeInSeconds
-      minter.maximumHalfLifeInSeconds = contract.maximumPriceDecayHalfLifeSeconds();
       setMinterExtraMinterDetailsValue(
         "minimumHalfLifeInSeconds",
         contract.minimumPriceDecayHalfLifeSeconds(),

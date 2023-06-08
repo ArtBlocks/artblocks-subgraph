@@ -371,11 +371,6 @@ test("handleIsCanonicalMinterFilter should populate project minter configuration
   previousMinterConfig2.currencyAddress = project2CurrencyAddress;
   previousMinterConfig2.currencySymbol = project2CurrencySymbol;
   previousMinterConfig2.purchaseToDisabled = project2PurchaseToDisabled;
-  // @dev Deprecated fields ----------------
-  previousMinterConfig2.startTime = project2StartTime;
-  previousMinterConfig2.endTime = project2EndTime;
-  previousMinterConfig2.startPrice = project2StartPrice;
-  // ---------------------------------------
   previousMinterConfig2.extraMinterDetails = getJSONStringFromEntries([
     { key: "startTime", value: toJSONValue(project2StartTime) },
     { key: "endTime", value: toJSONValue(project2EndTime) },
@@ -421,11 +416,6 @@ test("handleIsCanonicalMinterFilter should populate project minter configuration
   previousMinterConfig3.currencyAddress = project3CurrencyAddress;
   previousMinterConfig3.currencySymbol = project3CurrencySymbol;
   previousMinterConfig3.purchaseToDisabled = project3PurchaseToDisabled;
-  // @dev Deprecated fields ----------------
-  previousMinterConfig3.halfLifeSeconds = project3HalfLifeSeconds;
-  previousMinterConfig3.startTime = project3StartTime;
-  previousMinterConfig3.startPrice = project3StartPrice;
-  // ---------------------------------------
   previousMinterConfig3.extraMinterDetails = getJSONStringFromEntries([
     { key: "halfLifeSeconds", value: toJSONValue(project3HalfLifeSeconds) },
     { key: "startTime", value: toJSONValue(project3StartTime) },
@@ -696,26 +686,6 @@ test("handleIsCanonicalMinterFilter should populate project minter configuration
     "startPrice",
     project2StartPrice.toString()
   );
-  // @dev Deprecated fields ----------------
-  assert.fieldEquals(
-    PROJECT_MINTER_CONFIGURATION_ENTITY_TYPE,
-    configId2,
-    "startTime",
-    project2StartTime.toString()
-  );
-  assert.fieldEquals(
-    PROJECT_MINTER_CONFIGURATION_ENTITY_TYPE,
-    configId2,
-    "endTime",
-    project2EndTime.toString()
-  );
-  assert.fieldEquals(
-    PROJECT_MINTER_CONFIGURATION_ENTITY_TYPE,
-    configId2,
-    "startPrice",
-    project2StartPrice.toString()
-  );
-  // ---------------------------------------
 
   // Project 3 asserts
 
@@ -798,27 +768,6 @@ test("handleIsCanonicalMinterFilter should populate project minter configuration
     "startPrice",
     project3StartPrice.toString()
   );
-
-  // @dev Deprecated fields ----------------
-  assert.fieldEquals(
-    PROJECT_MINTER_CONFIGURATION_ENTITY_TYPE,
-    configId3,
-    "startTime",
-    project3StartTime.toString()
-  );
-  assert.fieldEquals(
-    PROJECT_MINTER_CONFIGURATION_ENTITY_TYPE,
-    configId3,
-    "halfLifeSeconds",
-    project3HalfLifeSeconds.toString()
-  );
-  assert.fieldEquals(
-    PROJECT_MINTER_CONFIGURATION_ENTITY_TYPE,
-    configId3,
-    "startPrice",
-    project3StartPrice.toString()
-  );
-  // ---------------------------------------
 });
 
 test("handleMinterApproved should not add minter to minterGlobalAllowlist if the approved minter has a different minter filter", () => {
@@ -1085,21 +1034,6 @@ test("handleMinterApproved should populate DA Exp default half life ranges", () 
       "maximumHalfLifeInSeconds",
       BigInt.fromI32(3600)
     );
-
-    // @dev Deprecated fields ----------------
-    assert.fieldEquals(
-      MINTER_ENTITY_TYPE,
-      minterToBeApprovedAddress.toHexString(),
-      "minimumHalfLifeInSeconds",
-      "300"
-    );
-    assert.fieldEquals(
-      MINTER_ENTITY_TYPE,
-      minterToBeApprovedAddress.toHexString(),
-      "maximumHalfLifeInSeconds",
-      "3600"
-    );
-    // ---------------------------------------
   }
 });
 
@@ -1164,15 +1098,6 @@ test("handleMinterApproved should populate DA Lin min auction time", () => {
       "minimumAuctionLengthInSeconds",
       BigInt.fromString("3600")
     );
-
-    // @dev Deprecated fields ----------------
-    assert.fieldEquals(
-      MINTER_ENTITY_TYPE,
-      minterToBeApprovedAddress.toHexString(),
-      "minimumAuctionLengthInSeconds",
-      "3600"
-    );
-    // ---------------------------------------
   }
 });
 
