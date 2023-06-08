@@ -7,5 +7,9 @@ query GetMinterFilters {
 query GetTargetMinterFilters($targetId: ID!) {
   minterFilters(where: { id: $targetId }) {
     id
+    coreRegistry {
+      id
+    }
+    updatedAt
   }
 }

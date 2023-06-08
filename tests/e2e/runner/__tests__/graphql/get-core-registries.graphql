@@ -1,0 +1,11 @@
+query GetCoreRegistries {
+  coreRegistries {
+    id
+  }
+}
+
+query GetTargetCoreRegistries($targetId: ID!) {
+  coreRegistries(where: { id: $targetId }) {
+    id
+  }
+}

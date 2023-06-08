@@ -3,6 +3,9 @@ import {
   GetTargetMinterFiltersDocument,
   GetTargetMinterFiltersQuery,
   GetTargetMinterFiltersQueryVariables,
+  GetTargetCoreRegistriesDocument,
+  GetTargetCoreRegistriesQuery,
+  GetTargetCoreRegistriesQueryVariables,
 } from "../../generated/graphql";
 import {
   getSubgraphConfig,
@@ -52,6 +55,39 @@ describe("Expected contract exist", () => {
         .toPromise();
       expect(minterFiltersRes.data?.minterFilters.length).toBe(1);
       expect(minterFiltersRes.data?.minterFilters[0].id).toBe(targetId);
+    });
+
+    test("created new CoreRegistry during deployment", async () => {
+      const targetId = coreRegistryAddress.toLowerCase();
+
+      const coreRegistryRes = await client
+        .query<
+          GetTargetCoreRegistriesQuery,
+          GetTargetCoreRegistriesQueryVariables
+        >(GetTargetCoreRegistriesDocument, { targetId })
+        .toPromise();
+      expect(coreRegistryRes.data?.coreRegistries.length).toBe(1);
+      expect(coreRegistryRes.data?.coreRegistries[0].id).toBe(targetId);
+    });
+
+    test("populates MinterFilter entity during deployment", async () => {
+      const targetId = sharedMinterFilter.address.toLowerCase();
+
+      const minterFiltersRes = await client
+        .query<
+          GetTargetMinterFiltersQuery,
+          GetTargetMinterFiltersQueryVariables
+        >(GetTargetMinterFiltersDocument, { targetId })
+        .toPromise();
+      const minterFilter = minterFiltersRes.data?.minterFilters[0];
+      // verify minter filter fields
+      expect(minterFilter?.id).toBe(targetId);
+      expect(minterFilter?.coreRegistry.id).toBe(
+        coreRegistryAddress.toLowerCase()
+      );
+      // updated at not checked for exact value because its was not recorded during seed deployment
+      // to be defined is sufficient
+      expect(minterFilter?.updatedAt).toBeDefined();
     });
   });
 });
