@@ -8,7 +8,7 @@ import {
   createSubgraphClient,
   waitUntilSubgraphIsSynced,
   getSubgraphConfig,
-} from "./helpers";
+} from "./utils/helpers";
 
 // waiting for subgraph to sync can take longer than the default 5s timeout
 jest.setTimeout(30 * 1000);
@@ -16,34 +16,7 @@ jest.setTimeout(30 * 1000);
 const config = getSubgraphConfig();
 const client = createSubgraphClient();
 
-// const client = createSubgraphClient();
-
-// const waitUntilSubgraphIsSynced = async () => {
-//   const provider = new ethers.providers.JsonRpcProvider("http://hardhat:8545");
-
-//   const currentBlockNumber = await provider.getBlockNumber();
-//   let syncedBlock = 0;
-//   let iterations = 0;
-//   while (syncedBlock < currentBlockNumber) {
-//     const syncedBlockRes = await client
-//       .query<GetCurrentBlockNumberQuery, GetContractsQueryVariables>(
-//         GetCurrentBlockNumberDocument,
-//         {}
-//       )
-//       .toPromise();
-//     syncedBlock = syncedBlockRes.data?._meta?.block.number ?? syncedBlock;
-//     // wait 1 second before checking again
-//     await new Promise((resolve) => setTimeout(resolve, 1000));
-//     // after 20 iterations, fail the test, and alert that subgraph may have failed
-//     if (iterations++ > 20) {
-//       throw new Error(
-//         "Subgraph did not sync in time - CHECK GRAPH NODE LOGS FOR CRASHED SUBGRAPH!"
-//       );
-//     }
-//   }
-// };
-
-describe("ALT contract exist", () => {
+describe("expected contract exist", () => {
   beforeAll(async () => {
     await waitUntilSubgraphIsSynced(client);
   });

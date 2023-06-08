@@ -1,0 +1,11 @@
+query GetMinterFilters {
+  minterFilters {
+    id
+  }
+}
+
+query GetTargetMinterFilters($targetId: ID!) {
+  minterFilters(where: { id: $targetId }) {
+    id
+  }
+}

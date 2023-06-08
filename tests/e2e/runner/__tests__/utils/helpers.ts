@@ -3,7 +3,7 @@ import {
   GetContractsQueryVariables,
   GetCurrentBlockNumberDocument,
   GetCurrentBlockNumberQuery,
-} from "../generated/graphql";
+} from "../../generated/graphql";
 import {
   createClient,
   dedupExchange,
@@ -11,14 +11,30 @@ import {
   fetchExchange,
   Client,
 } from "@urql/core";
+import fetch from "cross-fetch";
 import { retryExchange } from "@urql/exchange-retry";
 import { ethers } from "ethers";
-import { SubgraphConfig } from "./subgraph-config";
+import { JsonRpcProvider } from "@ethersproject/providers";
+import { SubgraphConfig } from "../subgraph-config";
 
 export const getSubgraphConfig = () => {
   return JSON.parse(
     fs.readFileSync("/usr/runner/shared/test-config.json", "utf-8")
   ) as SubgraphConfig;
+};
+
+export const getAccounts = () => {
+  const accounts = JSON.parse(
+    fs.readFileSync("./shared/accounts.json", "utf8")
+  );
+  const deployer = ethers.Wallet.fromMnemonic(accounts.mnemonic).connect(
+    new JsonRpcProvider("http://hardhat:8545")
+  );
+  const artist = ethers.Wallet.fromMnemonic(
+    accounts.mnemonic,
+    "m/44'/60'/1'/0/1" // derivation path index 1
+  );
+  return { deployer, artist };
 };
 
 export const createSubgraphClient = (): Client => {

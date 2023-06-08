@@ -12,7 +12,7 @@ export type SubgraphConfig = Partial<{
   engineFlexContracts: { address: string }[];
   minterFilterV0Contracts: { address: string }[];
   minterFilterV1Contracts: { address: string }[];
-  sharedMinterFilterConracts: { address: string }[];
+  sharedMinterFilterContracts: { address: string }[];
   minterSetPriceContracts: { address: string }[];
   minterSetPriceERC20Contracts: { address: string }[];
   minterDAExpContracts: { address: string }[];
@@ -24,4 +24,8 @@ export type SubgraphConfig = Partial<{
   iDependencyRegistryV0Contracts: { address: string }[];
   ownableUpgradeableDependencyRegistryContracts: { address: string }[];
   engineRegistryV0Contracts: { address: string }[];
+  metadata: {
+    minterFilterAdminACLAddress: string;
+    coreRegistryAddress: string;
+  };
 }>;

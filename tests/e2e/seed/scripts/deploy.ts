@@ -40,13 +40,19 @@ const initialProjectArtistAddress = undefined;
 // CONFIG ENDS HERE
 //////////////////////////////////////////////////////////////////////////////
 
-type SubgraphConfig = {
-  network: string;
+type ConfigMetadata = {
   [key: string]: { address: string }[] | string;
+};
+
+type SubgraphConfig = {
+  [key: string]: { address: string }[] | string | ConfigMetadata | undefined;
+  network: string;
+  metadata?: ConfigMetadata;
 };
 
 async function main() {
   const subgraphConfig: SubgraphConfig = { network: "mainnet" };
+  subgraphConfig.metadata = {};
 
   const accounts = JSON.parse(
     fs.readFileSync("./shared/accounts.json", "utf8")
@@ -135,11 +141,16 @@ async function main() {
   const minterFilterAdminACL = await minterFilterAdminACLFactory.deploy();
   await minterFilterAdminACL.deployed();
   const minterFilterAdminACLAddress = minterFilterAdminACL.address;
+  // record in metadata for future reference in tests
+  subgraphConfig.metadata.minterFilterAdminACLAddress =
+    minterFilterAdminACLAddress.toString();
 
   const coreRegistryFactory = new CoreRegistryV1__factory(deployer);
   const coreRegistry = await coreRegistryFactory.deploy();
   await coreRegistry.deployed();
   const coreRegistryAddress = coreRegistry.address;
+  // record in metadata for future reference in tests
+  subgraphConfig.metadata.coreRegistryAddress = coreRegistryAddress.toString();
 
   // @dev this key will be updated in a subsequent PR to be named engineRegistryContracts
   subgraphConfig.engineRegistryV0Contracts = [
