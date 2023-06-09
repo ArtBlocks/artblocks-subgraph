@@ -120,9 +120,22 @@ describe("MinterFilterV2 event handling", () => {
   });
 
   describe("MinterApprovedGlobally", () => {
+    let minterAddressToBeRemovedGlobally: string = "";
+    afterEach(async () => {
+      // revoke minter globally
+      try {
+        await sharedMinterFilterContract
+          .connect(deployer)
+          .revokeMinterGlobally(minterAddressToBeRemovedGlobally);
+      } catch (error) {
+        // swallow errors in case of test failure
+      }
+    });
+
     it("creates new Minter entity", async () => {
       // deploy a new shared minter
       const newMinter = await deployNewMinter(sharedMinterFilter.address);
+      minterAddressToBeRemovedGlobally = newMinter.address;
       // @dev minter does not yet exist because it is not in subgraph config
       // approve minter globally
       await sharedMinterFilterContract
@@ -138,6 +151,7 @@ describe("MinterFilterV2 event handling", () => {
     it("populates Minter entity as expected", async () => {
       // deploy a new shared minter
       const newMinter = await deployNewMinter(sharedMinterFilter.address);
+      minterAddressToBeRemovedGlobally = newMinter.address;
       // @dev minter does not yet exist because it is not in subgraph config
       // approve minter globally
       await sharedMinterFilterContract
@@ -159,6 +173,7 @@ describe("MinterFilterV2 event handling", () => {
     it("updates MinterFilter entity global allowlist", async () => {
       // deploy a new shared minter
       const newMinter = await deployNewMinter(sharedMinterFilter.address);
+      minterAddressToBeRemovedGlobally = newMinter.address;
       // @dev minter does not yet exist because it is not in subgraph config
       // approve minter globally
       await sharedMinterFilterContract
@@ -182,9 +197,22 @@ describe("MinterFilterV2 event handling", () => {
   });
 
   describe("MinterRemovedFromGlobalAllowlist", () => {
+    let minterAddressToBeRemovedGlobally: string = "";
+    afterEach(async () => {
+      // revoke minter globally in cases of test failure
+      try {
+        await sharedMinterFilterContract
+          .connect(deployer)
+          .revokeMinterGlobally(minterAddressToBeRemovedGlobally);
+      } catch (error) {
+        // swallow errors
+      }
+    });
+
     it("updates Minter entity", async () => {
       // deploy a new shared minter
       const newMinter = await deployNewMinter(sharedMinterFilter.address);
+      minterAddressToBeRemovedGlobally = newMinter.address;
       // add minter to global allowlist
       await sharedMinterFilterContract
         .connect(deployer)
@@ -208,6 +236,7 @@ describe("MinterFilterV2 event handling", () => {
     it("updates MinterFilter entity", async () => {
       // deploy a new shared minter
       const newMinter = await deployNewMinter(sharedMinterFilter.address);
+      minterAddressToBeRemovedGlobally = newMinter.address;
       // add minter to global allowlist
       await sharedMinterFilterContract
         .connect(deployer)
@@ -326,7 +355,7 @@ describe("MinterFilterV2 event handling", () => {
   describe("MinterRevokedForContract", () => {
     let newMinterAddressToCleanUp: string = "";
     let newMinter2AddressToCleanUp: string = "";
-    beforeEach(async () => {
+    afterEach(async () => {
       // attempt to clean up two minters in case of test failure
       try {
         // clean up - remove minter from contract allowlist
