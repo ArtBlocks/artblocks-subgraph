@@ -1,0 +1,25 @@
+query GetMinters {
+  minters {
+    id
+    type
+    minterFilter {
+      id
+    }
+    isGloballyAllowlistedOnMinterFilter
+    extraMinterDetails
+    updatedAt
+  }
+}
+
+query GetTargetMinters($targetId: ID!) {
+  minters(where: { id: $targetId }) {
+    id
+    type
+    minterFilter {
+      id
+    }
+    isGloballyAllowlistedOnMinterFilter
+    extraMinterDetails
+    updatedAt
+  }
+}

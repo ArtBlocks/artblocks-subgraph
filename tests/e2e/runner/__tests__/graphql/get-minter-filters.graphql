@@ -7,6 +7,12 @@ query GetMinterFilters {
 query GetTargetMinterFilters($targetId: ID!) {
   minterFilters(where: { id: $targetId }) {
     id
+    minterGlobalAllowlist {
+      id
+    }
+    knownMinters {
+      id
+    }
     coreRegistry {
       id
     }
