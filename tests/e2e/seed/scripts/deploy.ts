@@ -191,6 +191,18 @@ async function main() {
   // SETUP BEGINS HERE
   //////////////////////////////////////////////////////////////////////////////
 
+  // register the core contract with the core registry
+  await coreRegistry
+    .connect(deployer)
+    .registerContract(
+      genArt721Core.address,
+      ethers.utils.formatBytes32String("GenArt721CoreV3"),
+      ethers.utils.formatBytes32String("1.0.0")
+    );
+  console.log(
+    `Registered the Core contract with the Core Registry at ${coreRegistryAddress}.`
+  );
+
   // Allowlist the Minter on the Core contract.
   await genArt721Core
     .connect(deployer)

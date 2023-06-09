@@ -10,6 +10,15 @@ query GetTargetMinterFilters($targetId: ID!) {
     minterGlobalAllowlist {
       id
     }
+    minterFilterContractAllowlists {
+      id
+      contract {
+        id
+      }
+      minterContractAllowlist {
+        id
+      }
+    }
     knownMinters {
       id
     }
