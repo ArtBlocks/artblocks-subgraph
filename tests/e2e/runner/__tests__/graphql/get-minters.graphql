@@ -1,0 +1,22 @@
+fragment minterDetails on Minter {
+  id
+  type
+  minterFilter {
+    id
+  }
+  isGloballyAllowlistedOnMinterFilter
+  extraMinterDetails
+  updatedAt
+}
+
+query GetMinters {
+  minters {
+    ...minterDetails
+  }
+}
+
+query GetTargetMinters($targetId: ID!) {
+  minters(where: { id: $targetId }) {
+    ...minterDetails
+  }
+}

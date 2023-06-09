@@ -1,0 +1,40 @@
+fragment projectDetails on Project {
+  id
+  projectId
+  minterConfiguration {
+    id
+    project {
+      id
+    }
+    minter {
+      id
+      type
+      minterFilter {
+        id
+      }
+      isGloballyAllowlistedOnMinterFilter
+      extraMinterDetails
+      updatedAt
+    }
+    priceIsConfigured
+    currencySymbol
+    currencyAddress
+    purchaseToDisabled
+    basePrice
+    extraMinterDetails
+    maxInvocations
+  }
+  updatedAt
+}
+
+query GetProjects {
+  projects {
+    ...projectDetails
+  }
+}
+
+query GetTargetProjects($targetId: ID!) {
+  projects(where: { id: $targetId }) {
+    ...projectDetails
+  }
+}

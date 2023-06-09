@@ -14,6 +14,7 @@ import { IFilteredMinterV2 } from "../generated/MinterSetPrice/IFilteredMinterV2
 import {
   Minter,
   ProjectMinterConfiguration,
+  Project,
   Account,
   Whitelisting,
   Receipt,
@@ -233,6 +234,57 @@ export function loadOrCreateCoreRegistry(address: Address): CoreRegistry {
   return coreRegistry;
 }
 
+/**
+ * Loads or creates a ProjectMinterConfiguration entity for the given project
+ * and minter, and sets the project's minter configuration to the new or
+ * existing ProjectMinterConfiguration entity.
+ * Updates the project's updatedAt to the timestamp, and saves entity.
+ * @dev this is intended to support legacy and shared minter filters/minters
+ * @param project
+ * @param minter
+ * @param timestamp
+ * @returns
+ */
+export function loadOrCreateAndSetProjectMinterConfiguration(
+  project: Project,
+  minter: Minter,
+  timestamp: BigInt
+): ProjectMinterConfiguration {
+  const targetProjectMinterConfigId = getProjectMinterConfigId(
+    minter.id,
+    project.id
+  );
+
+  let projectMinterConfig = ProjectMinterConfiguration.load(
+    targetProjectMinterConfigId
+  );
+
+  if (!projectMinterConfig) {
+    // create new project minter config that assumes no pre-configuring
+    // @dev if minter data source templates are used, the no pre-configuring
+    // assumption must be revisited
+    projectMinterConfig = new ProjectMinterConfiguration(
+      targetProjectMinterConfigId
+    );
+    projectMinterConfig.project = project.id;
+    projectMinterConfig.minter = minter.id;
+    projectMinterConfig.priceIsConfigured = false;
+    projectMinterConfig.currencySymbol = "ETH";
+    projectMinterConfig.currencyAddress = Address.zero();
+    projectMinterConfig.purchaseToDisabled = false;
+    projectMinterConfig.extraMinterDetails = "{}";
+    projectMinterConfig.save();
+  }
+
+  project.updatedAt = timestamp;
+  project.minterConfiguration = projectMinterConfig.id;
+  project.save();
+
+  return projectMinterConfig;
+}
+
+// @dev this is intended to work with legacy (non-shared) and new (shared)
+// minters
 export function loadOrCreateMinter(
   minterAddress: Address,
   timestamp: BigInt
@@ -286,8 +338,6 @@ export function loadOrCreateMinter(
     // populate any minter-specific values
     if (minter.type.startsWith("MinterDALin")) {
       const contract = IFilteredMinterDALinV1.bind(minterAddress);
-      // @dev deprecated minter.minimumAuctionLengthInSeconds
-      minter.minimumAuctionLengthInSeconds = contract.minimumAuctionLengthSeconds();
       setMinterExtraMinterDetailsValue(
         "minimumAuctionLengthInSeconds",
         contract.minimumAuctionLengthSeconds(),
@@ -295,10 +345,6 @@ export function loadOrCreateMinter(
       );
     } else if (minter.type.startsWith("MinterDAExp")) {
       const contract = IFilteredMinterDAExpV1.bind(minterAddress);
-      // @dev deprecated minter.minimumHalfLifeInSeconds
-      minter.minimumHalfLifeInSeconds = contract.minimumPriceDecayHalfLifeSeconds();
-      // @dev deprecated minter.maximumHalfLifeInSeconds
-      minter.maximumHalfLifeInSeconds = contract.maximumPriceDecayHalfLifeSeconds();
       setMinterExtraMinterDetailsValue(
         "minimumHalfLifeInSeconds",
         contract.minimumPriceDecayHalfLifeSeconds(),

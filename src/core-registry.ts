@@ -22,8 +22,8 @@ import { Ownable } from "../generated/OwnableGenArt721CoreV3Contract/Ownable";
 // Registered contracts are tracked dynamically, and the contract's `registeredOn`
 // field is set to this core registry.
 export function handleContractRegistered(event: ContractRegistered): void {
-  // ensure an core registry entity exists
-  const _ = loadOrCreateCoreRegistry(event.address);
+  // ensure an engine registry entity exists
+  loadOrCreateCoreRegistry(event.address);
   // check if the contract is already registered
   const coreAddress = event.params._contractAddress;
   // dynamically track the new contract if not already in store, and refresh it
@@ -60,7 +60,7 @@ export function handleContractRegistered(event: ContractRegistered): void {
 // core registry.
 export function handleContractUnregistered(event: ContractUnregistered): void {
   // ensure an core registry entity exists
-  const _ = loadOrCreateCoreRegistry(event.address);
+  loadOrCreateCoreRegistry(event.address);
   // remove this core registry from the contract's registeredOn field
   const coreAddress = event.params._contractAddress;
   let contractEntity = Contract.load(coreAddress.toHexString());

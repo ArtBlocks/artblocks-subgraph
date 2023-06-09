@@ -1,0 +1,41 @@
+{
+  "network": "arbitrum-one",
+  "iGenArt721CoreContractV3_BaseContracts": [
+    {
+      "address": "0x0000000000000000000000000000000000000000",
+      "startBlock": 96747000
+    }
+  ],
+  "ownableGenArt721CoreV3Contracts": [
+  ],
+  "iERC721GenArt721CoreV3Contracts": [
+  ],
+  "iGenArt721CoreContractV3_Engine_FlexContracts": [
+  ],
+  "minterFilterV1Contracts": [
+  ],
+  "minterSetPriceContracts": [
+  ],
+  "minterSetPriceERC20Contracts": [
+  ],
+  "minterDAExpContracts": [
+  ],
+  "minterDALinContracts": [
+  ],
+  "minterDAExpSettlementContracts": [
+  ],
+  "minterMerkleContracts": [
+  ],
+  "minterHolderContracts": [
+  ],
+  "minterSEAContracts": [
+  ],
+  "adminACLV0Contracts": [
+  ],
+  "engineRegistryV0Contracts": [
+  ],
+  "iDependencyRegistryV0Contracts": [
+  ],
+  "ownableUpgradeableDependencyRegistryContracts": [
+  ]
+}

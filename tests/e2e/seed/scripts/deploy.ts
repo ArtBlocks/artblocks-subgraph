@@ -3,17 +3,21 @@
 
 import { ethers } from "ethers";
 // flagship
-import { GenArt721CoreV3__factory } from "../contracts/factories/GenArt721CoreV3__factory";
+import {
+  GenArt721CoreV3__factory,
+  GenArt721CoreV3LibraryAddresses,
+} from "../contracts/factories/GenArt721CoreV3__factory";
 import { AdminACLV0__factory } from "../contracts/factories/AdminACLV0__factory";
-import { BasicRandomizerV2__factory } from "../contracts/factories/BasicRandomizerV2__factory";
-// minter suite
-import { MinterFilterV1__factory } from "../contracts/factories/MinterFilterV1__factory";
-import { MinterSetPriceV2__factory } from "../contracts/factories/MinterSetPriceV2__factory";
-import { MinterSetPriceERC20V2__factory } from "../contracts/factories/MinterSetPriceERC20V2__factory";
-import { MinterDALinV2__factory } from "../contracts/factories/MinterDALinV2__factory";
-import { MinterDAExpV2__factory } from "../contracts/factories/MinterDAExpV2__factory";
-import { MinterMerkleV2__factory } from "../contracts/factories/MinterMerkleV2__factory";
-import { MinterHolderV1__factory } from "../contracts/factories/MinterHolderV1__factory";
+import { PseudorandomAtomic__factory } from "../contracts/factories/PseudorandomAtomic__factory";
+import { CoreRegistryV1__factory } from "../contracts/factories/CoreRegistryV1__factory";
+import { SharedRandomizerV0__factory } from "../contracts/factories/SharedRandomizerV0__factory";
+import { BytecodeStorageReader__factory } from "../contracts/factories/BytecodeStorageReader__factory";
+
+// minter suite (shared minter filter, shared minters)
+// @dev matchstick tests were used for legacy (non-shared) minter suite tests
+import { MinterFilterV2__factory } from "../contracts/factories/MinterFilterV2__factory";
+// @dev dummy shared minter used to test shared minter filter, but isn't used in production
+import { DummySharedMinter__factory } from "../contracts/factories/DummySharedMinter__factory";
 
 import fs from "fs";
 import { JsonRpcProvider } from "@ethersproject/providers";
@@ -24,43 +28,65 @@ import { JsonRpcProvider } from "@ethersproject/providers";
 const tokenName = "Art Blocks V3 Core Dev";
 const tokenTicker = "BLOCKS_V3_CORE_DEV";
 const superAdminAddress = undefined; // set to undefined to use deployer address
+const minterFilterSuperAdminAddress = undefined; // set to undefined to use deployer address
 const artblocksPrimarySalesAddress = undefined; // set to undefined to use deployer address
 const artblocksSecondarySalesAddress = undefined; // set to undefined to use deployer address
 const startingProjectId = 0; // offset from existing core with margin for new projects in the next ~month
-// (optional) add initial project
-const doAddInitialProject = false;
-const initialProjectName = undefined;
-const initialProjectArtistAddress = undefined;
 //////////////////////////////////////////////////////////////////////////////
 // CONFIG ENDS HERE
 //////////////////////////////////////////////////////////////////////////////
 
-type SubgraphConfig = {
-  network: string;
+type ConfigMetadata = {
   [key: string]: { address: string }[] | string;
+};
+
+type SubgraphConfig = {
+  [key: string]: { address: string }[] | string | ConfigMetadata | undefined;
+  network: string;
+  metadata?: ConfigMetadata;
 };
 
 async function main() {
   const subgraphConfig: SubgraphConfig = { network: "mainnet" };
+  subgraphConfig.metadata = {};
 
+  /////////////////////////////////////////////////////////////////////////////
+  // SETUP ACCOUNTS BEGINS HERE
+  /////////////////////////////////////////////////////////////////////////////
   const accounts = JSON.parse(
     fs.readFileSync("./shared/accounts.json", "utf8")
   );
   const deployer = ethers.Wallet.fromMnemonic(accounts.mnemonic).connect(
     new JsonRpcProvider("http://hardhat:8545")
   );
+  const artist = ethers.Wallet.fromMnemonic(
+    accounts.mnemonic,
+    "m/44'/60'/1'/0/1" // derivation path index 1
+  );
+  // fund artist wallet
+  await deployer.sendTransaction({
+    to: artist.address,
+    value: ethers.utils.parseEther("50"),
+  });
+  /////////////////////////////////////////////////////////////////////////////
+  // SETUP ACCOUNTS ENDS HERE
+  /////////////////////////////////////////////////////////////////////////////
 
   //////////////////////////////////////////////////////////////////////////////
   // DEPLOYMENT BEGINS HERE
   //////////////////////////////////////////////////////////////////////////////
 
   // Deploy randomizer contract
-  // @dev - comment out deployment if using existing randomizer
-  const randomizerFactory = new BasicRandomizerV2__factory(deployer);
-  const randomizer = await randomizerFactory.deploy();
+  const pseudorandomAtomicFactory = new PseudorandomAtomic__factory(deployer);
+  const pseudorandomAtomic = await pseudorandomAtomicFactory.deploy();
+  await pseudorandomAtomic.deployed();
+  const pseudorandomAtomicAddress = pseudorandomAtomic.address;
+  console.log(`Pseudorandom Atomoic deployed at ${pseudorandomAtomicAddress}`);
+  const randomizerFactory = new SharedRandomizerV0__factory(deployer);
+  const randomizer = await randomizerFactory.deploy(pseudorandomAtomicAddress);
   await randomizer.deployed();
   const randomizerAddress = randomizer.address;
-  console.log(`Randomizer deployed at ${randomizerAddress}`);
+  console.log(`Shared randomizer deployed at ${randomizerAddress}`);
 
   // Deploy AdminACL contract
   const adminACLFactory = new AdminACLV0__factory(deployer);
@@ -76,8 +102,28 @@ async function main() {
 
   console.log(`Admin ACL deployed at ${adminACLAddress}`);
 
-  // Deploy Core contract
-  const genArt721CoreFactory = new GenArt721CoreV3__factory(deployer);
+  // Deploy shared BytecodeStorage reader
+  const bytecodeStorageReaderFactory = new BytecodeStorageReader__factory(
+    deployer
+  );
+  const bytecodeStorageReader = await bytecodeStorageReaderFactory.deploy();
+  await bytecodeStorageReader.deployed();
+  const bytecodeStorageReaderAddress: string = bytecodeStorageReader.address;
+  console.log(
+    `BytecodeStorageReader deployed at ${bytecodeStorageReaderAddress}`
+  );
+  subgraphConfig.metadata.bytecodeStorageReaderAddress =
+    bytecodeStorageReaderAddress;
+
+  const linkLibraryAddresses: GenArt721CoreV3LibraryAddresses = {
+    "contracts/libs/0.8.x/BytecodeStorageV1.sol:BytecodeStorageReader":
+      bytecodeStorageReaderAddress,
+  };
+
+  const genArt721CoreFactory = new GenArt721CoreV3__factory(
+    linkLibraryAddresses,
+    deployer
+  );
   const genArt721Core = await genArt721CoreFactory.deploy(
     tokenName,
     tokenTicker,
@@ -94,123 +140,57 @@ async function main() {
     genArtV3SubgraphConfig,
   ];
   subgraphConfig.ownableGenArt721CoreV3Contracts = [genArtV3SubgraphConfig];
-  subgraphConfig.genArt721CoreV3Contracts = [genArtV3SubgraphConfig];
+  subgraphConfig.iERC721GenArt721CoreV3Contracts = [genArtV3SubgraphConfig];
 
   console.log(`GenArt721Core deployed at ${genArt721Core.address}`);
 
-  // Deploy Minter Filter contract.
-  const minterFilterFactory = new MinterFilterV1__factory(deployer);
-  const minterFilter = await minterFilterFactory.deploy(genArt721Core.address);
-  await minterFilter.deployed();
+  // Deploy Shared Minter Filter contract.
+  // first, deploy the minter filter's adminACL and core registry
+  const minterFilterAdminACLFactory = new AdminACLV0__factory(deployer);
+  const minterFilterAdminACL = await minterFilterAdminACLFactory.deploy();
+  await minterFilterAdminACL.deployed();
+  const minterFilterAdminACLAddress = minterFilterAdminACL.address;
+  // record in metadata for future reference in tests
+  subgraphConfig.metadata.minterFilterAdminACLAddress =
+    minterFilterAdminACLAddress.toString();
 
-  subgraphConfig.minterFilterV1Contracts = [
+  const coreRegistryFactory = new CoreRegistryV1__factory(deployer);
+  const coreRegistry = await coreRegistryFactory.deploy();
+  await coreRegistry.deployed();
+  const coreRegistryAddress = coreRegistry.address;
+  // record in metadata for future reference in tests
+  subgraphConfig.metadata.coreRegistryAddress = coreRegistryAddress.toString();
+
+  // @dev this key will be updated in a subsequent PR to be named engineRegistryContracts
+  subgraphConfig.engineRegistryV0Contracts = [
+    {
+      address: coreRegistryAddress,
+    },
+  ];
+
+  const minterFilterFactory = new MinterFilterV2__factory(deployer);
+  const minterFilter = await minterFilterFactory.deploy(
+    minterFilterAdminACLAddress,
+    coreRegistryAddress
+  );
+  await minterFilter.deployed();
+  console.log(`Shared Minter Filter deployed at ${minterFilter.address}`);
+
+  subgraphConfig.sharedMinterFilterContracts = [
     {
       address: minterFilter.address,
     },
   ];
 
-  console.log(`Minter Filter deployed at ${minterFilter.address}`);
-
   // Deploy Minter Suite contracts.
-  // set price V2
-  const minterSetPriceFactory = new MinterSetPriceV2__factory(deployer);
-  const minterSetPrice = await minterSetPriceFactory.deploy(
-    genArt721Core.address,
+  // dummy shared minter
+  const dummySharedMinterFactory = new DummySharedMinter__factory(deployer);
+  const dummySharedMinter = await dummySharedMinterFactory.deploy(
     minterFilter.address
   );
-  await minterSetPrice.deployed();
+  await dummySharedMinter.deployed();
 
-  subgraphConfig.minterSetPriceContracts = [
-    {
-      address: minterSetPrice.address,
-    },
-  ];
-
-  console.log(`MinterSetPrice V2 deployed at ${minterSetPrice.address}`);
-
-  // set price ERC20 V2
-  const minterSetPriceERC20Factory = new MinterSetPriceERC20V2__factory(
-    deployer
-  );
-  const minterSetPriceERC20 = await minterSetPriceERC20Factory.deploy(
-    genArt721Core.address,
-    minterFilter.address
-  );
-  await minterSetPriceERC20.deployed();
-
-  subgraphConfig.minterSetPriceERC20V2Contracts = [
-    {
-      address: minterSetPriceERC20.address,
-    },
-  ];
-
-  console.log(
-    `MinterSetPrice ERC20 V2 deployed at ${minterSetPriceERC20.address}`
-  );
-
-  // DA Lin V2
-  const MinterDALin__factory = new MinterDALinV2__factory(deployer);
-  const minterDALin = await MinterDALin__factory.deploy(
-    genArt721Core.address,
-    minterFilter.address
-  );
-  await minterDALin.deployed();
-
-  subgraphConfig.minterDALinContracts = [
-    {
-      address: minterDALin.address,
-    },
-  ];
-
-  console.log(`Minter DA Lin V2 deployed at ${minterDALin.address}`);
-
-  // DA Exp V2
-  const MinterDAExp__factory = new MinterDAExpV2__factory(deployer);
-  const minterDAExp = await MinterDAExp__factory.deploy(
-    genArt721Core.address,
-    minterFilter.address
-  );
-  await minterDAExp.deployed();
-
-  subgraphConfig.minterDAExpContracts = [
-    {
-      address: minterDAExp.address,
-    },
-  ];
-
-  console.log(`Minter DA Exp V2 deployed at ${minterDAExp.address}`);
-
-  // Merkle V1
-  const MinterMerkle__factory = new MinterMerkleV2__factory(deployer);
-  const minterMerkle = await MinterMerkle__factory.deploy(
-    genArt721Core.address,
-    minterFilter.address
-  );
-  await minterMerkle.deployed();
-
-  subgraphConfig.minterMerkleContracts = [
-    {
-      address: minterMerkle.address,
-    },
-  ];
-
-  console.log(`Minter Merkle V2 deployed at ${minterMerkle.address}`);
-
-  // Holder V1
-  const MinterHolder__factory = new MinterHolderV1__factory(deployer);
-  const minterHolder = await MinterHolder__factory.deploy(
-    genArt721Core.address,
-    minterFilter.address
-  );
-  await minterHolder.deployed();
-
-  subgraphConfig.minterHolderContracts = [
-    {
-      address: minterHolder.address,
-    },
-  ];
-
-  console.log(`Minter Holder V1 deployed at ${minterHolder.address}`);
+  console.log(`Dummy shared minter deployed at ${dummySharedMinter.address}`);
 
   //////////////////////////////////////////////////////////////////////////////
   // DEPLOYMENT ENDS HERE
@@ -220,14 +200,25 @@ async function main() {
   // SETUP BEGINS HERE
   //////////////////////////////////////////////////////////////////////////////
 
-  // Assign randomizer to core and renounce ownership
-  await randomizer.assignCoreAndRenounce(genArt721Core.address);
+  // register the core contract with the core registry
+  await coreRegistry
+    .connect(deployer)
+    .registerContract(
+      genArt721Core.address,
+      ethers.utils.formatBytes32String("GenArt721CoreV3"),
+      ethers.utils.formatBytes32String("1.0.0")
+    );
+  console.log(
+    `Registered the Core contract with the Core Registry at ${coreRegistryAddress}.`
+  );
 
   // Allowlist the Minter on the Core contract.
   await genArt721Core
     .connect(deployer)
     .updateMinterContract(minterFilter.address);
-  console.log(`Updated the Minter Filter on the Core contract.`);
+  console.log(
+    `Updated the Minter Filter on the Core contract to ${minterFilter.address}.`
+  );
 
   // Update the Art Blocks primary and secondary payment Addresses (if different than default deployer address).
   if (
@@ -261,36 +252,33 @@ async function main() {
     );
   }
 
-  // currently no ability to allowlist more than a single superAdmin on testnet
-
   // Allowlist new Minters on MinterFilter.
   await minterFilter
     .connect(deployer)
-    .addApprovedMinter(minterSetPrice.address);
-  console.log(`Allowlisted minter ${minterSetPrice.address} on minter filter.`);
-  await minterFilter
-    .connect(deployer)
-    .addApprovedMinter(minterSetPriceERC20.address);
+    .approveMinterGlobally(dummySharedMinter.address);
   console.log(
-    `Allowlisted minter ${minterSetPriceERC20.address} on minter filter.`
+    `Allowlisted dummy shared minter ${dummySharedMinter.address} on minter filter.`
   );
-  await minterFilter.connect(deployer).addApprovedMinter(minterDALin.address);
-  console.log(`Allowlisted minter ${minterDALin.address} on minter filter.`);
-  await minterFilter.connect(deployer).addApprovedMinter(minterDAExp.address);
-  console.log(`Allowlisted minter ${minterDAExp.address} on minter filter.`);
-  await minterFilter.connect(deployer).addApprovedMinter(minterMerkle.address);
-  console.log(`Allowlisted minter ${minterMerkle.address} on minter filter.`);
-  await minterFilter.connect(deployer).addApprovedMinter(minterHolder.address);
-  console.log(`Allowlisted minter ${minterHolder.address} on minter filter.`);
 
-  // update super admin address
+  // add initial project to the core contract
+  await genArt721Core
+    .connect(deployer)
+    .addProject("projectZero", artist.address);
+
+  // update super admin addresses
   if (superAdminAddress) {
     await adminACL
       .connect(deployer)
       .changeSuperAdmin(superAdminAddress, [genArt721Core.address]);
   }
+  if (minterFilterSuperAdminAddress) {
+    await minterFilterAdminACL
+      .connect(deployer)
+      .changeSuperAdmin(minterFilterSuperAdminAddress, []);
+  }
 
   // write subgraph config
+  console.log("subgraphConfig:", JSON.stringify(subgraphConfig, null, 2));
   fs.writeFileSync(
     "/usr/seed/shared/test-config.json",
     JSON.stringify(subgraphConfig)
