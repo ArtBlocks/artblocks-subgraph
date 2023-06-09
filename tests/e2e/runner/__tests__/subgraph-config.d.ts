@@ -27,5 +27,6 @@ export type SubgraphConfig = Partial<{
   metadata: {
     minterFilterAdminACLAddress: string;
     coreRegistryAddress: string;
+    bytecodeStorageReaderAddress: string;
   };
 }>;

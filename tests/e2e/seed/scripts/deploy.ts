@@ -32,10 +32,6 @@ const minterFilterSuperAdminAddress = undefined; // set to undefined to use depl
 const artblocksPrimarySalesAddress = undefined; // set to undefined to use deployer address
 const artblocksSecondarySalesAddress = undefined; // set to undefined to use deployer address
 const startingProjectId = 0; // offset from existing core with margin for new projects in the next ~month
-// (optional) add initial project
-const doAddInitialProject = false;
-const initialProjectName = undefined;
-const initialProjectArtistAddress = undefined;
 //////////////////////////////////////////////////////////////////////////////
 // CONFIG ENDS HERE
 //////////////////////////////////////////////////////////////////////////////
@@ -54,6 +50,9 @@ async function main() {
   const subgraphConfig: SubgraphConfig = { network: "mainnet" };
   subgraphConfig.metadata = {};
 
+  /////////////////////////////////////////////////////////////////////////////
+  // SETUP ACCOUNTS BEGINS HERE
+  /////////////////////////////////////////////////////////////////////////////
   const accounts = JSON.parse(
     fs.readFileSync("./shared/accounts.json", "utf8")
   );
@@ -64,6 +63,14 @@ async function main() {
     accounts.mnemonic,
     "m/44'/60'/1'/0/1" // derivation path index 1
   );
+  // fund artist wallet
+  await deployer.sendTransaction({
+    to: artist.address,
+    value: ethers.utils.parseEther("50"),
+  });
+  /////////////////////////////////////////////////////////////////////////////
+  // SETUP ACCOUNTS ENDS HERE
+  /////////////////////////////////////////////////////////////////////////////
 
   //////////////////////////////////////////////////////////////////////////////
   // DEPLOYMENT BEGINS HERE
@@ -105,6 +112,8 @@ async function main() {
   console.log(
     `BytecodeStorageReader deployed at ${bytecodeStorageReaderAddress}`
   );
+  subgraphConfig.metadata.bytecodeStorageReaderAddress =
+    bytecodeStorageReaderAddress;
 
   const linkLibraryAddresses: GenArt721CoreV3LibraryAddresses = {
     "contracts/libs/0.8.x/BytecodeStorageV1.sol:BytecodeStorageReader":
@@ -250,6 +259,11 @@ async function main() {
   console.log(
     `Allowlisted dummy shared minter ${dummySharedMinter.address} on minter filter.`
   );
+
+  // add initial project to the core contract
+  await genArt721Core
+    .connect(deployer)
+    .addProject("projectZero", artist.address);
 
   // update super admin addresses
   if (superAdminAddress) {

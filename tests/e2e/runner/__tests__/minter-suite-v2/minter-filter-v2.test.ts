@@ -9,6 +9,9 @@ import {
   GetTargetMintersDocument,
   GetTargetMintersQuery,
   GetTargetMintersQueryVariables,
+  GetTargetProjectsDocument,
+  GetTargetProjectsQuery,
+  GetTargetProjectsQueryVariables,
   Minter,
 } from "../../generated/graphql";
 import {
@@ -18,10 +21,16 @@ import {
   waitUntilSubgraphIsSynced,
 } from "../utils/helpers";
 
+import {
+  GenArt721CoreV3__factory,
+  GenArt721CoreV3LibraryAddresses,
+} from "../../contracts/factories/GenArt721CoreV3__factory";
 import { MinterFilterV2__factory } from "../../contracts/factories/MinterFilterV2__factory";
 // @dev dummy shared minter used to test shared minter filter, but isn't used in production
 import { DummySharedMinter__factory } from "../../contracts/factories/DummySharedMinter__factory";
 import { DummySharedMinter } from "../../contracts";
+import { constants, ethers } from "ethers";
+import { after } from "node:test";
 
 // waiting for subgraph to sync can take longer than the default 5s timeout
 jest.setTimeout(30 * 1000);
@@ -56,6 +65,21 @@ if (!config.iGenArt721CoreContractV3_BaseContracts) {
 }
 const genArt721CoreAddress =
   config.iGenArt721CoreContractV3_BaseContracts[0].address;
+
+const bytecodeStorageReaderAddress =
+  config.metadata?.bytecodeStorageReaderAddress;
+if (!bytecodeStorageReaderAddress)
+  throw new Error(
+    "No bytecode storage reader address found in config metadata"
+  );
+const linkLibraryAddresses: GenArt721CoreV3LibraryAddresses = {
+  "contracts/libs/0.8.x/BytecodeStorageV1.sol:BytecodeStorageReader":
+    bytecodeStorageReaderAddress,
+};
+const genArt721CoreContract = new GenArt721CoreV3__factory(
+  linkLibraryAddresses,
+  deployer
+).attach(genArt721CoreAddress);
 
 // helper functions
 
@@ -298,9 +322,26 @@ describe("MinterFilterV2 event handling", () => {
   });
 
   describe("MinterApprovedForContract", () => {
+    let newMinterAddressToCleanUp: string = "";
+    afterEach(async () => {
+      // clean up - remove minter from contract allowlist
+      try {
+        await sharedMinterFilterContract
+          .connect(deployer)
+          .revokeMinterForContract(
+            genArt721CoreAddress,
+            newMinterAddressToCleanUp
+          );
+      } catch (error) {
+        // swallow error if minter didn't need removal (likely failed test)
+      }
+    });
+
     it("updates MinterFilter entity", async () => {
       // deploy a new shared minter
       const newMinter = await deployNewMinter(sharedMinterFilter.address);
+      // ensure new minter address is cleaned up
+      newMinterAddressToCleanUp = newMinter.address;
       // approve minter for contract
       await sharedMinterFilterContract
         .connect(deployer)
@@ -342,15 +383,13 @@ describe("MinterFilterV2 event handling", () => {
       expect(minterFilterRes.knownMinters.map((minter) => minter.id)).toContain(
         newMinter.address.toLowerCase()
       );
-      // clean up - remove minter from contract allowlist
-      await sharedMinterFilterContract
-        .connect(deployer)
-        .revokeMinterForContract(genArt721CoreAddress, newMinter.address);
     });
 
     it("does not update minter to be globally allowlisted", async () => {
       // deploy a new shared minter
       const newMinter = await deployNewMinter(sharedMinterFilter.address);
+      // ensure new minter address is cleaned up
+      newMinterAddressToCleanUp = newMinter.address;
       // approve minter for contract
       await sharedMinterFilterContract
         .connect(deployer)
@@ -377,10 +416,40 @@ describe("MinterFilterV2 event handling", () => {
   });
 
   describe("MinterRevokedForContract", () => {
+    let newMinterAddressToCleanUp: string = "";
+    let newMinter2AddressToCleanUp: string = "";
+    beforeEach(async () => {
+      // attempt to clean up two minters in case of test failure
+      try {
+        // clean up - remove minter from contract allowlist
+        await sharedMinterFilterContract
+          .connect(deployer)
+          .revokeMinterForContract(
+            genArt721CoreAddress,
+            newMinterAddressToCleanUp
+          );
+      } catch (error) {
+        // swallow error if minter didn't need removal (likely failed test)
+      }
+      try {
+        // clean up - remove minter from contract allowlist
+        await sharedMinterFilterContract
+          .connect(deployer)
+          .revokeMinterForContract(
+            genArt721CoreAddress,
+            newMinter2AddressToCleanUp
+          );
+      } catch (error) {
+        // swallow error if minter didn't need removal (likely failed test)
+      }
+    });
+
     it("updates MinterFilter entity", async () => {
       // deploy two new shared minters
       const newMinter = await deployNewMinter(sharedMinterFilter.address);
+      newMinterAddressToCleanUp = newMinter.address;
       const newMinter2 = await deployNewMinter(sharedMinterFilter.address);
+      newMinter2AddressToCleanUp = newMinter2.address;
       // approve minters for contract
       await sharedMinterFilterContract
         .connect(deployer)
@@ -485,7 +554,98 @@ describe("MinterFilterV2 event handling", () => {
       expect(minterFilterRes.knownMinters.map((minter) => minter.id)).toContain(
         newMinter.address.toLowerCase()
       );
-      // @dev already cleaned up contract minter allowlist
+    });
+  });
+
+  describe("ProjectMinterRegistered", () => {
+    afterEach(async () => {
+      try {
+        // reset project minter
+        await sharedMinterFilterContract
+          .connect(artist)
+          .removeMinterForProject(0, genArt721CoreAddress);
+      } catch (e) {
+        // swallow error in case of test failure
+      }
+      try {
+        // reset core contract MinterFilter
+        await genArt721CoreContract
+          .connect(deployer)
+          .updateMinterContract(sharedMinterFilter.address);
+      } catch (e) {
+        // swallow error in case of test failure
+      }
+    });
+
+    it("does not affect project if core contract's minterFilter is different", async () => {
+      // temporarily update core contract's minterFilter to dummy address
+      const dummyAddress = ethers.Wallet.createRandom().address;
+      await genArt721CoreContract
+        .connect(deployer)
+        .updateMinterContract(dummyAddress);
+      // deploy new minter connected to inactive minterFilter
+      const newMinter = await deployNewMinter(sharedMinterFilter.address);
+      // global allowlist newMinter on inactive minterFilter
+      await sharedMinterFilterContract
+        .connect(deployer)
+        .approveMinterGlobally(newMinter.address);
+      await sharedMinterFilterContract
+        .connect(artist)
+        .setMinterForProject(0, genArt721CoreAddress, newMinter.address);
+      await waitUntilSubgraphIsSynced(client);
+      // project should not be updated since core contract's minterFilter is different
+      const projectRes = (
+        await client
+          .query<GetTargetProjectsQuery, GetTargetProjectsQueryVariables>(
+            GetTargetProjectsDocument,
+            { targetId: genArt721CoreAddress.toLowerCase().concat("-0") }
+          )
+          .toPromise()
+      ).data?.projects[0];
+      if (!projectRes) throw new Error("No project entity found");
+      // fix
+      expect(projectRes.minterConfiguration).toBeNull();
+    });
+
+    it("updates project's minterConfiguration when valid", async () => {
+      // deploy new minter connected to active minterFilter
+      const newMinter = await deployNewMinter(sharedMinterFilter.address);
+      // global allowlist newMinter on active minterFilter
+      await sharedMinterFilterContract
+        .connect(deployer)
+        .approveMinterGlobally(newMinter.address);
+      await sharedMinterFilterContract
+        .connect(artist)
+        .setMinterForProject(0, genArt721CoreAddress, newMinter.address);
+      await waitUntilSubgraphIsSynced(client);
+      // project should be updated
+      const projectRes = (
+        await client
+          .query<GetTargetProjectsQuery, GetTargetProjectsQueryVariables>(
+            GetTargetProjectsDocument,
+            { targetId: genArt721CoreAddress.toLowerCase().concat("-0") }
+          )
+          .toPromise()
+      ).data?.projects[0];
+      if (!projectRes) throw new Error("No project entity found");
+      // verify minterConfiguration was updated as expected
+      const projectMinterConfig = projectRes.minterConfiguration;
+      if (!projectMinterConfig) {
+        throw new Error("No minterConfiguration entity found");
+      }
+      expect(projectMinterConfig.minter.id).toEqual(
+        newMinter.address.toLowerCase()
+      );
+      expect(projectMinterConfig.project.id).toEqual(
+        genArt721CoreAddress.toLowerCase().concat("-0")
+      );
+      expect(projectMinterConfig.priceIsConfigured).toBe(false);
+      expect(projectMinterConfig.currencySymbol).toBe("ETH");
+      expect(projectMinterConfig.currencyAddress).toBe(constants.AddressZero);
+      expect(projectMinterConfig.purchaseToDisabled).toBe(false);
+      expect(projectMinterConfig.extraMinterDetails).toBe("{}");
+      expect(projectMinterConfig.basePrice).toBeNull();
+      expect(projectMinterConfig.maxInvocations).toBeNull();
     });
   });
 });

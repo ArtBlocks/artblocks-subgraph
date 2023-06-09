@@ -33,7 +33,7 @@ export const getAccounts = () => {
   const artist = ethers.Wallet.fromMnemonic(
     accounts.mnemonic,
     "m/44'/60'/1'/0/1" // derivation path index 1
-  );
+  ).connect(new JsonRpcProvider("http://hardhat:8545"));
   return { deployer, artist };
 };
 
