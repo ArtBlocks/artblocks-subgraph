@@ -342,6 +342,10 @@ describe("MinterFilterV2 event handling", () => {
       expect(minterFilterRes.knownMinters.map((minter) => minter.id)).toContain(
         newMinter.address.toLowerCase()
       );
+      // clean up - remove minter from contract allowlist
+      await sharedMinterFilterContract
+        .connect(deployer)
+        .revokeMinterForContract(genArt721CoreAddress, newMinter.address);
     });
 
     it("does not update minter to be globally allowlisted", async () => {
@@ -365,6 +369,123 @@ describe("MinterFilterV2 event handling", () => {
       if (!minterRes) throw new Error("No minter entity found");
       expect(minterRes.id).toBe(minterId);
       expect(minterRes.isGloballyAllowlistedOnMinterFilter).toBe(false);
+      // clean up - remove minter from contract allowlist
+      await sharedMinterFilterContract
+        .connect(deployer)
+        .revokeMinterForContract(genArt721CoreAddress, newMinter.address);
+    });
+  });
+
+  describe("MinterRevokedForContract", () => {
+    it("updates MinterFilter entity", async () => {
+      // deploy two new shared minters
+      const newMinter = await deployNewMinter(sharedMinterFilter.address);
+      const newMinter2 = await deployNewMinter(sharedMinterFilter.address);
+      // approve minters for contract
+      await sharedMinterFilterContract
+        .connect(deployer)
+        .approveMinterForContract(genArt721CoreAddress, newMinter.address);
+      await sharedMinterFilterContract
+        .connect(deployer)
+        .approveMinterForContract(genArt721CoreAddress, newMinter2.address);
+      await waitUntilSubgraphIsSynced(client);
+      // verify minter filter contract allowlist was updated
+      const minterFilterId = sharedMinterFilter.address.toLowerCase();
+      const minterFilterRes = (
+        await client
+          .query<
+            GetTargetMinterFiltersQuery,
+            GetTargetMinterFiltersQueryVariables
+          >(GetTargetMinterFiltersDocument, { targetId: minterFilterId })
+          .toPromise()
+      ).data?.minterFilters[0];
+      if (!minterFilterRes) throw new Error("No minter filter entity found");
+      // get target minter filter contract allowlist
+      const minterFilterContractAllowlistRes =
+        minterFilterRes.minterFilterContractAllowlists.find(
+          (minterFilterContractAllowlists) =>
+            minterFilterContractAllowlists.contract.id ===
+            genArt721CoreAddress.toLowerCase()
+        );
+      if (!minterFilterContractAllowlistRes)
+        throw new Error("No minter filter contract allowlist entity found");
+      // verify minters were added to contract allowlist
+      expect(
+        minterFilterContractAllowlistRes.minterContractAllowlist.map(
+          (minter) => minter.id
+        )
+      ).toContain(newMinter.address.toLowerCase());
+      expect(
+        minterFilterContractAllowlistRes.minterContractAllowlist.map(
+          (minter) => minter.id
+        )
+      ).toContain(newMinter2.address.toLowerCase());
+
+      // revoke newMinter for contract
+      await sharedMinterFilterContract
+        .connect(deployer)
+        .revokeMinterForContract(genArt721CoreAddress, newMinter.address);
+      await waitUntilSubgraphIsSynced(client);
+      // verify minter filter contract allowlist was updated
+      const minterFilterRes2 = (
+        await client
+          .query<
+            GetTargetMinterFiltersQuery,
+            GetTargetMinterFiltersQueryVariables
+          >(GetTargetMinterFiltersDocument, { targetId: minterFilterId })
+          .toPromise()
+      ).data?.minterFilters[0];
+      if (!minterFilterRes2) throw new Error("No minter filter entity found");
+      // get target minter filter contract allowlist
+      const minterFilterContractAllowlistRes2 =
+        minterFilterRes2.minterFilterContractAllowlists.find(
+          (minterFilterContractAllowlists) =>
+            minterFilterContractAllowlists.contract.id ===
+            genArt721CoreAddress.toLowerCase()
+        );
+      if (!minterFilterContractAllowlistRes2)
+        throw new Error("No minter filter contract allowlist entity found");
+      // verify newMinter was removed from contract allowlist
+      expect(
+        minterFilterContractAllowlistRes2.minterContractAllowlist.map(
+          (minter) => minter.id
+        )
+      ).not.toContain(newMinter.address.toLowerCase());
+      // verify newMinter2 is still in contract allowlist
+      expect(
+        minterFilterContractAllowlistRes2.minterContractAllowlist.map(
+          (minter) => minter.id
+        )
+      ).toContain(newMinter2.address.toLowerCase());
+      // revoke newMinter2 for contract
+      await sharedMinterFilterContract
+        .connect(deployer)
+        .revokeMinterForContract(genArt721CoreAddress, newMinter2.address);
+      await waitUntilSubgraphIsSynced(client);
+      // verify minter filter contract allowlist was updated
+      const minterFilterRes3 = (
+        await client
+          .query<
+            GetTargetMinterFiltersQuery,
+            GetTargetMinterFiltersQueryVariables
+          >(GetTargetMinterFiltersDocument, { targetId: minterFilterId })
+          .toPromise()
+      ).data?.minterFilters[0];
+      if (!minterFilterRes3) throw new Error("No minter filter entity found");
+      // get target minter filter contract allowlist
+      const minterFilterContractAllowlistRes3 =
+        minterFilterRes3.minterFilterContractAllowlists.find(
+          (minterFilterContractAllowlists) =>
+            minterFilterContractAllowlists.contract.id ===
+            genArt721CoreAddress.toLowerCase()
+        );
+      // vefify that the contract allowlist entity was deleted, since it is now empty
+      expect(minterFilterContractAllowlistRes3).toBeUndefined();
+      // derived field of knownMinters should still have minter
+      expect(minterFilterRes.knownMinters.map((minter) => minter.id)).toContain(
+        newMinter.address.toLowerCase()
+      );
+      // @dev already cleaned up contract minter allowlist
     });
   });
 });
