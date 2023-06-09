@@ -19,7 +19,6 @@ import { MinterFilterV2__factory } from "../../contracts/factories/MinterFilterV
 import { DummySharedMinter__factory } from "../../contracts/factories/DummySharedMinter__factory";
 import { DummySharedMinter } from "../../contracts";
 import { constants, ethers } from "ethers";
-import { after } from "node:test";
 
 // waiting for subgraph to sync can take longer than the default 5s timeout
 jest.setTimeout(30 * 1000);
