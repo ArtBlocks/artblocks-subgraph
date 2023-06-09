@@ -25,6 +25,7 @@ query GetProjects {
       extraMinterDetails
       maxInvocations
     }
+    updatedAt
   }
 }
 
@@ -55,5 +56,6 @@ query GetTargetProjects($targetId: ID!) {
       extraMinterDetails
       maxInvocations
     }
+    updatedAt
   }
 }

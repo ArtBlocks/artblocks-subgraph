@@ -648,4 +648,119 @@ describe("MinterFilterV2 event handling", () => {
       expect(projectMinterConfig.maxInvocations).toBeNull();
     });
   });
+
+  describe("ProjectMinterRemoved", () => {
+    afterEach(async () => {
+      // attempt to remove minter for project zero in case of test failure
+      try {
+        // reset project minter
+        await sharedMinterFilterContract
+          .connect(artist)
+          .removeMinterForProject(0, genArt721CoreAddress);
+      } catch (e) {
+        // swallow error in case of test success
+      }
+    });
+
+    it("clears project's minterConfiguration", async () => {
+      // deploy new minter connected to active minterFilter
+      const newMinter = await deployNewMinter(sharedMinterFilter.address);
+      // global allowlist newMinter on active minterFilter
+      await sharedMinterFilterContract
+        .connect(deployer)
+        .approveMinterGlobally(newMinter.address);
+      await sharedMinterFilterContract
+        .connect(artist)
+        .setMinterForProject(0, genArt721CoreAddress, newMinter.address);
+      await waitUntilSubgraphIsSynced(client);
+      // project should be updated
+      const projectRes = (
+        await client
+          .query<GetTargetProjectsQuery, GetTargetProjectsQueryVariables>(
+            GetTargetProjectsDocument,
+            { targetId: genArt721CoreAddress.toLowerCase().concat("-0") }
+          )
+          .toPromise()
+      ).data?.projects[0];
+      if (!projectRes) throw new Error("No project entity found");
+      // verify minterConfiguration was updated as expected
+      const projectMinterConfig = projectRes.minterConfiguration;
+      if (!projectMinterConfig) {
+        throw new Error("No minterConfiguration entity found");
+      }
+      expect(projectMinterConfig.minter.id).toEqual(
+        newMinter.address.toLowerCase()
+      );
+      // remove minter from project
+      await sharedMinterFilterContract
+        .connect(artist)
+        .removeMinterForProject(0, genArt721CoreAddress);
+      await waitUntilSubgraphIsSynced(client);
+      // project should be updated
+      const projectRes2 = (
+        await client
+          .query<GetTargetProjectsQuery, GetTargetProjectsQueryVariables>(
+            GetTargetProjectsDocument,
+            { targetId: genArt721CoreAddress.toLowerCase().concat("-0") }
+          )
+          .toPromise()
+      ).data?.projects[0];
+      if (!projectRes2) throw new Error("No project entity found");
+      // verify minterConfiguration was updated as expected
+      expect(projectRes2.minterConfiguration).toBeNull();
+      expect(parseInt(projectRes2.updatedAt)).toBeGreaterThan(
+        parseInt(projectRes.updatedAt)
+      );
+    });
+  });
+
+  describe("CoreRegistryUpdated", () => {
+    afterEach(async () => {
+      // reset minter filter's core registry
+      try {
+        await sharedMinterFilterContract
+          .connect(deployer)
+          .updateCoreRegistry(coreRegistryAddress);
+      } catch (error) {
+        // swallow error in case of test failure
+      }
+    });
+
+    it("updates minter filter's core registry", async () => {
+      const dummyAddress = ethers.Wallet.createRandom().address;
+      // update minter filter's core registry to dummy address
+      await sharedMinterFilterContract
+        .connect(deployer)
+        .updateCoreRegistry(dummyAddress);
+      await waitUntilSubgraphIsSynced(client);
+      // verify minter filter's core registry was updated
+      const minterFilterRes = (
+        await client
+          .query<
+            GetTargetMinterFiltersQuery,
+            GetTargetMinterFiltersQueryVariables
+          >(GetTargetMinterFiltersDocument, {
+            targetId: sharedMinterFilter.address.toLowerCase(),
+          })
+          .toPromise()
+      ).data?.minterFilters[0];
+      if (!minterFilterRes) throw new Error("No minterFilter entity found");
+      expect(minterFilterRes.coreRegistry.id).toEqual(
+        dummyAddress.toLowerCase()
+      );
+      // expect core registry to have been created with dummy address
+      const coreRegistryRes = (
+        await client
+          .query<
+            GetTargetCoreRegistriesQuery,
+            GetTargetCoreRegistriesQueryVariables
+          >(GetTargetCoreRegistriesDocument, {
+            targetId: dummyAddress.toLowerCase(),
+          })
+          .toPromise()
+      ).data?.coreRegistries[0];
+      if (!coreRegistryRes) throw new Error("No coreRegistry entity found");
+      expect(coreRegistryRes.id).toEqual(dummyAddress.toLowerCase());
+    });
+  });
 });
