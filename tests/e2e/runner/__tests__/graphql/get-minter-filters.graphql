@@ -1,30 +1,34 @@
+fragment minterFilterDetails on MinterFilter {
+  id
+  minterGlobalAllowlist {
+    id
+  }
+  minterFilterContractAllowlists {
+    id
+    contract {
+      id
+    }
+    minterContractAllowlist {
+      id
+    }
+  }
+  knownMinters {
+    id
+  }
+  coreRegistry {
+    id
+  }
+  updatedAt
+}
+
 query GetMinterFilters {
   minterFilters {
-    id
+    ...minterFilterDetails
   }
 }
 
 query GetTargetMinterFilters($targetId: ID!) {
   minterFilters(where: { id: $targetId }) {
-    id
-    minterGlobalAllowlist {
-      id
-    }
-    minterFilterContractAllowlists {
-      id
-      contract {
-        id
-      }
-      minterContractAllowlist {
-        id
-      }
-    }
-    knownMinters {
-      id
-    }
-    coreRegistry {
-      id
-    }
-    updatedAt
+    ...minterFilterDetails
   }
 }

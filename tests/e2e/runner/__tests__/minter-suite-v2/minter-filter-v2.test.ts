@@ -1,24 +1,13 @@
 import { describe, test, expect } from "@jest/globals";
 import {
-  GetTargetMinterFiltersDocument,
-  GetTargetMinterFiltersQuery,
-  GetTargetMinterFiltersQueryVariables,
-  GetTargetCoreRegistriesDocument,
-  GetTargetCoreRegistriesQuery,
-  GetTargetCoreRegistriesQueryVariables,
-  GetTargetMintersDocument,
-  GetTargetMintersQuery,
-  GetTargetMintersQueryVariables,
-  GetTargetProjectsDocument,
-  GetTargetProjectsQuery,
-  GetTargetProjectsQueryVariables,
-  Minter,
-} from "../../generated/graphql";
-import {
   getSubgraphConfig,
   getAccounts,
   createSubgraphClient,
   waitUntilSubgraphIsSynced,
+  getMinterFilterDetails,
+  getMinterDetails,
+  getProjectDetails,
+  getCoreRegistryDetails,
 } from "../utils/helpers";
 
 import {
@@ -105,48 +94,28 @@ describe("MinterFilterV2 event handling", () => {
   describe("Deployed", () => {
     test("creates new MinterFilter during deployment", async () => {
       const targetId = sharedMinterFilter.address.toLowerCase();
-
-      const minterFiltersRes = await client
-        .query<
-          GetTargetMinterFiltersQuery,
-          GetTargetMinterFiltersQueryVariables
-        >(GetTargetMinterFiltersDocument, { targetId })
-        .toPromise();
-      expect(minterFiltersRes.data?.minterFilters.length).toBe(1);
-      expect(minterFiltersRes.data?.minterFilters[0].id).toBe(targetId);
+      const minterFiltersRes = await getMinterFilterDetails(client, targetId);
+      expect(minterFiltersRes.id).toBe(targetId);
     });
 
     test("created new CoreRegistry during deployment", async () => {
       const targetId = coreRegistryAddress.toLowerCase();
-
-      const coreRegistryRes = await client
-        .query<
-          GetTargetCoreRegistriesQuery,
-          GetTargetCoreRegistriesQueryVariables
-        >(GetTargetCoreRegistriesDocument, { targetId })
-        .toPromise();
-      expect(coreRegistryRes.data?.coreRegistries.length).toBe(1);
-      expect(coreRegistryRes.data?.coreRegistries[0].id).toBe(targetId);
+      const coreRegistryRes = await getCoreRegistryDetails(client, targetId);
+      expect(coreRegistryRes.id).toBe(targetId);
     });
 
     test("populates MinterFilter entity during deployment", async () => {
       const targetId = sharedMinterFilter.address.toLowerCase();
 
-      const minterFiltersRes = await client
-        .query<
-          GetTargetMinterFiltersQuery,
-          GetTargetMinterFiltersQueryVariables
-        >(GetTargetMinterFiltersDocument, { targetId })
-        .toPromise();
-      const minterFilter = minterFiltersRes.data?.minterFilters[0];
+      const minterFilterRes = await getMinterFilterDetails(client, targetId);
       // verify minter filter fields
-      expect(minterFilter?.id).toBe(targetId);
-      expect(minterFilter?.coreRegistry.id).toBe(
+      expect(minterFilterRes.id).toBe(targetId);
+      expect(minterFilterRes.coreRegistry.id).toBe(
         coreRegistryAddress.toLowerCase()
       );
       // updated at not checked for exact value because its was not recorded during seed deployment
       // to be defined is sufficient
-      expect(minterFilter?.updatedAt).toBeDefined();
+      expect(minterFilterRes.updatedAt).toBeDefined();
     });
   });
 
@@ -162,15 +131,7 @@ describe("MinterFilterV2 event handling", () => {
       await waitUntilSubgraphIsSynced(client);
       // verify minter entity was created
       const minterId = newMinter.address.toLowerCase();
-      const minterRes = (
-        await client
-          .query<GetTargetMintersQuery, GetTargetMintersQueryVariables>(
-            GetTargetMintersDocument,
-            { targetId: minterId }
-          )
-          .toPromise()
-      ).data?.minters[0];
-      if (!minterRes) throw new Error("No minter entity found");
+      const minterRes = await getMinterDetails(client, minterId);
       expect(minterRes.id).toBe(minterId);
     });
 
@@ -185,16 +146,7 @@ describe("MinterFilterV2 event handling", () => {
       await waitUntilSubgraphIsSynced(client);
       // verify minter entity was created and is globally allowlisted
       const minterId = newMinter.address.toLowerCase();
-      const minterRes = (
-        await client
-          .query<GetTargetMintersQuery, GetTargetMintersQueryVariables>(
-            GetTargetMintersDocument,
-            { targetId: minterId }
-          )
-          .toPromise()
-      ).data?.minters[0];
-      // verify minter fields were populated as expected
-      if (!minterRes) throw new Error("No minter entity found");
+      const minterRes = await getMinterDetails(client, minterId);
       expect(minterRes.id).toBe(minterId);
       expect(minterRes.type).toBe("DummySharedMinter");
       expect(minterRes.minterFilter.id).toBe(
@@ -215,15 +167,10 @@ describe("MinterFilterV2 event handling", () => {
       await waitUntilSubgraphIsSynced(client);
       // verify minter filter global allowlist was updated
       const minterFilterId = sharedMinterFilter.address.toLowerCase();
-      const minterFilterRes = (
-        await client
-          .query<
-            GetTargetMinterFiltersQuery,
-            GetTargetMinterFiltersQueryVariables
-          >(GetTargetMinterFiltersDocument, { targetId: minterFilterId })
-          .toPromise()
-      ).data?.minterFilters[0];
-      if (!minterFilterRes) throw new Error("No minter filter entity found");
+      const minterFilterRes = await getMinterFilterDetails(
+        client,
+        minterFilterId
+      );
       expect(
         minterFilterRes.minterGlobalAllowlist.map((minter) => minter.id)
       ).toContain(newMinter.address.toLowerCase());
@@ -245,15 +192,7 @@ describe("MinterFilterV2 event handling", () => {
       await waitUntilSubgraphIsSynced(client);
       // verify minter entity was updated to be globally allowlisted
       const minterId = newMinter.address.toLowerCase();
-      const minterRes = (
-        await client
-          .query<GetTargetMintersQuery, GetTargetMintersQueryVariables>(
-            GetTargetMintersDocument,
-            { targetId: minterId }
-          )
-          .toPromise()
-      ).data?.minters[0];
-      if (!minterRes) throw new Error("No minter entity found");
+      const minterRes = await getMinterDetails(client, minterId);
       expect(minterRes.id).toBe(minterId);
       expect(minterRes.isGloballyAllowlistedOnMinterFilter).toBe(true);
       // remove minter from global allowlist, verify minter entity was updated
@@ -261,15 +200,7 @@ describe("MinterFilterV2 event handling", () => {
         .connect(deployer)
         .revokeMinterGlobally(newMinter.address);
       await waitUntilSubgraphIsSynced(client);
-      const minterRes2 = (
-        await client
-          .query<GetTargetMintersQuery, GetTargetMintersQueryVariables>(
-            GetTargetMintersDocument,
-            { targetId: minterId }
-          )
-          .toPromise()
-      ).data?.minters[0];
-      if (!minterRes2) throw new Error("No minter entity found");
+      const minterRes2 = await getMinterDetails(client, minterId);
       expect(minterRes2.id).toBe(minterId);
       expect(minterRes2.isGloballyAllowlistedOnMinterFilter).toBe(false);
     });
@@ -284,15 +215,10 @@ describe("MinterFilterV2 event handling", () => {
       await waitUntilSubgraphIsSynced(client);
       // verify minter filter global allowlist contains new minter
       const minterFilterId = sharedMinterFilter.address.toLowerCase();
-      const minterFilterRes = (
-        await client
-          .query<
-            GetTargetMinterFiltersQuery,
-            GetTargetMinterFiltersQueryVariables
-          >(GetTargetMinterFiltersDocument, { targetId: minterFilterId })
-          .toPromise()
-      ).data?.minterFilters[0];
-      if (!minterFilterRes) throw new Error("No minter filter entity found");
+      const minterFilterRes = await getMinterFilterDetails(
+        client,
+        minterFilterId
+      );
       expect(
         minterFilterRes.minterGlobalAllowlist.map((minter) => minter.id)
       ).toContain(newMinter.address.toLowerCase());
@@ -302,15 +228,10 @@ describe("MinterFilterV2 event handling", () => {
         .revokeMinterGlobally(newMinter.address);
       await waitUntilSubgraphIsSynced(client);
       // verify minter filter global allowlist does not contain new minter
-      const minterFilterRes2 = (
-        await client
-          .query<
-            GetTargetMinterFiltersQuery,
-            GetTargetMinterFiltersQueryVariables
-          >(GetTargetMinterFiltersDocument, { targetId: minterFilterId })
-          .toPromise()
-      ).data?.minterFilters[0];
-      if (!minterFilterRes2) throw new Error("No minter filter entity found");
+      const minterFilterRes2 = await getMinterFilterDetails(
+        client,
+        minterFilterId
+      );
       expect(
         minterFilterRes2.minterGlobalAllowlist.map((minter) => minter.id)
       ).not.toContain(newMinter.address.toLowerCase());
@@ -349,15 +270,10 @@ describe("MinterFilterV2 event handling", () => {
       await waitUntilSubgraphIsSynced(client);
       // verify minter filter contract allowlist was updated
       const minterFilterId = sharedMinterFilter.address.toLowerCase();
-      const minterFilterRes = (
-        await client
-          .query<
-            GetTargetMinterFiltersQuery,
-            GetTargetMinterFiltersQueryVariables
-          >(GetTargetMinterFiltersDocument, { targetId: minterFilterId })
-          .toPromise()
-      ).data?.minterFilters[0];
-      if (!minterFilterRes) throw new Error("No minter filter entity found");
+      const minterFilterRes = await getMinterFilterDetails(
+        client,
+        minterFilterId
+      );
       expect(
         minterFilterRes.minterFilterContractAllowlists.map(
           (minterFilterContractAllowlists) =>
@@ -397,15 +313,7 @@ describe("MinterFilterV2 event handling", () => {
       await waitUntilSubgraphIsSynced(client);
       // verify minter is not globally allowlisted
       const minterId = newMinter.address.toLowerCase();
-      const minterRes = (
-        await client
-          .query<GetTargetMintersQuery, GetTargetMintersQueryVariables>(
-            GetTargetMintersDocument,
-            { targetId: minterId }
-          )
-          .toPromise()
-      ).data?.minters[0];
-      if (!minterRes) throw new Error("No minter entity found");
+      const minterRes = await getMinterDetails(client, minterId);
       expect(minterRes.id).toBe(minterId);
       expect(minterRes.isGloballyAllowlistedOnMinterFilter).toBe(false);
       // clean up - remove minter from contract allowlist
@@ -460,15 +368,10 @@ describe("MinterFilterV2 event handling", () => {
       await waitUntilSubgraphIsSynced(client);
       // verify minter filter contract allowlist was updated
       const minterFilterId = sharedMinterFilter.address.toLowerCase();
-      const minterFilterRes = (
-        await client
-          .query<
-            GetTargetMinterFiltersQuery,
-            GetTargetMinterFiltersQueryVariables
-          >(GetTargetMinterFiltersDocument, { targetId: minterFilterId })
-          .toPromise()
-      ).data?.minterFilters[0];
-      if (!minterFilterRes) throw new Error("No minter filter entity found");
+      const minterFilterRes = await getMinterFilterDetails(
+        client,
+        minterFilterId
+      );
       // get target minter filter contract allowlist
       const minterFilterContractAllowlistRes =
         minterFilterRes.minterFilterContractAllowlists.find(
@@ -496,15 +399,10 @@ describe("MinterFilterV2 event handling", () => {
         .revokeMinterForContract(genArt721CoreAddress, newMinter.address);
       await waitUntilSubgraphIsSynced(client);
       // verify minter filter contract allowlist was updated
-      const minterFilterRes2 = (
-        await client
-          .query<
-            GetTargetMinterFiltersQuery,
-            GetTargetMinterFiltersQueryVariables
-          >(GetTargetMinterFiltersDocument, { targetId: minterFilterId })
-          .toPromise()
-      ).data?.minterFilters[0];
-      if (!minterFilterRes2) throw new Error("No minter filter entity found");
+      const minterFilterRes2 = await getMinterFilterDetails(
+        client,
+        minterFilterId
+      );
       // get target minter filter contract allowlist
       const minterFilterContractAllowlistRes2 =
         minterFilterRes2.minterFilterContractAllowlists.find(
@@ -532,15 +430,10 @@ describe("MinterFilterV2 event handling", () => {
         .revokeMinterForContract(genArt721CoreAddress, newMinter2.address);
       await waitUntilSubgraphIsSynced(client);
       // verify minter filter contract allowlist was updated
-      const minterFilterRes3 = (
-        await client
-          .query<
-            GetTargetMinterFiltersQuery,
-            GetTargetMinterFiltersQueryVariables
-          >(GetTargetMinterFiltersDocument, { targetId: minterFilterId })
-          .toPromise()
-      ).data?.minterFilters[0];
-      if (!minterFilterRes3) throw new Error("No minter filter entity found");
+      const minterFilterRes3 = await getMinterFilterDetails(
+        client,
+        minterFilterId
+      );
       // get target minter filter contract allowlist
       const minterFilterContractAllowlistRes3 =
         minterFilterRes3.minterFilterContractAllowlists.find(
@@ -594,16 +487,10 @@ describe("MinterFilterV2 event handling", () => {
         .setMinterForProject(0, genArt721CoreAddress, newMinter.address);
       await waitUntilSubgraphIsSynced(client);
       // project should not be updated since core contract's minterFilter is different
-      const projectRes = (
-        await client
-          .query<GetTargetProjectsQuery, GetTargetProjectsQueryVariables>(
-            GetTargetProjectsDocument,
-            { targetId: genArt721CoreAddress.toLowerCase().concat("-0") }
-          )
-          .toPromise()
-      ).data?.projects[0];
-      if (!projectRes) throw new Error("No project entity found");
-      // fix
+      const projectRes = await getProjectDetails(
+        client,
+        genArt721CoreAddress.toLowerCase().concat("-0")
+      );
       expect(projectRes.minterConfiguration).toBeNull();
     });
 
@@ -619,15 +506,10 @@ describe("MinterFilterV2 event handling", () => {
         .setMinterForProject(0, genArt721CoreAddress, newMinter.address);
       await waitUntilSubgraphIsSynced(client);
       // project should be updated
-      const projectRes = (
-        await client
-          .query<GetTargetProjectsQuery, GetTargetProjectsQueryVariables>(
-            GetTargetProjectsDocument,
-            { targetId: genArt721CoreAddress.toLowerCase().concat("-0") }
-          )
-          .toPromise()
-      ).data?.projects[0];
-      if (!projectRes) throw new Error("No project entity found");
+      const projectRes = await getProjectDetails(
+        client,
+        genArt721CoreAddress.toLowerCase().concat("-0")
+      );
       // verify minterConfiguration was updated as expected
       const projectMinterConfig = projectRes.minterConfiguration;
       if (!projectMinterConfig) {
@@ -674,15 +556,10 @@ describe("MinterFilterV2 event handling", () => {
         .setMinterForProject(0, genArt721CoreAddress, newMinter.address);
       await waitUntilSubgraphIsSynced(client);
       // project should be updated
-      const projectRes = (
-        await client
-          .query<GetTargetProjectsQuery, GetTargetProjectsQueryVariables>(
-            GetTargetProjectsDocument,
-            { targetId: genArt721CoreAddress.toLowerCase().concat("-0") }
-          )
-          .toPromise()
-      ).data?.projects[0];
-      if (!projectRes) throw new Error("No project entity found");
+      const projectRes = await getProjectDetails(
+        client,
+        genArt721CoreAddress.toLowerCase().concat("-0")
+      );
       // verify minterConfiguration was updated as expected
       const projectMinterConfig = projectRes.minterConfiguration;
       if (!projectMinterConfig) {
@@ -697,15 +574,10 @@ describe("MinterFilterV2 event handling", () => {
         .removeMinterForProject(0, genArt721CoreAddress);
       await waitUntilSubgraphIsSynced(client);
       // project should be updated
-      const projectRes2 = (
-        await client
-          .query<GetTargetProjectsQuery, GetTargetProjectsQueryVariables>(
-            GetTargetProjectsDocument,
-            { targetId: genArt721CoreAddress.toLowerCase().concat("-0") }
-          )
-          .toPromise()
-      ).data?.projects[0];
-      if (!projectRes2) throw new Error("No project entity found");
+      const projectRes2 = await getProjectDetails(
+        client,
+        genArt721CoreAddress.toLowerCase().concat("-0")
+      );
       // verify minterConfiguration was updated as expected
       expect(projectRes2.minterConfiguration).toBeNull();
       expect(parseInt(projectRes2.updatedAt)).toBeGreaterThan(
@@ -734,32 +606,18 @@ describe("MinterFilterV2 event handling", () => {
         .updateCoreRegistry(dummyAddress);
       await waitUntilSubgraphIsSynced(client);
       // verify minter filter's core registry was updated
-      const minterFilterRes = (
-        await client
-          .query<
-            GetTargetMinterFiltersQuery,
-            GetTargetMinterFiltersQueryVariables
-          >(GetTargetMinterFiltersDocument, {
-            targetId: sharedMinterFilter.address.toLowerCase(),
-          })
-          .toPromise()
-      ).data?.minterFilters[0];
-      if (!minterFilterRes) throw new Error("No minterFilter entity found");
+      const minterFilterRes = await getMinterFilterDetails(
+        client,
+        sharedMinterFilter.address.toLowerCase()
+      );
       expect(minterFilterRes.coreRegistry.id).toEqual(
         dummyAddress.toLowerCase()
       );
       // expect core registry to have been created with dummy address
-      const coreRegistryRes = (
-        await client
-          .query<
-            GetTargetCoreRegistriesQuery,
-            GetTargetCoreRegistriesQueryVariables
-          >(GetTargetCoreRegistriesDocument, {
-            targetId: dummyAddress.toLowerCase(),
-          })
-          .toPromise()
-      ).data?.coreRegistries[0];
-      if (!coreRegistryRes) throw new Error("No coreRegistry entity found");
+      const coreRegistryRes = await getCoreRegistryDetails(
+        client,
+        dummyAddress.toLowerCase()
+      );
       expect(coreRegistryRes.id).toEqual(dummyAddress.toLowerCase());
     });
   });
