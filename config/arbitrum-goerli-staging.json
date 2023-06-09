@@ -1,13 +1,9 @@
 {
   "network": "arbitrum-goerli",
-  "iGenArt721CoreContractV3_BaseContracts": [
-  ],
-  "ownableGenArt721CoreV3Contracts": [
-  ],
-  "iERC721GenArt721CoreV3Contracts": [
-  ],
-  "iGenArt721CoreContractV3_Engine_FlexContracts": [
-  ],
+  "iGenArt721CoreContractV3_BaseContracts": [],
+  "ownableGenArt721CoreV3Contracts": [],
+  "iERC721GenArt721CoreV3Contracts": [],
+  "iGenArt721CoreContractV3_Engine_FlexContracts": [],
   "minterFilterV1Contracts": [
     {
       "address": "0x5E9EDa0F8a6f14e2f900357D1aec1F53507605da",
@@ -22,12 +18,9 @@
       "startBlock": 21284800
     }
   ],
-  "minterSetPriceERC20Contracts": [
-  ],
-  "minterDAExpContracts": [
-  ],
-  "minterDALinContracts": [
-  ],
+  "minterSetPriceERC20Contracts": [],
+  "minterDAExpContracts": [],
+  "minterDALinContracts": [],
   "minterDAExpSettlementContracts": [
     {
       "address": "0x58C3B1fCF6c8Ef3a71BE318525b63121eC65E301",
@@ -35,23 +28,17 @@
       "startBlock": 21284840
     }
   ],
-  "minterMerkleContracts": [
-  ],
-  "minterHolderContracts": [
-  ],
-  "minterSEAContracts": [
-  ],
-  "adminACLV0Contracts": [
-  ],
-  "engineRegistryV0Contracts": [
+  "minterMerkleContracts": [],
+  "minterHolderContracts": [],
+  "minterSEAContracts": [],
+  "adminACLV0Contracts": [],
+  "ICoreRegistryContracts": [
     {
       "address": "0x25841600e79E9A5263Ec4badcC328AD9CFE5f8C8",
       "name": "Arbitrum Goerli dev engine registry contract, heylinds as Deployer",
       "startBlock": 20565900
     }
   ],
-  "iDependencyRegistryV0Contracts": [
-  ],
-  "ownableUpgradeableDependencyRegistryContracts": [
-  ]
+  "iDependencyRegistryV0Contracts": [],
+  "ownableUpgradeableDependencyRegistryContracts": []
 }

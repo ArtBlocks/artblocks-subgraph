@@ -23,7 +23,7 @@ export type SubgraphConfig = Partial<{
   adminACLV0Contracts: { address: string }[];
   iDependencyRegistryV0Contracts: { address: string }[];
   ownableUpgradeableDependencyRegistryContracts: { address: string }[];
-  engineRegistryV0Contracts: { address: string }[];
+  ICoreRegistryContracts: { address: string }[];
   metadata: {
     minterFilterAdminACLAddress: string;
     coreRegistryAddress: string;
