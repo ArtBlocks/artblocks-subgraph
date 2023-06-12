@@ -705,26 +705,6 @@ export function handleUpdateProjectScriptJSON(
       return;
     }
 
-    let scriptJSONRaw = jsonResult.value;
-
-    if (scriptJSONRaw.kind == JSONValueKind.OBJECT) {
-      let scriptJSON = scriptJSONRaw.toObject();
-
-      // Old site used curation_status, new site uses curationStatus
-      let curationStatusJSONValue = scriptJSON.get("curation_status");
-      if (!curationStatusJSONValue || curationStatusJSONValue.isNull()) {
-        curationStatusJSONValue = scriptJSON.get("curationStatus");
-      }
-
-      if (
-        curationStatusJSONValue &&
-        curationStatusJSONValue.kind == JSONValueKind.STRING
-      ) {
-        let curationStatus = curationStatusJSONValue.toString();
-        project.curationStatus = curationStatus;
-      }
-    }
-
     project.scriptJSON = call.inputs._projectScriptJSON;
     project.updatedAt = call.block.timestamp;
     project.save();
