@@ -250,6 +250,33 @@ export function loadOrCreateAndSetProjectMinterConfiguration(
   minter: Minter,
   timestamp: BigInt
 ): ProjectMinterConfiguration {
+  const projectMinterConfig = loadOrCreateProjectMinterConfiguration(
+    project,
+    minter
+  );
+
+  // update the project's minter configuration
+  project.updatedAt = timestamp;
+  project.minterConfiguration = projectMinterConfig.id;
+  project.save();
+
+  return projectMinterConfig;
+}
+
+/**
+ * Loads or creates a ProjectMinterConfiguration entity for the given project
+ * and minter.
+ * If a new ProjectMinterConfiguration entity is created, it is assumed that
+ * the minter is not pre-configured, and the price is not configured.
+ * The project's updatedAt is not updated, and the project is not saved.
+ * @param project The project entity
+ * @param minter The minter entity
+ * @returns
+ */
+export function loadOrCreateProjectMinterConfiguration(
+  project: Project,
+  minter: Minter
+): ProjectMinterConfiguration {
   const targetProjectMinterConfigId = getProjectMinterConfigId(
     minter.id,
     project.id
@@ -275,11 +302,6 @@ export function loadOrCreateAndSetProjectMinterConfiguration(
     projectMinterConfig.extraMinterDetails = "{}";
     projectMinterConfig.save();
   }
-
-  project.updatedAt = timestamp;
-  project.minterConfiguration = projectMinterConfig.id;
-  project.save();
-
   return projectMinterConfig;
 }
 
