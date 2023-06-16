@@ -98,6 +98,44 @@ export function handleProjectCurrencyInfoUpdated(
   project.save();
 }
 
+export function handleProjectMaxInvocationsLimitUpdated(
+  event: ProjectMaxInvocationsLimitUpdated
+): void {
+  // attempt to load project, if it doesn't exist, log a warning and return
+  // @dev we don't support or allow minters to pre-configure projects that do
+  // not yet exist
+  const project = tryLoadProject(
+    event.params._coreContract,
+    event.params._projectId
+  );
+  if (!project) {
+    log.warning("Project {} not found for core contract {}", [
+      event.params._projectId.toString(),
+      event.params._coreContract.toHexString()
+    ]);
+    return;
+  }
+
+  // load minter
+  const minter = loadOrCreateMinter(event.address, event.block.timestamp);
+
+  // load or create project minter configuration
+  const projectMinterConfig = loadOrCreateProjectMinterConfiguration(
+    project,
+    minter
+  );
+
+  projectMinterConfig.maxInvocations = event.params._maxInvocations;
+  projectMinterConfig.save();
+
+  // update project's updatedAt timestamp to induce a sync
+  // @dev this may induce a sync if the project's minter is not this minter,
+  // but good to consider the project as "updated", as it could switch to this
+  // minter in the future
+  project.updatedAt = event.block.timestamp;
+  project.save();
+}
+
 ///////////////////////////////////////////////////////////////////////////////
 // EVENT HANDLERS end here
 ///////////////////////////////////////////////////////////////////////////////
