@@ -1,5 +1,5 @@
-import { BigInt, log, Address, store } from "@graphprotocol/graph-ts";
-import { MinterFilter, Minter, Project } from "../generated/schema";
+import { BigInt, log, Address } from "@graphprotocol/graph-ts";
+import { Project } from "../generated/schema";
 
 import {
   PricePerTokenInWeiUpdated,
@@ -8,10 +8,7 @@ import {
 } from "../generated/ISharedMinterV0/ISharedMinterV0";
 
 import {
-  loadOrCreateSharedMinterFilter,
   loadOrCreateMinter,
-  loadOrCreateCoreRegistry,
-  generateMinterFilterContractAllowlistId,
   generateContractSpecificId,
   loadOrCreateProjectMinterConfiguration
 } from "./helpers";
@@ -160,3 +157,7 @@ function tryLoadProject(
   );
   return Project.load(fullProjectId);
 }
+
+///////////////////////////////////////////////////////////////////////////////
+// HELPER FUNCTIONS end here
+///////////////////////////////////////////////////////////////////////////////
