@@ -17,7 +17,7 @@ import {
 import { MinterFilterV2__factory } from "../../contracts/factories/MinterFilterV2__factory";
 // @dev dummy shared minter used to test shared minter filter, but isn't used in production
 import { DummySharedMinter__factory } from "../../contracts/factories/DummySharedMinter__factory";
-import { DummySharedMinter } from "../../contracts";
+import { DummySharedMinter } from "../../contracts/DummySharedMinter";
 import { constants, ethers } from "ethers";
 
 // waiting for subgraph to sync can take longer than the default 5s timeout

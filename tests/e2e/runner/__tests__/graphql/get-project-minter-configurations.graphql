@@ -1,0 +1,28 @@
+fragment projectMinterConfigurationDetails on ProjectMinterConfiguration {
+  id
+  project {
+    id
+  }
+  minter {
+    id
+  }
+  priceIsConfigured
+  currencySymbol
+  currencyAddress
+  purchaseToDisabled
+  basePrice
+  extraMinterDetails
+  maxInvocations
+}
+
+query GetProjectMinterConfigurations {
+  projectMinterConfigurations {
+    ...projectMinterConfigurationDetails
+  }
+}
+
+query GetTargetProjectMinterConfigurations($targetId: ID!) {
+  projectMinterConfigurations(where: { id: $targetId }) {
+    ...projectMinterConfigurationDetails
+  }
+}
