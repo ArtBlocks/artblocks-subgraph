@@ -26,7 +26,10 @@ import {
   loadOrCreateProjectMinterConfiguration
 } from "./helpers";
 
-import { setProjectMinterConfigExtraMinterDetailsValue } from "./extra-minter-details-helpers";
+import {
+  setProjectMinterConfigExtraMinterDetailsValue,
+  removeProjectMinterConfigExtraMinterDetailsEntry
+} from "./extra-minter-details-helpers";
 
 ///////////////////////////////////////////////////////////////////////////////
 // EVENT HANDLERS start here
@@ -180,6 +183,29 @@ export function handleSetValueProjectMinterConfig<EventType>(
   setProjectMinterConfigExtraMinterDetailsValue(
     event.params._key.toString(),
     event.params._value,
+    projectMinterConfig
+  );
+
+  const project = minterProjectAndConfig.project;
+  project.updatedAt = event.block.timestamp;
+  project.save();
+}
+
+export function handleConfigKeyRemoved(event: ConfigKeyRemoved): void {
+  const minterProjectAndConfig = loadOrCreateMinterProjectAndConfigIfProject(
+    event.address, // minter
+    event.params._coreContract,
+    event.params._projectId,
+    event.block.timestamp
+  );
+  if (!minterProjectAndConfig) {
+    // project wasn't found, warning already logged in helper function
+    return;
+  }
+
+  const projectMinterConfig = minterProjectAndConfig.projectMinterConfiguration;
+  removeProjectMinterConfigExtraMinterDetailsEntry(
+    event.params._key.toString(),
     projectMinterConfig
   );
 
