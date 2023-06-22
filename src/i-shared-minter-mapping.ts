@@ -28,7 +28,8 @@ import {
 
 import {
   setProjectMinterConfigExtraMinterDetailsValue,
-  removeProjectMinterConfigExtraMinterDetailsEntry
+  removeProjectMinterConfigExtraMinterDetailsEntry,
+  addProjectMinterConfigExtraMinterDetailsManyValue
 } from "./extra-minter-details-helpers";
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -136,6 +137,7 @@ export function handleProjectMaxInvocationsLimitUpdated(
 // GENERIC EVENT HANDLERS start here
 ///////////////////////////////////////////////////////////////////////////////
 
+// CONFIG VALUE SET HANDLERS
 export function handleConfigValueSetBool(event: ConfigValueSetBool): void {
   handleSetValueProjectMinterConfig(event);
 }
@@ -191,6 +193,7 @@ export function handleSetValueProjectMinterConfig<EventType>(
   project.save();
 }
 
+// CONFIG VALUE REMOVED HANDLER
 export function handleConfigKeyRemoved(event: ConfigKeyRemoved): void {
   const minterProjectAndConfig = loadOrCreateMinterProjectAndConfigIfProject(
     event.address, // minter
@@ -207,6 +210,61 @@ export function handleConfigKeyRemoved(event: ConfigKeyRemoved): void {
   removeProjectMinterConfigExtraMinterDetailsEntry(
     event.params._key.toString(),
     projectMinterConfig
+  );
+
+  const project = minterProjectAndConfig.project;
+  project.updatedAt = event.block.timestamp;
+  project.save();
+}
+
+// CONFIG VALUE ADDED TO SET HANDLERS
+export function handleConfigValueAddedToSetBigInt(
+  event: ConfigValueAddedToSetBigInt
+): void {
+  handleAddToSetProjectMinterConfig(event);
+}
+
+export function handleConfigValueAddedToSetAddress(
+  event: ConfigValueAddedToSetAddress
+): void {
+  handleAddToSetProjectMinterConfig(event);
+}
+
+export function handleConfigValueAddedToSetBytes(
+  event: ConfigValueAddedToSetBytes
+): void {
+  handleAddToSetProjectMinterConfig(event);
+}
+
+export function handleAddToSetProjectMinterConfig<EventType>(
+  event: EventType
+): void {
+  if (
+    !(
+      event instanceof ConfigValueAddedToSetBigInt ||
+      event instanceof ConfigValueAddedToSetAddress ||
+      event instanceof ConfigValueAddedToSetBytes
+    )
+  ) {
+    return;
+  }
+
+  const minterProjectAndConfig = loadOrCreateMinterProjectAndConfigIfProject(
+    event.address, // minter
+    event.params._coreContract,
+    event.params._projectId,
+    event.block.timestamp
+  );
+  if (!minterProjectAndConfig) {
+    // project wasn't found, warning already logged in helper function
+    return;
+  }
+
+  const projectMinterConfig = minterProjectAndConfig.projectMinterConfiguration;
+  addProjectMinterConfigExtraMinterDetailsManyValue(
+    projectMinterConfig,
+    event.params._key.toString(),
+    event.params._value
   );
 
   const project = minterProjectAndConfig.project;
