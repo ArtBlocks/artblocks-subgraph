@@ -19,6 +19,9 @@ import { MinterFilterV2__factory } from "../../contracts/factories/MinterFilterV
 import { DummySharedMinter__factory } from "../../contracts/factories/DummySharedMinter__factory";
 import { DummySharedMinter } from "../../contracts/DummySharedMinter";
 import { constants, ethers } from "ethers";
+// hide nuisance logs about event overloading
+import { Logger } from "@ethersproject/logger";
+Logger.setLogLevel(Logger.levels.ERROR);
 
 // waiting for subgraph to sync can take longer than the default 5s timeout
 jest.setTimeout(30 * 1000);
