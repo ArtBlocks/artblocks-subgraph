@@ -65,6 +65,11 @@
       "address": ""
     }
   ],
+  "iSharedMerkleContracts": [
+    {
+      "address": ""
+    }
+  ],
   "minterSetPriceContracts": [
     {
       "address": ""
