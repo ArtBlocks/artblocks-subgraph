@@ -29,7 +29,8 @@ import {
 import {
   setProjectMinterConfigExtraMinterDetailsValue,
   removeProjectMinterConfigExtraMinterDetailsEntry,
-  addProjectMinterConfigExtraMinterDetailsManyValue
+  addProjectMinterConfigExtraMinterDetailsManyValue,
+  removeProjectMinterConfigExtraMinterDetailsManyValue
 } from "./extra-minter-details-helpers";
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -156,9 +157,7 @@ export function handleConfigValueSetBytes(event: ConfigValueSetBytes): void {
   handleSetValueProjectMinterConfig(event);
 }
 
-export function handleSetValueProjectMinterConfig<EventType>(
-  event: EventType
-): void {
+function handleSetValueProjectMinterConfig<EventType>(event: EventType): void {
   if (
     !(
       event instanceof ConfigValueSetBool ||
@@ -236,9 +235,7 @@ export function handleConfigValueAddedToSetBytes(
   handleAddToSetProjectMinterConfig(event);
 }
 
-export function handleAddToSetProjectMinterConfig<EventType>(
-  event: EventType
-): void {
+function handleAddToSetProjectMinterConfig<EventType>(event: EventType): void {
   if (
     !(
       event instanceof ConfigValueAddedToSetBigInt ||
@@ -262,6 +259,61 @@ export function handleAddToSetProjectMinterConfig<EventType>(
 
   const projectMinterConfig = minterProjectAndConfig.projectMinterConfiguration;
   addProjectMinterConfigExtraMinterDetailsManyValue(
+    projectMinterConfig,
+    event.params._key.toString(),
+    event.params._value
+  );
+
+  const project = minterProjectAndConfig.project;
+  project.updatedAt = event.block.timestamp;
+  project.save();
+}
+
+// CONFIG VALUE REMOVED FROM SET HANDLERS
+export function handleConfigValueRemovedFromSetBigInt(
+  event: ConfigValueRemovedFromSetBigInt
+): void {
+  handleRemoveFromSetProjectMinterConfig(event);
+}
+
+export function handleConfigValueRemovedFromSetAddress(
+  event: ConfigValueRemovedFromSetAddress
+): void {
+  handleRemoveFromSetProjectMinterConfig(event);
+}
+
+export function handleConfigValueRemovedFromSetBytes(
+  event: ConfigValueRemovedFromSetBytes
+): void {
+  handleRemoveFromSetProjectMinterConfig(event);
+}
+
+function handleRemoveFromSetProjectMinterConfig<EventType>(
+  event: EventType
+): void {
+  if (
+    !(
+      event instanceof ConfigValueRemovedFromSetBigInt ||
+      event instanceof ConfigValueRemovedFromSetAddress ||
+      event instanceof ConfigValueRemovedFromSetBytes
+    )
+  ) {
+    return;
+  }
+
+  const minterProjectAndConfig = loadOrCreateMinterProjectAndConfigIfProject(
+    event.address, // minter
+    event.params._coreContract,
+    event.params._projectId,
+    event.block.timestamp
+  );
+  if (!minterProjectAndConfig) {
+    // project wasn't found, warning already logged in helper function
+    return;
+  }
+
+  const projectMinterConfig = minterProjectAndConfig.projectMinterConfiguration;
+  removeProjectMinterConfigExtraMinterDetailsManyValue(
     projectMinterConfig,
     event.params._key.toString(),
     event.params._value
