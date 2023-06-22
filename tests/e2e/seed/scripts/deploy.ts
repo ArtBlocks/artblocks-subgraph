@@ -13,12 +13,16 @@ import { CoreRegistryV1__factory } from "../contracts/factories/CoreRegistryV1__
 import { SharedRandomizerV0__factory } from "../contracts/factories/SharedRandomizerV0__factory";
 import { BytecodeStorageReader__factory } from "../contracts/factories/BytecodeStorageReader__factory";
 
+// integration references
+import { DelegationRegistry__factory } from "../contracts/factories/DelegationRegistry__factory";
+
 // minter suite (shared minter filter, shared minters)
 // @dev matchstick tests were used for legacy (non-shared) minter suite tests
 import { MinterFilterV2__factory } from "../contracts/factories/MinterFilterV2__factory";
 // @dev dummy shared minter used to test shared minter filter, but isn't used in production
 import { DummySharedMinter__factory } from "../contracts/factories/DummySharedMinter__factory";
 import { MinterSetPriceV5__factory } from "../contracts/factories/MinterSetPriceV5__factory";
+import { MinterSetPriceMerkleV5__factory } from "../contracts/factories/MinterSetPriceMerkleV5__factory";
 
 import fs from "fs";
 import { JsonRpcProvider } from "@ethersproject/providers";
@@ -76,6 +80,13 @@ async function main() {
   //////////////////////////////////////////////////////////////////////////////
   // DEPLOYMENT BEGINS HERE
   //////////////////////////////////////////////////////////////////////////////
+  // Deploy delegation registry
+  const delegationRegistryFactory = new DelegationRegistry__factory(deployer);
+  const delegationRegistry = await delegationRegistryFactory.deploy();
+  await delegationRegistry.deployed();
+  const delegationRegistryAddress = delegationRegistry.address;
+  console.log(`Delegation registry deployed at ${delegationRegistryAddress}`);
+  subgraphConfig.metadata.delegationRegistryAddress = delegationRegistryAddress;
 
   // Deploy randomizer contract
   const pseudorandomAtomicFactory = new PseudorandomAtomic__factory(deployer);
@@ -205,6 +216,25 @@ async function main() {
     },
   ];
 
+  // Merkle Minters
+  const minterMerkleV1Factory = new MinterSetPriceMerkleV5__factory(deployer);
+  const minterSetPriceMerkleV5 = await minterMerkleV1Factory.deploy(
+    minterFilter.address,
+    delegationRegistryAddress
+  );
+  await minterSetPriceMerkleV5.deployed();
+  console.log(
+    `MinterSetPriceMerkleV5 deployed at ${minterSetPriceMerkleV5.address}`
+  );
+  subgraphConfig.iSharedMinterV0Contracts.push({
+    address: minterSetPriceMerkleV5.address,
+  });
+  subgraphConfig.iSharedMerkleContracts = [
+    {
+      address: minterSetPriceMerkleV5.address,
+    },
+  ];
+
   //////////////////////////////////////////////////////////////////////////////
   // DEPLOYMENT ENDS HERE
   //////////////////////////////////////////////////////////////////////////////
@@ -277,6 +307,12 @@ async function main() {
     .approveMinterGlobally(minterSetPriceV5.address);
   console.log(
     `Allowlisted minterSetPriceV5 ${minterSetPriceV5.address} on minter filter.`
+  );
+  await minterFilter
+    .connect(deployer)
+    .approveMinterGlobally(minterSetPriceMerkleV5.address);
+  console.log(
+    `Allowlisted minterSetPriceMerkleV5 ${minterSetPriceMerkleV5.address} on minter filter.`
   );
 
   // add initial project to the core contract

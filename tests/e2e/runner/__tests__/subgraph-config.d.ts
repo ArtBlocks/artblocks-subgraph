@@ -25,9 +25,11 @@ export type SubgraphConfig = Partial<{
   ownableUpgradeableDependencyRegistryContracts: { address: string }[];
   ICoreRegistryContracts: { address: string }[];
   iSharedMinterV0Contracts: { address: string }[];
+  iSharedMerkleContracts: { address: string }[];
   metadata: {
     minterFilterAdminACLAddress: string;
     coreRegistryAddress: string;
     bytecodeStorageReaderAddress: string;
+    delegationRegistryAddress: string;
   };
 }>;
