@@ -1032,6 +1032,28 @@ dataSources:
           handler: handleProjectCurrencyInfoUpdated
         - event: ProjectMaxInvocationsLimitUpdated(indexed uint256,indexed address,uint256)
           handler: handleProjectMaxInvocationsLimitUpdated
+        - event: ConfigValueSet(indexed uint256,indexed address,bytes32,bytes32)
+          handler: handleConfigValueSetBytes
+        - event: ConfigValueSet(indexed uint256,indexed address,bytes32,bool)
+          handler: handleConfigValueSetBool
+        - event: ConfigValueSet(indexed uint256,indexed address,bytes32,uint256)
+          handler: handleConfigValueSetBigInt
+        - event: ConfigValueSet(indexed uint256,indexed address,bytes32,address)
+          handler: handleConfigValueSetAddress
+        - event: ConfigKeyRemoved(indexed uint256,indexed address,bytes32)
+          handler: handleConfigKeyRemoved
+        - event: ConfigValueAddedToSet(indexed uint256,indexed address,bytes32,bytes32)
+          handler: handleConfigValueAddedToSetBytes
+        - event: ConfigValueAddedToSet(indexed uint256,indexed address,bytes32,uint256)
+          handler: handleConfigValueAddedToSetBigInt
+        - event: ConfigValueAddedToSet(indexed uint256,indexed address,bytes32,address)
+          handler: handleConfigValueAddedToSetAddress
+        - event: ConfigValueRemovedFromSet(indexed uint256,indexed address,bytes32,bytes32)
+          handler: handleConfigValueRemovedFromSetBytes
+        - event: ConfigValueRemovedFromSet(indexed uint256,indexed address,bytes32,uint256)
+          handler: handleConfigValueRemovedFromSetBigInt
+        - event: ConfigValueRemovedFromSet(indexed uint256,indexed address,bytes32,address)
+          handler: handleConfigValueRemovedFromSetAddress
       file: ./src/i-shared-minter-mapping.ts
   {{/iSharedMinterV0Contracts}}
   {{#iSharedMerkleContracts}}
