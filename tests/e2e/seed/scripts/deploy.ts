@@ -23,6 +23,7 @@ import { MinterFilterV2__factory } from "../contracts/factories/MinterFilterV2__
 import { DummySharedMinter__factory } from "../contracts/factories/DummySharedMinter__factory";
 import { MinterSetPriceV5__factory } from "../contracts/factories/MinterSetPriceV5__factory";
 import { MinterSetPriceMerkleV5__factory } from "../contracts/factories/MinterSetPriceMerkleV5__factory";
+import { MinterSetPriceHolderV5__factory } from "../contracts/factories/MinterSetPriceHolderV5__factory";
 
 import fs from "fs";
 import { JsonRpcProvider } from "@ethersproject/providers";
@@ -217,8 +218,8 @@ async function main() {
   ];
 
   // Merkle Minters
-  const minterMerkleV1Factory = new MinterSetPriceMerkleV5__factory(deployer);
-  const minterSetPriceMerkleV5 = await minterMerkleV1Factory.deploy(
+  const minterMerkleV5Factory = new MinterSetPriceMerkleV5__factory(deployer);
+  const minterSetPriceMerkleV5 = await minterMerkleV5Factory.deploy(
     minterFilter.address,
     delegationRegistryAddress
   );
@@ -232,6 +233,25 @@ async function main() {
   subgraphConfig.iSharedMerkleContracts = [
     {
       address: minterSetPriceMerkleV5.address,
+    },
+  ];
+
+  // Holder Minters
+  const minterHolderV5Factory = new MinterSetPriceHolderV5__factory(deployer);
+  const minterSetPriceHolderV5 = await minterHolderV5Factory.deploy(
+    minterFilter.address,
+    delegationRegistryAddress
+  );
+  await minterSetPriceHolderV5.deployed();
+  console.log(
+    `minterSetPriceHolderV5 deployed at ${minterSetPriceHolderV5.address}`
+  );
+  subgraphConfig.iSharedMinterV0Contracts.push({
+    address: minterSetPriceHolderV5.address,
+  });
+  subgraphConfig.iSharedHolderContracts = [
+    {
+      address: minterSetPriceHolderV5.address,
     },
   ];
 
@@ -313,6 +333,12 @@ async function main() {
     .approveMinterGlobally(minterSetPriceMerkleV5.address);
   console.log(
     `Allowlisted minterSetPriceMerkleV5 ${minterSetPriceMerkleV5.address} on minter filter.`
+  );
+  await minterFilter
+    .connect(deployer)
+    .approveMinterGlobally(minterSetPriceHolderV5.address);
+  console.log(
+    `Allowlisted minterSetPriceHolderV5 ${minterSetPriceHolderV5.address} on minter filter.`
   );
 
   // add initial project to the core contract

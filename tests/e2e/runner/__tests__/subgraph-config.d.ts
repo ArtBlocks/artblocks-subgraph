@@ -26,6 +26,7 @@ export type SubgraphConfig = Partial<{
   ICoreRegistryContracts: { address: string }[];
   iSharedMinterV0Contracts: { address: string }[];
   iSharedMerkleContracts: { address: string }[];
+  iSharedHolderContracts: { address: string }[];
   metadata: {
     minterFilterAdminACLAddress: string;
     coreRegistryAddress: string;
