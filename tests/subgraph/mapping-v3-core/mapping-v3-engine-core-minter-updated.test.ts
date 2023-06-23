@@ -34,7 +34,7 @@ import {
   mockMintersMinterType
 } from "./helpers";
 
-import { mockGetProjectAndMinterInfoAt } from "../minter-suite/helpers";
+import { mockGetProjectAndMinterInfoAt } from "../legacy-minter-suite/helpers";
 
 import { ProjectMinterConfiguration, Minter } from "../../../generated/schema";
 import { MinterUpdated } from "../../../generated/IGenArt721CoreV3_Base/IGenArt721CoreContractV3_Base";
@@ -472,11 +472,18 @@ test(`${coreType}/MinterUpdated: should populate project minter configurations f
     "id",
     minterFilterAddress.toHexString()
   );
+  const coreRegistryId = TEST_CONTRACT_ADDRESS.toHexString();
   assert.fieldEquals(
     MINTER_FILTER_ENTITY_TYPE,
     minterFilterAddress.toHexString(),
-    "coreContract",
-    TEST_CONTRACT_ADDRESS.toHexString()
+    "coreRegistry",
+    coreRegistryId
+  );
+  assert.fieldEquals(
+    CONTRACT_ENTITY_TYPE,
+    TEST_CONTRACT_ADDRESS.toHexString(),
+    "registeredOn",
+    coreRegistryId
   );
 
   // Project 0 asserts

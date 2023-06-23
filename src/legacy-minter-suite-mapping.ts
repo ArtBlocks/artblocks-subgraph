@@ -62,8 +62,20 @@ import {
   loadOrCreateMinter,
   loadOrCreateReceipt,
   generateProjectIdNumberFromTokenIdNumber,
-  getMinterExtraMinterDetailsTypedMap
+  getMinterExtraMinterDetailsTypedMap,
+  getCoreContractAddressFromLegacyMinter
 } from "./helpers";
+
+import {
+  setProjectMinterConfigExtraMinterDetailsValue,
+  setMinterExtraMinterDetailsValue,
+  removeProjectMinterConfigExtraMinterDetailsEntry,
+  addProjectMinterConfigExtraMinterDetailsManyValue,
+  addMinterExtraMinterDetailsManyValue,
+  removeProjectMinterConfigExtraMinterDetailsManyValue,
+  removeMinterExtraMinterDetailsManyValue,
+  mergeProjectMinterConfigExtraMinterDetails
+} from "./extra-minter-details-helpers";
 
 import {
   ConfigKeyRemoved,
@@ -102,23 +114,13 @@ import {
   ProjectNextTokenEjected
 } from "../generated/MinterSEA/IFilteredMinterSEAV0";
 
-import { MinterConfigSetAddressEvent } from "./util-types";
-import {
-  typedMapToJSONString,
-  createMergedTypedMap,
-  createUpdatedTypedMapWithEntryAdded,
-  createUpdatedTypedMapWithEntryRemoved,
-  createUpdatedTypedMapWithArrayValueRemoved,
-  createUpdatedTypedMapWithArrayValueAdded,
-  createTypedMapFromEntries,
-  toJSONValue
-} from "./json";
+import { createTypedMapFromEntries, toJSONValue } from "./json";
 
 // IFilteredMinterV0 events
 export function handlePricePerTokenInWeiUpdated(
   event: PricePerTokenInWeiUpdated
 ): void {
-  let minterProjectAndConfig = loadMinterProjectAndConfig(
+  let minterProjectAndConfig = loadMinterProjectAndConfigLegacyMinters(
     event.address,
     event.params._projectId,
     event.block.timestamp
@@ -142,7 +144,7 @@ export function handlePricePerTokenInWeiUpdated(
 export function handleProjectCurrencyInfoUpdated(
   event: ProjectCurrencyInfoUpdated
 ): void {
-  let minterProjectAndConfig = loadMinterProjectAndConfig(
+  let minterProjectAndConfig = loadMinterProjectAndConfigLegacyMinters(
     event.address,
     event.params._projectId,
     event.block.timestamp
@@ -166,7 +168,7 @@ export function handleProjectCurrencyInfoUpdated(
 export function handlePurchaseToDisabledUpdated(
   event: PurchaseToDisabledUpdated
 ): void {
-  let minterProjectAndConfig = loadMinterProjectAndConfig(
+  let minterProjectAndConfig = loadMinterProjectAndConfigLegacyMinters(
     event.address,
     event.params._projectId,
     event.block.timestamp
@@ -192,7 +194,7 @@ export function handlePurchaseToDisabledUpdated(
 export function handleProjectMaxInvocationsLimitUpdated(
   event: ProjectMaxInvocationsLimitUpdated
 ): void {
-  let minterProjectAndConfig = loadMinterProjectAndConfig(
+  let minterProjectAndConfig = loadMinterProjectAndConfigLegacyMinters(
     event.address,
     event.params._projectId,
     event.block.timestamp
@@ -229,7 +231,7 @@ export function handleMinimumAuctionLengthSecondsUpdated(
 export function handleDALinSetAuctionDetails(
   event: DALinSetAuctionDetails
 ): void {
-  let minterProjectAndConfig = loadMinterProjectAndConfig(
+  let minterProjectAndConfig = loadMinterProjectAndConfigLegacyMinters(
     event.address,
     event.params.projectId,
     event.block.timestamp
@@ -265,7 +267,7 @@ export function handleDALinSetAuctionDetails(
 export function handleDALinResetAuctionDetails(
   event: DALinResetAuctionDetails
 ): void {
-  let minterProjectAndConfig = loadMinterProjectAndConfig(
+  let minterProjectAndConfig = loadMinterProjectAndConfigLegacyMinters(
     event.address,
     event.params.projectId,
     event.block.timestamp
@@ -318,7 +320,7 @@ export function handleAuctionHalfLifeRangeSecondsUpdated(
 export function handleDAExpSetAuctionDetails(
   event: DAExpSetAuctionDetails
 ): void {
-  let minterProjectAndConfig = loadMinterProjectAndConfig(
+  let minterProjectAndConfig = loadMinterProjectAndConfigLegacyMinters(
     event.address,
     event.params.projectId,
     event.block.timestamp
@@ -408,7 +410,7 @@ export function handleDAExpResetAuctionDetailsGeneric<T>(event: T): void {
     return;
   }
 
-  let minterProjectAndConfig = loadMinterProjectAndConfig(
+  let minterProjectAndConfig = loadMinterProjectAndConfigLegacyMinters(
     event.address,
     event.params.projectId,
     event.block.timestamp
@@ -466,7 +468,7 @@ export function handleHoldersOfProjectsGeneric<T>(event: T): void {
     return;
   }
 
-  const minterProjectAndConfig = loadMinterProjectAndConfig(
+  const minterProjectAndConfig = loadMinterProjectAndConfigLegacyMinters(
     event.address,
     event.params._projectId,
     event.block.timestamp
@@ -626,7 +628,7 @@ export function handleMinterTimeBufferUpdated(
 export function handleConfiguredFutureAuctions(
   event: ConfiguredFutureAuctions
 ): void {
-  let minterProjectAndConfig = loadMinterProjectAndConfig(
+  let minterProjectAndConfig = loadMinterProjectAndConfigLegacyMinters(
     event.address,
     event.params.projectId,
     event.block.timestamp
@@ -657,7 +659,7 @@ export function handleConfiguredFutureAuctions(
 }
 
 export function handleResetAuctionDetails(event: ResetAuctionDetails): void {
-  let minterProjectAndConfig = loadMinterProjectAndConfig(
+  let minterProjectAndConfig = loadMinterProjectAndConfigLegacyMinters(
     event.address,
     event.params.projectId,
     event.block.timestamp
@@ -689,7 +691,7 @@ export function handleAuctionInitialized(event: AuctionInitialized): void {
   const projectIdNumber = generateProjectIdNumberFromTokenIdNumber(
     event.params.tokenId
   );
-  let minterProjectAndConfig = loadMinterProjectAndConfig(
+  let minterProjectAndConfig = loadMinterProjectAndConfigLegacyMinters(
     event.address,
     projectIdNumber,
     event.block.timestamp
@@ -740,7 +742,7 @@ export function handleAuctionBid(event: AuctionBid): void {
   const projectIdNumber = generateProjectIdNumberFromTokenIdNumber(
     event.params.tokenId
   );
-  let minterProjectAndConfig = loadMinterProjectAndConfig(
+  let minterProjectAndConfig = loadMinterProjectAndConfigLegacyMinters(
     event.address,
     projectIdNumber,
     event.block.timestamp
@@ -798,7 +800,7 @@ export function handleAuctionSettled(event: AuctionSettled): void {
   const projectIdNumber = generateProjectIdNumberFromTokenIdNumber(
     event.params.tokenId
   );
-  let minterProjectAndConfig = loadMinterProjectAndConfig(
+  let minterProjectAndConfig = loadMinterProjectAndConfigLegacyMinters(
     event.address,
     projectIdNumber,
     event.block.timestamp
@@ -826,7 +828,7 @@ export function handleProjectNextTokenUpdated(
   const projectIdNumber = generateProjectIdNumberFromTokenIdNumber(
     event.params.tokenId
   );
-  let minterProjectAndConfig = loadMinterProjectAndConfig(
+  let minterProjectAndConfig = loadMinterProjectAndConfigLegacyMinters(
     event.address,
     projectIdNumber,
     event.block.timestamp
@@ -855,7 +857,7 @@ export function handleProjectNextTokenUpdated(
 export function handleProjectNextTokenEjected(
   event: ProjectNextTokenEjected
 ): void {
-  let minterProjectAndConfig = loadMinterProjectAndConfig(
+  let minterProjectAndConfig = loadMinterProjectAndConfigLegacyMinters(
     event.address,
     event.params.projectId,
     event.block.timestamp
@@ -880,156 +882,6 @@ export function handleProjectNextTokenEjected(
   project.save();
 }
 
-// Generic Handlers
-// Below is all logic pertaining to generic handlers used for maintaining JSON config stores on both the ProjectMinterConfiguration and Minter entities.
-// Most logic is shared and bubbled up each respective handler for each action. We utilize ducktype to allow these to work on either a Minter or ProjectMinterConfiguration
-// Because AssemblyScript does not support union types, we need to manually type check inside each method, to ensure correct usage.
-// Currently supported key-value types (value: T) include boolean, BigInt, ETH address, and bytes values.
-// For any questions reach out to @jon or @ryley-o.eth. or see the following document https://docs.google.com/document/d/1XSxl04eJyTxc_rbj6cmq-j00zaYDzApBBLT67JXtaOw/edit?disco=AAAAZa8xp-Q
-
-export function setProjectMinterConfigExtraMinterDetailsValue<ValueType>(
-  key: string,
-  value: ValueType,
-  config: ProjectMinterConfiguration
-): void {
-  let minterDetails = getProjectMinterConfigExtraMinterDetailsTypedMap(config);
-
-  minterDetails = createUpdatedTypedMapWithEntryAdded(
-    minterDetails,
-    key,
-    value
-  );
-
-  config.extraMinterDetails = typedMapToJSONString(minterDetails);
-  config.save();
-}
-
-export function setMinterExtraMinterDetailsValue<ValueType>(
-  key: string,
-  value: ValueType,
-  minter: Minter
-): void {
-  let minterDetails = getMinterExtraMinterDetailsTypedMap(minter);
-
-  minterDetails = createUpdatedTypedMapWithEntryAdded(
-    minterDetails,
-    key,
-    value
-  );
-
-  minter.extraMinterDetails = typedMapToJSONString(minterDetails);
-  minter.save();
-}
-
-export function removeProjectMinterConfigExtraMinterDetailsEntry(
-  key: string,
-  config: ProjectMinterConfiguration
-): void {
-  let minterDetails = getProjectMinterConfigExtraMinterDetailsTypedMap(config);
-  minterDetails = createUpdatedTypedMapWithEntryRemoved(minterDetails, key);
-
-  config.extraMinterDetails = typedMapToJSONString(minterDetails);
-  config.save();
-}
-
-export function removeMinterExtraMinterDetailsEntry(
-  key: string,
-  minter: Minter
-): void {
-  let minterDetails = getMinterExtraMinterDetailsTypedMap(minter);
-  minterDetails = createUpdatedTypedMapWithEntryRemoved(minterDetails, key);
-
-  minter.extraMinterDetails = typedMapToJSONString(minterDetails);
-  minter.save();
-}
-
-export function addProjectMinterConfigExtraMinterDetailsManyValue<ValueType>(
-  config: ProjectMinterConfiguration,
-  key: string,
-  value: ValueType
-): void {
-  let minterDetails = getProjectMinterConfigExtraMinterDetailsTypedMap(config);
-  minterDetails = createUpdatedTypedMapWithArrayValueAdded(
-    minterDetails,
-    key,
-    value
-  );
-  config.extraMinterDetails = typedMapToJSONString(minterDetails);
-  config.save();
-}
-
-export function addMinterExtraMinterDetailsManyValue<ValueType>(
-  minter: Minter,
-  key: string,
-  value: ValueType
-): void {
-  let minterDetails = getMinterExtraMinterDetailsTypedMap(minter);
-  minterDetails = createUpdatedTypedMapWithArrayValueAdded(
-    minterDetails,
-    key,
-    value
-  );
-  minter.extraMinterDetails = typedMapToJSONString(minterDetails);
-  minter.save();
-}
-
-export function removeProjectMinterConfigExtraMinterDetailsManyValue<ValueType>(
-  config: ProjectMinterConfiguration,
-  key: string,
-  value: ValueType
-): void {
-  let minterDetails = getProjectMinterConfigExtraMinterDetailsTypedMap(config);
-  minterDetails = createUpdatedTypedMapWithArrayValueRemoved(
-    minterDetails,
-    key,
-    value
-  );
-  config.extraMinterDetails = typedMapToJSONString(minterDetails);
-  config.save();
-}
-
-export function removeMinterExtraMinterDetailsManyValue<ValueType>(
-  minter: Minter,
-  key: string,
-  value: ValueType
-): void {
-  let minterDetails = getMinterExtraMinterDetailsTypedMap(minter);
-  minterDetails = createUpdatedTypedMapWithArrayValueRemoved(
-    minterDetails,
-    key,
-    value
-  );
-  minter.extraMinterDetails = typedMapToJSONString(minterDetails);
-  minter.save();
-}
-
-export function mergeProjectMinterConfigExtraMinterDetails(
-  projectMinterConfig: ProjectMinterConfiguration,
-  extraMinterDetails: TypedMap<string, JSONValue>
-): void {
-  let currentExtraMinterDetailsResult = json.try_fromString(
-    projectMinterConfig.extraMinterDetails
-  );
-
-  if (currentExtraMinterDetailsResult.isOk) {
-    const newExtraMinterDetails = createMergedTypedMap(
-      currentExtraMinterDetailsResult.value.toObject(),
-      extraMinterDetails
-    );
-
-    projectMinterConfig.extraMinterDetails = typedMapToJSONString(
-      newExtraMinterDetails
-    );
-  } else {
-    log.warning(
-      "Failed to parse extraMinterDetails json string for project minter config {}",
-      [projectMinterConfig.id]
-    );
-  }
-
-  projectMinterConfig.save();
-}
-
 export function handleSetValueProjectMinterConfig<EventType>(
   event: EventType
 ): void {
@@ -1044,7 +896,7 @@ export function handleSetValueProjectMinterConfig<EventType>(
     return;
   }
 
-  let minterProjectAndConfig = loadMinterProjectAndConfig(
+  let minterProjectAndConfig = loadMinterProjectAndConfigLegacyMinters(
     event.address,
     event.params._projectId,
     event.block.timestamp
@@ -1067,7 +919,7 @@ export function handleSetValueProjectMinterConfig<EventType>(
 export function handleRemoveValueProjectMinterConfig(
   event: ConfigKeyRemoved
 ): void {
-  let minterProjectAndConfig = loadMinterProjectAndConfig(
+  let minterProjectAndConfig = loadMinterProjectAndConfigLegacyMinters(
     event.address,
     event.params._projectId,
     event.block.timestamp
@@ -1097,7 +949,7 @@ export function handleAddManyProjectMinterConfig<T>(event: T): void {
   ) {
     return;
   }
-  let minterProjectAndConfig = loadMinterProjectAndConfig(
+  let minterProjectAndConfig = loadMinterProjectAndConfigLegacyMinters(
     event.address,
     event.params._projectId,
     event.block.timestamp
@@ -1126,7 +978,7 @@ export function handleRemoveManyProjectMinterConfig<EventType>(
   ) {
     return;
   }
-  let minterProjectAndConfig = loadMinterProjectAndConfig(
+  let minterProjectAndConfig = loadMinterProjectAndConfigLegacyMinters(
     event.address,
     event.params._projectId,
     event.block.timestamp
@@ -1207,46 +1059,48 @@ export function handleRemoveBytesManyValueProjectMinterConfig(
 
 export function handleReceiptUpdated(event: ReceiptUpdated): void {
   let minter = loadOrCreateMinter(event.address, event.block.timestamp);
-  if (minter) {
-    // load or create receipt
-    let projectId = generateContractSpecificId(
-      Address.fromString(minter.coreContract),
-      event.params._projectId
-    );
-    let receipt: Receipt = loadOrCreateReceipt(
-      minter.id,
-      projectId,
-      event.params._purchaser,
-      event.block.timestamp
-    );
-    if (receipt) {
-      // update receipt state
-      receipt.netPosted = event.params._netPosted;
-      receipt.numPurchased = event.params._numPurchased;
-      receipt.updatedAt = event.block.timestamp;
-      receipt.save();
-      // additionally, sync latest purchase price and number of settleable
-      // purchases for project on this minter
-      // @dev this is because this can be the only event emitted from the
-      // minter during a purchase on a settleable minter
-      syncLatestPurchasePrice(event.address, event.params._projectId, event);
-      syncNumSettleableInvocations(
-        event.address,
-        event.params._projectId,
-        event
-      );
-    } else {
-      log.warning(
-        "Error while loading/creating receipt in tx {}, log index {}",
-        [
-          event.transaction.hash.toHexString(),
-          event.transactionLogIndex.toString()
-        ]
-      );
-    }
-  } else {
+  if (!minter) {
     log.warning("Error while loading/creating minter with id {}", [
       event.address.toHexString()
+    ]);
+    return;
+  }
+
+  const coreContractAddress = getCoreContractAddressFromLegacyMinter(minter);
+  if (!coreContractAddress) {
+    log.warning("Error while loading core contract address from minter {}", [
+      minter.id
+    ]);
+    return;
+  }
+
+  // load or create receipt
+  let projectId = generateContractSpecificId(
+    coreContractAddress,
+    event.params._projectId
+  );
+  let receipt: Receipt = loadOrCreateReceipt(
+    minter.id,
+    projectId,
+    event.params._purchaser,
+    event.block.timestamp
+  );
+  if (receipt) {
+    // update receipt state
+    receipt.netPosted = event.params._netPosted;
+    receipt.numPurchased = event.params._numPurchased;
+    receipt.updatedAt = event.block.timestamp;
+    receipt.save();
+    // additionally, sync latest purchase price and number of settleable
+    // purchases for project on this minter
+    // @dev this is because this can be the only event emitted from the
+    // minter during a purchase on a settleable minter
+    syncLatestPurchasePrice(event.address, event.params._projectId, event);
+    syncNumSettleableInvocations(event.address, event.params._projectId, event);
+  } else {
+    log.warning("Error while loading/creating receipt in tx {}, log index {}", [
+      event.transaction.hash.toHexString(),
+      event.transactionLogIndex.toString()
     ]);
   }
 }
@@ -1263,7 +1117,7 @@ export function handleArtistAndAdminRevenuesWithdrawn(
 
   // It's important that we load the minterProjectAndConfig after syncing the
   // latest purchase price, so that the loaded config is up to date
-  const minterProjectAndConfig = loadMinterProjectAndConfig(
+  const minterProjectAndConfig = loadMinterProjectAndConfigLegacyMinters(
     event.address,
     event.params._projectId,
     event.block.timestamp
@@ -1297,7 +1151,7 @@ function syncLatestPurchasePrice(
   projectId: BigInt,
   event: ethereum.Event
 ): void {
-  const minterProjectAndConfig = loadMinterProjectAndConfig(
+  const minterProjectAndConfig = loadMinterProjectAndConfigLegacyMinters(
     minterAddress,
     projectId,
     event.block.timestamp
@@ -1339,7 +1193,7 @@ function syncNumSettleableInvocations(
     projectId
   );
   // update extraMinterDetails key `numSettleableInvocations` to be numSettleableInvocations
-  const minterProjectAndConfig = loadMinterProjectAndConfig(
+  const minterProjectAndConfig = loadMinterProjectAndConfigLegacyMinters(
     minterAddress,
     projectId,
     event.block.timestamp
@@ -1365,20 +1219,36 @@ class MinterProjectAndConfig {
   projectMinterConfiguration: ProjectMinterConfiguration;
 }
 
-function loadMinterProjectAndConfig(
+function loadMinterProjectAndConfigLegacyMinters(
   minterAddress: Address,
   projectId: BigInt,
   timestamp: BigInt
 ): MinterProjectAndConfig | null {
   let minter = loadOrCreateMinter(minterAddress, timestamp);
+  if (!minter) {
+    log.warning(
+      "[WARN] Legacy (non-shared) minter event handler encountered null minter at address {}.",
+      [minterAddress.toHexString()]
+    );
+    return null;
+  }
+  let coreContractAddress = getCoreContractAddressFromLegacyMinter(minter);
+  if (!coreContractAddress) {
+    log.warning(
+      "[WARN] Legacy (non-shared) error encountered, minter unable to get `coreContract` address, at minter address {}.",
+      [minterAddress.toHexString()]
+    );
+    return null;
+  }
 
   let project = Project.load(
-    generateContractSpecificId(
-      Address.fromString(minter.coreContract),
-      projectId
-    )
+    generateContractSpecificId(coreContractAddress, projectId)
   );
   if (!project) {
+    log.warning(
+      "[WARN] Legacy (non-shared) minter event handler encountered null project at minter address {}, projectId {}.",
+      [minterAddress.toHexString(), projectId.toString()]
+    );
     return null;
   }
 

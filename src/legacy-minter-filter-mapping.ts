@@ -1,4 +1,4 @@
-import { BigInt, store, Address } from "@graphprotocol/graph-ts";
+import { BigInt, log, Address } from "@graphprotocol/graph-ts";
 import { logStore } from "matchstick-as";
 
 import {
@@ -20,17 +20,22 @@ import {
   Contract,
   MinterFilter,
   Minter,
-  ProjectMinterConfiguration
+  ProjectMinterConfiguration,
+  CoreRegistry
 } from "../generated/schema";
 
 import {
   generateContractSpecificId,
   getProjectMinterConfigId,
-  loadOrCreateMinter
+  loadOrCreateMinter,
+  getCoreContractAddressFromLegacyMinterFilter
 } from "./helpers";
 
 // @dev - This event is ONLY emitted from a MinterFilterV0 contract, so we can
 // safely bind directly to a MinterFilterV0 contract in this handler.
+// @dev we can also safely assume that the MinterFilterV0 contract is
+// being used by a V1 core contract, so we can safely assume that the
+// engine registry is a dummy registry.
 export function handleIsCanonicalMinterFilter(
   event: IsCanonicalMinterFilter
 ): void {
@@ -48,8 +53,16 @@ export function handleIsCanonicalMinterFilter(
   let minterFilter = MinterFilter.load(event.address.toHexString());
   if (!minterFilter) {
     minterFilter = new MinterFilter(event.address.toHexString());
-    minterFilter.coreContract = event.params._coreContractAddress.toHexString();
-    minterFilter.minterAllowlist = [];
+    // dummy core registry has ID set to the associated core contract address
+    // @dev this is a trick to avoid having to create a nullable field to store
+    // the associated core contract address on the dummy core registry or
+    // minter filter.
+    const coreRegistry = getOrCreateDummyCoreRegistryForLegacyMinterFilter(
+      event.params._coreContractAddress.toHexString(),
+      event.block.timestamp
+    );
+    minterFilter.coreRegistry = coreRegistry.id;
+    minterFilter.minterGlobalAllowlist = [];
     minterFilter.updatedAt = event.block.timestamp;
     minterFilter.save();
   }
@@ -96,6 +109,8 @@ export function handleIsCanonicalMinterFilter(
   }
 
   coreContract.minterFilter = event.address.toHexString();
+  // update core contract as registered on the legacy MinterFilter's dummy core registry
+  coreContract.registeredOn = event.params._coreContractAddress.toHexString();
   coreContract.updatedAt = event.block.timestamp;
   coreContract.save();
 }
@@ -125,19 +140,26 @@ export function handleMinterApproved(event: MinterApproved): void {
   }
 
   // add minter to the list of allowlisted minters if it's not already there
-  if (!minterFilter.minterAllowlist.includes(minter.id)) {
-    minterFilter.minterAllowlist = minterFilter.minterAllowlist.concat([
-      minter.id
-    ]);
+  if (!minterFilter.minterGlobalAllowlist.includes(minter.id)) {
+    minterFilter.minterGlobalAllowlist = minterFilter.minterGlobalAllowlist.concat(
+      [minter.id]
+    );
     minterFilter.updatedAt = event.block.timestamp;
     minterFilter.save();
   }
+
+  // update minter's allowlisted state
+  minter.isGloballyAllowlistedOnMinterFilter = true;
+  minter.updatedAt = event.block.timestamp;
+  minter.save();
 }
 
 export function handleMinterRevoked(event: MinterRevoked): void {
-  // Note: there's a guard on the function that only allows a minter
-  // to be revoked if it is not set for any project. This means that
-  // we can avoid resetting any projects' minter configurations here.
+  // Note: We do not reset any project minter configurations here because
+  // we allow pre-configuring minter configurations on projects before the
+  // minter filter is set on the core contract. Frontends should check the
+  // minter's isGlobalAllowlistedOnMinterFilter field to determine if the
+  // minter is allowlisted on the associated minter filter.
   let minterFilter = loadOrCreateMinterFilter(
     event.address,
     event.block.timestamp
@@ -145,21 +167,28 @@ export function handleMinterRevoked(event: MinterRevoked): void {
 
   let minter = Minter.load(event.params._minterAddress.toHexString());
 
-  if (minter && minterFilter) {
-    // keep the Minter in the store to avoid having to re-populate it is
-    // re-approved
-
-    // remove the minter from the list of allowlisted minters
-    let newMinterAllowlist: string[] = [];
-    for (let i = 0; i < minterFilter.minterAllowlist.length; i++) {
-      if (minterFilter.minterAllowlist[i] != minter.id) {
-        newMinterAllowlist.push(minterFilter.minterAllowlist[i]);
-      }
-    }
-    minterFilter.minterAllowlist = newMinterAllowlist;
-    minterFilter.updatedAt = event.block.timestamp;
-    minterFilter.save();
+  // Only update state if the minter is allowlisted on this minter filter
+  if (!minter || !minterFilter || minter.minterFilter != minterFilter.id) {
+    return;
   }
+  // keep the Minter in the store to avoid having to re-populate if it is
+  // re-approved
+
+  // remove the minter from the list of allowlisted minters
+  let newMinterGlobalAllowlist: string[] = [];
+  for (let i = 0; i < minterFilter.minterGlobalAllowlist.length; i++) {
+    if (minterFilter.minterGlobalAllowlist[i] != minter.id) {
+      newMinterGlobalAllowlist.push(minterFilter.minterGlobalAllowlist[i]);
+    }
+  }
+  minterFilter.minterGlobalAllowlist = newMinterGlobalAllowlist;
+  minterFilter.updatedAt = event.block.timestamp;
+  minterFilter.save();
+
+  // update minter's allowlisted state
+  minter.isGloballyAllowlistedOnMinterFilter = false;
+  minter.updatedAt = event.block.timestamp;
+  minter.save();
 }
 
 export function handleProjectMinterRegistered(
@@ -175,7 +204,18 @@ export function handleProjectMinterRegistered(
   // we didn't create it because its minter filter is different from
   // the minter filter it was approved on.
   let minter = Minter.load(event.params._minterAddress.toHexString());
-  let coreContract = Contract.load(minterFilter.coreContract);
+  const coreContractAddress = getCoreContractAddressFromLegacyMinterFilter(
+    minterFilter
+  );
+  if (!coreContractAddress) {
+    log.warning(
+      "[WARN] Legacy MinterFilter event handler was emitted by MinterFilter with non-null coreContract at address {}.",
+      [event.address.toHexString()]
+    );
+    return;
+  }
+  // Legacy minter filter handling (pre-V2)
+  let coreContract = Contract.load(coreContractAddress.toHexString());
 
   if (
     !minter ||
@@ -186,10 +226,7 @@ export function handleProjectMinterRegistered(
   }
 
   let project = Project.load(
-    generateContractSpecificId(
-      Address.fromString(minterFilter.coreContract),
-      event.params._projectId
-    )
+    generateContractSpecificId(coreContractAddress, event.params._projectId)
   );
 
   if (project) {
@@ -209,8 +246,17 @@ export function handleProjectMinterRemoved(event: ProjectMinterRemoved): void {
     event.address,
     event.block.timestamp
   );
-
-  let coreContract = Contract.load(minterFilter.coreContract);
+  const coreContractAddress = getCoreContractAddressFromLegacyMinterFilter(
+    minterFilter
+  );
+  if (!coreContractAddress) {
+    log.warning(
+      "[WARN] Legacy MinterFilter event handler was emitted by MinterFilter with non-null coreContract at address {}.",
+      [event.address.toHexString()]
+    );
+    return;
+  }
+  let coreContract = Contract.load(coreContractAddress.toHexString());
 
   if (
     !coreContract ||
@@ -220,10 +266,7 @@ export function handleProjectMinterRemoved(event: ProjectMinterRemoved): void {
   }
 
   let project = Project.load(
-    generateContractSpecificId(
-      Address.fromString(minterFilter.coreContract),
-      event.params._projectId
-    )
+    generateContractSpecificId(coreContractAddress, event.params._projectId)
   );
 
   if (project) {
@@ -241,13 +284,18 @@ export function loadOrCreateAndSetProjectMinterConfiguration(
   // Bootstrap minter if it doesn't exist already
   loadOrCreateMinter(minterAddress, timestamp);
 
+  const targetProjectMinterConfigId = getProjectMinterConfigId(
+    minterAddress.toHexString(),
+    project.id
+  );
+
   let projectMinterConfig = ProjectMinterConfiguration.load(
-    getProjectMinterConfigId(minterAddress.toHexString(), project.id)
+    targetProjectMinterConfigId
   );
 
   if (!projectMinterConfig) {
     projectMinterConfig = new ProjectMinterConfiguration(
-      getProjectMinterConfigId(minterAddress.toHexString(), project.id)
+      targetProjectMinterConfigId
     );
     projectMinterConfig.project = project.id;
     projectMinterConfig.minter = minterAddress.toHexString();
@@ -267,9 +315,9 @@ export function loadOrCreateAndSetProjectMinterConfiguration(
 }
 
 // Helper function to load or create a minter filter.
-// Assumes that the minterAllowlist is empty when initializing a new minter
+// Assumes that the minterGlobalAllowlist is empty when initializing a new minter
 // filter.
-function loadOrCreateMinterFilter(
+export function loadOrCreateMinterFilter(
   minterFilterAddress: Address,
   timestamp: BigInt
 ): MinterFilter {
@@ -280,11 +328,42 @@ function loadOrCreateMinterFilter(
 
   minterFilter = new MinterFilter(minterFilterAddress.toHexString());
   let minterFilterContract = IMinterFilterV0.bind(minterFilterAddress);
+  // dummy core registry has ID set to the associated core contract address
+  // @dev this is a trick to avoid having to create a nullable field to store
+  // the associated core contract address on the dummy core registry or
+  // minter filter.
   let coreContractAddress = minterFilterContract.genArt721CoreAddress();
-  minterFilter.coreContract = coreContractAddress.toHexString();
-  minterFilter.minterAllowlist = [];
+  const coreRegistry = getOrCreateDummyCoreRegistryForLegacyMinterFilter(
+    coreContractAddress.toHexString(),
+    timestamp
+  );
+  minterFilter.coreRegistry = coreRegistry.id;
+  minterFilter.minterGlobalAllowlist = [];
   minterFilter.updatedAt = timestamp;
   minterFilter.save();
 
+  // @dev do not update core contract's registeredOn state, allow core contract to handle that state
+
   return minterFilter;
+}
+
+// Helper function that gets or creates a dummy core registry for a legacy minter filter.
+// If the core registry already exists, nothing is created.
+// This is needed to provide a relationship between the minter filter and the core contract
+// in a schema that doesn't have a core contract field on the minter filter.
+// In this case, we create a dummy core registry that has the id of the associated core
+// contract address, and we never update it because legacy MinterFilters have a single core
+// contract address that never changes.
+function getOrCreateDummyCoreRegistryForLegacyMinterFilter(
+  dummyCoreRegistryId: string,
+  timestamp: BigInt
+): CoreRegistry {
+  let coreRegistry = CoreRegistry.load(dummyCoreRegistryId);
+  if (coreRegistry) {
+    return coreRegistry;
+  }
+  // create new core registry if it didn't exist
+  coreRegistry = new CoreRegistry(dummyCoreRegistryId);
+  coreRegistry.save();
+  return coreRegistry;
 }
