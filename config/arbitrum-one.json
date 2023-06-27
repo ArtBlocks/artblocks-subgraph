@@ -33,6 +33,11 @@
   "adminACLV0Contracts": [
   ],
   "engineRegistryV0Contracts": [
+    {
+      "address": "0xdAe755c2944Ec125a0D8D5CB082c22837593441a",
+      "name": "Arbitrum mainnet Engine registry for partner deployments",
+      "startBlock": 103885679
+    }
   ],
   "iDependencyRegistryV0Contracts": [
   ],
