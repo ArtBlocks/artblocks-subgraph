@@ -75,7 +75,8 @@ import {
   generateProjectScriptId,
   addWhitelisting,
   removeWhitelisting,
-  generateTransferId
+  generateTransferId,
+  getProjectMinterConfigId
 } from "./helpers";
 import { GEN_ART_721_CORE_V1 } from "./constants";
 
@@ -359,10 +360,7 @@ function removeMintWhitelisting(
         project.save();
       }
 
-      let prevMinterConfig = ProjectMinterConfiguration.load(fullProjectId);
-      if (prevMinterConfig) {
-        store.remove("ProjectMinterConfiguration", fullProjectId);
-      }
+      // we can leave the project minter configuration in the store
     }
   }
 

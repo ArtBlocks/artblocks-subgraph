@@ -55,7 +55,6 @@ import {
   Contract,
   MinterFilter,
   Project,
-  ProjectMinterConfiguration,
   ProjectScript,
   Token,
   Whitelisting,

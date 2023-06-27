@@ -2,7 +2,7 @@ import { BigInt, store, log, Address, Bytes } from "@graphprotocol/graph-ts";
 
 import { refreshContractAtAddress } from "./mapping-v3-core";
 
-import { EngineRegistry, Contract } from "../generated/schema";
+import { CoreRegistry, Contract } from "../generated/schema";
 import {
   IGenArt721CoreV3_Base_Template,
   OwnableGenArt721CoreV3Contract_Template,
@@ -23,7 +23,7 @@ import { Ownable } from "../generated/OwnableGenArt721CoreV3Contract/Ownable";
 // field is set to this engine registry.
 export function handleContractRegistered(event: ContractRegistered): void {
   // ensure an engine registry entity exists
-  const _ = loadOrCreateEngineRegistry(event.address);
+  loadOrCreateCoreRegistry(event.address);
   // check if the contract is already registered
   const coreAddress = event.params._contractAddress;
   // dynamically track the new contract if not already in store, and refresh it
@@ -56,12 +56,12 @@ export function handleContractRegistered(event: ContractRegistered): void {
 }
 
 // Unregistered contracts are not removed from the store, but the contract's
-// `registeredOn` field will be nulled if this engine registry is the current
-// engine registry.
+// `registeredOn` field will be nulled if this core registry is the current
+// core registry.
 export function handleContractUnregistered(event: ContractUnregistered): void {
-  // ensure an engine registry entity exists
-  const _ = loadOrCreateEngineRegistry(event.address);
-  // remove this engine registry from the contract's registeredOn field
+  // ensure an core registry entity exists
+  loadOrCreateCoreRegistry(event.address);
+  // remove this core registry from the contract's registeredOn field
   const coreAddress = event.params._contractAddress;
   let contractEntity = Contract.load(coreAddress.toHexString());
   if (contractEntity) {
@@ -76,16 +76,16 @@ export function handleContractUnregistered(event: ContractUnregistered): void {
 }
 
 /*** HELPER FUNCTIONS ***/
-function loadOrCreateEngineRegistry(address: Address): EngineRegistry {
-  let engineRegistryEntity = EngineRegistry.load(address.toHexString());
-  if (!engineRegistryEntity) {
-    engineRegistryEntity = new EngineRegistry(address.toHexString());
+function loadOrCreateCoreRegistry(address: Address): CoreRegistry {
+  let coreRegistryEntity = CoreRegistry.load(address.toHexString());
+  if (!coreRegistryEntity) {
+    coreRegistryEntity = new CoreRegistry(address.toHexString());
     // initialize the engine registry's registered contracts array
     // must assume empty, since not enumerable mapping in the contract
     // @dev this means we must track engine registry contract events
     // immendiatly after deployment to ensure we have a complete list
     // of registered contracts
-    engineRegistryEntity.save();
+    coreRegistryEntity.save();
   }
-  return engineRegistryEntity as EngineRegistry;
+  return coreRegistryEntity as CoreRegistry;
 }

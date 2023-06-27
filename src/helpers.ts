@@ -7,6 +7,7 @@ import {
   JSONValueKind,
   TypedMap,
   store,
+  log,
   ethereum
 } from "@graphprotocol/graph-ts";
 import { IFilteredMinterV2 } from "../generated/MinterSetPrice/IFilteredMinterV2";
@@ -15,12 +16,14 @@ import {
   ProjectMinterConfiguration,
   Account,
   Whitelisting,
-  Receipt
+  Receipt,
+  MinterFilter,
+  CoreRegistry
 } from "../generated/schema";
 import { IFilteredMinterDALinV1 } from "../generated/MinterDALin/IFilteredMinterDALinV1";
 import { IFilteredMinterDAExpV1 } from "../generated/MinterDAExp/IFilteredMinterDAExpV1";
 
-import { setMinterExtraMinterDetailsValue } from "./minter-suite-mapping";
+import { setMinterExtraMinterDetailsValue } from "./extra-minter-details-helpers";
 import { createTypedMapFromJSONString } from "./json";
 
 export function generateProjectExternalAssetDependencyId(
@@ -117,18 +120,17 @@ export function getProjectMinterConfigId(
   minterId: string,
   projectId: string
 ): string {
-  return minterId + "-" + projectId.split("-")[1];
+  // projectId is the contract-specific id, not the number of the project
+  return minterId + "-" + projectId;
 }
 
-// @dev projectId is the number of the project, contract-specific id is not required
+// @dev projectId is the id of a Project entity, i.e. contract-specific id
 export function getReceiptId(
   minterId: string,
-  projectId: BigInt,
+  projectId: string,
   accountAddress: Address
 ): string {
-  return (
-    minterId + "-" + projectId.toString() + "-" + accountAddress.toHexString()
-  );
+  return minterId + "-" + projectId + "-" + accountAddress.toHexString();
 }
 
 // @dev projectId must be the contract-specific id
@@ -138,11 +140,7 @@ export function loadOrCreateReceipt(
   accountAddress: Address,
   timestamp: BigInt
 ): Receipt {
-  let receiptId = getReceiptId(
-    minterId,
-    BigInt.fromString(projectId.split("-")[1]),
-    accountAddress
-  );
+  let receiptId = getReceiptId(minterId, projectId, accountAddress);
   let receipt = Receipt.load(receiptId);
   if (receipt) {
     return receipt;
@@ -189,10 +187,10 @@ export function loadOrCreateMinter(
   minter.minterFilter = filteredMinterContract
     .minterFilterAddress()
     .toHexString();
-  minter.coreContract = filteredMinterContract
-    .genArt721CoreAddress()
-    .toHexString();
   minter.extraMinterDetails = "{}";
+  // by default, we assume the minter is not allowlisted on its MinterFilter during
+  // initialization, and we let the MinterFilter entity handle the allowlisting
+  minter.isGloballyAllowlistedOnMinterFilter = false;
   // @dev must populate updatedAt before calling handleSetMinterDetailsGeneric
   // to avoid saving an entity with a null updatedAt value (non-nullable field)
   minter.updatedAt = timestamp;
@@ -255,4 +253,26 @@ export function generateTransferId(
   logIndex: BigInt
 ): string {
   return transactionHash.toHexString() + "-" + logIndex.toString();
+}
+
+export function getCoreContractAddressFromLegacyMinter(
+  minter: Minter
+): Address | null {
+  // get associated core contract address through the minter filter
+  const minterFilter = MinterFilter.load(minter.minterFilter);
+  if (!minterFilter) {
+    log.warning("Error while loading minter filter with id {}", [
+      minter.minterFilter
+    ]);
+    return null;
+  }
+  return getCoreContractAddressFromLegacyMinterFilter(minterFilter);
+}
+
+export function getCoreContractAddressFromLegacyMinterFilter(
+  minterFilter: MinterFilter
+): Address | null {
+  // in the case of non-shared minterFilter, we may assume that the id of
+  // the dummy core registry is the single "registered" core contract address
+  return Address.fromString(minterFilter.coreRegistry);
 }

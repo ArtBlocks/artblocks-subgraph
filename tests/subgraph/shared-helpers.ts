@@ -86,7 +86,6 @@ export const ACCOUNT_ENTITY_TYPE = "Account";
 export const PROJECT_ENTITY_TYPE = "Project";
 export const CONTRACT_ENTITY_TYPE = "Contract";
 export const ADMIN_ACL_ENTITY_TYPE = "AdminACL";
-export const ENGINE_REGISTRY_TYPE = "EngineRegistry";
 export const WHITELISTING_ENTITY_TYPE = "Whitelisting";
 export const PROJECT_EXTERNAL_ASSET_DEPENDENCY_ENTITY_TYPE =
   "ProjectExternalAssetDependency";
@@ -97,6 +96,7 @@ export const PROJECT_MINTER_CONFIGURATION_ENTITY_TYPE =
   "ProjectMinterConfiguration";
 export const RECEIPT_ENTITY_TYPE = "Receipt";
 export const MINTER_FILTER_ENTITY_TYPE = "MinterFilter";
+export const CORE_REGISTRY_TYPE = "CoreRegistry";
 export const MINTER_ENTITY_TYPE = "Minter";
 export const ONE_MILLION = 1000000;
 export const RANDOMIZER_ADDRESS = randomAddressGenerator.generateRandomAddress();
@@ -399,9 +399,9 @@ export function addArbitraryContractToStore(
 
 export function addTestMinterFilterToStore(): MinterFilter {
   let minterFilter = new MinterFilter(TEST_MINTER_FILTER_ADDRESS.toHexString());
-  minterFilter.coreContract = TEST_CONTRACT_ADDRESS.toHexString();
+  minterFilter.coreRegistry = TEST_CONTRACT_ADDRESS.toHexString();
   minterFilter.updatedAt = CURRENT_BLOCK_TIMESTAMP.minus(BigInt.fromI32(10));
-  minterFilter.minterAllowlist = [];
+  minterFilter.minterGlobalAllowlist = [];
   minterFilter.save();
 
   return minterFilter;
@@ -411,19 +411,25 @@ export const addNewMinterToStore = (type: string): Minter => {
   const minterAddress = randomAddressGenerator.generateRandomAddress();
   const minterType = type;
   const minter = new Minter(minterAddress.toHexString());
-  minter.coreContract = TEST_CONTRACT_ADDRESS.toHexString();
-  minter.minterFilter = randomAddressGenerator
-    .generateRandomAddress()
-    .toHexString();
+  minter.minterFilter = TEST_MINTER_FILTER_ADDRESS.toHexString();
   minter.type = minterType;
   minter.extraMinterDetails = "{}";
+  minter.isGloballyAllowlistedOnMinterFilter = true;
   minter.updatedAt = CURRENT_BLOCK_TIMESTAMP;
   minter.save();
+
+  // ensure a test minter filter exists (so the minter can find its core contract)
+  const existingMinterFilter = MinterFilter.load(
+    TEST_MINTER_FILTER_ADDRESS.toHexString()
+  );
+  if (!existingMinterFilter) {
+    addTestMinterFilterToStore();
+  }
 
   return minter;
 };
 
-export const addNewProjectMinterConfigToStore = (
+export const addNewLegacyProjectMinterConfigToStore = (
   projectId: string,
   minterAddress: Address
 ): ProjectMinterConfiguration => {
@@ -439,6 +445,14 @@ export const addNewProjectMinterConfigToStore = (
   projectMinterConfig.extraMinterDetails = "{}";
 
   projectMinterConfig.save();
+
+  // ensure a test minter filter exists (so the minter can find its core contract)
+  const existingMinterFilter = MinterFilter.load(
+    TEST_MINTER_FILTER_ADDRESS.toHexString()
+  );
+  if (!existingMinterFilter) {
+    addTestMinterFilterToStore();
+  }
 
   return projectMinterConfig;
 };
