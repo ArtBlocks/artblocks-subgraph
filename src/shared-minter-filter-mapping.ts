@@ -214,7 +214,16 @@ export function handleProjectMinterRegistered(
   // emitted the ProjectMinterRemoved event, then this is a pre-configuring
   // event, and we should return early and not update the project's minter
   const coreContract = Contract.load(event.params.coreContract.toHexString());
-  if (!coreContract || coreContract.minterFilter != minterFilter.id) {
+  if (!coreContract) {
+    log.warning(
+      "[WARN] Core contract at {} does not exist for ProjectMinterRegistered event. This is unexpected.",
+      [event.params.coreContract.toHexString()]
+    );
+    return;
+  }
+  const currentMinterFilter = coreContract.minterFilter;
+  if (currentMinterFilter != minterFilter.id) {
+    // do not log a warning, as pre-configuring events are expected
     return;
   }
 
