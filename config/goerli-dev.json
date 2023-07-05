@@ -116,6 +116,11 @@
       "address": "0x72AE7160A580893Fb1049D17Fbd736Ad39Ea7FbD",
       "name": "Minter Filter for AB V3 Engine Dev C core at 0x5702797Ff45FCb0a70eB6AE1E4563299dCFa9Dd6",
       "startBlock": 8458567
+    },
+    {
+      "address": "0x19254c1226Dbb83EC08Ab07Ba0B5c3994792D9D8",
+      "name": "Minter Filter for Weekly Wins Core (used for testing) at 0x4A185f9A8ee3d247fD564407658602228a8de265",
+      "startBlock": 8591101
     }
   ],
   "minterSetPriceContracts": [
@@ -158,6 +163,11 @@
       "address": "0x4C10A27863FBE991B35659F7C98124A62EDac0c6",
       "name": "V4 Flagship Minter for V3 core",
       "startBlock": 8655366
+    },
+    {
+      "address": "0x2cf1978Cf9C66Ac98a9cb0259b9F4Ca51aF149f1",
+      "name": "V4 Minter for V3 core",
+      "startBlock": 8591102
     }
   ],
   "minterSetPriceERC20Contracts": [
@@ -254,6 +264,11 @@
       "address": "0x21998750F23CAFb4EA5d1300C8ac9B11283C1780",
       "name": "V4 Flagship Minter for V3 core",
       "startBlock": 8655363
+    },
+    {
+      "address": "0xD4c7f56b6e530f47DEADdfD92fD70Ac84345bEc3",
+      "name": "V4 Minter for V3 core",
+      "startBlock": 9216416
     }
   ],
   "minterDAExpSettlementContracts": [
@@ -276,6 +291,11 @@
       "address": "0x9e78e00b4AfE0AfE241608aC03F69e484a4c4f17",
       "name": "V1 Flagship Minter for V3 core",
       "startBlock": 8655361
+    },
+    {
+      "address": "0xf1A6EF1FA55AbF58fC801109D622A0b68E142bF0",
+      "name": "V1 Minter for V3 core",
+      "startBlock": 8591103
     }
   ],
   "minterMerkleContracts": [

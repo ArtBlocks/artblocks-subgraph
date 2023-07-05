@@ -62,7 +62,7 @@ async function main() {
   );
   const artist = ethers.Wallet.fromMnemonic(
     accounts.mnemonic,
-    "m/44'/60'/1'/0/1" // derivation path index 1
+    "m/44'/60'/1'/0/0" // bip-44 derivation path Ethereum account 1
   );
   // fund artist wallet
   await deployer.sendTransaction({

@@ -20,9 +20,6 @@ import { DummySharedMinter__factory } from "../../contracts/factories/DummyShare
 import { DummySharedMinter } from "../../contracts/DummySharedMinter";
 import { constants, ethers } from "ethers";
 
-// waiting for subgraph to sync can take longer than the default 5s timeout
-jest.setTimeout(30 * 1000);
-
 const config = getSubgraphConfig();
 
 const client = createSubgraphClient();

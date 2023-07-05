@@ -1,4 +1,4 @@
-fragment projectDetails on Project {
+fragment ProjectDetails on Project {
   id
   projectId
   minterConfiguration {
@@ -29,12 +29,12 @@ fragment projectDetails on Project {
 
 query GetProjects {
   projects {
-    ...projectDetails
+    ...ProjectDetails
   }
 }
 
 query GetTargetProjects($targetId: ID!) {
   projects(where: { id: $targetId }) {
-    ...projectDetails
+    ...ProjectDetails
   }
 }
