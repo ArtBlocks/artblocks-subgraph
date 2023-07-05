@@ -10,9 +10,6 @@ import {
   getSubgraphConfig,
 } from "./utils/helpers";
 
-// waiting for subgraph to sync can take longer than the default 5s timeout
-jest.setTimeout(30 * 1000);
-
 const config = getSubgraphConfig();
 const client = createSubgraphClient();
 
