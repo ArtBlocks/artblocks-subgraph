@@ -1,4 +1,4 @@
-fragment projectMinterConfigurationDetails on ProjectMinterConfiguration {
+fragment ProjectMinterConfigurationDetails on ProjectMinterConfiguration {
   id
   project {
     id
@@ -17,12 +17,12 @@ fragment projectMinterConfigurationDetails on ProjectMinterConfiguration {
 
 query GetProjectMinterConfigurations {
   projectMinterConfigurations {
-    ...projectMinterConfigurationDetails
+    ...ProjectMinterConfigurationDetails
   }
 }
 
 query GetTargetProjectMinterConfigurations($targetId: ID!) {
   projectMinterConfigurations(where: { id: $targetId }) {
-    ...projectMinterConfigurationDetails
+    ...ProjectMinterConfigurationDetails
   }
 }
