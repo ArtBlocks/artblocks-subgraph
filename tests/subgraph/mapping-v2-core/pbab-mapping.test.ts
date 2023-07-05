@@ -1665,7 +1665,7 @@ test("GenArt721Core2PBAB: Can handleUpdateProjectScriptJSON", () => {
   const updateCallBlockTimestamp = CURRENT_BLOCK_TIMESTAMP.plus(
     BigInt.fromI32(10)
   );
-  const scriptJSON = '{"curationStatus":"curated"}';
+  const scriptJSON = "{}";
 
   const call = changetype<UpdateProjectScriptJSONCall>(newMockCall());
 
@@ -1867,19 +1867,19 @@ test("GenArt721Core2PBAB: Can handle transfer", () => {
     generateTransferId(hash, logIndex),
     "blockHash",
     event.block.hash.toHexString()
-  )
+  );
   assert.fieldEquals(
     TRANSFER_ENTITY_TYPE,
     generateTransferId(hash, logIndex),
     "blockNumber",
     event.block.number.toString()
-  )
+  );
   assert.fieldEquals(
     TRANSFER_ENTITY_TYPE,
     generateTransferId(hash, logIndex),
     "blockTimestamp",
     event.block.timestamp.toString()
-  )
+  );
 });
 
 test("GenArt721Core2PBAB: Can handle mint transfer", () => {
@@ -1935,19 +1935,19 @@ test("GenArt721Core2PBAB: Can handle mint transfer", () => {
     generateTransferId(hash, logIndex),
     "blockHash",
     event.block.hash.toHexString()
-  )
+  );
   assert.fieldEquals(
     TRANSFER_ENTITY_TYPE,
     generateTransferId(hash, logIndex),
     "blockNumber",
     event.block.number.toString()
-  )
+  );
   assert.fieldEquals(
     TRANSFER_ENTITY_TYPE,
     generateTransferId(hash, logIndex),
     "blockTimestamp",
     event.block.timestamp.toString()
-  )
+  );
 });
 
 test("GenArt721Core2EngineFlex: Can add/update a project external asset dependency", () => {

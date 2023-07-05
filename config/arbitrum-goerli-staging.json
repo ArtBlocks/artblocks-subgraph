@@ -48,6 +48,11 @@
       "address": "0x25841600e79E9A5263Ec4badcC328AD9CFE5f8C8",
       "name": "Arbitrum Goerli dev engine registry contract, heylinds as Deployer",
       "startBlock": 20565900
+    },
+    {
+      "address": "0x3b30d421a6dA95694EaaE09971424F15Eb375269",
+      "name": "Arbitrum Goerli staging Engine registry for partner deployments",
+      "startBlock": 25125001
     }
   ],
   "iDependencyRegistryV0Contracts": [
