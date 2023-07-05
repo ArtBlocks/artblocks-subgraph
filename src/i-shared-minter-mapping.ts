@@ -43,7 +43,7 @@ export function handlePricePerTokenInWeiUpdated(
   // attempt to load project, if it doesn't exist, log a warning and return
   // @dev we don't support or allow minters to pre-configure projects that do
   // not yet exist
-  const project = tryLoadProject(
+  const project = loadProjectByCoreAddressAndProjectNumber(
     event.params._coreContract,
     event.params._projectId
   );
@@ -68,12 +68,12 @@ export function handlePricePerTokenInWeiUpdated(
   projectMinterConfig.priceIsConfigured = true;
   projectMinterConfig.save();
 
-  // update project's updatedAt timestamp to induce a sync
-  // @dev this may induce a sync if the project's minter is not this minter,
-  // but good to consider the project as "updated", as it could switch to this
-  // minter in the future
-  project.updatedAt = event.block.timestamp;
-  project.save();
+  // only induce sync via updating project's updatedAt if the
+  // projectMinterConfig is the active minter configuration for the project
+  if (project.minterConfiguration == projectMinterConfig.id) {
+    project.updatedAt = event.block.timestamp;
+    project.save();
+  }
 }
 
 export function handleProjectCurrencyInfoUpdated(
@@ -95,13 +95,13 @@ export function handleProjectCurrencyInfoUpdated(
   projectMinterConfig.currencySymbol = event.params._currencySymbol;
   projectMinterConfig.save();
 
-  // update project's updatedAt timestamp to induce a sync
-  // @dev this may induce a sync if the project's minter is not this minter,
-  // but good to consider the project as "updated", as it could switch to this
-  // minter in the future
+  // only induce sync via updating project's updatedAt if the
+  // projectMinterConfig is the active minter configuration for the project
   const project = minterProjectAndConfig.project;
-  project.updatedAt = event.block.timestamp;
-  project.save();
+  if (project.minterConfiguration == projectMinterConfig.id) {
+    project.updatedAt = event.block.timestamp;
+    project.save();
+  }
 }
 
 export function handleProjectMaxInvocationsLimitUpdated(
@@ -121,13 +121,13 @@ export function handleProjectMaxInvocationsLimitUpdated(
   projectMinterConfig.maxInvocations = event.params._maxInvocations;
   projectMinterConfig.save();
 
-  // update project's updatedAt timestamp to induce a sync
-  // @dev this may induce a sync if the project's minter is not this minter,
-  // but good to consider the project as "updated", as it could switch to this
-  // minter in the future
+  // only induce sync via updating project's updatedAt if the
+  // projectMinterConfig is the active minter configuration for the project
   const project = minterProjectAndConfig.project;
-  project.updatedAt = event.block.timestamp;
-  project.save();
+  if (project.minterConfiguration == projectMinterConfig.id) {
+    project.updatedAt = event.block.timestamp;
+    project.save();
+  }
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -332,13 +332,14 @@ function handleRemoveFromSetProjectMinterConfig<EventType>(
 // HELPER FUNCTIONS start here
 ///////////////////////////////////////////////////////////////////////////////
 /**
- * Helper function to attempt to load a project from the store. If the project
- * does not exist, returns null.
+ * Helper function to attempt to load a project from the store, based on core
+ * contract address and project number. If the project does not exist, returns
+ * null.
  * @param coreContractAddress core contract address of the project
  * @param projectNumber project number of the project (BigInt)
  * @returns The Project entity from the store if it exists, otherwise null
  */
-function tryLoadProject(
+function loadProjectByCoreAddressAndProjectNumber(
   coreContractAddress: Address,
   projectNumber: BigInt
 ): Project | null {

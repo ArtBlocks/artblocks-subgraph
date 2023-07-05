@@ -23,8 +23,9 @@ import { constants, ethers } from "ethers";
 import { Logger } from "@ethersproject/logger";
 Logger.setLogLevel(Logger.levels.ERROR);
 
-// waiting for subgraph to sync can take longer than the default 5s timeout
-jest.setTimeout(30 * 1000);
+// Increase global test timeout from 5s to 15s, due to some tests performing many sequential
+// actions, waiting for subgraph to sync multiple times
+jest.setTimeout(15 * 1000);
 
 const config = getSubgraphConfig();
 

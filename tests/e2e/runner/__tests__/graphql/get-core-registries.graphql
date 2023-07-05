@@ -1,15 +1,15 @@
-fragment coreRegistryDetails on CoreRegistry {
+fragment CoreRegistryDetails on CoreRegistry {
   id
 }
 
 query GetCoreRegistries {
   coreRegistries {
-    ...coreRegistryDetails
+    ...CoreRegistryDetails
   }
 }
 
 query GetTargetCoreRegistries($targetId: ID!) {
   coreRegistries(where: { id: $targetId }) {
-    ...coreRegistryDetails
+    ...CoreRegistryDetails
   }
 }
