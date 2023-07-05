@@ -20,6 +20,10 @@ import { DummySharedMinter__factory } from "../../contracts/factories/DummyShare
 import { DummySharedMinter } from "../../contracts/DummySharedMinter";
 import { constants, ethers } from "ethers";
 
+// Increase global test timeout from 5s to 15s, due to some tests performing many sequential
+// actions, waiting for subgraph to sync multiple times
+jest.setTimeout(15 * 1000);
+
 const config = getSubgraphConfig();
 
 const client = createSubgraphClient();
