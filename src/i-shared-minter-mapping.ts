@@ -48,12 +48,12 @@ export function handlePricePerTokenInWeiUpdated(
   projectMinterConfig.priceIsConfigured = true;
   projectMinterConfig.save();
 
-  // update project's updatedAt timestamp to induce a sync
-  // @dev this may induce a sync if the project's minter is not this minter,
-  // but good to consider the project as "updated", as it could switch to this
-  // minter in the future
-  project.updatedAt = event.block.timestamp;
-  project.save();
+  // only induce sync via updating project's updatedAt if the
+  // projectMinterConfig is the active minter configuration for the project
+  if (project.minterConfiguration == projectMinterConfig.id) {
+    project.updatedAt = event.block.timestamp;
+    project.save();
+  }
 }
 
 export function handleProjectCurrencyInfoUpdated(
@@ -87,12 +87,12 @@ export function handleProjectCurrencyInfoUpdated(
   projectMinterConfig.currencySymbol = event.params._currencySymbol;
   projectMinterConfig.save();
 
-  // update project's updatedAt timestamp to induce a sync
-  // @dev this may induce a sync if the project's minter is not this minter,
-  // but good to consider the project as "updated", as it could switch to this
-  // minter in the future
-  project.updatedAt = event.block.timestamp;
-  project.save();
+  // only induce sync via updating project's updatedAt if the
+  // projectMinterConfig is the active minter configuration for the project
+  if (project.minterConfiguration == projectMinterConfig.id) {
+    project.updatedAt = event.block.timestamp;
+    project.save();
+  }
 }
 
 export function handleProjectMaxInvocationsLimitUpdated(
@@ -125,12 +125,12 @@ export function handleProjectMaxInvocationsLimitUpdated(
   projectMinterConfig.maxInvocations = event.params._maxInvocations;
   projectMinterConfig.save();
 
-  // update project's updatedAt timestamp to induce a sync
-  // @dev this may induce a sync if the project's minter is not this minter,
-  // but good to consider the project as "updated", as it could switch to this
-  // minter in the future
-  project.updatedAt = event.block.timestamp;
-  project.save();
+  // only induce sync via updating project's updatedAt if the
+  // projectMinterConfig is the active minter configuration for the project
+  if (project.minterConfiguration == projectMinterConfig.id) {
+    project.updatedAt = event.block.timestamp;
+    project.save();
+  }
 }
 
 ///////////////////////////////////////////////////////////////////////////////
