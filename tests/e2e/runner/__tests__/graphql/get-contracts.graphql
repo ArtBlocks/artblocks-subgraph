@@ -1,15 +1,15 @@
-fragment contractDetails on Contract {
+fragment ContractDetails on Contract {
   id
 }
 
 query GetContracts {
   contracts {
-    ...contractDetails
+    ...ContractDetails
   }
 }
 
 query GetTargetContracts($targetId: ID!) {
   contracts(where: { id: $targetId }) {
-    ...contractDetails
+    ...ContractDetails
   }
 }

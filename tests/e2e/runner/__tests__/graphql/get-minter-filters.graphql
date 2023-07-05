@@ -1,4 +1,4 @@
-fragment minterFilterDetails on MinterFilter {
+fragment MinterFilterDetails on MinterFilter {
   id
   minterGlobalAllowlist {
     id
@@ -23,12 +23,12 @@ fragment minterFilterDetails on MinterFilter {
 
 query GetMinterFilters {
   minterFilters {
-    ...minterFilterDetails
+    ...MinterFilterDetails
   }
 }
 
 query GetTargetMinterFilters($targetId: ID!) {
   minterFilters(where: { id: $targetId }) {
-    ...minterFilterDetails
+    ...MinterFilterDetails
   }
 }
