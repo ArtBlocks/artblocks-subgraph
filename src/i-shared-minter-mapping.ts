@@ -187,9 +187,13 @@ function handleSetValueProjectMinterConfig<EventType>(event: EventType): void {
     projectMinterConfig
   );
 
+  // only induce sync via updating project's updatedAt if the
+  // projectMinterConfig is the active minter configuration for the project
   const project = minterProjectAndConfig.project;
-  project.updatedAt = event.block.timestamp;
-  project.save();
+  if (project.minterConfiguration == projectMinterConfig.id) {
+    project.updatedAt = event.block.timestamp;
+    project.save();
+  }
 }
 
 // CONFIG VALUE REMOVED HANDLER
@@ -211,9 +215,13 @@ export function handleConfigKeyRemoved(event: ConfigKeyRemoved): void {
     projectMinterConfig
   );
 
+  // only induce sync via updating project's updatedAt if the
+  // projectMinterConfig is the active minter configuration for the project
   const project = minterProjectAndConfig.project;
-  project.updatedAt = event.block.timestamp;
-  project.save();
+  if (project.minterConfiguration == projectMinterConfig.id) {
+    project.updatedAt = event.block.timestamp;
+    project.save();
+  }
 }
 
 // CONFIG VALUE ADDED TO SET HANDLERS
@@ -264,9 +272,13 @@ function handleAddToSetProjectMinterConfig<EventType>(event: EventType): void {
     event.params._value
   );
 
+  // only induce sync via updating project's updatedAt if the
+  // projectMinterConfig is the active minter configuration for the project
   const project = minterProjectAndConfig.project;
-  project.updatedAt = event.block.timestamp;
-  project.save();
+  if (project.minterConfiguration == projectMinterConfig.id) {
+    project.updatedAt = event.block.timestamp;
+    project.save();
+  }
 }
 
 // CONFIG VALUE REMOVED FROM SET HANDLERS
@@ -319,9 +331,13 @@ function handleRemoveFromSetProjectMinterConfig<EventType>(
     event.params._value
   );
 
+  // only induce sync via updating project's updatedAt if the
+  // projectMinterConfig is the active minter configuration for the project
   const project = minterProjectAndConfig.project;
-  project.updatedAt = event.block.timestamp;
-  project.save();
+  if (project.minterConfiguration == projectMinterConfig.id) {
+    project.updatedAt = event.block.timestamp;
+    project.save();
+  }
 }
 
 ///////////////////////////////////////////////////////////////////////////////
