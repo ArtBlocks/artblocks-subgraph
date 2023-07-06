@@ -375,7 +375,10 @@ function loadOrCreateMinterProjectAndConfigIfProject(
   // attempt to load project, if it doesn't exist, log a warning and return
   // @dev we don't support or allow minters to pre-configure projects that do
   // not yet exist
-  const project = tryLoadProject(coreContractAddress, projectNumber);
+  const project = loadProjectByCoreAddressAndProjectNumber(
+    coreContractAddress,
+    projectNumber
+  );
   if (!project) {
     log.warning("Project {} not found for core contract {}", [
       projectNumber.toString(),
