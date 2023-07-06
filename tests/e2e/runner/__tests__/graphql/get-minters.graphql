@@ -1,4 +1,4 @@
-fragment minterDetails on Minter {
+fragment MinterDetails on Minter {
   id
   type
   minterFilter {
@@ -11,12 +11,12 @@ fragment minterDetails on Minter {
 
 query GetMinters {
   minters {
-    ...minterDetails
+    ...MinterDetails
   }
 }
 
 query GetTargetMinters($targetId: ID!) {
   minters(where: { id: $targetId }) {
-    ...minterDetails
+    ...MinterDetails
   }
 }

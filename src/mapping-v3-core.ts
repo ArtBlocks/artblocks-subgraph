@@ -33,7 +33,7 @@ import {
 } from "../generated/AdminACLV0/IAdminACLV0";
 
 import { MinterFilterV1 } from "../generated/MinterFilterV1/MinterFilterV1";
-import { loadOrCreateMinterFilter as legacyLoadOrCreateLegacyMinterFilter } from "./legacy-minter-filter-mapping";
+import { loadOrCreateMinterFilter as legacyLoadOrCreatMinterFilter } from "./legacy-minter-filter-mapping";
 
 import {
   loadOrCreateAndSetProjectMinterConfiguration,
@@ -645,7 +645,7 @@ function _handleMinterUpdated<T>(contract: T, event: MinterUpdated): void {
   if (getIsLegacyMinterFilter(newMinterFilterAddress)) {
     // This is a legacy (non-shared) MinterFilter
     // create and save minter filter entity if doesn't exist
-    legacyLoadOrCreateLegacyMinterFilter(
+    legacyLoadOrCreatMinterFilter(
       newMinterFilterAddress,
       event.block.timestamp
     );
@@ -692,7 +692,7 @@ function _handleMinterUpdated<T>(contract: T, event: MinterUpdated): void {
     contractEntity.registeredOn = sharedMinterFilter.coreRegistry;
     // sync all pre-existing projectMinterConfigurations
     let minterFilterContract = IMinterFilterV1.bind(newMinterFilterAddress);
-    PopulateAllExistingMinterConfigurations(
+    populateAllExistingMinterConfigurations(
       minterFilterContract,
       contract,
       event.block.timestamp
@@ -1280,7 +1280,7 @@ function legacyPopulateAllExistingMinterConfigurations<T>(
  * @dev for legacy minter filters, use function
  * legacyPopulateAllExistingMinterConfigurations
  */
-function PopulateAllExistingMinterConfigurations<T>(
+function populateAllExistingMinterConfigurations<T>(
   minterFilterContract: IMinterFilterV1,
   contract: T,
   timestamp: BigInt
