@@ -1193,11 +1193,11 @@ dataSources:
           handler: handleMinAuctionDurationSecondsUpdated
         - event: MinterTimeBufferUpdated(uint32)
           handler: handleMinterTimeBufferUpdated
-        - event: MinterRefundGasLimitUpdated(uint32)
+        - event: MinterRefundGasLimitUpdated(uint24)
           handler: handleMinterRefundGasLimitUpdated
         - event: ConfiguredFutureAuctions(indexed uint256,indexed address,uint64,uint32,uint256,uint8)
           handler: handleConfiguredFutureAuctions
-        - event: AuctionInitialized(indexed uint256,indexed address,indexed address,uint256,uint64)
+        - event: AuctionInitialized(indexed uint256,indexed address,indexed address,uint256,uint64,uint8)
           handler: handleAuctionInitialized
         - event: AuctionBid(indexed uint256,indexed address,indexed address,uint256)
           handler: handleAuctionBid
