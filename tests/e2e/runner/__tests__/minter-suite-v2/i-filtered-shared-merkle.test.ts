@@ -38,7 +38,7 @@ if (!config.iSharedMerkleContracts) {
 }
 const minterSetPriceMerkleV5Address = config.iSharedMerkleContracts[0].address;
 
-describe("iFilteredSharedMerkle event handling", () => {
+describe("ISharedMinterMerkleV0 event handling", () => {
   beforeAll(async () => {
     await waitUntilSubgraphIsSynced(client);
   });
