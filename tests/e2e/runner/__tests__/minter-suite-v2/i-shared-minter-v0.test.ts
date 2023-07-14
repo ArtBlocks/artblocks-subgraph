@@ -14,6 +14,8 @@ import {
 } from "../../contracts/factories/GenArt721CoreV3__factory";
 import { MinterFilterV2__factory } from "../../contracts/factories/MinterFilterV2__factory";
 import { MinterSetPriceV5__factory } from "../../contracts/factories/MinterSetPriceV5__factory";
+import { MinterSetPriceERC20V5__factory } from "../../contracts/factories/MinterSetPriceERC20V5__factory";
+import { ERC20Mock__factory } from "../../contracts/factories/ERC20Mock__factory";
 import { ethers } from "ethers";
 // hide nuisance logs about event overloading
 import { Logger } from "@ethersproject/logger";
@@ -62,6 +64,7 @@ const genArt721CoreContract = new GenArt721CoreV3__factory(
 ).attach(genArt721CoreAddress);
 
 // get MinterSetPriceV5
+// @dev this is minter at index 0 in the subgraph config
 if (!config.iSharedMinterV0Contracts) {
   throw new Error("No iSharedMinterV0Contracts in config");
 }
@@ -69,6 +72,13 @@ const minterSetPriceV5Address = config.iSharedMinterV0Contracts[0].address;
 const minterSetPriceV5Contract = new MinterSetPriceV5__factory(deployer).attach(
   minterSetPriceV5Address
 );
+
+// get MinterSetPriceERC20V5
+// @dev this is minter at index 1 in the subgraph config
+const minterSetPriceERC20V5Address = config.iSharedMinterV0Contracts[1].address;
+const minterSetPriceERC20V5Contract = new MinterSetPriceERC20V5__factory(
+  deployer
+).attach(minterSetPriceERC20V5Address);
 
 describe("iSharedMinterV0 event handling", () => {
   beforeAll(async () => {
@@ -119,17 +129,59 @@ describe("iSharedMinterV0 event handling", () => {
     });
   });
 
-  // TODO - need ERC20 minter to test event handling of "ProjectCurrencyInfoUpdated"
-  // ERC20 minter is not yet developed at the time of writing this test
-  // describe("ProjectCurrencyInfoUpdated", () => {
-  //   afterEach(async () => {
-  //     // TODO
-  //   });
+  describe("ProjectCurrencyInfoUpdated", () => {
+    afterEach(async () => {
+      // clear the minter for project zero
+      try {
+        await sharedMinterFilterContract
+          .connect(artist)
+          .removeMinterForProject(0, genArt721CoreAddress);
+      } catch (error) {
+        // swallow error in case of test failure
+      }
+      // @dev we don't clear the currency info for project zero on the ERC20
+      // minter, because it cannot be set to the zero address. Instead, we
+      // deploy new ERC20 currencies for each test, and set the minter to use
+      // that currency
+    });
 
-  //   test("Currency is updated and configured", async () => {
-  //     // TODO - need ERC20 minter to test this
-  //   });
-  // });
+    test("Currency is updated and configured", async () => {
+      const currencySymbol = "ERC20";
+      // deploy new ERC20 currency, sending initial supply to artist
+      const newCurrency = await new ERC20Mock__factory(artist).deploy(
+        ethers.utils.parseEther("100")
+      );
+      // set minter for project zero to the fixed price ERC20 minter
+      await sharedMinterFilterContract
+        .connect(artist)
+        .setMinterForProject(
+          0,
+          genArt721CoreAddress,
+          minterSetPriceERC20V5Address
+        );
+      // update currency info
+      const newPrice = ethers.utils.parseEther(Math.random().toString());
+      await minterSetPriceERC20V5Contract
+        .connect(artist)
+        .updateProjectCurrencyInfo(
+          0,
+          genArt721CoreAddress,
+          currencySymbol,
+          newCurrency.address
+        );
+      await waitUntilSubgraphIsSynced(client);
+      // validate currency info in subgraph
+      const targetId = `${minterSetPriceERC20V5Address.toLowerCase()}-${genArt721CoreAddress.toLowerCase()}-0`;
+      const minterConfigRes = await getProjectMinterConfigurationDetails(
+        client,
+        targetId
+      );
+      expect(minterConfigRes.currencySymbol).toBe(currencySymbol);
+      expect(minterConfigRes.currencyAddress).toBe(
+        newCurrency.address.toLowerCase()
+      );
+    });
+  });
 
   describe("ProjectMaxInvocationsUpdated", () => {
     afterEach(async () => {

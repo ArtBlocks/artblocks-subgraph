@@ -22,6 +22,7 @@ import { MinterFilterV2__factory } from "../contracts/factories/MinterFilterV2__
 // @dev dummy shared minter used to test shared minter filter, but isn't used in production
 import { DummySharedMinter__factory } from "../contracts/factories/DummySharedMinter__factory";
 import { MinterSetPriceV5__factory } from "../contracts/factories/MinterSetPriceV5__factory";
+import { MinterSetPriceERC20V5__factory } from "../contracts/factories/MinterSetPriceERC20V5__factory";
 import { MinterSetPriceMerkleV5__factory } from "../contracts/factories/MinterSetPriceMerkleV5__factory";
 import { MinterSetPriceHolderV5__factory } from "../contracts/factories/MinterSetPriceHolderV5__factory";
 
@@ -217,6 +218,21 @@ async function main() {
     },
   ];
 
+  // @dev also deploy ERC20 set price minter
+  const minterSetPriceERC20V5Factory = new MinterSetPriceERC20V5__factory(
+    deployer
+  );
+  const minterSetPriceERC20V5 = await minterSetPriceERC20V5Factory.deploy(
+    minterFilter.address
+  );
+  await minterSetPriceERC20V5.deployed();
+  console.log(
+    `MinterSetPriceERC20V5 deployed at ${minterSetPriceERC20V5.address}`
+  );
+  subgraphConfig.iSharedMinterV0Contracts.push({
+    address: minterSetPriceERC20V5.address,
+  });
+
   // Merkle Minters
   const minterMerkleV5Factory = new MinterSetPriceMerkleV5__factory(deployer);
   const minterSetPriceMerkleV5 = await minterMerkleV5Factory.deploy(
@@ -327,6 +343,12 @@ async function main() {
     .approveMinterGlobally(minterSetPriceV5.address);
   console.log(
     `Allowlisted minterSetPriceV5 ${minterSetPriceV5.address} on minter filter.`
+  );
+  await minterFilter
+    .connect(deployer)
+    .approveMinterGlobally(minterSetPriceERC20V5.address);
+  console.log(
+    `Allowlisted minterSetPriceERC20V5 ${minterSetPriceERC20V5.address} on minter filter.`
   );
   await minterFilter
     .connect(deployer)
