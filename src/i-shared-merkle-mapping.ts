@@ -1,7 +1,7 @@
 import {
   DefaultMaxInvocationsPerAddress,
   DelegationRegistryUpdated
-} from "../generated/ISharedMerkle/IFilteredSharedMerkle";
+} from "../generated/ISharedMerkle/ISharedMinterMerkleV0";
 
 import { loadOrCreateMinter } from "./helpers";
 

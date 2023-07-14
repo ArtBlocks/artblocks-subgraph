@@ -1062,7 +1062,7 @@ dataSources:
     network: {{network}}
     source:
       address: "{{#address}}{{address}}{{/address}}{{^address}}0x0000000000000000000000000000000000000000{{/address}}"
-      abi: IFilteredSharedMerkle
+      abi: ISharedMinterMerkleV0
       {{#startBlock}}startBlock: {{startBlock}}{{/startBlock}}
     mapping:
       kind: ethereum/events
@@ -1080,8 +1080,8 @@ dataSources:
         - Minter
         - ProjectMinterConfiguration
       abis:
-        - name: IFilteredSharedMerkle
-          file: ./abis/IFilteredSharedMerkle.json
+        - name: ISharedMinterMerkleV0
+          file: ./abis/ISharedMinterMerkleV0.json
         - name: ISharedMinterV0
           file: ./abis/ISharedMinterV0.json
         - name: IFilteredMinterV2

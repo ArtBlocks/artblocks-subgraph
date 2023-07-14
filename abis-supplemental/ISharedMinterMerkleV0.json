@@ -1,7 +1,7 @@
 {
   "_format": "hh-sol-artifact-1",
-  "contractName": "IFilteredSharedMerkle",
-  "sourceName": "contracts/interfaces/v0.8.x/IFilteredSharedMerkle.sol",
+  "contractName": "ISharedMinterMerkleV0",
+  "sourceName": "contracts/interfaces/v0.8.x/ISharedMinterMerkleV0.sol",
   "abi": [
     {
       "anonymous": false,
