@@ -142,8 +142,8 @@ describe("iSharedMinterV0 event handling - generic handlers", () => {
       await minterSetPriceMerkleV5Contract
         .connect(artist)
         .setProjectInvocationsPerAddress(
-          genArt721CoreAddress,
           0,
+          genArt721CoreAddress,
           newMaxInvocationsPerAddress
         );
       await waitUntilSubgraphIsSynced(client);
@@ -189,8 +189,8 @@ describe("iSharedMinterV0 event handling - generic handlers", () => {
       await minterSetPriceMerkleV5Contract
         .connect(artist)
         .setProjectInvocationsPerAddress(
-          genArt721CoreAddress,
           0,
+          genArt721CoreAddress,
           newMaxInvocationsPerAddress
         );
       await waitUntilSubgraphIsSynced(client);
