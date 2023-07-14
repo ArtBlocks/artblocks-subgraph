@@ -1113,7 +1113,7 @@ dataSources:
     network: {{network}}
     source:
       address: "{{#address}}{{address}}{{/address}}{{^address}}0x0000000000000000000000000000000000000000{{/address}}"
-      abi: IFilteredSharedHolder
+      abi: ISharedMinterHolderV0
       {{#startBlock}}startBlock: {{startBlock}}{{/startBlock}}
     mapping:
       kind: ethereum/events
@@ -1131,8 +1131,8 @@ dataSources:
         - Minter
         - ProjectMinterConfiguration
       abis:
-        - name: IFilteredSharedHolder
-          file: ./abis/IFilteredSharedHolder.json
+        - name: ISharedMinterHolderV0
+          file: ./abis/ISharedMinterHolderV0.json
         - name: ISharedMinterV0
           file: ./abis/ISharedMinterV0.json
         - name: IFilteredMinterV2
@@ -1154,9 +1154,9 @@ dataSources:
       eventHandlers:
         - event: DelegationRegistryUpdated(address)
           handler: handleDelegationRegistryUpdated
-        - event: AllowedHoldersOfProjects(indexed uint256,address,address[],uint256[])
+        - event: AllowedHoldersOfProjects(indexed uint256,indexed address,address[],uint256[])
           handler: handleAllowedHoldersOfProjects
-        - event: RemovedHoldersOfProjects(indexed uint256,address,address[],uint256[])
+        - event: RemovedHoldersOfProjects(indexed uint256,indexed address,address[],uint256[])
           handler: handleRemovedHoldersOfProjects
       file: ./src/i-shared-holder-mapping.ts
   {{/iSharedHolderContracts}}

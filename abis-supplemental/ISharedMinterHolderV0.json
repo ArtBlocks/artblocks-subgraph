@@ -1,7 +1,7 @@
 {
   "_format": "hh-sol-artifact-1",
-  "contractName": "IFilteredSharedHolder",
-  "sourceName": "contracts/interfaces/v0.8.x/IFilteredSharedHolder.sol",
+  "contractName": "ISharedMinterHolderV0",
+  "sourceName": "contracts/interfaces/v0.8.x/ISharedMinterHolderV0.sol",
   "abi": [
     {
       "anonymous": false,
@@ -13,7 +13,7 @@
           "type": "uint256"
         },
         {
-          "indexed": false,
+          "indexed": true,
           "internalType": "address",
           "name": "_coreContract",
           "type": "address"
@@ -52,25 +52,12 @@
       "inputs": [
         {
           "indexed": true,
-          "internalType": "address",
-          "name": "_NFTAddress",
-          "type": "address"
-        }
-      ],
-      "name": "RegisteredNFTAddress",
-      "type": "event"
-    },
-    {
-      "anonymous": false,
-      "inputs": [
-        {
-          "indexed": true,
           "internalType": "uint256",
           "name": "_projectId",
           "type": "uint256"
         },
         {
-          "indexed": false,
+          "indexed": true,
           "internalType": "address",
           "name": "_coreContract",
           "type": "address"
@@ -89,19 +76,6 @@
         }
       ],
       "name": "RemovedHoldersOfProjects",
-      "type": "event"
-    },
-    {
-      "anonymous": false,
-      "inputs": [
-        {
-          "indexed": true,
-          "internalType": "address",
-          "name": "_NFTAddress",
-          "type": "address"
-        }
-      ],
-      "name": "UnregisteredNFTAddress",
       "type": "event"
     },
     {

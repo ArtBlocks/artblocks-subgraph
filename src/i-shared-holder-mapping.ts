@@ -4,7 +4,7 @@ import {
   DelegationRegistryUpdated,
   AllowedHoldersOfProjects,
   RemovedHoldersOfProjects
-} from "../generated/ISharedHolder/IFilteredSharedHolder";
+} from "../generated/ISharedHolder/ISharedMinterHolderV0";
 
 import { loadOrCreateMinterProjectAndConfigIfProject } from "./i-shared-minter-mapping";
 
