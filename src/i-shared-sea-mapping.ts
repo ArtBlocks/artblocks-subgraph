@@ -1,4 +1,4 @@
-import { Bytes, JSONValue, TypedMap } from "@graphprotocol/graph-ts";
+import { BigInt, JSONValue, TypedMap } from "@graphprotocol/graph-ts";
 
 import {
   MinAuctionDurationSecondsUpdated,
@@ -81,7 +81,7 @@ export function handleMinterRefundGasLimitUpdated(
   // update minter extra minter details value
   setMinterExtraMinterDetailsValue(
     "refundGasLimit",
-    event.params.refundGasLimit,
+    BigInt.fromI32(event.params.refundGasLimit),
     minter
   );
 
@@ -122,7 +122,7 @@ export function handleConfiguredFutureAuctions(
   );
   setProjectMinterConfigExtraMinterDetailsValue(
     "minBidIncrementPercentage",
-    event.params.minBidIncrementPercentage,
+    BigInt.fromI32(event.params.minBidIncrementPercentage),
     projectMinterConfig
   );
   projectMinterConfig.save();
@@ -168,7 +168,7 @@ export function handleAuctionInitialized(event: AuctionInitialized): void {
     { key: "auctionTokenId", value: toJSONValue(event.params.tokenId) },
     {
       key: "auctionMinBidIncrementPercentage",
-      value: toJSONValue(event.params.minBidIncrementPercentage)
+      value: toJSONValue(BigInt.fromI32(event.params.minBidIncrementPercentage))
     }
   ]);
 

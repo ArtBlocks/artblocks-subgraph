@@ -25,6 +25,7 @@ import { MinterSetPriceV5__factory } from "../contracts/factories/MinterSetPrice
 import { MinterSetPriceERC20V5__factory } from "../contracts/factories/MinterSetPriceERC20V5__factory";
 import { MinterSetPriceMerkleV5__factory } from "../contracts/factories/MinterSetPriceMerkleV5__factory";
 import { MinterSetPriceHolderV5__factory } from "../contracts/factories/MinterSetPriceHolderV5__factory";
+import { MinterSEAV1__factory } from "../contracts/factories/MinterSEAV1__factory";
 
 import fs from "fs";
 import { JsonRpcProvider } from "@ethersproject/providers";
@@ -271,6 +272,21 @@ async function main() {
     },
   ];
 
+  // SEA Minters
+  // MinterSEAV1__factory
+  const MinterSEAV1Factory = new MinterSEAV1__factory(deployer);
+  const minterSEAV1 = await MinterSEAV1Factory.deploy(minterFilter.address);
+  await minterSEAV1.deployed();
+  console.log(`minterSEAV1 deployed at ${minterSEAV1.address}`);
+  subgraphConfig.iSharedMinterV0Contracts.push({
+    address: minterSEAV1.address,
+  });
+  subgraphConfig.iSharedSEAContracts = [
+    {
+      address: minterSEAV1.address,
+    },
+  ];
+
   //////////////////////////////////////////////////////////////////////////////
   // DEPLOYMENT ENDS HERE
   //////////////////////////////////////////////////////////////////////////////
@@ -361,6 +377,12 @@ async function main() {
     .approveMinterGlobally(minterSetPriceHolderV5.address);
   console.log(
     `Allowlisted minterSetPriceHolderV5 ${minterSetPriceHolderV5.address} on minter filter.`
+  );
+  await minterFilter
+    .connect(deployer)
+    .approveMinterGlobally(minterSEAV1.address);
+  console.log(
+    `Allowlisted minterSEAV1 ${minterSEAV1.address} on minter filter.`
   );
 
   // add initial project to the core contract
