@@ -390,6 +390,13 @@ async function main() {
     .connect(deployer)
     .addProject("projectZero", artist.address);
 
+  // add projects 1 and 2 to the core contract
+  for (let i = 1; i < 3; i++) {
+    await genArt721Core
+      .connect(deployer)
+      .addProject("projectZero", artist.address);
+  }
+
   // update super admin addresses
   if (superAdminAddress) {
     await adminACL
