@@ -438,3 +438,26 @@ export function getCoreContractAddressFromLegacyMinterFilter(
   // the dummy core registry is the single "registered" core contract address
   return Address.fromString(minterFilter.coreRegistry);
 }
+
+/**
+ * This updates the project's updatedAt if the projectMinterConfig is the
+ * active minter configuration for the project.
+ * This is a common pattern when a project minter configuration is updated,
+ * the project's updatedAt should be updated to induce a sync, but only if the
+ * project minter configuration is the active minter configuration for the
+ * project.
+ * @param project Project entity
+ * @param projectMinterConfig ProjectMinterConfiguration entity
+ * @param timestamp Timestamp to set the project's updatedAt to, if the
+ * projectMinterConfig is the active minter configuration for the project
+ */
+export function updateProjectIfMinterConfigIsActive(
+  project: Project,
+  projectMinterConfig: ProjectMinterConfiguration,
+  timestamp: BigInt
+): void {
+  if (project.minterConfiguration == projectMinterConfig.id) {
+    project.updatedAt = timestamp;
+    project.save();
+  }
+}

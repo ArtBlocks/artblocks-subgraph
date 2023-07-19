@@ -23,7 +23,8 @@ import {
   MinterProjectAndConfig,
   loadOrCreateMinter,
   generateContractSpecificId,
-  loadOrCreateProjectMinterConfiguration
+  loadOrCreateProjectMinterConfiguration,
+  updateProjectIfMinterConfigIsActive
 } from "./helpers";
 
 import {
@@ -37,6 +38,11 @@ import {
 // EVENT HANDLERS start here
 ///////////////////////////////////////////////////////////////////////////////
 
+/**
+ * Handles the update of price per token in wei. Attempts to load associated project and
+ * its minter configuration, then updates base price in the configuration.
+ * @param event The event carrying new price per token in wei
+ */
 export function handlePricePerTokenInWeiUpdated(
   event: PricePerTokenInWeiUpdated
 ): void {
@@ -68,14 +74,19 @@ export function handlePricePerTokenInWeiUpdated(
   projectMinterConfig.priceIsConfigured = true;
   projectMinterConfig.save();
 
-  // only induce sync via updating project's updatedAt if the
-  // projectMinterConfig is the active minter configuration for the project
-  if (project.minterConfiguration == projectMinterConfig.id) {
-    project.updatedAt = event.block.timestamp;
-    project.save();
-  }
+  // induce sync if the project minter configuration is the active one
+  updateProjectIfMinterConfigIsActive(
+    project,
+    projectMinterConfig,
+    event.block.timestamp
+  );
 }
 
+/**
+ * Handles the update of a project's currency information. Attempts to load associated
+ * project and its minter configuration, then updates currency address and symbol.
+ * @param event The event carrying updated currency information
+ */
 export function handleProjectCurrencyInfoUpdated(
   event: ProjectCurrencyInfoUpdated
 ): void {
@@ -95,13 +106,12 @@ export function handleProjectCurrencyInfoUpdated(
   projectMinterConfig.currencySymbol = event.params._currencySymbol;
   projectMinterConfig.save();
 
-  // only induce sync via updating project's updatedAt if the
-  // projectMinterConfig is the active minter configuration for the project
-  const project = minterProjectAndConfig.project;
-  if (project.minterConfiguration == projectMinterConfig.id) {
-    project.updatedAt = event.block.timestamp;
-    project.save();
-  }
+  // induce sync if the project minter configuration is the active one
+  updateProjectIfMinterConfigIsActive(
+    minterProjectAndConfig.project,
+    projectMinterConfig,
+    event.block.timestamp
+  );
 }
 
 export function handleProjectMaxInvocationsLimitUpdated(
@@ -121,13 +131,12 @@ export function handleProjectMaxInvocationsLimitUpdated(
   projectMinterConfig.maxInvocations = event.params._maxInvocations;
   projectMinterConfig.save();
 
-  // only induce sync via updating project's updatedAt if the
-  // projectMinterConfig is the active minter configuration for the project
-  const project = minterProjectAndConfig.project;
-  if (project.minterConfiguration == projectMinterConfig.id) {
-    project.updatedAt = event.block.timestamp;
-    project.save();
-  }
+  // induce sync if the project minter configuration is the active one
+  updateProjectIfMinterConfigIsActive(
+    minterProjectAndConfig.project,
+    projectMinterConfig,
+    event.block.timestamp
+  );
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -187,13 +196,12 @@ function handleSetValueProjectMinterConfig<EventType>(event: EventType): void {
     projectMinterConfig
   );
 
-  // only induce sync via updating project's updatedAt if the
-  // projectMinterConfig is the active minter configuration for the project
-  const project = minterProjectAndConfig.project;
-  if (project.minterConfiguration == projectMinterConfig.id) {
-    project.updatedAt = event.block.timestamp;
-    project.save();
-  }
+  // induce sync if the project minter configuration is the active one
+  updateProjectIfMinterConfigIsActive(
+    minterProjectAndConfig.project,
+    projectMinterConfig,
+    event.block.timestamp
+  );
 }
 
 // CONFIG VALUE REMOVED HANDLER
@@ -215,13 +223,12 @@ export function handleConfigKeyRemoved(event: ConfigKeyRemoved): void {
     projectMinterConfig
   );
 
-  // only induce sync via updating project's updatedAt if the
-  // projectMinterConfig is the active minter configuration for the project
-  const project = minterProjectAndConfig.project;
-  if (project.minterConfiguration == projectMinterConfig.id) {
-    project.updatedAt = event.block.timestamp;
-    project.save();
-  }
+  // induce sync if the project minter configuration is the active one
+  updateProjectIfMinterConfigIsActive(
+    minterProjectAndConfig.project,
+    projectMinterConfig,
+    event.block.timestamp
+  );
 }
 
 // CONFIG VALUE ADDED TO SET HANDLERS
@@ -272,13 +279,12 @@ function handleAddToSetProjectMinterConfig<EventType>(event: EventType): void {
     event.params._value
   );
 
-  // only induce sync via updating project's updatedAt if the
-  // projectMinterConfig is the active minter configuration for the project
-  const project = minterProjectAndConfig.project;
-  if (project.minterConfiguration == projectMinterConfig.id) {
-    project.updatedAt = event.block.timestamp;
-    project.save();
-  }
+  // induce sync if the project minter configuration is the active one
+  updateProjectIfMinterConfigIsActive(
+    minterProjectAndConfig.project,
+    projectMinterConfig,
+    event.block.timestamp
+  );
 }
 
 // CONFIG VALUE REMOVED FROM SET HANDLERS
@@ -331,13 +337,12 @@ function handleRemoveFromSetProjectMinterConfig<EventType>(
     event.params._value
   );
 
-  // only induce sync via updating project's updatedAt if the
-  // projectMinterConfig is the active minter configuration for the project
-  const project = minterProjectAndConfig.project;
-  if (project.minterConfiguration == projectMinterConfig.id) {
-    project.updatedAt = event.block.timestamp;
-    project.save();
-  }
+  // induce sync if the project minter configuration is the active one
+  updateProjectIfMinterConfigIsActive(
+    minterProjectAndConfig.project,
+    projectMinterConfig,
+    event.block.timestamp
+  );
 }
 
 ///////////////////////////////////////////////////////////////////////////////
