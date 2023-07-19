@@ -191,6 +191,13 @@ export function handleMinterRevokedForContract(
   }
 }
 
+/**
+ * Handle the `ProjectMinterRegistered` event. Updates the minter configuration of a project.
+ * If the project does not exist or its minter filter does not match the minter filter that 
+ * emitted the event, warnings are logged and the function returns early.
+ *
+ * @param event - The `ProjectMinterRegistered` event emitted by the contract
+ */
 export function handleProjectMinterRegistered(
   event: ProjectMinterRegistered
 ): void {
