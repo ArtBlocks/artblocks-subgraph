@@ -29,6 +29,12 @@ import {
   loadOrCreateAndSetProjectMinterConfiguration
 } from "./helpers";
 
+/**
+ * Handle the `Deployed` event. Creates a new MinterFilter entity in the store
+ * to keep track of whether a MinterFilter is in our subgraph configuration.
+ *
+ * @param event - The `Deployed` event emitted by the contract
+ */
 export function handleDeployed(event: Deployed): void {
   // we simply create a new MinterFilter entity to ensure that it is in the
   // store. This enables us to determine if a MinterFilter is in our subgraph
