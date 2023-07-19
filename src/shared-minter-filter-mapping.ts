@@ -251,6 +251,13 @@ export function handleProjectMinterRegistered(
   );
 }
 
+/**
+ * Handle the `ProjectMinterRemoved` event. Clears the minter configuration of a project.
+ * If the project does not exist or its minter filter does not match the minter filter that
+ * emitted the event, the function returns early.
+ *
+ * @param event - The `ProjectMinterRemoved` event emitted by the contract
+ */
 export function handleProjectMinterRemoved(event: ProjectMinterRemoved): void {
   let minterFilter = loadOrCreateSharedMinterFilter(
     event.address,
