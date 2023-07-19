@@ -108,6 +108,12 @@ export function handleMinterRevokedGlobally(
   minterFilter.save();
 }
 
+/**
+ * Handle the `MinterApprovedForContract` event. Updates the contract-specific allowlisted
+ * state of a minter and add the minter to the list of contract-specific allowlisted minters.
+ *
+ * @param event - The `MinterApprovedForContract` event emitted by the contract
+ */
 export function handleMinterApprovedForContract(
   event: MinterApprovedForContract
 ): void {
