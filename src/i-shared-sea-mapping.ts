@@ -19,7 +19,8 @@ import {
   loadOrCreateMinter,
   generateProjectIdNumberFromTokenIdNumber,
   getMinterExtraMinterDetailsTypedMap,
-  getProjectMinterConfigExtraMinterDetailsTypedMap
+  getProjectMinterConfigExtraMinterDetailsTypedMap,
+  updateProjectIfMinterConfigIsActive
 } from "./helpers";
 
 import {
@@ -127,13 +128,12 @@ export function handleConfiguredFutureAuctions(
   );
   projectMinterConfig.save();
 
-  // only induce sync via updating project's updatedAt if the
-  // projectMinterConfig is the active minter configuration for the project
-  const project = minterProjectAndConfig.project;
-  if (project.minterConfiguration == projectMinterConfig.id) {
-    project.updatedAt = event.block.timestamp;
-    project.save();
-  }
+  // induce sync if the project minter configuration is the active one
+  updateProjectIfMinterConfigIsActive(
+    minterProjectAndConfig.project,
+    projectMinterConfig,
+    event.block.timestamp
+  );
 }
 
 export function handleAuctionInitialized(event: AuctionInitialized): void {
@@ -183,13 +183,12 @@ export function handleAuctionInitialized(event: AuctionInitialized): void {
   );
   projectMinterConfig.save();
 
-  // only induce sync via updating project's updatedAt if the
-  // projectMinterConfig is the active minter configuration for the project
-  const project = minterProjectAndConfig.project;
-  if (project.minterConfiguration == projectMinterConfig.id) {
-    project.updatedAt = event.block.timestamp;
-    project.save();
-  }
+  // induce sync if the project minter configuration is the active one
+  updateProjectIfMinterConfigIsActive(
+    minterProjectAndConfig.project,
+    projectMinterConfig,
+    event.block.timestamp
+  );
 }
 
 export function handleAuctionBid(event: AuctionBid): void {
@@ -247,13 +246,13 @@ export function handleAuctionBid(event: AuctionBid): void {
       projectMinterConfig
     );
   }
-  // only induce sync via updating project's updatedAt if the
-  // projectMinterConfig is the active minter configuration for the project
-  const project = minterProjectAndConfig.project;
-  if (project.minterConfiguration == projectMinterConfig.id) {
-    project.updatedAt = event.block.timestamp;
-    project.save();
-  }
+
+  // induce sync if the project minter configuration is the active one
+  updateProjectIfMinterConfigIsActive(
+    minterProjectAndConfig.project,
+    projectMinterConfig,
+    event.block.timestamp
+  );
 }
 
 export function handleAuctionSettled(event: AuctionSettled): void {
@@ -279,13 +278,12 @@ export function handleAuctionSettled(event: AuctionSettled): void {
     projectMinterConfig
   );
 
-  // only induce sync via updating project's updatedAt if the
-  // projectMinterConfig is the active minter configuration for the project
-  const project = minterProjectAndConfig.project;
-  if (project.minterConfiguration == projectMinterConfig.id) {
-    project.updatedAt = event.block.timestamp;
-    project.save();
-  }
+  // induce sync if the project minter configuration is the active one
+  updateProjectIfMinterConfigIsActive(
+    minterProjectAndConfig.project,
+    projectMinterConfig,
+    event.block.timestamp
+  );
 }
 
 export function handleResetAuctionDetails(event: ResetAuctionDetails): void {
@@ -318,13 +316,12 @@ export function handleResetAuctionDetails(event: ResetAuctionDetails): void {
     projectMinterConfig
   );
 
-  // only induce sync via updating project's updatedAt if the
-  // projectMinterConfig is the active minter configuration for the project
-  const project = minterProjectAndConfig.project;
-  if (project.minterConfiguration == projectMinterConfig.id) {
-    project.updatedAt = event.block.timestamp;
-    project.save();
-  }
+  // induce sync if the project minter configuration is the active one
+  updateProjectIfMinterConfigIsActive(
+    minterProjectAndConfig.project,
+    projectMinterConfig,
+    event.block.timestamp
+  );
 }
 
 export function handleProjectNextTokenUpdated(
@@ -349,13 +346,12 @@ export function handleProjectNextTokenUpdated(
     projectMinterConfig
   );
 
-  // only induce sync via updating project's updatedAt if the
-  // projectMinterConfig is the active minter configuration for the project
-  const project = minterProjectAndConfig.project;
-  if (project.minterConfiguration == projectMinterConfig.id) {
-    project.updatedAt = event.block.timestamp;
-    project.save();
-  }
+  // induce sync if the project minter configuration is the active one
+  updateProjectIfMinterConfigIsActive(
+    minterProjectAndConfig.project,
+    projectMinterConfig,
+    event.block.timestamp
+  );
 }
 
 export function handleProjectNextTokenEjected(
@@ -379,13 +375,12 @@ export function handleProjectNextTokenEjected(
     projectMinterConfig
   );
 
-  // only induce sync via updating project's updatedAt if the
-  // projectMinterConfig is the active minter configuration for the project
-  const project = minterProjectAndConfig.project;
-  if (project.minterConfiguration == projectMinterConfig.id) {
-    project.updatedAt = event.block.timestamp;
-    project.save();
-  }
+  // induce sync if the project minter configuration is the active one
+  updateProjectIfMinterConfigIsActive(
+    minterProjectAndConfig.project,
+    projectMinterConfig,
+    event.block.timestamp
+  );
 }
 
 ///////////////////////////////////////////////////////////////////////////////
