@@ -61,6 +61,11 @@ export function handlePricePerTokenInWeiUpdated(
   }
 }
 
+/**
+ * Handles the update of a project's currency information. Attempts to load associated 
+ * project and its minter configuration, then updates currency address and symbol.
+ * @param event The event carrying updated currency information
+ */
 export function handleProjectCurrencyInfoUpdated(
   event: ProjectCurrencyInfoUpdated
 ): void {
