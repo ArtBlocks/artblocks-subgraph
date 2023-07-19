@@ -17,6 +17,11 @@ import {
 // EVENT HANDLERS start here
 ///////////////////////////////////////////////////////////////////////////////
 
+/**
+ * Handles the update of price per token in wei. Attempts to load associated project and 
+ * its minter configuration, then updates base price in the configuration.
+ * @param event The event carrying new price per token in wei
+ */
 export function handlePricePerTokenInWeiUpdated(
   event: PricePerTokenInWeiUpdated
 ): void {
