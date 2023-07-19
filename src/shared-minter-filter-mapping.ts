@@ -36,6 +36,12 @@ export function handleDeployed(event: Deployed): void {
   loadOrCreateSharedMinterFilter(event.address, event.block.timestamp);
 }
 
+/**
+ * Handle the `MinterApprovedGlobally` event. Updates the globally allowlisted state
+ * of a minter and add the minter to the list of globally allowlisted minters.
+ *
+ * @param event - The `MinterApprovedGlobally` event emitted by the contract
+ */
 export function handleMinterApprovedGlobally(
   event: MinterApprovedGlobally
 ): void {
