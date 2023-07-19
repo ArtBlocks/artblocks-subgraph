@@ -146,6 +146,13 @@ export function handleMinterApprovedForContract(
   }
 }
 
+/**
+ * Handle the `MinterRevokedForContract` event. Updates the contract-specific allowlisted
+ * state of a minter and removes the minter from the list of contract-specific allowlisted minters.
+ * If the contract allowlist is empty, the entity is deleted.
+ *
+ * @param event - The `MinterRevokedForContract` event emitted by the contract
+ */
 export function handleMinterRevokedForContract(
   event: MinterRevokedForContract
 ): void {
