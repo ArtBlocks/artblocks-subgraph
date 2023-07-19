@@ -105,6 +105,11 @@ export function handleProjectCurrencyInfoUpdated(
   }
 }
 
+/**
+ * Handles the update of a project's max invocations limit. Attempts to load associated 
+ * project and its minter configuration, then updates max invocations in the configuration.
+ * @param event The event carrying updated max invocations limit
+ */
 export function handleProjectMaxInvocationsLimitUpdated(
   event: ProjectMaxInvocationsLimitUpdated
 ): void {
