@@ -11,6 +11,12 @@ import { setMinterExtraMinterDetailsValue } from "./extra-minter-details-helpers
 // EVENT HANDLERS start here
 ///////////////////////////////////////////////////////////////////////////////
 
+/**
+ * Handles the event that updates the default max invocations per address. 
+ * Loads or creates the minter, updates the minter's details, and refreshes
+ * the minter's timestamp to induce a sync.
+ * @param event The event containing the updated max invocations per address.
+ */
 export function handleDefaultMaxInvocationsPerAddress(
   event: DefaultMaxInvocationsPerAddress
 ): void {
