@@ -334,9 +334,7 @@ export function loadOrCreateMinter(
   // values assigned in contract constructors
   // @dev safely retrieve value, gracefully handle if it reverts
   const minterFilterResult = filteredMinterContract.try_minterFilterAddress();
-  if (!minterFilterResult.reverted) {
-    minter.minterFilter = minterFilterResult.value.toHexString();
-  } else {
+  if (minterFilterResult.reverted) {
     // if minterFilterAddress() reverts, then the minter is not as expected and
     // we log warning, and assign to dummy MinterFilter entity at zero address
     log.warning(
@@ -348,6 +346,8 @@ export function loadOrCreateMinter(
       timestamp
     );
     minter.minterFilter = dummyMinterFilter.id;
+  } else {
+    minter.minterFilter = minterFilterResult.value.toHexString();
   }
   minter.extraMinterDetails = "{}";
   // by default, we assume the minter is not allowlisted on its MinterFilter during
