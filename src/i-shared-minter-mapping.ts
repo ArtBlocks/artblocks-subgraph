@@ -10,7 +10,8 @@ import {
 import {
   loadOrCreateMinter,
   generateContractSpecificId,
-  loadOrCreateProjectMinterConfiguration
+  loadOrCreateProjectMinterConfiguration,
+  updateProjectIfMinterConfigIsActive
 } from "./helpers";
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -18,7 +19,7 @@ import {
 ///////////////////////////////////////////////////////////////////////////////
 
 /**
- * Handles the update of price per token in wei. Attempts to load associated project and 
+ * Handles the update of price per token in wei. Attempts to load associated project and
  * its minter configuration, then updates base price in the configuration.
  * @param event The event carrying new price per token in wei
  */
@@ -53,16 +54,16 @@ export function handlePricePerTokenInWeiUpdated(
   projectMinterConfig.priceIsConfigured = true;
   projectMinterConfig.save();
 
-  // only induce sync via updating project's updatedAt if the
-  // projectMinterConfig is the active minter configuration for the project
-  if (project.minterConfiguration == projectMinterConfig.id) {
-    project.updatedAt = event.block.timestamp;
-    project.save();
-  }
+  // induce sync if the project minter configuration is the active one
+  updateProjectIfMinterConfigIsActive(
+    project,
+    projectMinterConfig,
+    event.block.timestamp
+  );
 }
 
 /**
- * Handles the update of a project's currency information. Attempts to load associated 
+ * Handles the update of a project's currency information. Attempts to load associated
  * project and its minter configuration, then updates currency address and symbol.
  * @param event The event carrying updated currency information
  */
@@ -97,16 +98,16 @@ export function handleProjectCurrencyInfoUpdated(
   projectMinterConfig.currencySymbol = event.params._currencySymbol;
   projectMinterConfig.save();
 
-  // only induce sync via updating project's updatedAt if the
-  // projectMinterConfig is the active minter configuration for the project
-  if (project.minterConfiguration == projectMinterConfig.id) {
-    project.updatedAt = event.block.timestamp;
-    project.save();
-  }
+  // induce sync if the project minter configuration is the active one
+  updateProjectIfMinterConfigIsActive(
+    project,
+    projectMinterConfig,
+    event.block.timestamp
+  );
 }
 
 /**
- * Handles the update of a project's max invocations limit. Attempts to load associated 
+ * Handles the update of a project's max invocations limit. Attempts to load associated
  * project and its minter configuration, then updates max invocations in the configuration.
  * @param event The event carrying updated max invocations limit
  */
@@ -140,12 +141,12 @@ export function handleProjectMaxInvocationsLimitUpdated(
   projectMinterConfig.maxInvocations = event.params._maxInvocations;
   projectMinterConfig.save();
 
-  // only induce sync via updating project's updatedAt if the
-  // projectMinterConfig is the active minter configuration for the project
-  if (project.minterConfiguration == projectMinterConfig.id) {
-    project.updatedAt = event.block.timestamp;
-    project.save();
-  }
+  // induce sync if the project minter configuration is the active one
+  updateProjectIfMinterConfigIsActive(
+    project,
+    projectMinterConfig,
+    event.block.timestamp
+  );
 }
 
 ///////////////////////////////////////////////////////////////////////////////
