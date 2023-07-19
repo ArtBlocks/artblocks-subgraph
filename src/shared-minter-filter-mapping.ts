@@ -72,6 +72,12 @@ export function handleMinterApprovedGlobally(
   }
 }
 
+/**
+ * Handle the `MinterRevokedGlobally` event. Updates the globally allowlisted state
+ * of a minter and remove the minter from the list of globally allowlisted minters.
+ *
+ * @param event - The `MinterRevokedGlobally` event emitted by the contract
+ */
 export function handleMinterRevokedGlobally(
   event: MinterRevokedGlobally
 ): void {
