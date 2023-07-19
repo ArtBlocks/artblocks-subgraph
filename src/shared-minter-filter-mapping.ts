@@ -285,6 +285,11 @@ export function handleProjectMinterRemoved(event: ProjectMinterRemoved): void {
   project.save();
 }
 
+/**
+ * Handle the `CoreRegistryUpdated` event. Updates the core registry of a minter filter.
+ *
+ * @param event - The `CoreRegistryUpdated` event emitted by the contract
+ */
 export function handleCoreRegistryUpdated(event: CoreRegistryUpdated): void {
   const minterFilter = loadOrCreateSharedMinterFilter(
     event.address,
