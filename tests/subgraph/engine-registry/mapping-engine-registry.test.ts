@@ -43,20 +43,14 @@ import {
   WHITELISTING_ENTITY_TYPE
 } from "../shared-helpers";
 import { mockRefreshContractCalls } from "../mapping-v3-core/helpers";
-import { Contract, CoreRegistry } from "../../../generated/schema";
 import {
   ContractRegistered,
   ContractUnregistered
-} from "../../../generated/EngineRegistryV0/IEngineRegistryV0";
+} from "../../../generated/CoreRegistry/ICoreRegistryV1";
 import {
   handleContractRegistered,
   handleContractUnregistered
 } from "../../../src/core-registry";
-import {
-  generateContractSpecificId,
-  generateProjectScriptId,
-  generateWhitelistingId
-} from "../../../src/helpers";
 
 const randomAddressGenerator = new RandomAddressGenerator();
 const contractRegistryAddress = randomAddressGenerator.generateRandomAddress();

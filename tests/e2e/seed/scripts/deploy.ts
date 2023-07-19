@@ -162,7 +162,7 @@ async function main() {
   subgraphConfig.metadata.coreRegistryAddress = coreRegistryAddress.toString();
 
   // @dev this key will be updated in a subsequent PR to be named engineRegistryContracts
-  subgraphConfig.engineRegistryV0Contracts = [
+  subgraphConfig.ICoreRegistryContracts = [
     {
       address: coreRegistryAddress,
     },

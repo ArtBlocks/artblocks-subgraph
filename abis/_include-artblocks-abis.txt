@@ -1,5 +1,4 @@
 AdminACLV0
-EngineRegistryV0
 GenArt721
 GenArt721Core
 GenArt721Core2
@@ -9,10 +8,10 @@ GenArt721CoreV3
 GenArt721CoreV3_Engine
 GenArt721CoreV3_Engine_Flex
 IAdminACLV0
+ICoreRegistryV1
 IDependencyRegistryCompatibleV0
 IDependencyRegistryV0
 IERC721
-IEngineRegistryV0
 IFilteredMinterDAExpSettlementV1
 IFilteredMinterDAExpV1
 IFilteredMinterDALinV1
@@ -30,4 +29,3 @@ MinterFilterV0
 MinterFilterV1
 Ownable
 OwnableUpgradeable
-IMinterFilterV1

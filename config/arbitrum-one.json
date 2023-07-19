@@ -6,41 +6,26 @@
       "startBlock": 96747000
     }
   ],
-  "ownableGenArt721CoreV3Contracts": [
-  ],
-  "iERC721GenArt721CoreV3Contracts": [
-  ],
-  "iGenArt721CoreContractV3_Engine_FlexContracts": [
-  ],
-  "minterFilterV1Contracts": [
-  ],
-  "minterSetPriceContracts": [
-  ],
-  "minterSetPriceERC20Contracts": [
-  ],
-  "minterDAExpContracts": [
-  ],
-  "minterDALinContracts": [
-  ],
-  "minterDAExpSettlementContracts": [
-  ],
-  "minterMerkleContracts": [
-  ],
-  "minterHolderContracts": [
-  ],
-  "minterSEAContracts": [
-  ],
-  "adminACLV0Contracts": [
-  ],
-  "engineRegistryV0Contracts": [
+  "ownableGenArt721CoreV3Contracts": [],
+  "iERC721GenArt721CoreV3Contracts": [],
+  "iGenArt721CoreContractV3_Engine_FlexContracts": [],
+  "minterFilterV1Contracts": [],
+  "minterSetPriceContracts": [],
+  "minterSetPriceERC20Contracts": [],
+  "minterDAExpContracts": [],
+  "minterDALinContracts": [],
+  "minterDAExpSettlementContracts": [],
+  "minterMerkleContracts": [],
+  "minterHolderContracts": [],
+  "minterSEAContracts": [],
+  "adminACLV0Contracts": [],
+  "ICoreRegistryContracts": [
     {
       "address": "0xdAe755c2944Ec125a0D8D5CB082c22837593441a",
       "name": "Arbitrum mainnet Engine registry for partner deployments",
       "startBlock": 103885679
     }
   ],
-  "iDependencyRegistryV0Contracts": [
-  ],
-  "ownableUpgradeableDependencyRegistryContracts": [
-  ]
+  "iDependencyRegistryV0Contracts": [],
+  "ownableUpgradeableDependencyRegistryContracts": []
 }

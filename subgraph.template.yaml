@@ -780,13 +780,13 @@ dataSources:
           handler: handleUpdateProjectWebsite
       file: ./src/mapping-v0-core.ts
   {{/genArt721Contracts}}
-  {{#engineRegistryV0Contracts}}
+  {{#ICoreRegistryContracts}}
   - kind: ethereum/contract
-    name: 'EngineRegistryV0{{#address}}-{{address}}{{/address}}'
+    name: 'CoreRegistry{{#address}}-{{address}}{{/address}}'
     network: {{network}}
     source:
       address: "{{#address}}{{address}}{{/address}}{{^address}}0x0000000000000000000000000000000000000000{{/address}}"
-      abi: EngineRegistryV0
+      abi: ICoreRegistryV1
       {{#startBlock}}startBlock: {{startBlock}}{{/startBlock}}
     mapping:
       kind: ethereum/events
@@ -800,10 +800,8 @@ dataSources:
         - Minter
         - ProjectMinterConfiguration
       abis:
-        - name: IEngineRegistryV0
-          file: ./abis/IEngineRegistryV0.json
-        - name: EngineRegistryV0
-          file: ./abis/EngineRegistryV0.json
+        - name: ICoreRegistryV1
+          file: ./abis/ICoreRegistryV1.json
         - name: IGenArt721CoreContractV3_Base
           file: ./abis/IGenArt721CoreContractV3_Base.json
         - name: IGenArt721CoreContractV3
@@ -830,6 +828,8 @@ dataSources:
           file: ./abis/MinterFilterV0.json
         - name: MinterFilterV1
           file: ./abis/MinterFilterV1.json
+        - name: IMinterFilterV1
+          file: ./abis/IMinterFilterV1.json
         - name: IFilteredMinterV2
           file: ./abis/IFilteredMinterV2.json
         - name: IFilteredMinterDALinV1
@@ -844,7 +844,7 @@ dataSources:
         - event: ContractUnregistered(indexed address)
           handler: handleContractUnregistered
       file: ./src/core-registry.ts
-  {{/engineRegistryV0Contracts}}
+  {{/ICoreRegistryContracts}}
   {{#minterFilterV0Contracts}}
   - kind: ethereum/contract
     name: 'MinterFilterV0{{#address}}-{{address}}{{/address}}'
