@@ -8,7 +8,10 @@ import {
 
 import { loadOrCreateMinterProjectAndConfigIfProject } from "./i-shared-minter-mapping";
 
-import { loadOrCreateMinter } from "./helpers";
+import {
+  loadOrCreateMinter,
+  updateProjectIfMinterConfigIsActive
+} from "./helpers";
 
 import {
   setMinterExtraMinterDetailsValue,
@@ -99,10 +102,12 @@ function handleHoldersOfProjectsGeneric<EventType>(event: EventType): void {
     }
   }
 
-  // update project's updatedAt timestamp to induce a sync, and save
-  const project = minterProjectAndConfig.project;
-  project.updatedAt = event.block.timestamp;
-  project.save();
+  // induce sync if the project minter configuration is the active one
+  updateProjectIfMinterConfigIsActive(
+    minterProjectAndConfig.project,
+    projectMinterConfig,
+    event.block.timestamp
+  );
 }
 
 ///////////////////////////////////////////////////////////////////////////////
