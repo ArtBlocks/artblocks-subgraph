@@ -14,12 +14,15 @@ import { IFilteredMinterV2 } from "../generated/MinterSetPrice/IFilteredMinterV2
 import {
   Minter,
   ProjectMinterConfiguration,
+  Project,
   Account,
   Whitelisting,
   Receipt,
   MinterFilter,
   CoreRegistry
 } from "../generated/schema";
+
+import { IMinterFilterV1 } from "../generated/SharedMinterFilter/IMinterFilterV1";
 import { IFilteredMinterDALinV1 } from "../generated/MinterDALin/IFilteredMinterDALinV1";
 import { IFilteredMinterDAExpV1 } from "../generated/MinterDAExp/IFilteredMinterDAExpV1";
 
@@ -45,6 +48,13 @@ export function generateWhitelistingId(
   accountId: string
 ): string {
   return contractId + "-" + accountId;
+}
+
+export function generateMinterFilterContractAllowlistId(
+  minterFilterContractAddress: string,
+  coreContractAddress: string
+): string {
+  return minterFilterContractAddress + "-" + coreContractAddress;
 }
 
 export function generateProjectIdNumberFromTokenIdNumber(
@@ -165,6 +175,116 @@ export function loadOrCreateReceipt(
   return receipt;
 }
 
+/**
+ * Helper function to load or create a shared minter filter.
+ * Assumes:
+ *  - the minter filter conforms to IMinterFilterV1 when creating a new minter
+ * filter.
+ *  - the minterGlobalAllowlist is empty when initializing a new minter filter
+ * @returns MinterFilter entity (either loaded or created)
+ */
+export function loadOrCreateSharedMinterFilter(
+  minterFilterAddress: Address,
+  timestamp: BigInt
+): MinterFilter {
+  let minterFilter = MinterFilter.load(minterFilterAddress.toHexString());
+  if (minterFilter) {
+    return minterFilter;
+  }
+  // target MinterFilter was not in store, so create new one
+  minterFilter = new MinterFilter(minterFilterAddress.toHexString());
+  minterFilter.minterGlobalAllowlist = [];
+  // safely retrieve the core registry address from the minter filter
+  let minterFilterContract = IMinterFilterV1.bind(minterFilterAddress);
+  const coreRegistryResult = minterFilterContract.try_coreRegistry();
+  let coreRegistryAddress: Address;
+  if (coreRegistryResult.reverted) {
+    // unexpected minter filter behavior - log a warning, and assign to a dummy
+    // core registry at zero address
+    log.warning(
+      "[WARN] Could not load core registry on MinterFilter contract at address {}, so set core registry to null address on entity.",
+      [minterFilterAddress.toHexString()]
+    );
+    coreRegistryAddress = Address.zero();
+  } else {
+    coreRegistryAddress = coreRegistryResult.value;
+  }
+  // load or create the core registry entity, and assign to the minter filter
+  const coreRegistry = loadOrCreateCoreRegistry(coreRegistryAddress);
+  minterFilter.coreRegistry = coreRegistry.id;
+
+  minterFilter.updatedAt = timestamp;
+  minterFilter.save();
+
+  return minterFilter;
+}
+
+/**
+ * helper function that loads or creates a CoreRegistry entity in the store.
+ * @param address core registry address
+ * @returns CoreRegistry entity (either loaded or created)
+ */
+export function loadOrCreateCoreRegistry(address: Address): CoreRegistry {
+  let coreRegistry = CoreRegistry.load(address.toHexString());
+  if (coreRegistry) {
+    return coreRegistry;
+  }
+  coreRegistry = new CoreRegistry(address.toHexString());
+  coreRegistry.save();
+  return coreRegistry;
+}
+
+/**
+ * Loads or creates a ProjectMinterConfiguration entity for the given project
+ * and minter, and sets the project's minter configuration to the new or
+ * existing ProjectMinterConfiguration entity.
+ * Updates the project's updatedAt to the timestamp, and saves entity.
+ * @dev this is intended to support legacy and shared minter filters/minters
+ * @param project
+ * @param minter
+ * @param timestamp
+ * @returns
+ */
+export function loadOrCreateAndSetProjectMinterConfiguration(
+  project: Project,
+  minter: Minter,
+  timestamp: BigInt
+): ProjectMinterConfiguration {
+  const targetProjectMinterConfigId = getProjectMinterConfigId(
+    minter.id,
+    project.id
+  );
+
+  let projectMinterConfig = ProjectMinterConfiguration.load(
+    targetProjectMinterConfigId
+  );
+
+  if (!projectMinterConfig) {
+    // create new project minter config that assumes no pre-configuring
+    // @dev if minter data source templates are used, the no pre-configuring
+    // assumption must be revisited
+    projectMinterConfig = new ProjectMinterConfiguration(
+      targetProjectMinterConfigId
+    );
+    projectMinterConfig.project = project.id;
+    projectMinterConfig.minter = minter.id;
+    projectMinterConfig.priceIsConfigured = false;
+    projectMinterConfig.currencySymbol = "ETH";
+    projectMinterConfig.currencyAddress = Address.zero();
+    projectMinterConfig.purchaseToDisabled = false;
+    projectMinterConfig.extraMinterDetails = "{}";
+    projectMinterConfig.save();
+  }
+
+  project.updatedAt = timestamp;
+  project.minterConfiguration = projectMinterConfig.id;
+  project.save();
+
+  return projectMinterConfig;
+}
+
+// @dev this is intended to work with legacy (non-shared) and new (shared)
+// minters
 export function loadOrCreateMinter(
   minterAddress: Address,
   timestamp: BigInt
@@ -184,9 +304,23 @@ export function loadOrCreateMinter(
   let filteredMinterContract = IFilteredMinterV2.bind(minterAddress);
 
   // values assigned in contract constructors
-  minter.minterFilter = filteredMinterContract
-    .minterFilterAddress()
-    .toHexString();
+  // @dev safely retrieve value, gracefully handle if it reverts
+  const minterFilterResult = filteredMinterContract.try_minterFilterAddress();
+  if (minterFilterResult.reverted) {
+    // if minterFilterAddress() reverts, then the minter is not as expected and
+    // we log warning, and assign to dummy MinterFilter entity at zero address
+    log.warning(
+      "[WARN] Minter at {} does not have a valid minter filter address",
+      [minterAddress.toHexString()]
+    );
+    const dummyMinterFilter = loadOrCreateSharedMinterFilter(
+      Address.zero(),
+      timestamp
+    );
+    minter.minterFilter = dummyMinterFilter.id;
+  } else {
+    minter.minterFilter = minterFilterResult.value.toHexString();
+  }
   minter.extraMinterDetails = "{}";
   // by default, we assume the minter is not allowlisted on its MinterFilter during
   // initialization, and we let the MinterFilter entity handle the allowlisting

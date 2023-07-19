@@ -1,78 +1,39 @@
-import fs from "fs";
 import { describe, test, expect } from "@jest/globals";
 import {
-  createClient,
-  dedupExchange,
-  cacheExchange,
-  fetchExchange,
-  Client,
-} from "@urql/core";
-import { retryExchange } from "@urql/exchange-retry";
-import {
-  GetContractsDocument,
-  GetContractsQuery,
-  GetContractsQueryVariables,
-  GetCurrentBlockNumberDocument,
-  GetCurrentBlockNumberQuery,
+  GetTargetContractsDocument,
+  GetTargetContractsQuery,
+  GetTargetContractsQueryVariables,
 } from "../generated/graphql";
-import { SubgraphConfig } from "./subgraph-config";
-import fetch from "cross-fetch";
-import { ethers } from "ethers";
+import {
+  createSubgraphClient,
+  waitUntilSubgraphIsSynced,
+  getSubgraphConfig,
+} from "./utils/helpers";
 
-const createSubgraphClient = (): Client => {
-  const client = createClient({
-    url: process.env.SUBGRAPH_GRAPHQL_URL as string,
-    fetch: fetch as any,
-    exchanges: [
-      dedupExchange,
-      cacheExchange,
-      retryExchange({
-        maxNumberAttempts: 5,
-        retryIf: (error) => !!error,
-      }),
-      fetchExchange,
-    ],
-    requestPolicy: "network-only",
-  });
-
-  return client;
-};
-
-const contracts = JSON.parse(
-  fs.readFileSync("/usr/runner/shared/test-config.json", "utf-8")
-) as SubgraphConfig;
-
+const config = getSubgraphConfig();
 const client = createSubgraphClient();
 
-const waitUntilSubgraphIsSynced = async () => {
-  const provider = new ethers.providers.JsonRpcProvider("http://hardhat:8545");
-
-  const currentBlockNumber = await provider.getBlockNumber();
-  let syncedBlock = 0;
-  while (syncedBlock < currentBlockNumber) {
-    const syncedBlockRes = await client
-      .query<GetCurrentBlockNumberQuery, GetContractsQueryVariables>(
-        GetCurrentBlockNumberDocument,
-        {}
-      )
-      .toPromise();
-    syncedBlock = syncedBlockRes.data?._meta?.block.number ?? syncedBlock;
-  }
-};
-
-describe("Contracts exist", () => {
+describe("expected contract exist", () => {
   beforeAll(async () => {
-    await waitUntilSubgraphIsSynced();
+    await waitUntilSubgraphIsSynced(client);
   });
 
-  test("contracts exist", async () => {
+  test("expected contracts exist", async () => {
+    if (!config.iGenArt721CoreContractV3_BaseContracts) {
+      throw new Error("No iGenArt721CoreContractV3_BaseContracts in config");
+    }
+    // target contract is the contract in the subgraph config
+    const targetId =
+      config.iGenArt721CoreContractV3_BaseContracts[0].address.toLowerCase();
     const contractsRes = await client
-      .query<GetContractsQuery, GetContractsQueryVariables>(
-        GetContractsDocument,
-        {}
+      .query<GetTargetContractsQuery, GetTargetContractsQueryVariables>(
+        GetTargetContractsDocument,
+        { targetId }
       )
       .toPromise();
 
-    expect(contractsRes.data?.contracts.length).toBeGreaterThan(0);
+    // expect to have found the target contract
+    expect(contractsRes.data?.contracts.length).toBe(1);
+    expect(contractsRes.data?.contracts[0].id).toBe(targetId);
   });
 });

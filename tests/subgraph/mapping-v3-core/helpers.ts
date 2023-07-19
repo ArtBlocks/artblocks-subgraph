@@ -132,7 +132,10 @@ export function mockRefreshContractCalls(
       "artblocksCurationRegistryAddress",
       "artblocksCurationRegistryAddress():(address)"
     ).returns([ethereum.Value.fromAddress(TEST_CONTRACT.curationRegistry)]);
-  } else if (coreType == "GenArt721CoreV3_Engine" || coreType == "GenArt721CoreV3_Engine_Flex") {
+  } else if (
+    coreType == "GenArt721CoreV3_Engine" ||
+    coreType == "GenArt721CoreV3_Engine_Flex"
+  ) {
     // engine contract functions
     createMockedFunction(
       TEST_CONTRACT_ADDRESS,
@@ -272,6 +275,16 @@ export function mockMinterUpdatedCallsNoPreconfiguredProjects(
     "getNumProjectsWithMinters",
     "getNumProjectsWithMinters():(uint256)"
   ).returns([ethereum.Value.fromI32(0)]);
+
+  // should handle unsupported minterFilterType function, since some legacy
+  // minter filters (including flagship MinterFilterV1) don't implement the
+  // function
+  // @dev shared minter types not needed, since e2e testing is used for those minters
+  createMockedFunction(
+    TEST_MINTER_FILTER_ADDRESS,
+    "minterFilterType",
+    "minterFilterType():(string)"
+  ).reverts();
 }
 
 export function mockTokenURICall(tokenId: BigInt, tokenURI: string): void {
