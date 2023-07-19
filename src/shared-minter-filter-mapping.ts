@@ -29,6 +29,12 @@ import {
   loadOrCreateAndSetProjectMinterConfiguration
 } from "./helpers";
 
+/**
+ * Handle the `Deployed` event. Creates a new MinterFilter entity in the store
+ * to keep track of whether a MinterFilter is in our subgraph configuration.
+ *
+ * @param event - The `Deployed` event emitted by the contract
+ */
 export function handleDeployed(event: Deployed): void {
   // we simply create a new MinterFilter entity to ensure that it is in the
   // store. This enables us to determine if a MinterFilter is in our subgraph
@@ -36,6 +42,12 @@ export function handleDeployed(event: Deployed): void {
   loadOrCreateSharedMinterFilter(event.address, event.block.timestamp);
 }
 
+/**
+ * Handle the `MinterApprovedGlobally` event. Updates the globally allowlisted state
+ * of a minter and add the minter to the list of globally allowlisted minters.
+ *
+ * @param event - The `MinterApprovedGlobally` event emitted by the contract
+ */
 export function handleMinterApprovedGlobally(
   event: MinterApprovedGlobally
 ): void {
@@ -72,6 +84,12 @@ export function handleMinterApprovedGlobally(
   }
 }
 
+/**
+ * Handle the `MinterRevokedGlobally` event. Updates the globally allowlisted state
+ * of a minter and remove the minter from the list of globally allowlisted minters.
+ *
+ * @param event - The `MinterRevokedGlobally` event emitted by the contract
+ */
 export function handleMinterRevokedGlobally(
   event: MinterRevokedGlobally
 ): void {
@@ -108,6 +126,12 @@ export function handleMinterRevokedGlobally(
   minterFilter.save();
 }
 
+/**
+ * Handle the `MinterApprovedForContract` event. Updates the contract-specific allowlisted
+ * state of a minter and add the minter to the list of contract-specific allowlisted minters.
+ *
+ * @param event - The `MinterApprovedForContract` event emitted by the contract
+ */
 export function handleMinterApprovedForContract(
   event: MinterApprovedForContract
 ): void {
@@ -146,6 +170,13 @@ export function handleMinterApprovedForContract(
   }
 }
 
+/**
+ * Handle the `MinterRevokedForContract` event. Updates the contract-specific allowlisted
+ * state of a minter and removes the minter from the list of contract-specific allowlisted minters.
+ * If the contract allowlist is empty, the entity is deleted.
+ *
+ * @param event - The `MinterRevokedForContract` event emitted by the contract
+ */
 export function handleMinterRevokedForContract(
   event: MinterRevokedForContract
 ): void {
@@ -191,6 +222,13 @@ export function handleMinterRevokedForContract(
   }
 }
 
+/**
+ * Handle the `ProjectMinterRegistered` event. Updates the minter configuration of a project.
+ * If the project does not exist or its minter filter does not match the minter filter that 
+ * emitted the event, warnings are logged and the function returns early.
+ *
+ * @param event - The `ProjectMinterRegistered` event emitted by the contract
+ */
 export function handleProjectMinterRegistered(
   event: ProjectMinterRegistered
 ): void {
@@ -251,6 +289,13 @@ export function handleProjectMinterRegistered(
   );
 }
 
+/**
+ * Handle the `ProjectMinterRemoved` event. Clears the minter configuration of a project.
+ * If the project does not exist or its minter filter does not match the minter filter that
+ * emitted the event, the function returns early.
+ *
+ * @param event - The `ProjectMinterRemoved` event emitted by the contract
+ */
 export function handleProjectMinterRemoved(event: ProjectMinterRemoved): void {
   let minterFilter = loadOrCreateSharedMinterFilter(
     event.address,
@@ -285,6 +330,11 @@ export function handleProjectMinterRemoved(event: ProjectMinterRemoved): void {
   project.save();
 }
 
+/**
+ * Handle the `CoreRegistryUpdated` event. Updates the core registry of a minter filter.
+ *
+ * @param event - The `CoreRegistryUpdated` event emitted by the contract
+ */
 export function handleCoreRegistryUpdated(event: CoreRegistryUpdated): void {
   const minterFilter = loadOrCreateSharedMinterFilter(
     event.address,
