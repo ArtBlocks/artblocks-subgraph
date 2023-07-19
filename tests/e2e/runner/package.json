@@ -2,7 +2,7 @@
   "scripts": {
     "codegen": "yarn graphql-codegen --require dotenv/config --config ./graphql.config.js dotenv_config_path=./.env",
     "test": "yarn generate:typechain && yarn codegen && yarn jest",
-    "generate:typechain": "typechain --target ethers-v5 --out-dir ./contracts './node_modules/@artblocks/contracts/artifacts/**/*.json'"
+    "generate:typechain": "typechain --target ethers-v5 --out-dir ./contracts './node_modules/@artblocks/contracts/artifacts/**/*.json' && typechain --target ethers-v5 --out-dir ./contracts './supplemental_abis/*.json'"
   },
   "devDependencies": {
     "@artblocks/contracts": "^1.0.3",

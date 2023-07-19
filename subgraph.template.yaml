@@ -983,6 +983,57 @@ dataSources:
           handler: handleCoreRegistryUpdated
       file: ./src/shared-minter-filter-mapping.ts
   {{/sharedMinterFilterContracts}}
+  {{#iSharedMinterV0Contracts}}
+  - kind: ethereum/contract
+    name: 'ISharedMinterV0{{#address}}-{{address}}{{/address}}'
+    network: {{network}}
+    source:
+      address: "{{#address}}{{address}}{{/address}}{{^address}}0x0000000000000000000000000000000000000000{{/address}}"
+      abi: ISharedMinterV0
+      {{#startBlock}}startBlock: {{startBlock}}{{/startBlock}}
+    mapping:
+      kind: ethereum/events
+      apiVersion: 0.0.5
+      language: wasm/assemblyscript
+      entities:
+        - Project
+        - ProjectScript
+        - Token
+        - Contract
+        - Account
+        - AccountProject
+        - Whitelisting
+        - MinterFilter
+        - Minter
+        - ProjectMinterConfiguration
+      abis:
+        - name: ISharedMinterV0
+          file: ./abis/ISharedMinterV0.json
+        - name: IFilteredMinterV2
+          file: ./abis/IFilteredMinterV2.json
+        - name: IFilteredMinterDALinV1
+          file: ./abis/IFilteredMinterDALinV1.json
+        - name: IFilteredMinterDAExpV1
+          file: ./abis/IFilteredMinterDAExpV1.json
+        - name: IFilteredMinterDAExpSettlementV1
+          file: ./abis/IFilteredMinterDAExpSettlementV1.json
+        - name: IFilteredMinterV2
+          file: ./abis/IFilteredMinterV2.json
+        - name: IFilteredMinterHolderV2
+          file: ./abis/IFilteredMinterHolderV2.json
+        - name: IFilteredMinterMerkleV2
+          file: ./abis/IFilteredMinterMerkleV2.json
+        - name: IFilteredMinterSEAV0
+          file: ./abis/IFilteredMinterSEAV0.json
+      eventHandlers:
+        - event: PricePerTokenInWeiUpdated(indexed uint256,indexed address,indexed uint256)
+          handler: handlePricePerTokenInWeiUpdated
+        - event: ProjectCurrencyInfoUpdated(indexed uint256,indexed address,indexed address,string)
+          handler: handleProjectCurrencyInfoUpdated
+        - event: ProjectMaxInvocationsLimitUpdated(indexed uint256,indexed address,uint256)
+          handler: handleProjectMaxInvocationsLimitUpdated
+      file: ./src/i-shared-minter-mapping.ts
+  {{/iSharedMinterV0Contracts}}
   {{#minterSetPriceContracts}}
   - kind: ethereum/contract
     name: 'MinterSetPrice{{#address}}-{{address}}{{/address}}'

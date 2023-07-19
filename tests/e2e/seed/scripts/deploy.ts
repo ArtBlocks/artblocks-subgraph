@@ -18,6 +18,7 @@ import { BytecodeStorageReader__factory } from "../contracts/factories/BytecodeS
 import { MinterFilterV2__factory } from "../contracts/factories/MinterFilterV2__factory";
 // @dev dummy shared minter used to test shared minter filter, but isn't used in production
 import { DummySharedMinter__factory } from "../contracts/factories/DummySharedMinter__factory";
+import { MinterSetPriceV5__factory } from "../contracts/factories/MinterSetPriceV5__factory";
 
 import fs from "fs";
 import { JsonRpcProvider } from "@ethersproject/providers";
@@ -189,8 +190,20 @@ async function main() {
     minterFilter.address
   );
   await dummySharedMinter.deployed();
-
   console.log(`Dummy shared minter deployed at ${dummySharedMinter.address}`);
+
+  // Fixed Price Minters
+  const minterSetPriceV5Factory = new MinterSetPriceV5__factory(deployer);
+  const minterSetPriceV5 = await minterSetPriceV5Factory.deploy(
+    minterFilter.address
+  );
+  await minterSetPriceV5.deployed();
+  console.log(`MinterSetPriceV5 deployed at ${minterSetPriceV5.address}`);
+  subgraphConfig.iSharedMinterV0Contracts = [
+    {
+      address: minterSetPriceV5.address,
+    },
+  ];
 
   //////////////////////////////////////////////////////////////////////////////
   // DEPLOYMENT ENDS HERE
@@ -258,6 +271,12 @@ async function main() {
     .approveMinterGlobally(dummySharedMinter.address);
   console.log(
     `Allowlisted dummy shared minter ${dummySharedMinter.address} on minter filter.`
+  );
+  await minterFilter
+    .connect(deployer)
+    .approveMinterGlobally(minterSetPriceV5.address);
+  console.log(
+    `Allowlisted minterSetPriceV5 ${minterSetPriceV5.address} on minter filter.`
   );
 
   // add initial project to the core contract

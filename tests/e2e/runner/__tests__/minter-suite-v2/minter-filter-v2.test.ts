@@ -17,7 +17,7 @@ import {
 import { MinterFilterV2__factory } from "../../contracts/factories/MinterFilterV2__factory";
 // @dev dummy shared minter used to test shared minter filter, but isn't used in production
 import { DummySharedMinter__factory } from "../../contracts/factories/DummySharedMinter__factory";
-import { DummySharedMinter } from "../../contracts";
+import { DummySharedMinter } from "../../contracts/DummySharedMinter";
 import { constants, ethers } from "ethers";
 
 // Increase global test timeout from 5s to 15s, due to some tests performing many sequential

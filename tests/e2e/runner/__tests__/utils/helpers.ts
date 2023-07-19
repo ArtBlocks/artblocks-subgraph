@@ -12,11 +12,15 @@ import {
   GetTargetMintersDocument,
   GetTargetMintersQuery,
   GetTargetMintersQueryVariables,
+  GetTargetProjectMinterConfigurationsDocument,
+  GetTargetProjectMinterConfigurationsQuery,
+  GetTargetProjectMinterConfigurationsQueryVariables,
   GetTargetProjectsDocument,
   GetTargetProjectsQuery,
   GetTargetProjectsQueryVariables,
   MinterFilterDetailsFragment,
   MinterDetailsFragment,
+  ProjectMinterConfigurationDetailsFragment,
   ProjectDetailsFragment,
   CoreRegistryDetailsFragment,
 } from "../../generated/graphql";
@@ -141,8 +145,33 @@ export const getMinterDetails = async (
       )
       .toPromise()
   ).data?.minters[0];
-  if (!minterRes) throw new Error("No Project entity found");
+  if (!minterRes) throw new Error("No Minter entity found");
   return minterRes;
+};
+
+/**
+ * Gets a ProjectMinterConfiguration detail fragment from the subgraph, at specified id.
+ * Reverts if no entity is found.
+ * @param client the subgraph client
+ * @param minterId the id of the Minter entity
+ */
+export const getProjectMinterConfigurationDetails = async (
+  client: Client,
+  projectMinterConfigId: string
+): Promise<ProjectMinterConfigurationDetailsFragment> => {
+  const projectMinterConfigRes = (
+    await client
+      .query<
+        GetTargetProjectMinterConfigurationsQuery,
+        GetTargetProjectMinterConfigurationsQueryVariables
+      >(GetTargetProjectMinterConfigurationsDocument, {
+        targetId: projectMinterConfigId,
+      })
+      .toPromise()
+  ).data?.projectMinterConfigurations[0];
+  if (!projectMinterConfigRes)
+    throw new Error("No ProjectMinterConfiguration entity found");
+  return projectMinterConfigRes;
 };
 
 /**

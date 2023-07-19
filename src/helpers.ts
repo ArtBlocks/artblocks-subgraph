@@ -250,6 +250,33 @@ export function loadOrCreateAndSetProjectMinterConfiguration(
   minter: Minter,
   timestamp: BigInt
 ): ProjectMinterConfiguration {
+  const projectMinterConfig = loadOrCreateProjectMinterConfiguration(
+    project,
+    minter
+  );
+
+  // update the project's minter configuration
+  project.updatedAt = timestamp;
+  project.minterConfiguration = projectMinterConfig.id;
+  project.save();
+
+  return projectMinterConfig;
+}
+
+/**
+ * Loads or creates a ProjectMinterConfiguration entity for the given project
+ * and minter.
+ * If a new ProjectMinterConfiguration entity is created, it is assumed that
+ * the minter is not pre-configured, and the price is not configured.
+ * The project's updatedAt is not updated, and the project is not saved.
+ * @param project The project entity
+ * @param minter The minter entity
+ * @returns
+ */
+export function loadOrCreateProjectMinterConfiguration(
+  project: Project,
+  minter: Minter
+): ProjectMinterConfiguration {
   const targetProjectMinterConfigId = getProjectMinterConfigId(
     minter.id,
     project.id
@@ -275,11 +302,6 @@ export function loadOrCreateAndSetProjectMinterConfiguration(
     projectMinterConfig.extraMinterDetails = "{}";
     projectMinterConfig.save();
   }
-
-  project.updatedAt = timestamp;
-  project.minterConfiguration = projectMinterConfig.id;
-  project.save();
-
   return projectMinterConfig;
 }
 
@@ -409,4 +431,27 @@ export function getCoreContractAddressFromLegacyMinterFilter(
   // in the case of non-shared minterFilter, we may assume that the id of
   // the dummy core registry is the single "registered" core contract address
   return Address.fromString(minterFilter.coreRegistry);
+}
+
+/**
+ * This updates the project's updatedAt if the projectMinterConfig is the
+ * active minter configuration for the project.
+ * This is a common pattern when a project minter configuration is updated,
+ * the project's updatedAt should be updated to induce a sync, but only if the
+ * project minter configuration is the active minter configuration for the
+ * project.
+ * @param project Project entity
+ * @param projectMinterConfig ProjectMinterConfiguration entity
+ * @param timestamp Timestamp to set the project's updatedAt to, if the
+ * projectMinterConfig is the active minter configuration for the project
+ */
+export function updateProjectIfMinterConfigIsActive(
+  project: Project,
+  projectMinterConfig: ProjectMinterConfiguration,
+  timestamp: BigInt
+): void {
+  if (project.minterConfiguration == projectMinterConfig.id) {
+    project.updatedAt = timestamp;
+    project.save();
+  }
 }
