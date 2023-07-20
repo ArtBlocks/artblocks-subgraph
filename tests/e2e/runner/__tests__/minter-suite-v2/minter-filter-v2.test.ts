@@ -19,10 +19,13 @@ import { MinterFilterV2__factory } from "../../contracts/factories/MinterFilterV
 import { DummySharedMinter__factory } from "../../contracts/factories/DummySharedMinter__factory";
 import { DummySharedMinter } from "../../contracts/DummySharedMinter";
 import { constants, ethers } from "ethers";
+// hide nuisance logs about event overloading
+import { Logger } from "@ethersproject/logger";
+Logger.setLogLevel(Logger.levels.ERROR);
 
-// Increase global test timeout from 5s to 15s, due to some tests performing many sequential
+// Increase global test timeout from 5s to 30s, due to some tests performing many sequential
 // actions, waiting for subgraph to sync multiple times
-jest.setTimeout(15 * 1000);
+jest.setTimeout(30 * 1000);
 
 const config = getSubgraphConfig();
 

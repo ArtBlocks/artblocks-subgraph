@@ -56,6 +56,7 @@ import {
 } from "../generated/schema";
 
 import {
+  MinterProjectAndConfig,
   generateContractSpecificId,
   getProjectMinterConfigExtraMinterDetailsTypedMap,
   getProjectMinterConfigId,
@@ -1211,12 +1212,6 @@ function syncNumSettleableInvocations(
 
   minterProjectAndConfig.project.updatedAt = event.block.timestamp;
   minterProjectAndConfig.project.save();
-}
-
-class MinterProjectAndConfig {
-  minter: Minter;
-  project: Project;
-  projectMinterConfiguration: ProjectMinterConfiguration;
 }
 
 function loadMinterProjectAndConfigLegacyMinters(

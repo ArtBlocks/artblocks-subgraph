@@ -29,6 +29,12 @@ import { IFilteredMinterDAExpV1 } from "../generated/MinterDAExp/IFilteredMinter
 import { setMinterExtraMinterDetailsValue } from "./extra-minter-details-helpers";
 import { createTypedMapFromJSONString } from "./json";
 
+export class MinterProjectAndConfig {
+  minter: Minter;
+  project: Project;
+  projectMinterConfiguration: ProjectMinterConfiguration;
+}
+
 export function generateProjectExternalAssetDependencyId(
   projectId: string,
   index: string
