@@ -371,7 +371,7 @@ function loadProjectByCoreAddressAndProjectNumber(
   return Project.load(fullProjectId);
 }
 
-function loadOrCreateMinterProjectAndConfigIfProject(
+export function loadOrCreateMinterProjectAndConfigIfProject(
   minterAddress: Address,
   coreContractAddress: Address,
   projectNumber: BigInt,
