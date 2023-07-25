@@ -1,4 +1,4 @@
-import { Address } from "@graphprotocol/graph-ts";
+import { Address, log } from "@graphprotocol/graph-ts";
 
 import { refreshContractAtAddress } from "./mapping-v3-core";
 
@@ -39,8 +39,18 @@ export function handleContractRegistered(event: ContractRegistered): void {
     // also track the new contract's Admin ACL contract to enable indexing if admin changes
     // @dev for V3 core contracts, the admin acl contract is the core contract's owner
     const ownableV3Core = Ownable.bind(coreAddress);
-    const adminACLAddress = ownableV3Core.owner();
-    AdminACLV0_Template.create(adminACLAddress);
+    const adminACLAddressResult = ownableV3Core.try_owner();
+    if (adminACLAddressResult.reverted) {
+      // @dev this should never happen, but if it does, we should not create the Admin ACL template
+      log.warning(
+        "[WARN] V3 Core Contract at address {} does not implement owner() function.",
+        [ownableV3Core._address.toHexString()]
+      );
+      return;
+    } else {
+      const adminACLAddress = adminACLAddressResult.value;
+      AdminACLV0_Template.create(adminACLAddress);
+    }
     // refresh contract
     refreshContractAtAddress(coreAddress, event.block.timestamp);
   }
