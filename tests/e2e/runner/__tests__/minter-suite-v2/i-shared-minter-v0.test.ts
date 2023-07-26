@@ -96,12 +96,17 @@ describe("iSharedMinterV0 event handling", () => {
   describe("PricePerTokenInWeiUpdated", () => {
     afterEach(async () => {
       // clear the minter for project zero
+      // @dev call success depends on test state, so use a try/catch block
       try {
         await sharedMinterFilterContract
           .connect(artist)
           .removeMinterForProject(0, genArt721CoreAddress);
       } catch (error) {
-        // swallow error in case of test failure
+        // try block will only fail in case of previously failed test where
+        // project zero never had its minter assigned.
+        // Thus, swallow error here because the test failure has already been
+        // reported, and additional error messaging from afterEach is not
+        // helpful.
       }
     });
 
@@ -132,12 +137,17 @@ describe("iSharedMinterV0 event handling", () => {
   describe("ProjectCurrencyInfoUpdated", () => {
     afterEach(async () => {
       // clear the minter for project zero
+      // @dev call success depends on test state, so use a try/catch block
       try {
         await sharedMinterFilterContract
           .connect(artist)
           .removeMinterForProject(0, genArt721CoreAddress);
       } catch (error) {
-        // swallow error in case of test failure
+        // try block will only fail in case of previously failed test where
+        // project zero never had its minter assigned.
+        // Thus, swallow error here because the test failure has already been
+        // reported, and additional error messaging from afterEach is not
+        // helpful.
       }
       // @dev we don't clear the currency info for project zero on the ERC20
       // minter, because it cannot be set to the zero address. Instead, we
@@ -186,21 +196,24 @@ describe("iSharedMinterV0 event handling", () => {
   describe("ProjectMaxInvocationsUpdated", () => {
     afterEach(async () => {
       // reset minter max invocations to core max invocations
-      try {
-        await minterSetPriceV5Contract
-          .connect(artist)
-          .syncProjectMaxInvocationsToCore(0, genArt721CoreAddress);
-        await waitUntilSubgraphIsSynced(client);
-      } catch (error) {
-        // swallow error in case of test failure
-      }
+      // @dev does not depend on test state, so can be run in afterEach
+      // without needing a try/catch block
+      await minterSetPriceV5Contract
+        .connect(artist)
+        .syncProjectMaxInvocationsToCore(0, genArt721CoreAddress);
+
       // clear the minter for project zero
+      // @dev call success depends on test state, so use a try/catch block
       try {
         await sharedMinterFilterContract
           .connect(artist)
           .removeMinterForProject(0, genArt721CoreAddress);
       } catch (error) {
-        // swallow error in case of test failure
+        // try block will only fail in case of previously failed test where
+        // project zero never had its minter assigned.
+        // Thus, swallow error here because the test failure has already been
+        // reported, and additional error messaging from afterEach is not
+        // helpful.
       }
     });
 
