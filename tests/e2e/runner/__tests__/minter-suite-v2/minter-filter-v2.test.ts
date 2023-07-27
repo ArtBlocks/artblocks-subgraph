@@ -131,7 +131,7 @@ describe("MinterFilterV2 event handling", () => {
           .connect(deployer)
           .revokeMinterGlobally(minterAddressToBeRemovedGlobally);
       } catch (error) {
-        // swallow errors in case of test failure
+        // swallow error if minter didn't need removal (likely failed test)
       }
     });
 
@@ -208,7 +208,7 @@ describe("MinterFilterV2 event handling", () => {
           .connect(deployer)
           .revokeMinterGlobally(minterAddressToBeRemovedGlobally);
       } catch (error) {
-        // swallow errors
+        // swallow error if minter didn't need removal (likely failed test)
       }
     });
 
@@ -490,16 +490,13 @@ describe("MinterFilterV2 event handling", () => {
           .connect(artist)
           .removeMinterForProject(0, genArt721CoreAddress);
       } catch (e) {
-        // swallow error in case of test failure
+        // swallow error if minter didn't need removal (likely failed test)
       }
-      try {
-        // reset core contract MinterFilter
-        await genArt721CoreContract
-          .connect(deployer)
-          .updateMinterContract(sharedMinterFilter.address);
-      } catch (e) {
-        // swallow error in case of test failure
-      }
+
+      // reset core contract MinterFilter
+      await genArt721CoreContract
+        .connect(deployer)
+        .updateMinterContract(sharedMinterFilter.address);
     });
 
     it("does not affect project if core contract's minterFilter is different", async () => {
@@ -572,7 +569,7 @@ describe("MinterFilterV2 event handling", () => {
           .connect(artist)
           .removeMinterForProject(0, genArt721CoreAddress);
       } catch (e) {
-        // swallow error in case of test success
+        // swallow error if minter didn't need removal (likely failed test)
       }
     });
 
@@ -621,13 +618,9 @@ describe("MinterFilterV2 event handling", () => {
   describe("CoreRegistryUpdated", () => {
     afterEach(async () => {
       // reset minter filter's core registry
-      try {
-        await sharedMinterFilterContract
-          .connect(deployer)
-          .updateCoreRegistry(coreRegistryAddress);
-      } catch (error) {
-        // swallow error in case of test failure
-      }
+      await sharedMinterFilterContract
+        .connect(deployer)
+        .updateCoreRegistry(coreRegistryAddress);
     });
 
     it("updates minter filter's core registry", async () => {

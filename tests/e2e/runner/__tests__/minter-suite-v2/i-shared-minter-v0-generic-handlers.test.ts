@@ -78,12 +78,17 @@ describe("iSharedMinterV0 event handling - generic handlers", () => {
   describe("ConfigValueSet - bytes32, via MinterSetPriceMerkleV5", () => {
     afterEach(async () => {
       // clear the minter for project zero
+      // @dev call success depends on test state, so use a try/catch block
       try {
         await sharedMinterFilterContract
           .connect(artist)
           .removeMinterForProject(0, genArt721CoreAddress);
       } catch (error) {
-        // swallow error in case of test failure
+        // try block will only fail in case of previously failed test where
+        // project zero never had its minter assigned.
+        // Thus, swallow error here because the test failure has already been
+        // reported, and additional error messaging from afterEach is not
+        // helpful.
       }
     });
 
@@ -119,12 +124,17 @@ describe("iSharedMinterV0 event handling - generic handlers", () => {
   describe("ConfigValueSet - bool, via MinterSetPriceMerkleV5", () => {
     afterEach(async () => {
       // clear the minter for project zero
+      // @dev call success depends on test state, so use a try/catch block
       try {
         await sharedMinterFilterContract
           .connect(artist)
           .removeMinterForProject(0, genArt721CoreAddress);
       } catch (error) {
-        // swallow error in case of test failure
+        // try block will only fail in case of previously failed test where
+        // project zero never had its minter assigned.
+        // Thus, swallow error here because the test failure has already been
+        // reported, and additional error messaging from afterEach is not
+        // helpful.
       }
     });
 
@@ -166,12 +176,17 @@ describe("iSharedMinterV0 event handling - generic handlers", () => {
   describe("ConfigValueSet - uint256, via MinterSetPriceMerkleV5", () => {
     afterEach(async () => {
       // clear the minter for project zero
+      // @dev call success depends on test state, so use a try/catch block
       try {
         await sharedMinterFilterContract
           .connect(artist)
           .removeMinterForProject(0, genArt721CoreAddress);
       } catch (error) {
-        // swallow error in case of test failure
+        // try block will only fail in case of previously failed test where
+        // project zero never had its minter assigned.
+        // Thus, swallow error here because the test failure has already been
+        // reported, and additional error messaging from afterEach is not
+        // helpful.
       }
     });
 
