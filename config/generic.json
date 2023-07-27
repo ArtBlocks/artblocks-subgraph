@@ -75,6 +75,11 @@
       "address": ""
     }
   ],
+  "iSharedSEAContracts": [
+    {
+      "address": ""
+    }
+  ],
   "minterSetPriceContracts": [
     {
       "address": ""
