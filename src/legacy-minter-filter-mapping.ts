@@ -6,6 +6,8 @@ import {
   IsCanonicalMinterFilter
 } from "../generated/MinterFilterV0/MinterFilterV0";
 
+import { MinterFilterV1 } from "../generated/MinterFilterV1/MinterFilterV1";
+
 import {
   IMinterFilterV0,
   Deployed,
@@ -63,6 +65,7 @@ export function handleIsCanonicalMinterFilter(
     );
     minterFilter.coreRegistry = coreRegistry.id;
     minterFilter.minterGlobalAllowlist = [];
+    minterFilter.type = "MinterFilterV0";
     minterFilter.updatedAt = event.block.timestamp;
     minterFilter.save();
   }
@@ -337,6 +340,18 @@ export function loadOrCreateMinterFilter(
     coreContractAddress.toHexString(),
     timestamp
   );
+
+  // IMinterFilterV0 has no minterFilterType() function, however MinterFilterV1
+  // which implements IMinterFilterV0 does have a minterFilterType() function.
+  // We can use this to determine if the minter filter is a V0 or V1 minter filter.
+  const potentialV1MinterFilter = MinterFilterV1.bind(minterFilterAddress);
+  let minterTypeResult = potentialV1MinterFilter.try_minterFilterType();
+  if (!minterTypeResult.reverted) {
+    minterFilter.type = minterTypeResult.value;
+  } else {
+    minterFilter.type = "MinterFilterV0";
+  }
+
   minterFilter.coreRegistry = coreRegistry.id;
   minterFilter.minterGlobalAllowlist = [];
   minterFilter.updatedAt = timestamp;
