@@ -4,8 +4,7 @@ import {
   clearStore,
   test,
   newMockEvent,
-  createMockedFunction,
-  logStore
+  createMockedFunction
 } from "matchstick-as/assembly/index";
 // IsCanonicalMinterFilter only emitted by MinterFilterV0
 import { IsCanonicalMinterFilter } from "../../../generated/MinterFilterV0/MinterFilterV0";
@@ -68,6 +67,7 @@ const randomAddressGenerator = new RandomAddressGenerator();
 
 test("handleDeployed should add V0 MinterFilter to the store", () => {
   clearStore();
+  // Default test contract is GenArt721CoreV1 which should cause the minter filter type to be set to V0
   addTestContractToStore(BigInt.fromI32(0));
 
   const updateCallBlockTimestamp = CURRENT_BLOCK_TIMESTAMP.plus(
@@ -85,14 +85,6 @@ test("handleDeployed should add V0 MinterFilter to the store", () => {
     "genArt721CoreAddress",
     "genArt721CoreAddress():(address)"
   ).returns([ethereum.Value.fromAddress(TEST_CONTRACT_ADDRESS)]);
-
-  // MinterFilterV0 does not have this function and should revert.
-  // In this case we assume the type is MinterFilterV0
-  createMockedFunction(
-    minterFilterAddress,
-    "minterFilterType",
-    "minterFilterType():(string)"
-  ).reverts();
 
   assert.notInStore(
     MINTER_FILTER_ENTITY_TYPE,
@@ -128,6 +120,69 @@ test("handleDeployed should add V0 MinterFilter to the store", () => {
     minterFilterAddress.toHexString(),
     "type",
     "MinterFilterV0"
+  );
+
+  clearStore();
+});
+
+test("handleDeployed should add V1 MinterFilter to the store", () => {
+  clearStore();
+
+  // This should cause the minter filter type to be set to V1
+  const coreContract = addTestContractToStore(BigInt.fromI32(0));
+  coreContract.type = "GenArt721CoreV3";
+  coreContract.save();
+
+  const updateCallBlockTimestamp = CURRENT_BLOCK_TIMESTAMP.plus(
+    BigInt.fromI32(10)
+  );
+  const minterFilterAddress = randomAddressGenerator.generateRandomAddress();
+  const deployedEvent: Deployed = changetype<Deployed>(newMockEvent());
+  deployedEvent.address = minterFilterAddress;
+  deployedEvent.parameters = [];
+  deployedEvent.block.timestamp = updateCallBlockTimestamp;
+
+  // mock function called when adding a new minter
+  createMockedFunction(
+    minterFilterAddress,
+    "genArt721CoreAddress",
+    "genArt721CoreAddress():(address)"
+  ).returns([ethereum.Value.fromAddress(TEST_CONTRACT_ADDRESS)]);
+
+  assert.notInStore(
+    MINTER_FILTER_ENTITY_TYPE,
+    minterFilterAddress.toHexString()
+  );
+
+  handleDeployed(deployedEvent);
+
+  assert.fieldEquals(
+    MINTER_FILTER_ENTITY_TYPE,
+    minterFilterAddress.toHexString(),
+    "id",
+    minterFilterAddress.toHexString()
+  );
+  const coreRegistryId = TEST_CONTRACT_ADDRESS.toHexString();
+  assert.fieldEquals(
+    MINTER_FILTER_ENTITY_TYPE,
+    minterFilterAddress.toHexString(),
+    "coreRegistry",
+    coreRegistryId
+  );
+  // core contract doesn't update its registeredOn field when a minter filter is deployed,
+  // it only updates it when it updates its minter filter
+  assert.fieldEquals(
+    CONTRACT_ENTITY_TYPE,
+    TEST_CONTRACT_ADDRESS.toHexString(),
+    "registeredOn",
+    "null"
+  );
+
+  assert.fieldEquals(
+    MINTER_FILTER_ENTITY_TYPE,
+    minterFilterAddress.toHexString(),
+    "type",
+    "MinterFilterV1"
   );
 
   clearStore();

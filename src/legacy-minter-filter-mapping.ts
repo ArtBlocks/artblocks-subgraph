@@ -341,13 +341,23 @@ export function loadOrCreateMinterFilter(
     timestamp
   );
 
-  // IMinterFilterV0 has no minterFilterType() function, however MinterFilterV1
-  // which implements IMinterFilterV0 does have a minterFilterType() function.
-  // We can use this to determine if the minter filter is a V0 or V1 minter filter.
-  const potentialV1MinterFilter = MinterFilterV1.bind(minterFilterAddress);
-  let minterTypeResult = potentialV1MinterFilter.try_minterFilterType();
-  if (!minterTypeResult.reverted) {
-    minterFilter.type = minterTypeResult.value;
+  // IMinterFilterV0 contracts may or may not have a minterFilterTypeFunction
+  // so we derive this based on the associated core contract address instead.
+  // All pre GenArt721V3 contracts should have a V0 minter filter while all
+  // GenArt721V3 contracts and above should have a V1 minter filter or higher.
+  // If the minter filter version is greater than V1 we can assume the entity
+  // creation will be handled by another event handler.
+  const coreContract = Contract.load(coreContractAddress.toHexString());
+  // We don't expect this actually happens, but we'll log a warning if it does.
+  if (!coreContract) {
+    log.warning(
+      "[WARN] Legacy MinterFilter event handler was emitted by MinterFilter with an unknown associated core contract address, {}.",
+      [coreContractAddress.toHexString()]
+    );
+  }
+
+  if (coreContract && coreContract.type.startsWith("GenArt721CoreV3")) {
+    minterFilter.type = "MinterFilterV1";
   } else {
     minterFilter.type = "MinterFilterV0";
   }
