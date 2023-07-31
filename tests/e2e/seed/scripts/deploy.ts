@@ -22,8 +22,10 @@ import { MinterFilterV2__factory } from "../contracts/factories/MinterFilterV2__
 // @dev dummy shared minter used to test shared minter filter, but isn't used in production
 import { DummySharedMinter__factory } from "../contracts/factories/DummySharedMinter__factory";
 import { MinterSetPriceV5__factory } from "../contracts/factories/MinterSetPriceV5__factory";
+import { MinterSetPriceERC20V5__factory } from "../contracts/factories/MinterSetPriceERC20V5__factory";
 import { MinterSetPriceMerkleV5__factory } from "../contracts/factories/MinterSetPriceMerkleV5__factory";
 import { MinterSetPriceHolderV5__factory } from "../contracts/factories/MinterSetPriceHolderV5__factory";
+import { MinterSEAV1__factory } from "../contracts/factories/MinterSEAV1__factory";
 
 import fs from "fs";
 import { JsonRpcProvider } from "@ethersproject/providers";
@@ -217,6 +219,21 @@ async function main() {
     },
   ];
 
+  // @dev also deploy ERC20 set price minter
+  const minterSetPriceERC20V5Factory = new MinterSetPriceERC20V5__factory(
+    deployer
+  );
+  const minterSetPriceERC20V5 = await minterSetPriceERC20V5Factory.deploy(
+    minterFilter.address
+  );
+  await minterSetPriceERC20V5.deployed();
+  console.log(
+    `MinterSetPriceERC20V5 deployed at ${minterSetPriceERC20V5.address}`
+  );
+  subgraphConfig.iSharedMinterV0Contracts.push({
+    address: minterSetPriceERC20V5.address,
+  });
+
   // Merkle Minters
   const minterMerkleV5Factory = new MinterSetPriceMerkleV5__factory(deployer);
   const minterSetPriceMerkleV5 = await minterMerkleV5Factory.deploy(
@@ -252,6 +269,21 @@ async function main() {
   subgraphConfig.iSharedHolderContracts = [
     {
       address: minterSetPriceHolderV5.address,
+    },
+  ];
+
+  // SEA Minters
+  // MinterSEAV1__factory
+  const MinterSEAV1Factory = new MinterSEAV1__factory(deployer);
+  const minterSEAV1 = await MinterSEAV1Factory.deploy(minterFilter.address);
+  await minterSEAV1.deployed();
+  console.log(`minterSEAV1 deployed at ${minterSEAV1.address}`);
+  subgraphConfig.iSharedMinterV0Contracts.push({
+    address: minterSEAV1.address,
+  });
+  subgraphConfig.iSharedSEAContracts = [
+    {
+      address: minterSEAV1.address,
     },
   ];
 
@@ -330,6 +362,12 @@ async function main() {
   );
   await minterFilter
     .connect(deployer)
+    .approveMinterGlobally(minterSetPriceERC20V5.address);
+  console.log(
+    `Allowlisted minterSetPriceERC20V5 ${minterSetPriceERC20V5.address} on minter filter.`
+  );
+  await minterFilter
+    .connect(deployer)
     .approveMinterGlobally(minterSetPriceMerkleV5.address);
   console.log(
     `Allowlisted minterSetPriceMerkleV5 ${minterSetPriceMerkleV5.address} on minter filter.`
@@ -340,11 +378,24 @@ async function main() {
   console.log(
     `Allowlisted minterSetPriceHolderV5 ${minterSetPriceHolderV5.address} on minter filter.`
   );
+  await minterFilter
+    .connect(deployer)
+    .approveMinterGlobally(minterSEAV1.address);
+  console.log(
+    `Allowlisted minterSEAV1 ${minterSEAV1.address} on minter filter.`
+  );
 
   // add initial project to the core contract
   await genArt721Core
     .connect(deployer)
     .addProject("projectZero", artist.address);
+
+  // add projects 1 and 2 to the core contract
+  for (let i = 1; i < 3; i++) {
+    await genArt721Core
+      .connect(deployer)
+      .addProject("projectZero", artist.address);
+  }
 
   // update super admin addresses
   if (superAdminAddress) {

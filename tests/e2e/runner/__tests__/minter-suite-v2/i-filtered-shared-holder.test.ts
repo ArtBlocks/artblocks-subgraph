@@ -88,6 +88,7 @@ describe("iFilteredSharedMerkle event handling", () => {
   describe("AllowedHoldersOfProjects", () => {
     afterEach(async () => {
       // remove the allowlisting of holders of project one
+      // @dev call success depends on test state, so use a try/catch block
       try {
         await minterSetPriceHolderV5Contract
           .connect(artist)
@@ -98,16 +99,25 @@ describe("iFilteredSharedMerkle event handling", () => {
             [1]
           );
       } catch (error) {
-        // swallow error in case of test failure
+        // try block will fail in case of previously successful test where
+        // holders were successfully removed. In case of failed test that did
+        // not clean up after itself, this will properly clean up.
+        // Thus, swallow error here because entering catch block means the
+        // test was successful.
       }
 
       // clear the minter for project zero
+      // @dev call success depends on test state, so use a try/catch block
       try {
         await sharedMinterFilterContract
           .connect(artist)
           .removeMinterForProject(0, genArt721CoreAddress);
       } catch (error) {
-        // swallow error in case of test failure
+        // try block will only fail in case of previously failed test where
+        // project zero never had its minter assigned.
+        // Thus, swallow error here because the test failure has already been
+        // reported, and additional error messaging from afterEach is not
+        // helpful.
       }
     });
 
@@ -147,6 +157,7 @@ describe("iFilteredSharedMerkle event handling", () => {
   describe("RemovedHoldersOfProjects", () => {
     afterEach(async () => {
       // remove the allowlisting of holders of project one in case of test failure
+      // @dev call success depends on test state, so use a try/catch block
       try {
         await minterSetPriceHolderV5Contract
           .connect(artist)
@@ -157,16 +168,25 @@ describe("iFilteredSharedMerkle event handling", () => {
             [1]
           );
       } catch (error) {
-        // swallow error in case of test success
+        // try block will fail in case of previously successful test where
+        // holders were successfully removed. In case of failed test that did
+        // not clean up after itself, this will properly clean up.
+        // Thus, swallow error here because entering catch block means the
+        // test was successful.
       }
 
       // clear the minter for project zero
+      // @dev call success depends on test state, so use a try/catch block
       try {
         await sharedMinterFilterContract
           .connect(artist)
           .removeMinterForProject(0, genArt721CoreAddress);
       } catch (error) {
-        // swallow error in case of test failure
+        // try block will only fail in case of previously failed test where
+        // project zero never had its minter assigned.
+        // Thus, swallow error here because the test failure has already been
+        // reported, and additional error messaging from afterEach is not
+        // helpful.
       }
     });
 
