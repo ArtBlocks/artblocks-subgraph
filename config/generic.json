@@ -80,6 +80,21 @@
       "address": ""
     }
   ],
+  "iSharedDAContracts": [
+    {
+      "address": ""
+    }
+  ],
+  "iSharedDAExpContracts": [
+    {
+      "address": ""
+    }
+  ],
+  "iSharedDALinContracts": [
+    {
+      "address": ""
+    }
+  ],
   "minterSetPriceContracts": [
     {
       "address": ""

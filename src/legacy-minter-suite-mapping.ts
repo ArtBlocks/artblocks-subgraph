@@ -26,6 +26,8 @@ import {
   PurchaseToDisabledUpdated
 } from "../generated/MinterSetPrice/IFilteredMinterV2";
 
+import { getTotalDAExpAuctionTime } from "./helpers";
+
 import { ProjectMaxInvocationsLimitUpdated } from "../generated/MinterSetPrice/IFilteredMinterV2";
 
 import {
@@ -348,32 +350,10 @@ export function handleDAExpSetAuctionDetails(
       projectMinterConfig
     );
     // pre-calculate the approximate DA end time
-    const startPriceFloatingPoint = event.params._startPrice.toBigDecimal();
-    const basePriceFloatingPoint = event.params._basePrice.toBigDecimal();
-    const priceRatio: f64 = Number.parseFloat(
-      startPriceFloatingPoint.div(basePriceFloatingPoint).toString()
-    );
-    const completedHalfLives = BigInt.fromString(
-      u8(Math.floor(Math.log(priceRatio) / Math.log(2))).toString()
-    );
-    // @dev max possible completedHalfLives is 255 due to on-chain use of uint256,
-    // so this is safe
-    const completedHalfLivesU8: u8 = u8(
-      Number.parseInt(completedHalfLives.toString())
-    );
-    const x1 = completedHalfLives.times(
+    const totalAuctionTime = getTotalDAExpAuctionTime(
+      event.params._startPrice,
+      event.params._basePrice,
       event.params._priceDecayHalfLifeSeconds
-    );
-    const x2 = x1.plus(event.params._priceDecayHalfLifeSeconds);
-    const y1 = event.params._startPrice.div(
-      BigInt.fromI32(2).pow(completedHalfLivesU8)
-    );
-    const y2 = y1.div(BigInt.fromI32(2));
-    const totalAuctionTime = x1.plus(
-      x2
-        .minus(x1)
-        .times(event.params._basePrice.minus(y1))
-        .div(y2.minus(y1))
     );
     setProjectMinterConfigExtraMinterDetailsValue(
       "approximateDAExpEndTime",
