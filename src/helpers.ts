@@ -367,6 +367,7 @@ export function loadOrCreateMinter(
     if (minter.type.startsWith("MinterDALin")) {
       // only do this for legacy minters, because the new minters emit events
       if (
+        minter.type.endsWith("V0") ||
         minter.type.endsWith("V1") ||
         minter.type.endsWith("V2") ||
         minter.type.endsWith("V3") ||
@@ -383,6 +384,7 @@ export function loadOrCreateMinter(
     } else if (minter.type.startsWith("MinterDAExp")) {
       // only do this for legacy minters, because the new minters emit events
       if (
+        minter.type.endsWith("V0") ||
         minter.type.endsWith("V1") ||
         minter.type.endsWith("V2") ||
         minter.type.endsWith("V3") ||
