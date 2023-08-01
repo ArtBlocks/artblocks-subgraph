@@ -1274,7 +1274,7 @@ dataSources:
       eventHandlers:
         - event: ResetAuctionDetails(indexed uint256,indexed address)
           handler: handleResetAuctionDetails
-      file: ./src/i-shared-DA-mapping.ts
+      file: ./src/i-shared-da-mapping.ts
   {{/iSharedDAContracts}}
   {{#iSharedDAExpContracts}}
   - kind: ethereum/contract
@@ -1327,7 +1327,7 @@ dataSources:
           handler: handleSetAuctionDetailsExp
         - event: AuctionMinHalfLifeSecondsUpdated(uint256)
           handler: handleAuctionMinHalfLifeSecondsUpdated
-      file: ./src/i-shared-DA-mapping.ts
+      file: ./src/i-shared-da-exp-mapping.ts
   {{/iSharedDAExpContracts}}
   {{#iSharedDALinContracts}}
   - kind: ethereum/contract
@@ -1380,7 +1380,7 @@ dataSources:
           handler: handleSetAuctionDetailsLin
         - event: AuctionMinimumLengthSecondsUpdated(uint256)
           handler: handleAuctionMinimumLengthSecondsUpdated
-      file: ./src/i-shared-DA-mapping.ts
+      file: ./src/i-shared-da-lin-mapping.ts
   {{/iSharedDALinContracts}}
   {{#minterSetPriceContracts}}
   - kind: ethereum/contract
