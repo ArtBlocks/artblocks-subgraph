@@ -365,24 +365,42 @@ export function loadOrCreateMinter(
     minter.type = minterType.value;
     // populate any minter-specific values
     if (minter.type.startsWith("MinterDALin")) {
-      const contract = IFilteredMinterDALinV1.bind(minterAddress);
-      setMinterExtraMinterDetailsValue(
-        "minimumAuctionLengthInSeconds",
-        contract.minimumAuctionLengthSeconds(),
-        minter
-      );
+      // only do this for legacy minters, because the new minters emit events
+      if (
+        minter.type.endsWith("V1") ||
+        minter.type.endsWith("V2") ||
+        minter.type.endsWith("V3") ||
+        minter.type.endsWith("V4")
+        // @dev V5+ doesn't need the extra minter details, because it emits
+      ) {
+        const contract = IFilteredMinterDALinV1.bind(minterAddress);
+        setMinterExtraMinterDetailsValue(
+          "minimumAuctionLengthInSeconds",
+          contract.minimumAuctionLengthSeconds(),
+          minter
+        );
+      }
     } else if (minter.type.startsWith("MinterDAExp")) {
-      const contract = IFilteredMinterDAExpV1.bind(minterAddress);
-      setMinterExtraMinterDetailsValue(
-        "minimumHalfLifeInSeconds",
-        contract.minimumPriceDecayHalfLifeSeconds(),
-        minter
-      );
-      setMinterExtraMinterDetailsValue(
-        "maximumHalfLifeInSeconds",
-        contract.maximumPriceDecayHalfLifeSeconds(),
-        minter
-      );
+      // only do this for legacy minters, because the new minters emit events
+      if (
+        minter.type.endsWith("V1") ||
+        minter.type.endsWith("V2") ||
+        minter.type.endsWith("V3") ||
+        minter.type.endsWith("V4")
+        // @dev V5+ doesn't need the extra minter details, because it emits
+      ) {
+        const contract = IFilteredMinterDAExpV1.bind(minterAddress);
+        setMinterExtraMinterDetailsValue(
+          "minimumHalfLifeInSeconds",
+          contract.minimumPriceDecayHalfLifeSeconds(),
+          minter
+        );
+        setMinterExtraMinterDetailsValue(
+          "maximumHalfLifeInSeconds",
+          contract.maximumPriceDecayHalfLifeSeconds(),
+          minter
+        );
+      }
     }
   } else {
     // if minterType() reverts, then the minter is not as expected and is
