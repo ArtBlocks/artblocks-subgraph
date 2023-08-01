@@ -452,6 +452,7 @@ test("GenArt721Core: Removing a whitelisted minter filter should leave existing 
   minterFilter.coreRegistry = TEST_CONTRACT_ADDRESS.toHexString();
   minterFilter.minterGlobalAllowlist = [];
   minterFilter.updatedAt = CURRENT_BLOCK_TIMESTAMP;
+  minterFilter.type = "MinterFilterV1";
   minterFilter.save();
 
   let project0 = addNewProjectToStore(
@@ -2105,7 +2106,7 @@ test("GenArt721Core: Can handleUpdateProjectScriptJSON", () => {
   const updateCallBlockTimestamp = CURRENT_BLOCK_TIMESTAMP.plus(
     BigInt.fromI32(10)
   );
-  const scriptJSON = '{}';
+  const scriptJSON = "{}";
 
   const call = changetype<UpdateProjectScriptJSONCall>(newMockCall());
 

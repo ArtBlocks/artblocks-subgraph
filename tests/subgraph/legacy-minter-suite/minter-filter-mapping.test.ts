@@ -4,8 +4,7 @@ import {
   clearStore,
   test,
   newMockEvent,
-  createMockedFunction,
-  logStore
+  createMockedFunction
 } from "matchstick-as/assembly/index";
 // IsCanonicalMinterFilter only emitted by MinterFilterV0
 import { IsCanonicalMinterFilter } from "../../../generated/MinterFilterV0/MinterFilterV0";
@@ -66,8 +65,9 @@ import { toJSONValue } from "../../../src/json";
 
 const randomAddressGenerator = new RandomAddressGenerator();
 
-test("handleDeployed should add MinterFilter to the store", () => {
+test("handleDeployed should add V0 MinterFilter to the store", () => {
   clearStore();
+  // Default test contract is GenArt721CoreV1 which should cause the minter filter type to be set to V0
   addTestContractToStore(BigInt.fromI32(0));
 
   const updateCallBlockTimestamp = CURRENT_BLOCK_TIMESTAMP.plus(
@@ -114,6 +114,77 @@ test("handleDeployed should add MinterFilter to the store", () => {
     "registeredOn",
     "null"
   );
+
+  assert.fieldEquals(
+    MINTER_FILTER_ENTITY_TYPE,
+    minterFilterAddress.toHexString(),
+    "type",
+    "MinterFilterV0"
+  );
+
+  clearStore();
+});
+
+test("handleDeployed should add V1 MinterFilter to the store", () => {
+  clearStore();
+
+  // This should cause the minter filter type to be set to V1
+  const coreContract = addTestContractToStore(BigInt.fromI32(0));
+  coreContract.type = "GenArt721CoreV3";
+  coreContract.save();
+
+  const updateCallBlockTimestamp = CURRENT_BLOCK_TIMESTAMP.plus(
+    BigInt.fromI32(10)
+  );
+  const minterFilterAddress = randomAddressGenerator.generateRandomAddress();
+  const deployedEvent: Deployed = changetype<Deployed>(newMockEvent());
+  deployedEvent.address = minterFilterAddress;
+  deployedEvent.parameters = [];
+  deployedEvent.block.timestamp = updateCallBlockTimestamp;
+
+  // mock function called when adding a new minter
+  createMockedFunction(
+    minterFilterAddress,
+    "genArt721CoreAddress",
+    "genArt721CoreAddress():(address)"
+  ).returns([ethereum.Value.fromAddress(TEST_CONTRACT_ADDRESS)]);
+
+  assert.notInStore(
+    MINTER_FILTER_ENTITY_TYPE,
+    minterFilterAddress.toHexString()
+  );
+
+  handleDeployed(deployedEvent);
+
+  assert.fieldEquals(
+    MINTER_FILTER_ENTITY_TYPE,
+    minterFilterAddress.toHexString(),
+    "id",
+    minterFilterAddress.toHexString()
+  );
+  const coreRegistryId = TEST_CONTRACT_ADDRESS.toHexString();
+  assert.fieldEquals(
+    MINTER_FILTER_ENTITY_TYPE,
+    minterFilterAddress.toHexString(),
+    "coreRegistry",
+    coreRegistryId
+  );
+  // core contract doesn't update its registeredOn field when a minter filter is deployed,
+  // it only updates it when it updates its minter filter
+  assert.fieldEquals(
+    CONTRACT_ENTITY_TYPE,
+    TEST_CONTRACT_ADDRESS.toHexString(),
+    "registeredOn",
+    "null"
+  );
+
+  assert.fieldEquals(
+    MINTER_FILTER_ENTITY_TYPE,
+    minterFilterAddress.toHexString(),
+    "type",
+    "MinterFilterV1"
+  );
+
   clearStore();
 });
 
@@ -781,6 +852,7 @@ test("handleMinterApproved should not add minter to minterGlobalAllowlist if the
   );
   minterFilter.updatedAt = minterFilterUpdatedAt;
   minterFilter.minterGlobalAllowlist = [];
+  minterFilter.type = "MinterFilterV1";
   minterFilter.save();
 
   const otherMinterFilterAddress = randomAddressGenerator.generateRandomAddress();
@@ -838,6 +910,7 @@ test("handleMinterApproved should add new minter to store", () => {
   );
   minterFilter.updatedAt = minterFilterUpdatedAt;
   minterFilter.minterGlobalAllowlist = [];
+  minterFilter.type = "MinterFilterV1";
   minterFilter.save();
 
   const minterToBeApprovedAddress = randomAddressGenerator.generateRandomAddress();
@@ -909,6 +982,7 @@ test("handleMinterApproved should handle the same minter being approved more tha
   );
   minterFilter.updatedAt = minterFilterUpdatedAt;
   minterFilter.minterGlobalAllowlist = [];
+  minterFilter.type = "MinterFilterV1";
   minterFilter.save();
 
   const minterToBeApprovedAddress = randomAddressGenerator.generateRandomAddress();
@@ -976,6 +1050,7 @@ test("handleMinterApproved should populate DA Exp default half life ranges", () 
     );
     minterFilter.updatedAt = minterFilterUpdatedAt;
     minterFilter.minterGlobalAllowlist = [];
+    minterFilter.type = "MinterFilterV1";
     minterFilter.save();
 
     const minterToBeApprovedAddress = randomAddressGenerator.generateRandomAddress();
@@ -1049,6 +1124,7 @@ test("handleMinterApproved should populate DA Lin min auction time", () => {
     );
     minterFilter.updatedAt = minterFilterUpdatedAt;
     minterFilter.minterGlobalAllowlist = [];
+    minterFilter.type = "MinterFilterV1";
     minterFilter.save();
 
     const minterToBeApprovedAddress = randomAddressGenerator.generateRandomAddress();
@@ -1112,6 +1188,7 @@ test("handleMinterRevoke should do nothing to MinterFilter if minter is not in s
   );
   minterFilter.updatedAt = minterFilterUpdatedAt;
   minterFilter.minterGlobalAllowlist = [];
+  minterFilter.type = "MinterFilterV1";
   minterFilter.save();
 
   const minterToBeRevokedAddress = randomAddressGenerator.generateRandomAddress();
@@ -1151,6 +1228,7 @@ test("handleMinterRevoke should remove minter from MinterFilter's minterGlobalAl
   // dummy coreRegistry is set to core contract address
   minterFilter.coreRegistry = TEST_CONTRACT_ADDRESS.toHexString();
   minterFilter.minterGlobalAllowlist = [];
+  minterFilter.type = "MinterFilterV1";
   minterFilter.updatedAt = minterFilterUpdatedAt;
   minterFilter.save();
 
@@ -1251,6 +1329,7 @@ test("handleMinterRevoke should handle revoking a minter more than once", () => 
   // dummy coreRegistry is set to core contract address
   minterFilter.coreRegistry = TEST_CONTRACT_ADDRESS.toHexString();
   minterFilter.minterGlobalAllowlist = [];
+  minterFilter.type = "MinterFilterV1";
   minterFilter.updatedAt = minterFilterUpdatedAt;
   minterFilter.save();
 
@@ -1325,6 +1404,7 @@ test("handleProjectMinterRegistered should do nothing if the minter being regist
   minterFilter.coreRegistry = TEST_CONTRACT_ADDRESS.toHexString();
   minterFilter.updatedAt = minterFilterUpdatedAt;
   minterFilter.minterGlobalAllowlist = [];
+  minterFilter.type = "MinterFilterV1";
   minterFilter.save();
 
   const minterAddress = randomAddressGenerator.generateRandomAddress();
@@ -1385,6 +1465,7 @@ test("handleProjectMinterRegistered should do nothing if the minter filter's cor
   minterFilter.coreRegistry = TEST_CONTRACT_ADDRESS.toHexString();
   minterFilter.updatedAt = minterFilterUpdatedAt;
   minterFilter.minterGlobalAllowlist = [];
+  minterFilter.type = "MinterFilterV1";
   minterFilter.save();
 
   const minter = addNewMinterToStore("MinterSetPriceV0");
@@ -1455,6 +1536,7 @@ test("handleProjectMinterRegistered should do nothing if the minter filter is no
   minterFilter.coreRegistry = TEST_CONTRACT_ADDRESS.toHexString();
   minterFilter.updatedAt = minterFilterUpdatedAt;
   minterFilter.minterGlobalAllowlist = [];
+  minterFilter.type = "MinterFilterV1";
   minterFilter.save();
 
   const minter = addNewMinterToStore("MinterSetPriceV0");
@@ -1534,6 +1616,7 @@ test("handleProjectMinterRegistered should populate project from prior minter co
   minterFilter.coreRegistry = TEST_CONTRACT_ADDRESS.toHexString();
   minterFilter.updatedAt = minterFilterUpdatedAt;
   minterFilter.minterGlobalAllowlist = [];
+  minterFilter.type = "MinterFilterV1";
   minterFilter.save();
 
   const contract = addTestContractToStore(BigInt.fromI32(1));
@@ -1672,6 +1755,7 @@ test("handleProjectMinterRegistered should populate project from scratch for pro
   minterFilter.coreRegistry = TEST_CONTRACT_ADDRESS.toHexString();
   minterFilter.updatedAt = minterFilterUpdatedAt;
   minterFilter.minterGlobalAllowlist = [];
+  minterFilter.type = "MinterFilterV1";
   minterFilter.save();
 
   const contract = addTestContractToStore(BigInt.fromI32(1));
@@ -1771,6 +1855,7 @@ test("handleProjectMinterRemoved should do nothing if core contract is not in st
   minterFilter.coreRegistry = TEST_CONTRACT_ADDRESS.toHexString();
   minterFilter.updatedAt = minterFilterUpdatedAt;
   minterFilter.minterGlobalAllowlist = [];
+  minterFilter.type = "MinterFilterV1";
   minterFilter.save();
 
   const minterType = "MinterSetPriceV0";
@@ -1826,6 +1911,7 @@ test("handleProjectMinterRemoved should do nothing if core contract does not hav
   minterFilter.coreRegistry = TEST_CONTRACT_ADDRESS.toHexString();
   minterFilter.updatedAt = minterFilterUpdatedAt;
   minterFilter.minterGlobalAllowlist = [];
+  minterFilter.type = "MinterFilterV1";
   minterFilter.save();
 
   const contract = addTestContractToStore(BigInt.fromI32(1));
@@ -1881,6 +1967,7 @@ test("handleProjectMinterRemoved should remove minter configuration from project
   minterFilter.coreRegistry = TEST_CONTRACT_ADDRESS.toHexString();
   minterFilter.updatedAt = minterFilterUpdatedAt;
   minterFilter.minterGlobalAllowlist = [];
+  minterFilter.type = "MinterFilterV1";
   minterFilter.save();
 
   const contract = addTestContractToStore(BigInt.fromI32(1));

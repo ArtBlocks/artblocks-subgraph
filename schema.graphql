@@ -195,6 +195,15 @@ enum CoreType {
   GenArt721CoreV3_Engine_Flex
 }
 
+enum MinterFilterType {
+  "IMinterFilterV0, no minterFilterType function"
+  MinterFilterV0
+  "IMinterFilterV0, added minterFilterType function"
+  MinterFilterV1
+  "IMinterFilterV1 includes minterFilterType function"
+  MinterFilterV2
+}
+
 type Contract @entity {
   "Unique identifier made up of the contract address"
   id: ID!
@@ -364,6 +373,11 @@ type MinterFilter @entity {
   contains a single allowlisted core contract.
   """
   coreRegistry: CoreRegistry!
+
+  """
+  Speficies which MinterFilter type this MinterFilter is
+  """
+  type: MinterFilterType!
 
   updatedAt: BigInt!
 }
