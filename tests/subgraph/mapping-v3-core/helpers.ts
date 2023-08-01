@@ -132,7 +132,10 @@ export function mockRefreshContractCalls(
       "artblocksCurationRegistryAddress",
       "artblocksCurationRegistryAddress():(address)"
     ).returns([ethereum.Value.fromAddress(TEST_CONTRACT.curationRegistry)]);
-  } else if (coreType == "GenArt721CoreV3_Engine" || coreType == "GenArt721CoreV3_Engine_Flex") {
+  } else if (
+    coreType == "GenArt721CoreV3_Engine" ||
+    coreType == "GenArt721CoreV3_Engine_Flex"
+  ) {
     // engine contract functions
     createMockedFunction(
       TEST_CONTRACT_ADDRESS,
@@ -272,6 +275,12 @@ export function mockMinterUpdatedCallsNoPreconfiguredProjects(
     "getNumProjectsWithMinters",
     "getNumProjectsWithMinters():(uint256)"
   ).returns([ethereum.Value.fromI32(0)]);
+
+  createMockedFunction(
+    TEST_MINTER_FILTER_ADDRESS,
+    "minterFilterType",
+    "minterFilterType():(string)"
+  ).returns([ethereum.Value.fromString("MinterFilterV1")]);
 }
 
 export function mockTokenURICall(tokenId: BigInt, tokenURI: string): void {

@@ -6,6 +6,8 @@ import {
   IsCanonicalMinterFilter
 } from "../generated/MinterFilterV0/MinterFilterV0";
 
+import { MinterFilterV1 } from "../generated/MinterFilterV1/MinterFilterV1";
+
 import {
   IMinterFilterV0,
   Deployed,
@@ -63,6 +65,7 @@ export function handleIsCanonicalMinterFilter(
     );
     minterFilter.coreRegistry = coreRegistry.id;
     minterFilter.minterGlobalAllowlist = [];
+    minterFilter.type = "MinterFilterV0";
     minterFilter.updatedAt = event.block.timestamp;
     minterFilter.save();
   }
@@ -337,6 +340,28 @@ export function loadOrCreateMinterFilter(
     coreContractAddress.toHexString(),
     timestamp
   );
+
+  // IMinterFilterV0 contracts may or may not have a minterFilterTypeFunction
+  // so we derive this based on the associated core contract address instead.
+  // All pre GenArt721V3 contracts should have a V0 minter filter while all
+  // GenArt721V3 contracts and above should have a V1 minter filter or higher.
+  // If the minter filter version is greater than V1 we can assume the entity
+  // creation will be handled by another event handler.
+  const coreContract = Contract.load(coreContractAddress.toHexString());
+  // We don't expect this actually happens, but we'll log a warning if it does.
+  if (!coreContract) {
+    log.warning(
+      "[WARN] Legacy MinterFilter event handler was emitted by MinterFilter with an unknown associated core contract address, {}.",
+      [coreContractAddress.toHexString()]
+    );
+  }
+
+  if (coreContract && coreContract.type.startsWith("GenArt721CoreV3")) {
+    minterFilter.type = "MinterFilterV1";
+  } else {
+    minterFilter.type = "MinterFilterV0";
+  }
+
   minterFilter.coreRegistry = coreRegistry.id;
   minterFilter.minterGlobalAllowlist = [];
   minterFilter.updatedAt = timestamp;
