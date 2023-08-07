@@ -89,31 +89,6 @@
         },
         {
           "indexed": false,
-          "internalType": "uint128",
-          "name": "_selloutPrice",
-          "type": "uint128"
-        }
-      ],
-      "name": "SelloutPriceUpdated",
-      "type": "event"
-    },
-    {
-      "anonymous": false,
-      "inputs": [
-        {
-          "indexed": true,
-          "internalType": "uint256",
-          "name": "_projectId",
-          "type": "uint256"
-        },
-        {
-          "indexed": true,
-          "internalType": "address",
-          "name": "_coreContract",
-          "type": "address"
-        },
-        {
-          "indexed": false,
           "internalType": "uint64",
           "name": "_auctionTimestampStart",
           "type": "uint64"
