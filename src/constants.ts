@@ -55,4 +55,12 @@ export const FLEX_CONTRACT_EXTERNAL_ASSET_DEP_TYPES = [
   "ONCHAIN"
 ];
 
+// This is directly tied to the MinterFilterType enum defined in the subgraph schema
+// @dev does not include the "UNKNOWN" type, because this is a list of only known types
+export const KNOWN_MINTER_FILTER_TYPES = [
+  "MinterFilterV0",
+  "MinterFilterV1",
+  "MinterFilterV2"
+];
+
 export const JS_MAX_SAFE_INTEGER = BigInt.fromString("9007199254740991");
