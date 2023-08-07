@@ -1382,6 +1382,63 @@ dataSources:
           handler: handleAuctionMinimumLengthSecondsUpdated
       file: ./src/i-shared-da-lin-mapping.ts
   {{/iSharedDALinContracts}}
+  {{#iSharedDAExpSettlementContracts}}
+  - kind: ethereum/contract
+    name: 'ISharedDAExpSettlement{{#address}}-{{address}}{{/address}}'
+    network: {{network}}
+    source:
+      address: "{{#address}}{{address}}{{/address}}{{^address}}0x0000000000000000000000000000000000000000{{/address}}"
+      abi: ISharedMinterDAExpSettlementV0
+      {{#startBlock}}startBlock: {{startBlock}}{{/startBlock}}
+    mapping:
+      kind: ethereum/events
+      apiVersion: 0.0.5
+      language: wasm/assemblyscript
+      entities:
+        - Project
+        - ProjectScript
+        - Token
+        - Contract
+        - Account
+        - AccountProject
+        - Whitelisting
+        - MinterFilter
+        - Minter
+        - ProjectMinterConfiguration
+      abis:
+        - name: ISharedMinterDAExpSettlementV0
+          file: ./abis/ISharedMinterDAExpSettlementV0.json
+        - name: ISharedMinterDAExpV0
+          file: ./abis/ISharedMinterDAExpV0.json
+        - name: ISharedMinterDAV0
+          file: ./abis/ISharedMinterDAV0.json
+        - name: ISharedMinterV0
+          file: ./abis/ISharedMinterV0.json
+        - name: IFilteredMinterV2
+          file: ./abis/IFilteredMinterV2.json
+        - name: IFilteredMinterDALinV1
+          file: ./abis/IFilteredMinterDALinV1.json
+        - name: IFilteredMinterDAExpV1
+          file: ./abis/IFilteredMinterDAExpV1.json
+        - name: IFilteredMinterDAExpSettlementV1
+          file: ./abis/IFilteredMinterDAExpSettlementV1.json
+        - name: IFilteredMinterV2
+          file: ./abis/IFilteredMinterV2.json
+        - name: IFilteredMinterHolderV2
+          file: ./abis/IFilteredMinterHolderV2.json
+        - name: IFilteredMinterMerkleV2
+          file: ./abis/IFilteredMinterMerkleV2.json
+        - name: IFilteredMinterSEAV0
+          file: ./abis/IFilteredMinterSEAV0.json
+      eventHandlers:
+        - event: SelloutPriceUpdated(indexed uint256,indexed address,uint128)
+          handler: handleSelloutPriceUpdated
+        - event: ArtistAndAdminRevenuesWithdrawn(indexed uint256,indexed address)
+          handler: handleArtistAndAdminRevenuesWithdrawn
+        - event: ReceiptUpdated(indexed address,indexed uint256,indexed address,uint24,uint232)
+          handler: handleReceiptUpdated
+      file: ./src/i-shared-da-exp-settlement-mapping.ts
+  {{/iSharedDAExpSettlementContracts}}
   {{#minterSetPriceContracts}}
   - kind: ethereum/contract
     name: 'MinterSetPrice{{#address}}-{{address}}{{/address}}'
