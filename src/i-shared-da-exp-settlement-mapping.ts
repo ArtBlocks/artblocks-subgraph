@@ -1,6 +1,5 @@
 import { Address, BigInt, log, ethereum } from "@graphprotocol/graph-ts";
 import {
-  SelloutPriceUpdated,
   ArtistAndAdminRevenuesWithdrawn,
   ReceiptUpdated,
   ISharedMinterDAExpSettlementV0
