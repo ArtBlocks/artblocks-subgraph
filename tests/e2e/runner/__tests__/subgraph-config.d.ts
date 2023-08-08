@@ -31,6 +31,7 @@ export type SubgraphConfig = Partial<{
   iSharedDAContracts: { address: string }[];
   iSharedDAExpContracts: { address: string }[];
   iSharedDALinContracts: { address: string }[];
+  iSharedDAExpSettlementContracts: { address: string }[];
   metadata: {
     minterFilterAdminACLAddress: string;
     coreRegistryAddress: string;

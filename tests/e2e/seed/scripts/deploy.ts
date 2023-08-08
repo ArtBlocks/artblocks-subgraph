@@ -28,9 +28,13 @@ import { MinterSetPriceHolderV5__factory } from "../contracts/factories/MinterSe
 import { MinterSEAV1__factory } from "../contracts/factories/MinterSEAV1__factory";
 import { MinterDAExpV5__factory } from "../contracts/factories/MinterDAExpV5__factory";
 import { MinterDALinV5__factory } from "../contracts/factories/MinterDALinV5__factory";
+import { MinterDAExpSettlementV3__factory } from "../contracts/factories/MinterDAExpSettlementV3__factory";
 
 import fs from "fs";
 import { JsonRpcProvider } from "@ethersproject/providers";
+// hide nuisance logs about event overloading
+import { Logger } from "@ethersproject/logger";
+Logger.setLogLevel(Logger.levels.ERROR);
 
 //////////////////////////////////////////////////////////////////////////////
 // CONFIG BEGINS HERE
@@ -324,6 +328,32 @@ async function main() {
     },
   ];
 
+  // DA Exp Settlement Minters
+  const MinterDAExpSettlementV3Factory = new MinterDAExpSettlementV3__factory(
+    deployer
+  );
+  const minterDAExpSettlementV3 = await MinterDAExpSettlementV3Factory.deploy(
+    minterFilter.address
+  );
+  await minterDAExpSettlementV3.deployed();
+  console.log(
+    `minterDAExpSettlementV3 deployed at ${minterDAExpSettlementV3.address}`
+  );
+  subgraphConfig.iSharedMinterV0Contracts.push({
+    address: minterDAExpSettlementV3.address,
+  });
+  subgraphConfig.iSharedDAContracts.push({
+    address: minterDAExpSettlementV3.address,
+  });
+  subgraphConfig.iSharedDAExpContracts.push({
+    address: minterDAExpSettlementV3.address,
+  });
+  subgraphConfig.iSharedDAExpSettlementContracts = [
+    {
+      address: minterDAExpSettlementV3.address,
+    },
+  ];
+
   //////////////////////////////////////////////////////////////////////////////
   // DEPLOYMENT ENDS HERE
   //////////////////////////////////////////////////////////////////////////////
@@ -432,6 +462,12 @@ async function main() {
     .approveMinterGlobally(minterDALinV5.address);
   console.log(
     `Allowlisted minterDALinV5 ${minterDALinV5.address} on minter filter.`
+  );
+  await minterFilter
+    .connect(deployer)
+    .approveMinterGlobally(minterDAExpSettlementV3.address);
+  console.log(
+    `Allowlisted minterDAExpSettlementV3 ${minterDAExpSettlementV3.address} on minter filter.`
   );
 
   // add initial project to the core contract
