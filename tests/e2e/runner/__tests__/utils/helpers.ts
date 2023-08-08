@@ -23,6 +23,9 @@ import {
   ProjectMinterConfigurationDetailsFragment,
   ProjectDetailsFragment,
   CoreRegistryDetailsFragment,
+  ReceiptDetailsFragment,
+  GetTargetReceiptsQuery,
+  GetTargetReceiptsQueryVariables,
 } from "../../generated/graphql";
 import {
   createClient,
@@ -196,6 +199,30 @@ export const getProjectDetails = async (
   ).data?.projects[0];
   if (!projectRes) throw new Error("No Project entity found");
   return projectRes;
+};
+
+/**
+ * Gets a Receipt detail fragment from the subgraph, at specified id.
+ * Reverts if no entity is found.
+ * @param client the subgraph client
+ * @param projectId the id of the Receipt entity
+ */
+export const getReceiptDetails = async (
+  client: Client,
+  projectId: string
+): Promise<ReceiptDetailsFragment> => {
+  const receiptRes = (
+    await client
+      .query<GetTargetReceiptsQuery, GetTargetReceiptsQueryVariables>(
+        GetTargetProjectsDocument,
+        {
+          targetId: projectId,
+        }
+      )
+      .toPromise()
+  ).data?.receipts[0];
+  if (!receiptRes) throw new Error("No Receipt entity found");
+  return receiptRes;
 };
 
 /**

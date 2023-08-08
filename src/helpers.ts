@@ -389,7 +389,8 @@ export function loadOrCreateMinter(
         minter.type.endsWith("V2") ||
         minter.type.endsWith("V3") ||
         minter.type.endsWith("V4")
-        // @dev V5+ doesn't need the extra minter details, because it emits
+        // @dev non-legacy minters do not need the extra minter details, because they emit events
+        // during deployment that communicate default minter config values
       ) {
         const contract = IFilteredMinterDALinV1.bind(minterAddress);
         setMinterExtraMinterDetailsValue(
@@ -404,9 +405,10 @@ export function loadOrCreateMinter(
         minter.type.endsWith("V0") ||
         minter.type.endsWith("V1") ||
         minter.type.endsWith("V2") ||
-        minter.type.endsWith("V3") ||
-        minter.type.endsWith("V4")
-        // @dev V5+ doesn't need the extra minter details, because it emits
+        (minter.type.endsWith("V3") && !minter.type.includes("Settlement")) || // SettlementV3 is not a legacy minter
+        (minter.type.endsWith("V4") && !minter.type.includes("Settlement")) // SettlementV4 will not be a legacy minter
+        // @dev non-legacy minters do not need the extra minter details, because they emit events
+        // during deployment that communicate default minter config values
       ) {
         const contract = IFilteredMinterDAExpV1.bind(minterAddress);
         setMinterExtraMinterDetailsValue(
