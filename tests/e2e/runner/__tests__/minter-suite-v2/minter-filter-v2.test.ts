@@ -119,6 +119,8 @@ describe("MinterFilterV2 event handling", () => {
       // updated at not checked for exact value because its was not recorded during seed deployment
       // to be defined is sufficient
       expect(minterFilterRes.updatedAt).toBeDefined();
+      // verify minter filter type is correct
+      expect(minterFilterRes.type).toBe("MinterFilterV2");
     });
   });
 
