@@ -1431,8 +1431,6 @@ dataSources:
         - name: IFilteredMinterSEAV0
           file: ./abis/IFilteredMinterSEAV0.json
       eventHandlers:
-        - event: ArtistAndAdminRevenuesWithdrawn(indexed uint256,indexed address)
-          handler: handleArtistAndAdminRevenuesWithdrawn
         - event: ReceiptUpdated(indexed address,indexed uint256,indexed address,uint24,uint232)
           handler: handleReceiptUpdated
       file: ./src/i-shared-da-exp-settlement-mapping.ts

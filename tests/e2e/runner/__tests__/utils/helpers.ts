@@ -26,6 +26,7 @@ import {
   ReceiptDetailsFragment,
   GetTargetReceiptsQuery,
   GetTargetReceiptsQueryVariables,
+  GetTargetReceiptsDocument,
 } from "../../generated/graphql";
 import {
   createClient,
@@ -205,18 +206,18 @@ export const getProjectDetails = async (
  * Gets a Receipt detail fragment from the subgraph, at specified id.
  * Reverts if no entity is found.
  * @param client the subgraph client
- * @param projectId the id of the Receipt entity
+ * @param receiptId the id of the Receipt entity
  */
 export const getReceiptDetails = async (
   client: Client,
-  projectId: string
+  receiptId: string
 ): Promise<ReceiptDetailsFragment> => {
   const receiptRes = (
     await client
       .query<GetTargetReceiptsQuery, GetTargetReceiptsQueryVariables>(
-        GetTargetProjectsDocument,
+        GetTargetReceiptsDocument,
         {
-          targetId: projectId,
+          targetId: receiptId,
         }
       )
       .toPromise()

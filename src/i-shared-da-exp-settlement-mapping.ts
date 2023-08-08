@@ -1,6 +1,5 @@
 import { Address, BigInt, log, ethereum } from "@graphprotocol/graph-ts";
 import {
-  ArtistAndAdminRevenuesWithdrawn,
   ReceiptUpdated,
   ISharedMinterDAExpSettlementV0
 } from "../generated/ISharedDAExpSettlement/ISharedMinterDAExpSettlementV0";
@@ -28,42 +27,6 @@ import { Receipt } from "../generated/schema";
 ///////////////////////////////////////////////////////////////////////////////
 
 // project-level configuration events
-
-/**
- * Handles the event that indicates that artist and admin revenues have been
- * withdrawn for a project.
- * @param event The event carrying the event data.
- */
-export function handleArtistAndAdminRevenuesWithdrawn(
-  event: ArtistAndAdminRevenuesWithdrawn
-): void {
-  const minterProjectAndConfig = loadOrCreateMinterProjectAndConfigIfProject(
-    event.address, // minter
-    event.params._coreContract,
-    event.params._projectId,
-    event.block.timestamp
-  );
-  if (!minterProjectAndConfig) {
-    // project wasn't found, warning already logged in helper function
-    return;
-  }
-
-  const projectMinterConfig = minterProjectAndConfig.projectMinterConfiguration;
-  // update the project minter configuration
-  setProjectMinterConfigExtraMinterDetailsValue(
-    "auctionRevenuesCollected",
-    true,
-    projectMinterConfig
-  );
-  projectMinterConfig.save();
-
-  // induce sync if the project minter configuration is the active one
-  updateProjectIfMinterConfigIsActive(
-    minterProjectAndConfig.project,
-    projectMinterConfig,
-    event.block.timestamp
-  );
-}
 
 /**
  * Handles the event that updates the Receipt of a collector on a project.

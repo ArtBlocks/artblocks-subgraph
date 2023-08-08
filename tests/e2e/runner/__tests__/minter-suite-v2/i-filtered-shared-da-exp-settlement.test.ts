@@ -29,16 +29,6 @@ const config = getSubgraphConfig();
 const client = createSubgraphClient();
 const { deployer, artist } = getAccounts();
 
-// set up delegation registry address
-const delegationRegistryAddress = config.metadata?.delegationRegistryAddress;
-if (!delegationRegistryAddress)
-  throw new Error("No delegation registry address found in config metadata");
-
-// set up contract instances and/or addresses
-const coreRegistryAddress = config.metadata?.coreRegistryAddress;
-if (!coreRegistryAddress)
-  throw new Error("No core registry address found in config metadata");
-
 const sharedMinterFilter = config.sharedMinterFilterContracts?.[0];
 if (!sharedMinterFilter) {
   throw new Error("No shared minter filter found in config metadata");
@@ -92,85 +82,6 @@ describe("iSharedMinterDAExpSettlement event handling", () => {
     });
   });
 
-  describe("ArtistAndAdminRevenuesWithdrawn", () => {
-    let currentProjectNumber: BigNumber | undefined = undefined;
-    afterEach(async () => {
-      // clear the current minter for the project
-      // @dev okay to clear minter for project 0 in case of undefined project number,
-      // because that is the "clean" end state for that project anyway
-      await sharedMinterFilterContract
-        .connect(artist)
-        .removeMinterForProject(
-          currentProjectNumber || 0,
-          genArt721CoreAddress
-        );
-    });
-
-    test("subgraph is updated after event emitted", async () => {
-      // add new project to use with this irreversible test
-      currentProjectNumber = await genArt721CoreContract.nextProjectId();
-      await genArt721CoreContract
-        .connect(deployer)
-        .addProject(
-          "Test project for iSharedMinterDAExpSettlementV3:ArtistAndAdminRevenuesWithdrawn",
-          artist.address
-        );
-      await genArt721CoreContract
-        .connect(deployer)
-        .toggleProjectIsActive(currentProjectNumber);
-      await genArt721CoreContract
-        .connect(artist)
-        .toggleProjectIsPaused(currentProjectNumber);
-      // artist configures auction
-      await sharedMinterFilterContract.connect(artist).setMinterForProject(
-        currentProjectNumber, // _projectId
-        genArt721CoreAddress, // _coreContract
-        minterDAExpSettlementV3Address // _minter
-      );
-      const latestBlock = await deployer.provider.getBlock("latest");
-      const targetAuctionStart = latestBlock.timestamp + 5; // 5 seconds of margin
-      // make a very short auction so it ends quickly
-      const targetStartPrice = ethers.utils.parseEther("0.100001");
-      const targetBasePrice = ethers.utils.parseEther("0.1");
-      await minterDAExpSettlementV3Contract.connect(artist).setAuctionDetails(
-        currentProjectNumber, // _projectId
-        genArt721CoreAddress, // _coreContract
-        targetAuctionStart, // _timestampStart
-        600, // _priceDecayHalfLifeSeconds
-        targetStartPrice, // _startPrice
-        targetBasePrice // _basePrice
-      );
-      // validate initial state of project minter config in subgraph
-      await waitUntilSubgraphIsSynced(client);
-      const targetId = `${minterDAExpSettlementV3Address.toLowerCase()}-${genArt721CoreAddress.toLowerCase()}-${currentProjectNumber.toString()}`;
-      const initialMinterConfigRes = await getProjectMinterConfigurationDetails(
-        client,
-        targetId
-      );
-      const initialExtraMinterDetails = JSON.parse(
-        initialMinterConfigRes.extraMinterDetails
-      );
-      expect(initialExtraMinterDetails.auctionRevenuesCollected).toBe(false);
-      // artist may immediately withdraw their revenue since it is a short auction
-      await new Promise((f) => setTimeout(f, 6000)); // extra second of margin
-      await minterDAExpSettlementV3Contract
-        .connect(artist)
-        .withdrawArtistAndAdminRevenues(
-          currentProjectNumber, // _projectId
-          genArt721CoreAddress // _coreContract
-        );
-      // validate project minter config in subgraph
-      await waitUntilSubgraphIsSynced(client);
-      const minterConfigRes = await getProjectMinterConfigurationDetails(
-        client,
-        targetId
-      );
-      // validate affected field on extraMinterDetails
-      const extraMinterDetails = JSON.parse(minterConfigRes.extraMinterDetails);
-      expect(extraMinterDetails.auctionRevenuesCollected).toBe(true);
-    });
-  });
-
   describe("ReceiptUpdated", () => {
     let currentProjectNumber: BigNumber | undefined = undefined;
     afterEach(async () => {
@@ -221,11 +132,13 @@ describe("iSharedMinterDAExpSettlement event handling", () => {
       );
       // purchase a token to trigger Receipt update event
       await new Promise((f) => setTimeout(f, 6000)); // extra second of margin so auction has started
-      await minterDAExpSettlementV3Contract
+      const tx = await minterDAExpSettlementV3Contract
         .connect(artist)
         .purchase(currentProjectNumber, genArt721CoreAddress, {
           value: targetStartPrice,
         });
+      await tx.wait();
+      const blockTimestamp = tx.timestamp;
 
       // validate state of Receipt in the subgraph
       await waitUntilSubgraphIsSynced(client);
@@ -237,9 +150,9 @@ describe("iSharedMinterDAExpSettlement event handling", () => {
         minterDAExpSettlementV3Address.toLowerCase()
       );
       expect(receiptRes.account.id).toBe(artist.address.toLowerCase());
-      expect(receiptRes.netPosted).toBe(targetStartPrice);
+      expect(receiptRes.netPosted).toBe(targetStartPrice.toString());
       expect(receiptRes.numPurchased).toBe(1);
-      expect(receiptRes.updatedAt).toBe(false);
+      expect(receiptRes.updatedAt).toBe(blockTimestamp);
     });
   });
 });
