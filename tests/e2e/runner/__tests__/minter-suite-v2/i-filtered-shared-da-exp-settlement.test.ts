@@ -137,8 +137,10 @@ describe("iSharedMinterDAExpSettlement event handling", () => {
         .purchase(currentProjectNumber, genArt721CoreAddress, {
           value: targetStartPrice,
         });
-      await tx.wait();
-      const blockTimestamp = tx.timestamp;
+      const receipt = await tx.wait();
+      const blockTimestamp = (
+        await artist.provider.getBlock(receipt.blockNumber)
+      ).timestamp;
 
       // validate state of Receipt in the subgraph
       await waitUntilSubgraphIsSynced(client);
@@ -151,8 +153,8 @@ describe("iSharedMinterDAExpSettlement event handling", () => {
       );
       expect(receiptRes.account.id).toBe(artist.address.toLowerCase());
       expect(receiptRes.netPosted).toBe(targetStartPrice.toString());
-      expect(receiptRes.numPurchased).toBe(1);
-      expect(receiptRes.updatedAt).toBe(blockTimestamp);
+      expect(receiptRes.numPurchased).toBe("1");
+      expect(receiptRes.updatedAt.toString()).toBe(blockTimestamp?.toString());
     });
   });
 });
