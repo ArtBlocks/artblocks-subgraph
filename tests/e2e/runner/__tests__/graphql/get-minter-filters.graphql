@@ -18,6 +18,7 @@ fragment MinterFilterDetails on MinterFilter {
   coreRegistry {
     id
   }
+  type
   updatedAt
 }
 
