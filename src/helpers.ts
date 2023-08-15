@@ -219,6 +219,23 @@ export function loadOrCreateSharedMinterFilter(
   const coreRegistry = loadOrCreateCoreRegistry(coreRegistryAddress);
   minterFilter.coreRegistry = coreRegistry.id;
 
+  // populate minter filter type
+  // @dev we assume that the minter filter conforms to IMinterFilterV1, which
+  // always has a `minterFilterType` function
+  const minterFilterTypeResult = minterFilterContract.try_minterFilterType();
+  if (minterFilterTypeResult.reverted) {
+    // unexpected minter filter behavior - log a warning, and assume the type
+    // is MinterFilterV2
+    log.warning(
+      "[WARN] Unexpectedly could not load minter filter type on MinterFilter contract at address {}, so set minter filter type to MinterFilterV2.",
+      [minterFilterAddress.toHexString()]
+    );
+    minterFilter.type = "MinterFilterV2";
+  } else {
+    // @dev we assume that the returned value is a valid minter filter type
+    minterFilter.type = minterFilterTypeResult.value;
+  }
+
   minterFilter.updatedAt = timestamp;
   minterFilter.save();
 
