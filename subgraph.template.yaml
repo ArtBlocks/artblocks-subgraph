@@ -53,6 +53,8 @@ dataSources:
           file: ./abis/MinterFilterV0.json
         - name: MinterFilterV1
           file: ./abis/MinterFilterV1.json
+        - name: IMinterFilterV1
+          file: ./abis/IMinterFilterV1.json
         - name: IFilteredMinterV2
           file: ./abis/IFilteredMinterV2.json
         - name: IFilteredMinterDALinV1
@@ -125,6 +127,8 @@ dataSources:
           file: ./abis/MinterFilterV0.json
         - name: MinterFilterV1
           file: ./abis/MinterFilterV1.json
+        - name: IMinterFilterV1
+          file: ./abis/IMinterFilterV1.json
         - name: IFilteredMinterV2
           file: ./abis/IFilteredMinterV2.json
         - name: IFilteredMinterDALinV1
@@ -199,6 +203,8 @@ dataSources:
           file: ./abis/MinterFilterV0.json
         - name: MinterFilterV1
           file: ./abis/MinterFilterV1.json
+        - name: IMinterFilterV1
+          file: ./abis/IMinterFilterV1.json
         - name: IFilteredMinterV2
           file: ./abis/IFilteredMinterV2.json
         - name: IFilteredMinterDALinV1
@@ -263,6 +269,8 @@ dataSources:
           file: ./abis/MinterFilterV0.json
         - name: MinterFilterV1
           file: ./abis/MinterFilterV1.json
+        - name: IMinterFilterV1
+          file: ./abis/IMinterFilterV1.json
         - name: IFilteredMinterV2
           file: ./abis/IFilteredMinterV2.json
         - name: IFilteredMinterDALinV1
@@ -1903,6 +1911,8 @@ dataSources:
           file: ./abis/MinterFilterV0.json
         - name: MinterFilterV1
           file: ./abis/MinterFilterV1.json
+        - name: IMinterFilterV1
+          file: ./abis/IMinterFilterV1.json
         - name: IFilteredMinterV2
           file: ./abis/IFilteredMinterV2.json
         - name: IFilteredMinterDALinV1
@@ -2046,6 +2056,8 @@ templates:
           file: ./abis/MinterFilterV0.json
         - name: MinterFilterV1
           file: ./abis/MinterFilterV1.json
+        - name: IMinterFilterV1
+          file: ./abis/IMinterFilterV1.json
         - name: IFilteredMinterV2
           file: ./abis/IFilteredMinterV2.json
         - name: IFilteredMinterDALinV1
@@ -2117,6 +2129,8 @@ templates:
           file: ./abis/MinterFilterV0.json
         - name: MinterFilterV1
           file: ./abis/MinterFilterV1.json
+        - name: IMinterFilterV1
+          file: ./abis/IMinterFilterV1.json
         - name: IFilteredMinterV2
           file: ./abis/IFilteredMinterV2.json
         - name: IFilteredMinterDALinV1
@@ -2178,6 +2192,8 @@ templates:
           file: ./abis/MinterFilterV0.json
         - name: MinterFilterV1
           file: ./abis/MinterFilterV1.json
+        - name: IMinterFilterV1
+          file: ./abis/IMinterFilterV1.json
         - name: IFilteredMinterV2
           file: ./abis/IFilteredMinterV2.json
         - name: IFilteredMinterDALinV1
@@ -2239,6 +2255,8 @@ templates:
           file: ./abis/MinterFilterV0.json
         - name: MinterFilterV1
           file: ./abis/MinterFilterV1.json
+        - name: IMinterFilterV1
+          file: ./abis/IMinterFilterV1.json
         - name: IFilteredMinterV2
           file: ./abis/IFilteredMinterV2.json
         - name: IFilteredMinterDALinV1
@@ -2297,6 +2315,8 @@ templates:
           file: ./abis/MinterFilterV0.json
         - name: MinterFilterV1
           file: ./abis/MinterFilterV1.json
+        - name: IMinterFilterV1
+          file: ./abis/IMinterFilterV1.json
         - name: IFilteredMinterV2
           file: ./abis/IFilteredMinterV2.json
         - name: IFilteredMinterDALinV1
