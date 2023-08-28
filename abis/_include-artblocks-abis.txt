@@ -29,3 +29,11 @@ MinterFilterV0
 MinterFilterV1
 Ownable
 OwnableUpgradeable
+ISharedMinterDAExpSettlementV0
+ISharedMinterDAExpV0
+ISharedMinterDALinV0
+ISharedMinterDAV0
+ISharedMinterHolderV0
+ISharedMinterMerkleV0
+ISharedMinterSEAV0
+ISharedMinterV0
