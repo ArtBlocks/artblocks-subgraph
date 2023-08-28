@@ -45,18 +45,18 @@
   dependencies:
     node-fetch "^2.6.1"
 
-"@artblocks/contracts@^1.0.3":
-  version "1.0.3"
-  resolved "https://registry.yarnpkg.com/@artblocks/contracts/-/contracts-1.0.3.tgz#835bd901446dbc784d32d6b85192e4d7a06c4a2c"
-  integrity sha512-4GHvSyNcqlRDO18hjctw+l/spnOFqkyVbzQrX6R75oT10xqMJZOoYYvOnT2KCMYIatnPke92k0Dz3AARPLrODQ==
+"@artblocks/contracts@^1.0.4":
+  version "1.0.4"
+  resolved "https://registry.yarnpkg.com/@artblocks/contracts/-/contracts-1.0.4.tgz#c0fa6a39e5897a71f6b15adef921852ee8c197de"
+  integrity sha512-yaKOtZd+P8NDs2xEc3q+DUrLzIxoInEuuZvVyw+xl+bZD363Qbna+Jos8TOc1LLGJnTDOvpr9KgFxIplTHeE1Q==
   dependencies:
     "@openzeppelin-0.5/contracts" "npm:@openzeppelin/contracts@2.5.1"
     "@openzeppelin-4.5/contracts" "npm:@openzeppelin/contracts@4.5.0"
     "@openzeppelin-4.7/contracts" "npm:@openzeppelin/contracts@4.7.1"
     "@openzeppelin-4.8/contracts-upgradeable" "npm:@openzeppelin/contracts-upgradeable@4.8.0"
-    "@urql/exchange-retry" "^1.0.0"
-    graphql "^16.6.0"
-    urql "^4.0.0"
+    "@urql/exchange-retry" "^1.2.0"
+    graphql "^16.8.0"
+    urql "^4.0.5"
 
 "@babel/code-frame@^7.0.0", "@babel/code-frame@^7.12.13", "@babel/code-frame@^7.18.6":
   version "7.18.6"
@@ -1903,10 +1903,10 @@
   dependencies:
     wonka "^6.1.2"
 
-"@urql/core@^4.0.0":
-  version "4.0.7"
-  resolved "https://registry.yarnpkg.com/@urql/core/-/core-4.0.7.tgz#8918a956f8e2ffbaeb3aae58190d728813de5841"
-  integrity sha512-UtZ9oSbSFODXzFydgLCXpAQz26KGT1d6uEfcylKphiRWNXSWZi8k7vhJXNceNm/Dn0MiZ+kaaJHKcnGY1jvHRQ==
+"@urql/core@>=4.0.0", "@urql/core@^4.1.0":
+  version "4.1.1"
+  resolved "https://registry.yarnpkg.com/@urql/core/-/core-4.1.1.tgz#b1312eb0ecbc91e315457a3ec14741321cbee1c7"
+  integrity sha512-iIoAy6BY+BUZZ7KIpnMT7C9q+ULf5ZCVxGe3/i7WZSJBrQa2h1QkIMhL+8fAKmOn9gt83jSIv5drWWnhZ9izEA==
   dependencies:
     "@0no-co/graphql.web" "^1.0.1"
     wonka "^6.3.2"
@@ -1918,6 +1918,14 @@
   dependencies:
     "@urql/core" ">=3.0.0"
     wonka "^6.0.0"
+
+"@urql/exchange-retry@^1.2.0":
+  version "1.2.0"
+  resolved "https://registry.yarnpkg.com/@urql/exchange-retry/-/exchange-retry-1.2.0.tgz#23d3ec711754e3c67a843e0106f2cabddff2e5ff"
+  integrity sha512-1O/biKiVhhn0EtvDF4UOvz325K4RrLupfL8rHcmqD2TBLv4qVDWQuzx4JGa1FfqjjRb+C9TNZ6w19f32Mq85Ug==
+  dependencies:
+    "@urql/core" ">=4.0.0"
+    wonka "^6.3.2"
 
 "@whatwg-node/events@^0.0.2":
   version "0.0.2"
@@ -3094,6 +3102,11 @@ graphql@^16.6.0:
   version "16.6.0"
   resolved "https://registry.yarnpkg.com/graphql/-/graphql-16.6.0.tgz#c2dcffa4649db149f6282af726c8c83f1c7c5fdb"
   integrity sha512-KPIBPDlW7NxrbT/eh4qPXz5FiFdL5UbaA0XUNz2Rp3Z3hqBSkbj0GVjwFDztsWVauZUWsbKHgMg++sk8UX0bkw==
+
+graphql@^16.8.0:
+  version "16.8.0"
+  resolved "https://registry.yarnpkg.com/graphql/-/graphql-16.8.0.tgz#374478b7f27b2dc6153c8f42c1b80157f79d79d4"
+  integrity sha512-0oKGaR+y3qcS5mCu1vb7KG+a89vjn06C7Ihq/dDl3jA+A8B3TKomvi3CiEcVLJQGalbu8F52LxkOym7U5sSfbg==
 
 has-flag@^3.0.0:
   version "3.0.0"
@@ -4973,12 +4986,12 @@ urql@^3.0.3:
     "@urql/core" "^3.0.3"
     wonka "^6.0.0"
 
-urql@^4.0.0:
-  version "4.0.2"
-  resolved "https://registry.yarnpkg.com/urql/-/urql-4.0.2.tgz#c67a64fe80a5a66f2916a24e31493e0c91ab2f56"
-  integrity sha512-jMb71UGtoAHI4A0TO15ZUSG8qvUxC5fBTXmUq/DyE3WWcnJkZbnMCBlcZIzMrXK4txAMIHE718jsaUujRkdlkg==
+urql@^4.0.5:
+  version "4.0.5"
+  resolved "https://registry.yarnpkg.com/urql/-/urql-4.0.5.tgz#354106523a523d9b0c4101bf4988c7e34c5a243c"
+  integrity sha512-VicPBQXWicSbE+0oPzU2HMyDa//76FmwyQ7LayaYQxX97nhvMLs2ZWQdUmEzQQqvmw4YFaI0wPz1Qisp+PrZIQ==
   dependencies:
-    "@urql/core" "^4.0.0"
+    "@urql/core" "^4.1.0"
     wonka "^6.3.2"
 
 util-deprecate@^1.0.1:

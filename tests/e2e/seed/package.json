@@ -1,10 +1,10 @@
 {
   "scripts": {
     "start": "node -r ts-node/register scripts/deploy.ts && tail -f /dev/null",
-    "generate:typechain": "typechain --target ethers-v5 --out-dir ./contracts './node_modules/@artblocks/contracts/artifacts/**/*.json' && typechain --target ethers-v5 --out-dir ./contracts './supplemental_abis/*.json'"
+    "generate:typechain": "typechain --target ethers-v5 --out-dir ./contracts './node_modules/@artblocks/contracts//artifacts/contracts/**/!(*.dbg)*.json' && typechain --target ethers-v5 --out-dir ./contracts './supplemental_abis/*.json'"
   },
   "devDependencies": {
-    "@artblocks/contracts": "^1.0.3",
+    "@artblocks/contracts": "^1.0.4",
     "@typechain/ethers-v5": "^9.0.0",
     "@types/node": "^18.13.0",
     "ethers": "^5.0.0",
