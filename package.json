@@ -34,7 +34,7 @@
     "generate:abis": "cd ./abis && ./_generate-abis.sh && cd ../"
   },
   "dependencies": {
-    "@artblocks/contracts": "1.0.3",
+    "@artblocks/contracts": "1.0.4",
     "@assemblyscript/loader": "^0.19.22",
     "@graphprotocol/graph-cli": "^0.37.1",
     "@graphprotocol/graph-ts": "^0.27.0",
