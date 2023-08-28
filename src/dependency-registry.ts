@@ -268,11 +268,11 @@ export function handleDependencyScriptUpdated(
 
   let scripts: string[] = [];
   for (let i = 0; i < scriptCount; i++) {
-    let script = dependencyRegistryContract.getDependencyScriptAtIndex(
+    let script = dependencyRegistryContract.getDependencyScript(
       event.params._dependencyType,
       BigInt.fromI32(i)
     );
-    let scriptAddress = dependencyRegistryContract.getDependencyScriptBytecodeAddressAtIndex(
+    let scriptAddress = dependencyRegistryContract.getDependencyScriptBytecodeAddress(
       event.params._dependencyType,
       BigInt.fromI32(i)
     );
