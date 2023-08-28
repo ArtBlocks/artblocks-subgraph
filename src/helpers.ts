@@ -329,27 +329,36 @@ export function loadOrCreateProjectMinterConfiguration(
 }
 
 // util method to check if a minter is a legacy DALin minter
-function isLegacyMinterDALin(minter: Minter): boolean {
+function isLegacyMinterDALin(minterType: string): boolean {
   return (
-    minter.type.startsWith("MinterDALin") &&
-    (minter.type.endsWith("V0") ||
-      minter.type.endsWith("V1") ||
-      minter.type.endsWith("V2") ||
-      minter.type.endsWith("V3") ||
-      minter.type.endsWith("V4"))
+    minterType.startsWith("MinterDALin") &&
+    (minterType.endsWith("V0") ||
+      minterType.endsWith("V1") ||
+      minterType.endsWith("V2") ||
+      minterType.endsWith("V3") ||
+      minterType.endsWith("V4"))
     // @dev V5+ is a shared, non-legacy minter
   );
 }
 
 // util method to check if a minter is a legacy DAExp minter
-function isLegacyMinterDAExp(minter: Minter): boolean {
+function isLegacyMinterDAExp(minterType: string): boolean {
+  if (minterType.startsWith("MinterDAExpSettlement")) {
+    // DAExpSettlement minters are legacy if they are V0, V1, or V2
+    return (
+      minterType.endsWith("V0") ||
+      minterType.endsWith("V1") ||
+      minterType.endsWith("V2")
+    );
+  }
+  // DAExp minters are legacy if they are V0, V1, V2, V3, or V4
   return (
-    minter.type.startsWith("MinterDAExp") &&
-    (minter.type.endsWith("V0") ||
-      minter.type.endsWith("V1") ||
-      minter.type.endsWith("V2") ||
-      minter.type.endsWith("V3") ||
-      minter.type.endsWith("V4"))
+    minterType.startsWith("MinterDAExp") &&
+    (minterType.endsWith("V0") ||
+      minterType.endsWith("V1") ||
+      minterType.endsWith("V2") ||
+      minterType.endsWith("V3") ||
+      minterType.endsWith("V4"))
     // @dev V5+ is a shared, non-legacy minter
   );
 }
@@ -407,7 +416,7 @@ export function loadOrCreateMinter(
   if (!minterType.reverted) {
     minter.type = minterType.value;
     // populate any minter-specific values
-    if (isLegacyMinterDALin(minter)) {
+    if (isLegacyMinterDALin(minterType.value)) {
       // only do this for legacy minters, because the new minters emit events
       const contract = IFilteredMinterDALinV1.bind(minterAddress);
       setMinterExtraMinterDetailsValue(
@@ -415,7 +424,7 @@ export function loadOrCreateMinter(
         contract.minimumAuctionLengthSeconds(),
         minter
       );
-    } else if (isLegacyMinterDAExp(minter)) {
+    } else if (isLegacyMinterDAExp(minterType.value)) {
       const contract = IFilteredMinterDAExpV1.bind(minterAddress);
       setMinterExtraMinterDetailsValue(
         "minimumHalfLifeInSeconds",
