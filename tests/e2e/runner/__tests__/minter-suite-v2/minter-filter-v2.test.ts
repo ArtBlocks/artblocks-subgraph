@@ -65,7 +65,7 @@ if (!bytecodeStorageReaderAddress)
     "No bytecode storage reader address found in config metadata"
   );
 const linkLibraryAddresses: GenArt721CoreV3LibraryAddresses = {
-  "contracts/libs/0.8.x/BytecodeStorageV1.sol:BytecodeStorageReader":
+  "contracts/libs/v0.8.x/BytecodeStorageV1.sol:BytecodeStorageReader":
     bytecodeStorageReaderAddress,
 };
 const genArt721CoreContract = new GenArt721CoreV3__factory(
