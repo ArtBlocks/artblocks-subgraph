@@ -328,6 +328,32 @@ export function loadOrCreateProjectMinterConfiguration(
   return projectMinterConfig;
 }
 
+// util method to check if a minter is a legacy DALin minter
+function isLegacyMinterDALin(minter: Minter): boolean {
+  return (
+    minter.type.startsWith("MinterDALin") &&
+    (minter.type.endsWith("V0") ||
+      minter.type.endsWith("V1") ||
+      minter.type.endsWith("V2") ||
+      minter.type.endsWith("V3") ||
+      minter.type.endsWith("V4"))
+    // @dev V5+ is a shared, non-legacy minter
+  );
+}
+
+// util method to check if a minter is a legacy DAExp minter
+function isLegacyMinterDAExp(minter: Minter): boolean {
+  return (
+    minter.type.startsWith("MinterDAExp") &&
+    (minter.type.endsWith("V0") ||
+      minter.type.endsWith("V1") ||
+      minter.type.endsWith("V2") ||
+      minter.type.endsWith("V3") ||
+      minter.type.endsWith("V4"))
+    // @dev V5+ is a shared, non-legacy minter
+  );
+}
+
 // @dev this is intended to work with legacy (non-shared) and new (shared)
 // minters
 export function loadOrCreateMinter(
@@ -381,14 +407,15 @@ export function loadOrCreateMinter(
   if (!minterType.reverted) {
     minter.type = minterType.value;
     // populate any minter-specific values
-    if (minter.type.startsWith("MinterDALin")) {
+    if (isLegacyMinterDALin(minter)) {
+      // only do this for legacy minters, because the new minters emit events
       const contract = IFilteredMinterDALinV1.bind(minterAddress);
       setMinterExtraMinterDetailsValue(
         "minimumAuctionLengthInSeconds",
         contract.minimumAuctionLengthSeconds(),
         minter
       );
-    } else if (minter.type.startsWith("MinterDAExp")) {
+    } else if (isLegacyMinterDAExp(minter)) {
       const contract = IFilteredMinterDAExpV1.bind(minterAddress);
       setMinterExtraMinterDetailsValue(
         "minimumHalfLifeInSeconds",
@@ -477,4 +504,42 @@ export function updateProjectIfMinterConfigIsActive(
     project.updatedAt = timestamp;
     project.save();
   }
+}
+
+/**
+ * Calculates the total auction time for an exponential Dutch auction.
+ * @param startPrice The starting price of the auction.
+ * @param basePrice The base price of the auction.
+ * @param halfLifeSeconds The half life of the auction.
+ * @returns The total auction time in seconds.
+ **/
+export function getTotalDAExpAuctionTime(
+  startPrice: BigInt,
+  basePrice: BigInt,
+  halfLifeSeconds: BigInt
+): BigInt {
+  const startPriceFloatingPoint = startPrice.toBigDecimal();
+  const basePriceFloatingPoint = basePrice.toBigDecimal();
+  const priceRatio: f64 = Number.parseFloat(
+    startPriceFloatingPoint.div(basePriceFloatingPoint).toString()
+  );
+  const completedHalfLives = BigInt.fromString(
+    u8(Math.floor(Math.log(priceRatio) / Math.log(2))).toString()
+  );
+  // @dev max possible completedHalfLives is 255 due to on-chain use of uint256,
+  // so this is safe
+  const completedHalfLivesU8: u8 = u8(
+    Number.parseInt(completedHalfLives.toString())
+  );
+  const x1 = completedHalfLives.times(halfLifeSeconds);
+  const x2 = x1.plus(halfLifeSeconds);
+  const y1 = startPrice.div(BigInt.fromI32(2).pow(completedHalfLivesU8));
+  const y2 = y1.div(BigInt.fromI32(2));
+  const totalAuctionTime = x1.plus(
+    x2
+      .minus(x1)
+      .times(basePrice.minus(y1))
+      .div(y2.minus(y1))
+  );
+  return totalAuctionTime;
 }

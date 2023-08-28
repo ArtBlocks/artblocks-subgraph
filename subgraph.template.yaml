@@ -1227,6 +1227,161 @@ dataSources:
           handler: handleProjectNextTokenEjected
       file: ./src/i-shared-sea-mapping.ts
   {{/iSharedSEAContracts}}
+  {{#iSharedDAContracts}}
+  - kind: ethereum/contract
+    name: 'ISharedDA{{#address}}-{{address}}{{/address}}'
+    network: {{network}}
+    source:
+      address: "{{#address}}{{address}}{{/address}}{{^address}}0x0000000000000000000000000000000000000000{{/address}}"
+      abi: ISharedMinterDAV0
+      {{#startBlock}}startBlock: {{startBlock}}{{/startBlock}}
+    mapping:
+      kind: ethereum/events
+      apiVersion: 0.0.5
+      language: wasm/assemblyscript
+      entities:
+        - Project
+        - ProjectScript
+        - Token
+        - Contract
+        - Account
+        - AccountProject
+        - Whitelisting
+        - MinterFilter
+        - Minter
+        - ProjectMinterConfiguration
+      abis:
+        - name: ISharedMinterDAV0
+          file: ./abis/ISharedMinterDAV0.json
+        - name: ISharedMinterV0
+          file: ./abis/ISharedMinterV0.json
+        - name: IFilteredMinterV2
+          file: ./abis/IFilteredMinterV2.json
+        - name: IFilteredMinterDALinV1
+          file: ./abis/IFilteredMinterDALinV1.json
+        - name: IFilteredMinterDAExpV1
+          file: ./abis/IFilteredMinterDAExpV1.json
+        - name: IFilteredMinterDAExpSettlementV1
+          file: ./abis/IFilteredMinterDAExpSettlementV1.json
+        - name: IFilteredMinterV2
+          file: ./abis/IFilteredMinterV2.json
+        - name: IFilteredMinterHolderV2
+          file: ./abis/IFilteredMinterHolderV2.json
+        - name: IFilteredMinterMerkleV2
+          file: ./abis/IFilteredMinterMerkleV2.json
+        - name: IFilteredMinterSEAV0
+          file: ./abis/IFilteredMinterSEAV0.json
+      eventHandlers:
+        - event: ResetAuctionDetails(indexed uint256,indexed address)
+          handler: handleResetAuctionDetails
+      file: ./src/i-shared-da-mapping.ts
+  {{/iSharedDAContracts}}
+  {{#iSharedDAExpContracts}}
+  - kind: ethereum/contract
+    name: 'ISharedDAExp{{#address}}-{{address}}{{/address}}'
+    network: {{network}}
+    source:
+      address: "{{#address}}{{address}}{{/address}}{{^address}}0x0000000000000000000000000000000000000000{{/address}}"
+      abi: ISharedMinterDAExpV0
+      {{#startBlock}}startBlock: {{startBlock}}{{/startBlock}}
+    mapping:
+      kind: ethereum/events
+      apiVersion: 0.0.5
+      language: wasm/assemblyscript
+      entities:
+        - Project
+        - ProjectScript
+        - Token
+        - Contract
+        - Account
+        - AccountProject
+        - Whitelisting
+        - MinterFilter
+        - Minter
+        - ProjectMinterConfiguration
+      abis:
+        - name: ISharedMinterDAExpV0
+          file: ./abis/ISharedMinterDAExpV0.json
+        - name: ISharedMinterDAV0
+          file: ./abis/ISharedMinterDAV0.json
+        - name: ISharedMinterV0
+          file: ./abis/ISharedMinterV0.json
+        - name: IFilteredMinterV2
+          file: ./abis/IFilteredMinterV2.json
+        - name: IFilteredMinterDALinV1
+          file: ./abis/IFilteredMinterDALinV1.json
+        - name: IFilteredMinterDAExpV1
+          file: ./abis/IFilteredMinterDAExpV1.json
+        - name: IFilteredMinterDAExpSettlementV1
+          file: ./abis/IFilteredMinterDAExpSettlementV1.json
+        - name: IFilteredMinterV2
+          file: ./abis/IFilteredMinterV2.json
+        - name: IFilteredMinterHolderV2
+          file: ./abis/IFilteredMinterHolderV2.json
+        - name: IFilteredMinterMerkleV2
+          file: ./abis/IFilteredMinterMerkleV2.json
+        - name: IFilteredMinterSEAV0
+          file: ./abis/IFilteredMinterSEAV0.json
+      eventHandlers:
+        - event: SetAuctionDetailsExp(indexed uint256,indexed address,uint64,uint64,uint128,uint128)
+          handler: handleSetAuctionDetailsExp
+        - event: AuctionMinHalfLifeSecondsUpdated(uint256)
+          handler: handleAuctionMinHalfLifeSecondsUpdated
+      file: ./src/i-shared-da-exp-mapping.ts
+  {{/iSharedDAExpContracts}}
+  {{#iSharedDALinContracts}}
+  - kind: ethereum/contract
+    name: 'ISharedDALin{{#address}}-{{address}}{{/address}}'
+    network: {{network}}
+    source:
+      address: "{{#address}}{{address}}{{/address}}{{^address}}0x0000000000000000000000000000000000000000{{/address}}"
+      abi: ISharedMinterDALinV0
+      {{#startBlock}}startBlock: {{startBlock}}{{/startBlock}}
+    mapping:
+      kind: ethereum/events
+      apiVersion: 0.0.5
+      language: wasm/assemblyscript
+      entities:
+        - Project
+        - ProjectScript
+        - Token
+        - Contract
+        - Account
+        - AccountProject
+        - Whitelisting
+        - MinterFilter
+        - Minter
+        - ProjectMinterConfiguration
+      abis:
+        - name: ISharedMinterDALinV0
+          file: ./abis/ISharedMinterDALinV0.json
+        - name: ISharedMinterDAV0
+          file: ./abis/ISharedMinterDAV0.json
+        - name: ISharedMinterV0
+          file: ./abis/ISharedMinterV0.json
+        - name: IFilteredMinterV2
+          file: ./abis/IFilteredMinterV2.json
+        - name: IFilteredMinterDALinV1
+          file: ./abis/IFilteredMinterDALinV1.json
+        - name: IFilteredMinterDAExpV1
+          file: ./abis/IFilteredMinterDAExpV1.json
+        - name: IFilteredMinterDAExpSettlementV1
+          file: ./abis/IFilteredMinterDAExpSettlementV1.json
+        - name: IFilteredMinterV2
+          file: ./abis/IFilteredMinterV2.json
+        - name: IFilteredMinterHolderV2
+          file: ./abis/IFilteredMinterHolderV2.json
+        - name: IFilteredMinterMerkleV2
+          file: ./abis/IFilteredMinterMerkleV2.json
+        - name: IFilteredMinterSEAV0
+          file: ./abis/IFilteredMinterSEAV0.json
+      eventHandlers:
+        - event: SetAuctionDetailsLin(indexed uint256,indexed address,uint64,uint64,uint128,uint128)
+          handler: handleSetAuctionDetailsLin
+        - event: AuctionMinimumLengthSecondsUpdated(uint256)
+          handler: handleAuctionMinimumLengthSecondsUpdated
+      file: ./src/i-shared-da-lin-mapping.ts
+  {{/iSharedDALinContracts}}
   {{#minterSetPriceContracts}}
   - kind: ethereum/contract
     name: 'MinterSetPrice{{#address}}-{{address}}{{/address}}'
