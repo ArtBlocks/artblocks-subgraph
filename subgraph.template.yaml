@@ -1331,7 +1331,7 @@ dataSources:
         - name: IFilteredMinterSEAV0
           file: ./abis/IFilteredMinterSEAV0.json
       eventHandlers:
-        - event: SetAuctionDetailsExp(indexed uint256,indexed address,uint64,uint64,uint128,uint128)
+        - event: SetAuctionDetailsExp(indexed uint256,indexed address,uint40,uint40,uint256,uint256)
           handler: handleSetAuctionDetailsExp
         - event: AuctionMinHalfLifeSecondsUpdated(uint256)
           handler: handleAuctionMinHalfLifeSecondsUpdated
@@ -1384,7 +1384,7 @@ dataSources:
         - name: IFilteredMinterSEAV0
           file: ./abis/IFilteredMinterSEAV0.json
       eventHandlers:
-        - event: SetAuctionDetailsLin(indexed uint256,indexed address,uint64,uint64,uint128,uint128)
+        - event: SetAuctionDetailsLin(indexed uint256,indexed address,uint40,uint40,uint256,uint256)
           handler: handleSetAuctionDetailsLin
         - event: AuctionMinimumLengthSecondsUpdated(uint256)
           handler: handleAuctionMinimumLengthSecondsUpdated
@@ -1439,7 +1439,7 @@ dataSources:
         - name: IFilteredMinterSEAV0
           file: ./abis/IFilteredMinterSEAV0.json
       eventHandlers:
-        - event: ReceiptUpdated(indexed address,indexed uint256,indexed address,uint24,uint232)
+        - event: ReceiptUpdated(indexed address,indexed uint256,indexed address,uint24,uint256)
           handler: handleReceiptUpdated
       file: ./src/i-shared-da-exp-settlement-mapping.ts
   {{/iSharedDAExpSettlementContracts}}
@@ -1948,6 +1948,8 @@ dataSources:
       abis:
         - name: IDependencyRegistryV0
           file: ./abis/IDependencyRegistryV0.json
+        - name: IDependencyRegistryV0_Legacy
+          file: ./abis/IDependencyRegistryV0_Legacy.json
         - name: IDependencyRegistryCompatibleV0
           file: ./abis/IDependencyRegistryCompatibleV0.json
       eventHandlers:
@@ -2000,6 +2002,8 @@ dataSources:
           file: ./abis/OwnableUpgradeable.json
         - name: IDependencyRegistryV0
           file: ./abis/IDependencyRegistryV0.json
+        - name: IDependencyRegistryV0_Legacy
+          file: ./abis/IDependencyRegistryV0_Legacy.json
         - name: IDependencyRegistryCompatibleV0
           file: ./abis/IDependencyRegistryCompatibleV0.json
       eventHandlers:

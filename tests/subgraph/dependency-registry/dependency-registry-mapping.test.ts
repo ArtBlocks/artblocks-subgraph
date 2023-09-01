@@ -1222,8 +1222,8 @@ describe("DependencyRegistry", () => {
 
       createMockedFunction(
         DEPENDENCY_REGISTRY_ADDRESS,
-        "getDependencyScriptAtIndex",
-        "getDependencyScriptAtIndex(bytes32,uint256):(string)"
+        "getDependencyScript",
+        "getDependencyScript(bytes32,uint256):(string)"
       )
         .withArgs([
           ethereum.Value.fromFixedBytes(
@@ -1236,8 +1236,8 @@ describe("DependencyRegistry", () => {
       const scriptAddress = randomAddressGenerator.generateRandomAddress();
       createMockedFunction(
         DEPENDENCY_REGISTRY_ADDRESS,
-        "getDependencyScriptBytecodeAddressAtIndex",
-        "getDependencyScriptBytecodeAddressAtIndex(bytes32,uint256):(address)"
+        "getDependencyScriptBytecodeAddress",
+        "getDependencyScriptBytecodeAddress(bytes32,uint256):(address)"
       )
         .withArgs([
           ethereum.Value.fromFixedBytes(
@@ -1344,8 +1344,8 @@ describe("DependencyRegistry", () => {
 
       createMockedFunction(
         DEPENDENCY_REGISTRY_ADDRESS,
-        "getDependencyScriptAtIndex",
-        "getDependencyScriptAtIndex(bytes32,uint256):(string)"
+        "getDependencyScript",
+        "getDependencyScript(bytes32,uint256):(string)"
       )
         .withArgs([
           ethereum.Value.fromFixedBytes(
@@ -1357,8 +1357,8 @@ describe("DependencyRegistry", () => {
 
       createMockedFunction(
         DEPENDENCY_REGISTRY_ADDRESS,
-        "getDependencyScriptBytecodeAddressAtIndex",
-        "getDependencyScriptBytecodeAddressAtIndex(bytes32,uint256):(address)"
+        "getDependencyScriptBytecodeAddress",
+        "getDependencyScriptBytecodeAddress(bytes32,uint256):(address)"
       )
         .withArgs([
           ethereum.Value.fromFixedBytes(

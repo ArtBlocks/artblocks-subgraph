@@ -137,7 +137,7 @@ async function main() {
     bytecodeStorageReaderAddress;
 
   const linkLibraryAddresses: GenArt721CoreV3LibraryAddresses = {
-    "contracts/libs/0.8.x/BytecodeStorageV1.sol:BytecodeStorageReader":
+    "contracts/libs/v0.8.x/BytecodeStorageV1.sol:BytecodeStorageReader":
       bytecodeStorageReaderAddress,
   };
 
