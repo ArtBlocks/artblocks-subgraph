@@ -128,8 +128,8 @@
       "startBlock": 9602240
     },
     {
-      "address": "[bugged] 0xe3002BB7Bfd2ff61Ea1e9823e4723e4163C6BE72",
-      "name": "Goerli dev shared minter: MinterDAExpSettlementV3",
+      "address": "0xe3002BB7Bfd2ff61Ea1e9823e4723e4163C6BE72",
+      "name": "[bugged] Goerli dev shared minter: MinterDAExpSettlementV3",
       "startBlock": 9602240
     },
     {
@@ -194,8 +194,8 @@
       "startBlock": 9602240
     },
     {
-      "address": "[bugged] 0xe3002BB7Bfd2ff61Ea1e9823e4723e4163C6BE72",
-      "name": "Goerli dev shared minter: MinterDAExpSettlementV3",
+      "address": "0xe3002BB7Bfd2ff61Ea1e9823e4723e4163C6BE72",
+      "name": "[bugged] Goerli dev shared minter: MinterDAExpSettlementV3",
       "startBlock": 9602240
     },
     {
