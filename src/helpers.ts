@@ -29,6 +29,8 @@ import { IFilteredMinterDAExpV1 } from "../generated/MinterDAExp/IFilteredMinter
 import { setMinterExtraMinterDetailsValue } from "./extra-minter-details-helpers";
 import { createTypedMapFromJSONString } from "./json";
 
+import { KNOWN_MINTER_FILTER_TYPES } from "./constants";
+
 export class MinterProjectAndConfig {
   minter: Minter;
   project: Project;
@@ -220,20 +222,29 @@ export function loadOrCreateSharedMinterFilter(
   minterFilter.coreRegistry = coreRegistry.id;
 
   // populate minter filter type
-  // @dev we assume that the minter filter conforms to IMinterFilterV1, which
-  // always has a `minterFilterType` function
+  // @dev we try to interact with the minter filter as if it conforms to
+  // IMinterFilterV1, which has a `minterFilterType` function
   const minterFilterTypeResult = minterFilterContract.try_minterFilterType();
   if (minterFilterTypeResult.reverted) {
     // unexpected minter filter behavior - log a warning, and assume the type
-    // is MinterFilterV2
+    // is UNKNOWN
     log.warning(
-      "[WARN] Unexpectedly could not load minter filter type on MinterFilter contract at address {}, so set minter filter type to MinterFilterV2.",
+      "[WARN] Unexpectedly could not load minter filter type on MinterFilter contract at address {}, so set minter filter type to UNKNOWN.",
       [minterFilterAddress.toHexString()]
     );
-    minterFilter.type = "MinterFilterV2";
+    minterFilter.type = "UNKNOWN";
   } else {
-    // @dev we assume that the returned value is a valid minter filter type
-    minterFilter.type = minterFilterTypeResult.value;
+    // validate the returned type is in the enum of valid minter filter types
+    if (KNOWN_MINTER_FILTER_TYPES.includes(minterFilterTypeResult.value)) {
+      minterFilter.type = minterFilterTypeResult.value;
+    } else {
+      // unknown minter filter type - log a warning, and label the MinterFilter as UNKNOWN
+      log.warning(
+        "[WARN] Minter filter type on MinterFilter contract at address {} is not an expected minter filter type, so set minter filter type to UNKNOWN.",
+        [minterFilterAddress.toHexString()]
+      );
+      minterFilter.type = "UNKNOWN";
+    }
   }
 
   minterFilter.updatedAt = timestamp;
