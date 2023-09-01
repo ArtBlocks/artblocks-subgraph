@@ -369,6 +369,11 @@
       "address": "0x291cBD610fB1ba4186c7d99667e43D862EB0664e",
       "name": "V4 Minter for V3 core, PRD2",
       "startBlock": 9562700
+    },
+    {
+      "address": "0x9cDe518fDC34e76f9CaC602EA37dB1eD2CBB12dd",
+      "name": "V4 Minter for V3 Flex Core, DEVMIGRATEFLEX",
+      "startBlock": 9619873
     }
   ],
   "minterSetPriceERC20Contracts": [
@@ -537,6 +542,11 @@
       "address": "0x4ceCB118d7ea18B597b56b272b918bdDCf4cE347",
       "name": "V1 Minter for V3 core, PRD2",
       "startBlock": 9562700
+    },
+    {
+      "address": "0xb1E1db1d10Db273971AF80658d368AD41c07399F",
+      "name": "V1 Minter for V3 flex core, DEVMIGRATEFLEX",
+      "startBlock": 9619875
     }
   ],
   "minterMerkleContracts": [
