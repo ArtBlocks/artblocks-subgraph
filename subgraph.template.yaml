@@ -53,6 +53,8 @@ dataSources:
           file: ./abis/MinterFilterV0.json
         - name: MinterFilterV1
           file: ./abis/MinterFilterV1.json
+        - name: IMinterFilterV1
+          file: ./abis/IMinterFilterV1.json
         - name: IFilteredMinterV2
           file: ./abis/IFilteredMinterV2.json
         - name: IFilteredMinterDALinV1
@@ -125,6 +127,8 @@ dataSources:
           file: ./abis/MinterFilterV0.json
         - name: MinterFilterV1
           file: ./abis/MinterFilterV1.json
+        - name: IMinterFilterV1
+          file: ./abis/IMinterFilterV1.json
         - name: IFilteredMinterV2
           file: ./abis/IFilteredMinterV2.json
         - name: IFilteredMinterDALinV1
@@ -199,6 +203,8 @@ dataSources:
           file: ./abis/MinterFilterV0.json
         - name: MinterFilterV1
           file: ./abis/MinterFilterV1.json
+        - name: IMinterFilterV1
+          file: ./abis/IMinterFilterV1.json
         - name: IFilteredMinterV2
           file: ./abis/IFilteredMinterV2.json
         - name: IFilteredMinterDALinV1
@@ -263,6 +269,8 @@ dataSources:
           file: ./abis/MinterFilterV0.json
         - name: MinterFilterV1
           file: ./abis/MinterFilterV1.json
+        - name: IMinterFilterV1
+          file: ./abis/IMinterFilterV1.json
         - name: IFilteredMinterV2
           file: ./abis/IFilteredMinterV2.json
         - name: IFilteredMinterDALinV1
@@ -1227,6 +1235,214 @@ dataSources:
           handler: handleProjectNextTokenEjected
       file: ./src/i-shared-sea-mapping.ts
   {{/iSharedSEAContracts}}
+  {{#iSharedDAContracts}}
+  - kind: ethereum/contract
+    name: 'ISharedDA{{#address}}-{{address}}{{/address}}'
+    network: {{network}}
+    source:
+      address: "{{#address}}{{address}}{{/address}}{{^address}}0x0000000000000000000000000000000000000000{{/address}}"
+      abi: ISharedMinterDAV0
+      {{#startBlock}}startBlock: {{startBlock}}{{/startBlock}}
+    mapping:
+      kind: ethereum/events
+      apiVersion: 0.0.5
+      language: wasm/assemblyscript
+      entities:
+        - Project
+        - ProjectScript
+        - Token
+        - Contract
+        - Account
+        - AccountProject
+        - Whitelisting
+        - MinterFilter
+        - Minter
+        - ProjectMinterConfiguration
+      abis:
+        - name: ISharedMinterDAV0
+          file: ./abis/ISharedMinterDAV0.json
+        - name: ISharedMinterV0
+          file: ./abis/ISharedMinterV0.json
+        - name: IFilteredMinterV2
+          file: ./abis/IFilteredMinterV2.json
+        - name: IFilteredMinterDALinV1
+          file: ./abis/IFilteredMinterDALinV1.json
+        - name: IFilteredMinterDAExpV1
+          file: ./abis/IFilteredMinterDAExpV1.json
+        - name: IFilteredMinterDAExpSettlementV1
+          file: ./abis/IFilteredMinterDAExpSettlementV1.json
+        - name: IFilteredMinterV2
+          file: ./abis/IFilteredMinterV2.json
+        - name: IFilteredMinterHolderV2
+          file: ./abis/IFilteredMinterHolderV2.json
+        - name: IFilteredMinterMerkleV2
+          file: ./abis/IFilteredMinterMerkleV2.json
+        - name: IFilteredMinterSEAV0
+          file: ./abis/IFilteredMinterSEAV0.json
+      eventHandlers:
+        - event: ResetAuctionDetails(indexed uint256,indexed address)
+          handler: handleResetAuctionDetails
+      file: ./src/i-shared-da-mapping.ts
+  {{/iSharedDAContracts}}
+  {{#iSharedDAExpContracts}}
+  - kind: ethereum/contract
+    name: 'ISharedDAExp{{#address}}-{{address}}{{/address}}'
+    network: {{network}}
+    source:
+      address: "{{#address}}{{address}}{{/address}}{{^address}}0x0000000000000000000000000000000000000000{{/address}}"
+      abi: ISharedMinterDAExpV0
+      {{#startBlock}}startBlock: {{startBlock}}{{/startBlock}}
+    mapping:
+      kind: ethereum/events
+      apiVersion: 0.0.5
+      language: wasm/assemblyscript
+      entities:
+        - Project
+        - ProjectScript
+        - Token
+        - Contract
+        - Account
+        - AccountProject
+        - Whitelisting
+        - MinterFilter
+        - Minter
+        - ProjectMinterConfiguration
+      abis:
+        - name: ISharedMinterDAExpV0
+          file: ./abis/ISharedMinterDAExpV0.json
+        - name: ISharedMinterDAV0
+          file: ./abis/ISharedMinterDAV0.json
+        - name: ISharedMinterV0
+          file: ./abis/ISharedMinterV0.json
+        - name: IFilteredMinterV2
+          file: ./abis/IFilteredMinterV2.json
+        - name: IFilteredMinterDALinV1
+          file: ./abis/IFilteredMinterDALinV1.json
+        - name: IFilteredMinterDAExpV1
+          file: ./abis/IFilteredMinterDAExpV1.json
+        - name: IFilteredMinterDAExpSettlementV1
+          file: ./abis/IFilteredMinterDAExpSettlementV1.json
+        - name: IFilteredMinterV2
+          file: ./abis/IFilteredMinterV2.json
+        - name: IFilteredMinterHolderV2
+          file: ./abis/IFilteredMinterHolderV2.json
+        - name: IFilteredMinterMerkleV2
+          file: ./abis/IFilteredMinterMerkleV2.json
+        - name: IFilteredMinterSEAV0
+          file: ./abis/IFilteredMinterSEAV0.json
+      eventHandlers:
+        - event: SetAuctionDetailsExp(indexed uint256,indexed address,uint40,uint40,uint256,uint256)
+          handler: handleSetAuctionDetailsExp
+        - event: AuctionMinHalfLifeSecondsUpdated(uint256)
+          handler: handleAuctionMinHalfLifeSecondsUpdated
+      file: ./src/i-shared-da-exp-mapping.ts
+  {{/iSharedDAExpContracts}}
+  {{#iSharedDALinContracts}}
+  - kind: ethereum/contract
+    name: 'ISharedDALin{{#address}}-{{address}}{{/address}}'
+    network: {{network}}
+    source:
+      address: "{{#address}}{{address}}{{/address}}{{^address}}0x0000000000000000000000000000000000000000{{/address}}"
+      abi: ISharedMinterDALinV0
+      {{#startBlock}}startBlock: {{startBlock}}{{/startBlock}}
+    mapping:
+      kind: ethereum/events
+      apiVersion: 0.0.5
+      language: wasm/assemblyscript
+      entities:
+        - Project
+        - ProjectScript
+        - Token
+        - Contract
+        - Account
+        - AccountProject
+        - Whitelisting
+        - MinterFilter
+        - Minter
+        - ProjectMinterConfiguration
+      abis:
+        - name: ISharedMinterDALinV0
+          file: ./abis/ISharedMinterDALinV0.json
+        - name: ISharedMinterDAV0
+          file: ./abis/ISharedMinterDAV0.json
+        - name: ISharedMinterV0
+          file: ./abis/ISharedMinterV0.json
+        - name: IFilteredMinterV2
+          file: ./abis/IFilteredMinterV2.json
+        - name: IFilteredMinterDALinV1
+          file: ./abis/IFilteredMinterDALinV1.json
+        - name: IFilteredMinterDAExpV1
+          file: ./abis/IFilteredMinterDAExpV1.json
+        - name: IFilteredMinterDAExpSettlementV1
+          file: ./abis/IFilteredMinterDAExpSettlementV1.json
+        - name: IFilteredMinterV2
+          file: ./abis/IFilteredMinterV2.json
+        - name: IFilteredMinterHolderV2
+          file: ./abis/IFilteredMinterHolderV2.json
+        - name: IFilteredMinterMerkleV2
+          file: ./abis/IFilteredMinterMerkleV2.json
+        - name: IFilteredMinterSEAV0
+          file: ./abis/IFilteredMinterSEAV0.json
+      eventHandlers:
+        - event: SetAuctionDetailsLin(indexed uint256,indexed address,uint40,uint40,uint256,uint256)
+          handler: handleSetAuctionDetailsLin
+        - event: AuctionMinimumLengthSecondsUpdated(uint256)
+          handler: handleAuctionMinimumLengthSecondsUpdated
+      file: ./src/i-shared-da-lin-mapping.ts
+  {{/iSharedDALinContracts}}
+  {{#iSharedDAExpSettlementContracts}}
+  - kind: ethereum/contract
+    name: 'ISharedDAExpSettlement{{#address}}-{{address}}{{/address}}'
+    network: {{network}}
+    source:
+      address: "{{#address}}{{address}}{{/address}}{{^address}}0x0000000000000000000000000000000000000000{{/address}}"
+      abi: ISharedMinterDAExpSettlementV0
+      {{#startBlock}}startBlock: {{startBlock}}{{/startBlock}}
+    mapping:
+      kind: ethereum/events
+      apiVersion: 0.0.5
+      language: wasm/assemblyscript
+      entities:
+        - Project
+        - ProjectScript
+        - Token
+        - Contract
+        - Account
+        - AccountProject
+        - Whitelisting
+        - MinterFilter
+        - Minter
+        - ProjectMinterConfiguration
+      abis:
+        - name: ISharedMinterDAExpSettlementV0
+          file: ./abis/ISharedMinterDAExpSettlementV0.json
+        - name: ISharedMinterDAExpV0
+          file: ./abis/ISharedMinterDAExpV0.json
+        - name: ISharedMinterDAV0
+          file: ./abis/ISharedMinterDAV0.json
+        - name: ISharedMinterV0
+          file: ./abis/ISharedMinterV0.json
+        - name: IFilteredMinterV2
+          file: ./abis/IFilteredMinterV2.json
+        - name: IFilteredMinterDALinV1
+          file: ./abis/IFilteredMinterDALinV1.json
+        - name: IFilteredMinterDAExpV1
+          file: ./abis/IFilteredMinterDAExpV1.json
+        - name: IFilteredMinterDAExpSettlementV1
+          file: ./abis/IFilteredMinterDAExpSettlementV1.json
+        - name: IFilteredMinterV2
+          file: ./abis/IFilteredMinterV2.json
+        - name: IFilteredMinterHolderV2
+          file: ./abis/IFilteredMinterHolderV2.json
+        - name: IFilteredMinterMerkleV2
+          file: ./abis/IFilteredMinterMerkleV2.json
+        - name: IFilteredMinterSEAV0
+          file: ./abis/IFilteredMinterSEAV0.json
+      eventHandlers:
+        - event: ReceiptUpdated(indexed address,indexed uint256,indexed address,uint24,uint256)
+          handler: handleReceiptUpdated
+      file: ./src/i-shared-da-exp-settlement-mapping.ts
+  {{/iSharedDAExpSettlementContracts}}
   {{#minterSetPriceContracts}}
   - kind: ethereum/contract
     name: 'MinterSetPrice{{#address}}-{{address}}{{/address}}'
@@ -1695,6 +1911,8 @@ dataSources:
           file: ./abis/MinterFilterV0.json
         - name: MinterFilterV1
           file: ./abis/MinterFilterV1.json
+        - name: IMinterFilterV1
+          file: ./abis/IMinterFilterV1.json
         - name: IFilteredMinterV2
           file: ./abis/IFilteredMinterV2.json
         - name: IFilteredMinterDALinV1
@@ -1730,6 +1948,8 @@ dataSources:
       abis:
         - name: IDependencyRegistryV0
           file: ./abis/IDependencyRegistryV0.json
+        - name: IDependencyRegistryV0_Legacy
+          file: ./abis/IDependencyRegistryV0_Legacy.json
         - name: IDependencyRegistryCompatibleV0
           file: ./abis/IDependencyRegistryCompatibleV0.json
       eventHandlers:
@@ -1782,6 +2002,8 @@ dataSources:
           file: ./abis/OwnableUpgradeable.json
         - name: IDependencyRegistryV0
           file: ./abis/IDependencyRegistryV0.json
+        - name: IDependencyRegistryV0_Legacy
+          file: ./abis/IDependencyRegistryV0_Legacy.json
         - name: IDependencyRegistryCompatibleV0
           file: ./abis/IDependencyRegistryCompatibleV0.json
       eventHandlers:
@@ -1838,6 +2060,8 @@ templates:
           file: ./abis/MinterFilterV0.json
         - name: MinterFilterV1
           file: ./abis/MinterFilterV1.json
+        - name: IMinterFilterV1
+          file: ./abis/IMinterFilterV1.json
         - name: IFilteredMinterV2
           file: ./abis/IFilteredMinterV2.json
         - name: IFilteredMinterDALinV1
@@ -1909,6 +2133,8 @@ templates:
           file: ./abis/MinterFilterV0.json
         - name: MinterFilterV1
           file: ./abis/MinterFilterV1.json
+        - name: IMinterFilterV1
+          file: ./abis/IMinterFilterV1.json
         - name: IFilteredMinterV2
           file: ./abis/IFilteredMinterV2.json
         - name: IFilteredMinterDALinV1
@@ -1970,6 +2196,8 @@ templates:
           file: ./abis/MinterFilterV0.json
         - name: MinterFilterV1
           file: ./abis/MinterFilterV1.json
+        - name: IMinterFilterV1
+          file: ./abis/IMinterFilterV1.json
         - name: IFilteredMinterV2
           file: ./abis/IFilteredMinterV2.json
         - name: IFilteredMinterDALinV1
@@ -2031,6 +2259,8 @@ templates:
           file: ./abis/MinterFilterV0.json
         - name: MinterFilterV1
           file: ./abis/MinterFilterV1.json
+        - name: IMinterFilterV1
+          file: ./abis/IMinterFilterV1.json
         - name: IFilteredMinterV2
           file: ./abis/IFilteredMinterV2.json
         - name: IFilteredMinterDALinV1
@@ -2089,6 +2319,8 @@ templates:
           file: ./abis/MinterFilterV0.json
         - name: MinterFilterV1
           file: ./abis/MinterFilterV1.json
+        - name: IMinterFilterV1
+          file: ./abis/IMinterFilterV1.json
         - name: IFilteredMinterV2
           file: ./abis/IFilteredMinterV2.json
         - name: IFilteredMinterDALinV1

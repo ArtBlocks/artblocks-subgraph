@@ -26,9 +26,15 @@ import { MinterSetPriceERC20V5__factory } from "../contracts/factories/MinterSet
 import { MinterSetPriceMerkleV5__factory } from "../contracts/factories/MinterSetPriceMerkleV5__factory";
 import { MinterSetPriceHolderV5__factory } from "../contracts/factories/MinterSetPriceHolderV5__factory";
 import { MinterSEAV1__factory } from "../contracts/factories/MinterSEAV1__factory";
+import { MinterDAExpV5__factory } from "../contracts/factories/MinterDAExpV5__factory";
+import { MinterDALinV5__factory } from "../contracts/factories/MinterDALinV5__factory";
+import { MinterDAExpSettlementV3__factory } from "../contracts/factories/MinterDAExpSettlementV3__factory";
 
 import fs from "fs";
 import { JsonRpcProvider } from "@ethersproject/providers";
+// hide nuisance logs about event overloading
+import { Logger } from "@ethersproject/logger";
+Logger.setLogLevel(Logger.levels.ERROR);
 
 //////////////////////////////////////////////////////////////////////////////
 // CONFIG BEGINS HERE
@@ -131,7 +137,7 @@ async function main() {
     bytecodeStorageReaderAddress;
 
   const linkLibraryAddresses: GenArt721CoreV3LibraryAddresses = {
-    "contracts/libs/0.8.x/BytecodeStorageV1.sol:BytecodeStorageReader":
+    "contracts/libs/v0.8.x/BytecodeStorageV1.sol:BytecodeStorageReader":
       bytecodeStorageReaderAddress,
   };
 
@@ -273,7 +279,6 @@ async function main() {
   ];
 
   // SEA Minters
-  // MinterSEAV1__factory
   const MinterSEAV1Factory = new MinterSEAV1__factory(deployer);
   const minterSEAV1 = await MinterSEAV1Factory.deploy(minterFilter.address);
   await minterSEAV1.deployed();
@@ -284,6 +289,68 @@ async function main() {
   subgraphConfig.iSharedSEAContracts = [
     {
       address: minterSEAV1.address,
+    },
+  ];
+
+  // DA Exp Minters
+  const MinterDAExpV5Factory = new MinterDAExpV5__factory(deployer);
+  const minterDAExpV5 = await MinterDAExpV5Factory.deploy(minterFilter.address);
+  await minterDAExpV5.deployed();
+  console.log(`minterDAExpV5 deployed at ${minterDAExpV5.address}`);
+  subgraphConfig.iSharedMinterV0Contracts.push({
+    address: minterDAExpV5.address,
+  });
+  subgraphConfig.iSharedDAContracts = [
+    {
+      address: minterDAExpV5.address,
+    },
+  ];
+  subgraphConfig.iSharedDAExpContracts = [
+    {
+      address: minterDAExpV5.address,
+    },
+  ];
+
+  // DA Lin Minters
+  const MinterDALinV5Factory = new MinterDALinV5__factory(deployer);
+  const minterDALinV5 = await MinterDALinV5Factory.deploy(minterFilter.address);
+  await minterDALinV5.deployed();
+  console.log(`minterDALinV5 deployed at ${minterDALinV5.address}`);
+  subgraphConfig.iSharedMinterV0Contracts.push({
+    address: minterDALinV5.address,
+  });
+  subgraphConfig.iSharedDAContracts.push({
+    address: minterDALinV5.address,
+  });
+  subgraphConfig.iSharedDALinContracts = [
+    {
+      address: minterDALinV5.address,
+    },
+  ];
+
+  // DA Exp Settlement Minters
+  const MinterDAExpSettlementV3Factory = new MinterDAExpSettlementV3__factory(
+    deployer
+  );
+  const minterDAExpSettlementV3 = await MinterDAExpSettlementV3Factory.deploy(
+    minterFilter.address
+  );
+  await minterDAExpSettlementV3.deployed();
+  console.log(
+    `minterDAExpSettlementV3 deployed at ${minterDAExpSettlementV3.address}`
+  );
+  subgraphConfig.iSharedMinterV0Contracts.push({
+    address: minterDAExpSettlementV3.address,
+  });
+  subgraphConfig.iSharedDAContracts.push({
+    address: minterDAExpSettlementV3.address,
+  });
+  subgraphConfig.iSharedDAExpContracts.push({
+    address: minterDAExpSettlementV3.address,
+  });
+  subgraphConfig.iSharedDAExpSettlementContracts = [
+    {
+      address: minterDAExpSettlementV3.address,
     },
   ];
 
@@ -383,6 +450,24 @@ async function main() {
     .approveMinterGlobally(minterSEAV1.address);
   console.log(
     `Allowlisted minterSEAV1 ${minterSEAV1.address} on minter filter.`
+  );
+  await minterFilter
+    .connect(deployer)
+    .approveMinterGlobally(minterDAExpV5.address);
+  console.log(
+    `Allowlisted minterDAExpV5 ${minterDAExpV5.address} on minter filter.`
+  );
+  await minterFilter
+    .connect(deployer)
+    .approveMinterGlobally(minterDALinV5.address);
+  console.log(
+    `Allowlisted minterDALinV5 ${minterDALinV5.address} on minter filter.`
+  );
+  await minterFilter
+    .connect(deployer)
+    .approveMinterGlobally(minterDAExpSettlementV3.address);
+  console.log(
+    `Allowlisted minterDAExpSettlementV3 ${minterDAExpSettlementV3.address} on minter filter.`
   );
 
   // add initial project to the core contract

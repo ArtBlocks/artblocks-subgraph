@@ -1,4 +1,4 @@
-import { BigInt, store } from "@graphprotocol/graph-ts";
+import { BigInt, store, log, Address } from "@graphprotocol/graph-ts";
 import {
   DependencyAdded,
   DependencyAdditionalCDNRemoved,
@@ -16,6 +16,7 @@ import {
   SupportedCoreContractRemoved,
   IDependencyRegistryV0
 } from "../generated/IDependencyRegistryV0/IDependencyRegistryV0";
+import { IDependencyRegistryV0_Legacy } from "../generated/IDependencyRegistryV0/IDependencyRegistryV0_Legacy";
 import { OwnershipTransferred } from "../generated/OwnableUpgradeable/OwnableUpgradeable";
 import { IDependencyRegistryCompatibleV0 } from "../generated/IDependencyRegistryV0/IDependencyRegistryCompatibleV0";
 import {
@@ -268,14 +269,59 @@ export function handleDependencyScriptUpdated(
 
   let scripts: string[] = [];
   for (let i = 0; i < scriptCount; i++) {
-    let script = dependencyRegistryContract.getDependencyScriptAtIndex(
+    // default to empty string, raise warnings if fail to get script
+    let script: string = "";
+    let result = dependencyRegistryContract.try_getDependencyScript(
       event.params._dependencyType,
       BigInt.fromI32(i)
     );
-    let scriptAddress = dependencyRegistryContract.getDependencyScriptBytecodeAddressAtIndex(
+    if (!result.reverted) {
+      script = result.value;
+    } else {
+      // view function used to have different name, try legacy name
+      let legacyResult = IDependencyRegistryV0_Legacy.bind(
+        event.address
+      ).try_getDependencyScriptAtIndex(
+        event.params._dependencyType,
+        BigInt.fromI32(i)
+      );
+      if (!legacyResult.reverted) {
+        script = legacyResult.value;
+      } else {
+        // log error because this is unexpected
+        log.error(
+          "[ERROR] Failed to load script for dependency type {}, on registry at address {}",
+          [event.params._dependencyType.toString(), event.address.toHexString()]
+        );
+      }
+    }
+
+    // default to zero address, raise warnings if fail to get address
+    let scriptAddress: Address = Address.zero();
+    let addressResult = dependencyRegistryContract.try_getDependencyScriptBytecodeAddress(
       event.params._dependencyType,
       BigInt.fromI32(i)
     );
+    if (!addressResult.reverted) {
+      scriptAddress = addressResult.value;
+    } else {
+      // view function used to have different name, try legacy name
+      let legacyAddressResult = IDependencyRegistryV0_Legacy.bind(
+        event.address
+      ).try_getDependencyScriptBytecodeAddressAtIndex(
+        event.params._dependencyType,
+        BigInt.fromI32(i)
+      );
+      if (!legacyAddressResult.reverted) {
+        scriptAddress = legacyAddressResult.value;
+      } else {
+        // log error because this is unexpected
+        log.error(
+          "[ERROR] Failed to load script bytecode address for dependency type {}, on registry at address {}",
+          [event.params._dependencyType.toString(), event.address.toHexString()]
+        );
+      }
+    }
 
     let dependencyScriptIndex = BigInt.fromI32(i);
     let dependencyScript = new DependencyScript(
