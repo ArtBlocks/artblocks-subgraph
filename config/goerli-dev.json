@@ -128,9 +128,14 @@
       "startBlock": 9602240
     },
     {
-      "address": "0xe3002BB7Bfd2ff61Ea1e9823e4723e4163C6BE72",
+      "address": "[bugged] 0xe3002BB7Bfd2ff61Ea1e9823e4723e4163C6BE72",
       "name": "Goerli dev shared minter: MinterDAExpSettlementV3",
       "startBlock": 9602240
+    },
+    {
+      "address": "0xffFf56434Eb696f51775eDC7c9472A4046053c97",
+      "name": "Goerli dev shared minter: MinterDAExpSettlementV3",
+      "startBlock": 9615257
     },
     {
       "address": "0xc0a94bE251af03db788dced955C534467e90EdB1",
@@ -189,9 +194,14 @@
       "startBlock": 9602240
     },
     {
-      "address": "0xe3002BB7Bfd2ff61Ea1e9823e4723e4163C6BE72",
+      "address": "[bugged] 0xe3002BB7Bfd2ff61Ea1e9823e4723e4163C6BE72",
       "name": "Goerli dev shared minter: MinterDAExpSettlementV3",
       "startBlock": 9602240
+    },
+    {
+      "address": "0xffFf56434Eb696f51775eDC7c9472A4046053c97",
+      "name": "Goerli dev shared minter: MinterDAExpSettlementV3",
+      "startBlock": 9615257
     },
     {
       "address": "0xc0a94bE251af03db788dced955C534467e90EdB1",
@@ -212,8 +222,13 @@
     },
     {
       "address": "0xe3002BB7Bfd2ff61Ea1e9823e4723e4163C6BE72",
-      "name": "Goerli dev shared minter: MinterDAExpSettlementV3",
+      "name": "[bugged] Goerli dev shared minter: MinterDAExpSettlementV3",
       "startBlock": 9602240
+    },
+    {
+      "address": "0xffFf56434Eb696f51775eDC7c9472A4046053c97",
+      "name": "Goerli dev shared minter: MinterDAExpSettlementV3",
+      "startBlock": 9615257
     },
     {
       "address": "0xc0a94bE251af03db788dced955C534467e90EdB1",
@@ -236,8 +251,13 @@
   "iSharedDAExpSettlementContracts": [
     {
       "address": "0xe3002BB7Bfd2ff61Ea1e9823e4723e4163C6BE72",
-      "name": "Goerli dev shared minter: MinterDAExpSettlementV3",
+      "name": "[bugged] Goerli dev shared minter: MinterDAExpSettlementV3",
       "startBlock": 9602240
+    },
+    {
+      "address": "0xffFf56434Eb696f51775eDC7c9472A4046053c97",
+      "name": "Goerli dev shared minter: MinterDAExpSettlementV3",
+      "startBlock": 9615257
     }
   ],
   "minterFilterV0Contracts": [
