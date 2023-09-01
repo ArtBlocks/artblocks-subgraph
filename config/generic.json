@@ -95,6 +95,11 @@
       "address": ""
     }
   ],
+  "iSharedDAExpSettlementContracts": [
+    {
+      "address": ""
+    }
+  ],
   "minterSetPriceContracts": [
     {
       "address": ""
