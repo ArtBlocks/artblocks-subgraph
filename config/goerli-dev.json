@@ -312,6 +312,11 @@
       "address": "0x4E7953E906E0eeC925fB9C4799336f3C931438F4",
       "name": "PRD2 deploy for core at 0xc648f9326F087b74e2157F1923743d5A65c1a2E6",
       "startBlock": 9562700
+    },
+    {
+      "address": "0x23c10E68c269A03246f5dF37335e148fE6B70c99",
+      "name": "DEVMIGRATEFLEX deploy for flex core at 0x46F341F90Eb308D62C8211607B87421756190b7F",
+      "startBlock": 9619870
     }
   ],
   "minterSetPriceContracts": [
