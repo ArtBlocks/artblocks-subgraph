@@ -401,6 +401,7 @@ export function addTestMinterFilterToStore(): MinterFilter {
   let minterFilter = new MinterFilter(TEST_MINTER_FILTER_ADDRESS.toHexString());
   minterFilter.coreRegistry = TEST_CONTRACT_ADDRESS.toHexString();
   minterFilter.updatedAt = CURRENT_BLOCK_TIMESTAMP.minus(BigInt.fromI32(10));
+  minterFilter.type = "MinterFilterV1";
   minterFilter.minterGlobalAllowlist = [];
   minterFilter.save();
 
