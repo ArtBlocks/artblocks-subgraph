@@ -1,0 +1,27 @@
+fragment ReceiptDetails on Receipt {
+  id
+  project {
+    id
+  }
+  minter {
+    id
+  }
+  account {
+    id
+  }
+  netPosted
+  numPurchased
+  updatedAt
+}
+
+query GetReceipts {
+  receipts {
+    ...ReceiptDetails
+  }
+}
+
+query GetTargetReceipts($targetId: ID!) {
+  receipts(where: { id: $targetId }) {
+    ...ReceiptDetails
+  }
+}

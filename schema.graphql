@@ -202,6 +202,8 @@ enum MinterFilterType {
   MinterFilterV1
   "IMinterFilterV1 includes minterFilterType function"
   MinterFilterV2
+  "unknown minter filter type"
+  UNKNOWN
 }
 
 type Contract @entity {

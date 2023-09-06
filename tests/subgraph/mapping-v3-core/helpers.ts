@@ -276,11 +276,15 @@ export function mockMinterUpdatedCallsNoPreconfiguredProjects(
     "getNumProjectsWithMinters():(uint256)"
   ).returns([ethereum.Value.fromI32(0)]);
 
+  // should handle unsupported minterFilterType function, since some legacy
+  // minter filters (including flagship MinterFilterV1) don't implement the
+  // function
+  // @dev shared minter types not needed, since e2e testing is used for those minters
   createMockedFunction(
     TEST_MINTER_FILTER_ADDRESS,
     "minterFilterType",
     "minterFilterType():(string)"
-  ).returns([ethereum.Value.fromString("MinterFilterV1")]);
+  ).reverts();
 }
 
 export function mockTokenURICall(tokenId: BigInt, tokenURI: string): void {

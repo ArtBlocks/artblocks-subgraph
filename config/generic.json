@@ -55,6 +55,51 @@
       "address": ""
     }
   ],
+  "sharedMinterFilterContracts": [
+    {
+      "address": ""
+    }
+  ],
+  "iSharedMinterV0Contracts": [
+    {
+      "address": ""
+    }
+  ],
+  "iSharedMerkleContracts": [
+    {
+      "address": ""
+    }
+  ],
+  "iSharedHolderContracts": [
+    {
+      "address": ""
+    }
+  ],
+  "iSharedSEAContracts": [
+    {
+      "address": ""
+    }
+  ],
+  "iSharedDAContracts": [
+    {
+      "address": ""
+    }
+  ],
+  "iSharedDAExpContracts": [
+    {
+      "address": ""
+    }
+  ],
+  "iSharedDALinContracts": [
+    {
+      "address": ""
+    }
+  ],
+  "iSharedDAExpSettlementContracts": [
+    {
+      "address": ""
+    }
+  ],
   "minterSetPriceContracts": [
     {
       "address": ""
@@ -110,7 +155,7 @@
       "address": ""
     }
   ],
-  "engineRegistryV0Contracts": [
+  "ICoreRegistryContracts": [
     {
       "address": ""
     }

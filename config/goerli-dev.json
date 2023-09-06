@@ -79,6 +79,187 @@
       "startBlock": 7630500
     }
   ],
+  "sharedMinterFilterContracts": [
+    {
+      "address": "0x6f333Fd0323B1dcfe67100690d0c0c16D66e0208",
+      "name": "Goerli dev shared minter filter contract",
+      "startBlock": 9602240
+    }
+  ],
+  "iSharedMinterV0Contracts": [
+    {
+      "address": "0x12b87e163aDDA0E3A08F6181eE7F95fb6CA7A558",
+      "name": "Goerli dev shared minter: MinterSetPriceV5",
+      "startBlock": 9602240
+    },
+    {
+      "address": "0x5e16d4493f70568dE483F80d47f33ae1cDbD1b78",
+      "name": "Goerli dev shared minter: MinterSetPriceERC20V5",
+      "startBlock": 9602240
+    },
+    {
+      "address": "0x8FF22d210Db7304214Ec99225fBab325bb0Aaf91",
+      "name": "Goerli dev shared minter: MinterSetPriceHolderV5",
+      "startBlock": 9602240
+    },
+    {
+      "address": "0x6cc81bAF5f9a2266B0BE1334588e246C3A79996A",
+      "name": "Goerli dev shared minter: MinterSetPriceMerkleV5",
+      "startBlock": 9602240
+    },
+    {
+      "address": "0xB6A24AFAE90bd3A61F0a15De030092a662B4BEd4",
+      "name": "Goerli dev shared minter: MinterSetPricePolyptychV5",
+      "startBlock": 9602240
+    },
+    {
+      "address": "0xD4c85aa7beE5B5A4541ba5c873A54879140F9A2c",
+      "name": "Goerli dev shared minter: MinterSetPricePolyptychERC20V5",
+      "startBlock": 9602240
+    },
+    {
+      "address": "0x35e5D5D74a7347989D4C1BA444b980FacA06EFeA",
+      "name": "Goerli dev shared minter: MinterDAExpV5",
+      "startBlock": 9602240
+    },
+    {
+      "address": "0x18bcD7F2b3c6904e6D2EAf0da3CC94C4E2ACb52c",
+      "name": "Goerli dev shared minter: MinterDALinV5",
+      "startBlock": 9602240
+    },
+    {
+      "address": "0xe3002BB7Bfd2ff61Ea1e9823e4723e4163C6BE72",
+      "name": "[bugged] Goerli dev shared minter: MinterDAExpSettlementV3",
+      "startBlock": 9602240
+    },
+    {
+      "address": "0xffFf56434Eb696f51775eDC7c9472A4046053c97",
+      "name": "Goerli dev shared minter: MinterDAExpSettlementV3",
+      "startBlock": 9615257
+    },
+    {
+      "address": "0xc0a94bE251af03db788dced955C534467e90EdB1",
+      "name": "Goerli dev shared minter: MinterDAExpHolderV5",
+      "startBlock": 9602240
+    },
+    {
+      "address": "0x2D9B947c1f1E36d7f881D415A44598Ed9ff15b65",
+      "name": "Goerli dev shared minter: MinterDALinHolderV5",
+      "startBlock": 9602240
+    }
+  ],
+  "iSharedMerkleContracts": [
+    {
+      "address": "0x6cc81bAF5f9a2266B0BE1334588e246C3A79996A",
+      "name": "Goerli dev shared minter: MinterSetPriceMerkleV5",
+      "startBlock": 9602240
+    }
+  ],
+  "iSharedHolderContracts": [
+    {
+      "address": "0x8FF22d210Db7304214Ec99225fBab325bb0Aaf91",
+      "name": "Goerli dev shared minter: MinterSetPriceHolderV5",
+      "startBlock": 9602240
+    },
+    {
+      "address": "0xB6A24AFAE90bd3A61F0a15De030092a662B4BEd4",
+      "name": "Goerli dev shared minter: MinterSetPricePolyptychV5",
+      "startBlock": 9602240
+    },
+    {
+      "address": "0xD4c85aa7beE5B5A4541ba5c873A54879140F9A2c",
+      "name": "Goerli dev shared minter: MinterSetPricePolyptychERC20V5",
+      "startBlock": 9602240
+    },
+    {
+      "address": "0xc0a94bE251af03db788dced955C534467e90EdB1",
+      "name": "Goerli dev shared minter: MinterDAExpHolderV5",
+      "startBlock": 9602240
+    },
+    {
+      "address": "0x2D9B947c1f1E36d7f881D415A44598Ed9ff15b65",
+      "name": "Goerli dev shared minter: MinterDALinHolderV5",
+      "startBlock": 9602240
+    }
+  ],
+  "iSharedDAContracts": [
+    {
+      "address": "0x35e5D5D74a7347989D4C1BA444b980FacA06EFeA",
+      "name": "Goerli dev shared minter: MinterDAExpV5",
+      "startBlock": 9602240
+    },
+    {
+      "address": "0x18bcD7F2b3c6904e6D2EAf0da3CC94C4E2ACb52c",
+      "name": "Goerli dev shared minter: MinterDALinV5",
+      "startBlock": 9602240
+    },
+    {
+      "address": "0xe3002BB7Bfd2ff61Ea1e9823e4723e4163C6BE72",
+      "name": "[bugged] Goerli dev shared minter: MinterDAExpSettlementV3",
+      "startBlock": 9602240
+    },
+    {
+      "address": "0xffFf56434Eb696f51775eDC7c9472A4046053c97",
+      "name": "Goerli dev shared minter: MinterDAExpSettlementV3",
+      "startBlock": 9615257
+    },
+    {
+      "address": "0xc0a94bE251af03db788dced955C534467e90EdB1",
+      "name": "Goerli dev shared minter: MinterDAExpHolderV5",
+      "startBlock": 9602240
+    },
+    {
+      "address": "0x2D9B947c1f1E36d7f881D415A44598Ed9ff15b65",
+      "name": "Goerli dev shared minter: MinterDALinHolderV5",
+      "startBlock": 9602240
+    }
+  ],
+  "iSharedDAExpContracts": [
+    {
+      "address": "0x35e5D5D74a7347989D4C1BA444b980FacA06EFeA",
+      "name": "Goerli dev shared minter: MinterDAExpV5",
+      "startBlock": 9602240
+    },
+    {
+      "address": "0xe3002BB7Bfd2ff61Ea1e9823e4723e4163C6BE72",
+      "name": "[bugged] Goerli dev shared minter: MinterDAExpSettlementV3",
+      "startBlock": 9602240
+    },
+    {
+      "address": "0xffFf56434Eb696f51775eDC7c9472A4046053c97",
+      "name": "Goerli dev shared minter: MinterDAExpSettlementV3",
+      "startBlock": 9615257
+    },
+    {
+      "address": "0xc0a94bE251af03db788dced955C534467e90EdB1",
+      "name": "Goerli dev shared minter: MinterDAExpHolderV5",
+      "startBlock": 9602240
+    }
+  ],
+  "iSharedDALinContracts": [
+    {
+      "address": "0x18bcD7F2b3c6904e6D2EAf0da3CC94C4E2ACb52c",
+      "name": "Goerli dev shared minter: MinterDALinV5",
+      "startBlock": 9602240
+    },
+    {
+      "address": "0x2D9B947c1f1E36d7f881D415A44598Ed9ff15b65",
+      "name": "Goerli dev shared minter: MinterDALinHolderV5",
+      "startBlock": 9602240
+    }
+  ],
+  "iSharedDAExpSettlementContracts": [
+    {
+      "address": "0xe3002BB7Bfd2ff61Ea1e9823e4723e4163C6BE72",
+      "name": "[bugged] Goerli dev shared minter: MinterDAExpSettlementV3",
+      "startBlock": 9602240
+    },
+    {
+      "address": "0xffFf56434Eb696f51775eDC7c9472A4046053c97",
+      "name": "Goerli dev shared minter: MinterDAExpSettlementV3",
+      "startBlock": 9615257
+    }
+  ],
   "minterFilterV0Contracts": [
     {
       "address": "0x7c4FB14F0c020109cB95A9B92BC4c8267C421Cc4",
@@ -121,6 +302,21 @@
       "address": "0x19254c1226Dbb83EC08Ab07Ba0B5c3994792D9D8",
       "name": "Minter Filter for Weekly Wins Core (used for testing) at 0x4A185f9A8ee3d247fD564407658602228a8de265",
       "startBlock": 8591101
+    },
+    {
+      "address": "0x3318083274EEa571719e1385a73b7a15aAf374c8",
+      "name": "PRD deploy for core at 0x6A709B53e900036ecc8d6F4BEdE58c1E2dC97cff",
+      "startBlock": 9562700
+    },
+    {
+      "address": "0x4E7953E906E0eeC925fB9C4799336f3C931438F4",
+      "name": "PRD2 deploy for core at 0xc648f9326F087b74e2157F1923743d5A65c1a2E6",
+      "startBlock": 9562700
+    },
+    {
+      "address": "0x23c10E68c269A03246f5dF37335e148fE6B70c99",
+      "name": "DEVMIGRATEFLEX deploy for flex core at 0x46F341F90Eb308D62C8211607B87421756190b7F",
+      "startBlock": 9619870
     }
   ],
   "minterSetPriceContracts": [
@@ -168,6 +364,21 @@
       "address": "0x2cf1978Cf9C66Ac98a9cb0259b9F4Ca51aF149f1",
       "name": "V4 Minter for V3 core",
       "startBlock": 8591102
+    },
+    {
+      "address": "0x0545Bc606cbB33E96329Ac3F828a55aba91ef30B",
+      "name": "V4 Minter for V3 core, PRD",
+      "startBlock": 9562700
+    },
+    {
+      "address": "0x291cBD610fB1ba4186c7d99667e43D862EB0664e",
+      "name": "V4 Minter for V3 core, PRD2",
+      "startBlock": 9562700
+    },
+    {
+      "address": "0x9cDe518fDC34e76f9CaC602EA37dB1eD2CBB12dd",
+      "name": "V4 Minter for V3 Flex Core, DEVMIGRATEFLEX",
+      "startBlock": 9619873
     }
   ],
   "minterSetPriceERC20Contracts": [
@@ -200,6 +411,16 @@
       "address": "0xAF96E72FF6896B35c54b76Be9E248F01D5487397",
       "name": "V4 Flagship Minter for V3 core",
       "startBlock": 8655367
+    },
+    {
+      "address": "0x9f16eF13b59f3f404ac98396EEee00457B5A5688",
+      "name": "V4 Flagship Minter for V3 core, PRD",
+      "startBlock": 9562700
+    },
+    {
+      "address": "0x3ce6180b0dd2dFad890Cb334a66AAE19Aea91b53",
+      "name": "V4 Flagship Minter for V3 core, PRD2",
+      "startBlock": 9562700
     }
   ],
   "minterDAExpContracts": [
@@ -232,6 +453,16 @@
       "address": "0x9FF63446D56C608252fB8CB5772C849860843A46",
       "name": "V4 Flagship Minter for V3 core",
       "startBlock": 8655360
+    },
+    {
+      "address": "0x779a4e995BcEAA209894dea02bfd349f398de05e",
+      "name": "V4 Minter for V3 core, PRD",
+      "startBlock": 9562700
+    },
+    {
+      "address": "0xf049BFa1B45A6243cC20b8fc19d31daA4b21baE2",
+      "name": "V4 Minter for V3 core, PRD2",
+      "startBlock": 9562700
     }
   ],
   "minterDALinContracts": [
@@ -269,6 +500,16 @@
       "address": "0xD4c7f56b6e530f47DEADdfD92fD70Ac84345bEc3",
       "name": "V4 Minter for V3 core",
       "startBlock": 9216416
+    },
+    {
+      "address": "0x9B6Cd3b5C98ae2975474165241C4afAc8D190B10",
+      "name": "V4 Minter for V3 core, PRD",
+      "startBlock": 9562700
+    },
+    {
+      "address": "0x90BFa682f393d3E3F7f62b56971dF6B232f6da40",
+      "name": "V4 Minter for V3 core, PRD2",
+      "startBlock": 9562700
     }
   ],
   "minterDAExpSettlementContracts": [
@@ -296,6 +537,21 @@
       "address": "0xf1A6EF1FA55AbF58fC801109D622A0b68E142bF0",
       "name": "V1 Minter for V3 core",
       "startBlock": 8591103
+    },
+    {
+      "address": "0x9d6744cB65E63346839765C3F1516388AbB20B4E",
+      "name": "V1 Minter for V3 core, PRD",
+      "startBlock": 9562700
+    },
+    {
+      "address": "0x4ceCB118d7ea18B597b56b272b918bdDCf4cE347",
+      "name": "V1 Minter for V3 core, PRD2",
+      "startBlock": 9562700
+    },
+    {
+      "address": "0xb1E1db1d10Db273971AF80658d368AD41c07399F",
+      "name": "V1 Minter for V3 flex core, DEVMIGRATEFLEX",
+      "startBlock": 9619875
     }
   ],
   "minterMerkleContracts": [
@@ -343,6 +599,16 @@
       "address": "0xBC6C0c6cF8Fc7939880EB2243681Ad6507dea169",
       "name": "V5 Flagship Minter for V3 core",
       "startBlock": 8655365
+    },
+    {
+      "address": "0xd968F90ed0DaA4040EA783E93bD8E6B7ef077cBB",
+      "name": "V5 Minter for V3 core, PRD",
+      "startBlock": 9562700
+    },
+    {
+      "address": "0x43B2249764BF6D797D4A320996bCe882238a2cce",
+      "name": "V5 Minter for V3 core, PRD2",
+      "startBlock": 9562700
     }
   ],
   "minterHolderContracts": [
@@ -380,6 +646,16 @@
       "address": "0x64df8D9f818bCf0e74AF4EC9a98fb94D8d5E1513",
       "name": "V4 Flagship Minter for V3 core",
       "startBlock": 8655364
+    },
+    {
+      "address": "0xa18C38daD4fcbd48623df2BB461cb213E0278E53",
+      "name": "V4 Minter for V3 core, PRD",
+      "startBlock": 9562700
+    },
+    {
+      "address": "0x3e3BcaAd087BaE0dc41d7C3dece0b50ef3a6d315",
+      "name": "V4 Minter for V3 core, PRD2",
+      "startBlock": 9562700
     }
   ],
   "minterSEAContracts": [
@@ -409,13 +685,28 @@
       "address": "0x8CD0035E53816EED79aA96aB1442114400731D74",
       "name": "Dev Test C AdminACLV1 (cast as AdminACLV0 is okay)",
       "startBlock": 8458567
+    },
+    {
+      "address": "0xBE77D57D04B85F7d9741d8149675D9bA7358f5A0",
+      "name": "AdminACLV1 (cast as AdminACLV0 is okay), PRD",
+      "startBlock": 9562700
+    },
+    {
+      "address": "0x60c836BF93eBe6DeD82f49B216247841149A021c",
+      "name": "AdminACLV1 (cast as AdminACLV0 is okay), PRD2",
+      "startBlock": 9562700
     }
   ],
-  "engineRegistryV0Contracts": [
+  "ICoreRegistryContracts": [
     {
       "address": "0x2A39132E8d594d2c840D6656327fB26d900C05bA",
       "name": "Goerli dev engine registry contract, AB Dev Wallet as Deployer",
       "startBlock": 8407450
+    },
+    {
+      "address": "0x851881841ccb932D4eEe46Fb995c04e6E335986E",
+      "name": "Shared Goerli dev engine registry contract, AB Dev Wallet as Deployer",
+      "startBlock": 9602240
     }
   ],
   "iDependencyRegistryV0Contracts": [
