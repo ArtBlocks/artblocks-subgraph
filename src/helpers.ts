@@ -14,17 +14,28 @@ import { IFilteredMinterV2 } from "../generated/MinterSetPrice/IFilteredMinterV2
 import {
   Minter,
   ProjectMinterConfiguration,
+  Project,
   Account,
   Whitelisting,
   Receipt,
   MinterFilter,
   CoreRegistry
 } from "../generated/schema";
+
+import { IMinterFilterV1 } from "../generated/SharedMinterFilter/IMinterFilterV1";
 import { IFilteredMinterDALinV1 } from "../generated/MinterDALin/IFilteredMinterDALinV1";
 import { IFilteredMinterDAExpV1 } from "../generated/MinterDAExp/IFilteredMinterDAExpV1";
 
 import { setMinterExtraMinterDetailsValue } from "./extra-minter-details-helpers";
 import { createTypedMapFromJSONString } from "./json";
+
+import { KNOWN_MINTER_FILTER_TYPES } from "./constants";
+
+export class MinterProjectAndConfig {
+  minter: Minter;
+  project: Project;
+  projectMinterConfiguration: ProjectMinterConfiguration;
+}
 
 export function generateProjectExternalAssetDependencyId(
   projectId: string,
@@ -45,6 +56,13 @@ export function generateWhitelistingId(
   accountId: string
 ): string {
   return contractId + "-" + accountId;
+}
+
+export function generateMinterFilterContractAllowlistId(
+  minterFilterContractAddress: string,
+  coreContractAddress: string
+): string {
+  return minterFilterContractAddress + "-" + coreContractAddress;
 }
 
 export function generateProjectIdNumberFromTokenIdNumber(
@@ -165,6 +183,199 @@ export function loadOrCreateReceipt(
   return receipt;
 }
 
+/**
+ * Helper function to load or create a shared minter filter.
+ * Assumes:
+ *  - the minter filter conforms to IMinterFilterV1 when creating a new minter
+ * filter.
+ *  - the minterGlobalAllowlist is empty when initializing a new minter filter
+ * @returns MinterFilter entity (either loaded or created)
+ */
+export function loadOrCreateSharedMinterFilter(
+  minterFilterAddress: Address,
+  timestamp: BigInt
+): MinterFilter {
+  let minterFilter = MinterFilter.load(minterFilterAddress.toHexString());
+  if (minterFilter) {
+    return minterFilter;
+  }
+  // target MinterFilter was not in store, so create new one
+  minterFilter = new MinterFilter(minterFilterAddress.toHexString());
+  minterFilter.minterGlobalAllowlist = [];
+  // safely retrieve the core registry address from the minter filter
+  let minterFilterContract = IMinterFilterV1.bind(minterFilterAddress);
+  const coreRegistryResult = minterFilterContract.try_coreRegistry();
+  let coreRegistryAddress: Address;
+  if (coreRegistryResult.reverted) {
+    // unexpected minter filter behavior - log a warning, and assign to a dummy
+    // core registry at zero address
+    log.warning(
+      "[WARN] Could not load core registry on MinterFilter contract at address {}, so set core registry to null address on entity.",
+      [minterFilterAddress.toHexString()]
+    );
+    coreRegistryAddress = Address.zero();
+  } else {
+    coreRegistryAddress = coreRegistryResult.value;
+  }
+  // load or create the core registry entity, and assign to the minter filter
+  const coreRegistry = loadOrCreateCoreRegistry(coreRegistryAddress);
+  minterFilter.coreRegistry = coreRegistry.id;
+
+  // populate minter filter type
+  // @dev we try to interact with the minter filter as if it conforms to
+  // IMinterFilterV1, which has a `minterFilterType` function
+  const minterFilterTypeResult = minterFilterContract.try_minterFilterType();
+  if (minterFilterTypeResult.reverted) {
+    // unexpected minter filter behavior - log a warning, and assume the type
+    // is UNKNOWN
+    log.warning(
+      "[WARN] Unexpectedly could not load minter filter type on MinterFilter contract at address {}, so set minter filter type to UNKNOWN.",
+      [minterFilterAddress.toHexString()]
+    );
+    minterFilter.type = "UNKNOWN";
+  } else {
+    // validate the returned type is in the enum of valid minter filter types
+    if (KNOWN_MINTER_FILTER_TYPES.includes(minterFilterTypeResult.value)) {
+      minterFilter.type = minterFilterTypeResult.value;
+    } else {
+      // unknown minter filter type - log a warning, and label the MinterFilter as UNKNOWN
+      log.warning(
+        "[WARN] Minter filter type on MinterFilter contract at address {} is not an expected minter filter type, so set minter filter type to UNKNOWN.",
+        [minterFilterAddress.toHexString()]
+      );
+      minterFilter.type = "UNKNOWN";
+    }
+  }
+
+  minterFilter.updatedAt = timestamp;
+  minterFilter.save();
+
+  return minterFilter;
+}
+
+/**
+ * helper function that loads or creates a CoreRegistry entity in the store.
+ * @param address core registry address
+ * @returns CoreRegistry entity (either loaded or created)
+ */
+export function loadOrCreateCoreRegistry(address: Address): CoreRegistry {
+  let coreRegistry = CoreRegistry.load(address.toHexString());
+  if (coreRegistry) {
+    return coreRegistry;
+  }
+  coreRegistry = new CoreRegistry(address.toHexString());
+  coreRegistry.save();
+  return coreRegistry;
+}
+
+/**
+ * Loads or creates a ProjectMinterConfiguration entity for the given project
+ * and minter, and sets the project's minter configuration to the new or
+ * existing ProjectMinterConfiguration entity.
+ * Updates the project's updatedAt to the timestamp, and saves entity.
+ * @dev this is intended to support legacy and shared minter filters/minters
+ * @param project
+ * @param minter
+ * @param timestamp
+ * @returns
+ */
+export function loadOrCreateAndSetProjectMinterConfiguration(
+  project: Project,
+  minter: Minter,
+  timestamp: BigInt
+): ProjectMinterConfiguration {
+  const projectMinterConfig = loadOrCreateProjectMinterConfiguration(
+    project,
+    minter
+  );
+
+  // update the project's minter configuration
+  project.updatedAt = timestamp;
+  project.minterConfiguration = projectMinterConfig.id;
+  project.save();
+
+  return projectMinterConfig;
+}
+
+/**
+ * Loads or creates a ProjectMinterConfiguration entity for the given project
+ * and minter.
+ * If a new ProjectMinterConfiguration entity is created, it is assumed that
+ * the minter is not pre-configured, and the price is not configured.
+ * The project's updatedAt is not updated, and the project is not saved.
+ * @param project The project entity
+ * @param minter The minter entity
+ * @returns
+ */
+export function loadOrCreateProjectMinterConfiguration(
+  project: Project,
+  minter: Minter
+): ProjectMinterConfiguration {
+  const targetProjectMinterConfigId = getProjectMinterConfigId(
+    minter.id,
+    project.id
+  );
+
+  let projectMinterConfig = ProjectMinterConfiguration.load(
+    targetProjectMinterConfigId
+  );
+
+  if (!projectMinterConfig) {
+    // create new project minter config that assumes no pre-configuring
+    // @dev if minter data source templates are used, the no pre-configuring
+    // assumption must be revisited
+    projectMinterConfig = new ProjectMinterConfiguration(
+      targetProjectMinterConfigId
+    );
+    projectMinterConfig.project = project.id;
+    projectMinterConfig.minter = minter.id;
+    projectMinterConfig.priceIsConfigured = false;
+    projectMinterConfig.currencySymbol = "ETH";
+    projectMinterConfig.currencyAddress = Address.zero();
+    projectMinterConfig.purchaseToDisabled = false;
+    projectMinterConfig.extraMinterDetails = "{}";
+    projectMinterConfig.save();
+  }
+  return projectMinterConfig;
+}
+
+// util method to check if a minter is a legacy DALin minter
+function isLegacyMinterDALin(minterType: string): boolean {
+  return (
+    minterType.startsWith("MinterDALin") &&
+    (minterType.endsWith("V0") ||
+      minterType.endsWith("V1") ||
+      minterType.endsWith("V2") ||
+      minterType.endsWith("V3") ||
+      minterType.endsWith("V4"))
+    // @dev V5+ is a shared, non-legacy minter
+  );
+}
+
+// util method to check if a minter is a legacy DAExp minter
+function isLegacyMinterDAExp(minterType: string): boolean {
+  if (minterType.startsWith("MinterDAExpSettlement")) {
+    // DAExpSettlement minters are legacy if they are V0, V1, or V2
+    return (
+      minterType.endsWith("V0") ||
+      minterType.endsWith("V1") ||
+      minterType.endsWith("V2")
+    );
+  }
+  // DAExp minters are legacy if they are V0, V1, V2, V3, or V4
+  return (
+    minterType.startsWith("MinterDAExp") &&
+    (minterType.endsWith("V0") ||
+      minterType.endsWith("V1") ||
+      minterType.endsWith("V2") ||
+      minterType.endsWith("V3") ||
+      minterType.endsWith("V4"))
+    // @dev V5+ is a shared, non-legacy minter
+  );
+}
+
+// @dev this is intended to work with legacy (non-shared) and new (shared)
+// minters
 export function loadOrCreateMinter(
   minterAddress: Address,
   timestamp: BigInt
@@ -184,9 +395,23 @@ export function loadOrCreateMinter(
   let filteredMinterContract = IFilteredMinterV2.bind(minterAddress);
 
   // values assigned in contract constructors
-  minter.minterFilter = filteredMinterContract
-    .minterFilterAddress()
-    .toHexString();
+  // @dev safely retrieve value, gracefully handle if it reverts
+  const minterFilterResult = filteredMinterContract.try_minterFilterAddress();
+  if (minterFilterResult.reverted) {
+    // if minterFilterAddress() reverts, then the minter is not as expected and
+    // we log warning, and assign to dummy MinterFilter entity at zero address
+    log.warning(
+      "[WARN] Minter at {} does not have a valid minter filter address",
+      [minterAddress.toHexString()]
+    );
+    const dummyMinterFilter = loadOrCreateSharedMinterFilter(
+      Address.zero(),
+      timestamp
+    );
+    minter.minterFilter = dummyMinterFilter.id;
+  } else {
+    minter.minterFilter = minterFilterResult.value.toHexString();
+  }
   minter.extraMinterDetails = "{}";
   // by default, we assume the minter is not allowlisted on its MinterFilter during
   // initialization, and we let the MinterFilter entity handle the allowlisting
@@ -202,14 +427,15 @@ export function loadOrCreateMinter(
   if (!minterType.reverted) {
     minter.type = minterType.value;
     // populate any minter-specific values
-    if (minter.type.startsWith("MinterDALin")) {
+    if (isLegacyMinterDALin(minterType.value)) {
+      // only do this for legacy minters, because the new minters emit events
       const contract = IFilteredMinterDALinV1.bind(minterAddress);
       setMinterExtraMinterDetailsValue(
         "minimumAuctionLengthInSeconds",
         contract.minimumAuctionLengthSeconds(),
         minter
       );
-    } else if (minter.type.startsWith("MinterDAExp")) {
+    } else if (isLegacyMinterDAExp(minterType.value)) {
       const contract = IFilteredMinterDAExpV1.bind(minterAddress);
       setMinterExtraMinterDetailsValue(
         "minimumHalfLifeInSeconds",
@@ -275,4 +501,65 @@ export function getCoreContractAddressFromLegacyMinterFilter(
   // in the case of non-shared minterFilter, we may assume that the id of
   // the dummy core registry is the single "registered" core contract address
   return Address.fromString(minterFilter.coreRegistry);
+}
+
+/**
+ * This updates the project's updatedAt if the projectMinterConfig is the
+ * active minter configuration for the project.
+ * This is a common pattern when a project minter configuration is updated,
+ * the project's updatedAt should be updated to induce a sync, but only if the
+ * project minter configuration is the active minter configuration for the
+ * project.
+ * @param project Project entity
+ * @param projectMinterConfig ProjectMinterConfiguration entity
+ * @param timestamp Timestamp to set the project's updatedAt to, if the
+ * projectMinterConfig is the active minter configuration for the project
+ */
+export function updateProjectIfMinterConfigIsActive(
+  project: Project,
+  projectMinterConfig: ProjectMinterConfiguration,
+  timestamp: BigInt
+): void {
+  if (project.minterConfiguration == projectMinterConfig.id) {
+    project.updatedAt = timestamp;
+    project.save();
+  }
+}
+
+/**
+ * Calculates the total auction time for an exponential Dutch auction.
+ * @param startPrice The starting price of the auction.
+ * @param basePrice The base price of the auction.
+ * @param halfLifeSeconds The half life of the auction.
+ * @returns The total auction time in seconds.
+ **/
+export function getTotalDAExpAuctionTime(
+  startPrice: BigInt,
+  basePrice: BigInt,
+  halfLifeSeconds: BigInt
+): BigInt {
+  const startPriceFloatingPoint = startPrice.toBigDecimal();
+  const basePriceFloatingPoint = basePrice.toBigDecimal();
+  const priceRatio: f64 = Number.parseFloat(
+    startPriceFloatingPoint.div(basePriceFloatingPoint).toString()
+  );
+  const completedHalfLives = BigInt.fromString(
+    u8(Math.floor(Math.log(priceRatio) / Math.log(2))).toString()
+  );
+  // @dev max possible completedHalfLives is 255 due to on-chain use of uint256,
+  // so this is safe
+  const completedHalfLivesU8: u8 = u8(
+    Number.parseInt(completedHalfLives.toString())
+  );
+  const x1 = completedHalfLives.times(halfLifeSeconds);
+  const x2 = x1.plus(halfLifeSeconds);
+  const y1 = startPrice.div(BigInt.fromI32(2).pow(completedHalfLivesU8));
+  const y2 = y1.div(BigInt.fromI32(2));
+  const totalAuctionTime = x1.plus(
+    x2
+      .minus(x1)
+      .times(basePrice.minus(y1))
+      .div(y2.minus(y1))
+  );
+  return totalAuctionTime;
 }

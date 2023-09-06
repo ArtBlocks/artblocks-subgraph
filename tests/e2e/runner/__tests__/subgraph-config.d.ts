@@ -12,6 +12,7 @@ export type SubgraphConfig = Partial<{
   engineFlexContracts: { address: string }[];
   minterFilterV0Contracts: { address: string }[];
   minterFilterV1Contracts: { address: string }[];
+  sharedMinterFilterContracts: { address: string }[];
   minterSetPriceContracts: { address: string }[];
   minterSetPriceERC20Contracts: { address: string }[];
   minterDAExpContracts: { address: string }[];
@@ -22,5 +23,19 @@ export type SubgraphConfig = Partial<{
   adminACLV0Contracts: { address: string }[];
   iDependencyRegistryV0Contracts: { address: string }[];
   ownableUpgradeableDependencyRegistryContracts: { address: string }[];
-  engineRegistryV0Contracts: { address: string }[];
+  ICoreRegistryContracts: { address: string }[];
+  iSharedMinterV0Contracts: { address: string }[];
+  iSharedMerkleContracts: { address: string }[];
+  iSharedHolderContracts: { address: string }[];
+  iSharedSEAContracts: { address: string }[];
+  iSharedDAContracts: { address: string }[];
+  iSharedDAExpContracts: { address: string }[];
+  iSharedDALinContracts: { address: string }[];
+  iSharedDAExpSettlementContracts: { address: string }[];
+  metadata: {
+    minterFilterAdminACLAddress: string;
+    coreRegistryAddress: string;
+    bytecodeStorageReaderAddress: string;
+    delegationRegistryAddress: string;
+  };
 }>;

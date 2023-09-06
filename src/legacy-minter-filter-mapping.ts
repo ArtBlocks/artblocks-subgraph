@@ -28,7 +28,7 @@ import {
 
 import {
   generateContractSpecificId,
-  getProjectMinterConfigId,
+  loadOrCreateAndSetProjectMinterConfiguration,
   loadOrCreateMinter,
   getCoreContractAddressFromLegacyMinterFilter
 } from "./helpers";
@@ -103,9 +103,10 @@ export function handleIsCanonicalMinterFilter(
     );
 
     if (project) {
+      const minter = loadOrCreateMinter(minterAddress, event.block.timestamp);
       loadOrCreateAndSetProjectMinterConfiguration(
         project,
-        minterAddress,
+        minter,
         event.block.timestamp
       );
     }
@@ -234,11 +235,9 @@ export function handleProjectMinterRegistered(
 
   if (project) {
     // Create project configuration
-    let minterAddress = event.params._minterAddress;
-
     loadOrCreateAndSetProjectMinterConfiguration(
       project,
-      minterAddress,
+      minter,
       event.block.timestamp
     );
   }
@@ -279,44 +278,6 @@ export function handleProjectMinterRemoved(event: ProjectMinterRemoved): void {
   }
 }
 
-export function loadOrCreateAndSetProjectMinterConfiguration(
-  project: Project,
-  minterAddress: Address,
-  timestamp: BigInt
-): ProjectMinterConfiguration {
-  // Bootstrap minter if it doesn't exist already
-  loadOrCreateMinter(minterAddress, timestamp);
-
-  const targetProjectMinterConfigId = getProjectMinterConfigId(
-    minterAddress.toHexString(),
-    project.id
-  );
-
-  let projectMinterConfig = ProjectMinterConfiguration.load(
-    targetProjectMinterConfigId
-  );
-
-  if (!projectMinterConfig) {
-    projectMinterConfig = new ProjectMinterConfiguration(
-      targetProjectMinterConfigId
-    );
-    projectMinterConfig.project = project.id;
-    projectMinterConfig.minter = minterAddress.toHexString();
-    projectMinterConfig.priceIsConfigured = false;
-    projectMinterConfig.currencySymbol = "ETH";
-    projectMinterConfig.currencyAddress = Address.zero();
-    projectMinterConfig.purchaseToDisabled = false;
-    projectMinterConfig.extraMinterDetails = "{}";
-    projectMinterConfig.save();
-  }
-
-  project.updatedAt = timestamp;
-  project.minterConfiguration = projectMinterConfig.id;
-  project.save();
-
-  return projectMinterConfig;
-}
-
 // Helper function to load or create a minter filter.
 // Assumes that the minterGlobalAllowlist is empty when initializing a new minter
 // filter.
@@ -335,7 +296,18 @@ export function loadOrCreateMinterFilter(
   // @dev this is a trick to avoid having to create a nullable field to store
   // the associated core contract address on the dummy core registry or
   // minter filter.
-  let coreContractAddress = minterFilterContract.genArt721CoreAddress();
+  // @dev safely try/catch this, reverting to dummy core address of zero address
+  // if the call fails
+  let coreContractAddress = Address.zero(); // default value
+  const coreContractAddressResult = minterFilterContract.try_genArt721CoreAddress();
+  if (coreContractAddressResult.reverted) {
+    log.warning(
+      "[WARN] Legacy MinterFilter event handler was emitted by MinterFilter at {} that doesn't support function genArt721CoreAddress().",
+      [minterFilterAddress.toHexString()]
+    );
+  } else {
+    coreContractAddress = coreContractAddressResult.value;
+  }
   const coreRegistry = getOrCreateDummyCoreRegistryForLegacyMinterFilter(
     coreContractAddress.toHexString(),
     timestamp

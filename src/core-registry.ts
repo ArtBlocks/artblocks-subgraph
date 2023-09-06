@@ -1,4 +1,4 @@
-import { BigInt, store, log, Address, Bytes } from "@graphprotocol/graph-ts";
+import { Address, log } from "@graphprotocol/graph-ts";
 
 import { refreshContractAtAddress } from "./mapping-v3-core";
 
@@ -14,13 +14,13 @@ import {
 import {
   ContractRegistered,
   ContractUnregistered
-} from "../generated/EngineRegistryV0/IEngineRegistryV0";
+} from "../generated/CoreRegistry/ICoreRegistryV1";
 
 import { Ownable } from "../generated/OwnableGenArt721CoreV3Contract/Ownable";
 
 /*** EVENT HANDLERS ***/
 // Registered contracts are tracked dynamically, and the contract's `registeredOn`
-// field is set to this engine registry.
+// field is set to this core registry.
 export function handleContractRegistered(event: ContractRegistered): void {
   // ensure an engine registry entity exists
   loadOrCreateCoreRegistry(event.address);
@@ -39,13 +39,23 @@ export function handleContractRegistered(event: ContractRegistered): void {
     // also track the new contract's Admin ACL contract to enable indexing if admin changes
     // @dev for V3 core contracts, the admin acl contract is the core contract's owner
     const ownableV3Core = Ownable.bind(coreAddress);
-    const adminACLAddress = ownableV3Core.owner();
-    AdminACLV0_Template.create(adminACLAddress);
+    const adminACLAddressResult = ownableV3Core.try_owner();
+    if (adminACLAddressResult.reverted) {
+      // @dev this should never happen, but if it does, we should not create the Admin ACL template
+      log.warning(
+        "[WARN] V3 Core Contract at address {} does not implement owner() function.",
+        [ownableV3Core._address.toHexString()]
+      );
+      return;
+    } else {
+      const adminACLAddress = adminACLAddressResult.value;
+      AdminACLV0_Template.create(adminACLAddress);
+    }
     // refresh contract
     refreshContractAtAddress(coreAddress, event.block.timestamp);
   }
-  // set this engine registry as the contract's registeredOn field
-  // @dev this will overwrite the previous engine registry if the contract
+  // set this core registry as the contract's registeredOn field
+  // @dev this will overwrite the previous core registry if the contract
   // was previously not in store
   let contractEntityReload = Contract.load(coreAddress.toHexString());
   if (contractEntityReload) {
@@ -80,9 +90,9 @@ function loadOrCreateCoreRegistry(address: Address): CoreRegistry {
   let coreRegistryEntity = CoreRegistry.load(address.toHexString());
   if (!coreRegistryEntity) {
     coreRegistryEntity = new CoreRegistry(address.toHexString());
-    // initialize the engine registry's registered contracts array
+    // initialize the core registry's registered contracts array
     // must assume empty, since not enumerable mapping in the contract
-    // @dev this means we must track engine registry contract events
+    // @dev this means we must track core registry contract events
     // immendiatly after deployment to ensure we have a complete list
     // of registered contracts
     coreRegistryEntity.save();
