@@ -190,11 +190,25 @@ function handleSetValueProjectMinterConfig<EventType>(event: EventType): void {
   }
 
   const projectMinterConfig = minterProjectAndConfig.projectMinterConfiguration;
-  setProjectMinterConfigExtraMinterDetailsValue(
-    event.params._key.toString(),
-    event.params._value,
-    projectMinterConfig
-  );
+  const key = event.params._key.toString();
+  if (
+    event instanceof ConfigValueSetBigInt &&
+    (key.includes("price") || key.includes("Price"))
+  ) {
+    // always convert BigInt price values to strings to avoid js numeric overflow
+    setProjectMinterConfigExtraMinterDetailsValue(
+      key,
+      event.params._value.toString(), // <--- convert to string
+      projectMinterConfig
+    );
+  } else {
+    // default: do not convert to a string
+    setProjectMinterConfigExtraMinterDetailsValue(
+      key,
+      event.params._value,
+      projectMinterConfig
+    );
+  }
 
   // induce sync if the project minter configuration is the active one
   updateProjectIfMinterConfigIsActive(
