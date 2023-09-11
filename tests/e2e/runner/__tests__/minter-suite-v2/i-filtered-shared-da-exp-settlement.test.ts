@@ -22,8 +22,10 @@ import { Logger } from "@ethersproject/logger";
 Logger.setLogLevel(Logger.levels.ERROR);
 
 // waiting for subgraph to sync can take longer than the default 5s timeout
-// @dev specifically for this test, we need to wait for auction to complete, so need extra time
-jest.setTimeout(75 * 1000);
+// @dev specifically for this test, we need to wait for auction to complete, which is half of 45-second min half life
+// length = 22.5 seconds, plus 6 buffer seconds for the auction to start ~=30 seconds,
+// times 2 margin since this is just a timeout = 60 seconds timeout
+jest.setTimeout(60 * 1000);
 
 const config = getSubgraphConfig();
 
