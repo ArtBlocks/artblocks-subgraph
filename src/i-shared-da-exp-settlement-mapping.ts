@@ -160,7 +160,7 @@ function syncNumSettleableInvocations(
   // update extraMinterDetails key `currentSettledPrice` to be latestPurchasePrice
   setProjectMinterConfigExtraMinterDetailsValue(
     "numSettleableInvocations",
-    numSettleableInvocationsResult.value.toString(), // Price is likely to overflow js Number.MAX_SAFE_INTEGER, so store as string
+    numSettleableInvocationsResult.value,
     minterProjectAndConfig.projectMinterConfiguration
   );
 

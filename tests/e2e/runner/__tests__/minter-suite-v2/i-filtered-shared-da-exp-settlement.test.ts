@@ -22,7 +22,10 @@ import { Logger } from "@ethersproject/logger";
 Logger.setLogLevel(Logger.levels.ERROR);
 
 // waiting for subgraph to sync can take longer than the default 5s timeout
-jest.setTimeout(30 * 1000);
+// @dev specifically for this test, we need to wait for auction to complete, which is half of 45-second min half life
+// length = 22.5 seconds, plus 6 buffer seconds for the auction to start ~=30 seconds,
+// times 2 margin since this is just a timeout = 60 seconds timeout
+jest.setTimeout(60 * 1000);
 
 const config = getSubgraphConfig();
 
@@ -96,7 +99,7 @@ describe("iSharedMinterDAExpSettlement event handling", () => {
         );
     });
 
-    test("subgraph is updated after event emitted", async () => {
+    test("subgraph is updated after event emitted, settled price is accurate and a string", async () => {
       // add new project to use with this irreversible test
       currentProjectNumber = await genArt721CoreContract.nextProjectId();
       await genArt721CoreContract
@@ -120,17 +123,18 @@ describe("iSharedMinterDAExpSettlement event handling", () => {
       const latestBlock = await deployer.provider.getBlock("latest");
       const targetAuctionStart = latestBlock.timestamp + 5; // 5 seconds of margin
       // make a very short auction so it ends quickly
-      const targetStartPrice = ethers.utils.parseEther("1.0");
-      const targetBasePrice = ethers.utils.parseEther("0.1");
+      // @dev intentionally use a low price here to ensure use of string
+      const targetStartPrice = ethers.utils.parseEther("0.005");
+      const targetBasePrice = ethers.utils.parseEther("0.00375"); // total auction time is 1/2 of a half life
       await minterDAExpSettlementV3Contract.connect(artist).setAuctionDetails(
         currentProjectNumber, // _projectId
         genArt721CoreAddress, // _coreContract
         targetAuctionStart, // _timestampStart
-        600, // _priceDecayHalfLifeSeconds
+        45, // _priceDecayHalfLifeSeconds
         targetStartPrice, // _startPrice
         targetBasePrice // _basePrice
       );
-      // purchase a token to trigger Receipt update event
+      // PART 1: purchase a token to trigger Receipt update event
       await new Promise((f) => setTimeout(f, 6000)); // extra second of margin so auction has started
       const tx = await minterDAExpSettlementV3Contract
         .connect(artist)
@@ -155,6 +159,47 @@ describe("iSharedMinterDAExpSettlement event handling", () => {
       expect(receiptRes.netPosted).toBe(targetStartPrice.toString());
       expect(receiptRes.numPurchased).toBe("1");
       expect(receiptRes.updatedAt.toString()).toBe(blockTimestamp?.toString());
+
+      // validate the state of extraMinterDetails in the subgraph
+      // get last purchase price directly from minter contract
+      const latestPurchasePrice =
+        await minterDAExpSettlementV3Contract.getProjectLatestPurchasePrice(
+          currentProjectNumber,
+          genArt721CoreAddress
+        );
+      const targetConfigId = `${minterDAExpSettlementV3Address.toLowerCase()}-${genArt721CoreAddress.toLowerCase()}-${currentProjectNumber.toString()}`;
+      const projectMinterConfigRes = await getProjectMinterConfigurationDetails(
+        client,
+        targetConfigId
+      );
+      const extraMinterDetails = JSON.parse(
+        projectMinterConfigRes.extraMinterDetails
+      );
+      // @dev important that this is a string due to potential for numeric overflow in js
+      expect(extraMinterDetails.currentSettledPrice).toBe(
+        latestPurchasePrice.toString()
+      );
+
+      // PART 2: Artist withdraws revenues, and settled price is updated, remains a string
+      await new Promise((f) => setTimeout(f, 22500)); // wait the length of the auction, 22.5 seconds
+      await minterDAExpSettlementV3Contract
+        .connect(artist)
+        .withdrawArtistAndAdminRevenues(
+          currentProjectNumber,
+          genArt721CoreAddress
+        );
+      // validate state of projectMinterConfig in the subgraph
+      await waitUntilSubgraphIsSynced(client);
+      const projectMinterConfigRes2 =
+        await getProjectMinterConfigurationDetails(client, targetConfigId);
+      const extraMinterDetails2 = JSON.parse(
+        projectMinterConfigRes2.extraMinterDetails
+      );
+      // price should be updated to base price because auction reached end
+      // @dev important that this is a string due to potential for numeric overflow in js
+      expect(extraMinterDetails2.currentSettledPrice).toBe(
+        targetBasePrice.toString()
+      );
     });
   });
 });
