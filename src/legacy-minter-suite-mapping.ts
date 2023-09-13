@@ -51,7 +51,6 @@ import {
 } from "../generated/MinterDAExpSettlement/IFilteredMinterDAExpSettlementV1";
 
 import {
-  Minter,
   Project,
   ProjectMinterConfiguration,
   Receipt
@@ -66,7 +65,8 @@ import {
   loadOrCreateReceipt,
   generateProjectIdNumberFromTokenIdNumber,
   getMinterExtraMinterDetailsTypedMap,
-  getCoreContractAddressFromLegacyMinter
+  getCoreContractAddressFromLegacyMinter,
+  snapshotStateAtSettlementRevenueWithdrawal
 } from "./helpers";
 
 import {
@@ -1113,6 +1113,13 @@ export function handleArtistAndAdminRevenuesWithdrawn(
     "auctionRevenuesCollected",
     true,
     minterProjectAndConfig.projectMinterConfiguration
+  );
+
+  // snapshot important state at time of revenue withdrawal
+  snapshotStateAtSettlementRevenueWithdrawal(
+    minterProjectAndConfig.projectMinterConfiguration,
+    minterProjectAndConfig.project,
+    event.transaction.hash.toHexString()
   );
 
   minterProjectAndConfig.project.updatedAt = event.block.timestamp;
