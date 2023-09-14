@@ -201,8 +201,6 @@ describe("iSharedMinterDAExpSettlement event handling", () => {
         targetBasePrice.toString()
       );
       // snapshot of relevant state at time of withdrawal should be available
-      // TODO remove logging
-      console.log(extraMinterDetails2);
       expect(
         extraMinterDetails2.revenueWithdrawalSnapshot_widthdrawalTxHash
       ).toBe(withdrawalTx.hash);
