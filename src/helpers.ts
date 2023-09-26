@@ -19,14 +19,18 @@ import {
   Whitelisting,
   Receipt,
   MinterFilter,
-  CoreRegistry
+  CoreRegistry,
+  Contract
 } from "../generated/schema";
 
 import { IMinterFilterV1 } from "../generated/SharedMinterFilter/IMinterFilterV1";
 import { IFilteredMinterDALinV1 } from "../generated/MinterDALin/IFilteredMinterDALinV1";
 import { IFilteredMinterDAExpV1 } from "../generated/MinterDAExp/IFilteredMinterDAExpV1";
 
-import { setMinterExtraMinterDetailsValue } from "./extra-minter-details-helpers";
+import {
+  setMinterExtraMinterDetailsValue,
+  setProjectMinterConfigExtraMinterDetailsValue
+} from "./extra-minter-details-helpers";
 import { createTypedMapFromJSONString } from "./json";
 
 import { KNOWN_MINTER_FILTER_TYPES } from "./constants";
@@ -562,4 +566,94 @@ export function getTotalDAExpAuctionTime(
       .div(y2.minus(y1))
   );
   return totalAuctionTime;
+}
+
+/**
+ * helper function to snapshot the state of a project's splits and transaction
+ * hash at the time of a revenue withdrawal on a Settlement minter.
+ * @dev some of the branch logic and casting here may appear unnecessary/redundant,
+ * but it is necessary to avoid compiler errors.
+ * @param projectMinterConfig ProjectMinterConfiguration entity
+ * @param project Project entity being referenced, on a V3 flagship or engine contract
+ * @param txHash Hex string of the transaction hash of the revenue withdrawal
+ */
+export function snapshotStateAtSettlementRevenueWithdrawal(
+  projectMinterConfig: ProjectMinterConfiguration,
+  project: Project,
+  txHash: string
+): void {
+  // snapshot splits at time of revenue withdrawal
+  // @dev minter is only compatible with V3 core contracts
+  const contract = Contract.load(project.contract);
+  if (contract) {
+    // record tx hash of revenue withdrawal in case of further downstream analysis
+    setProjectMinterConfigExtraMinterDetailsValue(
+      "revenueWithdrawalSnapshot_widthdrawalTxHash",
+      txHash,
+      projectMinterConfig
+    );
+    // record payment addresses and splits
+    setProjectMinterConfigExtraMinterDetailsValue(
+      "revenueWithdrawalSnapshot_renderProviderAddress",
+      contract.renderProviderAddress.toHexString(),
+      projectMinterConfig
+    );
+    setProjectMinterConfigExtraMinterDetailsValue(
+      "revenueWithdrawalSnapshot_renderProviderPercentage",
+      contract.renderProviderPercentage,
+      projectMinterConfig
+    );
+    // only record platform provider if it exists (does not exist on non-engine)
+    if (contract.enginePlatformProviderAddress) {
+      setProjectMinterConfigExtraMinterDetailsValue(
+        "revenueWithdrawalSnapshot_platformProviderAddress",
+        Address.fromBytes(
+          // @dev compiler quirk requires casting as Bytes, even inside null check block
+          contract.enginePlatformProviderAddress as Bytes
+        ).toHexString(),
+        projectMinterConfig
+      );
+    }
+    if (contract.enginePlatformProviderPercentage) {
+      setProjectMinterConfigExtraMinterDetailsValue(
+        "revenueWithdrawalSnapshot_platformProviderPercentage",
+        contract.enginePlatformProviderPercentage,
+        projectMinterConfig
+      );
+    }
+    setProjectMinterConfigExtraMinterDetailsValue(
+      "revenueWithdrawalSnapshot_artistAddress",
+      project.artistAddress.toHexString(),
+      projectMinterConfig
+    );
+    // only record additional payee address if not null
+    if (project.additionalPayee) {
+      setProjectMinterConfigExtraMinterDetailsValue(
+        "revenueWithdrawalSnapshot_additionalPayeeAddress",
+
+        Address.fromBytes(project.additionalPayee as Bytes).toHexString(),
+        projectMinterConfig
+      );
+    }
+    // always additionalPayeePercentage as a value, even if null (zero if null)
+    if (project.additionalPayeePercentage) {
+      setProjectMinterConfigExtraMinterDetailsValue(
+        "revenueWithdrawalSnapshot_additionalPayeePercentage",
+        project.additionalPayeePercentage,
+        projectMinterConfig
+      );
+    } else {
+      // set to zero
+      setProjectMinterConfigExtraMinterDetailsValue(
+        "revenueWithdrawalSnapshot_additionalPayeePercentage",
+        BigInt.fromI32(0),
+        projectMinterConfig
+      );
+    }
+  } else {
+    log.warning(
+      "[WARN] Legacy (non-shared) minter event handler encountered null contract at address {}. Withdrawal details for project {} were not saved to extra minter details",
+      [project.contract, project.id]
+    );
+  }
 }

@@ -24,7 +24,8 @@ import {
   loadOrCreateMinter,
   generateContractSpecificId,
   loadOrCreateProjectMinterConfiguration,
-  updateProjectIfMinterConfigIsActive
+  updateProjectIfMinterConfigIsActive,
+  snapshotStateAtSettlementRevenueWithdrawal
 } from "./helpers";
 
 import {
@@ -191,6 +192,8 @@ function handleSetValueProjectMinterConfig<EventType>(event: EventType): void {
 
   const projectMinterConfig = minterProjectAndConfig.projectMinterConfiguration;
   const key = event.params._key.toString();
+
+  // ---- SYNC EXTRA MINTER DETAILS ----
   if (
     event instanceof ConfigValueSetBigInt &&
     (key.includes("price") || key.includes("Price"))
@@ -207,6 +210,20 @@ function handleSetValueProjectMinterConfig<EventType>(event: EventType): void {
       key,
       event.params._value,
       projectMinterConfig
+    );
+  }
+
+  // ---- AFTER-UPDATE HOOKS ----
+  // some keys require additional logic to be executed after the update
+  if (
+    event instanceof ConfigValueSetBool &&
+    key == "auctionRevenuesCollected"
+  ) {
+    // if auction revenues collected is updated, snapshot relevant state
+    snapshotStateAtSettlementRevenueWithdrawal(
+      projectMinterConfig,
+      minterProjectAndConfig.project,
+      event.transaction.hash.toHexString()
     );
   }
 
