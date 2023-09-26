@@ -182,7 +182,7 @@ describe("iSharedMinterDAExpSettlement event handling", () => {
 
       // PART 2: Artist withdraws revenues, and settled price is updated, remains a string
       await new Promise((f) => setTimeout(f, 22500)); // wait the length of the auction, 22.5 seconds
-      await minterDAExpSettlementV3Contract
+      const withdrawalTx = await minterDAExpSettlementV3Contract
         .connect(artist)
         .withdrawArtistAndAdminRevenues(
           currentProjectNumber,
@@ -200,6 +200,35 @@ describe("iSharedMinterDAExpSettlement event handling", () => {
       expect(extraMinterDetails2.currentSettledPrice).toBe(
         targetBasePrice.toString()
       );
+      // snapshot of relevant state at time of withdrawal should be available
+      expect(
+        extraMinterDetails2.revenueWithdrawalSnapshot_widthdrawalTxHash
+      ).toBe(withdrawalTx.hash);
+      expect(
+        extraMinterDetails2.revenueWithdrawalSnapshot_renderProviderAddress
+      ).toBe(deployer.address.toLowerCase());
+      expect(
+        extraMinterDetails2.revenueWithdrawalSnapshot_renderProviderPercentage
+      ).toBe(10);
+      // expect no platform provider info because tested core is a Flagship (not Engine)
+      expect(
+        extraMinterDetails2.revenueWithdrawalSnapshot_platformProviderAddress
+      ).toBeUndefined();
+      expect(
+        extraMinterDetails2.revenueWithdrawalSnapshot_platformProviderPercentage
+      ).toBeUndefined();
+      expect(extraMinterDetails2.revenueWithdrawalSnapshot_artistAddress).toBe(
+        artist.address.toLowerCase()
+      );
+      // expect no additional payee address because artist never configured it
+      expect(
+        extraMinterDetails2.revenueWithdrawalSnapshot_additionalPayeeAddress
+      ).toBeUndefined();
+      // expect additional payee percentage to always be defined, zero in this case
+      // because artist never configured it
+      expect(
+        extraMinterDetails2.revenueWithdrawalSnapshot_additionalPayeePercentage
+      ).toBe(0);
     });
   });
 });

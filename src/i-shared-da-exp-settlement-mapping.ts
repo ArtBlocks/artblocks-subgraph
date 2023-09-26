@@ -28,6 +28,9 @@ import { Receipt } from "../generated/schema";
 
 // project-level configuration events
 
+// note: state at the time of updating auctionRevenuesCollected to true is performed
+// in an after-update hook in the handler for the generic event
+
 /**
  * Handles the event that updates the Receipt of a collector on a project.
  * @param event The event carrying the updated Receipt data.
