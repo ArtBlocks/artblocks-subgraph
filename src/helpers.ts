@@ -41,6 +41,16 @@ export class MinterProjectAndConfig {
   projectMinterConfiguration: ProjectMinterConfiguration;
 }
 
+export function bytes32ToString(bytes32: Bytes): string {
+  let result = "";
+  for (let i = 0; i < 32; i++) {
+    let char = bytes32[i];
+    if (char == 0) break; // Stop at the first null character
+    result += String.fromCharCode(char);
+  }
+  return result;
+}
+
 export function generateProjectExternalAssetDependencyId(
   projectId: string,
   index: string
