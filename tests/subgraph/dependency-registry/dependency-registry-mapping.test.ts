@@ -80,7 +80,9 @@ describe("DependencyRegistry", () => {
     const preferredCDN = "cdn.com";
     const preferredRepository = "repository.com";
     const referenceWebsite = "p5js.org";
+    const licenseType = "MIT";
     const dependency = new Dependency(dependencyType);
+    dependency.licenseType = licenseType;
     dependency.preferredCDN = preferredCDN;
     dependency.preferredRepository = preferredRepository;
     dependency.referenceWebsite = referenceWebsite;
@@ -94,6 +96,7 @@ describe("DependencyRegistry", () => {
 
   test("handleDependencyAdded should add a new Depdendency", () => {
     const dependencyType = "threejs@1.0.0";
+    const licenseType = "MIT";
     const preferredCDN = "cdn.com";
     const preferredRepository = "repository.com";
     const referenceWebsite = "p5js.org";
@@ -112,6 +115,10 @@ describe("DependencyRegistry", () => {
       new ethereum.EventParam(
         "_dependencyType",
         ethereum.Value.fromBytes(Bytes.fromUTF8(dependencyType))
+      ),
+      new ethereum.EventParam(
+        "_licenseType",
+        ethereum.Value.fromBytes(Bytes.fromUTF8(licenseType))
       ),
       new ethereum.EventParam(
         "_preferredCDN",
@@ -140,6 +147,13 @@ describe("DependencyRegistry", () => {
       dependencyType,
       "updatedAt",
       updatedAtBlockTimestamp.toString()
+    );
+
+    assert.fieldEquals(
+      "Dependency",
+      dependencyType,
+      "licenseType",
+      licenseType
     );
 
     assert.fieldEquals(

@@ -596,6 +596,8 @@ type Transfer @entity(immutable: true) {
 type Dependency @entity {
   "Unique identifier made up of dependency name and version separated by an @ symbol (e.g. p5js@1.0.0)"
   id: ID!
+  "License Type of this dependency"
+  licenseType: String!
   "Preffered CDN for this dependency"
   preferredCDN: String!
   "Additional CDNs for this dependency"

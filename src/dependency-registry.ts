@@ -37,6 +37,7 @@ import {
 
 export function handleDependencyAdded(event: DependencyAdded): void {
   const dependency = new Dependency(event.params._dependencyType.toString());
+  dependency.licenseType = event.params._licenseType.toString();
   dependency.preferredCDN = event.params._preferredCDN;
   dependency.additionalCDNCount = BigInt.fromI32(0);
   dependency.preferredRepository = event.params._preferredRepository;

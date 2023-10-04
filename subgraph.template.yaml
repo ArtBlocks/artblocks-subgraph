@@ -1953,7 +1953,7 @@ dataSources:
         - name: IDependencyRegistryCompatibleV0
           file: ./abis/IDependencyRegistryCompatibleV0.json
       eventHandlers:
-        - event: DependencyAdded(indexed bytes32,string,string,string)
+        - event: DependencyAdded(indexed bytes32,indexed bytes32,string,string,string)
           handler: handleDependencyAdded
         - event: DependencyAdditionalCDNRemoved(indexed bytes32,indexed uint256)
           handler: handleDependencyAdditionalCDNRemoved
