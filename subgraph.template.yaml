@@ -1953,6 +1953,10 @@ dataSources:
         - name: IDependencyRegistryCompatibleV0
           file: ./abis/IDependencyRegistryCompatibleV0.json
       eventHandlers:
+        - event: LicenseTypeAdded(indexed bytes32)
+          handler: handleLicenseTypeAdded
+        - event: LicenseTextUpdated(indexed bytes32)
+          handler: handleLicenseTextUpdated
         - event: DependencyAdded(indexed bytes32,indexed bytes32,string,string,string)
           handler: handleDependencyAdded
         - event: DependencyAdditionalCDNRemoved(indexed bytes32,indexed uint256)

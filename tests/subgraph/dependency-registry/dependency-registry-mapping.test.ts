@@ -35,6 +35,8 @@ import {
   DependencyReferenceWebsiteUpdated,
   DependencyRemoved,
   DependencyScriptUpdated,
+  LicenseTextUpdated,
+  LicenseTypeAdded,
   ProjectDependencyTypeOverrideAdded,
   ProjectDependencyTypeOverrideRemoved,
   SupportedCoreContractAdded,
@@ -54,6 +56,8 @@ import {
   handleDependencyReferenceWebsiteUpdated,
   handleDependencyRemoved,
   handleDependencyScriptUpdated,
+  handleLicenseTextUpdated,
+  handleLicenseTypeAdded,
   handleOwnershipTransferred,
   handleProjectDependencyTypeOverrideAdded,
   handleProjectDependencyTypeOverrideRemoved,
@@ -66,7 +70,8 @@ import {
   DependencyAdditionalCDN,
   DependencyAdditionalRepository,
   DependencyRegistry,
-  DependencyScript
+  DependencyScript,
+  License
 } from "../../../generated/schema";
 
 const randomAddressGenerator = new RandomAddressGenerator();
@@ -92,6 +97,100 @@ describe("DependencyRegistry", () => {
     dependency.dependencyRegistry = DEPENDENCY_REGISTRY_ADDRESS;
     dependency.updatedAt = CURRENT_BLOCK_TIMESTAMP;
     dependency.save();
+
+    const licenseId = licenseType;
+    const license = new License(licenseId);
+    license.updatedAt = CURRENT_BLOCK_TIMESTAMP;
+    license.save();
+  });
+
+  test("handleLicenseTextUpdated should update license text", () => {
+    const licenseType = "MIT";
+    const licenseText =
+      "Permission is hereby granted, free of charge, to any person...";
+    const dependencyRegistryAddress = DEPENDENCY_REGISTRY_ADDRESS;
+
+    const dependencyRegistry = new DependencyRegistry(
+      dependencyRegistryAddress
+    );
+    dependencyRegistry.owner = randomAddressGenerator.generateRandomAddress();
+    dependencyRegistry.updatedAt = CURRENT_BLOCK_TIMESTAMP;
+    dependencyRegistry.save();
+
+    const event = changetype<LicenseTextUpdated>(newMockEvent());
+    event.address = dependencyRegistryAddress;
+    event.parameters = [
+      new ethereum.EventParam(
+        "_licenseType",
+        ethereum.Value.fromBytes(Bytes.fromUTF8(licenseType))
+      ),
+      new ethereum.EventParam(
+        "_licenseText",
+        ethereum.Value.fromBytes(Bytes.fromUTF8(licenseText))
+      )
+    ];
+    const updatedAtBlockTimestamp = CURRENT_BLOCK_TIMESTAMP.plus(
+      BigInt.fromI32(1)
+    );
+    event.block.timestamp = updatedAtBlockTimestamp;
+
+    handleLicenseTextUpdated(event);
+    // note: currently the license text is not stored in the subgraph
+    // so we can't assert on it, but we can assert that the updatedAt
+    // field was updated. If we decide to store the license text in the
+    // subgraph in the future, we should update this test.
+
+    assert.fieldEquals(
+      "DependencyRegistry",
+      dependencyRegistryAddress.toHexString(),
+      "updatedAt",
+      updatedAtBlockTimestamp.toString()
+    );
+  });
+
+  test("handleLicenseTypeAdded should add a new LicenseType", () => {
+    const licenseType = "GPLv3";
+    const dependencyRegistryAddress = DEPENDENCY_REGISTRY_ADDRESS;
+
+    const dependencyRegistry = new DependencyRegistry(
+      dependencyRegistryAddress
+    );
+    dependencyRegistry.owner = randomAddressGenerator.generateRandomAddress();
+    dependencyRegistry.updatedAt = CURRENT_BLOCK_TIMESTAMP;
+    dependencyRegistry.save();
+
+    const event: LicenseTypeAdded = changetype<LicenseTypeAdded>(
+      newMockEvent()
+    );
+    event.address = dependencyRegistryAddress;
+    event.parameters = [
+      new ethereum.EventParam(
+        "_licenseType",
+        ethereum.Value.fromBytes(Bytes.fromUTF8(licenseType))
+      )
+    ];
+    const updatedAtBlockTimestamp = CURRENT_BLOCK_TIMESTAMP.plus(
+      BigInt.fromI32(1)
+    );
+    event.block.timestamp = updatedAtBlockTimestamp;
+
+    handleLicenseTypeAdded(event);
+
+    assert.entityCount("License", 2);
+    assert.fieldEquals("License", licenseType, "id", licenseType);
+    assert.fieldEquals(
+      "License",
+      licenseType,
+      "updatedAt",
+      updatedAtBlockTimestamp.toString()
+    );
+
+    assert.fieldEquals(
+      "DependencyRegistry",
+      dependencyRegistryAddress.toHexString(),
+      "updatedAt",
+      updatedAtBlockTimestamp.toString()
+    );
   });
 
   test("handleDependencyAdded should add a new Depdendency", () => {

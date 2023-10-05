@@ -10,6 +10,8 @@ import {
   DependencyReferenceWebsiteUpdated,
   DependencyRemoved,
   DependencyScriptUpdated,
+  LicenseTextUpdated,
+  LicenseTypeAdded,
   ProjectDependencyTypeOverrideAdded,
   ProjectDependencyTypeOverrideRemoved,
   SupportedCoreContractAdded,
@@ -22,6 +24,7 @@ import { IDependencyRegistryCompatibleV0 } from "../generated/IDependencyRegistr
 import {
   Contract,
   Dependency,
+  License,
   DependencyAdditionalCDN,
   DependencyAdditionalRepository,
   DependencyRegistry,
@@ -34,6 +37,22 @@ import {
   generateDependencyAdditionalRepositoryId,
   generateDependencyScriptId
 } from "./helpers";
+
+export function handleLicenseTypeAdded(event: LicenseTypeAdded): void {
+  let licenseId = event.params._licenseType.toString();
+  const license = new License(licenseId);
+
+  license.updatedAt = event.block.timestamp;
+  license.save();
+}
+
+export function handleLicenseTextUpdated(event: LicenseTextUpdated): void {
+  let licenseId = event.params._licenseType.toString();
+  const license = new License(licenseId);
+
+  license.updatedAt = event.block.timestamp;
+  license.save();
+}
 
 export function handleDependencyAdded(event: DependencyAdded): void {
   const dependency = new Dependency(event.params._dependencyType.toString());
