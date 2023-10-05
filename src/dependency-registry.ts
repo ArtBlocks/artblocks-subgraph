@@ -48,10 +48,11 @@ export function handleLicenseTypeAdded(event: LicenseTypeAdded): void {
 
 export function handleLicenseTextUpdated(event: LicenseTextUpdated): void {
   let licenseId = event.params._licenseType.toString();
-  const license = new License(licenseId);
-
-  license.updatedAt = event.block.timestamp;
-  license.save();
+  const license = License.load(licenseId);
+  if (license) {
+    license.updatedAt = event.block.timestamp;
+    license.save();
+  }
 }
 
 export function handleDependencyAdded(event: DependencyAdded): void {
