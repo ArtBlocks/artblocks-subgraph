@@ -129,9 +129,7 @@ describe("DependencyRegistry", () => {
         ethereum.Value.fromBytes(Bytes.fromUTF8(licenseText))
       )
     ];
-    const updatedAtBlockTimestamp = CURRENT_BLOCK_TIMESTAMP.plus(
-      BigInt.fromI32(1)
-    );
+    const updatedAtBlockTimestamp = CURRENT_BLOCK_TIMESTAMP;
     event.block.timestamp = updatedAtBlockTimestamp;
 
     handleLicenseTextUpdated(event);
@@ -169,9 +167,7 @@ describe("DependencyRegistry", () => {
         ethereum.Value.fromBytes(Bytes.fromUTF8(licenseType))
       )
     ];
-    const updatedAtBlockTimestamp = CURRENT_BLOCK_TIMESTAMP.plus(
-      BigInt.fromI32(1)
-    );
+    const updatedAtBlockTimestamp = CURRENT_BLOCK_TIMESTAMP;
     event.block.timestamp = updatedAtBlockTimestamp;
 
     handleLicenseTypeAdded(event);
