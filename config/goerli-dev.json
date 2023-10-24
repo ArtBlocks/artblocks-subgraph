@@ -86,7 +86,7 @@
       "startBlock": 9602240
     }
   ],
-  "iSharedMinterV0Contracts": [
+  "genericMinterEventsLibContracts": [
     {
       "address": "0x12b87e163aDDA0E3A08F6181eE7F95fb6CA7A558",
       "name": "Goerli dev shared minter: MinterSetPriceV5",
@@ -148,14 +148,120 @@
       "startBlock": 9602240
     }
   ],
-  "iSharedMerkleContracts": [
+  "splitFundsLibContracts": [
+    {
+      "address": "0x5e16d4493f70568dE483F80d47f33ae1cDbD1b78",
+      "name": "Goerli dev shared minter: MinterSetPriceERC20V5",
+      "startBlock": 9602240
+    },
+    {
+      "address": "0xD4c85aa7beE5B5A4541ba5c873A54879140F9A2c",
+      "name": "Goerli dev shared minter: MinterSetPricePolyptychERC20V5",
+      "startBlock": 9602240
+    }
+  ],
+  "setPriceLibContracts": [
+    {
+      "address": "0x12b87e163aDDA0E3A08F6181eE7F95fb6CA7A558",
+      "name": "Goerli dev shared minter: MinterSetPriceV5",
+      "startBlock": 9602240
+    },
+    {
+      "address": "0x5e16d4493f70568dE483F80d47f33ae1cDbD1b78",
+      "name": "Goerli dev shared minter: MinterSetPriceERC20V5",
+      "startBlock": 9602240
+    },
+    {
+      "address": "0x8FF22d210Db7304214Ec99225fBab325bb0Aaf91",
+      "name": "Goerli dev shared minter: MinterSetPriceHolderV5",
+      "startBlock": 9602240
+    },
+    {
+      "address": "0x6cc81bAF5f9a2266B0BE1334588e246C3A79996A",
+      "name": "Goerli dev shared minter: MinterSetPriceMerkleV5",
+      "startBlock": 9602240
+    },
+    {
+      "address": "0xB6A24AFAE90bd3A61F0a15De030092a662B4BEd4",
+      "name": "Goerli dev shared minter: MinterSetPricePolyptychV5",
+      "startBlock": 9602240
+    },
+    {
+      "address": "0xD4c85aa7beE5B5A4541ba5c873A54879140F9A2c",
+      "name": "Goerli dev shared minter: MinterSetPricePolyptychERC20V5",
+      "startBlock": 9602240
+    }
+  ],
+  "maxInvocationsLibContracts": [
+    {
+      "address": "0x12b87e163aDDA0E3A08F6181eE7F95fb6CA7A558",
+      "name": "Goerli dev shared minter: MinterSetPriceV5",
+      "startBlock": 9602240
+    },
+    {
+      "address": "0x5e16d4493f70568dE483F80d47f33ae1cDbD1b78",
+      "name": "Goerli dev shared minter: MinterSetPriceERC20V5",
+      "startBlock": 9602240
+    },
+    {
+      "address": "0x8FF22d210Db7304214Ec99225fBab325bb0Aaf91",
+      "name": "Goerli dev shared minter: MinterSetPriceHolderV5",
+      "startBlock": 9602240
+    },
+    {
+      "address": "0x6cc81bAF5f9a2266B0BE1334588e246C3A79996A",
+      "name": "Goerli dev shared minter: MinterSetPriceMerkleV5",
+      "startBlock": 9602240
+    },
+    {
+      "address": "0xB6A24AFAE90bd3A61F0a15De030092a662B4BEd4",
+      "name": "Goerli dev shared minter: MinterSetPricePolyptychV5",
+      "startBlock": 9602240
+    },
+    {
+      "address": "0xD4c85aa7beE5B5A4541ba5c873A54879140F9A2c",
+      "name": "Goerli dev shared minter: MinterSetPricePolyptychERC20V5",
+      "startBlock": 9602240
+    },
+    {
+      "address": "0x35e5D5D74a7347989D4C1BA444b980FacA06EFeA",
+      "name": "Goerli dev shared minter: MinterDAExpV5",
+      "startBlock": 9602240
+    },
+    {
+      "address": "0x18bcD7F2b3c6904e6D2EAf0da3CC94C4E2ACb52c",
+      "name": "Goerli dev shared minter: MinterDALinV5",
+      "startBlock": 9602240
+    },
+    {
+      "address": "0xe3002BB7Bfd2ff61Ea1e9823e4723e4163C6BE72",
+      "name": "[bugged] Goerli dev shared minter: MinterDAExpSettlementV3",
+      "startBlock": 9602240
+    },
+    {
+      "address": "0xffFf56434Eb696f51775eDC7c9472A4046053c97",
+      "name": "Goerli dev shared minter: MinterDAExpSettlementV3",
+      "startBlock": 9615257
+    },
+    {
+      "address": "0xc0a94bE251af03db788dced955C534467e90EdB1",
+      "name": "Goerli dev shared minter: MinterDAExpHolderV5",
+      "startBlock": 9602240
+    },
+    {
+      "address": "0x2D9B947c1f1E36d7f881D415A44598Ed9ff15b65",
+      "name": "Goerli dev shared minter: MinterDALinHolderV5",
+      "startBlock": 9602240
+    }
+  ],
+  "merkleLibContracts": [
     {
       "address": "0x6cc81bAF5f9a2266B0BE1334588e246C3A79996A",
       "name": "Goerli dev shared minter: MinterSetPriceMerkleV5",
       "startBlock": 9602240
     }
   ],
-  "iSharedHolderContracts": [
+  "holderLibContracts": [
     {
       "address": "0x8FF22d210Db7304214Ec99225fBab325bb0Aaf91",
       "name": "Goerli dev shared minter: MinterSetPriceHolderV5",
@@ -182,7 +288,7 @@
       "startBlock": 9602240
     }
   ],
-  "iSharedDAContracts": [
+  "DALibContracts": [
     {
       "address": "0x35e5D5D74a7347989D4C1BA444b980FacA06EFeA",
       "name": "Goerli dev shared minter: MinterDAExpV5",
@@ -214,7 +320,7 @@
       "startBlock": 9602240
     }
   ],
-  "iSharedDAExpContracts": [
+  "DAExpLibContracts": [
     {
       "address": "0x35e5D5D74a7347989D4C1BA444b980FacA06EFeA",
       "name": "Goerli dev shared minter: MinterDAExpV5",
@@ -236,7 +342,7 @@
       "startBlock": 9602240
     }
   ],
-  "iSharedDALinContracts": [
+  "DALinLibContracts": [
     {
       "address": "0x18bcD7F2b3c6904e6D2EAf0da3CC94C4E2ACb52c",
       "name": "Goerli dev shared minter: MinterDALinV5",
@@ -248,7 +354,7 @@
       "startBlock": 9602240
     }
   ],
-  "iSharedDAExpSettlementContracts": [
+  "settlementExpLibContracts": [
     {
       "address": "0xe3002BB7Bfd2ff61Ea1e9823e4723e4163C6BE72",
       "name": "[bugged] Goerli dev shared minter: MinterDAExpSettlementV3",
