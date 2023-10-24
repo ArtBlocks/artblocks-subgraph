@@ -1,6 +1,6 @@
-import { ResetAuctionDetails } from "../generated/ISharedDA/ISharedMinterDAV0";
+import { ResetAuctionDetails } from "../generated/DALib/DALib";
 
-import { loadOrCreateMinterProjectAndConfigIfProject } from "./i-shared-minter-mapping";
+import { loadOrCreateMinterProjectAndConfigIfProject } from "./generic-minter-events-lib-mapping";
 
 import { updateProjectIfMinterConfigIsActive } from "./helpers";
 
@@ -19,8 +19,8 @@ import { removeProjectMinterConfigExtraMinterDetailsEntry } from "./extra-minter
 export function handleResetAuctionDetails(event: ResetAuctionDetails): void {
   const minterProjectAndConfig = loadOrCreateMinterProjectAndConfigIfProject(
     event.address, // minter
-    event.params._coreContract,
-    event.params._projectId,
+    event.params.coreContract,
+    event.params.projectId,
     event.block.timestamp
   );
   if (!minterProjectAndConfig) {
