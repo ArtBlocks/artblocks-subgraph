@@ -1,17 +1,17 @@
 version: 2.1
 
 orbs:
-  node: circleci/node@4.7
+  node: circleci/node@5.1.0
 
 jobs:
   test:
     docker:
-      - image: "cimg/base:stable"
+      - image: "cimg/base:current"
     steps:
       - checkout
       - node/install:
           install-yarn: true
-          lts: true
+          node-version: "18.15"
       - node/install-packages:
           pkg-manager: yarn
       - run: node --version
