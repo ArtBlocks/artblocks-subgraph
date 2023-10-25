@@ -1156,6 +1156,8 @@ dataSources:
       eventHandlers:
         - event: PricePerTokenUpdated(indexed uint256,indexed address,indexed uint256)
           handler: handlePricePerTokenUpdated
+        - event: PricePerTokenReset(indexed uint256,indexed address)
+          handler: handlePricePerTokenReset
       file: ./src/set-price-lib-mapping.ts
   {{/setPriceLibContracts}}
   {{#maxInvocationsLibContracts}}
