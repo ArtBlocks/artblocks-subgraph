@@ -219,7 +219,17 @@ async function main() {
   );
   await minterSetPriceV5.deployed();
   console.log(`MinterSetPriceV5 deployed at ${minterSetPriceV5.address}`);
-  subgraphConfig.iSharedMinterV0Contracts = [
+  subgraphConfig.genericMinterEventsLibContracts = [
+    {
+      address: minterSetPriceV5.address,
+    },
+  ];
+  subgraphConfig.setPriceLibContracts = [
+    {
+      address: minterSetPriceV5.address,
+    },
+  ];
+  subgraphConfig.maxInvocationsLibContracts = [
     {
       address: minterSetPriceV5.address,
     },
@@ -236,7 +246,18 @@ async function main() {
   console.log(
     `MinterSetPriceERC20V5 deployed at ${minterSetPriceERC20V5.address}`
   );
-  subgraphConfig.iSharedMinterV0Contracts.push({
+  subgraphConfig.genericMinterEventsLibContracts.push({
+    address: minterSetPriceERC20V5.address,
+  });
+  subgraphConfig.splitFundsLibContracts = [
+    {
+      address: minterSetPriceERC20V5.address,
+    },
+  ];
+  subgraphConfig.setPriceLibContracts.push({
+    address: minterSetPriceERC20V5.address,
+  });
+  subgraphConfig.maxInvocationsLibContracts.push({
     address: minterSetPriceERC20V5.address,
   });
 
@@ -250,10 +271,16 @@ async function main() {
   console.log(
     `MinterSetPriceMerkleV5 deployed at ${minterSetPriceMerkleV5.address}`
   );
-  subgraphConfig.iSharedMinterV0Contracts.push({
+  subgraphConfig.genericMinterEventsLibContracts.push({
     address: minterSetPriceMerkleV5.address,
   });
-  subgraphConfig.iSharedMerkleContracts = [
+  subgraphConfig.setPriceLibContracts.push({
+    address: minterSetPriceMerkleV5.address,
+  });
+  subgraphConfig.maxInvocationsLibContracts.push({
+    address: minterSetPriceMerkleV5.address,
+  });
+  subgraphConfig.merkleLibContracts = [
     {
       address: minterSetPriceMerkleV5.address,
     },
@@ -269,10 +296,16 @@ async function main() {
   console.log(
     `minterSetPriceHolderV5 deployed at ${minterSetPriceHolderV5.address}`
   );
-  subgraphConfig.iSharedMinterV0Contracts.push({
+  subgraphConfig.genericMinterEventsLibContracts.push({
     address: minterSetPriceHolderV5.address,
   });
-  subgraphConfig.iSharedHolderContracts = [
+  subgraphConfig.setPriceLibContracts.push({
+    address: minterSetPriceHolderV5.address,
+  });
+  subgraphConfig.maxInvocationsLibContracts.push({
+    address: minterSetPriceHolderV5.address,
+  });
+  subgraphConfig.holderLibContracts = [
     {
       address: minterSetPriceHolderV5.address,
     },
@@ -283,10 +316,13 @@ async function main() {
   const minterSEAV1 = await MinterSEAV1Factory.deploy(minterFilter.address);
   await minterSEAV1.deployed();
   console.log(`minterSEAV1 deployed at ${minterSEAV1.address}`);
-  subgraphConfig.iSharedMinterV0Contracts.push({
+  subgraphConfig.genericMinterEventsLibContracts.push({
     address: minterSEAV1.address,
   });
-  subgraphConfig.iSharedSEAContracts = [
+  subgraphConfig.maxInvocationsLibContracts.push({
+    address: minterSEAV1.address,
+  });
+  subgraphConfig.SEALibContracts = [
     {
       address: minterSEAV1.address,
     },
@@ -297,15 +333,18 @@ async function main() {
   const minterDAExpV5 = await MinterDAExpV5Factory.deploy(minterFilter.address);
   await minterDAExpV5.deployed();
   console.log(`minterDAExpV5 deployed at ${minterDAExpV5.address}`);
-  subgraphConfig.iSharedMinterV0Contracts.push({
+  subgraphConfig.genericMinterEventsLibContracts.push({
     address: minterDAExpV5.address,
   });
-  subgraphConfig.iSharedDAContracts = [
+  subgraphConfig.maxInvocationsLibContracts.push({
+    address: minterDAExpV5.address,
+  });
+  subgraphConfig.DALibContracts = [
     {
       address: minterDAExpV5.address,
     },
   ];
-  subgraphConfig.iSharedDAExpContracts = [
+  subgraphConfig.DAExpLibContracts = [
     {
       address: minterDAExpV5.address,
     },
@@ -316,13 +355,16 @@ async function main() {
   const minterDALinV5 = await MinterDALinV5Factory.deploy(minterFilter.address);
   await minterDALinV5.deployed();
   console.log(`minterDALinV5 deployed at ${minterDALinV5.address}`);
-  subgraphConfig.iSharedMinterV0Contracts.push({
+  subgraphConfig.genericMinterEventsLibContracts.push({
     address: minterDALinV5.address,
   });
-  subgraphConfig.iSharedDAContracts.push({
+  subgraphConfig.maxInvocationsLibContracts.push({
     address: minterDALinV5.address,
   });
-  subgraphConfig.iSharedDALinContracts = [
+  subgraphConfig.DALibContracts.push({
+    address: minterDALinV5.address,
+  });
+  subgraphConfig.DALinLibContracts = [
     {
       address: minterDALinV5.address,
     },
@@ -339,16 +381,19 @@ async function main() {
   console.log(
     `minterDAExpSettlementV3 deployed at ${minterDAExpSettlementV3.address}`
   );
-  subgraphConfig.iSharedMinterV0Contracts.push({
+  subgraphConfig.genericMinterEventsLibContracts.push({
     address: minterDAExpSettlementV3.address,
   });
-  subgraphConfig.iSharedDAContracts.push({
+  subgraphConfig.maxInvocationsLibContracts.push({
     address: minterDAExpSettlementV3.address,
   });
-  subgraphConfig.iSharedDAExpContracts.push({
+  subgraphConfig.DALibContracts.push({
     address: minterDAExpSettlementV3.address,
   });
-  subgraphConfig.iSharedDAExpSettlementContracts = [
+  subgraphConfig.DAExpLibContracts.push({
+    address: minterDAExpSettlementV3.address,
+  });
+  subgraphConfig.settlementExpLibContracts = [
     {
       address: minterDAExpSettlementV3.address,
     },

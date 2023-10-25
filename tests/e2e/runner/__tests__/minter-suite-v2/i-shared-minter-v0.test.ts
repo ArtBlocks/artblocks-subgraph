@@ -65,17 +65,19 @@ const genArt721CoreContract = new GenArt721CoreV3__factory(
 
 // get MinterSetPriceV5
 // @dev this is minter at index 0 in the subgraph config
-if (!config.iSharedMinterV0Contracts) {
-  throw new Error("No iSharedMinterV0Contracts in config");
+if (!config.genericMinterEventsLibContracts) {
+  throw new Error("No genericMinterEventsLibContracts in config");
 }
-const minterSetPriceV5Address = config.iSharedMinterV0Contracts[0].address;
+const minterSetPriceV5Address =
+  config.genericMinterEventsLibContracts[0].address;
 const minterSetPriceV5Contract = new MinterSetPriceV5__factory(deployer).attach(
   minterSetPriceV5Address
 );
 
 // get MinterSetPriceERC20V5
 // @dev this is minter at index 1 in the subgraph config
-const minterSetPriceERC20V5Address = config.iSharedMinterV0Contracts[1].address;
+const minterSetPriceERC20V5Address =
+  config.genericMinterEventsLibContracts[1].address;
 const minterSetPriceERC20V5Contract = new MinterSetPriceERC20V5__factory(
   deployer
 ).attach(minterSetPriceERC20V5Address);
@@ -93,7 +95,7 @@ describe("iSharedMinterV0 event handling", () => {
     });
   });
 
-  describe("PricePerTokenInWeiUpdated", () => {
+  describe("PricePerTokenUpdated", () => {
     afterEach(async () => {
       // clear the minter for project zero
       // @dev call success depends on test state, so use a try/catch block
@@ -170,7 +172,6 @@ describe("iSharedMinterV0 event handling", () => {
           minterSetPriceERC20V5Address
         );
       // update currency info
-      const newPrice = ethers.utils.parseEther(Math.random().toString());
       await minterSetPriceERC20V5Contract
         .connect(artist)
         .updateProjectCurrencyInfo(
@@ -190,6 +191,8 @@ describe("iSharedMinterV0 event handling", () => {
       expect(minterConfigRes.currencyAddress).toBe(
         newCurrency.address.toLowerCase()
       );
+      // TODO - also add test for PricePerTokenReset
+      const newPrice = ethers.utils.parseEther(Math.random().toString());
     });
   });
 

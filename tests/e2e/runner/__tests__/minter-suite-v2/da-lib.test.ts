@@ -51,24 +51,24 @@ const genArt721CoreAddress =
   config.iGenArt721CoreContractV3_BaseContracts[0].address;
 
 // get MinterDAExp contract from the subgraph config
-if (!config.iSharedDAExpContracts) {
-  throw new Error("No iSharedDAExpContracts in config");
+if (!config.DAExpLibContracts) {
+  throw new Error("No DAExpLibContracts in config");
 }
-const minterDAExpV5Address = config.iSharedDAExpContracts[0].address;
+const minterDAExpV5Address = config.DAExpLibContracts[0].address;
 const minterDAExpV5Contract = new MinterDAExpV5__factory(deployer).attach(
   minterDAExpV5Address
 );
 
 // get MinterDALin contract from the subgraph config
-if (!config.iSharedDALinContracts) {
-  throw new Error("No iSharedDALinContracts in config");
+if (!config.DALinLibContracts) {
+  throw new Error("No DALinLibContracts in config");
 }
-const minterDALinV5Address = config.iSharedDALinContracts[0].address;
+const minterDALinV5Address = config.DALinLibContracts[0].address;
 const minterDALinV5Contract = new MinterDALinV5__factory(deployer).attach(
   minterDALinV5Address
 );
 
-describe("iFilteredSharedDA event handling", () => {
+describe("DALib event handling", () => {
   beforeAll(async () => {
     await waitUntilSubgraphIsSynced(client);
   });
@@ -187,6 +187,7 @@ describe("iFilteredSharedDA event handling", () => {
       expect(minterConfigRes.basePrice).toBeDefined();
       // validate extraMinterDetails
       const extraMinterDetails = JSON.parse(minterConfigRes.extraMinterDetails);
+      console.log(extraMinterDetails);
       expect(extraMinterDetails.startPrice).toBeDefined();
       expect(extraMinterDetails.startTime).toBeDefined();
       expect(extraMinterDetails.endTime).toBeDefined();

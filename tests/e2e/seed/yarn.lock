@@ -7,17 +7,17 @@
   resolved "https://registry.yarnpkg.com/@0no-co/graphql.web/-/graphql.web-1.0.4.tgz#9606eb651955499525d068ce0ad8bea596286ce2"
   integrity sha512-W3ezhHGfO0MS1PtGloaTpg0PbaT8aZSmmaerL7idtU5F7oCI+uu25k+MsMS31BVFlp4aMkHSrNRxiD72IlK8TA==
 
-"@artblocks/contracts@^1.0.4":
-  version "1.0.4"
-  resolved "https://registry.yarnpkg.com/@artblocks/contracts/-/contracts-1.0.4.tgz#c0fa6a39e5897a71f6b15adef921852ee8c197de"
-  integrity sha512-yaKOtZd+P8NDs2xEc3q+DUrLzIxoInEuuZvVyw+xl+bZD363Qbna+Jos8TOc1LLGJnTDOvpr9KgFxIplTHeE1Q==
+"@artblocks/contracts@1.1.0":
+  version "1.1.0"
+  resolved "https://registry.yarnpkg.com/@artblocks/contracts/-/contracts-1.1.0.tgz#3dc17759a672c99bc3d0006d4352bdea92325ea0"
+  integrity sha512-pes9VoiC0pzDoRQbwbVoYKwrQ6kFZUJTt5PUu1j90DNASWvKaNAQSQAUzsKFrDmhpRX0hllbXzlfBDy0tE0D1A==
   dependencies:
     "@openzeppelin-0.5/contracts" "npm:@openzeppelin/contracts@2.5.1"
     "@openzeppelin-4.5/contracts" "npm:@openzeppelin/contracts@4.5.0"
     "@openzeppelin-4.7/contracts" "npm:@openzeppelin/contracts@4.7.1"
     "@openzeppelin-4.8/contracts-upgradeable" "npm:@openzeppelin/contracts-upgradeable@4.8.0"
     "@urql/exchange-retry" "^1.2.0"
-    graphql "^16.8.0"
+    graphql "^16.8.1"
     urql "^4.0.5"
 
 "@babel/code-frame@^7.0.0":
@@ -824,7 +824,7 @@ graceful-fs@^4.1.2, graceful-fs@^4.1.6:
   resolved "https://registry.yarnpkg.com/graceful-fs/-/graceful-fs-4.2.10.tgz#147d3a006da4ca3ce14728c7aefc287c367d7a6c"
   integrity sha512-9ByhssR2fPVsNZj478qUUbKfmL0+t5BDVyjShtyZZLiK7ZDAArFFfopyOTj0M05wE2tJPisA4iTnnXl2YoPvOA==
 
-graphql@^16.8.0:
+graphql@^16.8.1:
   version "16.8.1"
   resolved "https://registry.yarnpkg.com/graphql/-/graphql-16.8.1.tgz#1930a965bef1170603702acdb68aedd3f3cf6f07"
   integrity sha512-59LZHPdGZVh695Ud9lRzPBVTtlX9ZCV150Er2W43ro37wVof0ctenSaskPPjN7lVTIN8mSZt8PHUNKZuNQUuxw==
