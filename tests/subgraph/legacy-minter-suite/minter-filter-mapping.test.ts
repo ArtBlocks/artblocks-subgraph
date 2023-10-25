@@ -1290,12 +1290,13 @@ test("handleMinterRevoke should remove minter from MinterFilter's minterGlobalAl
   );
   // Minter should remain in store (to persist any populated fields)
   assert.assertNotNull(Minter.load(minter.id));
-  // MinterFilter should still recognize the revoked Minter as an associated minter
+  // cannot query derived field `knownMinters`, so check that minter is in
+  // store with appropriate minterFilter field value
   assert.fieldEquals(
-    MINTER_FILTER_ENTITY_TYPE,
-    minterFilterAddress.toHexString(),
-    "knownMinters",
-    `[${minterToBeRevokedAddress.toHexString()}]`
+    MINTER_ENTITY_TYPE,
+    minterToBeApprovedAddress.toHexString(),
+    "minterFilter",
+    `${minterFilterAddress.toHexString()}`
   );
   // MinterFilter should have been updated
   assert.fieldEquals(
@@ -1365,13 +1366,6 @@ test("handleMinterRevoke should handle revoking a minter more than once", () => 
   );
   // Minter should remain in store (to persist any populated fields)
   assert.assertNotNull(Minter.load(minter.id));
-  // MinterFilter should still recognize the revoked Minter as an associated minter
-  assert.fieldEquals(
-    MINTER_FILTER_ENTITY_TYPE,
-    minterFilterAddress.toHexString(),
-    "knownMinters",
-    `[${minterToBeRevokedAddress.toHexString()}]`
-  );
   // MinterFilter should have been updated
   assert.fieldEquals(
     MINTER_FILTER_ENTITY_TYPE,
