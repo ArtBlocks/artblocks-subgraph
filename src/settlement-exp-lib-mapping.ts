@@ -1,10 +1,8 @@
 import { Address, BigInt, log, ethereum } from "@graphprotocol/graph-ts";
-import {
-  ReceiptUpdated,
-  ISharedMinterDAExpSettlementV0
-} from "../generated/ISharedDAExpSettlement/ISharedMinterDAExpSettlementV0";
+import { ReceiptUpdated } from "../generated/SettlementExpLib/SettlementExpLib";
+import { ISharedMinterDAExpSettlementV0 } from "../generated/SettlementExpLib/ISharedMinterDAExpSettlementV0";
 
-import { loadOrCreateMinterProjectAndConfigIfProject } from "./i-shared-minter-mapping";
+import { loadOrCreateMinterProjectAndConfigIfProject } from "./generic-minter-events-lib-mapping";
 
 import {
   loadOrCreateMinter,
@@ -38,8 +36,8 @@ import { Receipt } from "../generated/schema";
 export function handleReceiptUpdated(event: ReceiptUpdated): void {
   const minterProjectAndConfig = loadOrCreateMinterProjectAndConfigIfProject(
     event.address, // minter
-    event.params._coreContract,
-    event.params._projectId,
+    event.params.coreContract,
+    event.params.projectId,
     event.block.timestamp
   );
   if (!minterProjectAndConfig) {
@@ -49,18 +47,18 @@ export function handleReceiptUpdated(event: ReceiptUpdated): void {
 
   // load or create receipt
   let projectId = generateContractSpecificId(
-    event.params._coreContract,
-    event.params._projectId
+    event.params.coreContract,
+    event.params.projectId
   );
   let receipt: Receipt = loadOrCreateReceipt(
     minterProjectAndConfig.minter.id,
     projectId,
-    event.params._purchaser,
+    event.params.purchaser,
     event.block.timestamp
   );
   // update receipt state
-  receipt.netPosted = event.params._netPosted;
-  receipt.numPurchased = BigInt.fromI32(event.params._numPurchased);
+  receipt.netPosted = event.params.netPosted;
+  receipt.numPurchased = BigInt.fromI32(event.params.numPurchased);
   receipt.updatedAt = event.block.timestamp;
   receipt.save();
 

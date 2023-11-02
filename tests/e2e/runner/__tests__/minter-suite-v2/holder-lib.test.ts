@@ -49,15 +49,15 @@ const genArt721CoreAddress =
   config.iGenArt721CoreContractV3_BaseContracts[0].address;
 
 // get MinterSetPriceHolderV5 contract from the subgraph config
-if (!config.iSharedHolderContracts) {
-  throw new Error("No iSharedHolderContracts in config");
+if (!config.holderLibContracts) {
+  throw new Error("No holderLibContracts in config");
 }
-const minterSetPriceHolderV5Address = config.iSharedHolderContracts[0].address;
+const minterSetPriceHolderV5Address = config.holderLibContracts[0].address;
 const minterSetPriceHolderV5Contract = new MinterSetPriceHolderV5__factory(
   deployer
 ).attach(minterSetPriceHolderV5Address);
 
-describe("iFilteredSharedMerkle event handling", () => {
+describe("HolderLib event handling", () => {
   beforeAll(async () => {
     await waitUntilSubgraphIsSynced(client);
   });

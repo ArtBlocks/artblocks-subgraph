@@ -33,12 +33,12 @@ if (!sharedMinterFilter) {
 }
 
 // get MinterSetPriceMerkleV5 contract from the subgraph config
-if (!config.iSharedMerkleContracts) {
-  throw new Error("No iSharedMerkleContracts in config");
+if (!config.merkleLibContracts) {
+  throw new Error("No merkleLibContracts in config");
 }
-const minterSetPriceMerkleV5Address = config.iSharedMerkleContracts[0].address;
+const minterSetPriceMerkleV5Address = config.merkleLibContracts[0].address;
 
-describe("ISharedMinterMerkleV0 event handling", () => {
+describe("MerkleLib event handling", () => {
   beforeAll(async () => {
     await waitUntilSubgraphIsSynced(client);
   });

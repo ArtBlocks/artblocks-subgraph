@@ -9,7 +9,7 @@ import {
 } from "../utils/helpers";
 
 import { MinterFilterV2__factory } from "../../contracts/factories/MinterFilterV2__factory";
-import { MinterDALinV5__factory } from "../../contracts/factories/MinterDALinV5__factory";
+import { MinterDAExpV5__factory } from "../../contracts/factories/MinterDAExpV5__factory";
 
 import { ethers } from "ethers";
 // hide nuisance logs about event overloading
@@ -49,54 +49,78 @@ if (!config.iGenArt721CoreContractV3_BaseContracts) {
 const genArt721CoreAddress =
   config.iGenArt721CoreContractV3_BaseContracts[0].address;
 
-// get MinterDALin contract from the subgraph config
-if (!config.iSharedDALinContracts) {
-  throw new Error("No iSharedDALinContracts in config");
+// get MinterDAExp contract from the subgraph config
+if (!config.DAExpLibContracts) {
+  throw new Error("No DAExpLibContracts in config");
 }
-const minterDALinV5Address = config.iSharedDALinContracts[0].address;
-const minterDALinV5Contract = new MinterDALinV5__factory(deployer).attach(
-  minterDALinV5Address
+const minterDAExpV5Address = config.DAExpLibContracts[0].address;
+const minterDAExpV5Contract = new MinterDAExpV5__factory(deployer).attach(
+  minterDAExpV5Address
 );
 
-describe("iFilteredSharedDALin event handling", () => {
+// helper function to calculate approximate DAExp length
+function getApproxDAExpLength(
+  startPrice: ethers.BigNumber,
+  basePrice: ethers.BigNumber,
+  halfLifeSeconds: number
+): number {
+  const EXTRA_DECIMALS = 10 ** 5;
+  // const startPriceFloatingPoint = ethers.utils.parseUnits(startPrice);
+  // const basePriceFloatingPoint = basePrice.toBigDecimal();
+  const priceRatio =
+    startPrice.mul(EXTRA_DECIMALS).div(basePrice).toNumber() / EXTRA_DECIMALS;
+  const completedHalfLives = Math.floor(Math.log(priceRatio) / Math.log(2));
+  const x1 = completedHalfLives * halfLifeSeconds;
+  const x2 = x1 + halfLifeSeconds;
+  const y1 = startPrice.div(2 ** completedHalfLives);
+  const y2 = y1.div(2);
+  const totalAuctionTime =
+    x1 +
+    (x2 - x1) *
+      (basePrice.sub(y1).mul(EXTRA_DECIMALS).div(y2.sub(y1)).toNumber() /
+        EXTRA_DECIMALS);
+  return totalAuctionTime;
+}
+
+describe("DAExpLib event handling", () => {
   beforeAll(async () => {
     await waitUntilSubgraphIsSynced(client);
   });
 
   describe("Indexed after setup", () => {
     test("created new Minter during deployment and allowlisting", async () => {
-      const targetId = minterDALinV5Address.toLowerCase();
+      const targetId = minterDAExpV5Address.toLowerCase();
       const minterRes = await getMinterDetails(client, targetId);
       expect(minterRes.id).toBe(targetId);
     });
   });
 
-  describe("AuctionMinimumLengthSecondsUpdated", () => {
+  describe("AuctionMinHalfLifeSecondsUpdated", () => {
     // @dev no need to reset the affected value after each test
     test("updated after admin configures", async () => {
       // query public constant for the expected value (>0)
       const initialValue =
-        await minterDALinV5Contract.minimumAuctionLengthSeconds();
+        await minterDAExpV5Contract.minimumPriceDecayHalfLifeSeconds();
       const newTargetValue = initialValue.add(1);
       // update the minter value
-      await minterDALinV5Contract
+      await minterDAExpV5Contract
         .connect(deployer)
-        .setMinimumAuctionLengthSeconds(newTargetValue);
+        .setMinimumPriceDecayHalfLifeSeconds(newTargetValue);
       // validate minter's extraMinterDetails in subgraph
       await waitUntilSubgraphIsSynced(client);
-      const targetId = minterDALinV5Address.toLowerCase();
+      const targetId = minterDAExpV5Address.toLowerCase();
       const minterRes = await getMinterDetails(client, targetId);
       const extraMinterDetails = JSON.parse(minterRes.extraMinterDetails);
-      expect(extraMinterDetails.minimumAuctionLengthInSeconds).toBe(
+      expect(extraMinterDetails.minimumHalfLifeInSeconds).toBe(
         newTargetValue.toNumber()
       );
     });
   });
 
-  describe("SetAuctionDetailsLin", () => {
+  describe("SetAuctionDetailsExp", () => {
     afterEach(async () => {
       // clear the auction details for the project
-      await minterDALinV5Contract
+      await minterDAExpV5Contract
         .connect(deployer)
         .resetAuctionDetails(0, genArt721CoreAddress);
       // clear the current minter for the project
@@ -119,24 +143,23 @@ describe("iFilteredSharedDALin event handling", () => {
       await sharedMinterFilterContract.connect(artist).setMinterForProject(
         0, // _projectId
         genArt721CoreAddress, // _coreContract
-        minterDALinV5Address // _minter
+        minterDAExpV5Address // _minter
       );
       const latestBlock = await deployer.provider.getBlock("latest");
       const targetAuctionStart = latestBlock.timestamp + 3600;
-      const targetAuctionEnd = targetAuctionStart + 3600;
       const targetStartPrice = ethers.utils.parseEther("1");
       const targetBasePrice = ethers.utils.parseEther("0.1");
-      await minterDALinV5Contract.connect(artist).setAuctionDetails(
+      await minterDAExpV5Contract.connect(artist).setAuctionDetails(
         0, // _projectId
         genArt721CoreAddress, // _coreContract
-        targetAuctionStart, // _auctionTimestampStart
-        targetAuctionEnd, // _auctionTimestampEnd
+        targetAuctionStart, // _timestampStart
+        600, // _priceDecayHalfLifeSeconds
         targetStartPrice, // _startPrice
         targetBasePrice // _basePrice
       );
       // validate project minter config in subgraph
       await waitUntilSubgraphIsSynced(client);
-      const targetId = `${minterDALinV5Address.toLowerCase()}-${genArt721CoreAddress.toLowerCase()}-0`;
+      const targetId = `${minterDAExpV5Address.toLowerCase()}-${genArt721CoreAddress.toLowerCase()}-0`;
       const minterConfigRes = await getProjectMinterConfigurationDetails(
         client,
         targetId
@@ -148,7 +171,15 @@ describe("iFilteredSharedDALin event handling", () => {
       const extraMinterDetails = JSON.parse(minterConfigRes.extraMinterDetails);
       expect(extraMinterDetails.startPrice).toBe(targetStartPrice.toString());
       expect(extraMinterDetails.startTime).toBe(targetAuctionStart);
-      expect(extraMinterDetails.endTime).toBe(targetAuctionEnd);
+      expect(extraMinterDetails.halfLifeSeconds).toBe(600);
+      const approxDALength = getApproxDAExpLength(
+        targetStartPrice,
+        targetBasePrice,
+        600
+      );
+      expect(extraMinterDetails.approximateDAExpEndTime).toBe(
+        targetAuctionStart + approxDALength
+      );
     });
   });
 });

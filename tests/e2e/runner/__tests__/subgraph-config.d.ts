@@ -24,14 +24,17 @@ export type SubgraphConfig = Partial<{
   iDependencyRegistryV0Contracts: { address: string }[];
   ownableUpgradeableDependencyRegistryContracts: { address: string }[];
   ICoreRegistryContracts: { address: string }[];
-  iSharedMinterV0Contracts: { address: string }[];
-  iSharedMerkleContracts: { address: string }[];
-  iSharedHolderContracts: { address: string }[];
-  iSharedSEAContracts: { address: string }[];
-  iSharedDAContracts: { address: string }[];
-  iSharedDAExpContracts: { address: string }[];
-  iSharedDALinContracts: { address: string }[];
-  iSharedDAExpSettlementContracts: { address: string }[];
+  genericMinterEventsLibContracts: { address: string }[];
+  splitFundsLibContracts: { address: string }[];
+  setPriceLibContracts: { address: string }[];
+  maxInvocationsLibContracts: { address: string }[];
+  merkleLibContracts: { address: string }[];
+  holderLibContracts: { address: string }[];
+  SEALibContracts: { address: string }[];
+  DALibContracts: { address: string }[];
+  DAExpLibContracts: { address: string }[];
+  DALinLibContracts: { address: string }[];
+  settlementExpLibContracts: { address: string }[];
   metadata: {
     minterFilterAdminACLAddress: string;
     coreRegistryAddress: string;

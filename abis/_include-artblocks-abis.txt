@@ -37,3 +37,15 @@ ISharedMinterHolderV0
 ISharedMinterMerkleV0
 ISharedMinterSEAV0
 ISharedMinterV0
+DAExpLib
+DALib
+DALinLib
+GenericMinterEventsLib
+MaxInvocationsLib
+MerkleLib
+PolyptychLib
+SEALib
+SetPriceLib
+SettlementExpLib
+SplitFundsLib
+TokenHolderLib

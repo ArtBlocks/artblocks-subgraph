@@ -1,14 +1,13 @@
 import {
-  AuctionMinHalfLifeSecondsUpdated,
-  SetAuctionDetailsExp
-} from "../generated/ISharedDAExp/ISharedMinterDAExpV0";
+  AuctionMinimumLengthSecondsUpdated,
+  SetAuctionDetailsLin
+} from "../generated/DALinLib/DALinLib";
 
-import { loadOrCreateMinterProjectAndConfigIfProject } from "./i-shared-minter-mapping";
+import { loadOrCreateMinterProjectAndConfigIfProject } from "./generic-minter-events-lib-mapping";
 
 import {
   loadOrCreateMinter,
-  updateProjectIfMinterConfigIsActive,
-  getTotalDAExpAuctionTime
+  updateProjectIfMinterConfigIsActive
 } from "./helpers";
 
 import {
@@ -23,19 +22,19 @@ import {
 // minter-level configuration events
 
 /**
- * handles the update of Exponential Dutch Auction's minimum price decay half life in seconds.
- * @param event The event containing the updated minimum price decay half life in seconds.
+ * handles the update of a Linear Dutch Auction's minimum auction length in seconds.
+ * @param event The event containing the updated minimum auction length in seconds.
  */
-export function handleAuctionMinHalfLifeSecondsUpdated(
-  event: AuctionMinHalfLifeSecondsUpdated
+export function handleAuctionMinimumLengthSecondsUpdated(
+  event: AuctionMinimumLengthSecondsUpdated
 ): void {
   // load minter
   const minter = loadOrCreateMinter(event.address, event.block.timestamp);
 
   // update minter extra minter details value
   setMinterExtraMinterDetailsValue(
-    "minimumHalfLifeInSeconds",
-    event.params._minimumPriceDecayHalfLifeSeconds,
+    "minimumAuctionLengthInSeconds",
+    event.params.minimumAuctionLengthSeconds,
     minter
   );
 
@@ -48,14 +47,14 @@ export function handleAuctionMinHalfLifeSecondsUpdated(
 
 /**
  * Handles the event that updates the auction details for a project using an
- * exponential Dutch auction minter.
- * @param event The event carrying the updated exp auction data.
+ * linear Dutch auction minter.
+ * @param event The event carrying the updated lin auction data.
  */
-export function handleSetAuctionDetailsExp(event: SetAuctionDetailsExp): void {
+export function handleSetAuctionDetailsLin(event: SetAuctionDetailsLin): void {
   const minterProjectAndConfig = loadOrCreateMinterProjectAndConfigIfProject(
     event.address, // minter
-    event.params._coreContract,
-    event.params._projectId,
+    event.params.coreContract,
+    event.params.projectId,
     event.block.timestamp
   );
   if (!minterProjectAndConfig) {
@@ -66,33 +65,21 @@ export function handleSetAuctionDetailsExp(event: SetAuctionDetailsExp): void {
   const projectMinterConfig = minterProjectAndConfig.projectMinterConfiguration;
   // remove the auction details from the project minter config
 
-  projectMinterConfig.basePrice = event.params._basePrice;
+  projectMinterConfig.basePrice = event.params.basePrice;
   projectMinterConfig.priceIsConfigured = true;
   setProjectMinterConfigExtraMinterDetailsValue(
     "startPrice",
-    event.params._startPrice.toString(), // Price is likely to overflow js Number.MAX_SAFE_INTEGER so store as string
+    event.params.startPrice.toString(), // Price is likely to overflow js Number.MAX_SAFE_INTEGER so store as string
     projectMinterConfig
   );
   setProjectMinterConfigExtraMinterDetailsValue(
     "startTime",
-    event.params._auctionTimestampStart,
+    event.params.auctionTimestampStart,
     projectMinterConfig
   );
   setProjectMinterConfigExtraMinterDetailsValue(
-    "halfLifeSeconds",
-    event.params._priceDecayHalfLifeSeconds,
-    projectMinterConfig
-  );
-
-  // pre-calculate the approximate DA end time
-  const totalAuctionTime = getTotalDAExpAuctionTime(
-    event.params._startPrice,
-    event.params._basePrice,
-    event.params._priceDecayHalfLifeSeconds
-  );
-  setProjectMinterConfigExtraMinterDetailsValue(
-    "approximateDAExpEndTime",
-    event.params._auctionTimestampStart.plus(totalAuctionTime),
+    "endTime",
+    event.params.auctionTimestampEnd,
     projectMinterConfig
   );
 

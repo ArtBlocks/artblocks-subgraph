@@ -11,9 +11,9 @@ import {
   ResetAuctionDetails,
   ProjectNextTokenUpdated,
   ProjectNextTokenEjected
-} from "../generated/ISharedSEA/ISharedMinterSEAV0";
+} from "../generated/SEALib/SEALib";
 
-import { loadOrCreateMinterProjectAndConfigIfProject } from "./i-shared-minter-mapping";
+import { loadOrCreateMinterProjectAndConfigIfProject } from "./generic-minter-events-lib-mapping";
 
 import {
   loadOrCreateMinter,

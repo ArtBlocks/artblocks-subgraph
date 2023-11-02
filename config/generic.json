@@ -60,42 +60,57 @@
       "address": ""
     }
   ],
-  "iSharedMinterV0Contracts": [
+  "genericMinterEventsLibContracts": [
     {
       "address": ""
     }
   ],
-  "iSharedMerkleContracts": [
+  "splitFundsLibContracts": [
     {
       "address": ""
     }
   ],
-  "iSharedHolderContracts": [
+  "setPriceLibContracts": [
     {
       "address": ""
     }
   ],
-  "iSharedSEAContracts": [
+  "maxInvocationsLibContracts": [
     {
       "address": ""
     }
   ],
-  "iSharedDAContracts": [
+  "merkleLibContracts": [
     {
       "address": ""
     }
   ],
-  "iSharedDAExpContracts": [
+  "holderLibContracts": [
     {
       "address": ""
     }
   ],
-  "iSharedDALinContracts": [
+  "SEALibContracts": [
     {
       "address": ""
     }
   ],
-  "iSharedDAExpSettlementContracts": [
+  "DALibContracts": [
+    {
+      "address": ""
+    }
+  ],
+  "DAExpLibContracts": [
+    {
+      "address": ""
+    }
+  ],
+  "DALinLibContracts": [
+    {
+      "address": ""
+    }
+  ],
+  "settlementExpLibContracts": [
     {
       "address": ""
     }

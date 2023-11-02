@@ -7,11 +7,6 @@ import {
   getMinterDetails,
   getProjectMinterConfigurationDetails,
 } from "../utils/helpers";
-
-import {
-  GenArt721CoreV3__factory,
-  GenArt721CoreV3LibraryAddresses,
-} from "../../contracts/factories/GenArt721CoreV3__factory";
 import { MinterFilterV2__factory } from "../../contracts/factories/MinterFilterV2__factory";
 import { MinterSetPriceV5__factory } from "../../contracts/factories/MinterSetPriceV5__factory";
 import { MinterSetPriceERC20V5__factory } from "../../contracts/factories/MinterSetPriceERC20V5__factory";
@@ -54,33 +49,27 @@ if (!bytecodeStorageReaderAddress)
   throw new Error(
     "No bytecode storage reader address found in config metadata"
   );
-const linkLibraryAddresses: GenArt721CoreV3LibraryAddresses = {
-  "contracts/libs/v0.8.x/BytecodeStorageV1.sol:BytecodeStorageReader":
-    bytecodeStorageReaderAddress,
-};
-const genArt721CoreContract = new GenArt721CoreV3__factory(
-  linkLibraryAddresses,
-  deployer
-).attach(genArt721CoreAddress);
 
 // get MinterSetPriceV5
 // @dev this is minter at index 0 in the subgraph config
-if (!config.iSharedMinterV0Contracts) {
-  throw new Error("No iSharedMinterV0Contracts in config");
+if (!config.genericMinterEventsLibContracts) {
+  throw new Error("No genericMinterEventsLibContracts in config");
 }
-const minterSetPriceV5Address = config.iSharedMinterV0Contracts[0].address;
+const minterSetPriceV5Address =
+  config.genericMinterEventsLibContracts[0].address;
 const minterSetPriceV5Contract = new MinterSetPriceV5__factory(deployer).attach(
   minterSetPriceV5Address
 );
 
 // get MinterSetPriceERC20V5
 // @dev this is minter at index 1 in the subgraph config
-const minterSetPriceERC20V5Address = config.iSharedMinterV0Contracts[1].address;
+const minterSetPriceERC20V5Address =
+  config.genericMinterEventsLibContracts[1].address;
 const minterSetPriceERC20V5Contract = new MinterSetPriceERC20V5__factory(
   deployer
 ).attach(minterSetPriceERC20V5Address);
 
-describe("iSharedMinterV0 event handling", () => {
+describe("SetPriceLib event handling", () => {
   beforeAll(async () => {
     await waitUntilSubgraphIsSynced(client);
   });
@@ -93,7 +82,7 @@ describe("iSharedMinterV0 event handling", () => {
     });
   });
 
-  describe("PricePerTokenInWeiUpdated", () => {
+  describe("PricePerTokenUpdated", () => {
     afterEach(async () => {
       // clear the minter for project zero
       // @dev call success depends on test state, so use a try/catch block
@@ -134,7 +123,7 @@ describe("iSharedMinterV0 event handling", () => {
     });
   });
 
-  describe("ProjectCurrencyInfoUpdated", () => {
+  describe("PricePerTokenReset", () => {
     afterEach(async () => {
       // clear the minter for project zero
       // @dev call success depends on test state, so use a try/catch block
@@ -170,7 +159,6 @@ describe("iSharedMinterV0 event handling", () => {
           minterSetPriceERC20V5Address
         );
       // update currency info
-      const newPrice = ethers.utils.parseEther(Math.random().toString());
       await minterSetPriceERC20V5Contract
         .connect(artist)
         .updateProjectCurrencyInfo(
@@ -179,8 +167,13 @@ describe("iSharedMinterV0 event handling", () => {
           currencySymbol,
           newCurrency.address
         );
+      // configure price
+      const newPrice = ethers.utils.parseEther(Math.random().toString());
+      await minterSetPriceERC20V5Contract
+        .connect(artist)
+        .updatePricePerTokenInWei(0, genArt721CoreAddress, newPrice);
       await waitUntilSubgraphIsSynced(client);
-      // validate currency info in subgraph
+      // validate currency info and price is configured in subgraph
       const targetId = `${minterSetPriceERC20V5Address.toLowerCase()}-${genArt721CoreAddress.toLowerCase()}-0`;
       const minterConfigRes = await getProjectMinterConfigurationDetails(
         client,
@@ -190,62 +183,33 @@ describe("iSharedMinterV0 event handling", () => {
       expect(minterConfigRes.currencyAddress).toBe(
         newCurrency.address.toLowerCase()
       );
-    });
-  });
-
-  describe("ProjectMaxInvocationsUpdated", () => {
-    afterEach(async () => {
-      // reset minter max invocations to core max invocations
-      // @dev does not depend on test state, so can be run in afterEach
-      // without needing a try/catch block
-      await minterSetPriceV5Contract
-        .connect(artist)
-        .syncProjectMaxInvocationsToCore(0, genArt721CoreAddress);
-
-      // clear the minter for project zero
-      // @dev call success depends on test state, so use a try/catch block
-      try {
-        await sharedMinterFilterContract
-          .connect(artist)
-          .removeMinterForProject(0, genArt721CoreAddress);
-      } catch (error) {
-        // try block will only fail in case of previously failed test where
-        // project zero never had its minter assigned.
-        // Thus, swallow error here because the test failure has already been
-        // reported, and additional error messaging from afterEach is not
-        // helpful.
-      }
-    });
-
-    test("Max invocations is updated and configured", async () => {
-      // set minter for project zero to the target minter
-      await sharedMinterFilterContract
-        .connect(artist)
-        .setMinterForProject(0, genArt721CoreAddress, minterSetPriceV5Address);
-      // verify initial max invocation state in subgraph
-      const projectStateData = await genArt721CoreContract.projectStateData(0);
-      const targetId = `${minterSetPriceV5Address.toLowerCase()}-${genArt721CoreAddress.toLowerCase()}-0`;
-      const minterConfigRes = await getProjectMinterConfigurationDetails(
-        client,
-        targetId
+      expect(minterConfigRes.basePrice).toBe(newPrice.toString());
+      expect(minterConfigRes.priceIsConfigured).toBe(true);
+      // invoke price reset by updating to a different currency
+      const newCurrency2 = await new ERC20Mock__factory(artist).deploy(
+        ethers.utils.parseEther("100")
       );
-      // subgraph max invocations should match core max invocations
-      expect(minterConfigRes.maxInvocations).toBe(
-        projectStateData.maxInvocations.toString()
-      );
-      // set max invocations to 99
-      await minterSetPriceV5Contract
+      const currencySymbol2 = "ERC20";
+      await minterSetPriceERC20V5Contract
         .connect(artist)
-        .manuallyLimitProjectMaxInvocations(0, genArt721CoreAddress, 99);
+        .updateProjectCurrencyInfo(
+          0,
+          genArt721CoreAddress,
+          currencySymbol2,
+          newCurrency2.address
+        );
       await waitUntilSubgraphIsSynced(client);
-      // validate max invocations in subgraph was updated
+      // validate currency info and price is NOT configured in subgraph
       const minterConfigRes2 = await getProjectMinterConfigurationDetails(
         client,
         targetId
       );
-      // subgraph max invocations should match core max invocations
-      expect(minterConfigRes2.maxInvocations).toBe("99");
-      // state is reset in afterEach
+      expect(minterConfigRes2.currencySymbol).toBe(currencySymbol2);
+      expect(minterConfigRes2.currencyAddress).toBe(
+        newCurrency2.address.toLowerCase()
+      );
+      expect(minterConfigRes2.priceIsConfigured).toBe(false);
+      expect(minterConfigRes2.basePrice).toBe("0");
     });
   });
 });

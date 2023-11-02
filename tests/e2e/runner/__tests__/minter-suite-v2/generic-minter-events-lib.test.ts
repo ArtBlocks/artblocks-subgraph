@@ -41,15 +41,15 @@ const genArt721CoreAddress =
   config.iGenArt721CoreContractV3_BaseContracts[0].address;
 
 // get MinterSetPriceMerkleV5 contract from the subgraph config
-if (!config.iSharedMerkleContracts) {
-  throw new Error("No iSharedMerkleContracts in config");
+if (!config.merkleLibContracts) {
+  throw new Error("No merkleLibContracts in config");
 }
-const minterSetPriceMerkleV5Address = config.iSharedMerkleContracts[0].address;
+const minterSetPriceMerkleV5Address = config.merkleLibContracts[0].address;
 const minterSetPriceMerkleV5Contract = new MinterSetPriceMerkleV5__factory(
   deployer
 ).attach(minterSetPriceMerkleV5Address);
 
-describe("iSharedMinterV0 event handling - generic handlers", () => {
+describe("GenericMinterEventsLib event handling - generic handlers", () => {
   // NOTE: this test suite is not exhaustive, because not all generic events are currently used by
   // the current set of minters.
   // Tests for specific generic events should be added here as they are implemented in the minters.

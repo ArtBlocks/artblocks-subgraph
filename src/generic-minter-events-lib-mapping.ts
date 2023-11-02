@@ -2,10 +2,6 @@ import { BigInt, log, Address } from "@graphprotocol/graph-ts";
 import { Project } from "../generated/schema";
 
 import {
-  PricePerTokenInWeiUpdated,
-  ProjectCurrencyInfoUpdated,
-  ProjectMaxInvocationsLimitUpdated,
-  // generic events
   ConfigValueSet as ConfigValueSetBool,
   ConfigValueSet1 as ConfigValueSetBigInt,
   ConfigValueSet2 as ConfigValueSetAddress,
@@ -17,7 +13,7 @@ import {
   ConfigValueRemovedFromSet as ConfigValueRemovedFromSetBigInt,
   ConfigValueRemovedFromSet1 as ConfigValueRemovedFromSetAddress,
   ConfigValueRemovedFromSet2 as ConfigValueRemovedFromSetBytes
-} from "../generated/ISharedMinterV0/ISharedMinterV0";
+} from "../generated/GenericMinterEventsLib/GenericMinterEventsLib";
 
 import {
   MinterProjectAndConfig,
@@ -34,115 +30,6 @@ import {
   addProjectMinterConfigExtraMinterDetailsManyValue,
   removeProjectMinterConfigExtraMinterDetailsManyValue
 } from "./extra-minter-details-helpers";
-
-///////////////////////////////////////////////////////////////////////////////
-// EVENT HANDLERS start here
-///////////////////////////////////////////////////////////////////////////////
-
-/**
- * Handles the update of price per token in wei. Attempts to load associated project and
- * its minter configuration, then updates base price in the configuration.
- * @param event The event carrying new price per token in wei
- */
-export function handlePricePerTokenInWeiUpdated(
-  event: PricePerTokenInWeiUpdated
-): void {
-  // attempt to load project, if it doesn't exist, log a warning and return
-  // @dev we don't support or allow minters to pre-configure projects that do
-  // not yet exist
-  const project = loadProjectByCoreAddressAndProjectNumber(
-    event.params._coreContract,
-    event.params._projectId
-  );
-  if (!project) {
-    log.warning("Project {} not found for core contract {}", [
-      event.params._projectId.toString(),
-      event.params._coreContract.toHexString()
-    ]);
-    return;
-  }
-
-  // load minter
-  const minter = loadOrCreateMinter(event.address, event.block.timestamp);
-
-  // load or create project minter configuration
-  const projectMinterConfig = loadOrCreateProjectMinterConfiguration(
-    project,
-    minter
-  );
-
-  projectMinterConfig.basePrice = event.params._pricePerTokenInWei;
-  projectMinterConfig.priceIsConfigured = true;
-  projectMinterConfig.save();
-
-  // induce sync if the project minter configuration is the active one
-  updateProjectIfMinterConfigIsActive(
-    project,
-    projectMinterConfig,
-    event.block.timestamp
-  );
-}
-
-/**
- * Handles the update of a project's currency information. Attempts to load associated
- * project and its minter configuration, then updates currency address and symbol.
- * @param event The event carrying updated currency information
- */
-export function handleProjectCurrencyInfoUpdated(
-  event: ProjectCurrencyInfoUpdated
-): void {
-  const minterProjectAndConfig = loadOrCreateMinterProjectAndConfigIfProject(
-    event.address, // minter
-    event.params._coreContract,
-    event.params._projectId,
-    event.block.timestamp
-  );
-  if (!minterProjectAndConfig) {
-    // project wasn't found, warning already logged in helper function
-    return;
-  }
-
-  const projectMinterConfig = minterProjectAndConfig.projectMinterConfiguration;
-  projectMinterConfig.currencyAddress = event.params._currencyAddress;
-  projectMinterConfig.currencySymbol = event.params._currencySymbol;
-  projectMinterConfig.save();
-
-  // induce sync if the project minter configuration is the active one
-  updateProjectIfMinterConfigIsActive(
-    minterProjectAndConfig.project,
-    projectMinterConfig,
-    event.block.timestamp
-  );
-}
-
-export function handleProjectMaxInvocationsLimitUpdated(
-  event: ProjectMaxInvocationsLimitUpdated
-): void {
-  const minterProjectAndConfig = loadOrCreateMinterProjectAndConfigIfProject(
-    event.address, // minter
-    event.params._coreContract,
-    event.params._projectId,
-    event.block.timestamp
-  );
-  if (!minterProjectAndConfig) {
-    // project wasn't found, warning already logged in helper function
-    return;
-  }
-  const projectMinterConfig = minterProjectAndConfig.projectMinterConfiguration;
-  projectMinterConfig.maxInvocations = event.params._maxInvocations;
-  projectMinterConfig.save();
-
-  // induce sync if the project minter configuration is the active one
-  updateProjectIfMinterConfigIsActive(
-    minterProjectAndConfig.project,
-    projectMinterConfig,
-    event.block.timestamp
-  );
-}
-
-///////////////////////////////////////////////////////////////////////////////
-// EVENT HANDLERS end here
-///////////////////////////////////////////////////////////////////////////////
 
 ///////////////////////////////////////////////////////////////////////////////
 // GENERIC EVENT HANDLERS start here
@@ -181,8 +68,8 @@ function handleSetValueProjectMinterConfig<EventType>(event: EventType): void {
 
   const minterProjectAndConfig = loadOrCreateMinterProjectAndConfigIfProject(
     event.address, // minter
-    event.params._coreContract,
-    event.params._projectId,
+    event.params.coreContract,
+    event.params.projectId,
     event.block.timestamp
   );
   if (!minterProjectAndConfig) {
@@ -191,7 +78,7 @@ function handleSetValueProjectMinterConfig<EventType>(event: EventType): void {
   }
 
   const projectMinterConfig = minterProjectAndConfig.projectMinterConfiguration;
-  const key = event.params._key.toString();
+  const key = event.params.key.toString();
 
   // ---- SYNC EXTRA MINTER DETAILS ----
   if (
@@ -201,14 +88,14 @@ function handleSetValueProjectMinterConfig<EventType>(event: EventType): void {
     // always convert BigInt price values to strings to avoid js numeric overflow
     setProjectMinterConfigExtraMinterDetailsValue(
       key,
-      event.params._value.toString(), // <--- convert to string
+      event.params.value.toString(), // <--- convert to string
       projectMinterConfig
     );
   } else {
     // default: do not convert to a string
     setProjectMinterConfigExtraMinterDetailsValue(
       key,
-      event.params._value,
+      event.params.value,
       projectMinterConfig
     );
   }
@@ -239,8 +126,8 @@ function handleSetValueProjectMinterConfig<EventType>(event: EventType): void {
 export function handleConfigKeyRemoved(event: ConfigKeyRemoved): void {
   const minterProjectAndConfig = loadOrCreateMinterProjectAndConfigIfProject(
     event.address, // minter
-    event.params._coreContract,
-    event.params._projectId,
+    event.params.coreContract,
+    event.params.projectId,
     event.block.timestamp
   );
   if (!minterProjectAndConfig) {
@@ -250,7 +137,7 @@ export function handleConfigKeyRemoved(event: ConfigKeyRemoved): void {
 
   const projectMinterConfig = minterProjectAndConfig.projectMinterConfiguration;
   removeProjectMinterConfigExtraMinterDetailsEntry(
-    event.params._key.toString(),
+    event.params.key.toString(),
     projectMinterConfig
   );
 
@@ -294,8 +181,8 @@ function handleAddToSetProjectMinterConfig<EventType>(event: EventType): void {
 
   const minterProjectAndConfig = loadOrCreateMinterProjectAndConfigIfProject(
     event.address, // minter
-    event.params._coreContract,
-    event.params._projectId,
+    event.params.coreContract,
+    event.params.projectId,
     event.block.timestamp
   );
   if (!minterProjectAndConfig) {
@@ -306,8 +193,8 @@ function handleAddToSetProjectMinterConfig<EventType>(event: EventType): void {
   const projectMinterConfig = minterProjectAndConfig.projectMinterConfiguration;
   addProjectMinterConfigExtraMinterDetailsManyValue(
     projectMinterConfig,
-    event.params._key.toString(),
-    event.params._value
+    event.params.key.toString(),
+    event.params.value
   );
 
   // induce sync if the project minter configuration is the active one
@@ -352,8 +239,8 @@ function handleRemoveFromSetProjectMinterConfig<EventType>(
 
   const minterProjectAndConfig = loadOrCreateMinterProjectAndConfigIfProject(
     event.address, // minter
-    event.params._coreContract,
-    event.params._projectId,
+    event.params.coreContract,
+    event.params.projectId,
     event.block.timestamp
   );
   if (!minterProjectAndConfig) {
@@ -364,8 +251,8 @@ function handleRemoveFromSetProjectMinterConfig<EventType>(
   const projectMinterConfig = minterProjectAndConfig.projectMinterConfiguration;
   removeProjectMinterConfigExtraMinterDetailsManyValue(
     projectMinterConfig,
-    event.params._key.toString(),
-    event.params._value
+    event.params.key.toString(),
+    event.params.value
   );
 
   // induce sync if the project minter configuration is the active one
@@ -391,7 +278,7 @@ function handleRemoveFromSetProjectMinterConfig<EventType>(
  * @param projectNumber project number of the project (BigInt)
  * @returns The Project entity from the store if it exists, otherwise null
  */
-function loadProjectByCoreAddressAndProjectNumber(
+export function loadProjectByCoreAddressAndProjectNumber(
   coreContractAddress: Address,
   projectNumber: BigInt
 ): Project | null {

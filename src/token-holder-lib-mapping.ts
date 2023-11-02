@@ -4,9 +4,9 @@ import {
   DelegationRegistryUpdated,
   AllowedHoldersOfProjects,
   RemovedHoldersOfProjects
-} from "../generated/ISharedHolder/ISharedMinterHolderV0";
+} from "../generated/TokenHolderLib/TokenHolderLib";
 
-import { loadOrCreateMinterProjectAndConfigIfProject } from "./i-shared-minter-mapping";
+import { loadOrCreateMinterProjectAndConfigIfProject } from "./generic-minter-events-lib-mapping";
 
 import {
   loadOrCreateMinter,
@@ -71,8 +71,8 @@ function handleHoldersOfProjectsGeneric<EventType>(event: EventType): void {
   // load projectMinterConfiguration
   let minterProjectAndConfig = loadOrCreateMinterProjectAndConfigIfProject(
     event.address, // minter
-    event.params._coreContract,
-    event.params._projectId,
+    event.params.coreContract,
+    event.params.projectId,
     event.block.timestamp
   );
   if (!minterProjectAndConfig) {
@@ -81,9 +81,9 @@ function handleHoldersOfProjectsGeneric<EventType>(event: EventType): void {
   }
 
   const projectMinterConfig = minterProjectAndConfig.projectMinterConfiguration;
-  for (let i = 0; i < event.params._ownedNFTAddresses.length; i++) {
-    let address = event.params._ownedNFTAddresses[i].toHexString();
-    let holderProjectId = event.params._ownedNFTProjectIds[i].toString();
+  for (let i = 0; i < event.params.ownedNFTAddresses.length; i++) {
+    let address = event.params.ownedNFTAddresses[i].toHexString();
+    let holderProjectId = event.params.ownedNFTProjectIds[i].toString();
     let bytesValueCombined = Bytes.fromUTF8(address + "-" + holderProjectId);
 
     if (event instanceof AllowedHoldersOfProjects) {
