@@ -187,7 +187,6 @@ describe("DALib event handling", () => {
       expect(minterConfigRes.basePrice).toBeDefined();
       // validate extraMinterDetails
       const extraMinterDetails = JSON.parse(minterConfigRes.extraMinterDetails);
-      console.log(extraMinterDetails);
       expect(extraMinterDetails.startPrice).toBeDefined();
       expect(extraMinterDetails.startTime).toBeDefined();
       expect(extraMinterDetails.endTime).toBeDefined();
