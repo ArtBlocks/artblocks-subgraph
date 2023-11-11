@@ -1,255 +1,229 @@
 {
-  "network": "arbitrum-one",
-  "iGenArt721CoreContractV3_BaseContracts": [
-    {
-      "address": "0x0000000000000000000000000000000000000000",
-      "startBlock": 96747000
-    }
-  ],
-  "ownableGenArt721CoreV3Contracts": [],
-  "iERC721GenArt721CoreV3Contracts": [],
-  "iGenArt721CoreContractV3_Engine_FlexContracts": [],
-  "minterFilterV1Contracts": [],
-  "minterSetPriceContracts": [],
-  "minterSetPriceERC20Contracts": [],
-  "minterDAExpContracts": [],
-  "minterDALinContracts": [],
-  "minterDAExpSettlementContracts": [],
-  "minterMerkleContracts": [],
-  "minterHolderContracts": [],
-  "minterSEAContracts": [],
-  "adminACLV0Contracts": [
-    {
-      "address": "0xa319C382a702682129fcbF55d514E61a16f97f9c",
-      "name": "Admin ACL for shared minter filter"
-    }
-  ],
+  "network": "arbitrum-sepolia",
   "sharedMinterFilterContracts": [
     {
-      "address": "0x3b1Fe77D72e2DE15EF3A1ff83176e9F9af9E292A",
-      "name": "Arbitrum mainnet shared minter filter: MinterFilterV2"
+      "address": "0xa07f47c30C262adcC263A4D44595972c50e04db7",
+      "name": "Arbitrum sepolia staging shared minter filter: MinterFilterV2"
     }
   ],
-  "ICoreRegistryContracts": [
-    {
-      "address": "0xdAe755c2944Ec125a0D8D5CB082c22837593441a",
-      "name": "Arbitrum mainnet Engine registry for partner deployments",
-      "startBlock": 103885679
-    },
-    {
-      "address": "0x463B8CED7D22a55Aa4A5d69EF6a54a08AA0feB93",
-      "name": "Arbitrum mainnet core registry for partner deployments: CoreRegistryV1",
-      "startBlock": 103885679
-    }
-  ],
-  "iDependencyRegistryV0Contracts": [],
-  "ownableUpgradeableDependencyRegistryContracts": [],
   "genericMinterEventsLibContracts": [
     {
-      "address": "0xfbA7e2f908829317A5b2259fE1f72E0354a781C6",
+      "address": "0x5C8C93998023556950174D97b311d2C6B653f586",
       "name": "Arbitrum sepolia staging shared minter: MinterSetPriceV5"
     },
     {
-      "address": "0x7DC2c066251A21520Ae03cd2C3567a3c073Be60A",
+      "address": "0x14ff6f834a2a00E6E5611962B5db6cD23AF401e9",
       "name": "Arbitrum sepolia staging shared minter: MinterSetPriceERC20V5"
     },
     {
-      "address": "0xb4510235B7CAc3c870312C732fe8E500cA77D4D8",
+      "address": "0xDd06d8483868Cd0C5E69C24eEaA2A5F2bEaFd42b",
       "name": "Arbitrum sepolia staging shared minter: MinterSetPriceHolderV5"
     },
     {
-      "address": "0x003C861f5989859966826aAbf3485942F3A0CD86",
+      "address": "0x2146A41F2c1432895d6D0ADF9c60BF0a226Bac0e",
       "name": "Arbitrum sepolia staging shared minter: MinterSetPriceMerkleV5"
     },
     {
-      "address": "0xf3A8f334b89f8E19e7F4A31f36217Cf497f9B39c",
+      "address": "0xE8394175365Fd746Bb1179244a6F8e3398aa22FF",
       "name": "Arbitrum sepolia staging shared minter: MinterSetPricePolyptychV5"
     },
     {
-      "address": "0x9ff1079a71dD0C77336466a008A4bB817028613c",
+      "address": "0x1c207b57D3FF22f58CE5aD702A2a89F09CE19366",
       "name": "Arbitrum sepolia staging shared minter: MinterSetPricePolyptychERC20V5"
     },
     {
-      "address": "0xd10e3DEe203579FcEE90eD7d0bDD8086F7E53beB",
+      "address": "0xA6AE3B1c0177C9addA7E9f57Bb96686F892aFe10",
       "name": "Arbitrum sepolia staging shared minter: MinterDAExpV5"
     },
     {
-      "address": "0x5AC861cE1562785e35A8E1A26fC462194b478DE2",
+      "address": "0x06Bdff0A69d1b8E18C5B27b03945f024d3490691",
       "name": "Arbitrum sepolia staging shared minter: MinterDALinV5"
     },
     {
-      "address": "0x35891863B5CA172A1c61B55A6511316Bb4e5ad93",
+      "address": "0xa319C382a702682129fcbF55d514E61a16f97f9c",
       "name": "Arbitrum sepolia staging shared minter: MinterDAExpSettlementV3"
     },
     {
-      "address": "0x2115b723C6aFB9A36ae0bBc0Eed5a4C30C5bb41A",
+      "address": "0x3b1Fe77D72e2DE15EF3A1ff83176e9F9af9E292A",
       "name": "Arbitrum sepolia staging shared minter: MinterDAExpHolderV5"
     },
     {
-      "address": "0x088098F7438773182b703625C4128aFf85fcFfC4",
+      "address": "0x6feb0aB02A85d2C3c5a79B822f0a00061cBBb040",
       "name": "Arbitrum sepolia staging shared minter: MinterDALinHolderV5"
     }
   ],
   "maxInvocationsLibContracts": [
     {
-      "address": "0xfbA7e2f908829317A5b2259fE1f72E0354a781C6",
+      "address": "0x5C8C93998023556950174D97b311d2C6B653f586",
       "name": "Arbitrum sepolia staging shared minter: MinterSetPriceV5"
     },
     {
-      "address": "0x7DC2c066251A21520Ae03cd2C3567a3c073Be60A",
+      "address": "0x14ff6f834a2a00E6E5611962B5db6cD23AF401e9",
       "name": "Arbitrum sepolia staging shared minter: MinterSetPriceERC20V5"
     },
     {
-      "address": "0xb4510235B7CAc3c870312C732fe8E500cA77D4D8",
+      "address": "0xDd06d8483868Cd0C5E69C24eEaA2A5F2bEaFd42b",
       "name": "Arbitrum sepolia staging shared minter: MinterSetPriceHolderV5"
     },
     {
-      "address": "0x003C861f5989859966826aAbf3485942F3A0CD86",
+      "address": "0x2146A41F2c1432895d6D0ADF9c60BF0a226Bac0e",
       "name": "Arbitrum sepolia staging shared minter: MinterSetPriceMerkleV5"
     },
     {
-      "address": "0xf3A8f334b89f8E19e7F4A31f36217Cf497f9B39c",
+      "address": "0xE8394175365Fd746Bb1179244a6F8e3398aa22FF",
       "name": "Arbitrum sepolia staging shared minter: MinterSetPricePolyptychV5"
     },
     {
-      "address": "0x9ff1079a71dD0C77336466a008A4bB817028613c",
+      "address": "0x1c207b57D3FF22f58CE5aD702A2a89F09CE19366",
       "name": "Arbitrum sepolia staging shared minter: MinterSetPricePolyptychERC20V5"
     },
     {
-      "address": "0xd10e3DEe203579FcEE90eD7d0bDD8086F7E53beB",
+      "address": "0xA6AE3B1c0177C9addA7E9f57Bb96686F892aFe10",
       "name": "Arbitrum sepolia staging shared minter: MinterDAExpV5"
     },
     {
-      "address": "0x5AC861cE1562785e35A8E1A26fC462194b478DE2",
+      "address": "0x06Bdff0A69d1b8E18C5B27b03945f024d3490691",
       "name": "Arbitrum sepolia staging shared minter: MinterDALinV5"
     },
     {
-      "address": "0x35891863B5CA172A1c61B55A6511316Bb4e5ad93",
+      "address": "0xa319C382a702682129fcbF55d514E61a16f97f9c",
       "name": "Arbitrum sepolia staging shared minter: MinterDAExpSettlementV3"
     },
     {
-      "address": "0x2115b723C6aFB9A36ae0bBc0Eed5a4C30C5bb41A",
+      "address": "0x3b1Fe77D72e2DE15EF3A1ff83176e9F9af9E292A",
       "name": "Arbitrum sepolia staging shared minter: MinterDAExpHolderV5"
     },
     {
-      "address": "0x088098F7438773182b703625C4128aFf85fcFfC4",
+      "address": "0x6feb0aB02A85d2C3c5a79B822f0a00061cBBb040",
       "name": "Arbitrum sepolia staging shared minter: MinterDALinHolderV5"
     }
   ],
   "setPriceLibContracts": [
     {
-      "address": "0xfbA7e2f908829317A5b2259fE1f72E0354a781C6",
+      "address": "0x5C8C93998023556950174D97b311d2C6B653f586",
       "name": "Arbitrum sepolia staging shared minter: MinterSetPriceV5"
     },
     {
-      "address": "0x7DC2c066251A21520Ae03cd2C3567a3c073Be60A",
+      "address": "0x14ff6f834a2a00E6E5611962B5db6cD23AF401e9",
       "name": "Arbitrum sepolia staging shared minter: MinterSetPriceERC20V5"
     },
     {
-      "address": "0xb4510235B7CAc3c870312C732fe8E500cA77D4D8",
+      "address": "0xDd06d8483868Cd0C5E69C24eEaA2A5F2bEaFd42b",
       "name": "Arbitrum sepolia staging shared minter: MinterSetPriceHolderV5"
     },
     {
-      "address": "0x003C861f5989859966826aAbf3485942F3A0CD86",
+      "address": "0x2146A41F2c1432895d6D0ADF9c60BF0a226Bac0e",
       "name": "Arbitrum sepolia staging shared minter: MinterSetPriceMerkleV5"
     },
     {
-      "address": "0xf3A8f334b89f8E19e7F4A31f36217Cf497f9B39c",
+      "address": "0xE8394175365Fd746Bb1179244a6F8e3398aa22FF",
       "name": "Arbitrum sepolia staging shared minter: MinterSetPricePolyptychV5"
     },
     {
-      "address": "0x9ff1079a71dD0C77336466a008A4bB817028613c",
+      "address": "0x1c207b57D3FF22f58CE5aD702A2a89F09CE19366",
       "name": "Arbitrum sepolia staging shared minter: MinterSetPricePolyptychERC20V5"
     }
   ],
   "splitFundsLibContracts": [
     {
-      "address": "0x7DC2c066251A21520Ae03cd2C3567a3c073Be60A",
+      "address": "0x14ff6f834a2a00E6E5611962B5db6cD23AF401e9",
       "name": "Arbitrum sepolia staging shared minter: MinterSetPriceERC20V5"
     },
     {
-      "address": "0x9ff1079a71dD0C77336466a008A4bB817028613c",
+      "address": "0x1c207b57D3FF22f58CE5aD702A2a89F09CE19366",
       "name": "Arbitrum sepolia staging shared minter: MinterSetPricePolyptychERC20V5"
     }
   ],
   "holderLibContracts": [
     {
-      "address": "0xb4510235B7CAc3c870312C732fe8E500cA77D4D8",
+      "address": "0xDd06d8483868Cd0C5E69C24eEaA2A5F2bEaFd42b",
       "name": "Arbitrum sepolia staging shared minter: MinterSetPriceHolderV5"
     },
     {
-      "address": "0xf3A8f334b89f8E19e7F4A31f36217Cf497f9B39c",
+      "address": "0xE8394175365Fd746Bb1179244a6F8e3398aa22FF",
       "name": "Arbitrum sepolia staging shared minter: MinterSetPricePolyptychV5"
     },
     {
-      "address": "0x9ff1079a71dD0C77336466a008A4bB817028613c",
+      "address": "0x1c207b57D3FF22f58CE5aD702A2a89F09CE19366",
       "name": "Arbitrum sepolia staging shared minter: MinterSetPricePolyptychERC20V5"
     },
     {
-      "address": "0x2115b723C6aFB9A36ae0bBc0Eed5a4C30C5bb41A",
+      "address": "0x3b1Fe77D72e2DE15EF3A1ff83176e9F9af9E292A",
       "name": "Arbitrum sepolia staging shared minter: MinterDAExpHolderV5"
     },
     {
-      "address": "0x088098F7438773182b703625C4128aFf85fcFfC4",
+      "address": "0x6feb0aB02A85d2C3c5a79B822f0a00061cBBb040",
       "name": "Arbitrum sepolia staging shared minter: MinterDALinHolderV5"
     }
   ],
   "merkleLibContracts": [
     {
-      "address": "0x003C861f5989859966826aAbf3485942F3A0CD86",
+      "address": "0x2146A41F2c1432895d6D0ADF9c60BF0a226Bac0e",
       "name": "Arbitrum sepolia staging shared minter: MinterSetPriceMerkleV5"
     }
   ],
   "DALibContracts": [
     {
-      "address": "0xd10e3DEe203579FcEE90eD7d0bDD8086F7E53beB",
+      "address": "0xA6AE3B1c0177C9addA7E9f57Bb96686F892aFe10",
       "name": "Arbitrum sepolia staging shared minter: MinterDAExpV5"
     },
     {
-      "address": "0x5AC861cE1562785e35A8E1A26fC462194b478DE2",
+      "address": "0x06Bdff0A69d1b8E18C5B27b03945f024d3490691",
       "name": "Arbitrum sepolia staging shared minter: MinterDALinV5"
     },
     {
-      "address": "0x35891863B5CA172A1c61B55A6511316Bb4e5ad93",
+      "address": "0xa319C382a702682129fcbF55d514E61a16f97f9c",
       "name": "Arbitrum sepolia staging shared minter: MinterDAExpSettlementV3"
     },
     {
-      "address": "0x2115b723C6aFB9A36ae0bBc0Eed5a4C30C5bb41A",
+      "address": "0x3b1Fe77D72e2DE15EF3A1ff83176e9F9af9E292A",
       "name": "Arbitrum sepolia staging shared minter: MinterDAExpHolderV5"
     },
     {
-      "address": "0x088098F7438773182b703625C4128aFf85fcFfC4",
+      "address": "0x6feb0aB02A85d2C3c5a79B822f0a00061cBBb040",
       "name": "Arbitrum sepolia staging shared minter: MinterDALinHolderV5"
     }
   ],
   "DAExpLibContracts": [
     {
-      "address": "0xd10e3DEe203579FcEE90eD7d0bDD8086F7E53beB",
+      "address": "0xA6AE3B1c0177C9addA7E9f57Bb96686F892aFe10",
       "name": "Arbitrum sepolia staging shared minter: MinterDAExpV5"
     },
     {
-      "address": "0x35891863B5CA172A1c61B55A6511316Bb4e5ad93",
+      "address": "0xa319C382a702682129fcbF55d514E61a16f97f9c",
       "name": "Arbitrum sepolia staging shared minter: MinterDAExpSettlementV3"
     },
     {
-      "address": "0x2115b723C6aFB9A36ae0bBc0Eed5a4C30C5bb41A",
+      "address": "0x3b1Fe77D72e2DE15EF3A1ff83176e9F9af9E292A",
       "name": "Arbitrum sepolia staging shared minter: MinterDAExpHolderV5"
     }
   ],
   "DALinLibContracts": [
     {
-      "address": "0x5AC861cE1562785e35A8E1A26fC462194b478DE2",
+      "address": "0x06Bdff0A69d1b8E18C5B27b03945f024d3490691",
       "name": "Arbitrum sepolia staging shared minter: MinterDALinV5"
     },
     {
-      "address": "0x088098F7438773182b703625C4128aFf85fcFfC4",
+      "address": "0x6feb0aB02A85d2C3c5a79B822f0a00061cBBb040",
       "name": "Arbitrum sepolia staging shared minter: MinterDALinHolderV5"
     }
   ],
   "settlementExpLibContracts": [
     {
-      "address": "0x35891863B5CA172A1c61B55A6511316Bb4e5ad93",
+      "address": "0xa319C382a702682129fcbF55d514E61a16f97f9c",
       "name": "Arbitrum sepolia staging shared minter: MinterDAExpSettlementV3"
+    }
+  ],
+  "adminACLV0Contracts": [
+    {
+      "address": "0x3b30d421a6dA95694EaaE09971424F15Eb375269",
+      "name": "Admin ACL for shared minter filter"
+    }
+  ],
+  "ICoreRegistryContracts": [
+    {
+      "address": "0xdAe755c2944Ec125a0D8D5CB082c22837593441a",
+      "name": "Sepolia staging engine registry contract: CoreRegistryV1"
     }
   ]
 }
