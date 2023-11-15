@@ -59,20 +59,19 @@ import {
   Account,
   AccountProject,
   Contract,
-  Whitelisting,
   ProjectScript,
   ProjectExternalAssetDependency
 } from "../generated/schema";
 
 import {
   generateAccountProjectId,
-  generateWhitelistingId,
   generateContractSpecificId,
   generateProjectScriptId,
   generateProjectExternalAssetDependencyId,
   addWhitelisting,
   removeWhitelisting,
-  generateTransferId
+  generateTransferId,
+  createPrimaryPurchaseDetailsFromTokenMint
 } from "./helpers";
 import {
   FLEX_CONTRACT_EXTERNAL_ASSET_DEP_TYPES,
@@ -105,6 +104,12 @@ export function handleMint(event: Mint): void {
     token.updatedAt = event.block.timestamp;
     token.transactionHash = event.transaction.hash;
     token.nextSaleId = BigInt.fromI32(0);
+    token.primaryPurchaseDetails = createPrimaryPurchaseDetailsFromTokenMint(
+      token,
+      project,
+      event
+    );
+
     token.save();
 
     project.invocations = invocation.plus(BigInt.fromI32(1));

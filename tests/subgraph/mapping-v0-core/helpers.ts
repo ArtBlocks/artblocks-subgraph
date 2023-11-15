@@ -1,4 +1,4 @@
-import { Address, BigInt, ethereum } from "@graphprotocol/graph-ts";
+import { Address, BigInt, Bytes, ethereum } from "@graphprotocol/graph-ts";
 import {
   assert,
   createMockedFunction,
@@ -251,3 +251,20 @@ export function mockProjectScriptInfoCall(
     .withArgs([ethereum.Value.fromUnsignedBigInt(projectId)])
     .returns(projectScriptInfoReturnArray);
 }
+
+export const mockShowTokenHashes = function(
+  contractAddress: Address,
+  tokenId: BigInt,
+  hash: Bytes
+): void {
+  let showTokenHashesInput: Array<ethereum.Value> = [
+    ethereum.Value.fromUnsignedBigInt(tokenId)
+  ];
+  createMockedFunction(
+    contractAddress,
+    "showTokenHashes",
+    "showTokenHashes(uint256):(bytes32[])"
+  )
+    .withArgs(showTokenHashesInput)
+    .returns([ethereum.Value.fromBytesArray([hash])]);
+};

@@ -62,21 +62,18 @@ import {
   Account,
   AccountProject,
   Contract,
-  Whitelisting,
   ProjectScript,
-  MinterFilter,
-  ProjectMinterConfiguration
+  MinterFilter
 } from "../generated/schema";
 
 import {
   generateAccountProjectId,
-  generateWhitelistingId,
   generateContractSpecificId,
   generateProjectScriptId,
   addWhitelisting,
   removeWhitelisting,
   generateTransferId,
-  getProjectMinterConfigId
+  createPrimaryPurchaseDetailsFromTokenMint
 } from "./helpers";
 import { GEN_ART_721_CORE_V1 } from "./constants";
 
@@ -106,6 +103,12 @@ export function handleMint(event: Mint): void {
     token.updatedAt = event.block.timestamp;
     token.transactionHash = event.transaction.hash;
     token.nextSaleId = BigInt.fromI32(0);
+    token.primaryPurchaseDetails = createPrimaryPurchaseDetailsFromTokenMint(
+      token,
+      project,
+      event
+    );
+
     token.save();
 
     project.invocations = invocation.plus(BigInt.fromI32(1));
