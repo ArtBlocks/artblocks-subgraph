@@ -1,4 +1,4 @@
-import { Address, log } from "@graphprotocol/graph-ts";
+import { Address, log, dataSource, BigInt } from "@graphprotocol/graph-ts";
 
 import { refreshContractAtAddress } from "./mapping-v3-core";
 
@@ -17,6 +17,13 @@ import {
 } from "../generated/CoreRegistry/ICoreRegistryV1";
 
 import { Ownable } from "../generated/OwnableGenArt721CoreV3Contract/Ownable";
+import {
+  COMPROMISED_ENGINE_REGISTRY_ADDRESS_GOERLI,
+  COMPROMISED_ENGINE_REGISTRY_ADDRESS_MAINNET,
+  COMPROMISED_ENGINE_REGISTRY_CUTOFF_BLOCK_GOERLI,
+  COMPROMISED_ENGINE_REGISTRY_CUTOFF_BLOCK_MAINNET
+} from "./constants";
+import { booleanToString } from "./helpers";
 
 /*** EVENT HANDLERS ***/
 // Registered contracts are tracked dynamically, and the contract's `registeredOn`
@@ -24,6 +31,26 @@ import { Ownable } from "../generated/OwnableGenArt721CoreV3Contract/Ownable";
 export function handleContractRegistered(event: ContractRegistered): void {
   // ensure an engine registry entity exists
   loadOrCreateCoreRegistry(event.address);
+
+  const network = dataSource.network();
+
+  if (
+    (network == "goerli" &&
+      event.address.toHexString() ==
+        COMPROMISED_ENGINE_REGISTRY_ADDRESS_GOERLI &&
+      event.block.number >= COMPROMISED_ENGINE_REGISTRY_CUTOFF_BLOCK_GOERLI) ||
+    (network == "mainnet" &&
+      event.address.toHexString() ==
+        COMPROMISED_ENGINE_REGISTRY_ADDRESS_MAINNET &&
+      event.block.number >= COMPROMISED_ENGINE_REGISTRY_CUTOFF_BLOCK_MAINNET)
+  ) {
+    log.warning(
+      "[WARN] Compromised Core Registry at address {} attempted to register new core contract.",
+      [event.address.toHexString()]
+    );
+    return;
+  }
+
   // check if the contract is already registered
   const coreAddress = event.params._contractAddress;
   // dynamically track the new contract if not already in store, and refresh it
