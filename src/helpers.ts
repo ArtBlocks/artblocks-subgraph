@@ -714,7 +714,7 @@ export function createPrimaryPurchaseDetailsFromTokenMint<T>(
       purchaseDetails.save();
       return purchaseDetails.id;
     } else {
-      log.warning("Minter configuration with id {} does not exists", [
+      log.warning("Minter configuration with id {} does not exist", [
         minterConfigId
       ]);
       return null;
