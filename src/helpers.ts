@@ -725,8 +725,15 @@ export function createPrimaryPurchaseDetailsFromTokenMint<T>(
     const to = changetype<Address>(event.transaction.to || Address.zero());
 
     // If the transaction to address is a whitelisted minter, use it as the minter address
-    if (contract && contract.mintWhitelisted.includes(to)) {
-      purchaseDetails.minterAddress = to;
+    // or if there is only one whitelisted minter, use it as the minter address
+    if (
+      contract &&
+      (contract.mintWhitelisted.includes(to) ||
+        contract.mintWhitelisted.length === 1)
+    ) {
+      purchaseDetails.minterAddress = contract.mintWhitelisted.includes(to)
+        ? to
+        : contract.mintWhitelisted[0];
 
       // Assume the minter uses the core contract's currency info
       purchaseDetails.currencyAddress =
