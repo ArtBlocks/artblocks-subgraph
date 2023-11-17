@@ -38,7 +38,9 @@ import {
   booleanToString,
   TEST_CONTRACT,
   TEST_SUPER_ADMIN_ADDRESS,
-  WHITELISTING_ENTITY_TYPE
+  WHITELISTING_ENTITY_TYPE,
+  addNewLegacyProjectMinterConfigToStore,
+  PRIMARY_PURCHASE_DETAILS_ENTITY_TYPE
 } from "../shared-helpers";
 import {
   mockProjectScriptDetailsCall,
@@ -92,7 +94,105 @@ const randomAddressGenerator = new RandomAddressGenerator();
 
 const coreType = "GenArt721CoreV3";
 
-test(`${coreType}: Can handle Mint`, () => {
+test(`${coreType}: Can handle Mint with purchase details`, () => {
+  clearStore();
+  // add contract to store
+  const projectId = BigInt.fromI32(1);
+  const tokenId = BigInt.fromI32(1000001);
+  addTestContractToStore(projectId);
+  mockTokenIdToHash(TEST_CONTRACT_ADDRESS, tokenId, TEST_TOKEN_HASH);
+  mockCoreType(TEST_CONTRACT_ADDRESS, `${coreType}`);
+  // add project to store
+  const fullProjectId = generateContractSpecificId(
+    TEST_CONTRACT_ADDRESS,
+    projectId
+  );
+  const artistAddress = randomAddressGenerator.generateRandomAddress();
+  const projectName = "Test Project";
+  const pricePerTokenInWei = BigInt.fromI64(i64(1e18));
+
+  const project = addNewProjectToStore(
+    TEST_CONTRACT_ADDRESS,
+    projectId,
+    projectName,
+    artistAddress,
+    pricePerTokenInWei,
+    CURRENT_BLOCK_TIMESTAMP
+  );
+
+  const minterAddress = randomAddressGenerator.generateRandomAddress();
+  const currencyAddress = randomAddressGenerator.generateRandomAddress();
+  const currencySymbol = "TEST";
+  const projectMinterConfig = addNewLegacyProjectMinterConfigToStore(
+    fullProjectId,
+    minterAddress
+  );
+  projectMinterConfig.currencyAddress = currencyAddress;
+  projectMinterConfig.currencySymbol = currencySymbol;
+  projectMinterConfig.save();
+
+  project.minterConfiguration = projectMinterConfig.id;
+  project.save();
+
+  // handle mint
+  const fullTokenId = generateContractSpecificId(
+    TEST_CONTRACT_ADDRESS,
+    tokenId
+  );
+
+  const toAddress = randomAddressGenerator.generateRandomAddress();
+
+  const event: Mint = changetype<Mint>(newMockEvent());
+  event.address = TEST_CONTRACT_ADDRESS;
+  event.transaction.hash = TEST_TX_HASH;
+  event.logIndex = BigInt.fromI32(0);
+  event.parameters = [
+    new ethereum.EventParam("_to", ethereum.Value.fromAddress(toAddress)),
+    new ethereum.EventParam(
+      "_tokenId",
+      ethereum.Value.fromUnsignedBigInt(tokenId)
+    )
+  ];
+
+  handleMint(event);
+
+  assert.fieldEquals(
+    TOKEN_ENTITY_TYPE,
+    fullTokenId,
+    "owner",
+    toAddress.toHexString()
+  );
+
+  assert.fieldEquals(
+    PRIMARY_PURCHASE_DETAILS_ENTITY_TYPE,
+    fullTokenId,
+    "token",
+    fullTokenId
+  );
+
+  assert.fieldEquals(
+    PRIMARY_PURCHASE_DETAILS_ENTITY_TYPE,
+    fullTokenId,
+    "minterAddress",
+    minterAddress.toHexString()
+  );
+
+  assert.fieldEquals(
+    PRIMARY_PURCHASE_DETAILS_ENTITY_TYPE,
+    fullTokenId,
+    "currencyAddress",
+    currencyAddress.toHexString()
+  );
+
+  assert.fieldEquals(
+    PRIMARY_PURCHASE_DETAILS_ENTITY_TYPE,
+    fullTokenId,
+    "currencySymbol",
+    currencySymbol
+  );
+});
+
+test(`${coreType}: Can handle Mint without purchase details`, () => {
   clearStore();
   // add contract to store
   const projectId = BigInt.fromI32(1);
@@ -146,6 +246,8 @@ test(`${coreType}: Can handle Mint`, () => {
     "owner",
     toAddress.toHexString()
   );
+
+  assert.notInStore(PRIMARY_PURCHASE_DETAILS_ENTITY_TYPE, fullTokenId);
 });
 
 test(`${coreType}: Can handle transfer`, () => {
