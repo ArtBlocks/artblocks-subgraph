@@ -262,13 +262,7 @@
       "blockNumber": 937420
     }
   ],
-  "adminACLV0Contracts": [
-    {
-      "address": "0x3b30d421a6dA95694EaaE09971424F15Eb375269",
-      "name": "Admin ACL for shared minter filter",
-      "blockNumber": 936767
-    }
-  ],
+  "adminACLV0Contracts": [],
   "ICoreRegistryContracts": [
     {
       "address": "0xdAe755c2944Ec125a0D8D5CB082c22837593441a",
