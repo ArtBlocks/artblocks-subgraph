@@ -354,6 +354,7 @@ type Token @entity {
 }
 
 type PrimaryPurchaseDetails @entity {
+  "Unique identifier made up of contract address and token id"
   id: ID!
 
   token: Token!
