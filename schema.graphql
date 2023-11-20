@@ -349,6 +349,27 @@ type Token @entity {
 
   "Next available sale id"
   nextSaleId: BigInt!
+
+  primaryPurchaseDetails: PrimaryPurchaseDetails
+}
+
+type PrimaryPurchaseDetails @entity {
+  "Unique identifier made up of contract address and token id"
+  id: ID!
+
+  token: Token!
+
+  "Transaction hash of token purchase"
+  transactionHash: Bytes!
+
+  "Address of the minter used to mint token"
+  minterAddress: Bytes
+
+  "Address of currency used to purchase token"
+  currencyAddress: Bytes
+
+  "Symbol of currency used to purchase token"
+  currencySymbol: String
 }
 
 type MinterFilter @entity {

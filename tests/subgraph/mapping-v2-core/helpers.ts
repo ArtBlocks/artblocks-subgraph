@@ -11,6 +11,8 @@ import {
   TEST_CONTRACT,
   DEFAULT_PROJECT_VALUES
 } from "../shared-helpers";
+import { Project } from "../../../generated/schema";
+import { generateContractSpecificId } from "../../../src/helpers";
 
 // helper mock function to initialize a Project entity in local in-memory store
 export function addNewProjectToStore(
@@ -20,7 +22,7 @@ export function addNewProjectToStore(
   pricePerTokenInWei: BigInt,
   mockCallsWithDefaults: boolean,
   timestamp: BigInt | null
-): void {
+): Project {
   if (mockCallsWithDefaults) {
     mockProjectDetailsCallWithDefaults(projectId, projectName);
     mockProjectTokenInfoCallWithDefaults(
@@ -51,6 +53,10 @@ export function addNewProjectToStore(
   ];
 
   handleAddProject(newProjectCall);
+
+  return changetype<Project>(
+    Project.load(generateContractSpecificId(TEST_CONTRACT_ADDRESS, projectId))
+  );
 }
 
 // mocks return values for Soldity contract calls in refreshContract() helper function

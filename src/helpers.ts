@@ -2,13 +2,11 @@ import {
   Address,
   BigInt,
   Bytes,
-  json,
   JSONValue,
-  JSONValueKind,
   TypedMap,
   store,
   log,
-  ethereum
+  ByteArray
 } from "@graphprotocol/graph-ts";
 import { IFilteredMinterV2 } from "../generated/MinterSetPrice/IFilteredMinterV2";
 import {
@@ -20,7 +18,9 @@ import {
   Receipt,
   MinterFilter,
   CoreRegistry,
-  Contract
+  Contract,
+  Token,
+  PrimaryPurchaseDetails
 } from "../generated/schema";
 
 import { IMinterFilterV1 } from "../generated/SharedMinterFilter/IMinterFilterV1";
@@ -34,6 +34,8 @@ import {
 import { createTypedMapFromJSONString } from "./json";
 
 import { KNOWN_MINTER_FILTER_TYPES } from "./constants";
+import { Mint as GenArt721Core2PBABMint } from "../generated/GenArt721Core2PBAB/GenArt721Core2PBAB";
+import { Mint as GenArt721CoreV1Mint } from "../generated/GenArt721Core/GenArt721Core";
 
 export class MinterProjectAndConfig {
   minter: Minter;
@@ -655,5 +657,94 @@ export function snapshotStateAtSettlementRevenueWithdrawal(
       "[WARN] Legacy (non-shared) minter event handler encountered null contract at address {}. Withdrawal details for project {} were not saved to extra minter details",
       [project.contract, project.id]
     );
+  }
+}
+
+/**
+ * Creates a PurchaseDetails entity for a given token based on the provided event and returns its ID.
+ * The function processes events that are instances of GenArt721CoreV1Mint or GenArt721Core2PBABMint.
+ * If the event does not match these types, a warning is logged, and the function returns null.
+ *
+ * The function populates the PurchaseDetails with the minter's address, purchase currency address,
+ * and purchase currency symbol. It first checks for a minter configuration associated with the
+ * token's project. If found, this configuration is used. Otherwise, it falls back to the minter
+ * address from the event's transaction data, provided it's whitelisted in the project's contract.
+ *
+ * In cases where required data is missing or relevant configurations or contracts are not found,
+ * the function logs a warning and returns null.
+ *
+ * @param token - The token for which to create purchase details.
+ * @param project - The project associated with the token.
+ * @param event - The event triggering the creation of purchase details.
+ * @returns The ID of the newly created PurchaseDetails entity if successful, or null if not.
+ */
+export function createPrimaryPurchaseDetailsFromTokenMint<T>(
+  token: Token,
+  project: Project,
+  event: T
+): string | null {
+  if (
+    !(
+      event instanceof GenArt721CoreV1Mint ||
+      event instanceof GenArt721Core2PBABMint
+    )
+  ) {
+    log.warning(
+      "[WARN] createAndAssociatePurchaseDetails was called with an event that is not a GenArt721CoreV1Mint or GenArt721Core2PBABMint. The event was not processed.",
+      []
+    );
+    return null;
+  }
+
+  const purchaseDetails = new PrimaryPurchaseDetails(token.id);
+  purchaseDetails.token = token.id;
+  purchaseDetails.transactionHash = event.transaction.hash;
+
+  // If the token's project has an associated minter configuration, use it to populate the tokens purchase info
+  const minterConfigId = project.minterConfiguration;
+  if (minterConfigId) {
+    const minterConfig = ProjectMinterConfiguration.load(minterConfigId);
+    if (minterConfig) {
+      purchaseDetails.minterAddress = changetype<Bytes>(
+        ByteArray.fromHexString(minterConfig.minter)
+      );
+      purchaseDetails.currencyAddress = minterConfig.currencyAddress;
+      purchaseDetails.currencySymbol = minterConfig.currencySymbol;
+
+      purchaseDetails.save();
+      return purchaseDetails.id;
+    } else {
+      log.warning("Minter configuration with id {} does not exist", [
+        minterConfigId
+      ]);
+      return null;
+    }
+  } else {
+    // If no minter configuration is associated with the project, use the minter currently assigned to the contract
+    const contract = Contract.load(project.contract);
+    const to = changetype<Address>(event.transaction.to || Address.zero());
+
+    // If the transaction to address is a whitelisted minter, use it as the minter address
+    // or if there is only one whitelisted minter, use it as the minter address
+    if (
+      contract &&
+      (contract.mintWhitelisted.includes(to) ||
+        contract.mintWhitelisted.length === 1)
+    ) {
+      purchaseDetails.minterAddress = contract.mintWhitelisted.includes(to)
+        ? to
+        : contract.mintWhitelisted[0];
+
+      // Assume the minter uses the core contract's currency info
+      purchaseDetails.currencyAddress =
+        project.currencyAddress || Address.zero();
+      purchaseDetails.currencySymbol = project.currencySymbol || "ETH";
+
+      purchaseDetails.save();
+      return purchaseDetails.id;
+    } else {
+      log.warning("Contract with id {} does not exist", [project.contract]);
+      return null;
+    }
   }
 }
