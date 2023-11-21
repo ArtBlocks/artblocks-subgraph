@@ -350,10 +350,10 @@ type Token @entity {
   "Next available sale id"
   nextSaleId: BigInt!
 
-  primaryPurchaseDetails: PrimaryPurchaseDetails
+  primaryPurchaseDetails: PrimaryPurchase
 }
 
-type PrimaryPurchaseDetails @entity {
+type PrimaryPurchase @entity {
   "Unique identifier made up of contract address and token id"
   id: ID!
 

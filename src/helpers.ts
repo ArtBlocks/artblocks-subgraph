@@ -20,7 +20,7 @@ import {
   CoreRegistry,
   Contract,
   Token,
-  PrimaryPurchaseDetails
+  PrimaryPurchase
 } from "../generated/schema";
 
 import { IMinterFilterV1 } from "../generated/SharedMinterFilter/IMinterFilterV1";
@@ -696,7 +696,7 @@ export function createPrimaryPurchaseDetailsFromTokenMint<T>(
     return null;
   }
 
-  const purchaseDetails = new PrimaryPurchaseDetails(token.id);
+  const purchaseDetails = new PrimaryPurchase(token.id);
   purchaseDetails.token = token.id;
   purchaseDetails.transactionHash = event.transaction.hash;
 

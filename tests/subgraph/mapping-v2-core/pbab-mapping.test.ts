@@ -32,7 +32,7 @@ import {
   mockTokenIdToHash,
   TEST_TOKEN_HASH,
   addNewLegacyProjectMinterConfigToStore,
-  PRIMARY_PURCHASE_DETAILS_ENTITY_TYPE
+  PRIMARY_PURCHASE_ENTITY_TYPE
 } from "../shared-helpers";
 
 import {
@@ -1965,28 +1965,28 @@ test("GenArt721Core2PBAB: Can handle Mint and create purchase details with proje
   );
 
   assert.fieldEquals(
-    PRIMARY_PURCHASE_DETAILS_ENTITY_TYPE,
+    PRIMARY_PURCHASE_ENTITY_TYPE,
     fullTokenId,
     "token",
     fullTokenId
   );
 
   assert.fieldEquals(
-    PRIMARY_PURCHASE_DETAILS_ENTITY_TYPE,
+    PRIMARY_PURCHASE_ENTITY_TYPE,
     fullTokenId,
     "minterAddress",
     minterAddress.toHexString()
   );
 
   assert.fieldEquals(
-    PRIMARY_PURCHASE_DETAILS_ENTITY_TYPE,
+    PRIMARY_PURCHASE_ENTITY_TYPE,
     fullTokenId,
     "currencyAddress",
     currencyAddress.toHexString()
   );
 
   assert.fieldEquals(
-    PRIMARY_PURCHASE_DETAILS_ENTITY_TYPE,
+    PRIMARY_PURCHASE_ENTITY_TYPE,
     fullTokenId,
     "currencySymbol",
     currencySymbol
@@ -2067,28 +2067,28 @@ test("GenArt721Core2PBAB: Can handle Mint and create purchase details with allow
   );
 
   assert.fieldEquals(
-    PRIMARY_PURCHASE_DETAILS_ENTITY_TYPE,
+    PRIMARY_PURCHASE_ENTITY_TYPE,
     fullTokenId,
     "token",
     fullTokenId
   );
 
   assert.fieldEquals(
-    PRIMARY_PURCHASE_DETAILS_ENTITY_TYPE,
+    PRIMARY_PURCHASE_ENTITY_TYPE,
     fullTokenId,
     "minterAddress",
     minterAddress.toHexString()
   );
 
   assert.fieldEquals(
-    PRIMARY_PURCHASE_DETAILS_ENTITY_TYPE,
+    PRIMARY_PURCHASE_ENTITY_TYPE,
     fullTokenId,
     "currencyAddress",
     currencyAddress.toHexString()
   );
 
   assert.fieldEquals(
-    PRIMARY_PURCHASE_DETAILS_ENTITY_TYPE,
+    PRIMARY_PURCHASE_ENTITY_TYPE,
     fullTokenId,
     "currencySymbol",
     currencySymbol
@@ -2167,7 +2167,7 @@ test("GenArt721Core2PBAB: Can handle Mint without purchase details for unknown m
     toAddress.toHexString()
   );
 
-  assert.notInStore(PRIMARY_PURCHASE_DETAILS_ENTITY_TYPE, fullTokenId);
+  assert.notInStore(PRIMARY_PURCHASE_ENTITY_TYPE, fullTokenId);
 });
 
 test("GenArt721Core2PBAB: Can handle mint transfer", () => {

@@ -26,7 +26,7 @@ import {
   TRANSFER_ENTITY_TYPE,
   addNewTokenToStore,
   TEST_TOKEN_HASH,
-  PRIMARY_PURCHASE_DETAILS_ENTITY_TYPE
+  PRIMARY_PURCHASE_ENTITY_TYPE
 } from "../shared-helpers";
 
 import {
@@ -42,7 +42,6 @@ import {
 import {
   Account,
   Contract,
-  PrimaryPurchaseDetails,
   Project,
   ProjectScript,
   Token,
@@ -2080,28 +2079,28 @@ test("GenArt721: Can handle mint", () => {
   );
 
   assert.fieldEquals(
-    PRIMARY_PURCHASE_DETAILS_ENTITY_TYPE,
+    PRIMARY_PURCHASE_ENTITY_TYPE,
     fullTokenId,
     "token",
     fullTokenId
   );
 
   assert.fieldEquals(
-    PRIMARY_PURCHASE_DETAILS_ENTITY_TYPE,
+    PRIMARY_PURCHASE_ENTITY_TYPE,
     fullTokenId,
     "minterAddress",
     TEST_CONTRACT_ADDRESS.toHexString()
   );
 
   assert.fieldEquals(
-    PRIMARY_PURCHASE_DETAILS_ENTITY_TYPE,
+    PRIMARY_PURCHASE_ENTITY_TYPE,
     fullTokenId,
     "currencySymbol",
     "ETH"
   );
 
   assert.fieldEquals(
-    PRIMARY_PURCHASE_DETAILS_ENTITY_TYPE,
+    PRIMARY_PURCHASE_ENTITY_TYPE,
     fullTokenId,
     "currencyAddress",
     Address.zero().toHexString()

@@ -59,7 +59,7 @@ import {
   ProposedArtistAddressesAndSplit,
   ProjectExternalAssetDependency,
   ProjectMinterConfiguration,
-  PrimaryPurchaseDetails
+  PrimaryPurchase
 } from "../generated/schema";
 
 import {
@@ -140,7 +140,7 @@ export function handleMint(event: Mint): void {
       );
 
       if (minterConfiguration) {
-        const purchaseDetails = new PrimaryPurchaseDetails(token.id);
+        const purchaseDetails = new PrimaryPurchase(token.id);
         purchaseDetails.token = token.id;
         purchaseDetails.transactionHash = event.transaction.hash;
         purchaseDetails.minterAddress = changetype<Bytes>(

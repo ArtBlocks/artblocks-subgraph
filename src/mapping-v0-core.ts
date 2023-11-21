@@ -61,7 +61,7 @@ import {
   AccountProject,
   Whitelisting,
   ProjectScript,
-  PrimaryPurchaseDetails
+  PrimaryPurchase
 } from "../generated/schema";
 import {
   generateAccountProjectId,
@@ -101,7 +101,7 @@ export function handleMint(event: Mint): void {
     token.nextSaleId = BigInt.fromI32(0);
 
     // V0 Contracts are purchased using the core contract directly
-    const primaryPurchaseDetails = new PrimaryPurchaseDetails(token.id);
+    const primaryPurchaseDetails = new PrimaryPurchase(token.id);
     primaryPurchaseDetails.token = token.id;
     primaryPurchaseDetails.transactionHash = event.transaction.hash;
     primaryPurchaseDetails.minterAddress = event.address;
