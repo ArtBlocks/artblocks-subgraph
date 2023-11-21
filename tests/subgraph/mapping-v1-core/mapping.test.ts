@@ -31,7 +31,7 @@ import {
   addNewTokenToStore,
   TRANSFER_ENTITY_TYPE,
   addNewLegacyProjectMinterConfigToStore,
-  PRIMARY_PURCHASE_DETAILS_ENTITY_TYPE
+  PRIMARY_PURCHASE_ENTITY_TYPE
 } from "../shared-helpers";
 
 import {
@@ -47,7 +47,6 @@ import {
   Account,
   Contract,
   MinterFilter,
-  PrimaryPurchaseDetails,
   Project,
   ProjectScript,
   Token,
@@ -2388,28 +2387,28 @@ test("GenArt721CoreV1: Can handle Mint and create purchase details with project 
   );
 
   assert.fieldEquals(
-    PRIMARY_PURCHASE_DETAILS_ENTITY_TYPE,
+    PRIMARY_PURCHASE_ENTITY_TYPE,
     fullTokenId,
     "token",
     fullTokenId
   );
 
   assert.fieldEquals(
-    PRIMARY_PURCHASE_DETAILS_ENTITY_TYPE,
+    PRIMARY_PURCHASE_ENTITY_TYPE,
     fullTokenId,
     "minterAddress",
     minterAddress.toHexString()
   );
 
   assert.fieldEquals(
-    PRIMARY_PURCHASE_DETAILS_ENTITY_TYPE,
+    PRIMARY_PURCHASE_ENTITY_TYPE,
     fullTokenId,
     "currencyAddress",
     currencyAddress.toHexString()
   );
 
   assert.fieldEquals(
-    PRIMARY_PURCHASE_DETAILS_ENTITY_TYPE,
+    PRIMARY_PURCHASE_ENTITY_TYPE,
     fullTokenId,
     "currencySymbol",
     currencySymbol
@@ -2490,28 +2489,28 @@ test("GenArt721CoreV1: Can handle Mint and create purchase details with allowed 
   );
 
   assert.fieldEquals(
-    PRIMARY_PURCHASE_DETAILS_ENTITY_TYPE,
+    PRIMARY_PURCHASE_ENTITY_TYPE,
     fullTokenId,
     "token",
     fullTokenId
   );
 
   assert.fieldEquals(
-    PRIMARY_PURCHASE_DETAILS_ENTITY_TYPE,
+    PRIMARY_PURCHASE_ENTITY_TYPE,
     fullTokenId,
     "minterAddress",
     minterAddress.toHexString()
   );
 
   assert.fieldEquals(
-    PRIMARY_PURCHASE_DETAILS_ENTITY_TYPE,
+    PRIMARY_PURCHASE_ENTITY_TYPE,
     fullTokenId,
     "currencyAddress",
     currencyAddress.toHexString()
   );
 
   assert.fieldEquals(
-    PRIMARY_PURCHASE_DETAILS_ENTITY_TYPE,
+    PRIMARY_PURCHASE_ENTITY_TYPE,
     fullTokenId,
     "currencySymbol",
     currencySymbol
@@ -2590,7 +2589,7 @@ test("GenArt721CoreV1: Can handle Mint without purchase details for unknown mint
     toAddress.toHexString()
   );
 
-  assert.notInStore(PRIMARY_PURCHASE_DETAILS_ENTITY_TYPE, fullTokenId);
+  assert.notInStore(PRIMARY_PURCHASE_ENTITY_TYPE, fullTokenId);
 });
 
 test("GenArt721Core: Can handle transfer", () => {

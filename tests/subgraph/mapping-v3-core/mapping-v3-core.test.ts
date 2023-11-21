@@ -40,7 +40,7 @@ import {
   TEST_SUPER_ADMIN_ADDRESS,
   WHITELISTING_ENTITY_TYPE,
   addNewLegacyProjectMinterConfigToStore,
-  PRIMARY_PURCHASE_DETAILS_ENTITY_TYPE
+  PRIMARY_PURCHASE_ENTITY_TYPE
 } from "../shared-helpers";
 import {
   mockProjectScriptDetailsCall,
@@ -164,28 +164,28 @@ test(`${coreType}: Can handle Mint with purchase details`, () => {
   );
 
   assert.fieldEquals(
-    PRIMARY_PURCHASE_DETAILS_ENTITY_TYPE,
+    PRIMARY_PURCHASE_ENTITY_TYPE,
     fullTokenId,
     "token",
     fullTokenId
   );
 
   assert.fieldEquals(
-    PRIMARY_PURCHASE_DETAILS_ENTITY_TYPE,
+    PRIMARY_PURCHASE_ENTITY_TYPE,
     fullTokenId,
     "minterAddress",
     minterAddress.toHexString()
   );
 
   assert.fieldEquals(
-    PRIMARY_PURCHASE_DETAILS_ENTITY_TYPE,
+    PRIMARY_PURCHASE_ENTITY_TYPE,
     fullTokenId,
     "currencyAddress",
     currencyAddress.toHexString()
   );
 
   assert.fieldEquals(
-    PRIMARY_PURCHASE_DETAILS_ENTITY_TYPE,
+    PRIMARY_PURCHASE_ENTITY_TYPE,
     fullTokenId,
     "currencySymbol",
     currencySymbol
@@ -247,7 +247,7 @@ test(`${coreType}: Can handle Mint without purchase details`, () => {
     toAddress.toHexString()
   );
 
-  assert.notInStore(PRIMARY_PURCHASE_DETAILS_ENTITY_TYPE, fullTokenId);
+  assert.notInStore(PRIMARY_PURCHASE_ENTITY_TYPE, fullTokenId);
 });
 
 test(`${coreType}: Can handle transfer`, () => {
