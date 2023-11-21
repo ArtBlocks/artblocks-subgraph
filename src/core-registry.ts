@@ -20,8 +20,10 @@ import { Ownable } from "../generated/OwnableGenArt721CoreV3Contract/Ownable";
 import {
   COMPROMISED_ENGINE_REGISTRY_ADDRESS_GOERLI,
   COMPROMISED_ENGINE_REGISTRY_ADDRESS_MAINNET,
+  COMPROMISED_ENGINE_REGISTRY_ADDRESS_ARBITRUM,
   COMPROMISED_ENGINE_REGISTRY_CUTOFF_BLOCK_GOERLI,
-  COMPROMISED_ENGINE_REGISTRY_CUTOFF_BLOCK_MAINNET
+  COMPROMISED_ENGINE_REGISTRY_CUTOFF_BLOCK_MAINNET,
+  COMPROMISED_ENGINE_REGISTRY_CUTOFF_BLOCK_ARBITRUM
 } from "./constants";
 import { booleanToString } from "./helpers";
 
@@ -42,7 +44,11 @@ export function handleContractRegistered(event: ContractRegistered): void {
     (network == "mainnet" &&
       event.address.toHexString() ==
         COMPROMISED_ENGINE_REGISTRY_ADDRESS_MAINNET &&
-      event.block.number >= COMPROMISED_ENGINE_REGISTRY_CUTOFF_BLOCK_MAINNET)
+      event.block.number >= COMPROMISED_ENGINE_REGISTRY_CUTOFF_BLOCK_MAINNET) ||
+    (network == "arbitrum-one" &&
+      event.address.toHexString() ==
+        COMPROMISED_ENGINE_REGISTRY_ADDRESS_ARBITRUM &&
+      event.block.number >= COMPROMISED_ENGINE_REGISTRY_CUTOFF_BLOCK_ARBITRUM)
   ) {
     log.warning(
       "[WARN] Compromised Core Registry at address {} attempted to register new core contract.",
