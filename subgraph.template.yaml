@@ -991,13 +991,13 @@ dataSources:
           handler: handleCoreRegistryUpdated
       file: ./src/shared-minter-filter-mapping.ts
   {{/sharedMinterFilterContracts}}
-  {{#iSharedMinterV0Contracts}}
+  {{#genericMinterEventsLibContracts}}
   - kind: ethereum/contract
-    name: 'ISharedMinterV0{{#address}}-{{address}}{{/address}}'
+    name: 'GenericMinterEventsLib{{#address}}-{{address}}{{/address}}'
     network: {{network}}
     source:
       address: "{{#address}}{{address}}{{/address}}{{^address}}0x0000000000000000000000000000000000000000{{/address}}"
-      abi: ISharedMinterV0
+      abi: GenericMinterEventsLib
       {{#startBlock}}startBlock: {{startBlock}}{{/startBlock}}
     mapping:
       kind: ethereum/events
@@ -1015,6 +1015,8 @@ dataSources:
         - Minter
         - ProjectMinterConfiguration
       abis:
+        - name: GenericMinterEventsLib
+          file: ./abis/GenericMinterEventsLib.json
         - name: ISharedMinterV0
           file: ./abis/ISharedMinterV0.json
         - name: IFilteredMinterV2
@@ -1034,12 +1036,6 @@ dataSources:
         - name: IFilteredMinterSEAV0
           file: ./abis/IFilteredMinterSEAV0.json
       eventHandlers:
-        - event: PricePerTokenInWeiUpdated(indexed uint256,indexed address,indexed uint256)
-          handler: handlePricePerTokenInWeiUpdated
-        - event: ProjectCurrencyInfoUpdated(indexed uint256,indexed address,indexed address,string)
-          handler: handleProjectCurrencyInfoUpdated
-        - event: ProjectMaxInvocationsLimitUpdated(indexed uint256,indexed address,uint256)
-          handler: handleProjectMaxInvocationsLimitUpdated
         - event: ConfigValueSet(indexed uint256,indexed address,bytes32,bytes32)
           handler: handleConfigValueSetBytes
         - event: ConfigValueSet(indexed uint256,indexed address,bytes32,bool)
@@ -1062,15 +1058,15 @@ dataSources:
           handler: handleConfigValueRemovedFromSetBigInt
         - event: ConfigValueRemovedFromSet(indexed uint256,indexed address,bytes32,address)
           handler: handleConfigValueRemovedFromSetAddress
-      file: ./src/i-shared-minter-mapping.ts
-  {{/iSharedMinterV0Contracts}}
-  {{#iSharedMerkleContracts}}
+      file: ./src/generic-minter-events-lib-mapping.ts
+  {{/genericMinterEventsLibContracts}}
+  {{#splitFundsLibContracts}}
   - kind: ethereum/contract
-    name: 'ISharedMerkle{{#address}}-{{address}}{{/address}}'
+    name: 'SplitFundsLib{{#address}}-{{address}}{{/address}}'
     network: {{network}}
     source:
       address: "{{#address}}{{address}}{{/address}}{{^address}}0x0000000000000000000000000000000000000000{{/address}}"
-      abi: ISharedMinterMerkleV0
+      abi: SplitFundsLib
       {{#startBlock}}startBlock: {{startBlock}}{{/startBlock}}
     mapping:
       kind: ethereum/events
@@ -1088,6 +1084,157 @@ dataSources:
         - Minter
         - ProjectMinterConfiguration
       abis:
+        - name: SplitFundsLib
+          file: ./abis/SplitFundsLib.json
+        - name: ISharedMinterV0
+          file: ./abis/ISharedMinterV0.json
+        - name: IFilteredMinterV2
+          file: ./abis/IFilteredMinterV2.json
+        - name: IFilteredMinterDALinV1
+          file: ./abis/IFilteredMinterDALinV1.json
+        - name: IFilteredMinterDAExpV1
+          file: ./abis/IFilteredMinterDAExpV1.json
+        - name: IFilteredMinterDAExpSettlementV1
+          file: ./abis/IFilteredMinterDAExpSettlementV1.json
+        - name: IFilteredMinterV2
+          file: ./abis/IFilteredMinterV2.json
+        - name: IFilteredMinterHolderV2
+          file: ./abis/IFilteredMinterHolderV2.json
+        - name: IFilteredMinterMerkleV2
+          file: ./abis/IFilteredMinterMerkleV2.json
+        - name: IFilteredMinterSEAV0
+          file: ./abis/IFilteredMinterSEAV0.json
+      eventHandlers:
+        - event: ProjectCurrencyInfoUpdated(indexed uint256,indexed address,indexed address,string)
+          handler: handleProjectCurrencyInfoUpdated
+      file: ./src/split-funds-lib-mapping.ts
+  {{/splitFundsLibContracts}}
+  {{#setPriceLibContracts}}
+  - kind: ethereum/contract
+    name: 'SetPriceLib{{#address}}-{{address}}{{/address}}'
+    network: {{network}}
+    source:
+      address: "{{#address}}{{address}}{{/address}}{{^address}}0x0000000000000000000000000000000000000000{{/address}}"
+      abi: SetPriceLib
+      {{#startBlock}}startBlock: {{startBlock}}{{/startBlock}}
+    mapping:
+      kind: ethereum/events
+      apiVersion: 0.0.5
+      language: wasm/assemblyscript
+      entities:
+        - Project
+        - ProjectScript
+        - Token
+        - Contract
+        - Account
+        - AccountProject
+        - Whitelisting
+        - MinterFilter
+        - Minter
+        - ProjectMinterConfiguration
+      abis:
+        - name: SetPriceLib
+          file: ./abis/SetPriceLib.json
+        - name: ISharedMinterV0
+          file: ./abis/ISharedMinterV0.json
+        - name: IFilteredMinterV2
+          file: ./abis/IFilteredMinterV2.json
+        - name: IFilteredMinterDALinV1
+          file: ./abis/IFilteredMinterDALinV1.json
+        - name: IFilteredMinterDAExpV1
+          file: ./abis/IFilteredMinterDAExpV1.json
+        - name: IFilteredMinterDAExpSettlementV1
+          file: ./abis/IFilteredMinterDAExpSettlementV1.json
+        - name: IFilteredMinterV2
+          file: ./abis/IFilteredMinterV2.json
+        - name: IFilteredMinterHolderV2
+          file: ./abis/IFilteredMinterHolderV2.json
+        - name: IFilteredMinterMerkleV2
+          file: ./abis/IFilteredMinterMerkleV2.json
+        - name: IFilteredMinterSEAV0
+          file: ./abis/IFilteredMinterSEAV0.json
+      eventHandlers:
+        - event: PricePerTokenUpdated(indexed uint256,indexed address,indexed uint256)
+          handler: handlePricePerTokenUpdated
+        - event: PricePerTokenReset(indexed uint256,indexed address)
+          handler: handlePricePerTokenReset
+      file: ./src/set-price-lib-mapping.ts
+  {{/setPriceLibContracts}}
+  {{#maxInvocationsLibContracts}}
+  - kind: ethereum/contract
+    name: 'MaxInvocationsLib{{#address}}-{{address}}{{/address}}'
+    network: {{network}}
+    source:
+      address: "{{#address}}{{address}}{{/address}}{{^address}}0x0000000000000000000000000000000000000000{{/address}}"
+      abi: MaxInvocationsLib
+      {{#startBlock}}startBlock: {{startBlock}}{{/startBlock}}
+    mapping:
+      kind: ethereum/events
+      apiVersion: 0.0.5
+      language: wasm/assemblyscript
+      entities:
+        - Project
+        - ProjectScript
+        - Token
+        - Contract
+        - Account
+        - AccountProject
+        - Whitelisting
+        - MinterFilter
+        - Minter
+        - ProjectMinterConfiguration
+      abis:
+        - name: MaxInvocationsLib
+          file: ./abis/MaxInvocationsLib.json
+        - name: ISharedMinterV0
+          file: ./abis/ISharedMinterV0.json
+        - name: IFilteredMinterV2
+          file: ./abis/IFilteredMinterV2.json
+        - name: IFilteredMinterDALinV1
+          file: ./abis/IFilteredMinterDALinV1.json
+        - name: IFilteredMinterDAExpV1
+          file: ./abis/IFilteredMinterDAExpV1.json
+        - name: IFilteredMinterDAExpSettlementV1
+          file: ./abis/IFilteredMinterDAExpSettlementV1.json
+        - name: IFilteredMinterV2
+          file: ./abis/IFilteredMinterV2.json
+        - name: IFilteredMinterHolderV2
+          file: ./abis/IFilteredMinterHolderV2.json
+        - name: IFilteredMinterMerkleV2
+          file: ./abis/IFilteredMinterMerkleV2.json
+        - name: IFilteredMinterSEAV0
+          file: ./abis/IFilteredMinterSEAV0.json
+      eventHandlers:
+        - event: ProjectMaxInvocationsLimitUpdated(indexed uint256,indexed address,uint256)
+          handler: handleProjectMaxInvocationsLimitUpdated
+      file: ./src/max-invocations-lib-mapping.ts
+  {{/maxInvocationsLibContracts}}
+  {{#merkleLibContracts}}
+  - kind: ethereum/contract
+    name: 'MerkleLib{{#address}}-{{address}}{{/address}}'
+    network: {{network}}
+    source:
+      address: "{{#address}}{{address}}{{/address}}{{^address}}0x0000000000000000000000000000000000000000{{/address}}"
+      abi: MerkleLib
+      {{#startBlock}}startBlock: {{startBlock}}{{/startBlock}}
+    mapping:
+      kind: ethereum/events
+      apiVersion: 0.0.5
+      language: wasm/assemblyscript
+      entities:
+        - Project
+        - ProjectScript
+        - Token
+        - Contract
+        - Account
+        - AccountProject
+        - Whitelisting
+        - MinterFilter
+        - Minter
+        - ProjectMinterConfiguration
+      abis:
+        - name: MerkleLib
+          file: ./abis/MerkleLib.json
         - name: ISharedMinterMerkleV0
           file: ./abis/ISharedMinterMerkleV0.json
         - name: ISharedMinterV0
@@ -1113,15 +1260,15 @@ dataSources:
           handler: handleDefaultMaxInvocationsPerAddress
         - event: DelegationRegistryUpdated(address)
           handler: handleDelegationRegistryUpdated
-      file: ./src/i-shared-merkle-mapping.ts
-  {{/iSharedMerkleContracts}}
-  {{#iSharedHolderContracts}}
+      file: ./src/merkle-lib-mapping.ts
+  {{/merkleLibContracts}}
+  {{#holderLibContracts}}
   - kind: ethereum/contract
-    name: 'ISharedHolder{{#address}}-{{address}}{{/address}}'
+    name: 'TokenHolderLib{{#address}}-{{address}}{{/address}}'
     network: {{network}}
     source:
       address: "{{#address}}{{address}}{{/address}}{{^address}}0x0000000000000000000000000000000000000000{{/address}}"
-      abi: ISharedMinterHolderV0
+      abi: TokenHolderLib
       {{#startBlock}}startBlock: {{startBlock}}{{/startBlock}}
     mapping:
       kind: ethereum/events
@@ -1139,6 +1286,8 @@ dataSources:
         - Minter
         - ProjectMinterConfiguration
       abis:
+        - name: TokenHolderLib
+          file: ./abis/TokenHolderLib.json
         - name: ISharedMinterHolderV0
           file: ./abis/ISharedMinterHolderV0.json
         - name: ISharedMinterV0
@@ -1166,15 +1315,15 @@ dataSources:
           handler: handleAllowedHoldersOfProjects
         - event: RemovedHoldersOfProjects(indexed uint256,indexed address,address[],uint256[])
           handler: handleRemovedHoldersOfProjects
-      file: ./src/i-shared-holder-mapping.ts
-  {{/iSharedHolderContracts}}
-  {{#iSharedSEAContracts}}
+      file: ./src/token-holder-lib-mapping.ts
+  {{/holderLibContracts}}
+  {{#SEALibContracts}}
   - kind: ethereum/contract
-    name: 'ISharedSEA{{#address}}-{{address}}{{/address}}'
+    name: 'SEALib{{#address}}-{{address}}{{/address}}'
     network: {{network}}
     source:
       address: "{{#address}}{{address}}{{/address}}{{^address}}0x0000000000000000000000000000000000000000{{/address}}"
-      abi: ISharedMinterSEAV0
+      abi: SEALib
       {{#startBlock}}startBlock: {{startBlock}}{{/startBlock}}
     mapping:
       kind: ethereum/events
@@ -1192,6 +1341,8 @@ dataSources:
         - Minter
         - ProjectMinterConfiguration
       abis:
+        - name: SEALib
+          file: ./abis/SEALib.json
         - name: ISharedMinterSEAV0
           file: ./abis/ISharedMinterSEAV0.json
         - name: ISharedMinterV0
@@ -1233,15 +1384,15 @@ dataSources:
           handler: handleProjectNextTokenUpdated
         - event: ProjectNextTokenEjected(indexed uint256,indexed address)
           handler: handleProjectNextTokenEjected
-      file: ./src/i-shared-sea-mapping.ts
-  {{/iSharedSEAContracts}}
-  {{#iSharedDAContracts}}
+      file: ./src/sea-lib-mapping.ts
+  {{/SEALibContracts}}
+  {{#DALibContracts}}
   - kind: ethereum/contract
-    name: 'ISharedDA{{#address}}-{{address}}{{/address}}'
+    name: 'DALib{{#address}}-{{address}}{{/address}}'
     network: {{network}}
     source:
       address: "{{#address}}{{address}}{{/address}}{{^address}}0x0000000000000000000000000000000000000000{{/address}}"
-      abi: ISharedMinterDAV0
+      abi: DALib
       {{#startBlock}}startBlock: {{startBlock}}{{/startBlock}}
     mapping:
       kind: ethereum/events
@@ -1259,6 +1410,8 @@ dataSources:
         - Minter
         - ProjectMinterConfiguration
       abis:
+        - name: DALib
+          file: ./abis/DALib.json
         - name: ISharedMinterDAV0
           file: ./abis/ISharedMinterDAV0.json
         - name: ISharedMinterV0
@@ -1282,15 +1435,15 @@ dataSources:
       eventHandlers:
         - event: ResetAuctionDetails(indexed uint256,indexed address)
           handler: handleResetAuctionDetails
-      file: ./src/i-shared-da-mapping.ts
-  {{/iSharedDAContracts}}
-  {{#iSharedDAExpContracts}}
+      file: ./src/da-lib-mapping.ts
+  {{/DALibContracts}}
+  {{#DAExpLibContracts}}
   - kind: ethereum/contract
-    name: 'ISharedDAExp{{#address}}-{{address}}{{/address}}'
+    name: 'DAExpLib{{#address}}-{{address}}{{/address}}'
     network: {{network}}
     source:
       address: "{{#address}}{{address}}{{/address}}{{^address}}0x0000000000000000000000000000000000000000{{/address}}"
-      abi: ISharedMinterDAExpV0
+      abi: DAExpLib
       {{#startBlock}}startBlock: {{startBlock}}{{/startBlock}}
     mapping:
       kind: ethereum/events
@@ -1308,6 +1461,8 @@ dataSources:
         - Minter
         - ProjectMinterConfiguration
       abis:
+        - name: DAExpLib
+          file: ./abis/DAExpLib.json
         - name: ISharedMinterDAExpV0
           file: ./abis/ISharedMinterDAExpV0.json
         - name: ISharedMinterDAV0
@@ -1335,15 +1490,15 @@ dataSources:
           handler: handleSetAuctionDetailsExp
         - event: AuctionMinHalfLifeSecondsUpdated(uint256)
           handler: handleAuctionMinHalfLifeSecondsUpdated
-      file: ./src/i-shared-da-exp-mapping.ts
-  {{/iSharedDAExpContracts}}
-  {{#iSharedDALinContracts}}
+      file: ./src/da-exp-lib-mapping.ts
+  {{/DAExpLibContracts}}
+  {{#DALinLibContracts}}
   - kind: ethereum/contract
-    name: 'ISharedDALin{{#address}}-{{address}}{{/address}}'
+    name: 'DALinLib{{#address}}-{{address}}{{/address}}'
     network: {{network}}
     source:
       address: "{{#address}}{{address}}{{/address}}{{^address}}0x0000000000000000000000000000000000000000{{/address}}"
-      abi: ISharedMinterDALinV0
+      abi: DALinLib
       {{#startBlock}}startBlock: {{startBlock}}{{/startBlock}}
     mapping:
       kind: ethereum/events
@@ -1361,6 +1516,8 @@ dataSources:
         - Minter
         - ProjectMinterConfiguration
       abis:
+        - name: DALinLib
+          file: ./abis/DALinLib.json
         - name: ISharedMinterDALinV0
           file: ./abis/ISharedMinterDALinV0.json
         - name: ISharedMinterDAV0
@@ -1388,15 +1545,15 @@ dataSources:
           handler: handleSetAuctionDetailsLin
         - event: AuctionMinimumLengthSecondsUpdated(uint256)
           handler: handleAuctionMinimumLengthSecondsUpdated
-      file: ./src/i-shared-da-lin-mapping.ts
-  {{/iSharedDALinContracts}}
-  {{#iSharedDAExpSettlementContracts}}
+      file: ./src/da-lin-lib-mapping.ts
+  {{/DALinLibContracts}}
+  {{#settlementExpLibContracts}}
   - kind: ethereum/contract
-    name: 'ISharedDAExpSettlement{{#address}}-{{address}}{{/address}}'
+    name: 'SettlementExpLib{{#address}}-{{address}}{{/address}}'
     network: {{network}}
     source:
       address: "{{#address}}{{address}}{{/address}}{{^address}}0x0000000000000000000000000000000000000000{{/address}}"
-      abi: ISharedMinterDAExpSettlementV0
+      abi: SettlementExpLib
       {{#startBlock}}startBlock: {{startBlock}}{{/startBlock}}
     mapping:
       kind: ethereum/events
@@ -1414,6 +1571,8 @@ dataSources:
         - Minter
         - ProjectMinterConfiguration
       abis:
+        - name: SettlementExpLib
+          file: ./abis/SettlementExpLib.json
         - name: ISharedMinterDAExpSettlementV0
           file: ./abis/ISharedMinterDAExpSettlementV0.json
         - name: ISharedMinterDAExpV0
@@ -1441,8 +1600,8 @@ dataSources:
       eventHandlers:
         - event: ReceiptUpdated(indexed address,indexed uint256,indexed address,uint24,uint256)
           handler: handleReceiptUpdated
-      file: ./src/i-shared-da-exp-settlement-mapping.ts
-  {{/iSharedDAExpSettlementContracts}}
+      file: ./src/settlement-exp-lib-mapping.ts
+  {{/settlementExpLibContracts}}
   {{#minterSetPriceContracts}}
   - kind: ethereum/contract
     name: 'MinterSetPrice{{#address}}-{{address}}{{/address}}'

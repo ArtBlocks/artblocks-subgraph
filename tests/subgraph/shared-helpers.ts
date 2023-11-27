@@ -98,6 +98,7 @@ export const RECEIPT_ENTITY_TYPE = "Receipt";
 export const MINTER_FILTER_ENTITY_TYPE = "MinterFilter";
 export const CORE_REGISTRY_TYPE = "CoreRegistry";
 export const MINTER_ENTITY_TYPE = "Minter";
+export const PRIMARY_PURCHASE_ENTITY_TYPE = "PrimaryPurchase";
 export const ONE_MILLION = 1000000;
 export const RANDOMIZER_ADDRESS = randomAddressGenerator.generateRandomAddress();
 export const IPFS_CID = "QmQCqjqxVXZQ6vXNmZvF7FjyZkCXKXMykCyyPQQrZ6m7W";

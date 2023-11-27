@@ -64,3 +64,21 @@ export const KNOWN_MINTER_FILTER_TYPES = [
 ];
 
 export const JS_MAX_SAFE_INTEGER = BigInt.fromString("9007199254740991");
+
+// @dev these are used to stop indexing of new engine contracts registered
+// on a compromised core registry contract
+export const COMPROMISED_ENGINE_REGISTRY_ADDRESS_GOERLI =
+  "0xea698596b6009a622c3ed00dd5a8b5d1cae4fc36";
+export const COMPROMISED_ENGINE_REGISTRY_CUTOFF_BLOCK_GOERLI = BigInt.fromI32(
+  10050500
+);
+export const COMPROMISED_ENGINE_REGISTRY_ADDRESS_MAINNET =
+  "0x652490c8bb6e7ec3fd798537d2f348d7904bbbc2";
+export const COMPROMISED_ENGINE_REGISTRY_CUTOFF_BLOCK_MAINNET = BigInt.fromI32(
+  18580700
+);
+export const COMPROMISED_ENGINE_REGISTRY_ADDRESS_ARBITRUM =
+  "0xdae755c2944ec125a0d8d5cb082c22837593441a";
+export const COMPROMISED_ENGINE_REGISTRY_CUTOFF_BLOCK_ARBITRUM = BigInt.fromI32(
+  150114684
+);

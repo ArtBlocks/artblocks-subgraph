@@ -1,4 +1,11 @@
-import { BigInt, store, log, Address, Bytes } from "@graphprotocol/graph-ts";
+import {
+  BigInt,
+  store,
+  log,
+  Address,
+  Bytes,
+  ByteArray
+} from "@graphprotocol/graph-ts";
 
 import {
   Mint,
@@ -50,7 +57,9 @@ import {
   Contract,
   MinterFilter,
   ProposedArtistAddressesAndSplit,
-  ProjectExternalAssetDependency
+  ProjectExternalAssetDependency,
+  ProjectMinterConfiguration,
+  PrimaryPurchase
 } from "../generated/schema";
 
 import {
@@ -124,6 +133,30 @@ export function handleMint(event: Mint): void {
     token.updatedAt = event.block.timestamp;
     token.transactionHash = event.transaction.hash;
     token.nextSaleId = BigInt.fromI32(0);
+
+    if (project.minterConfiguration) {
+      const minterConfiguration = ProjectMinterConfiguration.load(
+        changetype<string>(project.minterConfiguration)
+      );
+
+      if (minterConfiguration) {
+        const purchaseDetails = new PrimaryPurchase(token.id);
+        purchaseDetails.token = token.id;
+        purchaseDetails.transactionHash = event.transaction.hash;
+        purchaseDetails.minterAddress = changetype<Bytes>(
+          ByteArray.fromHexString(minterConfiguration.minter)
+        );
+        purchaseDetails.currencyAddress = minterConfiguration.currencyAddress;
+        purchaseDetails.currencySymbol = minterConfiguration.currencySymbol;
+        purchaseDetails.save();
+        token.primaryPurchaseDetails = purchaseDetails.id;
+      } else {
+        log.warning("Minter configuration not found with id: {}", [
+          changetype<string>(project.minterConfiguration)
+        ]);
+      }
+    }
+
     token.save();
 
     project.invocations = invocation.plus(BigInt.fromI32(1));

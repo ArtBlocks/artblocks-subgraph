@@ -60,7 +60,8 @@ import {
   Account,
   AccountProject,
   Whitelisting,
-  ProjectScript
+  ProjectScript,
+  PrimaryPurchase
 } from "../generated/schema";
 import {
   generateAccountProjectId,
@@ -98,6 +99,17 @@ export function handleMint(event: Mint): void {
     token.updatedAt = event.block.timestamp;
     token.transactionHash = event.transaction.hash;
     token.nextSaleId = BigInt.fromI32(0);
+
+    // V0 Contracts are purchased using the core contract directly
+    const primaryPurchaseDetails = new PrimaryPurchase(token.id);
+    primaryPurchaseDetails.token = token.id;
+    primaryPurchaseDetails.transactionHash = event.transaction.hash;
+    primaryPurchaseDetails.minterAddress = event.address;
+    primaryPurchaseDetails.currencyAddress = Address.zero();
+    primaryPurchaseDetails.currencySymbol = "ETH";
+    primaryPurchaseDetails.save();
+    token.primaryPurchaseDetails = primaryPurchaseDetails.id;
+
     token.save();
 
     project.invocations = invocation.plus(BigInt.fromI32(1));

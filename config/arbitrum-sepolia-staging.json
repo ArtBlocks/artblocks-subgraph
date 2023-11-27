@@ -1,0 +1,273 @@
+{
+  "network": "arbitrum-sepolia",
+  "sharedMinterFilterContracts": [
+    {
+      "address": "0xa07f47c30C262adcC263A4D44595972c50e04db7",
+      "name": "Arbitrum sepolia staging shared minter filter: MinterFilterV2",
+      "blockNumber": 936767
+    }
+  ],
+  "genericMinterEventsLibContracts": [
+    {
+      "address": "0x5C8C93998023556950174D97b311d2C6B653f586",
+      "name": "Arbitrum sepolia staging shared minter: MinterSetPriceV5",
+      "blockNumber": 937420
+    },
+    {
+      "address": "0x14ff6f834a2a00E6E5611962B5db6cD23AF401e9",
+      "name": "Arbitrum sepolia staging shared minter: MinterSetPriceERC20V5",
+      "blockNumber": 937420
+    },
+    {
+      "address": "0xDd06d8483868Cd0C5E69C24eEaA2A5F2bEaFd42b",
+      "name": "Arbitrum sepolia staging shared minter: MinterSetPriceHolderV5",
+      "blockNumber": 937420
+    },
+    {
+      "address": "0x2146A41F2c1432895d6D0ADF9c60BF0a226Bac0e",
+      "name": "Arbitrum sepolia staging shared minter: MinterSetPriceMerkleV5",
+      "blockNumber": 937420
+    },
+    {
+      "address": "0xE8394175365Fd746Bb1179244a6F8e3398aa22FF",
+      "name": "Arbitrum sepolia staging shared minter: MinterSetPricePolyptychV5",
+      "blockNumber": 937420
+    },
+    {
+      "address": "0x1c207b57D3FF22f58CE5aD702A2a89F09CE19366",
+      "name": "Arbitrum sepolia staging shared minter: MinterSetPricePolyptychERC20V5",
+      "blockNumber": 937420
+    },
+    {
+      "address": "0xA6AE3B1c0177C9addA7E9f57Bb96686F892aFe10",
+      "name": "Arbitrum sepolia staging shared minter: MinterDAExpV5",
+      "blockNumber": 937420
+    },
+    {
+      "address": "0x06Bdff0A69d1b8E18C5B27b03945f024d3490691",
+      "name": "Arbitrum sepolia staging shared minter: MinterDALinV5",
+      "blockNumber": 937420
+    },
+    {
+      "address": "0xa319C382a702682129fcbF55d514E61a16f97f9c",
+      "name": "Arbitrum sepolia staging shared minter: MinterDAExpSettlementV3",
+      "blockNumber": 937420
+    },
+    {
+      "address": "0x3b1Fe77D72e2DE15EF3A1ff83176e9F9af9E292A",
+      "name": "Arbitrum sepolia staging shared minter: MinterDAExpHolderV5",
+      "blockNumber": 937420
+    },
+    {
+      "address": "0x6feb0aB02A85d2C3c5a79B822f0a00061cBBb040",
+      "name": "Arbitrum sepolia staging shared minter: MinterDALinHolderV5",
+      "blockNumber": 937420
+    }
+  ],
+  "maxInvocationsLibContracts": [
+    {
+      "address": "0x5C8C93998023556950174D97b311d2C6B653f586",
+      "name": "Arbitrum sepolia staging shared minter: MinterSetPriceV5",
+      "blockNumber": 937420
+    },
+    {
+      "address": "0x14ff6f834a2a00E6E5611962B5db6cD23AF401e9",
+      "name": "Arbitrum sepolia staging shared minter: MinterSetPriceERC20V5",
+      "blockNumber": 937420
+    },
+    {
+      "address": "0xDd06d8483868Cd0C5E69C24eEaA2A5F2bEaFd42b",
+      "name": "Arbitrum sepolia staging shared minter: MinterSetPriceHolderV5",
+      "blockNumber": 937420
+    },
+    {
+      "address": "0x2146A41F2c1432895d6D0ADF9c60BF0a226Bac0e",
+      "name": "Arbitrum sepolia staging shared minter: MinterSetPriceMerkleV5",
+      "blockNumber": 937420
+    },
+    {
+      "address": "0xE8394175365Fd746Bb1179244a6F8e3398aa22FF",
+      "name": "Arbitrum sepolia staging shared minter: MinterSetPricePolyptychV5",
+      "blockNumber": 937420
+    },
+    {
+      "address": "0x1c207b57D3FF22f58CE5aD702A2a89F09CE19366",
+      "name": "Arbitrum sepolia staging shared minter: MinterSetPricePolyptychERC20V5",
+      "blockNumber": 937420
+    },
+    {
+      "address": "0xA6AE3B1c0177C9addA7E9f57Bb96686F892aFe10",
+      "name": "Arbitrum sepolia staging shared minter: MinterDAExpV5",
+      "blockNumber": 937420
+    },
+    {
+      "address": "0x06Bdff0A69d1b8E18C5B27b03945f024d3490691",
+      "name": "Arbitrum sepolia staging shared minter: MinterDALinV5",
+      "blockNumber": 937420
+    },
+    {
+      "address": "0xa319C382a702682129fcbF55d514E61a16f97f9c",
+      "name": "Arbitrum sepolia staging shared minter: MinterDAExpSettlementV3",
+      "blockNumber": 937420
+    },
+    {
+      "address": "0x3b1Fe77D72e2DE15EF3A1ff83176e9F9af9E292A",
+      "name": "Arbitrum sepolia staging shared minter: MinterDAExpHolderV5",
+      "blockNumber": 937420
+    },
+    {
+      "address": "0x6feb0aB02A85d2C3c5a79B822f0a00061cBBb040",
+      "name": "Arbitrum sepolia staging shared minter: MinterDALinHolderV5",
+      "blockNumber": 937420
+    }
+  ],
+  "setPriceLibContracts": [
+    {
+      "address": "0x5C8C93998023556950174D97b311d2C6B653f586",
+      "name": "Arbitrum sepolia staging shared minter: MinterSetPriceV5",
+      "blockNumber": 937420
+    },
+    {
+      "address": "0x14ff6f834a2a00E6E5611962B5db6cD23AF401e9",
+      "name": "Arbitrum sepolia staging shared minter: MinterSetPriceERC20V5",
+      "blockNumber": 937420
+    },
+    {
+      "address": "0xDd06d8483868Cd0C5E69C24eEaA2A5F2bEaFd42b",
+      "name": "Arbitrum sepolia staging shared minter: MinterSetPriceHolderV5",
+      "blockNumber": 937420
+    },
+    {
+      "address": "0x2146A41F2c1432895d6D0ADF9c60BF0a226Bac0e",
+      "name": "Arbitrum sepolia staging shared minter: MinterSetPriceMerkleV5",
+      "blockNumber": 937420
+    },
+    {
+      "address": "0xE8394175365Fd746Bb1179244a6F8e3398aa22FF",
+      "name": "Arbitrum sepolia staging shared minter: MinterSetPricePolyptychV5",
+      "blockNumber": 937420
+    },
+    {
+      "address": "0x1c207b57D3FF22f58CE5aD702A2a89F09CE19366",
+      "name": "Arbitrum sepolia staging shared minter: MinterSetPricePolyptychERC20V5",
+      "blockNumber": 937420
+    }
+  ],
+  "splitFundsLibContracts": [
+    {
+      "address": "0x14ff6f834a2a00E6E5611962B5db6cD23AF401e9",
+      "name": "Arbitrum sepolia staging shared minter: MinterSetPriceERC20V5",
+      "blockNumber": 937420
+    },
+    {
+      "address": "0x1c207b57D3FF22f58CE5aD702A2a89F09CE19366",
+      "name": "Arbitrum sepolia staging shared minter: MinterSetPricePolyptychERC20V5",
+      "blockNumber": 937420
+    }
+  ],
+  "holderLibContracts": [
+    {
+      "address": "0xDd06d8483868Cd0C5E69C24eEaA2A5F2bEaFd42b",
+      "name": "Arbitrum sepolia staging shared minter: MinterSetPriceHolderV5",
+      "blockNumber": 937420
+    },
+    {
+      "address": "0xE8394175365Fd746Bb1179244a6F8e3398aa22FF",
+      "name": "Arbitrum sepolia staging shared minter: MinterSetPricePolyptychV5",
+      "blockNumber": 937420
+    },
+    {
+      "address": "0x1c207b57D3FF22f58CE5aD702A2a89F09CE19366",
+      "name": "Arbitrum sepolia staging shared minter: MinterSetPricePolyptychERC20V5",
+      "blockNumber": 937420
+    },
+    {
+      "address": "0x3b1Fe77D72e2DE15EF3A1ff83176e9F9af9E292A",
+      "name": "Arbitrum sepolia staging shared minter: MinterDAExpHolderV5",
+      "blockNumber": 937420
+    },
+    {
+      "address": "0x6feb0aB02A85d2C3c5a79B822f0a00061cBBb040",
+      "name": "Arbitrum sepolia staging shared minter: MinterDALinHolderV5",
+      "blockNumber": 937420
+    }
+  ],
+  "merkleLibContracts": [
+    {
+      "address": "0x2146A41F2c1432895d6D0ADF9c60BF0a226Bac0e",
+      "name": "Arbitrum sepolia staging shared minter: MinterSetPriceMerkleV5",
+      "blockNumber": 937420
+    }
+  ],
+  "DALibContracts": [
+    {
+      "address": "0xA6AE3B1c0177C9addA7E9f57Bb96686F892aFe10",
+      "name": "Arbitrum sepolia staging shared minter: MinterDAExpV5",
+      "blockNumber": 937420
+    },
+    {
+      "address": "0x06Bdff0A69d1b8E18C5B27b03945f024d3490691",
+      "name": "Arbitrum sepolia staging shared minter: MinterDALinV5",
+      "blockNumber": 937420
+    },
+    {
+      "address": "0xa319C382a702682129fcbF55d514E61a16f97f9c",
+      "name": "Arbitrum sepolia staging shared minter: MinterDAExpSettlementV3",
+      "blockNumber": 937420
+    },
+    {
+      "address": "0x3b1Fe77D72e2DE15EF3A1ff83176e9F9af9E292A",
+      "name": "Arbitrum sepolia staging shared minter: MinterDAExpHolderV5",
+      "blockNumber": 937420
+    },
+    {
+      "address": "0x6feb0aB02A85d2C3c5a79B822f0a00061cBBb040",
+      "name": "Arbitrum sepolia staging shared minter: MinterDALinHolderV5",
+      "blockNumber": 937420
+    }
+  ],
+  "DAExpLibContracts": [
+    {
+      "address": "0xA6AE3B1c0177C9addA7E9f57Bb96686F892aFe10",
+      "name": "Arbitrum sepolia staging shared minter: MinterDAExpV5",
+      "blockNumber": 937420
+    },
+    {
+      "address": "0xa319C382a702682129fcbF55d514E61a16f97f9c",
+      "name": "Arbitrum sepolia staging shared minter: MinterDAExpSettlementV3",
+      "blockNumber": 937420
+    },
+    {
+      "address": "0x3b1Fe77D72e2DE15EF3A1ff83176e9F9af9E292A",
+      "name": "Arbitrum sepolia staging shared minter: MinterDAExpHolderV5",
+      "blockNumber": 937420
+    }
+  ],
+  "DALinLibContracts": [
+    {
+      "address": "0x06Bdff0A69d1b8E18C5B27b03945f024d3490691",
+      "name": "Arbitrum sepolia staging shared minter: MinterDALinV5",
+      "blockNumber": 937420
+    },
+    {
+      "address": "0x6feb0aB02A85d2C3c5a79B822f0a00061cBBb040",
+      "name": "Arbitrum sepolia staging shared minter: MinterDALinHolderV5",
+      "blockNumber": 937420
+    }
+  ],
+  "settlementExpLibContracts": [
+    {
+      "address": "0xa319C382a702682129fcbF55d514E61a16f97f9c",
+      "name": "Arbitrum sepolia staging shared minter: MinterDAExpSettlementV3",
+      "blockNumber": 937420
+    }
+  ],
+  "adminACLV0Contracts": [],
+  "ICoreRegistryContracts": [
+    {
+      "address": "0xdAe755c2944Ec125a0D8D5CB082c22837593441a",
+      "name": "Sepolia staging engine registry contract: CoreRegistryV1",
+      "blockNumber": 936767
+    }
+  ]
+}

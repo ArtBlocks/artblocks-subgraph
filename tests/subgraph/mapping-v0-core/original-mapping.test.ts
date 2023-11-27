@@ -24,7 +24,9 @@ import {
   addTestContractToStore,
   TEST_CONTRACT,
   TRANSFER_ENTITY_TYPE,
-  addNewTokenToStore
+  addNewTokenToStore,
+  TEST_TOKEN_HASH,
+  PRIMARY_PURCHASE_ENTITY_TYPE
 } from "../shared-helpers";
 
 import {
@@ -33,7 +35,8 @@ import {
   mockProjectTokenInfoCallWithDefaults,
   mockProjectDetailsCallWithDefaults,
   addNewProjectToStore,
-  mockTokenURICall
+  mockTokenURICall,
+  mockShowTokenHashes
 } from "./helpers";
 
 import {
@@ -74,7 +77,8 @@ import {
   UpdateProjectSecondaryMarketRoyaltyPercentageCall,
   UpdateProjectScriptCall,
   UpdateProjectScriptJSONCall,
-  Transfer
+  Transfer,
+  Mint
 } from "../../../generated/GenArt721/GenArt721";
 import {
   handleAddProject,
@@ -106,7 +110,8 @@ import {
   handleUpdateProjectSecondaryMarketRoyaltyPercentage,
   handleUpdateProjectScript,
   handleUpdateProjectScriptJSON,
-  handleTransfer
+  handleTransfer,
+  handleMint
 } from "../../../src/mapping-v0-core";
 
 import {
@@ -1717,7 +1722,7 @@ test("GenArt721: Can handleUpdateProjectScriptJSON", () => {
   const updateCallBlockTimestamp = CURRENT_BLOCK_TIMESTAMP.plus(
     BigInt.fromI32(10)
   );
-  const scriptJSON = '{}';
+  const scriptJSON = "{}";
 
   const call = changetype<UpdateProjectScriptJSONCall>(newMockCall());
 
@@ -1913,25 +1918,25 @@ test("GenArt721: Can handle transfer", () => {
     "token",
     fullTokenId
   );
- 
+
   assert.fieldEquals(
     TRANSFER_ENTITY_TYPE,
     generateTransferId(hash, logIndex),
     "blockHash",
     event.block.hash.toHexString()
-  )
+  );
   assert.fieldEquals(
     TRANSFER_ENTITY_TYPE,
     generateTransferId(hash, logIndex),
     "blockNumber",
     event.block.number.toString()
-  )
+  );
   assert.fieldEquals(
     TRANSFER_ENTITY_TYPE,
     generateTransferId(hash, logIndex),
     "blockTimestamp",
     event.block.timestamp.toString()
-  )
+  );
 });
 
 test("GenArt721: Can handle mint transfer", () => {
@@ -1982,25 +1987,124 @@ test("GenArt721: Can handle mint transfer", () => {
     "token",
     fullTokenId
   );
- 
+
   assert.fieldEquals(
     TRANSFER_ENTITY_TYPE,
     generateTransferId(hash, logIndex),
     "blockHash",
     event.block.hash.toHexString()
-  )
+  );
   assert.fieldEquals(
     TRANSFER_ENTITY_TYPE,
     generateTransferId(hash, logIndex),
     "blockNumber",
     event.block.number.toString()
-  )
+  );
   assert.fieldEquals(
     TRANSFER_ENTITY_TYPE,
     generateTransferId(hash, logIndex),
     "blockTimestamp",
     event.block.timestamp.toString()
-  )
+  );
+});
+
+test("GenArt721: Can handle mint", () => {
+  clearStore();
+  // add contract to store
+  const projectId = BigInt.fromI32(1);
+  const tokenId = BigInt.fromI32(1000001);
+  addTestContractToStore(projectId);
+  mockShowTokenHashes(TEST_CONTRACT_ADDRESS, tokenId, TEST_TOKEN_HASH);
+  // add project to store
+  const fullProjectId = generateContractSpecificId(
+    TEST_CONTRACT_ADDRESS,
+    projectId
+  );
+  const artistAddress = randomAddressGenerator.generateRandomAddress();
+  const projectName = "Test Project";
+  const pricePerTokenInWei = BigInt.fromI64(i64(1e18));
+
+  addNewProjectToStore(
+    projectId,
+    projectName,
+    artistAddress,
+    pricePerTokenInWei,
+    true,
+    CURRENT_BLOCK_TIMESTAMP
+  );
+
+  // handle mint
+  const fullTokenId = generateContractSpecificId(
+    TEST_CONTRACT_ADDRESS,
+    tokenId
+  );
+
+  const toAddress = randomAddressGenerator.generateRandomAddress();
+
+  const hash = Bytes.fromUTF8("QmYwAPJzv5CZsnA625s3Xf2nemtYgPpHdWEz79ojWnPbdG");
+
+  const logIndex = BigInt.fromI32(0);
+
+  const event: Mint = changetype<Mint>(newMockEvent());
+  event.address = TEST_CONTRACT_ADDRESS;
+  event.transaction.hash = hash;
+  event.logIndex = logIndex;
+  event.parameters = [
+    new ethereum.EventParam("_to", ethereum.Value.fromAddress(toAddress)),
+    new ethereum.EventParam(
+      "_tokenId",
+      ethereum.Value.fromUnsignedBigInt(tokenId)
+    ),
+    new ethereum.EventParam(
+      "_projectId",
+      ethereum.Value.fromUnsignedBigInt(projectId)
+    ),
+    new ethereum.EventParam(
+      "_invocations",
+      ethereum.Value.fromUnsignedBigInt(BigInt.fromI32(1))
+    ),
+    new ethereum.EventParam(
+      "_value",
+      ethereum.Value.fromUnsignedBigInt(pricePerTokenInWei)
+    )
+  ];
+
+  handleMint(event);
+
+  assert.fieldEquals(
+    TOKEN_ENTITY_TYPE,
+    fullTokenId,
+    "owner",
+    toAddress.toHexString()
+  );
+
+  assert.fieldEquals(
+    PRIMARY_PURCHASE_ENTITY_TYPE,
+    fullTokenId,
+    "token",
+    fullTokenId
+  );
+
+  assert.fieldEquals(
+    PRIMARY_PURCHASE_ENTITY_TYPE,
+    fullTokenId,
+    "minterAddress",
+    TEST_CONTRACT_ADDRESS.toHexString()
+  );
+
+  assert.fieldEquals(
+    PRIMARY_PURCHASE_ENTITY_TYPE,
+    fullTokenId,
+    "currencySymbol",
+    "ETH"
+  );
+
+  assert.fieldEquals(
+    PRIMARY_PURCHASE_ENTITY_TYPE,
+    fullTokenId,
+    "currencyAddress",
+    Address.zero().toHexString()
+  );
 });
 export {
   handleAddProject,
@@ -2031,5 +2135,6 @@ export {
   handleUpdateProjectWebsite,
   handleUpdateProjectSecondaryMarketRoyaltyPercentage,
   handleUpdateProjectScript,
-  handleUpdateProjectScriptJSON
+  handleUpdateProjectScriptJSON,
+  handleMint
 };

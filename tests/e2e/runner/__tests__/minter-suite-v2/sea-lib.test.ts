@@ -52,15 +52,15 @@ const genArt721CoreAddress =
   config.iGenArt721CoreContractV3_BaseContracts[0].address;
 
 // get MinterSEAV1 contract from the subgraph config
-if (!config.iSharedSEAContracts) {
-  throw new Error("No iSharedSEAContracts in config");
+if (!config.SEALibContracts) {
+  throw new Error("No SEALibContracts in config");
 }
-const minterSEAV1Address = config.iSharedSEAContracts[0].address;
+const minterSEAV1Address = config.SEALibContracts[0].address;
 const minterSEAV1Contract = new MinterSEAV1__factory(deployer).attach(
   minterSEAV1Address
 );
 
-describe("iFilteredSharedMerkle event handling", () => {
+describe("SEALib event handling", () => {
   beforeAll(async () => {
     await waitUntilSubgraphIsSynced(client);
   });
@@ -99,7 +99,7 @@ describe("iFilteredSharedMerkle event handling", () => {
       const minterConfigInitial =
         await minterSEAV1Contract.minterConfigurationDetails();
       const newMinterTimeBufferSeconds =
-        minterConfigInitial.minterTimeBufferSeconds_ + 1;
+        minterConfigInitial.minterTimeBufferSeconds + 1;
       // update the minter time buffer
       await minterSEAV1Contract
         .connect(deployer)
@@ -122,7 +122,7 @@ describe("iFilteredSharedMerkle event handling", () => {
       const minterConfigInitial =
         await minterSEAV1Contract.minterConfigurationDetails();
       const newMinterRefundGasLimit =
-        minterConfigInitial.minterRefundGasLimit_ + 1;
+        minterConfigInitial.minterRefundGasLimit + 1;
       // update the minter time buffer
       await minterSEAV1Contract
         .connect(deployer)

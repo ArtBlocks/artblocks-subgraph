@@ -4,43 +4,26 @@ import {
   test,
   newMockEvent,
   describe,
-  beforeEach,
-  createMockedFunction
+  dataSourceMock,
+  logStore
 } from "matchstick-as/assembly/index";
 import {
   BigInt,
   Bytes,
   ethereum,
-  store,
-  Address
+  Address,
+  DataSourceContext,
+  Value
 } from "@graphprotocol/graph-ts";
 import {
-  ACCOUNT_ENTITY_TYPE,
-  PROJECT_ENTITY_TYPE,
   CONTRACT_ENTITY_TYPE,
-  PROJECT_SCRIPT_ENTITY_TYPE,
-  TOKEN_ENTITY_TYPE,
-  CURRENT_BLOCK_TIMESTAMP,
   RandomAddressGenerator,
-  mockProjectScriptByIndex,
-  mockTokenIdToHash,
-  mockCoreType,
   TEST_CONTRACT_ADDRESS,
-  TEST_TOKEN_HASH,
   TEST_TX_HASH,
-  assertNewProjectFields,
-  assertTestContractFields,
   addTestContractToStore,
   addArbitraryContractToStore,
-  addNewProjectToStore,
-  addNewTokenToStore,
-  TRANSFER_ENTITY_TYPE,
-  ONE_MILLION,
-  booleanToString,
   TEST_CONTRACT,
-  TEST_SUPER_ADMIN_ADDRESS,
-  RANDOMIZER_ADDRESS,
-  WHITELISTING_ENTITY_TYPE
+  RANDOMIZER_ADDRESS
 } from "../shared-helpers";
 import { mockRefreshContractCalls } from "../mapping-v3-core/helpers";
 import {
@@ -51,6 +34,12 @@ import {
   handleContractRegistered,
   handleContractUnregistered
 } from "../../../src/core-registry";
+import {
+  COMPROMISED_ENGINE_REGISTRY_ADDRESS_GOERLI,
+  COMPROMISED_ENGINE_REGISTRY_ADDRESS_MAINNET,
+  COMPROMISED_ENGINE_REGISTRY_CUTOFF_BLOCK_GOERLI,
+  COMPROMISED_ENGINE_REGISTRY_CUTOFF_BLOCK_MAINNET
+} from "../../../src/constants";
 
 const randomAddressGenerator = new RandomAddressGenerator();
 const contractRegistryAddress = randomAddressGenerator.generateRandomAddress();
@@ -182,6 +171,96 @@ describe("ContractRegistered event", () => {
       "registeredOn",
       contractRegistryAddress.toHexString()
     );
+  });
+  test("does not add a new contract registered on compromised registry", () => {
+    clearStore();
+    let event: ContractRegistered = changetype<ContractRegistered>(
+      newMockEvent()
+    );
+
+    event.address = changetype<Address>(
+      Address.fromHexString(COMPROMISED_ENGINE_REGISTRY_ADDRESS_GOERLI)
+    );
+    event.transaction.hash = TEST_TX_HASH;
+    event.block.number = COMPROMISED_ENGINE_REGISTRY_CUTOFF_BLOCK_GOERLI;
+    event.logIndex = defaultLogIndex;
+    event.parameters = [
+      new ethereum.EventParam(
+        "_contractAddress",
+        ethereum.Value.fromAddress(TEST_CONTRACT_ADDRESS)
+      ),
+      new ethereum.EventParam(
+        "_coreVersion",
+        ethereum.Value.fromBytes(Bytes.fromUTF8("v3.1.1"))
+      ),
+      new ethereum.EventParam(
+        "_coreType",
+        ethereum.Value.fromBytes(Bytes.fromUTF8(coreType))
+      )
+    ];
+
+    let context = new DataSourceContext();
+    // context.set("contextVal", Value.fromI32(325));
+    dataSourceMock.setReturnValues(
+      COMPROMISED_ENGINE_REGISTRY_ADDRESS_GOERLI,
+      "goerli",
+      context
+    );
+
+    // ensure contract not currently in store
+    assert.notInStore(
+      CONTRACT_ENTITY_TYPE,
+      TEST_CONTRACT_ADDRESS.toHexString()
+    );
+
+    // handle event
+    handleContractRegistered(event);
+
+    assert.notInStore(
+      CONTRACT_ENTITY_TYPE,
+      TEST_CONTRACT_ADDRESS.toHexString()
+    );
+
+    event = changetype<ContractRegistered>(newMockEvent());
+
+    event.address = changetype<Address>(
+      Address.fromHexString(COMPROMISED_ENGINE_REGISTRY_ADDRESS_MAINNET)
+    );
+    event.transaction.hash = TEST_TX_HASH;
+    event.block.number = COMPROMISED_ENGINE_REGISTRY_CUTOFF_BLOCK_MAINNET;
+    event.logIndex = defaultLogIndex;
+    event.parameters = [
+      new ethereum.EventParam(
+        "_contractAddress",
+        ethereum.Value.fromAddress(TEST_CONTRACT_ADDRESS)
+      ),
+      new ethereum.EventParam(
+        "_coreVersion",
+        ethereum.Value.fromBytes(Bytes.fromUTF8("v3.1.1"))
+      ),
+      new ethereum.EventParam(
+        "_coreType",
+        ethereum.Value.fromBytes(Bytes.fromUTF8(coreType))
+      )
+    ];
+
+    context = new DataSourceContext();
+    // context.set("contextVal", Value.fromI32(325));
+    dataSourceMock.setReturnValues(
+      COMPROMISED_ENGINE_REGISTRY_ADDRESS_MAINNET,
+      "mainnet",
+      context
+    );
+
+    handleContractRegistered(event);
+
+    assert.notInStore(
+      CONTRACT_ENTITY_TYPE,
+      TEST_CONTRACT_ADDRESS.toHexString()
+    );
+
+    // @dev no way to determine if contract was added as template source
+    // at this time
   });
 });
 

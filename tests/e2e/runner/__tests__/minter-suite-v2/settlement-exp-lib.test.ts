@@ -63,16 +63,16 @@ const genArt721CoreContract = new GenArt721CoreV3__factory(
 ).attach(genArt721CoreAddress);
 
 // get MinterDAExpSettlement contract from the subgraph config
-if (!config.iSharedDAExpSettlementContracts) {
-  throw new Error("No iSharedDAExpSettlementContracts in config");
+if (!config.settlementExpLibContracts) {
+  throw new Error("No settlementExpLibContracts in config");
 }
 const minterDAExpSettlementV3Address =
-  config.iSharedDAExpSettlementContracts[0].address;
+  config.settlementExpLibContracts[0].address;
 const minterDAExpSettlementV3Contract = new MinterDAExpSettlementV3__factory(
   deployer
 ).attach(minterDAExpSettlementV3Address);
 
-describe("iSharedMinterDAExpSettlement event handling", () => {
+describe("SettlementExpLib event handling", () => {
   beforeAll(async () => {
     await waitUntilSubgraphIsSynced(client);
   });
