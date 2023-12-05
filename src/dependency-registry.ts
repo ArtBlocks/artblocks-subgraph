@@ -7,11 +7,13 @@ import {
   DependencyAdditionalRepositoryUpdated,
   DependencyPreferredCDNUpdated,
   DependencyPreferredRepositoryUpdated,
-  DependencyReferenceWebsiteUpdated,
+  DependencyWebsiteUpdated,
   DependencyRemoved,
   DependencyScriptUpdated,
-  ProjectDependencyTypeOverrideAdded,
-  ProjectDependencyTypeOverrideRemoved,
+  LicenseTextUpdated,
+  LicenseTypeAdded,
+  ProjectDependencyOverrideAdded,
+  ProjectDependencyOverrideRemoved,
   SupportedCoreContractAdded,
   SupportedCoreContractRemoved,
   IDependencyRegistryV0
@@ -22,6 +24,7 @@ import { IDependencyRegistryCompatibleV0 } from "../generated/IDependencyRegistr
 import {
   Contract,
   Dependency,
+  License,
   DependencyAdditionalCDN,
   DependencyAdditionalRepository,
   DependencyRegistry,
@@ -35,13 +38,33 @@ import {
   generateDependencyScriptId
 } from "./helpers";
 
+export function handleLicenseTypeAdded(event: LicenseTypeAdded): void {
+  let licenseId = event.params.licenseType.toString();
+  const license = new License(licenseId);
+
+  license.updatedAt = event.block.timestamp;
+  license.save();
+}
+
+export function handleLicenseTextUpdated(event: LicenseTextUpdated): void {
+  let licenseId = event.params.licenseType.toString();
+  const license = License.load(licenseId);
+  if (license) {
+    license.updatedAt = event.block.timestamp;
+    license.save();
+  }
+}
+
 export function handleDependencyAdded(event: DependencyAdded): void {
-  const dependency = new Dependency(event.params._dependencyType.toString());
-  dependency.preferredCDN = event.params._preferredCDN;
+  const dependency = new Dependency(
+    event.params.dependencyNameAndVersion.toString()
+  );
+  dependency.licenseType = event.params.licenseType.toString();
+  dependency.preferredCDN = event.params.preferredCDN;
   dependency.additionalCDNCount = BigInt.fromI32(0);
-  dependency.preferredRepository = event.params._preferredRepository;
+  dependency.preferredRepository = event.params.preferredRepository;
   dependency.additionalRepositoryCount = BigInt.fromI32(0);
-  dependency.referenceWebsite = event.params._referenceWebsite;
+  dependency.website = event.params.website;
   dependency.scriptCount = BigInt.fromI32(0);
   dependency.dependencyRegistry = event.address;
   dependency.updatedAt = event.block.timestamp;
@@ -55,7 +78,9 @@ export function handleDependencyAdded(event: DependencyAdded): void {
 }
 
 export function handleDependencyRemoved(event: DependencyRemoved): void {
-  const dependency = Dependency.load(event.params._dependencyType.toString());
+  const dependency = Dependency.load(
+    event.params.dependencyNameAndVersion.toString()
+  );
   if (dependency) {
     store.remove("Dependency", dependency.id);
   }
@@ -70,9 +95,11 @@ export function handleDependencyRemoved(event: DependencyRemoved): void {
 export function handleDependencyPreferredCDNUpdated(
   event: DependencyPreferredCDNUpdated
 ): void {
-  const dependency = Dependency.load(event.params._dependencyType.toString());
+  const dependency = Dependency.load(
+    event.params.dependencyNameAndVersion.toString()
+  );
   if (dependency) {
-    dependency.preferredCDN = event.params._preferredCDN;
+    dependency.preferredCDN = event.params.preferredCDN;
     dependency.updatedAt = event.block.timestamp;
     dependency.save();
   }
@@ -81,20 +108,24 @@ export function handleDependencyPreferredCDNUpdated(
 export function handleDependencyPreferredRepositoryUpdated(
   event: DependencyPreferredRepositoryUpdated
 ): void {
-  const dependency = Dependency.load(event.params._dependencyType.toString());
+  const dependency = Dependency.load(
+    event.params.dependencyNameAndVersion.toString()
+  );
   if (dependency) {
-    dependency.preferredRepository = event.params._preferredRepository;
+    dependency.preferredRepository = event.params.preferredRepository;
     dependency.updatedAt = event.block.timestamp;
     dependency.save();
   }
 }
 
-export function handleDependencyReferenceWebsiteUpdated(
-  event: DependencyReferenceWebsiteUpdated
+export function handleDependencyWebsiteUpdated(
+  event: DependencyWebsiteUpdated
 ): void {
-  const dependency = Dependency.load(event.params._dependencyType.toString());
+  const dependency = Dependency.load(
+    event.params.dependencyNameAndVersion.toString()
+  );
   if (dependency) {
-    dependency.referenceWebsite = event.params._referenceWebsite;
+    dependency.website = event.params.website;
     dependency.updatedAt = event.block.timestamp;
     dependency.save();
   }
@@ -103,13 +134,15 @@ export function handleDependencyReferenceWebsiteUpdated(
 export function handleDependencyAdditionalCDNUpdated(
   event: DependencyAdditionalCDNUpdated
 ): void {
-  const dependency = Dependency.load(event.params._dependencyType.toString());
+  const dependency = Dependency.load(
+    event.params.dependencyNameAndVersion.toString()
+  );
   if (!dependency) {
     return;
   }
   const id = generateDependencyAdditionalCDNId(
     dependency.id,
-    event.params._additionalCDNIndex
+    event.params.additionalCDNIndex
   );
 
   let additionalCDN = DependencyAdditionalCDN.load(id);
@@ -125,21 +158,23 @@ export function handleDependencyAdditionalCDNUpdated(
   dependency.save();
 
   additionalCDN.dependency = dependency.id;
-  additionalCDN.cdn = event.params._additionalCDN;
-  additionalCDN.index = event.params._additionalCDNIndex;
+  additionalCDN.cdn = event.params.additionalCDN;
+  additionalCDN.index = event.params.additionalCDNIndex;
   additionalCDN.save();
 }
 
 export function handleDependencyAdditionalCDNRemoved(
   event: DependencyAdditionalCDNRemoved
 ): void {
-  const dependency = Dependency.load(event.params._dependencyType.toString());
+  const dependency = Dependency.load(
+    event.params.dependencyNameAndVersion.toString()
+  );
   if (!dependency) {
     return;
   }
   const id = generateDependencyAdditionalCDNId(
     dependency.id,
-    event.params._additionalCDNIndex
+    event.params.additionalCDNIndex
   );
 
   const additionalCDN = DependencyAdditionalCDN.load(id);
@@ -170,13 +205,15 @@ export function handleDependencyAdditionalCDNRemoved(
 export function handleDependencyAdditionalRepositoryUpdated(
   event: DependencyAdditionalRepositoryUpdated
 ): void {
-  const dependency = Dependency.load(event.params._dependencyType.toString());
+  const dependency = Dependency.load(
+    event.params.dependencyNameAndVersion.toString()
+  );
   if (!dependency) {
     return;
   }
   const id = generateDependencyAdditionalRepositoryId(
     dependency.id,
-    event.params._additionalRepositoryIndex
+    event.params.additionalRepositoryIndex
   );
 
   let additionalRepository = DependencyAdditionalRepository.load(id);
@@ -192,21 +229,23 @@ export function handleDependencyAdditionalRepositoryUpdated(
   dependency.save();
 
   additionalRepository.dependency = dependency.id;
-  additionalRepository.repository = event.params._additionalRepository;
-  additionalRepository.index = event.params._additionalRepositoryIndex;
+  additionalRepository.repository = event.params.additionalRepository;
+  additionalRepository.index = event.params.additionalRepositoryIndex;
   additionalRepository.save();
 }
 
 export function handleDependencyAdditionalRepositoryRemoved(
   event: DependencyAdditionalRepositoryRemoved
 ): void {
-  const dependency = Dependency.load(event.params._dependencyType.toString());
+  const dependency = Dependency.load(
+    event.params.dependencyNameAndVersion.toString()
+  );
   if (!dependency) {
     return;
   }
   const id = generateDependencyAdditionalRepositoryId(
     dependency.id,
-    event.params._additionalRepositoryIndex
+    event.params.additionalRepositoryIndex
   );
 
   const additionalRepository = DependencyAdditionalRepository.load(id);
@@ -240,8 +279,8 @@ export function handleDependencyAdditionalRepositoryRemoved(
 export function handleDependencyScriptUpdated(
   event: DependencyScriptUpdated
 ): void {
-  const dependencyType = event.params._dependencyType.toString();
-  const dependency = Dependency.load(dependencyType);
+  const dependencyNameAndVersion = event.params.dependencyNameAndVersion.toString();
+  const dependency = Dependency.load(dependencyNameAndVersion);
   if (!dependency) {
     return;
   }
@@ -249,7 +288,7 @@ export function handleDependencyScriptUpdated(
   const dependencyRegistryContract = IDependencyRegistryV0.bind(event.address);
   let prevScriptCount = dependency.scriptCount.toI32();
   const scriptCount = dependencyRegistryContract
-    .getDependencyScriptCount(event.params._dependencyType)
+    .getDependencyScriptCount(event.params.dependencyNameAndVersion)
     .toI32();
 
   // Remove ProjectScripts that no longer exist on chain
@@ -257,7 +296,7 @@ export function handleDependencyScriptUpdated(
     for (let i = scriptCount; i < prevScriptCount; i++) {
       const dependencyScript = DependencyScript.load(
         generateDependencyScriptId(
-          event.params._dependencyType.toString(),
+          event.params.dependencyNameAndVersion.toString(),
           BigInt.fromI32(i)
         )
       );
@@ -272,7 +311,7 @@ export function handleDependencyScriptUpdated(
     // default to empty string, raise warnings if fail to get script
     let script: string = "";
     let result = dependencyRegistryContract.try_getDependencyScript(
-      event.params._dependencyType,
+      event.params.dependencyNameAndVersion,
       BigInt.fromI32(i)
     );
     if (!result.reverted) {
@@ -282,7 +321,7 @@ export function handleDependencyScriptUpdated(
       let legacyResult = IDependencyRegistryV0_Legacy.bind(
         event.address
       ).try_getDependencyScriptAtIndex(
-        event.params._dependencyType,
+        event.params.dependencyNameAndVersion,
         BigInt.fromI32(i)
       );
       if (!legacyResult.reverted) {
@@ -291,7 +330,10 @@ export function handleDependencyScriptUpdated(
         // log error because this is unexpected
         log.error(
           "[ERROR] Failed to load script for dependency type {}, on registry at address {}",
-          [event.params._dependencyType.toString(), event.address.toHexString()]
+          [
+            event.params.dependencyNameAndVersion.toString(),
+            event.address.toHexString()
+          ]
         );
       }
     }
@@ -299,7 +341,7 @@ export function handleDependencyScriptUpdated(
     // default to zero address, raise warnings if fail to get address
     let scriptAddress: Address = Address.zero();
     let addressResult = dependencyRegistryContract.try_getDependencyScriptBytecodeAddress(
-      event.params._dependencyType,
+      event.params.dependencyNameAndVersion,
       BigInt.fromI32(i)
     );
     if (!addressResult.reverted) {
@@ -309,7 +351,7 @@ export function handleDependencyScriptUpdated(
       let legacyAddressResult = IDependencyRegistryV0_Legacy.bind(
         event.address
       ).try_getDependencyScriptBytecodeAddressAtIndex(
-        event.params._dependencyType,
+        event.params.dependencyNameAndVersion,
         BigInt.fromI32(i)
       );
       if (!legacyAddressResult.reverted) {
@@ -318,17 +360,23 @@ export function handleDependencyScriptUpdated(
         // log error because this is unexpected
         log.error(
           "[ERROR] Failed to load script bytecode address for dependency type {}, on registry at address {}",
-          [event.params._dependencyType.toString(), event.address.toHexString()]
+          [
+            event.params.dependencyNameAndVersion.toString(),
+            event.address.toHexString()
+          ]
         );
       }
     }
 
     let dependencyScriptIndex = BigInt.fromI32(i);
     let dependencyScript = new DependencyScript(
-      generateDependencyScriptId(dependencyType, dependencyScriptIndex)
+      generateDependencyScriptId(
+        dependencyNameAndVersion,
+        dependencyScriptIndex
+      )
     );
     dependencyScript.index = dependencyScriptIndex;
-    dependencyScript.dependency = dependencyType;
+    dependencyScript.dependency = dependencyNameAndVersion;
     dependencyScript.script = script;
     dependencyScript.address = scriptAddress;
     dependencyScript.save();
@@ -351,7 +399,7 @@ export function handleSupportedCoreContractAdded(
   event: SupportedCoreContractAdded
 ): void {
   const coreContract = Contract.load(
-    event.params._coreContractAddress.toHexString()
+    event.params.coreContractAddress.toHexString()
   );
 
   if (!coreContract) {
@@ -367,7 +415,7 @@ export function handleSupportedCoreContractRemoved(
   event: SupportedCoreContractRemoved
 ): void {
   const coreContract = Contract.load(
-    event.params._coreContractAddress.toHexString()
+    event.params.coreContractAddress.toHexString()
   );
 
   if (!coreContract) {
@@ -379,12 +427,12 @@ export function handleSupportedCoreContractRemoved(
   coreContract.save();
 }
 
-export function handleProjectDependencyTypeOverrideAdded(
-  event: ProjectDependencyTypeOverrideAdded
+export function handleProjectDependencyOverrideAdded(
+  event: ProjectDependencyOverrideAdded
 ): void {
   const projectId = generateContractSpecificId(
-    event.params._coreContractAddress,
-    event.params._projectId
+    event.params.coreContractAddress,
+    event.params.projectId
   );
 
   const project = Project.load(projectId);
@@ -392,17 +440,17 @@ export function handleProjectDependencyTypeOverrideAdded(
     return;
   }
 
-  project.scriptTypeAndVersion = event.params._dependencyType.toString();
+  project.scriptTypeAndVersion = event.params.dependencyNameAndVersion.toString();
   project.updatedAt = event.block.timestamp;
   project.save();
 }
 
-export function handleProjectDependencyTypeOverrideRemoved(
-  event: ProjectDependencyTypeOverrideRemoved
+export function handleProjectDependencyOverrideRemoved(
+  event: ProjectDependencyOverrideRemoved
 ): void {
   const projectId = generateContractSpecificId(
-    event.params._coreContractAddress,
-    event.params._projectId
+    event.params.coreContractAddress,
+    event.params.projectId
   );
   const project = Project.load(projectId);
   if (!project) {
@@ -410,11 +458,11 @@ export function handleProjectDependencyTypeOverrideRemoved(
   }
 
   const coreContract = IDependencyRegistryCompatibleV0.bind(
-    event.params._coreContractAddress
+    event.params.coreContractAddress
   );
 
   const scriptDetailsResult = coreContract.try_projectScriptDetails(
-    event.params._projectId
+    event.params.projectId
   );
   if (scriptDetailsResult.reverted) {
     project.scriptTypeAndVersion = null;

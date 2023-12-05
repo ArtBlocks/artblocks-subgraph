@@ -9,25 +9,31 @@
         {
           "indexed": true,
           "internalType": "bytes32",
-          "name": "_dependencyType",
+          "name": "dependencyNameAndVersion",
+          "type": "bytes32"
+        },
+        {
+          "indexed": true,
+          "internalType": "bytes32",
+          "name": "licenseType",
           "type": "bytes32"
         },
         {
           "indexed": false,
           "internalType": "string",
-          "name": "_preferredCDN",
+          "name": "preferredCDN",
           "type": "string"
         },
         {
           "indexed": false,
           "internalType": "string",
-          "name": "_preferredRepository",
+          "name": "preferredRepository",
           "type": "string"
         },
         {
           "indexed": false,
           "internalType": "string",
-          "name": "_referenceWebsite",
+          "name": "website",
           "type": "string"
         }
       ],
@@ -40,13 +46,13 @@
         {
           "indexed": true,
           "internalType": "bytes32",
-          "name": "_dependencyType",
+          "name": "dependencyNameAndVersion",
           "type": "bytes32"
         },
         {
           "indexed": true,
           "internalType": "uint256",
-          "name": "_additionalCDNIndex",
+          "name": "additionalCDNIndex",
           "type": "uint256"
         }
       ],
@@ -59,19 +65,19 @@
         {
           "indexed": true,
           "internalType": "bytes32",
-          "name": "_dependencyType",
+          "name": "dependencyNameAndVersion",
           "type": "bytes32"
         },
         {
           "indexed": false,
           "internalType": "string",
-          "name": "_additionalCDN",
+          "name": "additionalCDN",
           "type": "string"
         },
         {
           "indexed": false,
           "internalType": "uint256",
-          "name": "_additionalCDNIndex",
+          "name": "additionalCDNIndex",
           "type": "uint256"
         }
       ],
@@ -84,13 +90,13 @@
         {
           "indexed": true,
           "internalType": "bytes32",
-          "name": "_dependencyType",
+          "name": "dependencyNameAndVersion",
           "type": "bytes32"
         },
         {
           "indexed": true,
           "internalType": "uint256",
-          "name": "_additionalRepositoryIndex",
+          "name": "additionalRepositoryIndex",
           "type": "uint256"
         }
       ],
@@ -103,19 +109,19 @@
         {
           "indexed": true,
           "internalType": "bytes32",
-          "name": "_dependencyType",
+          "name": "dependencyNameAndVersion",
           "type": "bytes32"
         },
         {
           "indexed": false,
           "internalType": "string",
-          "name": "_additionalRepository",
+          "name": "additionalRepository",
           "type": "string"
         },
         {
           "indexed": false,
           "internalType": "uint256",
-          "name": "_additionalRepositoryIndex",
+          "name": "additionalRepositoryIndex",
           "type": "uint256"
         }
       ],
@@ -128,13 +134,13 @@
         {
           "indexed": true,
           "internalType": "bytes32",
-          "name": "_dependencyType",
+          "name": "dependencyNameAndVersion",
           "type": "bytes32"
         },
         {
           "indexed": false,
           "internalType": "string",
-          "name": "_preferredCDN",
+          "name": "preferredCDN",
           "type": "string"
         }
       ],
@@ -147,13 +153,13 @@
         {
           "indexed": true,
           "internalType": "bytes32",
-          "name": "_dependencyType",
+          "name": "dependencyNameAndVersion",
           "type": "bytes32"
         },
         {
           "indexed": false,
           "internalType": "string",
-          "name": "_preferredRepository",
+          "name": "preferredRepository",
           "type": "string"
         }
       ],
@@ -166,26 +172,7 @@
         {
           "indexed": true,
           "internalType": "bytes32",
-          "name": "_dependencyType",
-          "type": "bytes32"
-        },
-        {
-          "indexed": false,
-          "internalType": "string",
-          "name": "_referenceWebsite",
-          "type": "string"
-        }
-      ],
-      "name": "DependencyReferenceWebsiteUpdated",
-      "type": "event"
-    },
-    {
-      "anonymous": false,
-      "inputs": [
-        {
-          "indexed": true,
-          "internalType": "bytes32",
-          "name": "_dependencyType",
+          "name": "dependencyNameAndVersion",
           "type": "bytes32"
         }
       ],
@@ -198,7 +185,7 @@
         {
           "indexed": true,
           "internalType": "bytes32",
-          "name": "_dependencyType",
+          "name": "dependencyNameAndVersion",
           "type": "bytes32"
         }
       ],
@@ -210,24 +197,69 @@
       "inputs": [
         {
           "indexed": true,
+          "internalType": "bytes32",
+          "name": "dependencyNameAndVersion",
+          "type": "bytes32"
+        },
+        {
+          "indexed": false,
+          "internalType": "string",
+          "name": "website",
+          "type": "string"
+        }
+      ],
+      "name": "DependencyWebsiteUpdated",
+      "type": "event"
+    },
+    {
+      "anonymous": false,
+      "inputs": [
+        {
+          "indexed": true,
+          "internalType": "bytes32",
+          "name": "licenseType",
+          "type": "bytes32"
+        }
+      ],
+      "name": "LicenseTextUpdated",
+      "type": "event"
+    },
+    {
+      "anonymous": false,
+      "inputs": [
+        {
+          "indexed": true,
+          "internalType": "bytes32",
+          "name": "licenseType",
+          "type": "bytes32"
+        }
+      ],
+      "name": "LicenseTypeAdded",
+      "type": "event"
+    },
+    {
+      "anonymous": false,
+      "inputs": [
+        {
+          "indexed": true,
           "internalType": "address",
-          "name": "_coreContractAddress",
+          "name": "coreContractAddress",
           "type": "address"
         },
         {
           "indexed": true,
           "internalType": "uint256",
-          "name": "_projectId",
+          "name": "projectId",
           "type": "uint256"
         },
         {
           "indexed": false,
           "internalType": "bytes32",
-          "name": "_dependencyType",
+          "name": "dependencyNameAndVersion",
           "type": "bytes32"
         }
       ],
-      "name": "ProjectDependencyTypeOverrideAdded",
+      "name": "ProjectDependencyOverrideAdded",
       "type": "event"
     },
     {
@@ -236,17 +268,17 @@
         {
           "indexed": true,
           "internalType": "address",
-          "name": "_coreContractAddress",
+          "name": "coreContractAddress",
           "type": "address"
         },
         {
           "indexed": true,
           "internalType": "uint256",
-          "name": "_projectId",
+          "name": "projectId",
           "type": "uint256"
         }
       ],
-      "name": "ProjectDependencyTypeOverrideRemoved",
+      "name": "ProjectDependencyOverrideRemoved",
       "type": "event"
     },
     {
@@ -255,7 +287,7 @@
         {
           "indexed": true,
           "internalType": "address",
-          "name": "_coreContractAddress",
+          "name": "coreContractAddress",
           "type": "address"
         }
       ],
@@ -268,7 +300,7 @@
         {
           "indexed": true,
           "internalType": "address",
-          "name": "_coreContractAddress",
+          "name": "coreContractAddress",
           "type": "address"
         }
       ],
@@ -279,12 +311,12 @@
       "inputs": [
         {
           "internalType": "bytes32",
-          "name": "_dependencyType",
+          "name": "dependencyNameAndVersion",
           "type": "bytes32"
         },
         {
           "internalType": "uint256",
-          "name": "_index",
+          "name": "index",
           "type": "uint256"
         }
       ],
@@ -303,12 +335,12 @@
       "inputs": [
         {
           "internalType": "bytes32",
-          "name": "_dependencyType",
+          "name": "dependencyNameAndVersion",
           "type": "bytes32"
         },
         {
           "internalType": "uint256",
-          "name": "_index",
+          "name": "index",
           "type": "uint256"
         }
       ],
@@ -327,7 +359,7 @@
       "inputs": [
         {
           "internalType": "bytes32",
-          "name": "_dependencyType",
+          "name": "dependencyNameAndVersion",
           "type": "bytes32"
         }
       ],

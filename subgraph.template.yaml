@@ -2112,7 +2112,11 @@ dataSources:
         - name: IDependencyRegistryCompatibleV0
           file: ./abis/IDependencyRegistryCompatibleV0.json
       eventHandlers:
-        - event: DependencyAdded(indexed bytes32,string,string,string)
+        - event: LicenseTypeAdded(indexed bytes32)
+          handler: handleLicenseTypeAdded
+        - event: LicenseTextUpdated(indexed bytes32)
+          handler: handleLicenseTextUpdated
+        - event: DependencyAdded(indexed bytes32,indexed bytes32,string,string,string)
           handler: handleDependencyAdded
         - event: DependencyAdditionalCDNRemoved(indexed bytes32,indexed uint256)
           handler: handleDependencyAdditionalCDNRemoved
@@ -2126,16 +2130,16 @@ dataSources:
           handler: handleDependencyPreferredCDNUpdated
         - event: DependencyPreferredRepositoryUpdated(indexed bytes32,string)
           handler: handleDependencyPreferredRepositoryUpdated
-        - event: DependencyReferenceWebsiteUpdated(indexed bytes32,string)
-          handler: handleDependencyReferenceWebsiteUpdated
+        - event: DependencyWebsiteUpdated(indexed bytes32,string)
+          handler: handleDependencyWebsiteUpdated
         - event: DependencyRemoved(indexed bytes32)
           handler: handleDependencyRemoved
         - event: DependencyScriptUpdated(indexed bytes32)
           handler: handleDependencyScriptUpdated
-        - event: ProjectDependencyTypeOverrideAdded(indexed address,indexed uint256,bytes32)
-          handler: handleProjectDependencyTypeOverrideAdded
-        - event: ProjectDependencyTypeOverrideRemoved(indexed address,indexed uint256)
-          handler: handleProjectDependencyTypeOverrideRemoved
+        - event: ProjectDependencyOverrideAdded(indexed address,indexed uint256,bytes32)
+          handler: handleProjectDependencyOverrideAdded
+        - event: ProjectDependencyOverrideRemoved(indexed address,indexed uint256)
+          handler: handleProjectDependencyOverrideRemoved
         - event: SupportedCoreContractAdded(indexed address)
           handler: handleSupportedCoreContractAdded
         - event: SupportedCoreContractRemoved(indexed address)
