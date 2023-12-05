@@ -32,13 +32,13 @@ import {
   DependencyAdditionalRepositoryUpdated,
   DependencyPreferredCDNUpdated,
   DependencyPreferredRepositoryUpdated,
-  DependencyReferenceWebsiteUpdated,
+  DependencyWebsiteUpdated,
   DependencyRemoved,
   DependencyScriptUpdated,
   LicenseTextUpdated,
   LicenseTypeAdded,
-  ProjectDependencyTypeOverrideAdded,
-  ProjectDependencyTypeOverrideRemoved,
+  ProjectDependencyOverrideAdded,
+  ProjectDependencyOverrideRemoved,
   SupportedCoreContractAdded,
   SupportedCoreContractRemoved
 } from "../../../generated/IDependencyRegistryV0/IDependencyRegistryV0";
@@ -53,14 +53,14 @@ import {
   handleDependencyAdditionalRepositoryUpdated,
   handleDependencyPreferredCDNUpdated,
   handleDependencyPreferredRepositoryUpdated,
-  handleDependencyReferenceWebsiteUpdated,
+  handleDependencyWebsiteUpdated,
   handleDependencyRemoved,
   handleDependencyScriptUpdated,
   handleLicenseTextUpdated,
   handleLicenseTypeAdded,
   handleOwnershipTransferred,
-  handleProjectDependencyTypeOverrideAdded,
-  handleProjectDependencyTypeOverrideRemoved,
+  handleProjectDependencyOverrideAdded,
+  handleProjectDependencyOverrideRemoved,
   handleSupportedCoreContractAdded,
   handleSupportedCoreContractRemoved
 } from "../../../src/dependency-registry";
@@ -81,16 +81,16 @@ const EXISTING_DEPENDENCY_TYPE = "p5js@1.0.0";
 describe("DependencyRegistry", () => {
   beforeEach(() => {
     clearStore();
-    const dependencyType = EXISTING_DEPENDENCY_TYPE;
+    const dependencyNameAndVersion = EXISTING_DEPENDENCY_TYPE;
     const preferredCDN = "cdn.com";
     const preferredRepository = "repository.com";
-    const referenceWebsite = "p5js.org";
+    const website = "p5js.org";
     const licenseType = "MIT";
-    const dependency = new Dependency(dependencyType);
+    const dependency = new Dependency(dependencyNameAndVersion);
     dependency.licenseType = licenseType;
     dependency.preferredCDN = preferredCDN;
     dependency.preferredRepository = preferredRepository;
-    dependency.referenceWebsite = referenceWebsite;
+    dependency.website = website;
     dependency.additionalCDNCount = BigInt.fromI32(0);
     dependency.additionalRepositoryCount = BigInt.fromI32(0);
     dependency.scriptCount = BigInt.fromI32(0);
@@ -121,11 +121,11 @@ describe("DependencyRegistry", () => {
     event.address = dependencyRegistryAddress;
     event.parameters = [
       new ethereum.EventParam(
-        "_licenseType",
+        "licenseType",
         ethereum.Value.fromBytes(Bytes.fromUTF8(licenseType))
       ),
       new ethereum.EventParam(
-        "_licenseText",
+        "licenseText",
         ethereum.Value.fromBytes(Bytes.fromUTF8(licenseText))
       )
     ];
@@ -163,7 +163,7 @@ describe("DependencyRegistry", () => {
     event.address = dependencyRegistryAddress;
     event.parameters = [
       new ethereum.EventParam(
-        "_licenseType",
+        "licenseType",
         ethereum.Value.fromBytes(Bytes.fromUTF8(licenseType))
       )
     ];
@@ -190,11 +190,11 @@ describe("DependencyRegistry", () => {
   });
 
   test("handleDependencyAdded should add a new Depdendency", () => {
-    const dependencyType = "threejs@1.0.0";
+    const dependencyNameAndVersion = "threejs@1.0.0";
     const licenseType = "MIT";
     const preferredCDN = "cdn.com";
     const preferredRepository = "repository.com";
-    const referenceWebsite = "p5js.org";
+    const website = "p5js.org";
     const dependencyRegistryAddress = DEPENDENCY_REGISTRY_ADDRESS;
 
     const dependencyRegistry = new DependencyRegistry(
@@ -208,25 +208,22 @@ describe("DependencyRegistry", () => {
     event.address = dependencyRegistryAddress;
     event.parameters = [
       new ethereum.EventParam(
-        "_dependencyType",
-        ethereum.Value.fromBytes(Bytes.fromUTF8(dependencyType))
+        "dependencyNameAndVersion",
+        ethereum.Value.fromBytes(Bytes.fromUTF8(dependencyNameAndVersion))
       ),
       new ethereum.EventParam(
-        "_licenseType",
+        "licenseType",
         ethereum.Value.fromBytes(Bytes.fromUTF8(licenseType))
       ),
       new ethereum.EventParam(
-        "_preferredCDN",
+        "preferredCDN",
         ethereum.Value.fromString(preferredCDN)
       ),
       new ethereum.EventParam(
-        "_preferredRepository",
+        "preferredRepository",
         ethereum.Value.fromString(preferredRepository)
       ),
-      new ethereum.EventParam(
-        "_referenceWebsite",
-        ethereum.Value.fromString(referenceWebsite)
-      )
+      new ethereum.EventParam("website", ethereum.Value.fromString(website))
     ];
     const updatedAtBlockTimestamp = CURRENT_BLOCK_TIMESTAMP.plus(
       BigInt.fromI32(1)
@@ -236,17 +233,22 @@ describe("DependencyRegistry", () => {
     handleDependencyAdded(event);
 
     assert.entityCount("Dependency", 2);
-    assert.fieldEquals("Dependency", dependencyType, "id", dependencyType);
     assert.fieldEquals(
       "Dependency",
-      dependencyType,
+      dependencyNameAndVersion,
+      "id",
+      dependencyNameAndVersion
+    );
+    assert.fieldEquals(
+      "Dependency",
+      dependencyNameAndVersion,
       "updatedAt",
       updatedAtBlockTimestamp.toString()
     );
 
     assert.fieldEquals(
       "Dependency",
-      dependencyType,
+      dependencyNameAndVersion,
       "licenseType",
       licenseType
     );
@@ -263,15 +265,15 @@ describe("DependencyRegistry", () => {
     test("should do nothing if dependency does not exist", () => {
       assert.entityCount("Dependency", 1);
 
-      const dependencyType = "does@notexist";
+      const dependencyNameAndVersion = "does@notexist";
 
       const event: DependencyRemoved = changetype<DependencyRemoved>(
         newMockEvent()
       );
       event.parameters = [
         new ethereum.EventParam(
-          "_dependencyType",
-          ethereum.Value.fromBytes(Bytes.fromUTF8(dependencyType))
+          "dependencyNameAndVersion",
+          ethereum.Value.fromBytes(Bytes.fromUTF8(dependencyNameAndVersion))
         )
       ];
 
@@ -290,15 +292,15 @@ describe("DependencyRegistry", () => {
       assert.entityCount("Dependency", 1);
 
       // redefining here because closures aren't supported in AssemblyScript
-      const dependencyType = EXISTING_DEPENDENCY_TYPE;
+      const dependencyNameAndVersion = EXISTING_DEPENDENCY_TYPE;
 
       const event: DependencyRemoved = changetype<DependencyRemoved>(
         newMockEvent()
       );
       event.parameters = [
         new ethereum.EventParam(
-          "_dependencyType",
-          ethereum.Value.fromBytes(Bytes.fromUTF8(dependencyType))
+          "dependencyNameAndVersion",
+          ethereum.Value.fromBytes(Bytes.fromUTF8(dependencyNameAndVersion))
         )
       ];
       const updatedAtBlockTimestamp = CURRENT_BLOCK_TIMESTAMP.plus(
@@ -329,7 +331,7 @@ describe("DependencyRegistry", () => {
 
       assert.assertNotNull(existingDependency);
 
-      const dependencyType = "does@notexist";
+      const dependencyNameAndVersion = "does@notexist";
       const preferredCDN = "newCdn.com";
 
       const event: DependencyPreferredCDNUpdated = changetype<
@@ -337,11 +339,11 @@ describe("DependencyRegistry", () => {
       >(newMockEvent());
       event.parameters = [
         new ethereum.EventParam(
-          "_dependencyType",
-          ethereum.Value.fromBytes(Bytes.fromUTF8(dependencyType))
+          "dependencyNameAndVersion",
+          ethereum.Value.fromBytes(Bytes.fromUTF8(dependencyNameAndVersion))
         ),
         new ethereum.EventParam(
-          "_preferredCDN",
+          "preferredCDN",
           ethereum.Value.fromString(preferredCDN)
         )
       ];
@@ -374,17 +376,17 @@ describe("DependencyRegistry", () => {
         throw Error("Dependency should exist");
       }
 
-      const dependencyType = dependency.id;
+      const dependencyNameAndVersion = dependency.id;
       const newCDN = "newCdn.com";
 
       const event = changetype<DependencyPreferredCDNUpdated>(newMockEvent());
       event.parameters = [
         new ethereum.EventParam(
-          "_dependencyType",
-          ethereum.Value.fromBytes(Bytes.fromUTF8(dependencyType))
+          "dependencyNameAndVersion",
+          ethereum.Value.fromBytes(Bytes.fromUTF8(dependencyNameAndVersion))
         ),
         new ethereum.EventParam(
-          "_preferredCDN",
+          "preferredCDN",
           ethereum.Value.fromString(newCDN)
         )
       ];
@@ -395,10 +397,15 @@ describe("DependencyRegistry", () => {
 
       handleDependencyPreferredCDNUpdated(event);
 
-      assert.fieldEquals("Dependency", dependencyType, "preferredCDN", newCDN);
       assert.fieldEquals(
         "Dependency",
-        dependencyType,
+        dependencyNameAndVersion,
+        "preferredCDN",
+        newCDN
+      );
+      assert.fieldEquals(
+        "Dependency",
+        dependencyNameAndVersion,
         "updatedAt",
         upddatedAtBlockTimestamp.toString()
       );
@@ -412,7 +419,7 @@ describe("DependencyRegistry", () => {
         throw Error("Dependency should exist");
       }
 
-      const nonExistantDependencyType = "does@notexist";
+      const nonExistantDependencyNameAndVersion = "does@notexist";
       const preferredRepository = "newRepository.com";
 
       const event: DependencyPreferredRepositoryUpdated = changetype<
@@ -421,11 +428,13 @@ describe("DependencyRegistry", () => {
 
       event.parameters = [
         new ethereum.EventParam(
-          "_dependencyType",
-          ethereum.Value.fromBytes(Bytes.fromUTF8(nonExistantDependencyType))
+          "dependencyNameAndVersion",
+          ethereum.Value.fromBytes(
+            Bytes.fromUTF8(nonExistantDependencyNameAndVersion)
+          )
         ),
         new ethereum.EventParam(
-          "_preferredRepository",
+          "preferredRepository",
           ethereum.Value.fromString(preferredRepository)
         )
       ];
@@ -459,7 +468,7 @@ describe("DependencyRegistry", () => {
         throw Error("Dependency should exist");
       }
 
-      const dependencyType = dependency.id;
+      const dependencyNameAndVersion = dependency.id;
       const newRepository = "newRepository.com";
 
       const event: DependencyPreferredRepositoryUpdated = changetype<
@@ -468,11 +477,11 @@ describe("DependencyRegistry", () => {
 
       event.parameters = [
         new ethereum.EventParam(
-          "_dependencyType",
-          ethereum.Value.fromBytes(Bytes.fromUTF8(dependencyType))
+          "dependencyNameAndVersion",
+          ethereum.Value.fromBytes(Bytes.fromUTF8(dependencyNameAndVersion))
         ),
         new ethereum.EventParam(
-          "_preferredRepository",
+          "preferredRepository",
           ethereum.Value.fromString(newRepository)
         )
       ];
@@ -485,19 +494,19 @@ describe("DependencyRegistry", () => {
 
       assert.fieldEquals(
         "Dependency",
-        dependencyType,
+        dependencyNameAndVersion,
         "preferredRepository",
         newRepository
       );
       assert.fieldEquals(
         "Dependency",
-        dependencyType,
+        dependencyNameAndVersion,
         "updatedAt",
         updatedAtBlockTimestamp.toString()
       );
     });
   });
-  describe("handleDependencyReferenceWebsiteUpdated", () => {
+  describe("handleDependencyWebsiteUpdated", () => {
     test("should do nothing if dependency does not exist", () => {
       const existingDependency = Dependency.load(EXISTING_DEPENDENCY_TYPE);
 
@@ -505,38 +514,35 @@ describe("DependencyRegistry", () => {
         throw Error("Dependency should exist");
       }
 
-      const nonExistantDependencyType = "does@notexist";
-      const referenceWebsite = "newReferenceWebsite.com";
+      const nonExistantDependencyNameAndVersion = "does@notexist";
+      const website = "newReferenceWebsite.com";
 
-      const event: DependencyReferenceWebsiteUpdated = changetype<
-        DependencyReferenceWebsiteUpdated
+      const event: DependencyWebsiteUpdated = changetype<
+        DependencyWebsiteUpdated
       >(newMockEvent());
 
       event.parameters = [
         new ethereum.EventParam(
-          "_dependencyType",
-          ethereum.Value.fromBytes(Bytes.fromUTF8(nonExistantDependencyType))
+          "dependencyNameAndVersion",
+          ethereum.Value.fromBytes(
+            Bytes.fromUTF8(nonExistantDependencyNameAndVersion)
+          )
         ),
-        new ethereum.EventParam(
-          "_referenceWebsite",
-          ethereum.Value.fromString(referenceWebsite)
-        )
+        new ethereum.EventParam("website", ethereum.Value.fromString(website))
       ];
       const updatedAtBlockTimestamp = CURRENT_BLOCK_TIMESTAMP.plus(
         BigInt.fromI32(1)
       );
       event.block.timestamp = updatedAtBlockTimestamp;
 
-      handleDependencyReferenceWebsiteUpdated(event);
+      handleDependencyWebsiteUpdated(event);
 
-      assert.assertTrue(
-        existingDependency.referenceWebsite !== referenceWebsite
-      );
+      assert.assertTrue(existingDependency.website !== website);
       assert.fieldEquals(
         "Dependency",
         existingDependency.id,
-        "referenceWebsite",
-        existingDependency.referenceWebsite
+        "website",
+        existingDependency.website
       );
       assert.fieldEquals(
         "Dependency",
@@ -552,39 +558,36 @@ describe("DependencyRegistry", () => {
         throw Error("Dependency should exist");
       }
 
-      const dependencyType = dependency.id;
-      const referenceWebsite = "newReferenceWebsite.com";
+      const dependencyNameAndVersion = dependency.id;
+      const website = "newReferenceWebsite.com";
 
-      const event: DependencyReferenceWebsiteUpdated = changetype<
-        DependencyReferenceWebsiteUpdated
+      const event: DependencyWebsiteUpdated = changetype<
+        DependencyWebsiteUpdated
       >(newMockEvent());
 
       event.parameters = [
         new ethereum.EventParam(
-          "_dependencyType",
-          ethereum.Value.fromBytes(Bytes.fromUTF8(dependencyType))
+          "dependencyNameAndVersion",
+          ethereum.Value.fromBytes(Bytes.fromUTF8(dependencyNameAndVersion))
         ),
-        new ethereum.EventParam(
-          "_referenceWebsite",
-          ethereum.Value.fromString(referenceWebsite)
-        )
+        new ethereum.EventParam("website", ethereum.Value.fromString(website))
       ];
       const updatedAtBlockTimestamp = CURRENT_BLOCK_TIMESTAMP.plus(
         BigInt.fromI32(1)
       );
       event.block.timestamp = updatedAtBlockTimestamp;
 
-      handleDependencyReferenceWebsiteUpdated(event);
+      handleDependencyWebsiteUpdated(event);
 
       assert.fieldEquals(
         "Dependency",
-        dependencyType,
-        "referenceWebsite",
-        referenceWebsite
+        dependencyNameAndVersion,
+        "website",
+        website
       );
       assert.fieldEquals(
         "Dependency",
-        dependencyType,
+        dependencyNameAndVersion,
         "updatedAt",
         updatedAtBlockTimestamp.toString()
       );
@@ -598,7 +601,7 @@ describe("DependencyRegistry", () => {
         throw Error("Dependency should exist");
       }
 
-      const nonExistantDependencyType = "does@notexist";
+      const nonExistantDependencyNameAndVersion = "does@notexist";
       const additionalCDN = "newAdditionalCDN.com";
       const additionalCDNIndex = BigInt.fromI32(0);
 
@@ -607,15 +610,17 @@ describe("DependencyRegistry", () => {
       >(newMockEvent());
       event.parameters = [
         new ethereum.EventParam(
-          "_dependencyType",
-          ethereum.Value.fromBytes(Bytes.fromUTF8(nonExistantDependencyType))
+          "dependencyNameAndVersion",
+          ethereum.Value.fromBytes(
+            Bytes.fromUTF8(nonExistantDependencyNameAndVersion)
+          )
         ),
         new ethereum.EventParam(
-          "_additionalCDN",
+          "additionalCDN",
           ethereum.Value.fromString(additionalCDN)
         ),
         new ethereum.EventParam(
-          "_additionalCDNIndex",
+          "additionalCDNIndex",
           ethereum.Value.fromUnsignedBigInt(additionalCDNIndex)
         )
       ];
@@ -633,7 +638,7 @@ describe("DependencyRegistry", () => {
       assert.notInStore(
         "DependencyAdditionalCDN",
         generateDependencyAdditionalCDNId(
-          nonExistantDependencyType,
+          nonExistantDependencyNameAndVersion,
           additionalCDNIndex
         )
       );
@@ -651,7 +656,7 @@ describe("DependencyRegistry", () => {
         throw Error("Dependency should exist");
       }
 
-      const dependencyType = dependency.id;
+      const dependencyNameAndVersion = dependency.id;
       const additionalCDN = "newAdditionalCDN.com";
       const additionalCDNIndex = BigInt.fromI32(0);
 
@@ -660,15 +665,15 @@ describe("DependencyRegistry", () => {
       >(newMockEvent());
       event.parameters = [
         new ethereum.EventParam(
-          "_dependencyType",
-          ethereum.Value.fromBytes(Bytes.fromUTF8(dependencyType))
+          "dependencyNameAndVersion",
+          ethereum.Value.fromBytes(Bytes.fromUTF8(dependencyNameAndVersion))
         ),
         new ethereum.EventParam(
-          "_additionalCDN",
+          "additionalCDN",
           ethereum.Value.fromString(additionalCDN)
         ),
         new ethereum.EventParam(
-          "_additionalCDNIndex",
+          "additionalCDNIndex",
           ethereum.Value.fromUnsignedBigInt(additionalCDNIndex)
         )
       ];
@@ -682,26 +687,32 @@ describe("DependencyRegistry", () => {
       assert.entityCount("DependencyAdditionalCDN", 1);
       assert.fieldEquals(
         "DependencyAdditionalCDN",
-        generateDependencyAdditionalCDNId(dependencyType, additionalCDNIndex),
+        generateDependencyAdditionalCDNId(
+          dependencyNameAndVersion,
+          additionalCDNIndex
+        ),
         "cdn",
         additionalCDN
       );
       assert.fieldEquals(
         "DependencyAdditionalCDN",
-        generateDependencyAdditionalCDNId(dependencyType, additionalCDNIndex),
+        generateDependencyAdditionalCDNId(
+          dependencyNameAndVersion,
+          additionalCDNIndex
+        ),
         "dependency",
-        dependencyType
+        dependencyNameAndVersion
       );
 
       assert.fieldEquals(
         "Dependency",
-        dependencyType,
+        dependencyNameAndVersion,
         "additionalCDNCount",
         additionalCDNIndex.plus(BigInt.fromI32(1)).toString()
       );
       assert.fieldEquals(
         "Dependency",
-        dependencyType,
+        dependencyNameAndVersion,
         "updatedAt",
         updatedAtBlockTimestamp.toString()
       );
@@ -713,17 +724,17 @@ describe("DependencyRegistry", () => {
         throw Error("Dependency should exist");
       }
 
-      const dependencyType = dependency.id;
+      const dependencyNameAndVersion = dependency.id;
       const additionalCDN = "existingAdditionalCDN.com";
       const additionalCDNIndex = BigInt.fromI32(0);
       const additionalCDNId = generateDependencyAdditionalCDNId(
-        dependencyType,
+        dependencyNameAndVersion,
         additionalCDNIndex
       );
 
       const existingDependency = new DependencyAdditionalCDN(additionalCDNId);
       existingDependency.cdn = additionalCDN;
-      existingDependency.dependency = dependencyType;
+      existingDependency.dependency = dependencyNameAndVersion;
       existingDependency.index = additionalCDNIndex;
       existingDependency.save();
 
@@ -737,15 +748,15 @@ describe("DependencyRegistry", () => {
       >(newMockEvent());
       event.parameters = [
         new ethereum.EventParam(
-          "_dependencyType",
-          ethereum.Value.fromBytes(Bytes.fromUTF8(dependencyType))
+          "dependencyNameAndVersion",
+          ethereum.Value.fromBytes(Bytes.fromUTF8(dependencyNameAndVersion))
         ),
         new ethereum.EventParam(
-          "_additionalCDN",
+          "additionalCDN",
           ethereum.Value.fromString(updatedAdditionalCDN)
         ),
         new ethereum.EventParam(
-          "_additionalCDNIndex",
+          "additionalCDNIndex",
           ethereum.Value.fromUnsignedBigInt(additionalCDNIndex)
         )
       ];
@@ -767,18 +778,18 @@ describe("DependencyRegistry", () => {
         "DependencyAdditionalCDN",
         additionalCDNId,
         "dependency",
-        dependencyType
+        dependencyNameAndVersion
       );
 
       assert.fieldEquals(
         "Dependency",
-        dependencyType,
+        dependencyNameAndVersion,
         "additionalCDNCount",
         additionalCDNIndex.plus(BigInt.fromI32(1)).toString()
       );
       assert.fieldEquals(
         "Dependency",
-        dependencyType,
+        dependencyNameAndVersion,
         "updatedAt",
         updatedAtBlockTimestamp.toString()
       );
@@ -792,7 +803,7 @@ describe("DependencyRegistry", () => {
         throw Error("Dependency should exist");
       }
 
-      const nonExistantDependencyType = "does@notexist";
+      const nonExistantDependencyNameAndVersion = "does@notexist";
       const additionalRepository = "newadditionalRepository.com";
       const additionalRepositoryIndex = BigInt.fromI32(0);
 
@@ -801,15 +812,17 @@ describe("DependencyRegistry", () => {
       >(newMockEvent());
       event.parameters = [
         new ethereum.EventParam(
-          "_dependencyType",
-          ethereum.Value.fromBytes(Bytes.fromUTF8(nonExistantDependencyType))
+          "dependencyNameAndVersion",
+          ethereum.Value.fromBytes(
+            Bytes.fromUTF8(nonExistantDependencyNameAndVersion)
+          )
         ),
         new ethereum.EventParam(
-          "_additionalRepository",
+          "additionalRepository",
           ethereum.Value.fromString(additionalRepository)
         ),
         new ethereum.EventParam(
-          "_additionalRepositoryIndex",
+          "additionalRepositoryIndex",
           ethereum.Value.fromUnsignedBigInt(additionalRepositoryIndex)
         )
       ];
@@ -827,7 +840,7 @@ describe("DependencyRegistry", () => {
       assert.notInStore(
         "DependencyAdditionalRepository",
         generateDependencyAdditionalRepositoryId(
-          nonExistantDependencyType,
+          nonExistantDependencyNameAndVersion,
           additionalRepositoryIndex
         )
       );
@@ -845,7 +858,7 @@ describe("DependencyRegistry", () => {
         throw Error("Dependency should exist");
       }
 
-      const dependencyType = dependency.id;
+      const dependencyNameAndVersion = dependency.id;
       const additionalRepository = "newadditionalRepository.com";
       const additionalRepositoryIndex = BigInt.fromI32(0);
 
@@ -854,15 +867,15 @@ describe("DependencyRegistry", () => {
       >(newMockEvent());
       event.parameters = [
         new ethereum.EventParam(
-          "_dependencyType",
-          ethereum.Value.fromBytes(Bytes.fromUTF8(dependencyType))
+          "dependencyNameAndVersion",
+          ethereum.Value.fromBytes(Bytes.fromUTF8(dependencyNameAndVersion))
         ),
         new ethereum.EventParam(
-          "_additionalRepository",
+          "additionalRepository",
           ethereum.Value.fromString(additionalRepository)
         ),
         new ethereum.EventParam(
-          "_additionalRepositoryIndex",
+          "additionalRepositoryIndex",
           ethereum.Value.fromUnsignedBigInt(additionalRepositoryIndex)
         )
       ];
@@ -877,7 +890,7 @@ describe("DependencyRegistry", () => {
       assert.fieldEquals(
         "DependencyAdditionalRepository",
         generateDependencyAdditionalRepositoryId(
-          dependencyType,
+          dependencyNameAndVersion,
           additionalRepositoryIndex
         ),
         "repository",
@@ -886,22 +899,22 @@ describe("DependencyRegistry", () => {
       assert.fieldEquals(
         "DependencyAdditionalRepository",
         generateDependencyAdditionalRepositoryId(
-          dependencyType,
+          dependencyNameAndVersion,
           additionalRepositoryIndex
         ),
         "dependency",
-        dependencyType
+        dependencyNameAndVersion
       );
 
       assert.fieldEquals(
         "Dependency",
-        dependencyType,
+        dependencyNameAndVersion,
         "additionalRepositoryCount",
         additionalRepositoryIndex.plus(BigInt.fromI32(1)).toString()
       );
       assert.fieldEquals(
         "Dependency",
-        dependencyType,
+        dependencyNameAndVersion,
         "updatedAt",
         updatedAtBlockTimestamp.toString()
       );
@@ -913,11 +926,11 @@ describe("DependencyRegistry", () => {
         throw Error("Dependency should exist");
       }
 
-      const dependencyType = dependency.id;
+      const dependencyNameAndVersion = dependency.id;
       const additionalRepository = "existingadditionalRepository.com";
       const additionalRepositoryIndex = BigInt.fromI32(0);
       const additionalRepositoryId = generateDependencyAdditionalRepositoryId(
-        dependencyType,
+        dependencyNameAndVersion,
         additionalRepositoryIndex
       );
 
@@ -925,7 +938,7 @@ describe("DependencyRegistry", () => {
         additionalRepositoryId
       );
       existingDependency.repository = additionalRepository;
-      existingDependency.dependency = dependencyType;
+      existingDependency.dependency = dependencyNameAndVersion;
       existingDependency.index = additionalRepositoryIndex;
       existingDependency.save();
 
@@ -939,15 +952,15 @@ describe("DependencyRegistry", () => {
       >(newMockEvent());
       event.parameters = [
         new ethereum.EventParam(
-          "_dependencyType",
-          ethereum.Value.fromBytes(Bytes.fromUTF8(dependencyType))
+          "dependencyNameAndVersion",
+          ethereum.Value.fromBytes(Bytes.fromUTF8(dependencyNameAndVersion))
         ),
         new ethereum.EventParam(
-          "_additionalRepository",
+          "additionalRepository",
           ethereum.Value.fromString(updatedadditionalRepository)
         ),
         new ethereum.EventParam(
-          "_additionalRepositoryIndex",
+          "additionalRepositoryIndex",
           ethereum.Value.fromUnsignedBigInt(additionalRepositoryIndex)
         )
       ];
@@ -969,18 +982,18 @@ describe("DependencyRegistry", () => {
         "DependencyAdditionalRepository",
         additionalRepositoryId,
         "dependency",
-        dependencyType
+        dependencyNameAndVersion
       );
 
       assert.fieldEquals(
         "Dependency",
-        dependencyType,
+        dependencyNameAndVersion,
         "additionalRepositoryCount",
         additionalRepositoryIndex.plus(BigInt.fromI32(1)).toString()
       );
       assert.fieldEquals(
         "Dependency",
-        dependencyType,
+        dependencyNameAndVersion,
         "updatedAt",
         updatedAtBlockTimestamp.toString()
       );
@@ -1008,7 +1021,8 @@ describe("DependencyRegistry", () => {
     });
 
     test("should not remove additional cdn for non existant dependency", () => {
-      const nonExistantDependencyType = "nonExistantDependencyType";
+      const nonExistantDependencyNameAndVersion =
+        "nonExistantDependencyNameAndVersion";
       const additionalCDNIndex = BigInt.fromI32(0);
 
       const event: DependencyAdditionalCDNRemoved = changetype<
@@ -1016,11 +1030,13 @@ describe("DependencyRegistry", () => {
       >(newMockEvent());
       event.parameters = [
         new ethereum.EventParam(
-          "_dependencyType",
-          ethereum.Value.fromBytes(Bytes.fromUTF8(nonExistantDependencyType))
+          "dependencyNameAndVersion",
+          ethereum.Value.fromBytes(
+            Bytes.fromUTF8(nonExistantDependencyNameAndVersion)
+          )
         ),
         new ethereum.EventParam(
-          "_additionalCDNIndex",
+          "additionalCDNIndex",
           ethereum.Value.fromUnsignedBigInt(additionalCDNIndex)
         )
       ];
@@ -1037,9 +1053,9 @@ describe("DependencyRegistry", () => {
     });
 
     test("should do nothing if additional cdn does not exist", () => {
-      const dependencyType = EXISTING_DEPENDENCY_TYPE;
+      const dependencyNameAndVersion = EXISTING_DEPENDENCY_TYPE;
       const additionalCDNIndex = BigInt.fromI32(1);
-      const existingDependency = Dependency.load(dependencyType);
+      const existingDependency = Dependency.load(dependencyNameAndVersion);
 
       if (!existingDependency) {
         throw Error("Dependency should exist");
@@ -1050,11 +1066,11 @@ describe("DependencyRegistry", () => {
       >(newMockEvent());
       event.parameters = [
         new ethereum.EventParam(
-          "_dependencyType",
-          ethereum.Value.fromBytes(Bytes.fromUTF8(dependencyType))
+          "dependencyNameAndVersion",
+          ethereum.Value.fromBytes(Bytes.fromUTF8(dependencyNameAndVersion))
         ),
         new ethereum.EventParam(
-          "_additionalCDNIndex",
+          "additionalCDNIndex",
           ethereum.Value.fromUnsignedBigInt(additionalCDNIndex)
         )
       ];
@@ -1071,22 +1087,22 @@ describe("DependencyRegistry", () => {
 
       assert.fieldEquals(
         "Dependency",
-        dependencyType,
+        dependencyNameAndVersion,
         "additionalCDNCount",
         existingDependency.additionalCDNCount.toString()
       );
       assert.fieldEquals(
         "Dependency",
-        dependencyType,
+        dependencyNameAndVersion,
         "updatedAt",
         CURRENT_BLOCK_TIMESTAMP.toString()
       );
     });
 
     test("should remove existing additional cdn for existing dependency", () => {
-      const dependencyType = EXISTING_DEPENDENCY_TYPE;
+      const dependencyNameAndVersion = EXISTING_DEPENDENCY_TYPE;
       const additionalCDNIndex = BigInt.fromI32(0);
-      const existingDependency = Dependency.load(dependencyType);
+      const existingDependency = Dependency.load(dependencyNameAndVersion);
 
       if (!existingDependency) {
         throw Error("Dependency should exist");
@@ -1097,11 +1113,11 @@ describe("DependencyRegistry", () => {
       >(newMockEvent());
       event.parameters = [
         new ethereum.EventParam(
-          "_dependencyType",
-          ethereum.Value.fromBytes(Bytes.fromUTF8(dependencyType))
+          "dependencyNameAndVersion",
+          ethereum.Value.fromBytes(Bytes.fromUTF8(dependencyNameAndVersion))
         ),
         new ethereum.EventParam(
-          "_additionalCDNIndex",
+          "additionalCDNIndex",
           ethereum.Value.fromUnsignedBigInt(additionalCDNIndex)
         )
       ];
@@ -1118,7 +1134,7 @@ describe("DependencyRegistry", () => {
 
       assert.fieldEquals(
         "Dependency",
-        dependencyType,
+        dependencyNameAndVersion,
         "additionalCDNCount",
         existingDependency.additionalCDNCount
           .minus(BigInt.fromI32(1))
@@ -1126,7 +1142,7 @@ describe("DependencyRegistry", () => {
       );
       assert.fieldEquals(
         "Dependency",
-        dependencyType,
+        dependencyNameAndVersion,
         "updatedAt",
         updatedAtBlockTimestamp.toString()
       );
@@ -1154,7 +1170,8 @@ describe("DependencyRegistry", () => {
     });
 
     test("should not remove additional cdn for non existant dependency", () => {
-      const nonExistantDependencyType = "nonExistantDependencyType";
+      const nonExistantDependencyNameAndVersion =
+        "nonExistantDependencyNameAndVersion";
       const additionalRepositoryIndex = BigInt.fromI32(0);
 
       const event: DependencyAdditionalRepositoryRemoved = changetype<
@@ -1162,11 +1179,13 @@ describe("DependencyRegistry", () => {
       >(newMockEvent());
       event.parameters = [
         new ethereum.EventParam(
-          "_dependencyType",
-          ethereum.Value.fromBytes(Bytes.fromUTF8(nonExistantDependencyType))
+          "dependencyNameAndVersion",
+          ethereum.Value.fromBytes(
+            Bytes.fromUTF8(nonExistantDependencyNameAndVersion)
+          )
         ),
         new ethereum.EventParam(
-          "_additionalRepositoryIndex",
+          "additionalRepositoryIndex",
           ethereum.Value.fromUnsignedBigInt(additionalRepositoryIndex)
         )
       ];
@@ -1183,9 +1202,9 @@ describe("DependencyRegistry", () => {
     });
 
     test("should do nothing if additional cdn does not exist", () => {
-      const dependencyType = EXISTING_DEPENDENCY_TYPE;
+      const dependencyNameAndVersion = EXISTING_DEPENDENCY_TYPE;
       const additionalRepositoryIndex = BigInt.fromI32(1);
-      const existingDependency = Dependency.load(dependencyType);
+      const existingDependency = Dependency.load(dependencyNameAndVersion);
 
       if (!existingDependency) {
         throw Error("Dependency should exist");
@@ -1196,11 +1215,11 @@ describe("DependencyRegistry", () => {
       >(newMockEvent());
       event.parameters = [
         new ethereum.EventParam(
-          "_dependencyType",
-          ethereum.Value.fromBytes(Bytes.fromUTF8(dependencyType))
+          "dependencyNameAndVersion",
+          ethereum.Value.fromBytes(Bytes.fromUTF8(dependencyNameAndVersion))
         ),
         new ethereum.EventParam(
-          "_additionalRepositoryIndex",
+          "additionalRepositoryIndex",
           ethereum.Value.fromUnsignedBigInt(additionalRepositoryIndex)
         )
       ];
@@ -1217,22 +1236,22 @@ describe("DependencyRegistry", () => {
 
       assert.fieldEquals(
         "Dependency",
-        dependencyType,
+        dependencyNameAndVersion,
         "additionalRepositoryCount",
         existingDependency.additionalRepositoryCount.toString()
       );
       assert.fieldEquals(
         "Dependency",
-        dependencyType,
+        dependencyNameAndVersion,
         "updatedAt",
         CURRENT_BLOCK_TIMESTAMP.toString()
       );
     });
 
     test("should remove existing additional cdn for existing dependency", () => {
-      const dependencyType = EXISTING_DEPENDENCY_TYPE;
+      const dependencyNameAndVersion = EXISTING_DEPENDENCY_TYPE;
       const additionalRepositoryIndex = BigInt.fromI32(0);
-      const existingDependency = Dependency.load(dependencyType);
+      const existingDependency = Dependency.load(dependencyNameAndVersion);
 
       if (!existingDependency) {
         throw Error("Dependency should exist");
@@ -1243,11 +1262,11 @@ describe("DependencyRegistry", () => {
       >(newMockEvent());
       event.parameters = [
         new ethereum.EventParam(
-          "_dependencyType",
-          ethereum.Value.fromBytes(Bytes.fromUTF8(dependencyType))
+          "dependencyNameAndVersion",
+          ethereum.Value.fromBytes(Bytes.fromUTF8(dependencyNameAndVersion))
         ),
         new ethereum.EventParam(
-          "_additionalRepositoryIndex",
+          "additionalRepositoryIndex",
           ethereum.Value.fromUnsignedBigInt(additionalRepositoryIndex)
         )
       ];
@@ -1264,7 +1283,7 @@ describe("DependencyRegistry", () => {
 
       assert.fieldEquals(
         "Dependency",
-        dependencyType,
+        dependencyNameAndVersion,
         "additionalRepositoryCount",
         existingDependency.additionalRepositoryCount
           .minus(BigInt.fromI32(1))
@@ -1272,7 +1291,7 @@ describe("DependencyRegistry", () => {
       );
       assert.fieldEquals(
         "Dependency",
-        dependencyType,
+        dependencyNameAndVersion,
         "updatedAt",
         updatedAtBlockTimestamp.toString()
       );
@@ -1280,15 +1299,18 @@ describe("DependencyRegistry", () => {
   });
   describe("handleDependencyScriptUpdated", () => {
     test("should not update script for non existant dependency", () => {
-      const nonExistantDependencyType = "nonExistantDependencyType";
+      const nonExistantDependencyNameAndVersion =
+        "nonExistantDependencyNameAndVersion";
 
       const event: DependencyScriptUpdated = changetype<
         DependencyScriptUpdated
       >(newMockEvent());
       event.parameters = [
         new ethereum.EventParam(
-          "_dependencyType",
-          ethereum.Value.fromBytes(Bytes.fromUTF8(nonExistantDependencyType))
+          "dependencyNameAndVersion",
+          ethereum.Value.fromBytes(
+            Bytes.fromUTF8(nonExistantDependencyNameAndVersion)
+          )
         )
       ];
       const updatedAtBlockTimestamp = CURRENT_BLOCK_TIMESTAMP.plus(
@@ -1361,7 +1383,7 @@ describe("DependencyRegistry", () => {
       >(newMockEvent());
       event.parameters = [
         new ethereum.EventParam(
-          "_dependencyType",
+          "dependencyNameAndVersion",
           ethereum.Value.fromBytes(Bytes.fromUTF8(EXISTING_DEPENDENCY_TYPE))
         )
       ];
@@ -1482,7 +1504,7 @@ describe("DependencyRegistry", () => {
       >(newMockEvent());
       event.parameters = [
         new ethereum.EventParam(
-          "_dependencyType",
+          "dependencyNameAndVersion",
           ethereum.Value.fromBytes(Bytes.fromUTF8(EXISTING_DEPENDENCY_TYPE))
         )
       ];
@@ -1575,7 +1597,7 @@ describe("DependencyRegistry", () => {
       >(newMockEvent());
       event.parameters = [
         new ethereum.EventParam(
-          "_dependencyType",
+          "dependencyNameAndVersion",
           ethereum.Value.fromBytes(Bytes.fromUTF8(EXISTING_DEPENDENCY_TYPE))
         )
       ];
@@ -1618,7 +1640,7 @@ describe("DependencyRegistry", () => {
       >(newMockEvent());
       event.parameters = [
         new ethereum.EventParam(
-          "_coreContract",
+          "coreContract",
           ethereum.Value.fromAddress(
             randomAddressGenerator.generateRandomAddress()
           )
@@ -1637,7 +1659,7 @@ describe("DependencyRegistry", () => {
       >(newMockEvent());
       event.parameters = [
         new ethereum.EventParam(
-          "_coreContract",
+          "coreContract",
           ethereum.Value.fromAddress(Address.fromString(coreContract.id))
         )
       ];
@@ -1670,7 +1692,7 @@ describe("DependencyRegistry", () => {
       >(newMockEvent());
       event.parameters = [
         new ethereum.EventParam(
-          "_coreContract",
+          "coreContract",
           ethereum.Value.fromAddress(
             randomAddressGenerator.generateRandomAddress()
           )
@@ -1691,7 +1713,7 @@ describe("DependencyRegistry", () => {
       >(newMockEvent());
       event.parameters = [
         new ethereum.EventParam(
-          "_coreContract",
+          "coreContract",
           ethereum.Value.fromAddress(Address.fromString(coreContract.id))
         )
       ];
@@ -1717,28 +1739,28 @@ describe("DependencyRegistry", () => {
       );
     });
   });
-  describe("handleProjectDependencyTypeOverrideAdded", () => {
+  describe("handleProjectDependencyOverrideAdded", () => {
     test("should do nothing if project does not exist", () => {
-      const event: ProjectDependencyTypeOverrideAdded = changetype<
-        ProjectDependencyTypeOverrideAdded
+      const event: ProjectDependencyOverrideAdded = changetype<
+        ProjectDependencyOverrideAdded
       >(newMockEvent());
       event.parameters = [
         new ethereum.EventParam(
-          "_coreContractAddress",
+          "coreContractAddress",
           ethereum.Value.fromAddress(
             randomAddressGenerator.generateRandomAddress()
           )
         ),
         new ethereum.EventParam(
-          "_projectId",
+          "projectId",
           ethereum.Value.fromUnsignedBigInt(BigInt.fromI32(1))
         ),
         new ethereum.EventParam(
-          "_dependencyType",
+          "dependencyNameAndVersion",
           ethereum.Value.fromBytes(Bytes.fromUTF8(EXISTING_DEPENDENCY_TYPE))
         )
       ];
-      handleProjectDependencyTypeOverrideAdded(event);
+      handleProjectDependencyOverrideAdded(event);
 
       assert.entityCount("Project", 0);
     });
@@ -1755,20 +1777,20 @@ describe("DependencyRegistry", () => {
         CURRENT_BLOCK_TIMESTAMP
       );
 
-      const event: ProjectDependencyTypeOverrideAdded = changetype<
-        ProjectDependencyTypeOverrideAdded
+      const event: ProjectDependencyOverrideAdded = changetype<
+        ProjectDependencyOverrideAdded
       >(newMockEvent());
       event.parameters = [
         new ethereum.EventParam(
-          "_coreContractAddress",
+          "coreContractAddress",
           ethereum.Value.fromAddress(Address.fromString(contract.id))
         ),
         new ethereum.EventParam(
-          "_projectId",
+          "projectId",
           ethereum.Value.fromUnsignedBigInt(project.projectId)
         ),
         new ethereum.EventParam(
-          "_dependencyType",
+          "dependencyNameAndVersion",
           ethereum.Value.fromBytes(Bytes.fromUTF8(EXISTING_DEPENDENCY_TYPE))
         )
       ];
@@ -1779,7 +1801,7 @@ describe("DependencyRegistry", () => {
 
       assert.assertNull(project.scriptTypeAndVersion);
 
-      handleProjectDependencyTypeOverrideAdded(event);
+      handleProjectDependencyOverrideAdded(event);
 
       assert.fieldEquals(
         "Project",
@@ -1795,24 +1817,24 @@ describe("DependencyRegistry", () => {
       );
     });
   });
-  describe("handleProjectDependencyTypeOverrideRemoved", () => {
+  describe("handleProjectDependencyOverrideRemoved", () => {
     test("should do nothing if project does not exist", () => {
-      const event: ProjectDependencyTypeOverrideRemoved = changetype<
-        ProjectDependencyTypeOverrideRemoved
+      const event: ProjectDependencyOverrideRemoved = changetype<
+        ProjectDependencyOverrideRemoved
       >(newMockEvent());
       event.parameters = [
         new ethereum.EventParam(
-          "_coreContractAddress",
+          "coreContractAddress",
           ethereum.Value.fromAddress(
             randomAddressGenerator.generateRandomAddress()
           )
         ),
         new ethereum.EventParam(
-          "_projectId",
+          "projectId",
           ethereum.Value.fromUnsignedBigInt(BigInt.fromI32(1))
         )
       ];
-      handleProjectDependencyTypeOverrideRemoved(event);
+      handleProjectDependencyOverrideRemoved(event);
 
       assert.entityCount("Project", 0);
     });
@@ -1844,16 +1866,16 @@ describe("DependencyRegistry", () => {
           ethereum.Value.fromUnsignedBigInt(BigInt.fromI32(0))
         ]);
 
-      const event: ProjectDependencyTypeOverrideRemoved = changetype<
-        ProjectDependencyTypeOverrideRemoved
+      const event: ProjectDependencyOverrideRemoved = changetype<
+        ProjectDependencyOverrideRemoved
       >(newMockEvent());
       event.parameters = [
         new ethereum.EventParam(
-          "_coreContractAddress",
+          "coreContractAddress",
           ethereum.Value.fromAddress(coreContractAddress)
         ),
         new ethereum.EventParam(
-          "_projectId",
+          "projectId",
           ethereum.Value.fromUnsignedBigInt(project.projectId)
         )
       ];
@@ -1869,7 +1891,7 @@ describe("DependencyRegistry", () => {
         EXISTING_DEPENDENCY_TYPE
       );
 
-      handleProjectDependencyTypeOverrideRemoved(event);
+      handleProjectDependencyOverrideRemoved(event);
 
       assert.fieldEquals(
         "Project",
@@ -1907,16 +1929,16 @@ describe("DependencyRegistry", () => {
         .withArgs([ethereum.Value.fromUnsignedBigInt(project.projectId)])
         .reverts();
 
-      const event: ProjectDependencyTypeOverrideRemoved = changetype<
-        ProjectDependencyTypeOverrideRemoved
+      const event: ProjectDependencyOverrideRemoved = changetype<
+        ProjectDependencyOverrideRemoved
       >(newMockEvent());
       event.parameters = [
         new ethereum.EventParam(
-          "_coreContractAddress",
+          "coreContractAddress",
           ethereum.Value.fromAddress(coreContractAddress)
         ),
         new ethereum.EventParam(
-          "_projectId",
+          "projectId",
           ethereum.Value.fromUnsignedBigInt(project.projectId)
         )
       ];
@@ -1932,7 +1954,7 @@ describe("DependencyRegistry", () => {
         EXISTING_DEPENDENCY_TYPE
       );
 
-      handleProjectDependencyTypeOverrideRemoved(event);
+      handleProjectDependencyOverrideRemoved(event);
 
       assert.fieldEquals("Project", project.id, "scriptTypeAndVersion", "null");
       assert.fieldEquals(
@@ -1951,11 +1973,11 @@ describe("DependencyRegistry", () => {
       const event = changetype<OwnershipTransferred>(newMockEvent());
       event.parameters = [
         new ethereum.EventParam(
-          "_previousOwner",
+          "previousOwner",
           ethereum.Value.fromAddress(prevOwner)
         ),
         new ethereum.EventParam(
-          "_newOwner",
+          "newOwner",
           ethereum.Value.fromAddress(newOwner)
         )
       ];
@@ -1998,11 +2020,11 @@ describe("DependencyRegistry", () => {
       const event = changetype<OwnershipTransferred>(newMockEvent());
       event.parameters = [
         new ethereum.EventParam(
-          "_previousOwner",
+          "previousOwner",
           ethereum.Value.fromAddress(prevOwner)
         ),
         new ethereum.EventParam(
-          "_newOwner",
+          "newOwner",
           ethereum.Value.fromAddress(newOwner)
         )
       ];

@@ -625,7 +625,7 @@ type Dependency @entity {
   "Unique identifier made up of dependency name and version separated by an @ symbol (e.g. p5js@1.0.0)"
   id: ID!
   "License Type of this dependency"
-  licenseType: String!
+  licenseType: License!
   "Preffered CDN for this dependency"
   preferredCDN: String!
   "Additional CDNs for this dependency"
@@ -646,7 +646,7 @@ type Dependency @entity {
   "Concatenated string of all scripts for this dependency"
   script: String
   "Reference website for this dependency (e.g. https://p5js.org)"
-  referenceWebsite: String!
+  website: String!
   "Depenency registry contract that this dependency is registered on"
   dependencyRegistry: DependencyRegistry!
   "Timestamp of last update"
