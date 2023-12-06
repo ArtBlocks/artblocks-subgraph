@@ -71,7 +71,8 @@ import {
   DependencyAdditionalRepository,
   DependencyRegistry,
   DependencyScript,
-  License
+  License,
+  Project
 } from "../../../generated/schema";
 
 const randomAddressGenerator = new RandomAddressGenerator();
@@ -1806,7 +1807,7 @@ describe("DependencyRegistry", () => {
       assert.fieldEquals(
         "Project",
         project.id,
-        "scriptTypeAndVersion",
+        "scriptTypeAndVersionOverride",
         EXISTING_DEPENDENCY_TYPE
       );
       assert.fieldEquals(
@@ -1838,7 +1839,7 @@ describe("DependencyRegistry", () => {
 
       assert.entityCount("Project", 0);
     });
-    test("should remove project dependency type override and reset to address on contract", () => {
+    test("should remove project dependency type override", () => {
       const coreContract = addNewContractToStore();
       const coreContractAddress = Address.fromString(coreContract.id);
       const coreContractScriptTypeAndVersion = "three@0.0.24";
@@ -1851,20 +1852,9 @@ describe("DependencyRegistry", () => {
         BigInt.fromI32(0),
         CURRENT_BLOCK_TIMESTAMP
       );
-      project.scriptTypeAndVersion = EXISTING_DEPENDENCY_TYPE;
+      project.scriptTypeAndVersion = coreContractScriptTypeAndVersion;
+      project.scriptTypeAndVersionOverride = EXISTING_DEPENDENCY_TYPE;
       project.save();
-
-      createMockedFunction(
-        coreContractAddress,
-        "projectScriptDetails",
-        "projectScriptDetails(uint256):(string,string,uint256)"
-      )
-        .withArgs([ethereum.Value.fromUnsignedBigInt(project.projectId)])
-        .returns([
-          ethereum.Value.fromString(coreContractScriptTypeAndVersion),
-          ethereum.Value.fromString("1.77"),
-          ethereum.Value.fromUnsignedBigInt(BigInt.fromI32(0))
-        ]);
 
       const event: ProjectDependencyOverrideRemoved = changetype<
         ProjectDependencyOverrideRemoved
@@ -1887,7 +1877,7 @@ describe("DependencyRegistry", () => {
       assert.fieldEquals(
         "Project",
         project.id,
-        "scriptTypeAndVersion",
+        "scriptTypeAndVersionOverride",
         EXISTING_DEPENDENCY_TYPE
       );
 
@@ -1899,64 +1889,10 @@ describe("DependencyRegistry", () => {
         "scriptTypeAndVersion",
         coreContractScriptTypeAndVersion
       );
-      assert.fieldEquals(
-        "Project",
-        project.id,
-        "updatedAt",
-        updatedAtBlockTimestamp.toString()
-      );
-    });
-    test("should remove project dependency type override and reset to null if not dependency registry compatible", () => {
-      const coreContract = addNewContractToStore();
-      const coreContractAddress = Address.fromString(coreContract.id);
 
-      const project = addNewProjectToStore(
-        coreContractAddress,
-        BigInt.fromI32(0),
-        "test project",
-        randomAddressGenerator.generateRandomAddress(),
-        BigInt.fromI32(0),
-        CURRENT_BLOCK_TIMESTAMP
-      );
-      project.scriptTypeAndVersion = EXISTING_DEPENDENCY_TYPE;
-      project.save();
+      const postEventProject = Project.load(project.id);
+      assert.assertNull(postEventProject!.scriptTypeAndVersionOverride);
 
-      createMockedFunction(
-        coreContractAddress,
-        "projectScriptDetails",
-        "projectScriptDetails(uint256):(string,string,uint256)"
-      )
-        .withArgs([ethereum.Value.fromUnsignedBigInt(project.projectId)])
-        .reverts();
-
-      const event: ProjectDependencyOverrideRemoved = changetype<
-        ProjectDependencyOverrideRemoved
-      >(newMockEvent());
-      event.parameters = [
-        new ethereum.EventParam(
-          "coreContractAddress",
-          ethereum.Value.fromAddress(coreContractAddress)
-        ),
-        new ethereum.EventParam(
-          "projectId",
-          ethereum.Value.fromUnsignedBigInt(project.projectId)
-        )
-      ];
-      const updatedAtBlockTimestamp = CURRENT_BLOCK_TIMESTAMP.plus(
-        BigInt.fromI32(1)
-      );
-      event.block.timestamp = updatedAtBlockTimestamp;
-
-      assert.fieldEquals(
-        "Project",
-        project.id,
-        "scriptTypeAndVersion",
-        EXISTING_DEPENDENCY_TYPE
-      );
-
-      handleProjectDependencyOverrideRemoved(event);
-
-      assert.fieldEquals("Project", project.id, "scriptTypeAndVersion", "null");
       assert.fieldEquals(
         "Project",
         project.id,

@@ -96,6 +96,9 @@ type Project @entity {
   "Script type and version (see `scriptJSON` if null)"
   scriptTypeAndVersion: String
 
+  "Script type and version override (override set on dependency registry)"
+  scriptTypeAndVersionOverride: String
+
   "Aspect ratio of the project (see `scriptJSON` if null)"
   aspectRatio: String
 
