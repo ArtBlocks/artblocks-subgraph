@@ -20,7 +20,6 @@ import {
 } from "../generated/IDependencyRegistryV0/IDependencyRegistryV0";
 import { IDependencyRegistryV0_Legacy } from "../generated/IDependencyRegistryV0/IDependencyRegistryV0_Legacy";
 import { OwnershipTransferred } from "../generated/OwnableUpgradeable/OwnableUpgradeable";
-import { IDependencyRegistryCompatibleV0 } from "../generated/IDependencyRegistryV0/IDependencyRegistryCompatibleV0";
 import {
   Contract,
   Dependency,
@@ -37,6 +36,17 @@ import {
   generateDependencyAdditionalRepositoryId,
   generateDependencyScriptId
 } from "./helpers";
+
+/*
+ * This code operates under the assumption that only a single dependency registry is being indexed. This assumption has several significant effects:
+
+ * 1. The 'dependencyNameAndVersion' is used as the unique identifier for the Dependency entity.
+ * 2. Before updating a Dependency entity, we do not verify if the dependency's associated dependency registry matches the event address.
+ * 3. In the 'handleSupportedCoreContractAdded' and 'handleSupportedCoreContractRemoved' handlers, we do not check a contract's dependency registry address before updating its dependency registry field.
+ * 4. In the 'handleProjectDependencyOverrideAdded' and 'handleProjectDependencyOverrideRemoved' functions, we do not verify a project's contract's dependency registry address before updating its 'scriptTypeAndVersionOverride' field.
+
+ * Given that we control the indexing process with this subgraph, this assumption is considered safe.
+ */
 
 export function handleLicenseTypeAdded(event: LicenseTypeAdded): void {
   let licenseId = event.params.licenseType.toString();
@@ -440,7 +450,7 @@ export function handleProjectDependencyOverrideAdded(
     return;
   }
 
-  project.scriptTypeAndVersion = event.params.dependencyNameAndVersion.toString();
+  project.scriptTypeAndVersionOverride = event.params.dependencyNameAndVersion.toString();
   project.updatedAt = event.block.timestamp;
   project.save();
 }
@@ -457,19 +467,7 @@ export function handleProjectDependencyOverrideRemoved(
     return;
   }
 
-  const coreContract = IDependencyRegistryCompatibleV0.bind(
-    event.params.coreContractAddress
-  );
-
-  const scriptDetailsResult = coreContract.try_projectScriptDetails(
-    event.params.projectId
-  );
-  if (scriptDetailsResult.reverted) {
-    project.scriptTypeAndVersion = null;
-  } else {
-    project.scriptTypeAndVersion = scriptDetailsResult.value.getScriptTypeAndVersion();
-  }
-
+  project.scriptTypeAndVersionOverride = null;
   project.updatedAt = event.block.timestamp;
   project.save();
 }
