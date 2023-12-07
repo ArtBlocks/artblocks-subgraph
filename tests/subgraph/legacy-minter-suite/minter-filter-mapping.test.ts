@@ -865,6 +865,18 @@ test("handleMinterApproved should not add minter to minterGlobalAllowlist if the
     otherMinterFilterAddress.toHexString() != minterFilterAddress.toHexString()
   );
 
+  createMockedFunction(
+    Address.zero(),
+    "coreRegistry",
+    "coreRegistry():(address)"
+  ).reverts();
+
+  createMockedFunction(
+    Address.zero(),
+    "minterFilterType",
+    "minterFilterType():(string)"
+  ).reverts();
+
   const minterApprovedEvent: MinterApproved = changetype<MinterApproved>(
     newMockEvent()
   );
