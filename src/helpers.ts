@@ -407,7 +407,7 @@ export function loadOrCreateMinter(
     // if minterFilterAddress() reverts, then the minter is not as expected and
     // we log warning, and assign to dummy MinterFilter entity at zero address
     log.warning(
-      "[WARN] Minter at {} does not have a valid minter filter address",
+      "[WARN] Cannot retrieve minter filter address for minter at {}",
       [minterAddress.toHexString()]
     );
     const dummyMinterFilter = loadOrCreateSharedMinterFilter(
@@ -416,7 +416,20 @@ export function loadOrCreateMinter(
     );
     minter.minterFilter = dummyMinterFilter.id;
   } else {
-    minter.minterFilter = minterFilterResult.value.toHexString();
+    let minterFilter = MinterFilter.load(
+      minterFilterResult.value.toHexString()
+    );
+    // If this happens, there was likely a mistake approving the minter for a
+    // contract with a different associated minter filter. We log a warning,
+    // and assign to dummy MinterFilter entity at zero address.
+    if (!minterFilter) {
+      log.warning(
+        "[WARN] Minter at {} has a minter filter address that is not in the store",
+        [minterAddress.toHexString()]
+      );
+      minterFilter = loadOrCreateSharedMinterFilter(Address.zero(), timestamp);
+    }
+    minter.minterFilter = minterFilter.id;
   }
   minter.extraMinterDetails = "{}";
   // by default, we assume the minter is not allowlisted on its MinterFilter during
