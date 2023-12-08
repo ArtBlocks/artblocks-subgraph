@@ -296,5 +296,19 @@
       "name": "Sepolia staging engine registry contract",
       "blockNumber": 4643697
     }
+  ],
+  "pbabContracts": [
+    {
+      "address": "0x6Ceab51Fc8EE931Df84d3db66E747b617EB7dE21",
+      "name": "Bright Moments",
+      "startBlock": 4849018
+    }
+  ],
+  "engineFlexContracts": [
+    {
+      "address": "0x7380C14beCB82e50B7Bc22dF47fcf3bF505aa8b7",
+      "name": "Bright Moments - Flex",
+      "startBlock": 4849041
+    }
   ]
 }
