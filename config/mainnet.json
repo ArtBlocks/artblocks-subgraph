@@ -727,5 +727,19 @@
       "name": "Shared mainnet core registry contract",
       "startBlock": 18486235
     }
+  ],
+  "iDependencyRegistryV0Contracts": [
+    {
+      "address": "0x37861f95882ACDba2cCD84F5bFc4598e2ECDDdAF",
+      "name": "Mainnet dependency registry contract",
+      "startBlock": 18772893
+    }
+  ],
+  "ownableUpgradeableDependencyRegistryContracts": [
+    {
+      "address": "0x37861f95882ACDba2cCD84F5bFc4598e2ECDDdAF",
+      "name": "Mainnet dependency registry contract",
+      "startBlock": 18772893
+    }
   ]
 }

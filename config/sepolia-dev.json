@@ -297,5 +297,19 @@
       "name": "Sepolia staging engine registry contract",
       "startBlock": 4405396
     }
+  ],
+  "iDependencyRegistryV0Contracts": [
+    {
+      "address": "0x5Fcc415BCFb164C5F826B5305274749BeB684e9b",
+      "name": "Sepolia dev dependency registry contract",
+      "startBlock": 4869157
+    }
+  ],
+  "ownableUpgradeableDependencyRegistryContracts": [
+    {
+      "address": "0x5Fcc415BCFb164C5F826B5305274749BeB684e9b",
+      "name": "Sepolia dev dependency registry contract",
+      "startBlock": 4869157
+    }
   ]
 }

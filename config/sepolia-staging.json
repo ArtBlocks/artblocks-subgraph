@@ -310,5 +310,19 @@
       "name": "Bright Moments - Flex",
       "startBlock": 4849041
     }
+  ],
+  "iDependencyRegistryV0Contracts": [
+    {
+      "address": "0xEFA7Ef074A6E90a99fba8bAd4dCf337ef298387f",
+      "name": "Sepolia staging dependency registry contract",
+      "startBlock": 4874684
+    }
+  ],
+  "ownableUpgradeableDependencyRegistryContracts": [
+    {
+      "address": "0xEFA7Ef074A6E90a99fba8bAd4dCf337ef298387f",
+      "name": "Sepolia staging dependency registry contract",
+      "startBlock": 4874684
+    }
   ]
 }
