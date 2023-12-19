@@ -531,13 +531,12 @@ type SplitAtomicContract @entity {
   implementation: Bytes!
 
   "List of split atomic contract splits"
-  splits: [SplitAtomicContractSplit!]!
-    @derivedFrom(field: "splitAtomicContract")
+  splits: [SplitAtomicSplit!]! @derivedFrom(field: "splitAtomicContract")
 
   updatedAt: BigInt!
 }
 
-type SplitAtomicContractSplit @entity {
+type SplitAtomicSplit @entity {
   "unique identifier equal to split atomic contract address + index"
   id: ID!
 

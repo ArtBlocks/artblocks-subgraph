@@ -3,7 +3,7 @@ import { Address, log, BigInt } from "@graphprotocol/graph-ts";
 import {
   SplitAtomicFactory,
   SplitAtomicContract,
-  SplitAtomicContractSplit
+  SplitAtomicSplit
 } from "../generated/schema";
 
 import {
@@ -86,7 +86,7 @@ export function handleSplitAtomicCreated(event: SplitAtomicCreated): void {
   const splits = splitsResult.value;
   // loop over the splits array and add each split to the store
   for (let i = 0; i < splits.length; i++) {
-    const split = new SplitAtomicContractSplit(
+    const split = new SplitAtomicSplit(
       event.params.splitAtomic.toHexString() + "-" + i.toString()
     );
     split.splitAtomicContract = splitAtomicContract.id;
