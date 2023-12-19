@@ -2174,6 +2174,30 @@ dataSources:
           handler: handleOwnershipTransferred
       file: ./src/dependency-registry.ts
   {{/ownableUpgradeableDependencyRegistryContracts}}
+  {{#iSplitAtomicFactoryV0Contracts}}
+  - kind: ethereum/contract
+    name: 'ISplitAtomicFactory{{#address}}-{{address}}{{/address}}'
+    network: {{network}}
+    source:
+      address: "{{#address}}{{address}}{{/address}}{{^address}}0x0000000000000000000000000000000000000000{{/address}}"
+      abi: ISplitAtomicFactoryV0
+      {{#startBlock}}startBlock: {{startBlock}}{{/startBlock}}
+    mapping:
+      kind: ethereum/events
+      apiVersion: 0.0.5
+      language: wasm/assemblyscript
+      abis:
+        - name: ISplitAtomicFactoryV0
+          file: ./abis/ISplitAtomicFactoryV0.json
+        - name: ISplitAtomicV0
+          file: ./abis/ISplitAtomicV0.json
+      eventHandlers:
+        - event: Deployed(indexed address,indexed bytes32)
+          handler: handleDeployed
+        - event: SplitAtomicCreated(indexed address)
+          handler: handleSplitAtomicCreated
+      file: ./src/split-atomic-mapping.ts
+  {{/iSplitAtomicFactoryV0Contracts}}
 templates:
   - name: IGenArt721CoreV3_Base_Template
     kind: ethereum/contract

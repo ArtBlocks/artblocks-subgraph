@@ -500,6 +500,60 @@ type Receipt @entity {
   updatedAt: BigInt!
 }
 
+type SplitAtomicFactory @entity {
+  "unique identifier equal to split atomic factory contract address"
+  id: ID!
+
+  "type of split atomic factory"
+  type: String!
+
+  "implementation contract address for the created EIP-1167 minimal proxy contracts"
+  implementation: Bytes!
+
+  "List of split atomic contracts created by this factory"
+  splitAtomicContracts: [SplitAtomicContract!]!
+    @derivedFrom(field: "splitAtomicFactory")
+
+  updatedAt: BigInt!
+}
+
+type SplitAtomicContract @entity {
+  "unique identifier equal to split atomic contract address"
+  id: ID!
+
+  "type of split atomic contract"
+  type: String!
+
+  "Split atomic factory that created this contract"
+  splitAtomicFactory: SplitAtomicFactory!
+
+  "implementation contract address for this EIP-1167 minimal proxy"
+  implementation: Bytes!
+
+  "List of split atomic contract splits"
+  splits: [SplitAtomicContractSplit!]!
+    @derivedFrom(field: "splitAtomicContract")
+
+  updatedAt: BigInt!
+}
+
+type SplitAtomicContractSplit @entity {
+  "unique identifier equal to split atomic contract address + index"
+  id: ID!
+
+  "Split atomic contract that created this split"
+  splitAtomicContract: SplitAtomicContract!
+
+  "Index of this split"
+  index: BigInt!
+
+  "Address of the recipient of this split"
+  recipient: Bytes!
+
+  "Basis points of the split"
+  basisPoints: BigInt!
+}
+
 enum SaleType {
   Single
   Bundle
