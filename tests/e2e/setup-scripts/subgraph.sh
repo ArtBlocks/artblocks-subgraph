@@ -1,6 +1,6 @@
 #!/bin/sh
-yarn;
 echo "HELLOOOOOO";
+yarn;
 cp ./shared/test-config.json ./config/local.json;
 yarn prepare:local;
 yarn graph create --node $GRAPH_NODE artblocks/art-blocks;
