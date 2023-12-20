@@ -29,6 +29,9 @@ import { MinterSEAV1__factory } from "../contracts/factories/MinterSEAV1__factor
 import { MinterDAExpV5__factory } from "../contracts/factories/MinterDAExpV5__factory";
 import { MinterDALinV5__factory } from "../contracts/factories/MinterDALinV5__factory";
 import { MinterDAExpSettlementV3__factory } from "../contracts/factories/MinterDAExpSettlementV3__factory";
+// splitter contracts
+import { SplitAtomicV0__factory } from "../contracts/factories/SplitAtomicV0__factory";
+import { SplitAtomicFactoryV0__factory } from "../contracts/factories/SplitAtomicFactoryV0__factory";
 
 import fs from "fs";
 import { JsonRpcProvider } from "@ethersproject/providers";
@@ -396,6 +399,32 @@ async function main() {
   subgraphConfig.settlementExpLibContracts = [
     {
       address: minterDAExpSettlementV3.address,
+    },
+  ];
+
+  // deploy splitAtomic system of contracts
+  // deploy implementation
+  const splitAtomicV0Factory = new SplitAtomicV0__factory(deployer);
+  const splitAtomicV0 = await splitAtomicV0Factory.deploy();
+  await splitAtomicV0.deployed();
+  console.log(
+    `splitAtomicV0 implementation deployed at ${splitAtomicV0.address}`
+  );
+  // deploy proxy factory
+  const splitAtomicFactoryV0Factory = new SplitAtomicFactoryV0__factory(
+    deployer
+  );
+  const splitAtomicFactoryV0 = await splitAtomicFactoryV0Factory.deploy(
+    splitAtomicV0.address
+  );
+  await splitAtomicFactoryV0.deployed();
+  console.log(
+    `splitAtomicFactoryV0 deployed at ${splitAtomicFactoryV0.address}`
+  );
+  // update subgraph config to index splitAtomicFactoryV0
+  subgraphConfig.iSplitAtomicFactoryV0Contracts = [
+    {
+      address: splitAtomicFactoryV0.address,
     },
   ];
 

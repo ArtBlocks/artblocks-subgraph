@@ -1,0 +1,15 @@
+fragment SplitAtomicFactoryDetails on SplitAtomicFactory {
+  id
+}
+
+query GetSplitAtomicFactories {
+  splitAtomicFactories {
+    ...SplitAtomicFactoryDetails
+  }
+}
+
+query GetTargetSplitAtomicFactories($targetId: ID!) {
+  splitAtomicFactories(where: { id: $targetId }) {
+    ...SplitAtomicFactoryDetails
+  }
+}
