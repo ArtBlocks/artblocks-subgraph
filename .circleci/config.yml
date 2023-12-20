@@ -32,9 +32,6 @@ jobs:
           pkg-manager: yarn
       - run: node --version
       - run:
-          name: Print working directory and list contents
-          command: pwd && ls
-      - run:
           name: Run e2e tests
           command: yarn test:e2e
 
