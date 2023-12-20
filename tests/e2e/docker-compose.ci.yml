@@ -9,7 +9,3 @@ services:
         condition: service_healthy
     volumes:
       - shared-data:/usr/runner/shared
-      - ./runner/__tests__:/usr/runner/__tests__
-  subgraph:
-    volumes:
-      - ./setup-scripts:/usr/subgraph/setup-scripts

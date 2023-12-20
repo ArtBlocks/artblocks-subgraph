@@ -33,7 +33,7 @@ jobs:
       - run: node --version
       - run:
           name: Run e2e tests
-          command: yarn test:e2e
+          command: yarn test:e2e:ci
 
 workflows:
   run-ci:
