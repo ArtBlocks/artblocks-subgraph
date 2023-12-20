@@ -73,7 +73,7 @@ services:
     volumes:
       - shared-data:/usr/subgraph/shared
       - ./tests/e2e/setup-scripts:/usr/subgraph/setup-scripts
-    command: sh ./setup-scripts/subgraph.sh
+    command: ls ./setup-scripts && exit 1
     # We create an empty file called `subgraph-complete` in the shared
     # volume when the subgraph is deployed. We use this file as a
     # healthcheck to ensure that the subgraph is deployed before
