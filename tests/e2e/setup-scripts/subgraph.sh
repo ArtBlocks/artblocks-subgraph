@@ -1,5 +1,4 @@
 #!/bin/sh
-echo "HELLOOOOOO";
 yarn;
 cp ./shared/test-config.json ./config/local.json;
 yarn prepare:local;
