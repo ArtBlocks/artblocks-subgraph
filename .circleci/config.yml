@@ -18,8 +18,19 @@ jobs:
       - run:
           name: Run tests
           command: yarn test
+  test_e2e:
+    docker:
+      - image: "cimg/base:current"
+    resource_class: medium+
+    steps:
+      - checkout
+      - setup_remote_docker
+      - run:
+          name: Run e2e tests
+          command: yarn test:e2e
 
 workflows:
   run-ci:
     jobs:
       - test
+      - test_e2e
