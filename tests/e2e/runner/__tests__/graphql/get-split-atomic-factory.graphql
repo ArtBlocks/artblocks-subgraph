@@ -1,5 +1,11 @@
 fragment SplitAtomicFactoryDetails on SplitAtomicFactory {
   id
+  type
+  implementation
+  splitAtomicContracts {
+    id
+  }
+  updatedAt
 }
 
 query GetSplitAtomicFactories {

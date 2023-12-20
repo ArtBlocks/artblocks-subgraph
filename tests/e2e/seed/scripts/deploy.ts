@@ -427,6 +427,9 @@ async function main() {
       address: splitAtomicFactoryV0.address,
     },
   ];
+  // update subgraph config metadata to include splitAtomic implementation address
+  subgraphConfig.metadata.splitAtomicImplementationAddress =
+    splitAtomicV0.address;
 
   //////////////////////////////////////////////////////////////////////////////
   // DEPLOYMENT ENDS HERE

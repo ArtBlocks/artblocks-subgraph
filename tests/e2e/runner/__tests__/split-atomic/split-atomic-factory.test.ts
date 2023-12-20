@@ -5,13 +5,12 @@ import {
   getAccounts,
   waitUntilSubgraphIsSynced,
   getSplitAtomicFactoryDetails,
+  getSplitAtomicContractDetails,
 } from "../utils/helpers";
 
 // splitter contracts
-import { SplitAtomicV0__factory } from "../../contracts/factories/SplitAtomicV0__factory";
 import { SplitAtomicFactoryV0__factory } from "../../contracts/factories/SplitAtomicFactoryV0__factory";
 
-import { ethers } from "ethers";
 // hide nuisance logs about event overloading
 import { Logger } from "@ethersproject/logger";
 Logger.setLogLevel(Logger.levels.ERROR);
@@ -33,6 +32,12 @@ const splitAtomicFactoryV0Address =
 const splitAtomicFactoryV0Contract = new SplitAtomicFactoryV0__factory(
   deployer
 ).attach(splitAtomicFactoryV0Address);
+// get SplitAtomic implementation contract from the subgraph config metadata
+if (!config.metadata?.splitAtomicImplementationAddress) {
+  throw new Error("No splitAtomicImplementationAddress metadata in config");
+}
+const splitAtomicImplementationAddress =
+  config.metadata.splitAtomicImplementationAddress;
 
 describe("SplitAtomicFactoryV0 event handling", () => {
   beforeAll(async () => {
@@ -50,91 +55,91 @@ describe("SplitAtomicFactoryV0 event handling", () => {
     });
   });
 
-  // describe("AuctionMinHalfLifeSecondsUpdated", () => {
-  //   // @dev no need to reset the affected value after each test
-  //   test("updated after admin configures", async () => {
-  //     // query public constant for the expected value (>0)
-  //     const initialValue =
-  //       await minterDAExpV5Contract.minimumPriceDecayHalfLifeSeconds();
-  //     const newTargetValue = initialValue.add(1);
-  //     // update the minter value
-  //     await minterDAExpV5Contract
-  //       .connect(deployer)
-  //       .setMinimumPriceDecayHalfLifeSeconds(newTargetValue);
-  //     // validate minter's extraMinterDetails in subgraph
-  //     await waitUntilSubgraphIsSynced(client);
-  //     const targetId = minterDAExpV5Address.toLowerCase();
-  //     const minterRes = await getMinterDetails(client, targetId);
-  //     const extraMinterDetails = JSON.parse(minterRes.extraMinterDetails);
-  //     expect(extraMinterDetails.minimumHalfLifeInSeconds).toBe(
-  //       newTargetValue.toNumber()
-  //     );
-  //   });
-  // });
+  describe("Deployed", () => {
+    // @dev since factory was already deployed, confirm state of existing subgraph entity
+    test("updated after deployment", async () => {
+      const targetId = splitAtomicFactoryV0Address.toLowerCase();
+      const splitAtomicFactoryRes = await getSplitAtomicFactoryDetails(
+        client,
+        targetId
+      );
+      // validate fields
+      expect(splitAtomicFactoryRes.id).toBe(targetId);
+      expect(splitAtomicFactoryRes.type).toBe("SplitAtomicFactoryV0");
+      expect(splitAtomicFactoryRes.implementation).toBe(
+        splitAtomicImplementationAddress.toLowerCase()
+      );
+      expect(splitAtomicFactoryRes.splitAtomicContracts.length).toBe(0);
+      expect(splitAtomicFactoryRes.updatedAt).toBeDefined();
+    });
+  });
 
-  // describe("SetAuctionDetailsExp", () => {
-  //   afterEach(async () => {
-  //     // clear the auction details for the project
-  //     await minterDAExpV5Contract
-  //       .connect(deployer)
-  //       .resetAuctionDetails(0, genArt721CoreAddress);
-  //     // clear the current minter for the project
-  //     // @dev call success depends on test state, so use a try/catch block
-  //     try {
-  //       await sharedMinterFilterContract
-  //         .connect(artist)
-  //         .removeMinterForProject(0, genArt721CoreAddress);
-  //     } catch (error) {
-  //       // try block will only fail in case of previously failed test where
-  //       // project zero never had its minter assigned.
-  //       // Thus, swallow error here because the test failure has already been
-  //       // reported, and additional error messaging from afterEach is not
-  //       // helpful.
-  //     }
-  //   });
+  describe("SplitAtomicCreated", () => {
+    test("handles split atomic factory creation", async () => {
+      await waitUntilSubgraphIsSynced(client);
+      // validate initial state of split atomic factory in subgraph
+      await waitUntilSubgraphIsSynced(client);
+      const targetId = splitAtomicFactoryV0Address.toLowerCase();
+      const splitAtomicFactoryRes = await getSplitAtomicFactoryDetails(
+        client,
+        targetId
+      );
+      const initialUpdatedAt = splitAtomicFactoryRes.updatedAt;
+      // deploy the split atomic from the factory
+      const splitStruct = [
+        {
+          recipient: artist.address,
+          basisPoints: 9000,
+        },
+        {
+          recipient: deployer.address,
+          basisPoints: 1000,
+        },
+      ];
+      await splitAtomicFactoryV0Contract.createSplit(splitStruct);
+      await waitUntilSubgraphIsSynced(client);
+      // validate split atomic factory in subgraph
+      const splitAtomicFactoryRes2 = await getSplitAtomicFactoryDetails(
+        client,
+        targetId
+      );
+      expect(parseInt(splitAtomicFactoryRes2.updatedAt)).toBeGreaterThan(
+        parseInt(initialUpdatedAt)
+      );
+      expect(
+        splitAtomicFactoryRes2.splitAtomicContracts.length
+      ).toBeGreaterThan(0);
 
-  //   test("subgraph is updated after event emitted", async () => {
-  //     // artist configures auction
-  //     await sharedMinterFilterContract.connect(artist).setMinterForProject(
-  //       0, // _projectId
-  //       genArt721CoreAddress, // _coreContract
-  //       minterDAExpV5Address // _minter
-  //     );
-  //     const latestBlock = await deployer.provider.getBlock("latest");
-  //     const targetAuctionStart = latestBlock.timestamp + 3600;
-  //     const targetStartPrice = ethers.utils.parseEther("1");
-  //     const targetBasePrice = ethers.utils.parseEther("0.1");
-  //     await minterDAExpV5Contract.connect(artist).setAuctionDetails(
-  //       0, // _projectId
-  //       genArt721CoreAddress, // _coreContract
-  //       targetAuctionStart, // _timestampStart
-  //       600, // _priceDecayHalfLifeSeconds
-  //       targetStartPrice, // _startPrice
-  //       targetBasePrice // _basePrice
-  //     );
-  //     // validate project minter config in subgraph
-  //     await waitUntilSubgraphIsSynced(client);
-  //     const targetId = `${minterDAExpV5Address.toLowerCase()}-${genArt721CoreAddress.toLowerCase()}-0`;
-  //     const minterConfigRes = await getProjectMinterConfigurationDetails(
-  //       client,
-  //       targetId
-  //     );
-  //     // validate fields
-  //     expect(minterConfigRes.priceIsConfigured).toBe(true);
-  //     expect(minterConfigRes.basePrice).toBe(targetBasePrice.toString());
-  //     // validate extraMinterDetails
-  //     const extraMinterDetails = JSON.parse(minterConfigRes.extraMinterDetails);
-  //     expect(extraMinterDetails.startPrice).toBe(targetStartPrice.toString());
-  //     expect(extraMinterDetails.startTime).toBe(targetAuctionStart);
-  //     expect(extraMinterDetails.halfLifeSeconds).toBe(600);
-  //     const approxDALength = getApproxDAExpLength(
-  //       targetStartPrice,
-  //       targetBasePrice,
-  //       600
-  //     );
-  //     expect(extraMinterDetails.approximateDAExpEndTime).toBe(
-  //       targetAuctionStart + approxDALength
-  //     );
-  //   });
-  // });
+      // validate new split atomic contract in subgraph
+      const splitAtomicContractId =
+        splitAtomicFactoryRes2.splitAtomicContracts[0].id;
+      const splitAtomicContractRes = await getSplitAtomicContractDetails(
+        client,
+        splitAtomicContractId
+      );
+      expect(splitAtomicContractRes.id).toBe(splitAtomicContractId);
+      expect(splitAtomicContractRes.type).toBe("SplitAtomicV0");
+      expect(splitAtomicContractRes.implementation).toBe(
+        splitAtomicImplementationAddress.toLowerCase()
+      );
+      expect(splitAtomicContractRes.splitAtomicFactory.id).toBe(targetId);
+      expect(splitAtomicContractRes.splits.length).toBe(2);
+      expect(splitAtomicContractRes.updatedAt).toBe(
+        splitAtomicFactoryRes2.updatedAt
+      );
+      // validate splits
+      const split0 = splitAtomicContractRes.splits[0];
+      expect(split0.id).toBe(`${splitAtomicContractId}-0`);
+      expect(split0.splitAtomicContract.id).toBe(splitAtomicContractId);
+      expect(split0.index).toBe("0");
+      expect(split0.recipient).toBe(artist.address.toLowerCase());
+      expect(split0.basisPoints).toBe("9000");
+      const split1 = splitAtomicContractRes.splits[1];
+      expect(split1.id).toBe(`${splitAtomicContractId}-1`);
+      expect(split1.splitAtomicContract.id).toBe(splitAtomicContractId);
+      expect(split1.index).toBe("1");
+      expect(split1.recipient).toBe(deployer.address.toLowerCase());
+      expect(split1.basisPoints).toBe("1000");
+    });
+  });
 });

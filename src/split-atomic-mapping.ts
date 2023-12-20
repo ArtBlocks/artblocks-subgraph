@@ -14,7 +14,7 @@ import {
 import { ISplitAtomicV0 } from "../generated/ISplitAtomicFactory/ISplitAtomicV0";
 
 /*** EVENT HANDLERS ***/
-export function handlehandleDeployed(event: Deployed): void {
+export function handleDeployed(event: Deployed): void {
   // create the split atomic factory entity
   const splitAtomicFactory = new SplitAtomicFactory(
     event.address.toHexString()
@@ -68,6 +68,7 @@ export function handleSplitAtomicCreated(event: SplitAtomicCreated): void {
     return;
   }
   splitAtomicContract.type = splitAtomicFactoryTypeResult.value.toString();
+  splitAtomicContract.updatedAt = event.block.timestamp;
   // safe the split atomic contract
   splitAtomicContract.save();
 

@@ -41,5 +41,6 @@ export type SubgraphConfig = Partial<{
     coreRegistryAddress: string;
     bytecodeStorageReaderAddress: string;
     delegationRegistryAddress: string;
+    splitAtomicImplementationAddress: string;
   };
 }>;
