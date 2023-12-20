@@ -72,7 +72,7 @@ services:
       IPFS: 'http://ipfs:5001'
     volumes:
       - shared-data:/usr/subgraph/shared
-      - ./setup-scripts:/usr/subgraph/setup-scripts
+      - ./tests/e2e/setup-scripts:/usr/subgraph/setup-scripts
     command: ./setup-scripts/subgraph.sh
     # We create an empty file called `subgraph-complete` in the shared
     # volume when the subgraph is deployed. We use this file as a
