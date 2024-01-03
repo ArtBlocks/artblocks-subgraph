@@ -5,6 +5,9 @@ fragment SplitAtomicFactoryDetails on SplitAtomicFactory {
   splitAtomicContracts {
     id
   }
+  requiredSplitAddress
+  requiredSplitBasisPoints
+  abandoned
   updatedAt
 }
 

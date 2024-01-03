@@ -70,13 +70,17 @@ describe("SplitAtomicFactoryV0 event handling", () => {
         splitAtomicImplementationAddress.toLowerCase()
       );
       expect(splitAtomicFactoryRes.splitAtomicContracts.length).toBe(0);
+      expect(splitAtomicFactoryRes.requiredSplitAddress).toBe(
+        deployer.address.toLowerCase()
+      );
+      expect(splitAtomicFactoryRes.requiredSplitBasisPoints).toBe("2222");
+      expect(splitAtomicFactoryRes.abandoned).toBe(false);
       expect(splitAtomicFactoryRes.updatedAt).toBeDefined();
     });
   });
 
   describe("SplitAtomicCreated", () => {
     test("handles split atomic factory creation", async () => {
-      await waitUntilSubgraphIsSynced(client);
       // validate initial state of split atomic factory in subgraph
       await waitUntilSubgraphIsSynced(client);
       const targetId = splitAtomicFactoryV0Address.toLowerCase();
@@ -88,12 +92,12 @@ describe("SplitAtomicFactoryV0 event handling", () => {
       // deploy the split atomic from the factory
       const splitStruct = [
         {
-          recipient: artist.address,
-          basisPoints: 9000,
+          recipient: deployer.address,
+          basisPoints: 2222,
         },
         {
-          recipient: deployer.address,
-          basisPoints: 1000,
+          recipient: artist.address,
+          basisPoints: 7778,
         },
       ];
       await splitAtomicFactoryV0Contract.createSplit(splitStruct);
@@ -132,14 +136,36 @@ describe("SplitAtomicFactoryV0 event handling", () => {
       expect(split0.id).toBe(`${splitAtomicContractId}-0`);
       expect(split0.splitAtomicContract.id).toBe(splitAtomicContractId);
       expect(split0.index).toBe("0");
-      expect(split0.recipient).toBe(artist.address.toLowerCase());
-      expect(split0.basisPoints).toBe("9000");
+      expect(split0.recipient).toBe(deployer.address.toLowerCase());
+      expect(split0.basisPoints).toBe("2222");
       const split1 = splitAtomicContractRes.splits[1];
       expect(split1.id).toBe(`${splitAtomicContractId}-1`);
       expect(split1.splitAtomicContract.id).toBe(splitAtomicContractId);
       expect(split1.index).toBe("1");
-      expect(split1.recipient).toBe(deployer.address.toLowerCase());
-      expect(split1.basisPoints).toBe("1000");
+      expect(split1.recipient).toBe(artist.address.toLowerCase());
+      expect(split1.basisPoints).toBe("7778");
+    });
+  });
+
+  describe("SplitAtomicAbandoned", () => {
+    test("handles split atomic factory abandonment", async () => {
+      // validate initial state of split atomic factory in subgraph
+      await waitUntilSubgraphIsSynced(client);
+      const targetId = splitAtomicFactoryV0Address.toLowerCase();
+      const splitAtomicFactoryRes = await getSplitAtomicFactoryDetails(
+        client,
+        targetId
+      );
+      expect(splitAtomicFactoryRes.abandoned).toBe(false);
+      // abandon the split atomic factory
+      await splitAtomicFactoryV0Contract.connect(deployer).abandon();
+      await waitUntilSubgraphIsSynced(client);
+      // validate split atomic factory state update
+      const splitAtomicFactoryRes2 = await getSplitAtomicFactoryDetails(
+        client,
+        targetId
+      );
+      expect(splitAtomicFactoryRes2.abandoned).toBe(true);
     });
   });
 });

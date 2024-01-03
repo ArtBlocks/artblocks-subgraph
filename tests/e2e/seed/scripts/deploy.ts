@@ -415,7 +415,9 @@ async function main() {
     deployer
   );
   const splitAtomicFactoryV0 = await splitAtomicFactoryV0Factory.deploy(
-    splitAtomicV0.address
+    splitAtomicV0.address,
+    deployer.address, // easy address to test with
+    2222 // 22.22%
   );
   await splitAtomicFactoryV0.deployed();
   console.log(

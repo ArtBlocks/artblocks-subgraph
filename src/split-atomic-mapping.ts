@@ -8,7 +8,8 @@ import {
 
 import {
   Deployed,
-  SplitAtomicCreated
+  SplitAtomicCreated,
+  Abandoned
 } from "../generated/ISplitAtomicFactory/ISplitAtomicFactoryV0";
 
 import { ISplitAtomicV0 } from "../generated/ISplitAtomicFactory/ISplitAtomicV0";
@@ -22,6 +23,33 @@ export function handleDeployed(event: Deployed): void {
   // update the implementation and type
   splitAtomicFactory.implementation = event.params.implementation;
   splitAtomicFactory.type = event.params.type_.toString();
+  // update the required splits
+  splitAtomicFactory.requiredSplitAddress = event.params.requiredSplitAddress;
+  splitAtomicFactory.requiredSplitBasisPoints = BigInt.fromI32(
+    event.params.requiredSplitBasisPoints
+  );
+  // set as not abandoned
+  splitAtomicFactory.abandoned = false;
+  // update the updated at timestamp
+  splitAtomicFactory.updatedAt = event.block.timestamp;
+  // save the split atomic factory
+  splitAtomicFactory.save();
+}
+
+export function handleAbandoned(event: Abandoned): void {
+  // load the split atomic factory
+  const splitAtomicFactory = SplitAtomicFactory.load(
+    event.address.toHexString()
+  );
+  if (!splitAtomicFactory) {
+    // This should never happen
+    log.warning("SplitAtomicCreated: split atomic factory {} not found", [
+      event.address.toHexString()
+    ]);
+    return;
+  }
+  // set as abandoned
+  splitAtomicFactory.abandoned = true;
   // update the updated at timestamp
   splitAtomicFactory.updatedAt = event.block.timestamp;
   // save the split atomic factory

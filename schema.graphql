@@ -514,6 +514,15 @@ type SplitAtomicFactory @entity {
   splitAtomicContracts: [SplitAtomicContract!]!
     @derivedFrom(field: "splitAtomicFactory")
 
+  "Required split address for this factory"
+  requiredSplitAddress: Bytes
+
+  "Required split basis points for this factory"
+  requiredSplitBasisPoints: BigInt
+
+  "Boolean representing if the factory is abandoned (can no longer be used to create new contracts)"
+  abandoned: Boolean!
+
   updatedAt: BigInt!
 }
 

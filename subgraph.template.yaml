@@ -2196,10 +2196,12 @@ dataSources:
         - name: ISplitAtomicV0
           file: ./abis/ISplitAtomicV0.json
       eventHandlers:
-        - event: Deployed(indexed address,indexed bytes32)
+        - event: Deployed(indexed address,indexed bytes32,address,uint16)
           handler: handleDeployed
         - event: SplitAtomicCreated(indexed address)
           handler: handleSplitAtomicCreated
+        - event: Abandoned()
+          handler: handleAbandoned
       file: ./src/split-atomic-mapping.ts
   {{/iSplitAtomicFactoryV0Contracts}}
 templates:

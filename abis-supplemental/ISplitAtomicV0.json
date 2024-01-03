@@ -8,6 +8,25 @@
       "inputs": [
         {
           "indexed": false,
+          "internalType": "address",
+          "name": "ERC20TokenAddress",
+          "type": "address"
+        }
+      ],
+      "name": "DrainedERC20",
+      "type": "event"
+    },
+    {
+      "anonymous": false,
+      "inputs": [],
+      "name": "DrainedETH",
+      "type": "event"
+    },
+    {
+      "anonymous": false,
+      "inputs": [
+        {
+          "indexed": false,
           "internalType": "bytes32",
           "name": "type_",
           "type": "bytes32"
