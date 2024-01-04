@@ -27,6 +27,14 @@ import {
   GetTargetReceiptsQuery,
   GetTargetReceiptsQueryVariables,
   GetTargetReceiptsDocument,
+  GetTargetSplitAtomicFactoriesQuery,
+  GetTargetSplitAtomicFactoriesQueryVariables,
+  GetTargetSplitAtomicFactoriesDocument,
+  SplitAtomicFactoryDetailsFragment,
+  GetTargetSplitAtomicContractsQuery,
+  GetTargetSplitAtomicContractsQueryVariables,
+  GetTargetSplitAtomicContractsDocument,
+  SplitAtomicContractDetailsFragment,
 } from "../../generated/graphql";
 import {
   createClient,
@@ -248,4 +256,54 @@ export const getCoreRegistryDetails = async (
   ).data?.coreRegistries[0];
   if (!coreRegistryRes) throw new Error("No Core Registry entity found");
   return coreRegistryRes;
+};
+
+/**
+ * Gets a getSplitAtomicFactoryDetails detail fragment from the subgraph, at specified id.
+ * Reverts if no entity is found.
+ * @param client the subgraph client
+ * @param id the id of the SplitAtomicFactory entity
+ */
+export const getSplitAtomicFactoryDetails = async (
+  client: Client,
+  entityId: string
+): Promise<SplitAtomicFactoryDetailsFragment> => {
+  const splitAtomicFactoryRes = (
+    await client
+      .query<
+        GetTargetSplitAtomicFactoriesQuery,
+        GetTargetSplitAtomicFactoriesQueryVariables
+      >(GetTargetSplitAtomicFactoriesDocument, {
+        targetId: entityId,
+      })
+      .toPromise()
+  ).data?.splitAtomicFactories[0];
+  if (!splitAtomicFactoryRes)
+    throw new Error("No Split Atomic Factory entity found");
+  return splitAtomicFactoryRes;
+};
+
+/**
+ * Gets a getSplitAtomicContractDetails detail fragment from the subgraph, at specified id.
+ * Reverts if no entity is found.
+ * @param client the subgraph client
+ * @param id the id of the SplitAtomicContract entity
+ */
+export const getSplitAtomicContractDetails = async (
+  client: Client,
+  entityId: string
+): Promise<SplitAtomicContractDetailsFragment> => {
+  const splitAtomicContractRes = (
+    await client
+      .query<
+        GetTargetSplitAtomicContractsQuery,
+        GetTargetSplitAtomicContractsQueryVariables
+      >(GetTargetSplitAtomicContractsDocument, {
+        targetId: entityId,
+      })
+      .toPromise()
+  ).data?.splitAtomicContracts[0];
+  if (!splitAtomicContractRes)
+    throw new Error("No Split Atomic Contract entity found");
+  return splitAtomicContractRes;
 };

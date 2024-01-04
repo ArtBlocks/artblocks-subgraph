@@ -1,0 +1,24 @@
+fragment SplitAtomicFactoryDetails on SplitAtomicFactory {
+  id
+  type
+  implementation
+  splitAtomicContracts {
+    id
+  }
+  requiredSplitAddress
+  requiredSplitBasisPoints
+  abandoned
+  updatedAt
+}
+
+query GetSplitAtomicFactories {
+  splitAtomicFactories {
+    ...SplitAtomicFactoryDetails
+  }
+}
+
+query GetTargetSplitAtomicFactories($targetId: ID!) {
+  splitAtomicFactories(where: { id: $targetId }) {
+    ...SplitAtomicFactoryDetails
+  }
+}

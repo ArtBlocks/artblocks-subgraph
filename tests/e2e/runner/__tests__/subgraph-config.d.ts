@@ -35,10 +35,12 @@ export type SubgraphConfig = Partial<{
   DAExpLibContracts: { address: string }[];
   DALinLibContracts: { address: string }[];
   settlementExpLibContracts: { address: string }[];
+  iSplitAtomicFactoryV0Contracts: { address: string }[];
   metadata: {
     minterFilterAdminACLAddress: string;
     coreRegistryAddress: string;
     bytecodeStorageReaderAddress: string;
     delegationRegistryAddress: string;
+    splitAtomicImplementationAddress: string;
   };
 }>;

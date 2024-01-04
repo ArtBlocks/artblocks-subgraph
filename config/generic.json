@@ -174,5 +174,10 @@
     {
       "address": ""
     }
+  ],
+  "iSplitAtomicFactoryV0Contracts": [
+    {
+      "address": ""
+    }
   ]
 }
