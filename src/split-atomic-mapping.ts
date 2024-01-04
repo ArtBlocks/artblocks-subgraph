@@ -1,4 +1,4 @@
-import { Address, log, BigInt } from "@graphprotocol/graph-ts";
+import { log, BigInt } from "@graphprotocol/graph-ts";
 
 import {
   SplitAtomicFactory,
@@ -124,21 +124,4 @@ export function handleSplitAtomicCreated(event: SplitAtomicCreated): void {
     split.basisPoints = BigInt.fromI32(splits[i].basisPoints);
     split.save();
   }
-}
-
-/*** HELPER FUNCTIONS ***/
-/**
- * @notice gets or creates split atomic factory at address `address`.
- * Important: does not save the split atomic factory if a new one is created.
- * This is because we don't assign all required fields in this function.
- * @param address the address of the split atomic factory
- * @returns SplitAtomicFactory the split atomic factory
- */
-function loadOrCreateSplitAtomicFactory(address: Address): SplitAtomicFactory {
-  let splitAtomicFactoryEntity = SplitAtomicFactory.load(address.toHexString());
-  if (!splitAtomicFactoryEntity) {
-    splitAtomicFactoryEntity = new SplitAtomicFactory(address.toHexString());
-    // do not save, because we don't assign all required fields at this time
-  }
-  return splitAtomicFactoryEntity as SplitAtomicFactory;
 }
