@@ -1,0 +1,30 @@
+fragment SplitAtomicContractDetails on SplitAtomicContract {
+  id
+  type
+  splitAtomicFactory {
+    id
+  }
+  implementation
+  splits {
+    id
+    splitAtomicContract {
+      id
+    }
+    index
+    recipient
+    basisPoints
+  }
+  updatedAt
+}
+
+query GetSplitAtomicContracts {
+  splitAtomicContracts {
+    ...SplitAtomicContractDetails
+  }
+}
+
+query GetTargetSplitAtomicContracts($targetId: ID!) {
+  splitAtomicContracts(where: { id: $targetId }) {
+    ...SplitAtomicContractDetails
+  }
+}
