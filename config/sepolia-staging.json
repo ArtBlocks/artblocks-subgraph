@@ -302,6 +302,11 @@
       "address": "0x6Ceab51Fc8EE931Df84d3db66E747b617EB7dE21",
       "name": "Bright Moments",
       "startBlock": 4849018
+    },
+    {
+      "address": "0xaDe9dF7D1F38299b26266af80c9679d97Dd1F0CC",
+      "name": "newrafael",
+      "startBlock": 4933475
     }
   ],
   "engineFlexContracts": [
