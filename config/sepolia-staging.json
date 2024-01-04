@@ -329,5 +329,12 @@
       "name": "Sepolia staging dependency registry contract",
       "startBlock": 4874684
     }
+  ],
+  "iSplitAtomicFactoryV0Contracts": [
+    {
+      "address": "0x39D9580445A3Fcf486c6AD0d06F66fe0d42230eC",
+      "name": "Sepolia staging split atomic factory contract",
+      "startBlock": 5011536
+    }
   ]
 }
