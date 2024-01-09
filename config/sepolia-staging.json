@@ -332,7 +332,7 @@
   ],
   "iSplitAtomicFactoryV0Contracts": [
     {
-      "address": "0x39D9580445A3Fcf486c6AD0d06F66fe0d42230eC",
+      "address": "0xe3D5373D2dc56948737E79244C8C6C856336BF1A",
       "name": "Sepolia staging split atomic factory contract",
       "startBlock": 5011536
     }
