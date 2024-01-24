@@ -13,6 +13,8 @@ import {
   ProjectNextTokenEjected
 } from "../generated/SEALib/SEALib";
 
+import { Bid } from "../generated/schema";
+
 import { loadOrCreateMinterProjectAndConfigIfProject } from "./generic-minter-events-lib-mapping";
 
 import {
@@ -253,6 +255,38 @@ export function handleAuctionBid(event: AuctionBid): void {
     projectMinterConfig,
     event.block.timestamp
   );
+
+  // update Bids entity
+  //minter-project-bidder-value-timestamp-token
+  const bidId =
+    event.address +
+    "-" +
+    projectIdNumber.toString() +
+    "-" +
+    event.params.bidder +
+    "-" +
+    event.block.timestamp.toString() +
+    "-" +
+    event.params.tokenId.toString();
+  let bid = Bid.load(bidId);
+  if (bid) {
+    // This is never expected to be possible with SEA minter
+    // TODO warn
+  } else {
+    // new bid
+    bid = new Bid(bidId);
+    bid.project = minterProjectAndConfig.project.id;
+    bid.minter = event.address.toHexString();
+    bid.token =
+      event.params.coreContract.toHexString() + "-" + event.params.tokenId;
+    bid.bidder = event.params.bidder;
+    bid.value = event.params.bidAmount;
+    // TODO set previous winning bid to false
+    bid.winningBid = true;
+    bid.timestamp = event.block.timestamp;
+    bid.updatedAt = event.block.timestamp;
+    bid.save();
+  }
 }
 
 export function handleAuctionSettled(event: AuctionSettled): void {

@@ -478,6 +478,33 @@ type ProjectMinterConfiguration @entity {
   maxInvocations: BigInt
 }
 
+type Bid @entity {
+  "Unique identifier made up of for SEA - minter-project-bidder-value-timestamp-token [TODO - do something different from RAM]"
+  id: ID!
+
+  "The associated project"
+  project: Project!
+
+  "The associated minter"
+  minter: Minter!
+
+  token: Token
+
+  "The associated account - TODO make this an Account"
+  bidder: Bytes!
+
+  "The value of the bid"
+  value: BigInt!
+
+  "TBD on a good description"
+  winningBid: Boolean!
+
+  "The timestamp of the bid"
+  timestamp: BigInt!
+
+  updatedAt: BigInt!
+}
+
 type Receipt @entity {
   "Unique identifier made up of {minter contract address}-{core contract address}-{project number}-{account address}"
   id: ID!

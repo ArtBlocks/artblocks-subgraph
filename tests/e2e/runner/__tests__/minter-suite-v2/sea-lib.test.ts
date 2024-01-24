@@ -5,6 +5,7 @@ import {
   getAccounts,
   waitUntilSubgraphIsSynced,
   getMinterDetails,
+  getBidDetails,
   getProjectMinterConfigurationDetails,
 } from "../utils/helpers";
 
@@ -395,6 +396,16 @@ describe("SEALib event handling", () => {
       expect(extraMinterDetails2.auctionEndTime).toBe(
         auctionBidTimestamp + 600
       );
+
+      // PART 4: Bid indexing
+      // validate that the Bid entity was created
+      // TODO verify this ID
+      const bidId = `${minterSEAV1Address.toLowerCase()}-${genArt721CoreAddress.toLowerCase()}-${targetTokenId}-${deployer.address.toLowerCase()}`;
+      const bidRes = await getBidDetails(client, bidId);
+      expect(bidRes.id).toBe(bidId);
+      expect(bidRes.bidder).toBe(deployer.address.toLowerCase());
+      expect(bidRes.amount).toBe(ethers.utils.parseEther("1.20").toString());
+      // TODO - check all fields
     });
   });
 
