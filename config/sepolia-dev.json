@@ -189,6 +189,11 @@
       "address": "0x725b18673125Bb1384c65a558D24A13fbb88D812",
       "name": "Sepolia dev shared minter: MinterDALinHolderV5",
       "blockNumber": 4655325
+    },
+    {
+      "address": "0x9Fa2FDE53148e0dcbA6335E51Bd539BedCe633E4",
+      "name": "Sepolia dev shared minter: MinterSEAV1",
+      "blockNumber": 5140819
     }
   ],
   "merkleLibContracts": [
@@ -288,7 +293,13 @@
       "blockNumber": 4655325
     }
   ],
-
+  "SEALibContracts": [
+    {
+      "address": "0x9Fa2FDE53148e0dcbA6335E51Bd539BedCe633E4",
+      "name": "Sepolia dev shared minter: MinterSEAV1",
+      "blockNumber": 5140819
+    }
+  ],
   "adminACLV0Contracts": [
     {
       "address": "0x2a37fD7c5eAf4149B811796ab00769dE0F6B5569",
