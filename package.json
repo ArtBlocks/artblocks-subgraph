@@ -4,8 +4,9 @@
   "scripts": {
     "build": "yarn codegen:generic && graph build",
     "test": "yarn codegen:generic && graph test -r",
-    "test:e2e": "cd tests/e2e && docker compose -f docker-compose.yml -f docker-compose.test.yml up --exit-code-from runner",
-    "test:e2e:ci": "cd tests/e2e && docker compose -f docker-compose.yml -f docker-compose.ci.yml up --exit-code-from runner",
+    "test:e2e": "cd tests/e2e && GRAPH_NODE_BASE_IMAGE=graphprotocol/graph-node:latest docker compose -f docker-compose.yml -f docker-compose.test.yml up --exit-code-from runner",
+    "test:e2e:m1": "cd tests/e2e && GRAPH_NODE_BASE_IMAGE=graph-node:latest docker compose -f docker-compose.yml -f docker-compose.test.yml up --exit-code-from runner",
+    "test:e2e:ci": "cd tests/e2e && GRAPH_NODE_BASE_IMAGE=graphprotocol/graph-node:latest docker compose -f docker-compose.yml -f docker-compose.ci.yml up --exit-code-from runner",
     "run:local": "cd tests/e2e && docker compose -f docker-compose.yml -f docker-compose.local.yml up",
     "coverage": "graph test -- -c",
     "deploy:mainnet-hosted": "yarn prepare:mainnet && graph deploy --product hosted-service --node https://api.thegraph.com/deploy/ --ipfs https://api.thegraph.com/ipfs/ artblocks/art-blocks",

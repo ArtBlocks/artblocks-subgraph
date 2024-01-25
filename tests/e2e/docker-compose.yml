@@ -17,7 +17,12 @@ services:
       hardhat:
         condition: service_healthy
   graph-node:
-    build: graph-node
+    build:
+      context: .
+      dockerfile_inline: |
+        FROM ${GRAPH_NODE_BASE_IMAGE}
+        RUN ["apt", "update"]
+        RUN ["apt-get", "install", "-y", "curl"]
     depends_on:
       - ipfs
       - postgres
