@@ -10,3 +10,6 @@ services:
       - '8020:8020'
       - '8030:8030'
       - '8040:8040'
+  subgraph:
+    volumes:
+      - ./setup-scripts:/usr/subgraph/setup-scripts
