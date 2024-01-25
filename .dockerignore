@@ -3,3 +3,4 @@ build
 contracts
 generated
 tests
+!tests/e2e/setup-scripts/*

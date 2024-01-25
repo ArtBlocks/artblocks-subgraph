@@ -13,12 +13,16 @@ services:
     build: seed
     volumes:
       - shared-data:/usr/seed/shared
-      - ./setup-scripts:/usr/seed/setup-scripts
     depends_on:
       hardhat:
         condition: service_healthy
   graph-node:
-    build: graph-node
+    build:
+      context: .
+      dockerfile_inline: |
+        FROM ${GRAPH_NODE_BASE_IMAGE}
+        RUN ["apt", "update"]
+        RUN ["apt-get", "install", "-y", "curl"]
     depends_on:
       - ipfs
       - postgres
@@ -72,7 +76,6 @@ services:
       IPFS: 'http://ipfs:5001'
     volumes:
       - shared-data:/usr/subgraph/shared
-      - ./setup-scripts:/usr/subgraph/setup-scripts
     command: ./setup-scripts/subgraph.sh
     # We create an empty file called `subgraph-complete` in the shared
     # volume when the subgraph is deployed. We use this file as a
