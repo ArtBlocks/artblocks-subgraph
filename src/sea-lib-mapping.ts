@@ -1,4 +1,4 @@
-import { BigInt, JSONValue, TypedMap } from "@graphprotocol/graph-ts";
+import { BigInt, log, JSONValue, TypedMap } from "@graphprotocol/graph-ts";
 
 import {
   MinAuctionDurationSecondsUpdated,
@@ -163,7 +163,14 @@ export function handleAuctionInitialized(event: AuctionInitialized): void {
       key: "auctionCurrentBid",
       value: toJSONValue(event.params.bidAmount.toString()) // Bid is likely to overflow js Number.MAX_SAFE_INTEGER so store as string
     },
-    { key: "auctionCurrentBidder", value: toJSONValue(event.params.bidder) },
+    {
+      key: "auctionCurrentBidTimestamp",
+      value: toJSONValue(event.block.timestamp.toString())
+    },
+    {
+      key: "auctionCurrentBidder",
+      value: toJSONValue(event.params.bidder)
+    },
     { key: "auctionEndTime", value: toJSONValue(event.params.endTime) },
     { key: "auctionInitialized", value: toJSONValue(true) },
     { key: "auctionSettled", value: toJSONValue(false) },
@@ -210,6 +217,18 @@ export function handleAuctionBid(event: AuctionBid): void {
 
   const projectMinterConfig = minterProjectAndConfig.projectMinterConfiguration;
 
+  // Get the current highest bid so that we can update it
+  let currentProjectMinterConfigDetails = getProjectMinterConfigExtraMinterDetailsTypedMap(
+    projectMinterConfig
+  );
+
+  const previousHighestBidTimestampJSON = currentProjectMinterConfigDetails.get(
+    "auctionCurrentBidTimestamp"
+  );
+  const previousHighestBidderJSON = currentProjectMinterConfigDetails.get(
+    "auctionCurrentBidder"
+  );
+
   // update relevant auction details in project minter configuration extraMinterDetails json field
   setProjectMinterConfigExtraMinterDetailsValue(
     "auctionCurrentBid",
@@ -221,6 +240,12 @@ export function handleAuctionBid(event: AuctionBid): void {
     event.params.bidder,
     projectMinterConfig
   );
+  setProjectMinterConfigExtraMinterDetailsValue(
+    "auctionCurrentBidTimestamp",
+    event.block.timestamp.toString(),
+    projectMinterConfig
+  );
+
   // determine if auction end time needs to be updated
   let minterDetails = getMinterExtraMinterDetailsTypedMap(
     minterProjectAndConfig.minter
@@ -256,36 +281,62 @@ export function handleAuctionBid(event: AuctionBid): void {
     event.block.timestamp
   );
 
-  // update Bids entity
+  // Update Bids entity
   //minter-project-bidder-value-timestamp-token
   const bidId =
-    event.address +
+    event.address.toHexString() +
     "-" +
     projectIdNumber.toString() +
     "-" +
-    event.params.bidder +
+    event.params.bidder.toHexString() +
     "-" +
     event.block.timestamp.toString() +
     "-" +
     event.params.tokenId.toString();
+
   let bid = Bid.load(bidId);
   if (bid) {
     // This is never expected to be possible with SEA minter
-    // TODO warn
+    log.warning("Existing Bid with ID {} found for SEA Minter contract {}", [
+      bidId,
+      event.address.toString()
+    ]);
   } else {
-    // new bid
+    // New bid
     bid = new Bid(bidId);
     bid.project = minterProjectAndConfig.project.id;
     bid.minter = event.address.toHexString();
     bid.token =
-      event.params.coreContract.toHexString() + "-" + event.params.tokenId;
+      event.params.coreContract.toHexString() +
+      "-" +
+      event.params.tokenId.toString();
     bid.bidder = event.params.bidder;
     bid.value = event.params.bidAmount;
-    // TODO set previous winning bid to false
     bid.winningBid = true;
     bid.timestamp = event.block.timestamp;
     bid.updatedAt = event.block.timestamp;
     bid.save();
+
+    // Update previous winning bid to false, if it exists
+    if (previousHighestBidderJSON && previousHighestBidTimestampJSON) {
+      const previousHighestBidId =
+        event.address.toHexString() +
+        "-" +
+        projectIdNumber.toString() +
+        "-" +
+        previousHighestBidderJSON.toString() +
+        "-" +
+        previousHighestBidTimestampJSON.toString() +
+        "-" +
+        event.params.tokenId.toString();
+
+      const previousWinningBid = Bid.load(previousHighestBidId);
+      if (previousWinningBid) {
+        previousWinningBid.winningBid = false;
+        previousWinningBid.updatedAt = event.block.timestamp;
+        previousWinningBid.save();
+      }
+    }
   }
 }
 

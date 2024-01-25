@@ -22,6 +22,7 @@ import {
   MinterDetailsFragment,
   ProjectMinterConfigurationDetailsFragment,
   ProjectDetailsFragment,
+  BidDetailsFragment,
   CoreRegistryDetailsFragment,
   ReceiptDetailsFragment,
   GetTargetReceiptsQuery,
@@ -256,7 +257,7 @@ export const getBidDetails = async (
         }
       )
       .toPromise()
-  ).data?.receipts[0];
+  ).data?.bids[0];
   if (!bidRes) throw new Error("No Bid entity found");
   return bidRes;
 };
