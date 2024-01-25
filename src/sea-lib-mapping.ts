@@ -282,7 +282,6 @@ export function handleAuctionBid(event: AuctionBid): void {
   );
 
   // Update Bids entity
-  //minter-project-bidder-value-timestamp-token
   const bidId =
     event.address.toHexString() +
     "-" +
