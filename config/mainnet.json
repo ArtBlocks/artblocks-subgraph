@@ -741,5 +741,12 @@
       "name": "Mainnet dependency registry contract",
       "startBlock": 18772893
     }
+  ],
+  "iSplitAtomicFactoryV0Contracts": [
+    {
+      "address": "0xb26aaD97B0e1d250dB131CD4133c11629EBB4ef7",
+      "name": "Mainnet split atomic factory contract",
+      "startBlock": 18924905
+    }
   ]
 }

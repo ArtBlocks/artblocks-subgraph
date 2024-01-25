@@ -302,6 +302,11 @@
       "address": "0x6Ceab51Fc8EE931Df84d3db66E747b617EB7dE21",
       "name": "Bright Moments",
       "startBlock": 4849018
+    },
+    {
+      "address": "0xaDe9dF7D1F38299b26266af80c9679d97Dd1F0CC",
+      "name": "newrafael",
+      "startBlock": 4933475
     }
   ],
   "engineFlexContracts": [
@@ -323,6 +328,13 @@
       "address": "0xEFA7Ef074A6E90a99fba8bAd4dCf337ef298387f",
       "name": "Sepolia staging dependency registry contract",
       "startBlock": 4874684
+    }
+  ],
+  "iSplitAtomicFactoryV0Contracts": [
+    {
+      "address": "0xe3D5373D2dc56948737E79244C8C6C856336BF1A",
+      "name": "Sepolia staging split atomic factory contract",
+      "startBlock": 5011536
     }
   ]
 }
