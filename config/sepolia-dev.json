@@ -298,6 +298,20 @@
       "startBlock": 4405396
     }
   ],
+  "pbabContracts": [
+    {
+      "address": "0xB8A5222C33289f8A6ee42a215bC1CA886365b4f8",
+      "name": "AB Internal Engine",
+      "startBlock": 5116111
+    }
+  ],
+  "engineFlexContracts": [
+    {
+      "address": "0xB5de93C717bb9AC6aae466E341ef949006A95316",
+      "name": "AB Internal Engine Flex",
+      "startBlock": 5116143
+    }
+  ],
   "iDependencyRegistryV0Contracts": [
     {
       "address": "0x5Fcc415BCFb164C5F826B5305274749BeB684e9b",
