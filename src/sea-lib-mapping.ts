@@ -13,7 +13,7 @@ import {
   ProjectNextTokenEjected
 } from "../generated/SEALib/SEALib";
 
-import { Bid } from "../generated/schema";
+import { Account, Bid } from "../generated/schema";
 
 import { loadOrCreateMinterProjectAndConfigIfProject } from "./generic-minter-events-lib-mapping";
 
@@ -285,8 +285,6 @@ export function handleAuctionBid(event: AuctionBid): void {
   const bidId =
     event.address.toHexString() +
     "-" +
-    projectIdNumber.toString() +
-    "-" +
     event.params.bidder.toHexString() +
     "-" +
     event.block.timestamp.toString() +
@@ -303,13 +301,17 @@ export function handleAuctionBid(event: AuctionBid): void {
   } else {
     // New bid
     bid = new Bid(bidId);
+    // Create new account entity if one for the bidder doesn't exist
+    const bidderAccount = new Account(event.params.bidder.toHexString());
+    bidderAccount.save();
+
     bid.project = minterProjectAndConfig.project.id;
     bid.minter = event.address.toHexString();
     bid.token =
       event.params.coreContract.toHexString() +
       "-" +
       event.params.tokenId.toString();
-    bid.bidder = event.params.bidder;
+    bid.bidder = bidderAccount.id;
     bid.value = event.params.bidAmount;
     bid.winningBid = true;
     bid.timestamp = event.block.timestamp;
@@ -320,8 +322,6 @@ export function handleAuctionBid(event: AuctionBid): void {
     if (previousHighestBidderJSON && previousHighestBidTimestampJSON) {
       const previousHighestBidId =
         event.address.toHexString() +
-        "-" +
-        projectIdNumber.toString() +
         "-" +
         previousHighestBidderJSON.toString() +
         "-" +

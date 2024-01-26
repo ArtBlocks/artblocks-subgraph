@@ -479,7 +479,7 @@ type ProjectMinterConfiguration @entity {
 }
 
 type Bid @entity {
-  "Unique identifier made up of for SEA - minter-project-bidder-value-timestamp-token [TODO - do something different from RAM]"
+  "Unique identifier made up of for SEA - {minter contract address}-{bidder}-{timestamp}-{token} [TODO - do something different from RAM]"
   id: ID!
 
   "The associated project"
@@ -490,13 +490,13 @@ type Bid @entity {
 
   token: Token
 
-  "The associated account - TODO make this an Account"
-  bidder: Bytes!
+  "The associated account"
+  bidder: Account!
 
   "The value of the bid"
   value: BigInt!
 
-  "TBD on a good description"
+  "Highest bid for token"
   winningBid: Boolean!
 
   "The timestamp of the bid"

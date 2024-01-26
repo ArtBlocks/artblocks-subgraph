@@ -9,7 +9,9 @@ fragment BidDetails on Bid {
   token {
     id
   }
-  bidder
+  bidder {
+    id
+  }
   value
   winningBid
   timestamp

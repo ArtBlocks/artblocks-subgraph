@@ -399,10 +399,10 @@ describe("SEALib event handling", () => {
 
       // PART 4: Bid indexing
       // Validate that the Bid entity was created
-      const bidId = `${minterSEAV1Address.toLowerCase()}-1-${deployer.address.toLowerCase()}-${auctionBidTimestamp}-${targetTokenId}`;
+      const bidId = `${minterSEAV1Address.toLowerCase()}-${deployer.address.toLowerCase()}-${auctionBidTimestamp}-${targetTokenId}`;
       const bidRes = await getBidDetails(client, bidId);
       expect(bidRes.id).toBe(bidId);
-      expect(bidRes.bidder).toBe(deployer.address.toLowerCase());
+      expect(bidRes.bidder.id).toBe(deployer.address.toLowerCase());
       expect(bidRes.value).toBe(ethers.utils.parseEther("1.20").toString());
       expect(bidRes.winningBid).toBe(true);
       expect(bidRes.timestamp).toBe(auctionBidTimestamp.toString());
