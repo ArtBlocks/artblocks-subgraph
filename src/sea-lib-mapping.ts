@@ -164,10 +164,6 @@ export function handleAuctionInitialized(event: AuctionInitialized): void {
       value: toJSONValue(event.params.bidAmount.toString()) // Bid is likely to overflow js Number.MAX_SAFE_INTEGER so store as string
     },
     {
-      key: "auctionCurrentBidTimestamp",
-      value: toJSONValue(event.block.timestamp.toString())
-    },
-    {
       key: "auctionCurrentBidder",
       value: toJSONValue(event.params.bidder)
     },
@@ -222,8 +218,8 @@ export function handleAuctionBid(event: AuctionBid): void {
     projectMinterConfig
   );
 
-  const previousHighestBidTimestampJSON = currentProjectMinterConfigDetails.get(
-    "auctionCurrentBidTimestamp"
+  const previousHighestBidValueJSON = currentProjectMinterConfigDetails.get(
+    "auctionCurrentBid"
   );
   const previousHighestBidderJSON = currentProjectMinterConfigDetails.get(
     "auctionCurrentBidder"
@@ -287,7 +283,7 @@ export function handleAuctionBid(event: AuctionBid): void {
     "-" +
     event.params.bidder.toHexString() +
     "-" +
-    event.block.timestamp.toString() +
+    event.params.bidAmount.toString() +
     "-" +
     event.params.tokenId.toString();
 
@@ -319,13 +315,13 @@ export function handleAuctionBid(event: AuctionBid): void {
     bid.save();
 
     // Update previous winning bid to false, if it exists
-    if (previousHighestBidderJSON && previousHighestBidTimestampJSON) {
+    if (previousHighestBidderJSON && previousHighestBidValueJSON) {
       const previousHighestBidId =
         event.address.toHexString() +
         "-" +
         previousHighestBidderJSON.toString() +
         "-" +
-        previousHighestBidTimestampJSON.toString() +
+        previousHighestBidValueJSON.toString() +
         "-" +
         event.params.tokenId.toString();
 

@@ -364,10 +364,11 @@ describe("SEALib event handling", () => {
         .connect(deployer)
         .updateMinterTimeBufferSeconds(600);
       // deployer bids
+      const auctionBidValue = ethers.utils.parseEther("1.20");
       const tx2 = await minterSEAV1Contract.connect(deployer).createBid(
         targetTokenId, // _tokenId
         genArt721CoreAddress, // _coreContract
-        { value: ethers.utils.parseEther("1.20") }
+        { value: auctionBidValue }
       );
       const receipt2 = await tx2.wait();
       const auctionBidTimestamp = (
@@ -387,7 +388,7 @@ describe("SEALib event handling", () => {
         minterConfigRes2.extraMinterDetails
       );
       expect(extraMinterDetails2.auctionCurrentBid).toBe(
-        ethers.utils.parseEther("1.20").toString()
+        auctionBidValue.toString()
       );
       expect(extraMinterDetails2.auctionCurrentBidder).toBe(
         deployer.address.toLowerCase()
@@ -399,11 +400,11 @@ describe("SEALib event handling", () => {
 
       // PART 4: Bid indexing
       // Validate that the Bid entity was created
-      const bidId = `${minterSEAV1Address.toLowerCase()}-${deployer.address.toLowerCase()}-${auctionBidTimestamp}-${targetTokenId}`;
+      const bidId = `${minterSEAV1Address.toLowerCase()}-${deployer.address.toLowerCase()}-${auctionBidValue.toString()}-${targetTokenId}`;
       const bidRes = await getBidDetails(client, bidId);
       expect(bidRes.id).toBe(bidId);
       expect(bidRes.bidder.id).toBe(deployer.address.toLowerCase());
-      expect(bidRes.value).toBe(ethers.utils.parseEther("1.20").toString());
+      expect(bidRes.value).toBe(auctionBidValue.toString());
       expect(bidRes.winningBid).toBe(true);
       expect(bidRes.timestamp).toBe(auctionBidTimestamp.toString());
       expect(bidRes.updatedAt).toBe(auctionBidTimestamp.toString());

@@ -479,7 +479,7 @@ type ProjectMinterConfiguration @entity {
 }
 
 type Bid @entity {
-  "Unique identifier made up of for SEA - {minter contract address}-{bidder}-{timestamp}-{token} [TODO - do something different from RAM]"
+  "Unique identifier made up of for SEA - {minter contract address}-{bidder}-{value}-{token} [TODO - do something different from RAM]"
   id: ID!
 
   "The associated project"
