@@ -30,6 +30,11 @@
   ],
   "genericMinterEventsLibContracts": [
     {
+      "address": "0x9E19D9Ec5a73E616C153E65291306F6ef1917Bdf",
+      "name": "Sepolia staging shared minter: MinterSEAV1",
+      "blockNumber": 5140842
+    },
+    {
       "address": "0xA84E2eFFfCFd1cbE01785Bd10aaEE520A68CD3DD",
       "name": "Sepolia staging shared minter: MinterSetPriceV5",
       "blockNumber": 4655740
@@ -184,6 +189,11 @@
       "address": "0xa1577a3EB47CB49afB6b8F53cBcF0E9d613ABEB4",
       "name": "Sepolia staging shared minter: MinterDALinHolderV5",
       "blockNumber": 4655740
+    },
+    {
+      "address": "0x9E19D9Ec5a73E616C153E65291306F6ef1917Bdf",
+      "name": "Sepolia staging shared minter: MinterSEAV1",
+      "blockNumber": 5140842
     }
   ],
   "merkleLibContracts": [
@@ -281,6 +291,13 @@
       "address": "0xF9AbD90B27dBfbeD4eF05CAdCd9c95CDc88d52c2",
       "name": "Sepolia staging shared minter: MinterDAExpSettlementV3",
       "blockNumber": 4655740
+    }
+  ],
+  "SEALibContracts": [
+    {
+      "address": "0x9E19D9Ec5a73E616C153E65291306F6ef1917Bdf",
+      "name": "Sepolia staging shared minter: MinterSEAV1",
+      "blockNumber": 5140842
     }
   ],
   "adminACLV0Contracts": [
