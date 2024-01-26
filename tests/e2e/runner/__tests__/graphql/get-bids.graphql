@@ -1,0 +1,31 @@
+fragment BidDetails on Bid {
+  id
+  project {
+    id
+  }
+  minter {
+    id
+  }
+  token {
+    id
+  }
+  bidder {
+    id
+  }
+  value
+  winningBid
+  timestamp
+  updatedAt
+}
+
+query GetBids {
+  bids {
+    ...BidDetails
+  }
+}
+
+query GetTargetBids($targetId: ID!) {
+  bids(where: { id: $targetId }) {
+    ...BidDetails
+  }
+}

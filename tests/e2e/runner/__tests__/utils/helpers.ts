@@ -22,11 +22,15 @@ import {
   MinterDetailsFragment,
   ProjectMinterConfigurationDetailsFragment,
   ProjectDetailsFragment,
+  BidDetailsFragment,
   CoreRegistryDetailsFragment,
   ReceiptDetailsFragment,
   GetTargetReceiptsQuery,
   GetTargetReceiptsQueryVariables,
   GetTargetReceiptsDocument,
+  GetTargetBidsQuery,
+  GetTargetBidsQueryVariables,
+  GetTargetBidsDocument,
   GetTargetSplitAtomicFactoriesQuery,
   GetTargetSplitAtomicFactoriesQueryVariables,
   GetTargetSplitAtomicFactoriesDocument,
@@ -232,6 +236,30 @@ export const getReceiptDetails = async (
   ).data?.receipts[0];
   if (!receiptRes) throw new Error("No Receipt entity found");
   return receiptRes;
+};
+
+/**
+ * Gets a Bid detail fragment from the subgraph, at specified id.
+ * Reverts if no entity is found.
+ * @param client the subgraph client
+ * @param bidId the id of the Bid entity
+ */
+export const getBidDetails = async (
+  client: Client,
+  bidId: string
+): Promise<BidDetailsFragment> => {
+  const bidRes = (
+    await client
+      .query<GetTargetBidsQuery, GetTargetBidsQueryVariables>(
+        GetTargetBidsDocument,
+        {
+          targetId: bidId,
+        }
+      )
+      .toPromise()
+  ).data?.bids[0];
+  if (!bidRes) throw new Error("No Bid entity found");
+  return bidRes;
 };
 
 /**

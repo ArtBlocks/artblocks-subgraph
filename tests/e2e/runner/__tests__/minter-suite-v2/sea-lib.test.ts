@@ -5,6 +5,7 @@ import {
   getAccounts,
   waitUntilSubgraphIsSynced,
   getMinterDetails,
+  getBidDetails,
   getProjectMinterConfigurationDetails,
 } from "../utils/helpers";
 
@@ -363,10 +364,11 @@ describe("SEALib event handling", () => {
         .connect(deployer)
         .updateMinterTimeBufferSeconds(600);
       // deployer bids
+      const auctionBidValue = ethers.utils.parseEther("1.20");
       const tx2 = await minterSEAV1Contract.connect(deployer).createBid(
         targetTokenId, // _tokenId
         genArt721CoreAddress, // _coreContract
-        { value: ethers.utils.parseEther("1.20") }
+        { value: auctionBidValue }
       );
       const receipt2 = await tx2.wait();
       const auctionBidTimestamp = (
@@ -386,7 +388,7 @@ describe("SEALib event handling", () => {
         minterConfigRes2.extraMinterDetails
       );
       expect(extraMinterDetails2.auctionCurrentBid).toBe(
-        ethers.utils.parseEther("1.20").toString()
+        auctionBidValue.toString()
       );
       expect(extraMinterDetails2.auctionCurrentBidder).toBe(
         deployer.address.toLowerCase()
@@ -394,6 +396,43 @@ describe("SEALib event handling", () => {
       // we expect new auction end time in subgraph to be expanded due to buffer time
       expect(extraMinterDetails2.auctionEndTime).toBe(
         auctionBidTimestamp + 600
+      );
+
+      // PART 4: Bid indexing
+      // Validate that the Bid entity was created
+      const bidId = `${minterSEAV1Address.toLowerCase()}-${deployer.address.toLowerCase()}-${auctionBidValue.toString()}-${targetTokenId}`;
+      const bidRes = await getBidDetails(client, bidId);
+      expect(bidRes.id).toBe(bidId);
+      expect(bidRes.bidder.id).toBe(deployer.address.toLowerCase());
+      expect(bidRes.value).toBe(auctionBidValue.toString());
+      expect(bidRes.winningBid).toBe(true);
+      expect(bidRes.timestamp).toBe(auctionBidTimestamp.toString());
+      expect(bidRes.updatedAt).toBe(auctionBidTimestamp.toString());
+      expect(bidRes.project.id).toBe(`${genArt721CoreAddress.toLowerCase()}-1`);
+      expect(bidRes.minter.id).toBe(minterSEAV1Address.toLowerCase());
+      expect(bidRes.token?.id).toBe(
+        `${genArt721CoreAddress.toLowerCase()}-${targetTokenId.toString()}`
+      );
+
+      // Create another bid
+      const tx3 = await minterSEAV1Contract.connect(artist).createBid(
+        targetTokenId, // _tokenId
+        genArt721CoreAddress, // _coreContract
+        { value: ethers.utils.parseEther("1.50") }
+      );
+      const receipt3 = await tx3.wait();
+      const auctionBid2Timestamp = (
+        await artist.provider.getBlock(receipt3.blockNumber)
+      )?.timestamp;
+      if (!auctionBid2Timestamp) {
+        throw new Error("No auctionBid2Timestamp found");
+      }
+      await waitUntilSubgraphIsSynced(client);
+      // Validate that the previous winning bid has been updated
+      const previousWinningBidRes = await getBidDetails(client, bidId);
+      expect(previousWinningBidRes.winningBid).toBe(false);
+      expect(previousWinningBidRes.updatedAt).toBe(
+        auctionBid2Timestamp.toString()
       );
     });
   });
