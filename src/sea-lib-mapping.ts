@@ -22,7 +22,9 @@ import {
   generateProjectIdNumberFromTokenIdNumber,
   getMinterExtraMinterDetailsTypedMap,
   getProjectMinterConfigExtraMinterDetailsTypedMap,
-  updateProjectIfMinterConfigIsActive
+  updateProjectIfMinterConfigIsActive,
+  generateContractSpecificId,
+  generateSEAMinterBidId
 } from "./helpers";
 
 import {
@@ -213,7 +215,7 @@ export function handleAuctionBid(event: AuctionBid): void {
 
   const projectMinterConfig = minterProjectAndConfig.projectMinterConfiguration;
 
-  // Get the current highest bid so that we can update it
+  // Get the previous highest bid
   let currentProjectMinterConfigDetails = getProjectMinterConfigExtraMinterDetailsTypedMap(
     projectMinterConfig
   );
@@ -224,6 +226,23 @@ export function handleAuctionBid(event: AuctionBid): void {
   const previousHighestBidderJSON = currentProjectMinterConfigDetails.get(
     "auctionCurrentBidder"
   );
+
+  // Update winningBid on the previous highest bid, as it is now outbid
+  if (previousHighestBidderJSON && previousHighestBidValueJSON) {
+    const previousHighestBidId = generateSEAMinterBidId(
+      event.address.toHexString(),
+      previousHighestBidderJSON.toString(),
+      previousHighestBidValueJSON.toString(),
+      event.params.tokenId.toString()
+    );
+
+    const previousWinningBid = Bid.load(previousHighestBidId);
+    if (previousWinningBid) {
+      previousWinningBid.winningBid = false;
+      previousWinningBid.updatedAt = event.block.timestamp;
+      previousWinningBid.save();
+    }
+  }
 
   // update relevant auction details in project minter configuration extraMinterDetails json field
   setProjectMinterConfigExtraMinterDetailsValue(
@@ -278,61 +297,31 @@ export function handleAuctionBid(event: AuctionBid): void {
   );
 
   // Update Bids entity
-  const bidId =
-    event.address.toHexString() +
-    "-" +
-    event.params.bidder.toHexString() +
-    "-" +
-    event.params.bidAmount.toString() +
-    "-" +
-    event.params.tokenId.toString();
+  const bidId = generateSEAMinterBidId(
+    event.address.toHexString(),
+    event.params.bidder.toHexString(),
+    event.params.bidAmount.toString(),
+    event.params.tokenId.toString()
+  );
 
-  let bid = Bid.load(bidId);
-  if (bid) {
-    // This is never expected to be possible with SEA minter
-    log.warning("Existing Bid with ID {} found for SEA Minter contract {}", [
-      bidId,
-      event.address.toString()
-    ]);
-  } else {
-    // New bid
-    bid = new Bid(bidId);
-    // Create new account entity if one for the bidder doesn't exist
-    const bidderAccount = new Account(event.params.bidder.toHexString());
-    bidderAccount.save();
+  // @dev: a bid with this ID should not already exist for the SEA Minter
+  const bid = new Bid(bidId);
+  // Create new account entity if one for the bidder doesn't exist
+  const bidderAccount = new Account(event.params.bidder.toHexString());
+  bidderAccount.save();
 
-    bid.project = minterProjectAndConfig.project.id;
-    bid.minter = event.address.toHexString();
-    bid.token =
-      event.params.coreContract.toHexString() +
-      "-" +
-      event.params.tokenId.toString();
-    bid.bidder = bidderAccount.id;
-    bid.value = event.params.bidAmount;
-    bid.winningBid = true;
-    bid.timestamp = event.block.timestamp;
-    bid.updatedAt = event.block.timestamp;
-    bid.save();
-
-    // Update previous winning bid to false, if it exists
-    if (previousHighestBidderJSON && previousHighestBidValueJSON) {
-      const previousHighestBidId =
-        event.address.toHexString() +
-        "-" +
-        previousHighestBidderJSON.toString() +
-        "-" +
-        previousHighestBidValueJSON.toString() +
-        "-" +
-        event.params.tokenId.toString();
-
-      const previousWinningBid = Bid.load(previousHighestBidId);
-      if (previousWinningBid) {
-        previousWinningBid.winningBid = false;
-        previousWinningBid.updatedAt = event.block.timestamp;
-        previousWinningBid.save();
-      }
-    }
-  }
+  bid.project = minterProjectAndConfig.project.id;
+  bid.minter = event.address.toHexString();
+  bid.token = generateContractSpecificId(
+    event.params.coreContract,
+    event.params.tokenId
+  );
+  bid.bidder = bidderAccount.id;
+  bid.value = event.params.bidAmount;
+  bid.winningBid = true;
+  bid.timestamp = event.block.timestamp;
+  bid.updatedAt = event.block.timestamp;
+  bid.save();
 }
 
 export function handleAuctionSettled(event: AuctionSettled): void {

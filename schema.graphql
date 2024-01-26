@@ -488,6 +488,7 @@ type Bid @entity {
   "The associated minter"
   minter: Minter!
 
+  "The associated token"
   token: Token
 
   "The associated account"

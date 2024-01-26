@@ -77,6 +77,15 @@ export function generateProjectIdNumberFromTokenIdNumber(
   return tokenId.div(BigInt.fromI32(1000000));
 }
 
+export function generateSEAMinterBidId(
+  minterAddress: string,
+  bidderAddress: string,
+  bidAmount: string,
+  tokenId: string
+): string {
+  return minterAddress + "-" + bidderAddress + "-" + bidAmount + "-" + tokenId;
+}
+
 export function generateContractSpecificId(
   contractAddress: Address,
   entityId: BigInt
