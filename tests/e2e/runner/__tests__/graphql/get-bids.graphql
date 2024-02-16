@@ -12,6 +12,8 @@ fragment BidDetails on Bid {
   bidder {
     id
   }
+  settled
+  slotIndex
   value
   winningBid
   timestamp

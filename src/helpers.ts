@@ -86,6 +86,14 @@ export function generateSEAMinterBidId(
   return minterAddress + "-" + bidderAddress + "-" + bidAmount + "-" + tokenId;
 }
 
+export function generateRAMMinterBidId(
+  minterAddress: string,
+  projectId: string,
+  bidId: string
+): string {
+  return minterAddress + "-" + projectId + "-" + bidId;
+}
+
 export function generateContractSpecificId(
   contractAddress: Address,
   entityId: BigInt

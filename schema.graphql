@@ -479,7 +479,7 @@ type ProjectMinterConfiguration @entity {
 }
 
 type Bid @entity {
-  "Unique identifier made up of for SEA - {minter contract address}-{bidder}-{value}-{token} [TODO - do something different from RAM]"
+  "Unique identifier made up of for SEA - {minter contract address}-{bidder}-{value}-{token} and for RAM {minter contract address}-{full project ID}-{bidID}"
   id: ID!
 
   "The associated project"
@@ -495,10 +495,16 @@ type Bid @entity {
   bidder: Account!
 
   "The value of the bid"
-  value: BigInt!
+  value: BigInt
+
+  "The slot index of the bid - RAM Minter"
+  slotIndex: BigInt
 
   "Highest bid for token"
   winningBid: Boolean!
+
+  "Bid has been settled"
+  settled: Boolean
 
   "The timestamp of the bid"
   timestamp: BigInt!
