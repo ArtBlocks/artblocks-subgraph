@@ -207,6 +207,37 @@ export function loadOrCreateReceipt(
 }
 
 /**
+ * helper function that returns the value of a bid in a given slot index, in Wei.
+ * used by the RAM Minter.
+ * @param basePrice Base price (or reserve price) of the auction in Wei, string representation
+ * @param slotIndex Slot index to query
+ * @returns slotBidValue Value of a bid in the slot, in Wei
+ */
+export function slotIndexToBidValue(
+  basePrice: string,
+  slotIndex: BigInt
+): BigInt {
+  // Convert basePrice to BigInt
+  const basePriceBigInt: BigInt = BigInt.fromString(basePrice);
+
+  // pricing assumes maxPrice = minPrice * 2^8, pseudo-exponential curve
+  const slotsPerDouble: BigInt = BigInt.fromI32(512 / 8);
+  // Calculate the bit-shift amount by dividing slotIndex and converting result to an exponent
+  // for the bit-shifting equivalent
+  let shiftAmount: BigInt = slotIndex.div(slotsPerDouble);
+  let slotBidValue: BigInt = basePriceBigInt.times(
+    BigInt.fromI32(2).pow(shiftAmount.toI32() as u8)
+  );
+  // Perform linear-interpolation for partial half-life points
+  let remainder: BigInt = slotIndex.mod(slotsPerDouble);
+  slotBidValue = slotBidValue.plus(
+    slotBidValue.times(remainder).div(slotsPerDouble)
+  );
+
+  return slotBidValue;
+}
+
+/**
  * Helper function to load or create a shared minter filter.
  * Assumes:
  *  - the minter filter conforms to IMinterFilterV1 when creating a new minter

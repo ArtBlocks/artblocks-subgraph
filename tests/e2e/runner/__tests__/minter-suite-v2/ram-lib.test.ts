@@ -8,6 +8,10 @@ import {
   getBidDetails,
   getProjectMinterConfigurationDetails,
 } from "../utils/helpers";
+import {
+  GenArt721CoreV3__factory,
+  GenArt721CoreV3LibraryAddresses,
+} from "../../contracts/factories/GenArt721CoreV3__factory";
 
 import { MinterFilterV2__factory } from "../../contracts/factories/MinterFilterV2__factory";
 import { MinterRAMV0__factory } from "../../contracts/factories/MinterRAMV0__factory";
@@ -17,9 +21,9 @@ import { Logger } from "@ethersproject/logger";
 Logger.setLogLevel(Logger.levels.ERROR);
 
 // waiting for subgraph to sync can take longer than the default 5s timeout
-// @dev For this file specifically, one test takes >60s due to hard-coded minimum
+// @dev For this file specifically, two of the tests take ~10min due to hard-coded minimum
 // auction duration on RAM minter
-jest.setTimeout(100 * 1000);
+jest.setTimeout(1800 * 1000);
 
 const config = getSubgraphConfig();
 
@@ -59,6 +63,20 @@ const minterRAMV0Address = config.RAMLibContracts[0].address;
 const minterRAMV0Contract = new MinterRAMV0__factory(deployer).attach(
   minterRAMV0Address
 );
+const bytecodeStorageReaderAddress =
+  config.metadata?.bytecodeStorageReaderAddress;
+if (!bytecodeStorageReaderAddress)
+  throw new Error(
+    "No bytecode storage reader address found in config metadata"
+  );
+const linkLibraryAddresses: GenArt721CoreV3LibraryAddresses = {
+  "contracts/libs/v0.8.x/BytecodeStorageV1.sol:BytecodeStorageReader":
+    bytecodeStorageReaderAddress,
+};
+const genArt721CoreContract = new GenArt721CoreV3__factory(
+  linkLibraryAddresses,
+  deployer
+).attach(genArt721CoreAddress);
 
 // Constants
 const NUM_SLOTS = 512;
@@ -323,6 +341,7 @@ describe("RAMLib event handling", () => {
       expect(bidRes.bidder.id).toBe(deployer.address.toLowerCase());
       expect(bidRes.settled).toBe(false);
       expect(bidRes.slotIndex).toBe("10");
+      expect(bidRes.value).toBe(slot10price.toString());
       expect(bidRes.winningBid).toBe(true);
       expect(bidRes.timestamp).toBe(auctionBidTimestamp.toString());
       expect(bidRes.updatedAt).toBe(auctionBidTimestamp.toString());
@@ -354,6 +373,7 @@ describe("RAMLib event handling", () => {
       // validate topped up Bid entity
       const toppedUpBidRes = await getBidDetails(client, bidId);
       expect(toppedUpBidRes.slotIndex).toBe("12");
+      expect(toppedUpBidRes.value).toBe(slot12price.toString());
       expect(toppedUpBidRes.updatedAt).toBe(auctionBid2Timestamp.toString());
     });
   });
@@ -462,6 +482,8 @@ describe("RAMLib event handling", () => {
       const bidRes = await getBidDetails(client, bidId);
       expect(bidRes.id).toBe(bidId);
       expect(bidRes.winningBid).toBe(false);
+      expect(bidRes.slotIndex).toBe(null);
+      expect(bidRes.value).toBe("0");
       expect(bidRes.updatedAt).toBe(auctionBid3Timestamp.toString());
 
       // Artist reduces auction length time
@@ -504,17 +526,193 @@ describe("RAMLib event handling", () => {
       const winningBid1Res = await getBidDetails(client, winningBid1);
       const winningBid2Res = await getBidDetails(client, winningBid2);
       expect(winningBid1Res.settled).toBe(true);
-      expect(winningBid1Res.token.id).toBe(
-        `${genArt721CoreAddress.toLowerCase()}-1000000`
+      expect(winningBid1Res?.token?.id).toBe(
+        `${genArt721CoreAddress.toLowerCase()}-1000001`
       );
       expect(winningBid1Res.updatedAt).toBe(auctionBid5Timestamp.toString());
       expect(winningBid2Res.settled).toBe(true);
-      expect(winningBid2Res.token.id).toBe(
-        `${genArt721CoreAddress.toLowerCase()}-1000001`
+      expect(winningBid2Res?.token?.id).toBe(
+        `${genArt721CoreAddress.toLowerCase()}-1000000`
       );
       expect(winningBid1Res.updatedAt).toBe(auctionBid5Timestamp.toString());
     });
   });
 
-  // TODO: BidRefunded in E1 state
+  describe("BidRefunded", () => {
+    afterEach(async () => {
+      // clear the current minter for the project
+      try {
+        await sharedMinterFilterContract
+          .connect(artist)
+          .removeMinterForProject(1, genArt721CoreAddress);
+      } catch (error) {
+        // swallow error in case of test failure
+      }
+    });
+
+    test("subgraph is updated after event emitted", async () => {
+      // artist configures the auction
+      // @dev set minter as active
+      await sharedMinterFilterContract.connect(artist).setMinterForProject(
+        1, // _projectId
+        genArt721CoreAddress, // _coreContract
+        minterRAMV0Address // _minter
+      );
+
+      const latestBlock = await deployer.provider.getBlock("latest");
+      const targetAuctionStart = latestBlock.timestamp + 60;
+      const targetAuctionEnd = targetAuctionStart + 600;
+      // Set auction details
+      await minterRAMV0Contract.connect(artist).setAuctionDetails(
+        1, // _projectId
+        genArt721CoreAddress, // _coreContract
+        targetAuctionStart, // _auctionTimestampStart
+        targetAuctionEnd, // _auctionTimestampEnd
+        ethers.utils.parseEther("1"), // _basePrice
+        true, // _allowExtraTime
+        true // _adminArtistOnlyMintPeriodIfSellout
+      );
+      // validate project minter config in subgraph
+      await waitUntilSubgraphIsSynced(client);
+      // Manually limit project max invocations to 10
+      // @dev this can only happen in RAM Auction State A
+      await minterRAMV0Contract
+        .connect(artist)
+        .manuallyLimitProjectMaxInvocations(
+          1, // _projectId
+          genArt721CoreAddress, // _coreContract
+          10
+        );
+      // Get slot index for bid value
+      const slot5price = await minterRAMV0Contract.slotIndexToBidValue(
+        1, //_projectId
+        genArt721CoreAddress, // _coreContract
+        5 // _slotIndex
+      );
+      // Wait until auction starts (60s + 1s margin)
+      await new Promise((resolve) => {
+        setTimeout(resolve, 61 * 1000);
+      });
+      // Create 5 bids for auction
+      // @dev bids can only be created when auction is live
+      for (let i = 0; i < 5; i++) {
+        const tx = await minterRAMV0Contract.connect(deployer).createBid(
+          1, // _projectId
+          genArt721CoreAddress, // _coreContract
+          5, // _slotIndex
+          {
+            value: slot5price,
+          }
+        );
+        await tx.wait();
+        await waitUntilSubgraphIsSynced(client);
+      }
+      // Lower core contract max invocations to 2, lower than the amount of bids
+      // @dev Bids are only refunded in an E1 error state
+      const tx = await genArt721CoreContract
+        .connect(deployer)
+        .updateProjectMaxInvocations(
+          1, // _projectId
+          2 // _maxInvocations
+        );
+      await tx.wait();
+      await waitUntilSubgraphIsSynced(client);
+
+      // Wait til auction ends, should be in E1 state
+      await new Promise((resolve) => {
+        setTimeout(resolve, 620 * 1000);
+      });
+
+      // First auto-mint tokens to winners
+      // Auto mint tokens to winners
+      const tx2 = await minterRAMV0Contract
+        .connect(artist)
+        .adminArtistAutoMintTokensToWinners(
+          1, // _projectId
+          genArt721CoreAddress, // _coreContract
+          2 // _numTokensToMint
+        );
+      const receipt2 = await tx2.wait();
+      const autoMintTokenTimestamp = (
+        await artist.provider.getBlock(receipt2.blockNumber)
+      )?.timestamp;
+      await waitUntilSubgraphIsSynced(client);
+
+      // Call adminArtistDirectRefundWinners
+      const tx3 = await minterRAMV0Contract
+        .connect(artist)
+        .adminArtistDirectRefundWinners(
+          1, // _projectId,
+          genArt721CoreAddress, // _coreContract
+          [3, 4, 5] // _bidIds[]
+        );
+      const receipt3 = await tx3.wait();
+      const directRefundWinnersTimestamp = (
+        await artist.provider.getBlock(receipt3.blockNumber)
+      )?.timestamp;
+      await waitUntilSubgraphIsSynced(client);
+
+      // validate winning Bid entities
+      const winningBid1 = `${minterRAMV0Address.toLowerCase()}-${genArt721CoreAddress.toLowerCase()}-1-1`;
+      const winningBid2 = `${minterRAMV0Address.toLowerCase()}-${genArt721CoreAddress.toLowerCase()}-1-2`;
+      const winningBid1Res = await getBidDetails(client, winningBid1);
+      const winningBid2Res = await getBidDetails(client, winningBid2);
+      expect(winningBid1Res.id).toBe(winningBid1);
+      expect(winningBid1Res.bidder.id).toBe(deployer.address.toLowerCase());
+      expect(winningBid1Res.settled).toBe(true);
+      expect(winningBid1Res.slotIndex).toBe("5");
+      expect(winningBid1Res.value).toBe(slot5price.toString());
+      expect(winningBid1Res.winningBid).toBe(true);
+      expect(winningBid1Res.updatedAt).toBe(autoMintTokenTimestamp.toString());
+      expect(winningBid1Res.project.id).toBe(
+        `${genArt721CoreAddress.toLowerCase()}-1`
+      );
+      expect(winningBid1Res.minter.id).toBe(minterRAMV0Address.toLowerCase());
+      expect(winningBid1Res.token.id).toBe(
+        `${genArt721CoreAddress.toLowerCase()}-0`
+      );
+
+      expect(winningBid2Res.id).toBe(winningBid2);
+      expect(winningBid2Res.bidder.id).toBe(deployer.address.toLowerCase());
+      expect(winningBid2Res.settled).toBe(true);
+      expect(winningBid2Res.slotIndex).toBe("5");
+      expect(winningBid2Res.value).toBe(slot5price.toString());
+      expect(winningBid2Res.winningBid).toBe(true);
+      expect(winningBid2Res.updatedAt).toBe(autoMintTokenTimestamp.toString());
+      expect(winningBid2Res.project.id).toBe(
+        `${genArt721CoreAddress.toLowerCase()}-1`
+      );
+      expect(winningBid2Res.minter.id).toBe(minterRAMV0Address.toLowerCase());
+      expect(winningBid2Res.token.id).toBe(
+        `${genArt721CoreAddress.toLowerCase()}-1`
+      );
+
+      // validate bids were refunded + settled + have no tokens associated with them
+      const refundedBid1 = `${minterRAMV0Address.toLowerCase()}-${genArt721CoreAddress.toLowerCase()}-1-3`;
+      const refundedBid2 = `${minterRAMV0Address.toLowerCase()}-${genArt721CoreAddress.toLowerCase()}-1-4`;
+      const refundedBid3 = `${minterRAMV0Address.toLowerCase()}-${genArt721CoreAddress.toLowerCase()}-1-5`;
+      const refundedBid1Res = await getBidDetails(client, refundedBid1);
+      const refundedBid2Res = await getBidDetails(client, refundedBid2);
+      const refundedBid3Res = await getBidDetails(client, refundedBid3);
+
+      expect(refundedBid1Res.slotIndex).toBe(null);
+      expect(refundedBid1Res.winningBid).toBe(false);
+      expect(refundedBid1Res.value).toBe("0");
+      expect(refundedBid1Res.updatedAt).toBe(
+        directRefundWinnersTimestamp.toString()
+      );
+      expect(refundedBid2Res.slotIndex).toBe(null);
+      expect(refundedBid2Res.winningBid).toBe(false);
+      expect(refundedBid2Res.value).toBe("0");
+      expect(refundedBid2Res.updatedAt).toBe(
+        directRefundWinnersTimestamp.toString()
+      );
+      expect(refundedBid3Res.slotIndex).toBe(null);
+      expect(refundedBid3Res.winningBid).toBe(false);
+      expect(refundedBid3Res.value).toBe("0");
+      expect(refundedBid3Res.updatedAt).toBe(
+        directRefundWinnersTimestamp.toString()
+      );
+    });
+  });
 });

@@ -1,4 +1,4 @@
-import { BigInt, JSONValue, TypedMap } from "@graphprotocol/graph-ts";
+import { BigInt, log, JSONValue, TypedMap } from "@graphprotocol/graph-ts";
 
 import {
   MinAuctionDurationSecondsUpdated,
@@ -24,7 +24,9 @@ import {
   loadOrCreateMinter,
   updateProjectIfMinterConfigIsActive,
   generateContractSpecificId,
-  generateRAMMinterBidId
+  generateRAMMinterBidId,
+  slotIndexToBidValue,
+  getProjectMinterConfigExtraMinterDetailsTypedMap
 } from "./helpers";
 
 import {
@@ -170,7 +172,7 @@ export function handleAuctionConfigUpdated(event: AuctionConfigUpdated): void {
     { key: "auctionEndTime", value: toJSONValue(event.params.timestampEnd) },
     {
       key: "auctionBasePrice",
-      value: toJSONValue(event.params.basePrice.toString())
+      value: toJSONValue(event.params.basePrice.toString()) // basePrice is likely to overflow js Number.MAX_SAFE_INTEGER so store as string
     },
     {
       key: "auctionNumTokensInAuction",
@@ -246,32 +248,60 @@ export function handleBidCreated(event: BidCreated): void {
     return;
   }
 
-  const fullProjectId = generateContractSpecificId(
-    event.params.coreContract,
-    event.params.projectId
+  const projectMinterConfig = minterProjectAndConfig.projectMinterConfiguration;
+  // Get the auction base price
+  const currentProjectMinterConfigDetails = getProjectMinterConfigExtraMinterDetailsTypedMap(
+    projectMinterConfig
+  );
+  const auctionBasePrice = currentProjectMinterConfigDetails.get(
+    "auctionBasePrice"
   );
 
-  const ramBidId = generateRAMMinterBidId(
-    event.address.toHexString(),
-    fullProjectId,
-    event.params.bidId.toString()
-  );
+  if (auctionBasePrice) {
+    const bidValue = slotIndexToBidValue(
+      auctionBasePrice.toString(),
+      event.params.slotIndex
+    );
 
-  // @dev: a bid with this ID should not already exist for the RAM Minter
-  const bid = new Bid(ramBidId);
-  // Create new account entity if one for the bidder doesn't exist
-  const bidderAccount = new Account(event.params.bidder.toHexString());
-  bidderAccount.save();
+    const fullProjectId = generateContractSpecificId(
+      event.params.coreContract,
+      event.params.projectId
+    );
 
-  bid.project = minterProjectAndConfig.project.id;
-  bid.minter = event.address.toHexString();
-  bid.bidder = bidderAccount.id;
-  bid.settled = false;
-  bid.slotIndex = event.params.slotIndex;
-  bid.winningBid = true;
-  bid.timestamp = event.block.timestamp;
-  bid.updatedAt = event.block.timestamp;
-  bid.save();
+    const ramBidId = generateRAMMinterBidId(
+      event.address.toHexString(),
+      fullProjectId,
+      event.params.bidId.toString()
+    );
+    // @dev: a bid with this ID should not already exist for the RAM Minter
+    const bid = new Bid(ramBidId);
+    if (bid) {
+      // Create new account entity if one for the bidder doesn't exist
+      const bidderAccount = new Account(event.params.bidder.toHexString());
+      bidderAccount.save();
+
+      bid.project = minterProjectAndConfig.project.id;
+      bid.minter = event.address.toHexString();
+      bid.value = bidValue;
+      bid.bidder = bidderAccount.id;
+      bid.settled = false;
+      bid.slotIndex = event.params.slotIndex;
+      bid.winningBid = true;
+      bid.timestamp = event.block.timestamp;
+      bid.updatedAt = event.block.timestamp;
+      bid.save();
+    } else {
+      log.warning("Bid ID {} not found for minter {}", [
+        ramBidId,
+        event.address.toHexString()
+      ]);
+    }
+  } else {
+    log.warning(
+      "Auction base price for minter {} not found for core contract {}",
+      [event.address.toString(), event.params.coreContract.toHexString()]
+    );
+  }
 }
 
 export function handleBidRemoved(event: BidRemoved): void {
@@ -301,10 +331,17 @@ export function handleBidRemoved(event: BidRemoved): void {
   const bid = Bid.load(ramBidId);
 
   if (bid) {
-    // Update winning bid to false
+    // Update winning bid to false, slotIndex to null, value to 0
     bid.winningBid = false;
+    bid.value = BigInt.fromI32(0);
+    bid.slotIndex = null;
     bid.updatedAt = event.block.timestamp;
     bid.save();
+  } else {
+    log.warning("Bid ID {} not found for minter {}", [
+      ramBidId,
+      event.address.toHexString()
+    ]);
   }
 }
 
@@ -320,25 +357,51 @@ export function handleBidToppedUp(event: BidToppedUp): void {
     return;
   }
 
-  const fullProjectId = generateContractSpecificId(
-    event.params.coreContract,
-    event.params.projectId
+  const projectMinterConfig = minterProjectAndConfig.projectMinterConfiguration;
+  // Get the auction base price
+  const currentProjectMinterConfigDetails = getProjectMinterConfigExtraMinterDetailsTypedMap(
+    projectMinterConfig
+  );
+  const auctionBasePrice = currentProjectMinterConfigDetails.get(
+    "auctionBasePrice"
   );
 
-  const ramBidId = generateRAMMinterBidId(
-    event.address.toHexString(),
-    fullProjectId,
-    event.params.bidId.toString()
-  );
+  if (auctionBasePrice) {
+    const bidValue = slotIndexToBidValue(
+      auctionBasePrice.toString(),
+      event.params.newSlotIndex
+    );
 
-  // @dev: a bid with this ID should exist for the RAM Minter
-  const bid = Bid.load(ramBidId);
+    const fullProjectId = generateContractSpecificId(
+      event.params.coreContract,
+      event.params.projectId
+    );
 
-  if (bid) {
-    // Update slot index
-    bid.slotIndex = event.params.newSlotIndex;
-    bid.updatedAt = event.block.timestamp;
-    bid.save();
+    const ramBidId = generateRAMMinterBidId(
+      event.address.toHexString(),
+      fullProjectId,
+      event.params.bidId.toString()
+    );
+
+    // @dev: a bid with this ID should exist for the RAM Minter
+    const bid = Bid.load(ramBidId);
+    if (bid) {
+      // Update slot index and value
+      bid.slotIndex = event.params.newSlotIndex;
+      bid.value = bidValue;
+      bid.updatedAt = event.block.timestamp;
+      bid.save();
+    } else {
+      log.warning("Bid ID {} not found for minter {}", [
+        ramBidId,
+        event.address.toHexString()
+      ]);
+    }
+  } else {
+    log.warning(
+      "Auction base price for minter {} not found for core contract {}",
+      [event.address.toString(), event.params.coreContract.toHexString()]
+    );
   }
 }
 
@@ -373,6 +436,11 @@ export function handleBidSettled(event: BidSettled): void {
     bid.settled = true;
     bid.updatedAt = event.block.timestamp;
     bid.save();
+  } else {
+    log.warning("Bid ID {} not found for minter {}", [
+      ramBidId,
+      event.address.toHexString()
+    ]);
   }
 }
 
@@ -410,6 +478,11 @@ export function handleBidMinted(event: BidMinted): void {
     );
     bid.updatedAt = event.block.timestamp;
     bid.save();
+  } else {
+    log.warning("Bid ID {} not found for minter {}", [
+      ramBidId,
+      event.address.toHexString()
+    ]);
   }
 }
 
@@ -440,9 +513,17 @@ export function handleBidRefunded(event: BidRefunded): void {
   const bid = Bid.load(ramBidId);
 
   if (bid) {
+    // Update winning bid to false, slotIndex to null, value to 0
+    bid.winningBid = false;
+    bid.value = BigInt.fromI32(0);
     bid.slotIndex = null;
     bid.updatedAt = event.block.timestamp;
     bid.save();
+  } else {
+    log.warning("Bid ID {} not found for minter {}", [
+      ramBidId,
+      event.address.toHexString()
+    ]);
   }
 }
 
