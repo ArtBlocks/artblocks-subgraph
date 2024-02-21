@@ -668,10 +668,9 @@ describe("RAMLib event handling", () => {
         `${genArt721CoreAddress.toLowerCase()}-1`
       );
       expect(winningBid1Res.minter.id).toBe(minterRAMV0Address.toLowerCase());
-      expect(winningBid1Res.token.id).toBe(
-        `${genArt721CoreAddress.toLowerCase()}-0`
+      expect(winningBid1Res?.token?.id).toBe(
+        `${genArt721CoreAddress.toLowerCase()}-1000001`
       );
-
       expect(winningBid2Res.id).toBe(winningBid2);
       expect(winningBid2Res.bidder.id).toBe(deployer.address.toLowerCase());
       expect(winningBid2Res.settled).toBe(true);
@@ -683,8 +682,8 @@ describe("RAMLib event handling", () => {
         `${genArt721CoreAddress.toLowerCase()}-1`
       );
       expect(winningBid2Res.minter.id).toBe(minterRAMV0Address.toLowerCase());
-      expect(winningBid2Res.token.id).toBe(
-        `${genArt721CoreAddress.toLowerCase()}-1`
+      expect(winningBid2Res?.token?.id).toBe(
+        `${genArt721CoreAddress.toLowerCase()}-1000000`
       );
 
       // validate bids were refunded + settled + have no tokens associated with them
