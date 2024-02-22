@@ -610,7 +610,7 @@ describe("RAMLib event handling", () => {
       // Lower core contract max invocations to 2, lower than the amount of bids
       // @dev Bids are only refunded in an E1 error state
       const tx = await genArt721CoreContract
-        .connect(deployer)
+        .connect(artist)
         .updateProjectMaxInvocations(
           1, // _projectId
           2 // _maxInvocations
@@ -618,7 +618,7 @@ describe("RAMLib event handling", () => {
       await tx.wait();
       await waitUntilSubgraphIsSynced(client);
 
-      // Wait til auction ends, should be in E1 state
+      // Wait til auction ends
       await new Promise((resolve) => {
         setTimeout(resolve, 620 * 1000);
       });
@@ -627,10 +627,10 @@ describe("RAMLib event handling", () => {
       // Auto mint tokens to winners
       const tx2 = await minterRAMV0Contract
         .connect(artist)
-        .adminArtistAutoMintTokensToWinners(
+        .adminArtistDirectMintTokensToWinners(
           1, // _projectId
           genArt721CoreAddress, // _coreContract
-          2 // _numTokensToMint
+          [1, 2] // _bidIds[]
         );
       const receipt2 = await tx2.wait();
       const autoMintTokenTimestamp = (
@@ -669,7 +669,7 @@ describe("RAMLib event handling", () => {
       );
       expect(winningBid1Res.minter.id).toBe(minterRAMV0Address.toLowerCase());
       expect(winningBid1Res?.token?.id).toBe(
-        `${genArt721CoreAddress.toLowerCase()}-1000001`
+        `${genArt721CoreAddress.toLowerCase()}-1000000`
       );
       expect(winningBid2Res.id).toBe(winningBid2);
       expect(winningBid2Res.bidder.id).toBe(deployer.address.toLowerCase());
@@ -683,7 +683,7 @@ describe("RAMLib event handling", () => {
       );
       expect(winningBid2Res.minter.id).toBe(minterRAMV0Address.toLowerCase());
       expect(winningBid2Res?.token?.id).toBe(
-        `${genArt721CoreAddress.toLowerCase()}-1000000`
+        `${genArt721CoreAddress.toLowerCase()}-1000001`
       );
 
       // validate bids were refunded + settled + have no tokens associated with them
