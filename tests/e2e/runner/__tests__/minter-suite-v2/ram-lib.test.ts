@@ -554,7 +554,7 @@ describe("RAMLib event handling", () => {
       // artist configures the auction
       // @dev set minter as active
       await sharedMinterFilterContract.connect(artist).setMinterForProject(
-        1, // _projectId
+        2, // _projectId
         genArt721CoreAddress, // _coreContract
         minterRAMV0Address // _minter
       );
@@ -564,7 +564,7 @@ describe("RAMLib event handling", () => {
       const targetAuctionEnd = targetAuctionStart + 600;
       // Set auction details
       await minterRAMV0Contract.connect(artist).setAuctionDetails(
-        1, // _projectId
+        2, // _projectId
         genArt721CoreAddress, // _coreContract
         targetAuctionStart, // _auctionTimestampStart
         targetAuctionEnd, // _auctionTimestampEnd
@@ -579,13 +579,13 @@ describe("RAMLib event handling", () => {
       await minterRAMV0Contract
         .connect(artist)
         .manuallyLimitProjectMaxInvocations(
-          1, // _projectId
+          2, // _projectId
           genArt721CoreAddress, // _coreContract
           10
         );
       // Get slot index for bid value
       const slot5price = await minterRAMV0Contract.slotIndexToBidValue(
-        1, //_projectId
+        2, //_projectId
         genArt721CoreAddress, // _coreContract
         5 // _slotIndex
       );
@@ -597,7 +597,7 @@ describe("RAMLib event handling", () => {
       // @dev bids can only be created when auction is live
       for (let i = 0; i < 5; i++) {
         const tx = await minterRAMV0Contract.connect(deployer).createBid(
-          1, // _projectId
+          2, // _projectId
           genArt721CoreAddress, // _coreContract
           5, // _slotIndex
           {
@@ -612,7 +612,7 @@ describe("RAMLib event handling", () => {
       const tx = await genArt721CoreContract
         .connect(artist)
         .updateProjectMaxInvocations(
-          1, // _projectId
+          2, // _projectId
           2 // _maxInvocations
         );
       await tx.wait();
@@ -628,7 +628,7 @@ describe("RAMLib event handling", () => {
       const tx2 = await minterRAMV0Contract
         .connect(artist)
         .adminArtistDirectMintTokensToWinners(
-          1, // _projectId
+          2, // _projectId
           genArt721CoreAddress, // _coreContract
           [1, 2] // _bidIds[]
         );
@@ -642,7 +642,7 @@ describe("RAMLib event handling", () => {
       const tx3 = await minterRAMV0Contract
         .connect(artist)
         .adminArtistDirectRefundWinners(
-          1, // _projectId,
+          2, // _projectId,
           genArt721CoreAddress, // _coreContract
           [3, 4, 5] // _bidIds[]
         );
@@ -653,8 +653,8 @@ describe("RAMLib event handling", () => {
       await waitUntilSubgraphIsSynced(client);
 
       // validate winning Bid entities
-      const winningBid1 = `${minterRAMV0Address.toLowerCase()}-${genArt721CoreAddress.toLowerCase()}-1-1`;
-      const winningBid2 = `${minterRAMV0Address.toLowerCase()}-${genArt721CoreAddress.toLowerCase()}-1-2`;
+      const winningBid1 = `${minterRAMV0Address.toLowerCase()}-${genArt721CoreAddress.toLowerCase()}-2-1`;
+      const winningBid2 = `${minterRAMV0Address.toLowerCase()}-${genArt721CoreAddress.toLowerCase()}-2-2`;
       const winningBid1Res = await getBidDetails(client, winningBid1);
       const winningBid2Res = await getBidDetails(client, winningBid2);
       expect(winningBid1Res.id).toBe(winningBid1);
@@ -665,11 +665,11 @@ describe("RAMLib event handling", () => {
       expect(winningBid1Res.winningBid).toBe(true);
       expect(winningBid1Res.updatedAt).toBe(autoMintTokenTimestamp.toString());
       expect(winningBid1Res.project.id).toBe(
-        `${genArt721CoreAddress.toLowerCase()}-1`
+        `${genArt721CoreAddress.toLowerCase()}-2`
       );
       expect(winningBid1Res.minter.id).toBe(minterRAMV0Address.toLowerCase());
       expect(winningBid1Res?.token?.id).toBe(
-        `${genArt721CoreAddress.toLowerCase()}-1000000`
+        `${genArt721CoreAddress.toLowerCase()}-2000000`
       );
       expect(winningBid2Res.id).toBe(winningBid2);
       expect(winningBid2Res.bidder.id).toBe(deployer.address.toLowerCase());
@@ -679,17 +679,17 @@ describe("RAMLib event handling", () => {
       expect(winningBid2Res.winningBid).toBe(true);
       expect(winningBid2Res.updatedAt).toBe(autoMintTokenTimestamp.toString());
       expect(winningBid2Res.project.id).toBe(
-        `${genArt721CoreAddress.toLowerCase()}-1`
+        `${genArt721CoreAddress.toLowerCase()}-2`
       );
       expect(winningBid2Res.minter.id).toBe(minterRAMV0Address.toLowerCase());
       expect(winningBid2Res?.token?.id).toBe(
-        `${genArt721CoreAddress.toLowerCase()}-1000001`
+        `${genArt721CoreAddress.toLowerCase()}-2000001`
       );
 
       // validate bids were refunded + settled + have no tokens associated with them
-      const refundedBid1 = `${minterRAMV0Address.toLowerCase()}-${genArt721CoreAddress.toLowerCase()}-1-3`;
-      const refundedBid2 = `${minterRAMV0Address.toLowerCase()}-${genArt721CoreAddress.toLowerCase()}-1-4`;
-      const refundedBid3 = `${minterRAMV0Address.toLowerCase()}-${genArt721CoreAddress.toLowerCase()}-1-5`;
+      const refundedBid1 = `${minterRAMV0Address.toLowerCase()}-${genArt721CoreAddress.toLowerCase()}-2-3`;
+      const refundedBid2 = `${minterRAMV0Address.toLowerCase()}-${genArt721CoreAddress.toLowerCase()}-2-4`;
+      const refundedBid3 = `${minterRAMV0Address.toLowerCase()}-${genArt721CoreAddress.toLowerCase()}-2-5`;
       const refundedBid1Res = await getBidDetails(client, refundedBid1);
       const refundedBid2Res = await getBidDetails(client, refundedBid2);
       const refundedBid3Res = await getBidDetails(client, refundedBid3);
