@@ -528,7 +528,7 @@ describe("SEALib event handling", () => {
       );
       // @dev auction end time should be start time + duration
       expect(extraMinterDetails.auctionEndTime).toBe(
-        auctionInitializedTimestamp + 60
+        auctionSettledBidCreatedTimestamp + 60
       );
       expect(extraMinterDetails.auctionInitialized).toBe(true);
       expect(extraMinterDetails.auctionSettled).toBe(true);
