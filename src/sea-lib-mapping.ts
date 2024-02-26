@@ -196,6 +196,33 @@ export function handleAuctionInitialized(event: AuctionInitialized): void {
     projectMinterConfig,
     event.block.timestamp
   );
+
+  // Update Bids entity
+  const bidId = generateSEAMinterBidId(
+    event.address.toHexString(),
+    event.params.bidder.toHexString(),
+    event.params.bidAmount.toString(),
+    event.params.tokenId.toString()
+  );
+
+  // @dev: a bid with this ID should not already exist for the SEA Minter
+  const bid = new Bid(bidId);
+  // Create new account entity if one for the bidder doesn't exist
+  const bidderAccount = new Account(event.params.bidder.toHexString());
+  bidderAccount.save();
+
+  bid.project = minterProjectAndConfig.project.id;
+  bid.minter = event.address.toHexString();
+  bid.token = generateContractSpecificId(
+    event.params.coreContract,
+    event.params.tokenId
+  );
+  bid.bidder = bidderAccount.id;
+  bid.value = event.params.bidAmount;
+  bid.winningBid = true;
+  bid.timestamp = event.block.timestamp;
+  bid.updatedAt = event.block.timestamp;
+  bid.save();
 }
 
 export function handleAuctionBid(event: AuctionBid): void {

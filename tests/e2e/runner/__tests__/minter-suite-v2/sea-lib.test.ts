@@ -481,6 +481,7 @@ describe("SEALib event handling", () => {
 
       // PART 2: AuctionInitialized indexing
       const targetTokenId = 2000000; // project 2, token 0
+      const nextTargetTokenId = 2000001;
       const tx = await minterSEAV1Contract.connect(artist).createBid(
         targetTokenId, // _tokenId
         genArt721CoreAddress, // _coreContract
@@ -497,11 +498,19 @@ describe("SEALib event handling", () => {
       await new Promise((resolve) => {
         setTimeout(resolve, 61 * 1000);
       });
-      // settle auction to emit AuctionSettled event
-      await minterSEAV1Contract.connect(artist).settleAuction(
-        targetTokenId, // _tokenId
-        genArt721CoreAddress // _coreContract
-      );
+      // Call settleAuctionAndCreateBid to emit AuctionSettled event and initialize auction for next token ID
+      const tx2 = await minterSEAV1Contract
+        .connect(artist)
+        .settleAuctionAndCreateBid(
+          targetTokenId, // _settleTokenId
+          nextTargetTokenId, // _bidTokenId
+          genArt721CoreAddress, // _coreContract
+          { value: ethers.utils.parseEther("1.01") }
+        );
+      const receipt2 = await tx2.wait();
+      const auctionSettledBidCreatedTimestamp = (
+        await artist.provider.getBlock(receipt2.blockNumber)
+      )?.timestamp;
       // validate project minter config's auction parameters in subgraph
       await waitUntilSubgraphIsSynced(client);
       const targetId = `${minterSEAV1Address.toLowerCase()}-${genArt721CoreAddress.toLowerCase()}-2`;
@@ -525,6 +534,27 @@ describe("SEALib event handling", () => {
       expect(extraMinterDetails.auctionSettled).toBe(true);
       expect(extraMinterDetails.auctionTokenId).toBe(targetTokenId);
       expect(extraMinterDetails.auctionMinBidIncrementPercentage).toBe(5);
+
+      // Validate bid entity was created and auction initialized on target token
+      const bidId = `${minterSEAV1Address.toLowerCase()}-${artist.address.toLowerCase()}-${ethers.utils
+        .parseEther("1.01")
+        .toString()}-${nextTargetTokenId}`;
+      const bidRes = await getBidDetails(client, bidId);
+      expect(bidRes.id).toBe(bidId);
+      expect(bidRes.bidder.id).toBe(artist.address.toLowerCase());
+      expect(bidRes.value).toBe(ethers.utils.parseEther("1.01").toString());
+      expect(bidRes.winningBid).toBe(true);
+      expect(bidRes.timestamp).toBe(
+        auctionSettledBidCreatedTimestamp.toString()
+      );
+      expect(bidRes.updatedAt).toBe(
+        auctionSettledBidCreatedTimestamp.toString()
+      );
+      expect(bidRes.project.id).toBe(`${genArt721CoreAddress.toLowerCase()}-1`);
+      expect(bidRes.minter.id).toBe(minterSEAV1Address.toLowerCase());
+      expect(bidRes.token?.id).toBe(
+        `${genArt721CoreAddress.toLowerCase()}-${nextTargetTokenId.toString()}`
+      );
     });
   });
 
