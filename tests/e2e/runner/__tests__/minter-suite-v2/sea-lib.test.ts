@@ -545,7 +545,7 @@ describe("SEALib event handling", () => {
       );
       expect(extraMinterDetails.auctionInitialized).toBe(true);
       expect(extraMinterDetails.auctionSettled).toBe(false);
-      expect(extraMinterDetails.auctionTokenId).toBe(targetTokenId);
+      expect(extraMinterDetails.auctionTokenId).toBe(nextTargetTokenId);
       expect(extraMinterDetails.auctionMinBidIncrementPercentage).toBe(5);
 
       // Validate bid entity was created and auction initialized on target token
