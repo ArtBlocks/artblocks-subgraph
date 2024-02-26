@@ -563,7 +563,7 @@ describe("SEALib event handling", () => {
       expect(bidRes.updatedAt).toBe(
         auctionSettledBidCreatedTimestamp.toString()
       );
-      expect(bidRes.project.id).toBe(`${genArt721CoreAddress.toLowerCase()}-1`);
+      expect(bidRes.project.id).toBe(`${genArt721CoreAddress.toLowerCase()}-2`);
       expect(bidRes.minter.id).toBe(minterSEAV1Address.toLowerCase());
       expect(bidRes.token?.id).toBe(
         `${genArt721CoreAddress.toLowerCase()}-${nextTargetTokenId.toString()}`
