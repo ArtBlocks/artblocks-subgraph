@@ -498,7 +498,21 @@ describe("SEALib event handling", () => {
       await new Promise((resolve) => {
         setTimeout(resolve, 61 * 1000);
       });
-      // Call settleAuctionAndCreateBid to emit AuctionSettled event and initialize auction for next token ID
+      // settle auction to emit AuctionSettled event
+      await minterSEAV1Contract.connect(artist).settleAuction(
+        targetTokenId, // _tokenId
+        genArt721CoreAddress // _coreContract
+      );
+      await waitUntilSubgraphIsSynced(client);
+      const targetId = `${minterSEAV1Address.toLowerCase()}-${genArt721CoreAddress.toLowerCase()}-2`;
+      let minterConfigRes = await getProjectMinterConfigurationDetails(
+        client,
+        targetId
+      );
+      // Validate auction is settled in extra minter details
+      let extraMinterDetails = JSON.parse(minterConfigRes.extraMinterDetails);
+      expect(extraMinterDetails.auctionSettled).toBe(true);
+      // Call settleAuctionAndCreateBid to initialize auction for next token ID
       const tx2 = await minterSEAV1Contract
         .connect(artist)
         .settleAuctionAndCreateBid(
@@ -513,13 +527,12 @@ describe("SEALib event handling", () => {
       )?.timestamp;
       // validate project minter config's auction parameters in subgraph
       await waitUntilSubgraphIsSynced(client);
-      const targetId = `${minterSEAV1Address.toLowerCase()}-${genArt721CoreAddress.toLowerCase()}-2`;
-      const minterConfigRes = await getProjectMinterConfigurationDetails(
+      minterConfigRes = await getProjectMinterConfigurationDetails(
         client,
         targetId
       );
       // validate extraMinterDetails auction parameters
-      const extraMinterDetails = JSON.parse(minterConfigRes.extraMinterDetails);
+      extraMinterDetails = JSON.parse(minterConfigRes.extraMinterDetails);
       expect(extraMinterDetails.auctionCurrentBid).toBe(
         ethers.utils.parseEther("1.01").toString()
       );
@@ -531,7 +544,7 @@ describe("SEALib event handling", () => {
         auctionSettledBidCreatedTimestamp + 60
       );
       expect(extraMinterDetails.auctionInitialized).toBe(true);
-      expect(extraMinterDetails.auctionSettled).toBe(true);
+      expect(extraMinterDetails.auctionSettled).toBe(false);
       expect(extraMinterDetails.auctionTokenId).toBe(targetTokenId);
       expect(extraMinterDetails.auctionMinBidIncrementPercentage).toBe(5);
 
