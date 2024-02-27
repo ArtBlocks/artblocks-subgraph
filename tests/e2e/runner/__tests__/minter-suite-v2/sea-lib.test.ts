@@ -406,7 +406,7 @@ describe("SEALib event handling", () => {
       expect(bidRes.bidType).toBe("SEA");
       expect(bidRes.bidder.id).toBe(deployer.address.toLowerCase());
       expect(bidRes.value).toBe(auctionBidValue.toString());
-      expect(bidRes.winningBid).toBe(true);
+      expect(bidRes?.winningBid).toBe(true);
       expect(bidRes.timestamp).toBe(auctionBidTimestamp.toString());
       expect(bidRes.updatedAt).toBe(auctionBidTimestamp.toString());
       expect(bidRes.project.id).toBe(`${genArt721CoreAddress.toLowerCase()}-1`);
@@ -431,7 +431,7 @@ describe("SEALib event handling", () => {
       await waitUntilSubgraphIsSynced(client);
       // Validate that the previous winning bid has been updated
       const previousWinningBidRes = await getBidDetails(client, bidId);
-      expect(previousWinningBidRes.winningBid).toBe(false);
+      expect(previousWinningBidRes?.winningBid).toBe(false);
       expect(previousWinningBidRes.updatedAt).toBe(
         auctionBid2Timestamp.toString()
       );
@@ -557,7 +557,7 @@ describe("SEALib event handling", () => {
       expect(bidRes.id).toBe(bidId);
       expect(bidRes.bidder.id).toBe(artist.address.toLowerCase());
       expect(bidRes.value).toBe(ethers.utils.parseEther("1.01").toString());
-      expect(bidRes.winningBid).toBe(true);
+      expect(bidRes?.winningBid).toBe(true);
       expect(bidRes.timestamp).toBe(
         auctionSettledBidCreatedTimestamp.toString()
       );

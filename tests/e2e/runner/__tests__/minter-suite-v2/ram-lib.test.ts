@@ -343,7 +343,7 @@ describe("RAMLib event handling", () => {
       expect(bidRes.settled).toBe(false);
       expect(bidRes.slotIndex).toBe("10");
       expect(bidRes.value).toBe(slot10price.toString());
-      expect(bidRes.winningBid).toBe(null);
+      expect(bidRes?.winningBid).toBe(null);
       expect(bidRes.timestamp).toBe(auctionBidTimestamp.toString());
       expect(bidRes.updatedAt).toBe(auctionBidTimestamp.toString());
       expect(bidRes.project.id).toBe(`${genArt721CoreAddress.toLowerCase()}-0`);
@@ -497,7 +497,7 @@ describe("RAMLib event handling", () => {
       const bidId = `${minterRAMV0Address.toLowerCase()}-${genArt721CoreAddress.toLowerCase()}-${currentProjectNumber}-2`;
       const bidRes = await getBidDetails(client, bidId);
       expect(bidRes.id).toBe(bidId);
-      expect(bidRes.winningBid).toBe(false);
+      expect(bidRes?.winningBid).toBe(false);
       expect(bidRes.slotIndex).toBe(null);
       expect(bidRes.value).toBe("0");
       expect(bidRes.updatedAt).toBe(auctionBid3Timestamp.toString());
@@ -543,13 +543,13 @@ describe("RAMLib event handling", () => {
       const winningBid1Res = await getBidDetails(client, winningBid1);
       const winningBid2Res = await getBidDetails(client, winningBid2);
       expect(winningBid1Res.settled).toBe(true);
-      expect(winningBid1Res.winningBid).toBe(true);
+      expect(winningBid1Res?.winningBid).toBe(true);
       expect(winningBid1Res?.token?.id).toBe(
         `${genArt721CoreAddress.toLowerCase()}-${winningBidTokenId + 1}`
       );
       expect(winningBid1Res.updatedAt).toBe(auctionBid5Timestamp.toString());
       expect(winningBid2Res.settled).toBe(true);
-      expect(winningBid2Res.winningBid).toBe(true);
+      expect(winningBid2Res?.winningBid).toBe(true);
       expect(winningBid2Res?.token?.id).toBe(
         `${genArt721CoreAddress.toLowerCase()}-${winningBidTokenId}`
       );
@@ -699,7 +699,7 @@ describe("RAMLib event handling", () => {
       expect(winningBid1Res.settled).toBe(true);
       expect(winningBid1Res.slotIndex).toBe("5");
       expect(winningBid1Res.value).toBe(slot5price.toString());
-      expect(winningBid1Res.winningBid).toBe(true);
+      expect(winningBid1Res?.winningBid).toBe(true);
       expect(winningBid1Res.updatedAt).toBe(autoMintTokenTimestamp.toString());
       expect(winningBid1Res.project.id).toBe(
         `${genArt721CoreAddress.toLowerCase()}-${currentProjectNumber}`
@@ -714,7 +714,7 @@ describe("RAMLib event handling", () => {
       expect(winningBid2Res.settled).toBe(true);
       expect(winningBid2Res.slotIndex).toBe("5");
       expect(winningBid2Res.value).toBe(slot5price.toString());
-      expect(winningBid2Res.winningBid).toBe(true);
+      expect(winningBid2Res?.winningBid).toBe(true);
       expect(winningBid2Res.updatedAt).toBe(autoMintTokenTimestamp.toString());
       expect(winningBid2Res.project.id).toBe(
         `${genArt721CoreAddress.toLowerCase()}-${currentProjectNumber}`
@@ -733,19 +733,19 @@ describe("RAMLib event handling", () => {
       const refundedBid3Res = await getBidDetails(client, refundedBid3);
 
       expect(refundedBid1Res.slotIndex).toBe(null);
-      expect(refundedBid1Res.winningBid).toBe(false);
+      expect(refundedBid1Res?.winningBid).toBe(false);
       expect(refundedBid1Res.value).toBe("0");
       expect(refundedBid1Res.updatedAt).toBe(
         directRefundWinnersTimestamp.toString()
       );
       expect(refundedBid2Res.slotIndex).toBe(null);
-      expect(refundedBid2Res.winningBid).toBe(false);
+      expect(refundedBid2Res?.winningBid).toBe(false);
       expect(refundedBid2Res.value).toBe("0");
       expect(refundedBid2Res.updatedAt).toBe(
         directRefundWinnersTimestamp.toString()
       );
       expect(refundedBid3Res.slotIndex).toBe(null);
-      expect(refundedBid3Res.winningBid).toBe(false);
+      expect(refundedBid3Res?.winningBid).toBe(false);
       expect(refundedBid3Res.value).toBe("0");
       expect(refundedBid3Res.updatedAt).toBe(
         directRefundWinnersTimestamp.toString()
