@@ -300,7 +300,6 @@ export function handleBidCreated(event: BidCreated): void {
   bid.bidder = bidderAccount.id;
   bid.settled = false;
   bid.slotIndex = event.params.slotIndex;
-  bid.winningBid = true;
   bid.timestamp = event.block.timestamp;
   bid.updatedAt = event.block.timestamp;
   bid.save();
@@ -484,6 +483,7 @@ export function handleBidMinted(event: BidMinted): void {
     event.params.coreContract,
     event.params.tokenId
   );
+  bid.winningBid = true;
   bid.updatedAt = event.block.timestamp;
   bid.save();
 }

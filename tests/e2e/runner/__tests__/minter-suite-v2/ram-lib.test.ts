@@ -177,7 +177,7 @@ describe("RAMLib event handling", () => {
       }
     });
 
-    test("subgraph is updated after event emitted", async () => {
+    test("sets auction start time, end time, and base price in extra minter details in subgraph after event emitted", async () => {
       // artist configures the auction
       // @dev set minter as active
       await sharedMinterFilterContract.connect(artist).setMinterForProject(
@@ -228,7 +228,7 @@ describe("RAMLib event handling", () => {
       }
     });
 
-    test("subgraph is updated after event emitted", async () => {
+    test("sets auction num tokens in extra minter details in subgraph after event emitted", async () => {
       // artist configures the auction
       // @dev set minter as active
       await sharedMinterFilterContract.connect(artist).setMinterForProject(
@@ -285,7 +285,7 @@ describe("RAMLib event handling", () => {
       }
     });
 
-    test("subgraph is updated after event emitted", async () => {
+    test("during live auction bids are created and topped up in subgraph after event emitted", async () => {
       // artist configures the auction
       // @dev set minter as active
       await sharedMinterFilterContract.connect(artist).setMinterForProject(
@@ -343,7 +343,7 @@ describe("RAMLib event handling", () => {
       expect(bidRes.settled).toBe(false);
       expect(bidRes.slotIndex).toBe("10");
       expect(bidRes.value).toBe(slot10price.toString());
-      expect(bidRes.winningBid).toBe(true);
+      expect(bidRes.winningBid).toBe(null);
       expect(bidRes.timestamp).toBe(auctionBidTimestamp.toString());
       expect(bidRes.updatedAt).toBe(auctionBidTimestamp.toString());
       expect(bidRes.project.id).toBe(`${genArt721CoreAddress.toLowerCase()}-0`);
@@ -392,7 +392,7 @@ describe("RAMLib event handling", () => {
       }
     });
 
-    test("subgraph is updated after event emitted", async () => {
+    test("during live auction bids are removed when outbid, and settled and minted in post-auction state in subgraph after event emitted", async () => {
       // Add a new project for this auction as tokens will be minted
       const currentProjectNumber = await genArt721CoreContract.nextProjectId();
       await genArt721CoreContract
@@ -543,11 +543,13 @@ describe("RAMLib event handling", () => {
       const winningBid1Res = await getBidDetails(client, winningBid1);
       const winningBid2Res = await getBidDetails(client, winningBid2);
       expect(winningBid1Res.settled).toBe(true);
+      expect(winningBid1Res.winningBid).toBe(true);
       expect(winningBid1Res?.token?.id).toBe(
         `${genArt721CoreAddress.toLowerCase()}-${winningBidTokenId + 1}`
       );
       expect(winningBid1Res.updatedAt).toBe(auctionBid5Timestamp.toString());
       expect(winningBid2Res.settled).toBe(true);
+      expect(winningBid2Res.winningBid).toBe(true);
       expect(winningBid2Res?.token?.id).toBe(
         `${genArt721CoreAddress.toLowerCase()}-${winningBidTokenId}`
       );
@@ -568,7 +570,7 @@ describe("RAMLib event handling", () => {
       }
     });
 
-    test("subgraph is updated after event emitted", async () => {
+    test("in e1 error state if invocations < winning bids, highest + earliest bids are minted tokens and lowest bids are refunded in subgraph after event emitted", async () => {
       // Add a new project for this auction as tokens will be minted
       const currentProjectNumber = await genArt721CoreContract.nextProjectId();
       await genArt721CoreContract
