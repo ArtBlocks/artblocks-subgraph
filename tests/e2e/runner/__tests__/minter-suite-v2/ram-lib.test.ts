@@ -338,6 +338,7 @@ describe("RAMLib event handling", () => {
       const bidId = `${minterRAMV0Address.toLowerCase()}-${genArt721CoreAddress.toLowerCase()}-0-1`;
       const bidRes = await getBidDetails(client, bidId);
       expect(bidRes.id).toBe(bidId);
+      expect(bidRes.bidType).toBe("RAM");
       expect(bidRes.bidder.id).toBe(deployer.address.toLowerCase());
       expect(bidRes.settled).toBe(false);
       expect(bidRes.slotIndex).toBe("10");
@@ -691,6 +692,7 @@ describe("RAMLib event handling", () => {
       const winningBid1Res = await getBidDetails(client, winningBid1);
       const winningBid2Res = await getBidDetails(client, winningBid2);
       expect(winningBid1Res.id).toBe(winningBid1);
+      expect(winningBid1Res.bidType).toBe("RAM");
       expect(winningBid1Res.bidder.id).toBe(deployer.address.toLowerCase());
       expect(winningBid1Res.settled).toBe(true);
       expect(winningBid1Res.slotIndex).toBe("5");
@@ -705,6 +707,7 @@ describe("RAMLib event handling", () => {
         `${genArt721CoreAddress.toLowerCase()}-${winningBidTokenId}`
       );
       expect(winningBid2Res.id).toBe(winningBid2);
+      expect(winningBid2Res.bidType).toBe("RAM");
       expect(winningBid2Res.bidder.id).toBe(deployer.address.toLowerCase());
       expect(winningBid2Res.settled).toBe(true);
       expect(winningBid2Res.slotIndex).toBe("5");

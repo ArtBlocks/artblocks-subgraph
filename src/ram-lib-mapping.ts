@@ -293,6 +293,7 @@ export function handleBidCreated(event: BidCreated): void {
   bidderAccount.save();
 
   bid.project = minterProjectAndConfig.project.id;
+  bid.bidType = "RAM";
   bid.minter = event.address.toHexString();
   bid.value = bidValue;
   bid.bidder = bidderAccount.id;
