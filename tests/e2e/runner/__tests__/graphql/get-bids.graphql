@@ -1,5 +1,6 @@
 fragment BidDetails on Bid {
   id
+  bidType
   project {
     id
   }
