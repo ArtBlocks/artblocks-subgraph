@@ -295,6 +295,7 @@ export function handleBidCreated(event: BidCreated): void {
 
   bid.project = minterProjectAndConfig.project.id;
   bid.bidType = "RAM";
+  bid.winningBid = false;
   bid.minter = event.address.toHexString();
   bid.value = bidValue;
   bid.bidder = bidderAccount.id;
@@ -338,8 +339,7 @@ export function handleBidRemoved(event: BidRemoved): void {
     ]);
     return;
   }
-  // Update winning bid to false, slotIndex to null, value to 0
-  bid.winningBid = false;
+  // Update slotIndex to null, value to 0
   bid.value = BigInt.fromI32(0);
   bid.slotIndex = null;
   bid.updatedAt = event.block.timestamp;
@@ -521,8 +521,7 @@ export function handleBidRefunded(event: BidRefunded): void {
     ]);
     return;
   }
-  // Update winning bid to false, slotIndex to null, value to 0
-  bid.winningBid = false;
+  // Update slotIndex to null, value to 0
   bid.value = BigInt.fromI32(0);
   bid.slotIndex = null;
   bid.updatedAt = event.block.timestamp;

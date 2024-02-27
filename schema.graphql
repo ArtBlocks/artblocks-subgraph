@@ -508,8 +508,8 @@ type Bid @entity {
   "The slot index of the bid (RAM only)"
   slotIndex: BigInt
 
-  "Indicates the highest bid for SEA; For RAM, true for bids that won post-settlement."
-  winningBid: Boolean
+  "Indicates the highest bid for SEA; For RAM, true for bids that won post-settlement otherwise false."
+  winningBid: Boolean!
 
   "Indicates settlement status (RAM only)"
   settled: Boolean
