@@ -280,14 +280,15 @@ export function handleBidCreated(event: BidCreated): void {
     event.params.bidId.toString()
   );
   // @dev: a bid with this ID should not already exist for the RAM Minter
-  const bid = new Bid(ramBidId);
-  if (!bid) {
-    log.warning("Bid ID {} not found for minter {}", [
+  let bid = Bid.load(ramBidId);
+  if (bid) {
+    log.warning("Bid ID {} already exists for minter {}", [
       ramBidId,
       event.address.toHexString()
     ]);
     return;
   }
+  bid = new Bid(ramBidId);
   // Create new account entity if one for the bidder doesn't exist
   const bidderAccount = new Account(event.params.bidder.toHexString());
   bidderAccount.save();
