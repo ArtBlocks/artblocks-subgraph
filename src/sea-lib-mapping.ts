@@ -196,6 +196,9 @@ export function handleAuctionInitialized(event: AuctionInitialized): void {
     projectMinterConfig,
     event.block.timestamp
   );
+
+  // Update Bids entity
+  createBidFromValidEvent(event);
 }
 
 export function handleAuctionBid(event: AuctionBid): void {
@@ -297,31 +300,7 @@ export function handleAuctionBid(event: AuctionBid): void {
   );
 
   // Update Bids entity
-  const bidId = generateSEAMinterBidId(
-    event.address.toHexString(),
-    event.params.bidder.toHexString(),
-    event.params.bidAmount.toString(),
-    event.params.tokenId.toString()
-  );
-
-  // @dev: a bid with this ID should not already exist for the SEA Minter
-  const bid = new Bid(bidId);
-  // Create new account entity if one for the bidder doesn't exist
-  const bidderAccount = new Account(event.params.bidder.toHexString());
-  bidderAccount.save();
-
-  bid.project = minterProjectAndConfig.project.id;
-  bid.minter = event.address.toHexString();
-  bid.token = generateContractSpecificId(
-    event.params.coreContract,
-    event.params.tokenId
-  );
-  bid.bidder = bidderAccount.id;
-  bid.value = event.params.bidAmount;
-  bid.winningBid = true;
-  bid.timestamp = event.block.timestamp;
-  bid.updatedAt = event.block.timestamp;
-  bid.save();
+  createBidFromValidEvent(event);
 }
 
 export function handleAuctionSettled(event: AuctionSettled): void {
@@ -455,3 +434,59 @@ export function handleProjectNextTokenEjected(
 ///////////////////////////////////////////////////////////////////////////////
 // EVENT HANDLERS end here
 ///////////////////////////////////////////////////////////////////////////////
+
+/**
+ *
+ * @param event AuctionInitialized or AuctionBid event
+ * @description This helper function handles the Bid creation for AuctionInitialized and AuctionBid events
+ */
+function createBidFromValidEvent<T>(event: T): void {
+  // Invalid call, not a valid event
+  if (
+    !(event instanceof AuctionInitialized) &&
+    !(event instanceof AuctionBid)
+  ) {
+    return;
+  }
+  const projectIdNumber = generateProjectIdNumberFromTokenIdNumber(
+    event.params.tokenId
+  );
+  const minterProjectAndConfig = loadOrCreateMinterProjectAndConfigIfProject(
+    event.address, // minter
+    event.params.coreContract,
+    projectIdNumber,
+    event.block.timestamp
+  );
+
+  if (!minterProjectAndConfig) {
+    // project wasn't found, warning already logged in helper function
+    return;
+  }
+
+  // Update Bids entity
+  const bidId = generateSEAMinterBidId(
+    event.address.toHexString(),
+    event.params.bidder.toHexString(),
+    event.params.bidAmount.toString(),
+    event.params.tokenId.toString()
+  );
+
+  // @dev: a bid with this ID should not already exist for the SEA Minter
+  const bid = new Bid(bidId);
+  // Create new account entity if one for the bidder doesn't exist
+  const bidderAccount = new Account(event.params.bidder.toHexString());
+  bidderAccount.save();
+
+  bid.project = minterProjectAndConfig.project.id;
+  bid.minter = event.address.toHexString();
+  bid.token = generateContractSpecificId(
+    event.params.coreContract,
+    event.params.tokenId
+  );
+  bid.bidder = bidderAccount.id;
+  bid.value = event.params.bidAmount;
+  bid.winningBid = true;
+  bid.timestamp = event.block.timestamp;
+  bid.updatedAt = event.block.timestamp;
+  bid.save();
+}
