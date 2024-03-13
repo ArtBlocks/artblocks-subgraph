@@ -206,13 +206,14 @@ describe("RAMLib event handling", () => {
         client,
         targetId
       );
-      // validate extraMinterDetails
-      const extraMinterDetails = JSON.parse(minterConfigRes.extraMinterDetails);
-      expect(extraMinterDetails.auctionStartTime).toBe(targetAuctionStart);
-      expect(extraMinterDetails.auctionEndTime).toBe(targetAuctionEnd);
-      expect(extraMinterDetails.auctionBasePrice).toBe(
+      expect(minterConfigRes.priceIsConfigured).toBe(true);
+      expect(minterConfigRes.basePrice).toBe(
         ethers.utils.parseEther("1").toString()
       );
+      // validate extraMinterDetails
+      const extraMinterDetails = JSON.parse(minterConfigRes.extraMinterDetails);
+      expect(extraMinterDetails.startTime).toBe(targetAuctionStart);
+      expect(extraMinterDetails.auctionEndTime).toBe(targetAuctionEnd);
     });
   });
 
@@ -270,7 +271,7 @@ describe("RAMLib event handling", () => {
       );
       // validate extraMinterDetails
       const extraMinterDetails = JSON.parse(minterConfigRes.extraMinterDetails);
-      expect(extraMinterDetails.auctionNumTokensInAuction).toBe("1000");
+      expect(extraMinterDetails.numTokensInAuction).toBe("1000");
     });
   });
 

@@ -25,8 +25,7 @@ import {
   updateProjectIfMinterConfigIsActive,
   generateContractSpecificId,
   generateRAMMinterBidId,
-  slotIndexToBidValue,
-  getProjectMinterConfigExtraMinterDetailsTypedMap
+  slotIndexToBidValue
 } from "./helpers";
 
 import {
@@ -160,22 +159,21 @@ export function handleAuctionConfigUpdated(event: AuctionConfigUpdated): void {
   }
 
   const projectMinterConfig = minterProjectAndConfig.projectMinterConfiguration;
+  // update project minter configuration fields
+  projectMinterConfig.priceIsConfigured = true;
+  projectMinterConfig.basePrice = event.params.basePrice;
   // update all auction details in project minter configuration extraMinterDetails json field
   let auctionConfigUpdateDetails: TypedMap<
     string,
     JSONValue
   > = createTypedMapFromEntries([
     {
-      key: "auctionStartTime",
+      key: "startTime",
       value: toJSONValue(event.params.timestampStart)
     },
     { key: "auctionEndTime", value: toJSONValue(event.params.timestampEnd) },
     {
-      key: "auctionBasePrice",
-      value: toJSONValue(event.params.basePrice.toString()) // basePrice is likely to overflow js Number.MAX_SAFE_INTEGER so store as string
-    },
-    {
-      key: "auctionNumTokensInAuction",
+      key: "numTokensInAuction",
       value: toJSONValue(event.params.numTokensInAuction.toString())
     }
   ]);
@@ -216,7 +214,7 @@ export function handleNumTokensInAuctionUpdated(
     JSONValue
   > = createTypedMapFromEntries([
     {
-      key: "auctionNumTokensInAuction",
+      key: "numTokensInAuction",
       value: toJSONValue(event.params.numTokensInAuction.toString())
     }
   ]);
@@ -249,13 +247,7 @@ export function handleBidCreated(event: BidCreated): void {
   }
 
   const projectMinterConfig = minterProjectAndConfig.projectMinterConfiguration;
-  // Get the auction base price
-  const currentProjectMinterConfigDetails = getProjectMinterConfigExtraMinterDetailsTypedMap(
-    projectMinterConfig
-  );
-  const auctionBasePrice = currentProjectMinterConfigDetails.get(
-    "auctionBasePrice"
-  );
+  const auctionBasePrice = projectMinterConfig.basePrice;
 
   if (!auctionBasePrice) {
     log.warning(
@@ -360,12 +352,7 @@ export function handleBidToppedUp(event: BidToppedUp): void {
 
   const projectMinterConfig = minterProjectAndConfig.projectMinterConfiguration;
   // Get the auction base price
-  const currentProjectMinterConfigDetails = getProjectMinterConfigExtraMinterDetailsTypedMap(
-    projectMinterConfig
-  );
-  const auctionBasePrice = currentProjectMinterConfigDetails.get(
-    "auctionBasePrice"
-  );
+  const auctionBasePrice = projectMinterConfig.basePrice;
 
   if (!auctionBasePrice) {
     log.warning(
