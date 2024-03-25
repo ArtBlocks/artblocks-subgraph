@@ -17,11 +17,11 @@ Please take care to ensure that you are copy-pasting the auth-token for _Art Blo
 
 ## Subgraph Deployments
 
-### Testnet (Goerli)
+### Testnet (Sepolia)
 
-Goerli subgraph deployments can be performed on any day of the working week, other than Friday, in order to avoid causing an outage on https://artist-staging.artblocks.io going into a weekend, when the team will not be readily available to look into it.
+Sepolia subgraph deployments can be performed on any day of the working week, other than Friday, in order to avoid causing an outage on https://artist-staging.artblocks.io going into a weekend, when the team will not be readily available to look into it.
 
-For Goerli subgraph deployments, we deploy directly to a hosted subgraph service provided by The Graph, which takes ~20 minutes to sync.
+For Sepolia subgraph deployments, we deploy directly to a hosted subgraph service provided by The Graph, which takes ~20 minutes to sync.
 
 ### Mainnet
 

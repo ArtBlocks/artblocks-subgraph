@@ -1,5 +1,5 @@
 {
-  "network": "goerli",
+  "network": "sepolia",
   "iGenArt721CoreContractV3_BaseContracts": [
     {
       "address": ""
