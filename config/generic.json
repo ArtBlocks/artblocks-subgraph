@@ -95,6 +95,11 @@
       "address": ""
     }
   ],
+  "RAMLibContracts": [
+    {
+      "address": ""
+    }
+  ],
   "DALibContracts": [
     {
       "address": ""

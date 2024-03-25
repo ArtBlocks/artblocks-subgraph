@@ -478,6 +478,7 @@ function createBidFromValidEvent<T>(event: T): void {
   bidderAccount.save();
 
   bid.project = minterProjectAndConfig.project.id;
+  bid.bidType = "SEA";
   bid.minter = event.address.toHexString();
   bid.token = generateContractSpecificId(
     event.params.coreContract,

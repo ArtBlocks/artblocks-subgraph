@@ -31,6 +31,7 @@ export type SubgraphConfig = Partial<{
   merkleLibContracts: { address: string }[];
   holderLibContracts: { address: string }[];
   SEALibContracts: { address: string }[];
+  RAMLibContracts: { address: string }[];
   DALibContracts: { address: string }[];
   DAExpLibContracts: { address: string }[];
   DALinLibContracts: { address: string }[];

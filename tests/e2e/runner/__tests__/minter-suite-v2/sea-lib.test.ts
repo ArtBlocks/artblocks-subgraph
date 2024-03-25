@@ -403,6 +403,7 @@ describe("SEALib event handling", () => {
       const bidId = `${minterSEAV1Address.toLowerCase()}-${deployer.address.toLowerCase()}-${auctionBidValue.toString()}-${targetTokenId}`;
       const bidRes = await getBidDetails(client, bidId);
       expect(bidRes.id).toBe(bidId);
+      expect(bidRes.bidType).toBe("SEA");
       expect(bidRes.bidder.id).toBe(deployer.address.toLowerCase());
       expect(bidRes.value).toBe(auctionBidValue.toString());
       expect(bidRes.winningBid).toBe(true);

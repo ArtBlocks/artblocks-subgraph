@@ -1386,6 +1386,81 @@ dataSources:
           handler: handleProjectNextTokenEjected
       file: ./src/sea-lib-mapping.ts
   {{/SEALibContracts}}
+  {{#RAMLibContracts}}
+  - kind: ethereum/contract
+    name: 'RAMLib{{#address}}-{{address}}{{/address}}'
+    network: {{network}}
+    source:
+      address: "{{#address}}{{address}}{{/address}}{{^address}}0x0000000000000000000000000000000000000000{{/address}}"
+      abi: RAMLib
+      {{#startBlock}}startBlock: {{startBlock}}{{/startBlock}}
+    mapping:
+      kind: ethereum/events
+      apiVersion: 0.0.5
+      language: wasm/assemblyscript
+      entities:
+        - Project
+        - ProjectScript
+        - Token
+        - Contract
+        - Account
+        - AccountProject
+        - Whitelisting
+        - MinterFilter
+        - Minter
+        - ProjectMinterConfiguration
+      abis:
+        - name: RAMLib
+          file: ./abis/RAMLib.json
+        - name: ISharedMinterV0
+          file: ./abis/ISharedMinterV0.json
+        - name: ISharedMinterRAMV0
+          file: ./abis/ISharedMinterRAMV0.json
+        - name: IMinterFilterV1
+          file: ./abis/IMinterFilterV1.json
+        - name: IFilteredMinterV2
+          file: ./abis/IFilteredMinterV2.json
+        - name: IFilteredMinterDALinV1
+          file: ./abis/IFilteredMinterDALinV1.json
+        - name: IFilteredMinterDAExpV1
+          file: ./abis/IFilteredMinterDAExpV1.json
+        - name: IFilteredMinterDAExpSettlementV1
+          file: ./abis/IFilteredMinterDAExpSettlementV1.json
+        - name: IFilteredMinterV2
+          file: ./abis/IFilteredMinterV2.json
+        - name: IFilteredMinterHolderV2
+          file: ./abis/IFilteredMinterHolderV2.json
+        - name: IFilteredMinterMerkleV2
+          file: ./abis/IFilteredMinterMerkleV2.json
+      eventHandlers:
+        - event: AuctionBufferTimeParamsUpdated(uint256,uint256)
+          handler: handleAuctionBufferTimeParamsUpdated
+        - event: AuctionConfigUpdated(indexed uint256,indexed address,uint256,uint256,uint256,bool,bool,uint256)
+          handler: handleAuctionConfigUpdated
+        - event: AuctionTimestampEndUpdated(indexed uint256,indexed address,uint256)
+          handler: handleAuctionTimestampEndUpdated
+        - event: BidCreated(indexed uint256,indexed address,uint256,uint256,address)
+          handler: handleBidCreated
+        - event: BidMinted(indexed uint256,indexed address,uint256,uint256)
+          handler: handleBidMinted
+        - event: BidRefunded(indexed uint256,indexed address,uint256)
+          handler: handleBidRefunded
+        - event: BidRemoved(indexed uint256,indexed address,uint256)
+          handler: handleBidRemoved
+        - event: BidSettled(indexed uint256,indexed address,uint256)
+          handler: handleBidSettled
+        - event: BidToppedUp(indexed uint256,indexed address,uint256,uint256)
+          handler: handleBidToppedUp
+        - event: MinAuctionDurationSecondsUpdated(uint256)
+          handler: handleMinAuctionDurationSecondsUpdated
+        - event: MinterRefundGasLimitUpdated(uint24)
+          handler: handleMinterRefundGasLimitUpdated
+        - event: NumSlotsUpdated(uint256)
+          handler: handleNumSlotsUpdated
+        - event: NumTokensInAuctionUpdated(indexed uint256,indexed address,uint256)
+          handler: handleNumTokensInAuctionUpdated
+      file: ./src/ram-lib-mapping.ts
+  {{/RAMLibContracts}}
   {{#DALibContracts}}
   - kind: ethereum/contract
     name: 'DALib{{#address}}-{{address}}{{/address}}'
