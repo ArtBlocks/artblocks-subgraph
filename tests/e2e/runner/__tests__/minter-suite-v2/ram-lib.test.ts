@@ -7,6 +7,7 @@ import {
   getMinterDetails,
   getBidDetails,
   getProjectMinterConfigurationDetails,
+  increaseTimeNextBlock,
 } from "../utils/helpers";
 import {
   GenArt721CoreV3__factory,
@@ -316,10 +317,8 @@ describe("RAMLib event handling", () => {
         genArt721CoreAddress, // _coreContract
         10 // _slotIndex
       );
-      // Wait until auction starts (60s + 1s margin)
-      await new Promise((resolve) => {
-        setTimeout(resolve, 61 * 1000);
-      });
+      // Wait until auction starts (60s + 6s margin)
+      await increaseTimeNextBlock(66);
       // Create initial bid for auction
       // @dev bids can only be created when auction is live
       const tx = await minterRAMV0Contract.connect(deployer).createBid(
@@ -447,10 +446,8 @@ describe("RAMLib event handling", () => {
         genArt721CoreAddress, // _coreContract
         5 // _slotIndex
       );
-      // Wait until auction starts (60s + 1s margin)
-      await new Promise((resolve) => {
-        setTimeout(resolve, 61 * 1000);
-      });
+      // Wait until auction starts (60s + 6s margin)
+      await increaseTimeNextBlock(66);
       // Create bid for auction
       // @dev bids can only be created when auction is live
       const tx = await minterRAMV0Contract.connect(deployer).createBid(
@@ -521,9 +518,7 @@ describe("RAMLib event handling", () => {
       expect(extraMinterDetails.auctionEndTime).toBe(reducedTargetAuctionEnd);
 
       // Wait until auction ends
-      await new Promise((resolve) => {
-        setTimeout(resolve, 620 * 1000);
-      });
+      await increaseTimeNextBlock(620);
       // Auto mint tokens to winners
       const tx5 = await minterRAMV0Contract
         .connect(artist)
@@ -625,10 +620,8 @@ describe("RAMLib event handling", () => {
         genArt721CoreAddress, // _coreContract
         5 // _slotIndex
       );
-      // Wait until auction starts (60s + 1s margin)
-      await new Promise((resolve) => {
-        setTimeout(resolve, 61 * 1000);
-      });
+      // Wait until auction starts (60s + 6s margin)
+      await increaseTimeNextBlock(66);
       // Create 5 bids for auction
       // @dev bids can only be created when auction is live
       for (let i = 0; i < 5; i++) {
@@ -655,9 +648,7 @@ describe("RAMLib event handling", () => {
       await waitUntilSubgraphIsSynced(client);
 
       // Wait til auction ends
-      await new Promise((resolve) => {
-        setTimeout(resolve, 620 * 1000);
-      });
+      await increaseTimeNextBlock(620);
 
       // First auto-mint tokens to winners
       // Auto mint tokens to winners

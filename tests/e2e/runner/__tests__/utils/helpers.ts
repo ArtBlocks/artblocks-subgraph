@@ -92,6 +92,19 @@ export const createSubgraphClient = (): Client => {
   return client;
 };
 
+/**
+ * Adds `timeAmount` seconds to the timestamp of the latest block.
+ * @param timeAmount the amount of time in seconds to add to the latest block.
+ */
+export const increaseTimeNextBlock = async (timeAmount: number) => {
+  const provider = new ethers.providers.JsonRpcProvider("http://hardhat:8545");
+  // Increase latest block timestamp by timeAmount
+  await provider.send("evm_increaseTime", [timeAmount]);
+  // Mine a new block so the timestamp takes effect
+  await provider.send("evm_mine", []);
+  return;
+};
+
 export const waitUntilSubgraphIsSynced = async (client: Client) => {
   const provider = new ethers.providers.JsonRpcProvider("http://hardhat:8545");
 
