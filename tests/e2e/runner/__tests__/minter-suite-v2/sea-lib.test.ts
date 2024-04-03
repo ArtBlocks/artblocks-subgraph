@@ -432,6 +432,7 @@ describe("SEALib event handling", () => {
       // Validate that the previous winning bid has been updated
       const previousWinningBidRes = await getBidDetails(client, bidId);
       expect(previousWinningBidRes.winningBid).toBe(false);
+      expect(previousWinningBidRes.isRemoved).toBe(true);
       expect(previousWinningBidRes.updatedAt).toBe(
         auctionBid2Timestamp.toString()
       );

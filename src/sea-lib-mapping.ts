@@ -242,6 +242,7 @@ export function handleAuctionBid(event: AuctionBid): void {
     const previousWinningBid = Bid.load(previousHighestBidId);
     if (previousWinningBid) {
       previousWinningBid.winningBid = false;
+      previousWinningBid.isRemoved = true;
       previousWinningBid.updatedAt = event.block.timestamp;
       previousWinningBid.save();
     }

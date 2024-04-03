@@ -511,7 +511,7 @@ type Bid @entity {
   "Indicates the highest bid for SEA; For RAM, true for bids that won post-settlement otherwise false."
   winningBid: Boolean!
 
-  "Indicates bid was removed (RAM only)"
+  "Indicates bid was removed"
   isRemoved: Boolean
 
   "Indicates settlement status (RAM only)"
