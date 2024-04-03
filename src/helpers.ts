@@ -214,18 +214,15 @@ export function loadOrCreateReceipt(
  * @returns slotBidValue Value of a bid in the slot, in Wei
  */
 export function slotIndexToBidValue(
-  basePrice: string,
+  basePrice: BigInt,
   slotIndex: BigInt
 ): BigInt {
-  // Convert basePrice to BigInt
-  const basePriceBigInt: BigInt = BigInt.fromString(basePrice);
-
   // pricing assumes maxPrice = minPrice * 2^8, pseudo-exponential curve
   const slotsPerDouble: BigInt = BigInt.fromI32(512 / 8);
   // Calculate the bit-shift amount by dividing slotIndex and converting result to an exponent
   // for the bit-shifting equivalent
   let shiftAmount: BigInt = slotIndex.div(slotsPerDouble);
-  let slotBidValue: BigInt = basePriceBigInt.times(
+  let slotBidValue: BigInt = basePrice.times(
     BigInt.fromI32(2).pow(shiftAmount.toI32() as u8)
   );
   // Perform linear-interpolation for partial half-life points

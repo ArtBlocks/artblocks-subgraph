@@ -174,7 +174,7 @@ export function handleAuctionConfigUpdated(event: AuctionConfigUpdated): void {
     { key: "auctionEndTime", value: toJSONValue(event.params.timestampEnd) },
     {
       key: "numTokensInAuction",
-      value: toJSONValue(event.params.numTokensInAuction.toString())
+      value: toJSONValue(event.params.numTokensInAuction)
     }
   ]);
 
@@ -215,7 +215,7 @@ export function handleNumTokensInAuctionUpdated(
   > = createTypedMapFromEntries([
     {
       key: "numTokensInAuction",
-      value: toJSONValue(event.params.numTokensInAuction.toString())
+      value: toJSONValue(event.params.numTokensInAuction)
     }
   ]);
 
@@ -257,7 +257,7 @@ export function handleBidCreated(event: BidCreated): void {
     return;
   }
   const bidValue = slotIndexToBidValue(
-    auctionBasePrice.toString(),
+    auctionBasePrice,
     event.params.slotIndex
   );
 
@@ -362,7 +362,7 @@ export function handleBidToppedUp(event: BidToppedUp): void {
     return;
   }
   const bidValue = slotIndexToBidValue(
-    auctionBasePrice.toString(),
+    auctionBasePrice,
     event.params.newSlotIndex
   );
 

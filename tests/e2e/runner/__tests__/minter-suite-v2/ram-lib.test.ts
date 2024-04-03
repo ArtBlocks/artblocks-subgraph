@@ -272,7 +272,7 @@ describe("RAMLib event handling", () => {
       );
       // validate extraMinterDetails
       const extraMinterDetails = JSON.parse(minterConfigRes.extraMinterDetails);
-      expect(extraMinterDetails.numTokensInAuction).toBe("1000");
+      expect(extraMinterDetails.numTokensInAuction).toBe(1000);
     });
   });
 
