@@ -331,9 +331,9 @@ export function handleBidRemoved(event: BidRemoved): void {
     ]);
     return;
   }
-  // Update slotIndex to null, value to 0
-  bid.value = BigInt.fromI32(0);
-  bid.slotIndex = null;
+
+  // update bid
+  bid.isRemoved = true;
   bid.updatedAt = event.block.timestamp;
   bid.save();
 }
@@ -508,9 +508,8 @@ export function handleBidRefunded(event: BidRefunded): void {
     ]);
     return;
   }
-  // Update slotIndex to null, value to 0
-  bid.value = BigInt.fromI32(0);
-  bid.slotIndex = null;
+  // update bid
+  bid.isRemoved = true;
   bid.updatedAt = event.block.timestamp;
   bid.save();
 }

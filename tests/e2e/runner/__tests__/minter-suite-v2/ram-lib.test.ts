@@ -496,8 +496,9 @@ describe("RAMLib event handling", () => {
       const bidRes = await getBidDetails(client, bidId);
       expect(bidRes.id).toBe(bidId);
       expect(bidRes.winningBid).toBe(false);
-      expect(bidRes.slotIndex).toBe(null);
-      expect(bidRes.value).toBe("0");
+      expect(bidRes.slotIndex).toBe("5");
+      expect(bidRes.value).toBe(slot5price.toString());
+      expect(bidRes.isRemoved).toBe(true);
       expect(bidRes.updatedAt).toBe(auctionBid3Timestamp.toString());
 
       // Artist reduces auction length time
@@ -724,21 +725,24 @@ describe("RAMLib event handling", () => {
       const refundedBid2Res = await getBidDetails(client, refundedBid2);
       const refundedBid3Res = await getBidDetails(client, refundedBid3);
 
-      expect(refundedBid1Res.slotIndex).toBe(null);
+      expect(refundedBid1Res.slotIndex).toBe("5");
+      expect(refundedBid1Res.value).toBe(slot5price.toString());
+      expect(refundedBid1Res.isRemoved).toBe(true);
       expect(refundedBid1Res.winningBid).toBe(false);
-      expect(refundedBid1Res.value).toBe("0");
       expect(refundedBid1Res.updatedAt).toBe(
         directRefundWinnersTimestamp.toString()
       );
-      expect(refundedBid2Res.slotIndex).toBe(null);
+      expect(refundedBid2Res.slotIndex).toBe("5");
+      expect(refundedBid2Res.value).toBe(slot5price.toString());
+      expect(refundedBid2Res.isRemoved).toBe(true);
       expect(refundedBid2Res.winningBid).toBe(false);
-      expect(refundedBid2Res.value).toBe("0");
       expect(refundedBid2Res.updatedAt).toBe(
         directRefundWinnersTimestamp.toString()
       );
-      expect(refundedBid3Res.slotIndex).toBe(null);
+      expect(refundedBid3Res.slotIndex).toBe("5");
+      expect(refundedBid3Res.value).toBe(slot5price.toString());
+      expect(refundedBid3Res.isRemoved).toBe(true);
       expect(refundedBid3Res.winningBid).toBe(false);
-      expect(refundedBid3Res.value).toBe("0");
       expect(refundedBid3Res.updatedAt).toBe(
         directRefundWinnersTimestamp.toString()
       );

@@ -13,6 +13,7 @@ fragment BidDetails on Bid {
   bidder {
     id
   }
+  isRemoved
   settled
   slotIndex
   value
