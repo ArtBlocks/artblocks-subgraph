@@ -488,6 +488,7 @@ function createBidFromValidEvent<T>(event: T): void {
   bid.bidder = bidderAccount.id;
   bid.value = event.params.bidAmount;
   bid.winningBid = true;
+  bid.isRemoved = false;
   bid.timestamp = event.block.timestamp;
   bid.updatedAt = event.block.timestamp;
   bid.save();

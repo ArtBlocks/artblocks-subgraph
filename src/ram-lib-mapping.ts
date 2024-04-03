@@ -292,6 +292,7 @@ export function handleBidCreated(event: BidCreated): void {
   bid.value = bidValue;
   bid.bidder = bidderAccount.id;
   bid.settled = false;
+  bid.isRemoved = false;
   bid.slotIndex = event.params.slotIndex;
   bid.timestamp = event.block.timestamp;
   bid.updatedAt = event.block.timestamp;

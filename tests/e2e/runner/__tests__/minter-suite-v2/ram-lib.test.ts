@@ -344,6 +344,7 @@ describe("RAMLib event handling", () => {
       expect(bidRes.slotIndex).toBe("10");
       expect(bidRes.value).toBe(slot10price.toString());
       expect(bidRes.winningBid).toBe(false);
+      expect(bidRes.isRemoved).toBe(false);
       expect(bidRes.timestamp).toBe(auctionBidTimestamp.toString());
       expect(bidRes.updatedAt).toBe(auctionBidTimestamp.toString());
       expect(bidRes.project.id).toBe(`${genArt721CoreAddress.toLowerCase()}-0`);
@@ -374,6 +375,7 @@ describe("RAMLib event handling", () => {
       // validate topped up Bid entity
       const toppedUpBidRes = await getBidDetails(client, bidId);
       expect(toppedUpBidRes.slotIndex).toBe("12");
+      expect(toppedUpBidRes.isRemoved).toBe(false);
       expect(toppedUpBidRes.value).toBe(slot12price.toString());
       expect(toppedUpBidRes.updatedAt).toBe(auctionBid2Timestamp.toString());
     });
@@ -541,12 +543,14 @@ describe("RAMLib event handling", () => {
       const winningBid2Res = await getBidDetails(client, winningBid2);
       expect(winningBid1Res.settled).toBe(true);
       expect(winningBid1Res.winningBid).toBe(true);
+      expect(winningBid1Res.isRemoved).toBe(false);
       expect(winningBid1Res?.token?.id).toBe(
         `${genArt721CoreAddress.toLowerCase()}-${winningBidTokenId + 1}`
       );
       expect(winningBid1Res.updatedAt).toBe(auctionBid5Timestamp.toString());
       expect(winningBid2Res.settled).toBe(true);
       expect(winningBid2Res.winningBid).toBe(true);
+      expect(winningBid2Res.isRemoved).toBe(false);
       expect(winningBid2Res?.token?.id).toBe(
         `${genArt721CoreAddress.toLowerCase()}-${winningBidTokenId}`
       );
@@ -691,6 +695,7 @@ describe("RAMLib event handling", () => {
       expect(winningBid1Res.bidder.id).toBe(deployer.address.toLowerCase());
       expect(winningBid1Res.settled).toBe(true);
       expect(winningBid1Res.slotIndex).toBe("5");
+      expect(winningBid1Res.isRemoved).toBe(false);
       expect(winningBid1Res.value).toBe(slot5price.toString());
       expect(winningBid1Res.winningBid).toBe(true);
       expect(winningBid1Res.updatedAt).toBe(autoMintTokenTimestamp.toString());
@@ -706,6 +711,7 @@ describe("RAMLib event handling", () => {
       expect(winningBid2Res.bidder.id).toBe(deployer.address.toLowerCase());
       expect(winningBid2Res.settled).toBe(true);
       expect(winningBid2Res.slotIndex).toBe("5");
+      expect(winningBid2Res.isRemoved).toBe(false);
       expect(winningBid2Res.value).toBe(slot5price.toString());
       expect(winningBid2Res.winningBid).toBe(true);
       expect(winningBid2Res.updatedAt).toBe(autoMintTokenTimestamp.toString());
