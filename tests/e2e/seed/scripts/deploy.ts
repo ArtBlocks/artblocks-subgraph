@@ -5,7 +5,7 @@ import { ethers } from "ethers";
 // flagship
 import {
   GenArt721CoreV3__factory,
-  GenArt721CoreV3LibraryAddresses,
+  GenArt721CoreV3LibraryAddresses
 } from "../contracts/factories/GenArt721CoreV3__factory";
 import { AdminACLV0__factory } from "../contracts/factories/AdminACLV0__factory";
 import { PseudorandomAtomic__factory } from "../contracts/factories/PseudorandomAtomic__factory";
@@ -26,6 +26,7 @@ import { MinterSetPriceERC20V5__factory } from "../contracts/factories/MinterSet
 import { MinterSetPriceMerkleV5__factory } from "../contracts/factories/MinterSetPriceMerkleV5__factory";
 import { MinterSetPriceHolderV5__factory } from "../contracts/factories/MinterSetPriceHolderV5__factory";
 import { MinterSEAV1__factory } from "../contracts/factories/MinterSEAV1__factory";
+import { MinterRAMV0__factory } from "../contracts/factories/MinterRAMV0__factory";
 import { MinterDAExpV5__factory } from "../contracts/factories/MinterDAExpV5__factory";
 import { MinterDALinV5__factory } from "../contracts/factories/MinterDALinV5__factory";
 import { MinterDAExpSettlementV3__factory } from "../contracts/factories/MinterDAExpSettlementV3__factory";
@@ -83,7 +84,7 @@ async function main() {
   // fund artist wallet
   await deployer.sendTransaction({
     to: artist.address,
-    value: ethers.utils.parseEther("50"),
+    value: ethers.utils.parseEther("50")
   });
   /////////////////////////////////////////////////////////////////////////////
   // SETUP ACCOUNTS ENDS HERE
@@ -120,8 +121,8 @@ async function main() {
 
   subgraphConfig.adminACLV0Contracts = [
     {
-      address: adminACLAddress,
-    },
+      address: adminACLAddress
+    }
   ];
 
   console.log(`Admin ACL deployed at ${adminACLAddress}`);
@@ -136,12 +137,10 @@ async function main() {
   console.log(
     `BytecodeStorageReader deployed at ${bytecodeStorageReaderAddress}`
   );
-  subgraphConfig.metadata.bytecodeStorageReaderAddress =
-    bytecodeStorageReaderAddress;
+  subgraphConfig.metadata.bytecodeStorageReaderAddress = bytecodeStorageReaderAddress;
 
   const linkLibraryAddresses: GenArt721CoreV3LibraryAddresses = {
-    "contracts/libs/v0.8.x/BytecodeStorageV1.sol:BytecodeStorageReader":
-      bytecodeStorageReaderAddress,
+    "contracts/libs/v0.8.x/BytecodeStorageV1.sol:BytecodeStorageReader": bytecodeStorageReaderAddress
   };
 
   const genArt721CoreFactory = new GenArt721CoreV3__factory(
@@ -158,10 +157,10 @@ async function main() {
   await genArt721Core.deployed();
 
   const genArtV3SubgraphConfig = {
-    address: genArt721Core.address,
+    address: genArt721Core.address
   };
   subgraphConfig.iGenArt721CoreContractV3_BaseContracts = [
-    genArtV3SubgraphConfig,
+    genArtV3SubgraphConfig
   ];
   subgraphConfig.ownableGenArt721CoreV3Contracts = [genArtV3SubgraphConfig];
   subgraphConfig.iERC721GenArt721CoreV3Contracts = [genArtV3SubgraphConfig];
@@ -175,8 +174,7 @@ async function main() {
   await minterFilterAdminACL.deployed();
   const minterFilterAdminACLAddress = minterFilterAdminACL.address;
   // record in metadata for future reference in tests
-  subgraphConfig.metadata.minterFilterAdminACLAddress =
-    minterFilterAdminACLAddress.toString();
+  subgraphConfig.metadata.minterFilterAdminACLAddress = minterFilterAdminACLAddress.toString();
 
   const coreRegistryFactory = new CoreRegistryV1__factory(deployer);
   const coreRegistry = await coreRegistryFactory.deploy();
@@ -188,8 +186,8 @@ async function main() {
   // @dev this key will be updated in a subsequent PR to be named engineRegistryContracts
   subgraphConfig.ICoreRegistryContracts = [
     {
-      address: coreRegistryAddress,
-    },
+      address: coreRegistryAddress
+    }
   ];
 
   const minterFilterFactory = new MinterFilterV2__factory(deployer);
@@ -202,8 +200,8 @@ async function main() {
 
   subgraphConfig.sharedMinterFilterContracts = [
     {
-      address: minterFilter.address,
-    },
+      address: minterFilter.address
+    }
   ];
 
   // Deploy Minter Suite contracts.
@@ -224,18 +222,18 @@ async function main() {
   console.log(`MinterSetPriceV5 deployed at ${minterSetPriceV5.address}`);
   subgraphConfig.genericMinterEventsLibContracts = [
     {
-      address: minterSetPriceV5.address,
-    },
+      address: minterSetPriceV5.address
+    }
   ];
   subgraphConfig.setPriceLibContracts = [
     {
-      address: minterSetPriceV5.address,
-    },
+      address: minterSetPriceV5.address
+    }
   ];
   subgraphConfig.maxInvocationsLibContracts = [
     {
-      address: minterSetPriceV5.address,
-    },
+      address: minterSetPriceV5.address
+    }
   ];
 
   // @dev also deploy ERC20 set price minter
@@ -250,18 +248,18 @@ async function main() {
     `MinterSetPriceERC20V5 deployed at ${minterSetPriceERC20V5.address}`
   );
   subgraphConfig.genericMinterEventsLibContracts.push({
-    address: minterSetPriceERC20V5.address,
+    address: minterSetPriceERC20V5.address
   });
   subgraphConfig.splitFundsLibContracts = [
     {
-      address: minterSetPriceERC20V5.address,
-    },
+      address: minterSetPriceERC20V5.address
+    }
   ];
   subgraphConfig.setPriceLibContracts.push({
-    address: minterSetPriceERC20V5.address,
+    address: minterSetPriceERC20V5.address
   });
   subgraphConfig.maxInvocationsLibContracts.push({
-    address: minterSetPriceERC20V5.address,
+    address: minterSetPriceERC20V5.address
   });
 
   // Merkle Minters
@@ -275,18 +273,18 @@ async function main() {
     `MinterSetPriceMerkleV5 deployed at ${minterSetPriceMerkleV5.address}`
   );
   subgraphConfig.genericMinterEventsLibContracts.push({
-    address: minterSetPriceMerkleV5.address,
+    address: minterSetPriceMerkleV5.address
   });
   subgraphConfig.setPriceLibContracts.push({
-    address: minterSetPriceMerkleV5.address,
+    address: minterSetPriceMerkleV5.address
   });
   subgraphConfig.maxInvocationsLibContracts.push({
-    address: minterSetPriceMerkleV5.address,
+    address: minterSetPriceMerkleV5.address
   });
   subgraphConfig.merkleLibContracts = [
     {
-      address: minterSetPriceMerkleV5.address,
-    },
+      address: minterSetPriceMerkleV5.address
+    }
   ];
 
   // Holder Minters
@@ -300,18 +298,18 @@ async function main() {
     `minterSetPriceHolderV5 deployed at ${minterSetPriceHolderV5.address}`
   );
   subgraphConfig.genericMinterEventsLibContracts.push({
-    address: minterSetPriceHolderV5.address,
+    address: minterSetPriceHolderV5.address
   });
   subgraphConfig.setPriceLibContracts.push({
-    address: minterSetPriceHolderV5.address,
+    address: minterSetPriceHolderV5.address
   });
   subgraphConfig.maxInvocationsLibContracts.push({
-    address: minterSetPriceHolderV5.address,
+    address: minterSetPriceHolderV5.address
   });
   subgraphConfig.holderLibContracts = [
     {
-      address: minterSetPriceHolderV5.address,
-    },
+      address: minterSetPriceHolderV5.address
+    }
   ];
 
   // SEA Minters
@@ -320,15 +318,32 @@ async function main() {
   await minterSEAV1.deployed();
   console.log(`minterSEAV1 deployed at ${minterSEAV1.address}`);
   subgraphConfig.genericMinterEventsLibContracts.push({
-    address: minterSEAV1.address,
+    address: minterSEAV1.address
   });
   subgraphConfig.maxInvocationsLibContracts.push({
-    address: minterSEAV1.address,
+    address: minterSEAV1.address
   });
   subgraphConfig.SEALibContracts = [
     {
-      address: minterSEAV1.address,
-    },
+      address: minterSEAV1.address
+    }
+  ];
+
+  // RAM Minters
+  const MinterRAMV0Factory = new MinterRAMV0__factory(deployer);
+  const minterRAMV0 = await MinterRAMV0Factory.deploy(minterFilter.address);
+  await minterRAMV0.deployed();
+  console.log(`minterRAMV0 deployed at ${minterRAMV0.address}`);
+  subgraphConfig.genericMinterEventsLibContracts.push({
+    address: minterRAMV0.address
+  });
+  subgraphConfig.maxInvocationsLibContracts.push({
+    address: minterRAMV0.address
+  });
+  subgraphConfig.RAMLibContracts = [
+    {
+      address: minterRAMV0.address
+    }
   ];
 
   // DA Exp Minters
@@ -337,20 +352,20 @@ async function main() {
   await minterDAExpV5.deployed();
   console.log(`minterDAExpV5 deployed at ${minterDAExpV5.address}`);
   subgraphConfig.genericMinterEventsLibContracts.push({
-    address: minterDAExpV5.address,
+    address: minterDAExpV5.address
   });
   subgraphConfig.maxInvocationsLibContracts.push({
-    address: minterDAExpV5.address,
+    address: minterDAExpV5.address
   });
   subgraphConfig.DALibContracts = [
     {
-      address: minterDAExpV5.address,
-    },
+      address: minterDAExpV5.address
+    }
   ];
   subgraphConfig.DAExpLibContracts = [
     {
-      address: minterDAExpV5.address,
-    },
+      address: minterDAExpV5.address
+    }
   ];
 
   // DA Lin Minters
@@ -359,18 +374,18 @@ async function main() {
   await minterDALinV5.deployed();
   console.log(`minterDALinV5 deployed at ${minterDALinV5.address}`);
   subgraphConfig.genericMinterEventsLibContracts.push({
-    address: minterDALinV5.address,
+    address: minterDALinV5.address
   });
   subgraphConfig.maxInvocationsLibContracts.push({
-    address: minterDALinV5.address,
+    address: minterDALinV5.address
   });
   subgraphConfig.DALibContracts.push({
-    address: minterDALinV5.address,
+    address: minterDALinV5.address
   });
   subgraphConfig.DALinLibContracts = [
     {
-      address: minterDALinV5.address,
-    },
+      address: minterDALinV5.address
+    }
   ];
 
   // DA Exp Settlement Minters
@@ -385,21 +400,21 @@ async function main() {
     `minterDAExpSettlementV3 deployed at ${minterDAExpSettlementV3.address}`
   );
   subgraphConfig.genericMinterEventsLibContracts.push({
-    address: minterDAExpSettlementV3.address,
+    address: minterDAExpSettlementV3.address
   });
   subgraphConfig.maxInvocationsLibContracts.push({
-    address: minterDAExpSettlementV3.address,
+    address: minterDAExpSettlementV3.address
   });
   subgraphConfig.DALibContracts.push({
-    address: minterDAExpSettlementV3.address,
+    address: minterDAExpSettlementV3.address
   });
   subgraphConfig.DAExpLibContracts.push({
-    address: minterDAExpSettlementV3.address,
+    address: minterDAExpSettlementV3.address
   });
   subgraphConfig.settlementExpLibContracts = [
     {
-      address: minterDAExpSettlementV3.address,
-    },
+      address: minterDAExpSettlementV3.address
+    }
   ];
 
   // deploy splitAtomic system of contracts
@@ -426,8 +441,8 @@ async function main() {
   // update subgraph config to index splitAtomicFactoryV0
   subgraphConfig.iSplitAtomicFactoryV0Contracts = [
     {
-      address: splitAtomicFactoryV0.address,
-    },
+      address: splitAtomicFactoryV0.address
+    }
   ];
   // update subgraph config metadata to include splitAtomic implementation address
   subgraphConfig.metadata.splitAtomicImplementationAddress =
@@ -532,6 +547,12 @@ async function main() {
   );
   await minterFilter
     .connect(deployer)
+    .approveMinterGlobally(minterRAMV0.address);
+  console.log(
+    `Allowlisted minterRAMV0 ${minterRAMV0.address} on minter filter.`
+  );
+  await minterFilter
+    .connect(deployer)
     .approveMinterGlobally(minterDAExpV5.address);
   console.log(
     `Allowlisted minterDAExpV5 ${minterDAExpV5.address} on minter filter.`
@@ -587,7 +608,7 @@ async function main() {
 
 main()
   .then(() => process.exit(0))
-  .catch((error) => {
+  .catch(error => {
     console.error(error);
     process.exit(1);
   });

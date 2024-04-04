@@ -242,6 +242,7 @@ export function handleAuctionBid(event: AuctionBid): void {
     const previousWinningBid = Bid.load(previousHighestBidId);
     if (previousWinningBid) {
       previousWinningBid.winningBid = false;
+      previousWinningBid.isRemoved = true;
       previousWinningBid.updatedAt = event.block.timestamp;
       previousWinningBid.save();
     }
@@ -478,6 +479,7 @@ function createBidFromValidEvent<T>(event: T): void {
   bidderAccount.save();
 
   bid.project = minterProjectAndConfig.project.id;
+  bid.bidType = "SEA";
   bid.minter = event.address.toHexString();
   bid.token = generateContractSpecificId(
     event.params.coreContract,
@@ -486,6 +488,7 @@ function createBidFromValidEvent<T>(event: T): void {
   bid.bidder = bidderAccount.id;
   bid.value = event.params.bidAmount;
   bid.winningBid = true;
+  bid.isRemoved = false;
   bid.timestamp = event.block.timestamp;
   bid.updatedAt = event.block.timestamp;
   bid.save();

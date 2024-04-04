@@ -1,5 +1,6 @@
 fragment BidDetails on Bid {
   id
+  bidType
   project {
     id
   }
@@ -12,6 +13,9 @@ fragment BidDetails on Bid {
   bidder {
     id
   }
+  isRemoved
+  settled
+  slotIndex
   value
   winningBid
   timestamp

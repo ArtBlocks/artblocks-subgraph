@@ -478,9 +478,17 @@ type ProjectMinterConfiguration @entity {
   maxInvocations: BigInt
 }
 
+enum BidType {
+  RAM
+  SEA
+}
+
 type Bid @entity {
-  "Unique identifier made up of for SEA - {minter contract address}-{bidder}-{value}-{token} [TODO - do something different from RAM]"
+  "Unique identifier: SEA - {minter contract address}-{bidder}-{value}-{token}; RAM - {minter contract address}-{full project ID}-{bidID}"
   id: ID!
+
+  "The bid type (RAM | SEA)"
+  bidType: BidType!
 
   "The associated project"
   project: Project!
@@ -488,7 +496,7 @@ type Bid @entity {
   "The associated minter"
   minter: Minter!
 
-  "The associated token"
+  "The token associated with SEA bids or winning RAM bids post-settlement"
   token: Token
 
   "The associated account"
@@ -497,8 +505,17 @@ type Bid @entity {
   "The value of the bid"
   value: BigInt!
 
-  "Highest bid for token"
+  "The slot index of the bid (RAM only)"
+  slotIndex: BigInt
+
+  "Indicates the highest bid for SEA; For RAM, true for bids that won post-settlement otherwise false."
   winningBid: Boolean!
+
+  "Indicates bid was removed"
+  isRemoved: Boolean
+
+  "Indicates settlement status (RAM only)"
+  settled: Boolean
 
   "The timestamp of the bid"
   timestamp: BigInt!

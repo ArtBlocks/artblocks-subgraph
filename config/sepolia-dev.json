@@ -35,6 +35,11 @@
       "blockNumber": 5140819
     },
     {
+      "address": "0xaCdAeb402C6733CeaeF332383AEaB1763e712722",
+      "name": "Sepolia dev shared minter: MinterRAMV0",
+      "blockNumber": 5621983
+    },
+    {
       "address": "0x42c250c81cd2D38143a89A21cab6434092c2F52b",
       "name": "Sepolia dev shared minter: MinterSetPriceV5",
       "blockNumber": 4655325
@@ -194,6 +199,11 @@
       "address": "0x9Fa2FDE53148e0dcbA6335E51Bd539BedCe633E4",
       "name": "Sepolia dev shared minter: MinterSEAV1",
       "blockNumber": 5140819
+    },
+    {
+      "address": "0xaCdAeb402C6733CeaeF332383AEaB1763e712722",
+      "name": "Sepolia dev shared minter: MinterRAMV0",
+      "blockNumber": 5621983
     }
   ],
   "merkleLibContracts": [
@@ -298,6 +308,13 @@
       "address": "0x9Fa2FDE53148e0dcbA6335E51Bd539BedCe633E4",
       "name": "Sepolia dev shared minter: MinterSEAV1",
       "blockNumber": 5140819
+    }
+  ],
+  "RAMLibContracts": [
+    {
+      "address": "0xaCdAeb402C6733CeaeF332383AEaB1763e712722",
+      "name": "Sepolia dev shared minter: MinterRAMV0",
+      "blockNumber": 5621983
     }
   ],
   "adminACLV0Contracts": [
