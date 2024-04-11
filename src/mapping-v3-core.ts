@@ -460,7 +460,8 @@ function createProject(
     projectDetails.reverted ||
     projectScriptDetails.reverted ||
     projectStateData.reverted ||
-    projectArtistAddress.reverted
+    projectArtistAddress.reverted ||
+    projectBaseURI.reverted
   ) {
     log.warning("Failed to get project details for new project: {}-{}", [
       contractAddress,
@@ -488,6 +489,7 @@ function createProject(
   let project = new Project(
     generateContractSpecificId(contract._address, projectId)
   );
+
 
   project.active = false;
   project.artist = artist.id;
