@@ -470,7 +470,6 @@ function createProject(
   }
 
   let name = projectDetails.value.getProjectName();
-  let artistName = projectDetails.value.getArtist();
 
   let artistAddress = projectArtistAddress.value;
   let artist = new Account(artistAddress.toHexString());
