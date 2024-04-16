@@ -86,6 +86,7 @@ import {
   generateProjectScriptId,
   generateWhitelistingId
 } from "../../../src/helpers";
+import { logStore, log } from "matchstick-as";
 
 const randomAddressGenerator = new RandomAddressGenerator();
 
@@ -1078,7 +1079,7 @@ describe(`${coreType}: handleProjectUpdated`, () => {
 
     test("should do nothing if request for project info reverts", () => {
       const projectId = BigInt.fromI32(0);
-
+      const newBaseUri = "New Base URI";
       const event: ProjectUpdated = changetype<ProjectUpdated>(newMockEvent());
       event.address = TEST_CONTRACT_ADDRESS;
       event.parameters = [
@@ -1142,6 +1143,15 @@ describe(`${coreType}: handleProjectUpdated`, () => {
         .withArgs([ethereum.Value.fromUnsignedBigInt(projectId)])
         .reverts();
 
+      // // mock projectURIInfo
+      createMockedFunction(
+        TEST_CONTRACT_ADDRESS,
+        "projectURIInfo",
+        "projectURIInfo(uint256):(string)"
+      )
+        .withArgs([ethereum.Value.fromUnsignedBigInt(projectId)])
+        .returns([ethereum.Value.fromString(newBaseUri)]);
+
       handleProjectUpdated(event);
 
       assert.notInStore(
@@ -1158,6 +1168,7 @@ describe(`${coreType}: handleProjectUpdated`, () => {
       const maxInvocations = BigInt.fromI32(ONE_MILLION);
       const paused = true;
       const scriptCount = BigInt.fromI32(0);
+      const newBaseUri = "New Base URI";
 
       const event: ProjectUpdated = changetype<ProjectUpdated>(newMockEvent());
       event.address = TEST_CONTRACT_ADDRESS;
@@ -1222,6 +1233,15 @@ describe(`${coreType}: handleProjectUpdated`, () => {
       )
         .withArgs([ethereum.Value.fromUnsignedBigInt(projectId)])
         .returns([ethereum.Value.fromAddress(artistAddress)]);
+
+      // // mock projectURIInfo
+      createMockedFunction(
+        TEST_CONTRACT_ADDRESS,
+        "projectURIInfo",
+        "projectURIInfo(uint256):(string)"
+      )
+        .withArgs([ethereum.Value.fromUnsignedBigInt(projectId)])
+        .returns([ethereum.Value.fromString(newBaseUri)]);
 
       handleProjectUpdated(event);
 
