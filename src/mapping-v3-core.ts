@@ -17,6 +17,10 @@ import {
   IGenArt721CoreContractV3_Base
 } from "../generated/IGenArt721CoreV3_Base/IGenArt721CoreContractV3_Base";
 
+import { IGenArt721CoreContractV3_ProjectFinance } from "../generated/IGenArt721CoreV3_Base/IGenArt721CoreContractV3_ProjectFinance";
+import { IGenArt721CoreContractV3_Engine } from "../generated/IGenArt721CoreV3_Base/IGenArt721CoreContractV3_Engine";
+import { IGenArt721CoreContractV3_Engine_PreV3p2 } from "../generated/IGenArt721CoreV3_Base/IGenArt721CoreContractV3_Engine_PreV3p2";
+
 import { IMinterFilterV1 } from "../generated/IGenArt721CoreV3_Base/IMinterFilterV1";
 
 import {
@@ -251,6 +255,25 @@ export function handleTransfer(event: Transfer): void {
   transfer.save();
 }
 
+// v3.2 core contract Enum ProjectUpdatedFields
+const ENUM_FIELD_PROJECT_COMPLETED = 0;
+const ENUM_FIELD_PROJECT_ACTIVE = 1;
+const ENUM_FIELD_PROJECT_ARTIST_ADDRESS = 2;
+const ENUM_FIELD_PROJECT_PAUSED = 3;
+const ENUM_FIELD_PROJECT_CREATED = 4;
+const ENUM_FIELD_PROJECT_NAME = 5;
+const ENUM_FIELD_PROJECT_ARTIST_NAME = 6;
+const ENUM_FIELD_PROJECT_SECONDARY_MARKET_ROYALTY_PERCENTAGE = 7;
+const ENUM_FIELD_PROJECT_DESCRIPTION = 8;
+const ENUM_FIELD_PROJECT_WEBSITE = 9;
+const ENUM_FIELD_PROJECT_LICENSE = 10;
+const ENUM_FIELD_PROJECT_MAX_INVOCATIONS = 11;
+const ENUM_FIELD_PROJECT_SCRIPT = 12;
+const ENUM_FIELD_PROJECT_SCRIPT_TYPE = 13;
+const ENUM_FIELD_PROJECT_ASPECT_RATIO = 14;
+const ENUM_FIELD_PROJECT_BASE_URI = 15;
+const ENUM_FIELD_PROJECT_PROVIDER_SECONDARY_FINANCIALS = 16;
+
 export const FIELD_PROJECT_ACTIVE = "active";
 export const FIELD_PROJECT_ARTIST_ADDRESS = "artistAddress";
 export const FIELD_PROJECT_ARTIST_NAME = "artistName";
@@ -268,11 +291,120 @@ export const FIELD_PROJECT_SCRIPT_TYPE = "scriptType";
 export const FIELD_PROJECT_SECONDARY_MARKET_ROYALTY_PERCENTAGE =
   "royaltyPercentage";
 export const FIELD_PROJECT_WEBSITE = "website";
+// field did not exist prior to v3.2, and only uses string here for consistency with other fields
+export const FIELD_PROJECT_PROVIDER_SECONDARY_FINANCIALS =
+  "secondaryFinancials";
+
+/**
+ * @notice helper function to get the field name for a ProjectUpdated event
+ * that handles both string and enum values for the _update field.
+ * @param _update bytes32 value of the field emitted in the ProjectUpdated event
+ * @returns string field name or null if the field is not recognized
+ */
+function getProjectUpdatedField(_update: Bytes): string | null {
+  // @dev switch/case not supported in AssemblyScript for Bytes type
+  if (
+    _update == Bytes.fromUTF8(FIELD_PROJECT_ACTIVE) ||
+    _update == Bytes.fromI32(ENUM_FIELD_PROJECT_ACTIVE)
+  ) {
+    return FIELD_PROJECT_ACTIVE;
+  } else if (
+    _update == Bytes.fromUTF8(FIELD_PROJECT_ARTIST_ADDRESS) ||
+    _update == Bytes.fromI32(ENUM_FIELD_PROJECT_ARTIST_ADDRESS)
+  ) {
+    return FIELD_PROJECT_ARTIST_ADDRESS;
+  } else if (
+    _update == Bytes.fromUTF8(FIELD_PROJECT_ARTIST_NAME) ||
+    _update == Bytes.fromI32(ENUM_FIELD_PROJECT_ARTIST_NAME)
+  ) {
+    return FIELD_PROJECT_ARTIST_NAME;
+  } else if (
+    _update == Bytes.fromUTF8(FIELD_PROJECT_ASPECT_RATIO) ||
+    _update == Bytes.fromI32(ENUM_FIELD_PROJECT_ASPECT_RATIO)
+  ) {
+    return FIELD_PROJECT_ASPECT_RATIO;
+  } else if (
+    _update == Bytes.fromUTF8(FIELD_PROJECT_BASE_URI) ||
+    _update == Bytes.fromI32(ENUM_FIELD_PROJECT_BASE_URI)
+  ) {
+    return FIELD_PROJECT_BASE_URI;
+  } else if (
+    _update == Bytes.fromUTF8(FIELD_PROJECT_COMPLETED) ||
+    _update == Bytes.fromI32(ENUM_FIELD_PROJECT_COMPLETED)
+  ) {
+    return FIELD_PROJECT_COMPLETED;
+  } else if (
+    _update == Bytes.fromUTF8(FIELD_PROJECT_CREATED) ||
+    _update == Bytes.fromI32(ENUM_FIELD_PROJECT_CREATED)
+  ) {
+    return FIELD_PROJECT_CREATED;
+  } else if (
+    _update == Bytes.fromUTF8(FIELD_PROJECT_DESCRIPTION) ||
+    _update == Bytes.fromI32(ENUM_FIELD_PROJECT_DESCRIPTION)
+  ) {
+    return FIELD_PROJECT_DESCRIPTION;
+  } else if (
+    _update == Bytes.fromUTF8(FIELD_PROJECT_LICENSE) ||
+    _update == Bytes.fromI32(ENUM_FIELD_PROJECT_LICENSE)
+  ) {
+    return FIELD_PROJECT_LICENSE;
+  } else if (
+    _update == Bytes.fromUTF8(FIELD_PROJECT_MAX_INVOCATIONS) ||
+    _update == Bytes.fromI32(ENUM_FIELD_PROJECT_MAX_INVOCATIONS)
+  ) {
+    return FIELD_PROJECT_MAX_INVOCATIONS;
+  } else if (
+    _update == Bytes.fromUTF8(FIELD_PROJECT_NAME) ||
+    _update == Bytes.fromI32(ENUM_FIELD_PROJECT_NAME)
+  ) {
+    return FIELD_PROJECT_NAME;
+  } else if (
+    _update == Bytes.fromUTF8(FIELD_PROJECT_PAUSED) ||
+    _update == Bytes.fromI32(ENUM_FIELD_PROJECT_PAUSED)
+  ) {
+    return FIELD_PROJECT_PAUSED;
+  } else if (
+    _update == Bytes.fromUTF8(FIELD_PROJECT_SCRIPT) ||
+    _update == Bytes.fromI32(ENUM_FIELD_PROJECT_SCRIPT)
+  ) {
+    return FIELD_PROJECT_SCRIPT;
+  } else if (
+    _update == Bytes.fromUTF8(FIELD_PROJECT_SCRIPT_TYPE) ||
+    _update == Bytes.fromI32(ENUM_FIELD_PROJECT_SCRIPT_TYPE)
+  ) {
+    return FIELD_PROJECT_SCRIPT_TYPE;
+  } else if (
+    _update ==
+      Bytes.fromUTF8(FIELD_PROJECT_SECONDARY_MARKET_ROYALTY_PERCENTAGE) ||
+    _update ==
+      Bytes.fromI32(ENUM_FIELD_PROJECT_SECONDARY_MARKET_ROYALTY_PERCENTAGE)
+  ) {
+    return FIELD_PROJECT_SECONDARY_MARKET_ROYALTY_PERCENTAGE;
+  } else if (
+    _update == Bytes.fromUTF8(FIELD_PROJECT_WEBSITE) ||
+    _update == Bytes.fromI32(ENUM_FIELD_PROJECT_WEBSITE)
+  ) {
+    return FIELD_PROJECT_WEBSITE;
+  } else if (
+    _update == Bytes.fromI32(ENUM_FIELD_PROJECT_PROVIDER_SECONDARY_FINANCIALS) // field did not exist prior to v3.2, so only check enum value
+  ) {
+    return FIELD_PROJECT_PROVIDER_SECONDARY_FINANCIALS;
+  } else {
+    return null;
+  }
+}
 
 export function handleProjectUpdated(event: ProjectUpdated): void {
   const contract = getIGenArt721CoreContractV3_BaseContract(event.address);
-
-  const update = event.params._update.toString();
+  const update = getProjectUpdatedField(event.params._update);
+  // unexpected case: unrecognized update field. Log warning and return early.
+  if (!update) {
+    log.warning("Unexpected update field for project {} on contract {}", [
+      event.params._projectId.toString(),
+      event.address.toHexString()
+    ]);
+    return;
+  }
   const timestamp = event.block.timestamp;
   const projectId = event.params._projectId;
   const fullProjectId = generateContractSpecificId(event.address, projectId);
@@ -328,8 +460,23 @@ export function handleProjectUpdated(event: ProjectUpdated): void {
       project,
       timestamp
     );
+  } else if (update == FIELD_PROJECT_PROVIDER_SECONDARY_FINANCIALS) {
+    handleProjectProviderSecondaryFinancialsUpdated(
+      contract,
+      project,
+      timestamp
+    );
   } else {
-    log.warning("Unexpected update field for project {}", [project.id]);
+    // @dev all possible update fields should be handled above, so this should
+    // never be reached. Log a warning and return.
+    log.warning(
+      "Subgraph issue: Unhandled update field for project {} on contract {} in tx {}",
+      [
+        project.id,
+        event.address.toHexString(),
+        event.transaction.hash.toHexString()
+      ]
+    );
   }
 }
 
@@ -432,6 +579,51 @@ function handleProjectSecondaryMarketRoyaltyPercentageUpdated(
   }
 }
 
+/**
+ * @notice Handle ProjectExternalAssetDependenciesLocked event. The event was
+ * introduced in v3.2 and is emitted when the project's provider secondary payment
+ * information are updated.
+ * @param contract V3 core contract
+ * @param project project associated with the event
+ * @param timestamp timestamp of the event
+ */
+function handleProjectProviderSecondaryFinancialsUpdated(
+  contract: IGenArt721CoreContractV3_Base,
+  project: Project,
+  timestamp: BigInt
+): void {
+  // @dev event added in v3.2, so we can safely assume the contract conforms to
+  // the ProjectFinance interface. Use try/catch for redundant safety.
+  const contractAsV3_ProjectFinance = IGenArt721CoreContractV3_ProjectFinance.bind(
+    contract._address
+  );
+  const projectFinance = contractAsV3_ProjectFinance.try_projectIdToFinancials(
+    project.projectId
+  );
+  if (!projectFinance.reverted) {
+    // update provider secondary financials on the project entity
+    project.renderProviderSecondarySalesAddress =
+      projectFinance.value.renderProviderSecondarySalesAddress;
+    project.renderProviderSecondarySalesBPS = BigInt.fromI32(
+      projectFinance.value.renderProviderSecondarySalesBPS
+    );
+    project.enginePlatformProviderSecondarySalesAddress =
+      projectFinance.value.platformProviderSecondarySalesAddress;
+    project.enginePlatformProviderSecondarySalesBPS = BigInt.fromI32(
+      projectFinance.value.platformProviderSecondarySalesBPS
+    );
+    // update and save project entity
+    project.updatedAt = timestamp;
+    project.save();
+  } else {
+    // @dev this should never happen, so log a warning if it does
+    log.warning(
+      "Unexpected error: Failed to get project financials for project: {}-{}",
+      [contract._address.toHexString(), project.projectId.toString()]
+    );
+  }
+}
+
 function createProject(
   contract: IGenArt721CoreContractV3_Base,
   projectId: BigInt,
@@ -508,10 +700,64 @@ function createProject(
   project.pricePerTokenInWei = pricePerTokenInWei;
   project.projectId = projectId;
   project.scriptCount = scriptCount;
-  project.updatedAt = timestamp;
   project.useHashString = useHashString;
   project.useIpfs = false;
 
+  // populate the project's financial information
+  // available on all cores, populated to non-zero value for new projects on v3.2+ cores
+  project.royaltyPercentage = contract.projectIdToSecondaryMarketRoyaltyPercentage(
+    projectId
+  );
+  // provider secondary financials are modeled differently on v3.0 and v3.1 vs. v3.2+, handle both cases
+  const coreVersion = contractEntity.version;
+  // version should never be null on a V3 contract
+  if (!coreVersion) {
+    log.error(
+      "V3 Contract entity for contract {} does not have a version set and has caused a subgraph error.",
+      [contract._address.toHexString()]
+    );
+    return null;
+  }
+  const isPreV3_2 = getIsPreV3_2(coreVersion as string);
+  if (isPreV3_2) {
+    if (contractEntity.type == "GenArt721CoreV3") {
+      // use the artbocks getter functions (not an Engine contract)
+      const contractAsV3_Legacy = GenArt721CoreV3.bind(contract._address);
+      project.renderProviderSecondarySalesAddress = contractAsV3_Legacy.artblocksSecondarySalesAddress();
+      project.renderProviderSecondarySalesBPS = contractAsV3_Legacy.artblocksSecondarySalesBPS();
+      project.enginePlatformProviderSecondarySalesAddress = null;
+      project.enginePlatformProviderSecondarySalesBPS = BigInt.fromI32(0);
+    } else {
+      // use the render provider and platform provider getters (it is an Engine contract)
+      // populate project provider secondary addresses and BPS for v3.0 and v3.1
+      const contractAsV3_PreV3p2 = IGenArt721CoreContractV3_Engine_PreV3p2.bind(
+        contract._address
+      );
+      project.renderProviderSecondarySalesAddress = contractAsV3_PreV3p2.renderProviderSecondarySalesAddress();
+      project.renderProviderSecondarySalesBPS = contractAsV3_PreV3p2.renderProviderSecondarySalesBPS();
+      project.enginePlatformProviderSecondarySalesAddress = contractAsV3_PreV3p2.platformProviderSecondarySalesAddress();
+      project.enginePlatformProviderSecondarySalesBPS = contractAsV3_PreV3p2.platformProviderSecondarySalesBPS();
+    }
+  } else {
+    // populate project provider secondary addresses and BPS for v3.2+.
+    // note that projectIdToFinancials is only available on v3.2+ contracts.
+    const contractAsV3_2 = IGenArt721CoreContractV3_ProjectFinance.bind(
+      contract._address
+    );
+    const projectFinance = contractAsV3_2.projectIdToFinancials(projectId);
+    project.renderProviderSecondarySalesAddress =
+      projectFinance.renderProviderSecondarySalesAddress;
+    project.renderProviderSecondarySalesBPS = BigInt.fromI32(
+      projectFinance.renderProviderSecondarySalesBPS
+    );
+    project.enginePlatformProviderSecondarySalesAddress =
+      projectFinance.platformProviderSecondarySalesAddress;
+    project.enginePlatformProviderSecondarySalesBPS = BigInt.fromI32(
+      projectFinance.platformProviderSecondarySalesBPS
+    );
+  }
+
+  project.updatedAt = timestamp;
   project.save();
   return project;
 }
@@ -1175,6 +1421,8 @@ function refreshContract<T>(contract: T, timestamp: BigInt): Contract | null {
     }
   }
   contractEntity.type = contract.coreType();
+  const coreVersion = contract.coreVersion();
+  contractEntity.version = coreVersion;
   const isEngineOrEngineFlex =
     contract instanceof GenArt721CoreV3_Engine ||
     contract instanceof GenArt721CoreV3_Engine_Flex;
@@ -1182,8 +1430,44 @@ function refreshContract<T>(contract: T, timestamp: BigInt): Contract | null {
     // render provider address and percentage are called arblocks* on flagship
     contractEntity.renderProviderAddress = contract.artblocksPrimarySalesAddress();
     contractEntity.renderProviderPercentage = contract.artblocksPrimarySalesPercentage();
-    contractEntity.renderProviderSecondarySalesAddress = contract.artblocksSecondarySalesAddress();
-    contractEntity.renderProviderSecondarySalesBPS = contract.artblocksSecondarySalesBPS();
+    // secondary sales are defined on the projects after release of v3.2 core contracts
+    const renderProviderSecondarySalesAddress = contract.artblocksSecondarySalesAddress();
+    const renderProviderSecondarySalesBPS = contract.artblocksSecondarySalesBPS();
+    // detect if secondary sales payment info have changed
+    const platformSecondaryHaveChanged =
+      !contractEntity.renderProviderSecondarySalesAddress ||
+      Address.fromBytes(
+        contractEntity.renderProviderSecondarySalesAddress as Bytes // @dev casting shouldn't be necessary, but is required to compile
+      ).toHexString() != renderProviderSecondarySalesAddress.toHexString() ||
+      !contractEntity.renderProviderSecondarySalesBPS ||
+      (contractEntity.renderProviderSecondarySalesBPS as BigInt) != // @dev casting shouldn't be necessary, but is required to compile
+        renderProviderSecondarySalesBPS;
+    if (platformSecondaryHaveChanged) {
+      // @dev DEPRECATED-START ---
+      contractEntity.renderProviderSecondarySalesAddress = renderProviderSecondarySalesAddress;
+      contractEntity.renderProviderSecondarySalesBPS = renderProviderSecondarySalesBPS;
+      // @dev DEPRECATED-END ---
+      contractEntity.defaultRenderProviderSecondarySalesAddress = renderProviderSecondarySalesAddress;
+      contractEntity.defaultRenderProviderSecondarySalesBPS = renderProviderSecondarySalesBPS;
+      // secondary sales are defined on the projects after release of v3.2 core contracts
+      const startingProjectId = contract.startingProjectId();
+      let nextProjectId = contract.nextProjectId();
+      // iterate over every project and update the platform and render provider secondary sales info
+      for (
+        let i = startingProjectId;
+        i.lt(nextProjectId);
+        i = i.plus(BigInt.fromI32(1))
+      ) {
+        let fullProjectId = contractEntity.id + "-" + i.toString();
+        let project = Project.load(fullProjectId);
+        if (project) {
+          project.renderProviderSecondarySalesAddress = renderProviderSecondarySalesAddress;
+          project.renderProviderSecondarySalesBPS = renderProviderSecondarySalesBPS;
+          project.updatedAt = timestamp;
+          project.save();
+        }
+      }
+    }
     // curation registry exists on flagship
     contractEntity.curationRegistry = contract.artblocksCurationRegistryAddress();
     // flagship never auto approves artist split proposals for all changes
@@ -1191,15 +1475,82 @@ function refreshContract<T>(contract: T, timestamp: BigInt): Contract | null {
   } else if (isEngineOrEngineFlex) {
     // flex specific fields are not refreshed here due to flex specific handlers updating all relevant fields on their own
     // render provider address and percentage are called renderProvider* on engine
+    // platform provider address and percentage are defined on engine contracts
     contractEntity.renderProviderAddress = contract.renderProviderPrimarySalesAddress();
     contractEntity.renderProviderPercentage = contract.renderProviderPrimarySalesPercentage();
-    contractEntity.renderProviderSecondarySalesAddress = contract.renderProviderSecondarySalesAddress();
-    contractEntity.renderProviderSecondarySalesBPS = contract.renderProviderSecondarySalesBPS();
-    // platform provider address and percentage are defined on engine contracts
     contractEntity.enginePlatformProviderAddress = contract.platformProviderPrimarySalesAddress();
     contractEntity.enginePlatformProviderPercentage = contract.platformProviderPrimarySalesPercentage();
-    contractEntity.enginePlatformProviderSecondarySalesAddress = contract.platformProviderSecondarySalesAddress();
-    contractEntity.enginePlatformProviderSecondarySalesBPS = contract.platformProviderSecondarySalesBPS();
+    // secondary sales are defined on the projects after release of v3.2 core contracts
+    const isPreV3_2 = getIsPreV3_2(coreVersion as string);
+    if (isPreV3_2) {
+      const preV3_2Contract = IGenArt721CoreContractV3_Engine_PreV3p2.bind(
+        contract._address
+      );
+      const renderProviderSecondarySalesAddress = preV3_2Contract.renderProviderSecondarySalesAddress();
+      const renderProviderSecondarySalesBPS = preV3_2Contract.renderProviderSecondarySalesBPS();
+      const enginePlatformProviderSecondarySalesAddress = preV3_2Contract.platformProviderSecondarySalesAddress();
+      const enginePlatformProviderSecondarySalesBPS = preV3_2Contract.platformProviderSecondarySalesBPS();
+      // detect if secondary sales payment info have changed (to prevent unnecessary updates)
+      let platformSecondaryHaveChanged =
+        !contractEntity.renderProviderSecondarySalesAddress ||
+        Address.fromBytes(
+          contractEntity.renderProviderSecondarySalesAddress as Bytes // @dev casting shouldn't be necessary, but is required to compile
+        ).toHexString() != renderProviderSecondarySalesAddress.toHexString() ||
+        !contractEntity.renderProviderSecondarySalesBPS ||
+        (contractEntity.renderProviderSecondarySalesBPS as BigInt) != // @dev casting shouldn't be necessary, but is required to compile
+          renderProviderSecondarySalesBPS ||
+        !contractEntity.enginePlatformProviderSecondarySalesAddress ||
+        Address.fromBytes(
+          contractEntity.enginePlatformProviderSecondarySalesAddress as Bytes // @dev casting shouldn't be necessary, but is required to compile
+        ).toHexString() !=
+          enginePlatformProviderSecondarySalesAddress.toHexString() ||
+        !contractEntity.enginePlatformProviderSecondarySalesBPS ||
+        (contractEntity.enginePlatformProviderSecondarySalesBPS as BigInt) != // @dev casting shouldn't be necessary, but is required to compile
+          enginePlatformProviderSecondarySalesBPS;
+      if (platformSecondaryHaveChanged) {
+        // @dev DEPRECATED-START ---
+        contractEntity.renderProviderSecondarySalesAddress = renderProviderSecondarySalesAddress;
+        contractEntity.renderProviderSecondarySalesBPS = renderProviderSecondarySalesBPS;
+        contractEntity.enginePlatformProviderSecondarySalesAddress = enginePlatformProviderSecondarySalesAddress;
+        contractEntity.enginePlatformProviderSecondarySalesBPS = enginePlatformProviderSecondarySalesBPS;
+        // @dev DEPRECATED-END ---
+        // set defaults to the contract-level fields for pre-v3.2 contracts
+        contractEntity.defaultRenderProviderSecondarySalesAddress = renderProviderSecondarySalesAddress;
+        contractEntity.defaultRenderProviderSecondarySalesBPS = renderProviderSecondarySalesBPS;
+        contractEntity.defaultEnginePlatformProviderSecondarySalesAddress = enginePlatformProviderSecondarySalesAddress;
+        contractEntity.defaultEnginePlatformProviderSecondarySalesBPS = enginePlatformProviderSecondarySalesBPS;
+        // secondary sales are defined on the projects after release of v3.2 core contracts
+        const startingProjectId = contract.startingProjectId();
+        let nextProjectId = contract.nextProjectId();
+        // iterate over every project and update the platform and render provider secondary sales info
+        for (
+          let i = startingProjectId;
+          i.lt(nextProjectId);
+          i = i.plus(BigInt.fromI32(1))
+        ) {
+          let fullProjectId = contractEntity.id + "-" + i.toString();
+          let project = Project.load(fullProjectId);
+          if (project) {
+            project.renderProviderSecondarySalesAddress = renderProviderSecondarySalesAddress;
+            project.renderProviderSecondarySalesBPS = renderProviderSecondarySalesBPS;
+            project.enginePlatformProviderSecondarySalesAddress = enginePlatformProviderSecondarySalesAddress;
+            project.enginePlatformProviderSecondarySalesBPS = enginePlatformProviderSecondarySalesBPS;
+            project.updatedAt = timestamp;
+            project.save();
+          }
+        }
+      }
+    } else {
+      // assign defaults to the contract-level fields for v3.2+ contracts
+      const preV3_2Contract = IGenArt721CoreContractV3_Engine.bind(
+        contract._address
+      );
+      contractEntity.defaultRenderProviderSecondarySalesAddress = preV3_2Contract.defaultRenderProviderSecondarySalesAddress();
+      contractEntity.defaultRenderProviderSecondarySalesBPS = preV3_2Contract.defaultRenderProviderSecondarySalesBPS();
+      contractEntity.defaultEnginePlatformProviderSecondarySalesAddress = preV3_2Contract.defaultPlatformProviderSecondarySalesAddress();
+      contractEntity.defaultEnginePlatformProviderSecondarySalesBPS = preV3_2Contract.defaultPlatformProviderSecondarySalesBPS();
+      // project-level secondary sales are defined on the projects after release of v3.2 core contracts, so we don't need to update them here
+    }
     // null curation registry on engine contracts
     contractEntity.curationRegistry = null;
     // automatic approval exists on engine contracts
@@ -1394,6 +1745,16 @@ function getIsLegacyMinterFilter(minterFilterAddress: Address): boolean {
   // function returns "MinterFilterV1" (since MinterFilterV0 does not implement,
   // and MinterFilterV1 SOMETIMES returns "MinterFilterV1")
   return minterFilterTypeResult.value == "MinterFilterV1";
+}
+
+/**
+ * @notice helper function to determine if a given version string is pre-v3.2
+ * for a given V3 core contract's version string.
+ * @param version version string of V3 core contract
+ * @returns boolean, true if the version is pre-v3.2, false otherwise.
+ */
+function getIsPreV3_2(version: string): boolean {
+  return version.includes("v3.0") || version.includes("v3.1");
 }
 
 /** END HELPERS ***/

@@ -69,6 +69,20 @@ export function mockRefreshContractCalls(
     "coreType():(string)"
   ).returns([ethereum.Value.fromString(coreType)]);
 
+  createMockedFunction(
+    TEST_CONTRACT_ADDRESS,
+    "coreVersion",
+    "coreVersion():(string)"
+  ).returns([ethereum.Value.fromString("v3.0.0")]);
+
+  createMockedFunction(
+    TEST_CONTRACT_ADDRESS,
+    "projectIdToSecondaryMarketRoyaltyPercentage",
+    "projectIdToSecondaryMarketRoyaltyPercentage(uint256):(uint256)"
+  )
+    .withArgs([ethereum.Value.fromUnsignedBigInt(BigInt.fromI32(0))])
+    .returns([ethereum.Value.fromUnsignedBigInt(BigInt.fromI32(5))]);
+
   if (coreType == "GenArt721CoreV3") {
     // flagship contract functions
     createMockedFunction(
@@ -222,6 +236,12 @@ export function mockRefreshContractCalls(
   } else {
     throw new Error("invalid coreType passed to mockRefreshContractCalls");
   }
+
+  createMockedFunction(
+    TEST_CONTRACT_ADDRESS,
+    "startingProjectId",
+    "startingProjectId():(uint256)"
+  ).returns([ethereum.Value.fromUnsignedBigInt(BigInt.fromI32(0))]);
 
   createMockedFunction(
     TEST_CONTRACT_ADDRESS,

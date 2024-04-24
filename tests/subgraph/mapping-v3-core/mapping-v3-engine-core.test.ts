@@ -31,6 +31,7 @@ import {
   assertNewProjectFields,
   assertTestContractFields,
   addTestContractToStore,
+  addTestContractToStoreOfTypeAndVersion,
   addNewProjectToStore,
   addNewTokenToStore,
   TRANSFER_ENTITY_TYPE,
@@ -1047,6 +1048,11 @@ describe(`${coreType}: handleProjectUpdated`, () => {
     beforeEach(() => {
       clearStore();
       addTestContractToStore(BigInt.fromI32(0));
+      addTestContractToStoreOfTypeAndVersion(
+        BigInt.fromI32(0),
+        coreType,
+        "v3.1.0"
+      );
     });
 
     test("should do nothing if the contract does not already exist", () => {
@@ -1172,6 +1178,9 @@ describe(`${coreType}: handleProjectUpdated`, () => {
           ethereum.Value.fromBytes(Bytes.fromUTF8(FIELD_PROJECT_CREATED))
         )
       ];
+
+      // mock all refresh contract calls to ensure the required contract-level royalty functions are mocked
+      mockRefreshContractCalls(projectId, coreType, null);
 
       // mock projectDetails
       createMockedFunction(

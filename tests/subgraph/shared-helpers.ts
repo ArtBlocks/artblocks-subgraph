@@ -151,6 +151,7 @@ export const DEFAULT_AUTO_APPROVE_ARTIST_SPLIT_PROPOSALS = false;
 export class ContractValues {
   admin: Address;
   type: string;
+  version: string;
   mintWhitelisted: Bytes[];
   randomizerContract: Address;
   minterContract: Address;
@@ -171,6 +172,7 @@ export class ContractValues {
 export const TEST_CONTRACT: ContractValues = {
   admin: Address.fromString("0x96dc73c8b5969608c77375f085949744b5177660"),
   type: "GenArt721CoreV1",
+  version: "v1.0.0",
   renderProviderPercentage: BigInt.fromI32(10),
   renderProviderAddress: Address.fromString(
     "0xf7a55108a6e830a809e88e74cbf5f5de9d930153"
@@ -352,6 +354,36 @@ export function addTestContractToStore(nextProjectId: BigInt): Contract {
   let contract = new Contract(TEST_CONTRACT_ADDRESS.toHexString());
   contract.admin = TEST_CONTRACT.admin;
   contract.type = TEST_CONTRACT.type;
+  contract.createdAt = CURRENT_BLOCK_TIMESTAMP.minus(BigInt.fromI32(10));
+  contract.nextProjectId = nextProjectId;
+  contract.randomizerContract = TEST_CONTRACT.randomizerContract;
+  contract.renderProviderAddress = TEST_CONTRACT.renderProviderAddress;
+  contract.renderProviderPercentage = TEST_CONTRACT.renderProviderPercentage;
+  contract.renderProviderSecondarySalesAddress =
+    TEST_CONTRACT.renderProviderSecondarySalesAddress;
+  contract.renderProviderSecondarySalesBPS =
+    TEST_CONTRACT.renderProviderSecondarySalesBPS;
+  contract.curationRegistry = TEST_CONTRACT.curationRegistry;
+  contract.dependencyRegistry = TEST_CONTRACT.dependencyRegistry;
+  contract.updatedAt = contract.createdAt;
+  contract.mintWhitelisted = TEST_CONTRACT.mintWhitelisted;
+  contract.newProjectsForbidden = false;
+  contract.registeredOn = null;
+  contract.save();
+
+  return contract;
+}
+
+// adds test contract to store with specified core type and version
+export function addTestContractToStoreOfTypeAndVersion(
+  nextProjectId: BigInt,
+  coreType: string,
+  coreVersion: string
+): Contract {
+  let contract = new Contract(TEST_CONTRACT_ADDRESS.toHexString());
+  contract.admin = TEST_CONTRACT.admin;
+  contract.type = coreType;
+  contract.version = coreVersion;
   contract.createdAt = CURRENT_BLOCK_TIMESTAMP.minus(BigInt.fromI32(10));
   contract.nextProjectId = nextProjectId;
   contract.randomizerContract = TEST_CONTRACT.randomizerContract;
