@@ -39,6 +39,8 @@ import { ProjectUpdated } from "../../../generated/IGenArt721CoreV3_Base/IGenArt
 
 // mocks return values for Soldity contract calls in refreshContract() helper function
 // currently handles V3 flagship and engine contracts
+// @dev accepts `coreVersion` as an optional override to test different core versions,
+// defaults to "v3.0.0"
 export function mockRefreshContractCalls(
   nextProjectId: BigInt,
   coreType: string,
@@ -73,7 +75,13 @@ export function mockRefreshContractCalls(
     TEST_CONTRACT_ADDRESS,
     "coreVersion",
     "coreVersion():(string)"
-  ).returns([ethereum.Value.fromString("v3.0.0")]);
+  ).returns([
+    ethereum.Value.fromString(
+      overrides && overrides.has("coreVersion")
+        ? changetype<Map<string, string>>(overrides).get("coreVersion")
+        : "v3.0.0"
+    )
+  ]);
 
   createMockedFunction(
     TEST_CONTRACT_ADDRESS,

@@ -1542,13 +1542,28 @@ function refreshContract<T>(contract: T, timestamp: BigInt): Contract | null {
       }
     } else {
       // assign defaults to the contract-level fields for v3.2+ contracts
-      const preV3_2Contract = IGenArt721CoreContractV3_Engine.bind(
+      const V3_2Contract = IGenArt721CoreContractV3_Engine.bind(
         contract._address
       );
-      contractEntity.defaultRenderProviderSecondarySalesAddress = preV3_2Contract.defaultRenderProviderSecondarySalesAddress();
-      contractEntity.defaultRenderProviderSecondarySalesBPS = preV3_2Contract.defaultRenderProviderSecondarySalesBPS();
-      contractEntity.defaultEnginePlatformProviderSecondarySalesAddress = preV3_2Contract.defaultPlatformProviderSecondarySalesAddress();
-      contractEntity.defaultEnginePlatformProviderSecondarySalesBPS = preV3_2Contract.defaultPlatformProviderSecondarySalesBPS();
+      const defaultRenderProviderSecondarySalesAddress = V3_2Contract.defaultRenderProviderSecondarySalesAddress();
+      const defaultRenderProviderSecondarySalesBPS = V3_2Contract.defaultRenderProviderSecondarySalesBPS();
+      const defaultEnginePlatformProviderSecondarySalesAddress = V3_2Contract.defaultPlatformProviderSecondarySalesAddress();
+      const defaultEnginePlatformProviderSecondarySalesBPS = V3_2Contract.defaultPlatformProviderSecondarySalesBPS();
+      // @dev no need to optimally detect if secondary sales payment info have changed, as we are setting defaults
+      // and not iterating over all projects on the contract
+
+      // backwards-compatible deprecated fields
+      // @dev DEPRECATED-START ---
+      contractEntity.renderProviderSecondarySalesAddress = defaultRenderProviderSecondarySalesAddress;
+      contractEntity.renderProviderSecondarySalesBPS = defaultRenderProviderSecondarySalesBPS;
+      contractEntity.enginePlatformProviderSecondarySalesAddress = defaultEnginePlatformProviderSecondarySalesAddress;
+      contractEntity.enginePlatformProviderSecondarySalesBPS = defaultEnginePlatformProviderSecondarySalesBPS;
+      // @dev DEPRECATED-END ---
+      // set defaults to the default values for v3.2+ contracts
+      contractEntity.defaultRenderProviderSecondarySalesAddress = defaultRenderProviderSecondarySalesAddress;
+      contractEntity.defaultRenderProviderSecondarySalesBPS = defaultRenderProviderSecondarySalesBPS;
+      contractEntity.defaultEnginePlatformProviderSecondarySalesAddress = defaultEnginePlatformProviderSecondarySalesAddress;
+      contractEntity.defaultEnginePlatformProviderSecondarySalesBPS = defaultEnginePlatformProviderSecondarySalesBPS;
       // project-level secondary sales are defined on the projects after release of v3.2 core contracts, so we don't need to update them here
     }
     // null curation registry on engine contracts

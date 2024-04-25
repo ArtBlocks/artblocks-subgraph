@@ -558,6 +558,7 @@ test(`${coreType}: Handles PlatformUpdated::providerSalesAddresses - changed val
   ).returns([
     ethereum.Value.fromAddress(newRenderProviderSecondarySalesAddress)
   ]);
+  // @dev pre-v3.2 do not have defaultRenderProviderSecondarySalesAddress()
 
   const newPlatformProviderPrimarySalesAddress = randomAddressGenerator.generateRandomAddress();
   createMockedFunction(
@@ -576,6 +577,7 @@ test(`${coreType}: Handles PlatformUpdated::providerSalesAddresses - changed val
   ).returns([
     ethereum.Value.fromAddress(newPlatformProviderSecondarySalesAddress)
   ]);
+  // @dev pre-v3.2 do not have defaultPlatformProviderSecondarySalesAddress()
 
   // create event
   const event: PlatformUpdated = changetype<PlatformUpdated>(newMockEvent());
@@ -598,10 +600,18 @@ test(`${coreType}: Handles PlatformUpdated::providerSalesAddresses - changed val
     "renderProviderAddress",
     newRenderProviderPrimarySalesAddress.toHexString()
   );
+  // DEPRECATED START ---
   assert.fieldEquals(
     CONTRACT_ENTITY_TYPE,
     TEST_CONTRACT_ADDRESS.toHexString(),
     "renderProviderSecondarySalesAddress",
+    newRenderProviderSecondarySalesAddress.toHexString()
+  );
+  // DEPRECATED END ---
+  assert.fieldEquals(
+    CONTRACT_ENTITY_TYPE,
+    TEST_CONTRACT_ADDRESS.toHexString(),
+    "defaultRenderProviderSecondarySalesAddress",
     newRenderProviderSecondarySalesAddress.toHexString()
   );
   assert.fieldEquals(
@@ -610,10 +620,18 @@ test(`${coreType}: Handles PlatformUpdated::providerSalesAddresses - changed val
     "enginePlatformProviderAddress",
     newPlatformProviderPrimarySalesAddress.toHexString()
   );
+  // DEPRECATED START ---
   assert.fieldEquals(
     CONTRACT_ENTITY_TYPE,
     TEST_CONTRACT_ADDRESS.toHexString(),
     "enginePlatformProviderSecondarySalesAddress",
+    newPlatformProviderSecondarySalesAddress.toHexString()
+  );
+  // DEPRECATED END ---
+  assert.fieldEquals(
+    CONTRACT_ENTITY_TYPE,
+    TEST_CONTRACT_ADDRESS.toHexString(),
+    "defaultEnginePlatformProviderSecondarySalesAddress",
     newPlatformProviderSecondarySalesAddress.toHexString()
   );
 });
@@ -626,12 +644,20 @@ test(`${coreType}: Handles PlatformUpdated::providerPrimaryPercentages - default
   addTestContractToStore(projectId);
   mockRefreshContractCalls(BigInt.fromI32(0), coreType, null);
 
-  // default value should be false
+  // default value should be test contract value
+  // DEPRECATED START ---
   assert.fieldEquals(
     CONTRACT_ENTITY_TYPE,
     TEST_CONTRACT_ADDRESS.toHexString(),
     "renderProviderSecondarySalesAddress",
     TEST_CONTRACT.renderProviderSecondarySalesAddress.toHexString()
+  );
+  // DEPRECATED END ---
+  assert.fieldEquals(
+    CONTRACT_ENTITY_TYPE,
+    TEST_CONTRACT_ADDRESS.toHexString(),
+    "defaultRenderProviderSecondarySalesAddress",
+    TEST_CONTRACT.defaultRenderProviderSecondarySalesAddress.toHexString()
   );
 });
 
@@ -923,12 +949,20 @@ test(`${coreType}: Handles PlatformUpdated::providerSecondaryBPS - default value
   addTestContractToStore(projectId);
   mockRefreshContractCalls(BigInt.fromI32(0), coreType, null);
 
-  // default value should be false
+  // default value should be test contract default value
+  // DEFAULT START ---
   assert.fieldEquals(
     CONTRACT_ENTITY_TYPE,
     TEST_CONTRACT_ADDRESS.toHexString(),
     "renderProviderSecondarySalesBPS",
     TEST_CONTRACT.renderProviderSecondarySalesBPS.toString()
+  );
+  // DEFAULT END ---
+  assert.fieldEquals(
+    CONTRACT_ENTITY_TYPE,
+    TEST_CONTRACT_ADDRESS.toHexString(),
+    "defaultRenderProviderSecondarySalesBPS",
+    TEST_CONTRACT.defaultRenderProviderSecondarySalesBPS.toString()
   );
 });
 
@@ -948,6 +982,7 @@ test(`${coreType}: Handles PlatformUpdated::providerSecondaryBPS - changed value
   ).returns([
     ethereum.Value.fromUnsignedBigInt(newRenderProviderSecondarySalesBPS)
   ]);
+  // @dev pre-v3.2 do not have defaultRenderProviderSecondarySalesBPS()
 
   const newPlatformProviderSecondarySalesBPS = BigInt.fromI32(200);
   createMockedFunction(
@@ -957,6 +992,7 @@ test(`${coreType}: Handles PlatformUpdated::providerSecondaryBPS - changed value
   ).returns([
     ethereum.Value.fromUnsignedBigInt(newPlatformProviderSecondarySalesBPS)
   ]);
+  // @dev pre-v3.2 do not have defaultPlatformProviderSecondarySalesBPS()
 
   // create event
   const event: PlatformUpdated = changetype<PlatformUpdated>(newMockEvent());
@@ -973,6 +1009,7 @@ test(`${coreType}: Handles PlatformUpdated::providerSecondaryBPS - changed value
   handlePlatformUpdated(event);
 
   // values in store should be updated
+  // DEPRECATED START ---
   assert.fieldEquals(
     CONTRACT_ENTITY_TYPE,
     TEST_CONTRACT_ADDRESS.toHexString(),
@@ -983,6 +1020,19 @@ test(`${coreType}: Handles PlatformUpdated::providerSecondaryBPS - changed value
     CONTRACT_ENTITY_TYPE,
     TEST_CONTRACT_ADDRESS.toHexString(),
     "enginePlatformProviderSecondarySalesBPS",
+    newPlatformProviderSecondarySalesBPS.toString()
+  );
+  // DEPRECATED END ---
+  assert.fieldEquals(
+    CONTRACT_ENTITY_TYPE,
+    TEST_CONTRACT_ADDRESS.toHexString(),
+    "defaultRenderProviderSecondarySalesBPS",
+    newRenderProviderSecondarySalesBPS.toString()
+  );
+  assert.fieldEquals(
+    CONTRACT_ENTITY_TYPE,
+    TEST_CONTRACT_ADDRESS.toHexString(),
+    "defaultEnginePlatformProviderSecondarySalesBPS",
     newPlatformProviderSecondarySalesBPS.toString()
   );
 });
