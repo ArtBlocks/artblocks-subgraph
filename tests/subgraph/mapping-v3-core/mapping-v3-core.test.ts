@@ -833,6 +833,88 @@ test(`${coreType}: Handles PlatformUpdated::artblocksSecondarySalesAddress - cha
   );
 });
 
+test(`${coreType}: Handles PlatformUpdated::artblocksSecondarySalesAddress - changed value - multi-project iteration`, () => {
+  // this test is to ensure that the secondary sales address is updated for all projects
+  // when the platform's secondary sales address is updated.
+  clearStore();
+  // add new contract to store
+  const projectId = BigInt.fromI32(0);
+  addTestContractToStore(projectId);
+  mockRefreshContractCalls(
+    BigInt.fromI32(2), // next project id = 2, so projects 0 and 1 exist and should be iterated over
+    coreType,
+    null
+  );
+  // add projects 0 and 1 to store
+  addNewProjectToStore(
+    TEST_CONTRACT_ADDRESS,
+    BigInt.fromI32(0),
+    "Project 0",
+    randomAddressGenerator.generateRandomAddress(),
+    BigInt.fromI32(1),
+    CURRENT_BLOCK_TIMESTAMP
+  );
+  addNewProjectToStore(
+    TEST_CONTRACT_ADDRESS,
+    BigInt.fromI32(1),
+    "Project 1",
+    randomAddressGenerator.generateRandomAddress(),
+    BigInt.fromI32(1),
+    CURRENT_BLOCK_TIMESTAMP
+  );
+
+  // update mock function return value
+  const newAddress = randomAddressGenerator.generateRandomAddress();
+  createMockedFunction(
+    TEST_CONTRACT_ADDRESS,
+    "artblocksSecondarySalesAddress",
+    "artblocksSecondarySalesAddress():(address)"
+  ).returns([ethereum.Value.fromAddress(newAddress)]);
+
+  // create event
+  const event: PlatformUpdated = changetype<PlatformUpdated>(newMockEvent());
+  event.address = TEST_CONTRACT_ADDRESS;
+  event.transaction.hash = TEST_TX_HASH;
+  event.logIndex = BigInt.fromI32(0);
+  event.parameters = [
+    new ethereum.EventParam(
+      "_field",
+      ethereum.Value.fromBytes(Bytes.fromUTF8("artblocksSecondarySalesAddress"))
+    )
+  ];
+  // handle event
+  handlePlatformUpdated(event);
+
+  // value in store should be updated
+  // DEPRECATED START ---
+  assert.fieldEquals(
+    CONTRACT_ENTITY_TYPE,
+    TEST_CONTRACT_ADDRESS.toHexString(),
+    "renderProviderSecondarySalesAddress",
+    newAddress.toHexString()
+  );
+  // DEPRECATED END ---
+  assert.fieldEquals(
+    CONTRACT_ENTITY_TYPE,
+    TEST_CONTRACT_ADDRESS.toHexString(),
+    "defaultRenderProviderSecondarySalesAddress",
+    newAddress.toHexString()
+  );
+  // projects should also be updated
+  assert.fieldEquals(
+    PROJECT_ENTITY_TYPE,
+    generateContractSpecificId(TEST_CONTRACT_ADDRESS, BigInt.fromI32(0)),
+    "renderProviderSecondarySalesAddress",
+    newAddress.toHexString()
+  );
+  assert.fieldEquals(
+    PROJECT_ENTITY_TYPE,
+    generateContractSpecificId(TEST_CONTRACT_ADDRESS, BigInt.fromI32(1)),
+    "renderProviderSecondarySalesAddress",
+    newAddress.toHexString()
+  );
+});
+
 test(`${coreType}: Handles PlatformUpdated::randomizerAddress - default value`, () => {
   // default value is false
   clearStore();
