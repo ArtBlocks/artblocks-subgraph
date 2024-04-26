@@ -78,6 +78,25 @@
         {
           "indexed": true,
           "internalType": "uint256",
+          "name": "projectId",
+          "type": "uint256"
+        },
+        {
+          "indexed": true,
+          "internalType": "address",
+          "name": "royaltySplitter",
+          "type": "address"
+        }
+      ],
+      "name": "ProjectRoyaltySplitterUpdated",
+      "type": "event"
+    },
+    {
+      "anonymous": false,
+      "inputs": [
+        {
+          "indexed": true,
+          "internalType": "uint256",
           "name": "_projectId",
           "type": "uint256"
         },
