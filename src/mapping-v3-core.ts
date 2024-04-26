@@ -729,9 +729,7 @@ function createProject(
     );
     return null;
   }
-  log.info("found core contract version: {}", [coreVersion as string]);
   const isPreV3_2 = getIsPreV3_2(coreVersion as string);
-  log.info("isPreV3_2: {}", [isPreV3_2.toString()]);
   if (isPreV3_2) {
     if (contractEntity.type == "GenArt721CoreV3") {
       // use the artbocks getter functions (not an Engine contract)
