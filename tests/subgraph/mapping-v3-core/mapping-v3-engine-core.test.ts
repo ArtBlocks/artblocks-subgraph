@@ -91,6 +91,7 @@ import {
 const randomAddressGenerator = new RandomAddressGenerator();
 
 const coreType = "GenArt721CoreV3_Engine";
+const coreVersion = "v3.1.0";
 
 test(`${coreType}: Can handle Mint`, () => {
   clearStore();
@@ -1101,7 +1102,7 @@ describe(`${coreType}: handleProjectUpdated`, () => {
       addTestContractToStoreOfTypeAndVersion(
         BigInt.fromI32(0),
         coreType,
-        "v3.1.0"
+        coreVersion
       );
     });
 
@@ -1281,6 +1282,14 @@ describe(`${coreType}: handleProjectUpdated`, () => {
       )
         .withArgs([ethereum.Value.fromUnsignedBigInt(projectId)])
         .returns([ethereum.Value.fromAddress(artistAddress)]);
+      // mock projectIdToSecondaryMarketRoyaltyPercentage, return 0
+      createMockedFunction(
+        TEST_CONTRACT_ADDRESS,
+        "projectIdToSecondaryMarketRoyaltyPercentage",
+        "projectIdToSecondaryMarketRoyaltyPercentage(uint256):(uint256)"
+      )
+        .withArgs([ethereum.Value.fromUnsignedBigInt(projectId)])
+        .returns([ethereum.Value.fromI32(0)]);
 
       handleProjectUpdated(event);
 
@@ -1400,6 +1409,39 @@ describe(`${coreType}: handleProjectUpdated`, () => {
         generateContractSpecificId(TEST_CONTRACT_ADDRESS, projectId),
         "useIpfs",
         "false"
+      );
+      // default royalty upon project creation is 0 for pre-v3.2 Engine core
+      assert.fieldEquals(
+        PROJECT_ENTITY_TYPE,
+        generateContractSpecificId(TEST_CONTRACT_ADDRESS, projectId),
+        "royaltyPercentage",
+        "0"
+      );
+      // project render provider royalties should equal contract-level values for pre-v3.2 Engine core
+      assert.fieldEquals(
+        PROJECT_ENTITY_TYPE,
+        generateContractSpecificId(TEST_CONTRACT_ADDRESS, projectId),
+        "renderProviderSecondarySalesAddress",
+        TEST_CONTRACT.defaultRenderProviderSecondarySalesAddress.toHexString()
+      );
+      assert.fieldEquals(
+        PROJECT_ENTITY_TYPE,
+        generateContractSpecificId(TEST_CONTRACT_ADDRESS, projectId),
+        "renderProviderSecondarySalesBPS",
+        TEST_CONTRACT.defaultRenderProviderSecondarySalesBPS.toString()
+      );
+      // project platform provider royalties should equal contract-level values for pre-v3.2 Engine core
+      assert.fieldEquals(
+        PROJECT_ENTITY_TYPE,
+        generateContractSpecificId(TEST_CONTRACT_ADDRESS, projectId),
+        "enginePlatformProviderSecondarySalesAddress",
+        TEST_CONTRACT.defaultEnginePlatformProviderSecondarySalesAddress.toHexString()
+      );
+      assert.fieldEquals(
+        PROJECT_ENTITY_TYPE,
+        generateContractSpecificId(TEST_CONTRACT_ADDRESS, projectId),
+        "enginePlatformProviderSecondarySalesBPS",
+        TEST_CONTRACT.defaultEnginePlatformProviderSecondarySalesBPS.toString()
       );
     });
   });

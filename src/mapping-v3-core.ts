@@ -726,7 +726,7 @@ function createProject(
       project.renderProviderSecondarySalesAddress = contractAsV3_Legacy.artblocksSecondarySalesAddress();
       project.renderProviderSecondarySalesBPS = contractAsV3_Legacy.artblocksSecondarySalesBPS();
       project.enginePlatformProviderSecondarySalesAddress = null;
-      project.enginePlatformProviderSecondarySalesBPS = BigInt.fromI32(0);
+      project.enginePlatformProviderSecondarySalesBPS = null;
     } else {
       // use the render provider and platform provider getters (it is an Engine contract)
       // populate project provider secondary addresses and BPS for v3.0 and v3.1

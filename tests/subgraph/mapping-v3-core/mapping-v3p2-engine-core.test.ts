@@ -1126,7 +1126,7 @@ describe(`${coreType}-${coreVersion}: handleProjectUpdated`, () => {
       addTestContractToStoreOfTypeAndVersion(
         BigInt.fromI32(0),
         coreType,
-        "v3.1.0"
+        coreVersion
       );
     });
 
@@ -1255,7 +1255,7 @@ describe(`${coreType}-${coreVersion}: handleProjectUpdated`, () => {
       ];
 
       // mock all refresh contract calls to ensure the required contract-level royalty functions are mocked
-      mockRefreshContractCalls(projectId, coreType, null);
+      mockRefreshContractCalls(projectId, coreType, mockCoreContractOverrides);
 
       // mock projectDetails
       createMockedFunction(
@@ -1306,6 +1306,76 @@ describe(`${coreType}-${coreVersion}: handleProjectUpdated`, () => {
       )
         .withArgs([ethereum.Value.fromUnsignedBigInt(projectId)])
         .returns([ethereum.Value.fromAddress(artistAddress)]);
+      // mock projectIdToSecondaryMarketRoyaltyPercentage, return 5
+      createMockedFunction(
+        TEST_CONTRACT_ADDRESS,
+        "projectIdToSecondaryMarketRoyaltyPercentage",
+        "projectIdToSecondaryMarketRoyaltyPercentage(uint256):(uint256)"
+      )
+        .withArgs([ethereum.Value.fromUnsignedBigInt(projectId)])
+        .returns([ethereum.Value.fromI32(5)]);
+
+      // mock projectIdToFinancials, used on v3.2 Engine core in handler
+      const localDefaultRenderProviderSecondarySalesAddress = randomAddressGenerator.generateRandomAddress();
+      const localDefaultRenderProviderSecondarySalesBPS = BigInt.fromI32(4);
+      const localDefaultEnginePlatformProviderSecondarySalesAddress = randomAddressGenerator.generateRandomAddress();
+      const localDefaultEnginePlatformProviderSecondarySalesBPS = BigInt.fromI32(
+        6
+      );
+      // return is a struct, which solidity returns as a tuple
+      let tupleArray: Array<ethereum.Value> = [
+        ethereum.Value.fromAddress(Address.zero()), // additional payee primary sales (unused in this test)
+        ethereum.Value.fromUnsignedBigInt(BigInt.fromI32(0)), // secondary market royalty percentage (unused in this test)
+        ethereum.Value.fromAddress(Address.zero()), // additional payee secondary sales (unused in this test)
+        ethereum.Value.fromUnsignedBigInt(BigInt.fromI32(0)), // additional payee secondary sales percentage (unused in this test)
+        ethereum.Value.fromAddress(Address.zero()), // artist address (unused in this test)
+        ethereum.Value.fromUnsignedBigInt(BigInt.fromI32(0)), // additionalPayeePrimarySalesPercentage (unused in this test)
+        ethereum.Value.fromAddress(
+          localDefaultEnginePlatformProviderSecondarySalesAddress
+        ),
+        ethereum.Value.fromUnsignedBigInt(
+          localDefaultEnginePlatformProviderSecondarySalesBPS
+        ),
+        ethereum.Value.fromAddress(
+          localDefaultRenderProviderSecondarySalesAddress
+        ),
+        ethereum.Value.fromUnsignedBigInt(
+          localDefaultRenderProviderSecondarySalesBPS
+        ),
+        ethereum.Value.fromAddress(Address.zero()) // royalty splitter (unused in this test)
+      ];
+      let tuple: ethereum.Tuple = changetype<ethereum.Tuple>(tupleArray);
+
+      createMockedFunction(
+        TEST_CONTRACT_ADDRESS,
+        "projectIdToFinancials",
+        "projectIdToFinancials(uint256):((address,uint8,address,uint8,address,uint8,address,uint16,address,uint16,address))"
+      )
+        .withArgs([ethereum.Value.fromUnsignedBigInt(projectId)])
+        .returns([ethereum.Value.fromTuple(tuple)]);
+      // .returns([
+      //   ethereum.Value.fromTuple([
+      //     ethereum.Value.fromAddress(Address.zero()), // additional payee primary sales (unused in this test)
+      //     ethereum.Value.fromI32(0), // secondary market royalty percentage (unused in this test)
+      //     ethereum.Value.fromAddress(Address.zero()), // additional payee secondary sales (unused in this test)
+      //     ethereum.Value.fromI32(0), // additional payee secondary sales percentage (unused in this test)
+      //     ethereum.Value.fromAddress(Address.zero()), // artist address (unused in this test)
+      //     ethereum.Value.fromI32(0), // additionalPayeePrimarySalesPercentage (unused in this test)
+      //     ethereum.Value.fromAddress(
+      //       localDefaultEnginePlatformProviderSecondarySalesAddress
+      //     ),
+      //     ethereum.Value.fromUnsignedBigInt(
+      //       localDefaultEnginePlatformProviderSecondarySalesBPS
+      //     ),
+      //     ethereum.Value.fromAddress(
+      //       localDefaultRenderProviderSecondarySalesAddress
+      //     ),
+      //     ethereum.Value.fromUnsignedBigInt(
+      //       localDefaultRenderProviderSecondarySalesBPS
+      //     ),
+      //     ethereum.Value.fromAddress(Address.zero()) // royalty splitter (unused in this test)
+      //   ] as ethereum.Tuple)
+      // ]);
 
       handleProjectUpdated(event);
 
@@ -1425,6 +1495,39 @@ describe(`${coreType}-${coreVersion}: handleProjectUpdated`, () => {
         generateContractSpecificId(TEST_CONTRACT_ADDRESS, projectId),
         "useIpfs",
         "false"
+      );
+      // default royalty upon project creation is non-zero for v3.2 Engine core
+      assert.fieldEquals(
+        PROJECT_ENTITY_TYPE,
+        generateContractSpecificId(TEST_CONTRACT_ADDRESS, projectId),
+        "royaltyPercentage",
+        "5"
+      );
+      // project render provider royalties should equal contract-level values for v3.2 Engine core
+      assert.fieldEquals(
+        PROJECT_ENTITY_TYPE,
+        generateContractSpecificId(TEST_CONTRACT_ADDRESS, projectId),
+        "renderProviderSecondarySalesAddress",
+        localDefaultRenderProviderSecondarySalesAddress.toHexString()
+      );
+      assert.fieldEquals(
+        PROJECT_ENTITY_TYPE,
+        generateContractSpecificId(TEST_CONTRACT_ADDRESS, projectId),
+        "renderProviderSecondarySalesBPS",
+        localDefaultRenderProviderSecondarySalesBPS.toString()
+      );
+      // project platform provider royalties should equal contract-level values for pre-v3.2 Engine core
+      assert.fieldEquals(
+        PROJECT_ENTITY_TYPE,
+        generateContractSpecificId(TEST_CONTRACT_ADDRESS, projectId),
+        "enginePlatformProviderSecondarySalesAddress",
+        localDefaultEnginePlatformProviderSecondarySalesAddress.toHexString()
+      );
+      assert.fieldEquals(
+        PROJECT_ENTITY_TYPE,
+        generateContractSpecificId(TEST_CONTRACT_ADDRESS, projectId),
+        "enginePlatformProviderSecondarySalesBPS",
+        localDefaultEnginePlatformProviderSecondarySalesBPS.toString()
       );
     });
   });
