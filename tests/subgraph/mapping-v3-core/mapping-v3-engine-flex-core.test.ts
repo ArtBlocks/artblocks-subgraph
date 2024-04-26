@@ -60,6 +60,7 @@ import { Transfer } from "../../../generated/IERC721GenArt721CoreV3Contract/IERC
 import { OwnershipTransferred } from "../../../generated/OwnableGenArt721CoreV3Contract/Ownable";
 import { SuperAdminTransferred } from "../../../generated/AdminACLV0/IAdminACLV0";
 import {
+  toBytes32,
   FIELD_PROJECT_ACTIVE,
   FIELD_PROJECT_ARTIST_ADDRESS,
   FIELD_PROJECT_ARTIST_NAME,
@@ -1069,7 +1070,7 @@ describe(`${coreType}: handleProjectUpdated`, () => {
         ),
         new ethereum.EventParam(
           "_update",
-          ethereum.Value.fromBytes(Bytes.fromUTF8(FIELD_PROJECT_CREATED))
+          ethereum.Value.fromBytes(toBytes32(FIELD_PROJECT_CREATED))
         )
       ];
 
@@ -1175,7 +1176,7 @@ describe(`${coreType}: handleProjectUpdated`, () => {
         ),
         new ethereum.EventParam(
           "_update",
-          ethereum.Value.fromBytes(Bytes.fromUTF8(FIELD_PROJECT_CREATED))
+          ethereum.Value.fromBytes(toBytes32(FIELD_PROJECT_CREATED))
         )
       ];
 
@@ -1393,7 +1394,7 @@ describe(`${coreType}: handleProjectUpdated`, () => {
         ),
         new ethereum.EventParam(
           "_update",
-          ethereum.Value.fromBytes(Bytes.fromUTF8(FIELD_PROJECT_ACTIVE))
+          ethereum.Value.fromBytes(toBytes32(FIELD_PROJECT_ACTIVE))
         )
       ];
 
@@ -1442,7 +1443,7 @@ describe(`${coreType}: handleProjectUpdated`, () => {
         ),
         new ethereum.EventParam(
           "_update",
-          ethereum.Value.fromBytes(Bytes.fromUTF8(FIELD_PROJECT_ARTIST_ADDRESS))
+          ethereum.Value.fromBytes(toBytes32(FIELD_PROJECT_ARTIST_ADDRESS))
         )
       ];
 
@@ -1528,7 +1529,7 @@ describe(`${coreType}: handleProjectUpdated`, () => {
         ),
         new ethereum.EventParam(
           "_update",
-          ethereum.Value.fromBytes(Bytes.fromUTF8(FIELD_PROJECT_BASE_URI))
+          ethereum.Value.fromBytes(toBytes32(FIELD_PROJECT_BASE_URI))
         )
       ];
 
@@ -1576,7 +1577,7 @@ describe(`${coreType}: handleProjectUpdated`, () => {
         ),
         new ethereum.EventParam(
           "_update",
-          ethereum.Value.fromBytes(Bytes.fromUTF8(FIELD_PROJECT_COMPLETED))
+          ethereum.Value.fromBytes(toBytes32(FIELD_PROJECT_COMPLETED))
         )
       ];
 
@@ -1636,7 +1637,7 @@ describe(`${coreType}: handleProjectUpdated`, () => {
         ),
         new ethereum.EventParam(
           "_update",
-          ethereum.Value.fromBytes(Bytes.fromUTF8(FIELD_PROJECT_SCRIPT))
+          ethereum.Value.fromBytes(toBytes32(FIELD_PROJECT_SCRIPT))
         )
       ];
 
@@ -1709,7 +1710,7 @@ describe(`${coreType}: handleProjectUpdated`, () => {
         ),
         new ethereum.EventParam(
           "_update",
-          ethereum.Value.fromBytes(Bytes.fromUTF8(FIELD_PROJECT_SCRIPT))
+          ethereum.Value.fromBytes(toBytes32(FIELD_PROJECT_SCRIPT))
         )
       ];
 
@@ -1782,7 +1783,7 @@ describe(`${coreType}: handleProjectUpdated`, () => {
         ),
         new ethereum.EventParam(
           "_update",
-          ethereum.Value.fromBytes(Bytes.fromUTF8(FIELD_PROJECT_SCRIPT))
+          ethereum.Value.fromBytes(toBytes32(FIELD_PROJECT_SCRIPT))
         )
       ];
 
@@ -1852,7 +1853,7 @@ describe(`${coreType}: handleProjectUpdated`, () => {
         ),
         new ethereum.EventParam(
           "_update",
-          ethereum.Value.fromBytes(Bytes.fromUTF8(FIELD_PROJECT_SCRIPT))
+          ethereum.Value.fromBytes(toBytes32(FIELD_PROJECT_SCRIPT))
         )
       ];
 
@@ -1928,7 +1929,7 @@ describe(`${coreType}: handleProjectUpdated`, () => {
         new ethereum.EventParam(
           "_update",
           ethereum.Value.fromBytes(
-            Bytes.fromUTF8(FIELD_PROJECT_SECONDARY_MARKET_ROYALTY_PERCENTAGE)
+            toBytes32(FIELD_PROJECT_SECONDARY_MARKET_ROYALTY_PERCENTAGE)
           )
         )
       ];

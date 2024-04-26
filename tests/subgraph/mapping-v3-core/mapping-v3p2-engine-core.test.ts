@@ -1146,7 +1146,7 @@ describe(`${coreType}-${coreVersion}: handleProjectUpdated`, () => {
         ),
         new ethereum.EventParam(
           "_update",
-          ethereum.Value.fromBytes(Bytes.fromI32(ENUM_FIELD_PROJECT_CREATED))
+          ethereum.Value.fromBytes(ENUM_FIELD_PROJECT_CREATED)
         )
       ];
 
@@ -1171,7 +1171,7 @@ describe(`${coreType}-${coreVersion}: handleProjectUpdated`, () => {
         ),
         new ethereum.EventParam(
           "_update",
-          ethereum.Value.fromBytes(Bytes.fromI32(ENUM_FIELD_PROJECT_CREATED))
+          ethereum.Value.fromBytes(ENUM_FIELD_PROJECT_CREATED)
         )
       ];
 
@@ -1252,7 +1252,7 @@ describe(`${coreType}-${coreVersion}: handleProjectUpdated`, () => {
         ),
         new ethereum.EventParam(
           "_update",
-          ethereum.Value.fromBytes(Bytes.fromI32(ENUM_FIELD_PROJECT_CREATED))
+          ethereum.Value.fromBytes(ENUM_FIELD_PROJECT_CREATED)
         )
       ];
 
@@ -1550,7 +1550,7 @@ describe(`${coreType}-${coreVersion}: handleProjectUpdated`, () => {
         ),
         new ethereum.EventParam(
           "_update",
-          ethereum.Value.fromBytes(Bytes.fromI32(ENUM_FIELD_PROJECT_ACTIVE))
+          ethereum.Value.fromBytes(ENUM_FIELD_PROJECT_ACTIVE)
         )
       ];
 
@@ -1599,9 +1599,7 @@ describe(`${coreType}-${coreVersion}: handleProjectUpdated`, () => {
         ),
         new ethereum.EventParam(
           "_update",
-          ethereum.Value.fromBytes(
-            Bytes.fromI32(ENUM_FIELD_PROJECT_ARTIST_ADDRESS)
-          )
+          ethereum.Value.fromBytes(ENUM_FIELD_PROJECT_ARTIST_ADDRESS)
         )
       ];
 
@@ -1687,7 +1685,7 @@ describe(`${coreType}-${coreVersion}: handleProjectUpdated`, () => {
         ),
         new ethereum.EventParam(
           "_update",
-          ethereum.Value.fromBytes(Bytes.fromI32(ENUM_FIELD_PROJECT_BASE_URI))
+          ethereum.Value.fromBytes(ENUM_FIELD_PROJECT_BASE_URI)
         )
       ];
 
@@ -1735,7 +1733,7 @@ describe(`${coreType}-${coreVersion}: handleProjectUpdated`, () => {
         ),
         new ethereum.EventParam(
           "_update",
-          ethereum.Value.fromBytes(Bytes.fromI32(ENUM_FIELD_PROJECT_COMPLETED))
+          ethereum.Value.fromBytes(ENUM_FIELD_PROJECT_COMPLETED)
         )
       ];
 
@@ -1795,7 +1793,7 @@ describe(`${coreType}-${coreVersion}: handleProjectUpdated`, () => {
         ),
         new ethereum.EventParam(
           "_update",
-          ethereum.Value.fromBytes(Bytes.fromI32(ENUM_FIELD_PROJECT_SCRIPT))
+          ethereum.Value.fromBytes(ENUM_FIELD_PROJECT_SCRIPT)
         )
       ];
 
@@ -1868,7 +1866,7 @@ describe(`${coreType}-${coreVersion}: handleProjectUpdated`, () => {
         ),
         new ethereum.EventParam(
           "_update",
-          ethereum.Value.fromBytes(Bytes.fromI32(ENUM_FIELD_PROJECT_SCRIPT))
+          ethereum.Value.fromBytes(ENUM_FIELD_PROJECT_SCRIPT)
         )
       ];
 
@@ -1941,7 +1939,7 @@ describe(`${coreType}-${coreVersion}: handleProjectUpdated`, () => {
         ),
         new ethereum.EventParam(
           "_update",
-          ethereum.Value.fromBytes(Bytes.fromI32(ENUM_FIELD_PROJECT_SCRIPT))
+          ethereum.Value.fromBytes(ENUM_FIELD_PROJECT_SCRIPT)
         )
       ];
 
@@ -2011,7 +2009,7 @@ describe(`${coreType}-${coreVersion}: handleProjectUpdated`, () => {
         ),
         new ethereum.EventParam(
           "_update",
-          ethereum.Value.fromBytes(Bytes.fromI32(ENUM_FIELD_PROJECT_SCRIPT))
+          ethereum.Value.fromBytes(ENUM_FIELD_PROJECT_SCRIPT)
         )
       ];
 
@@ -2087,9 +2085,7 @@ describe(`${coreType}-${coreVersion}: handleProjectUpdated`, () => {
         new ethereum.EventParam(
           "_update",
           ethereum.Value.fromBytes(
-            Bytes.fromI32(
-              ENUM_FIELD_PROJECT_SECONDARY_MARKET_ROYALTY_PERCENTAGE
-            )
+            ENUM_FIELD_PROJECT_SECONDARY_MARKET_ROYALTY_PERCENTAGE
           )
         )
       ];
@@ -2145,7 +2141,7 @@ describe(`${coreType}-${coreVersion}: handleProjectUpdated`, () => {
         new ethereum.EventParam(
           "_update",
           ethereum.Value.fromBytes(
-            Bytes.fromI32(ENUM_FIELD_PROJECT_PROVIDER_SECONDARY_FINANCIALS)
+            ENUM_FIELD_PROJECT_PROVIDER_SECONDARY_FINANCIALS
           )
         )
       ];

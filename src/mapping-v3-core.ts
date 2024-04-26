@@ -255,26 +255,30 @@ export function handleTransfer(event: Transfer): void {
   transfer.save();
 }
 
-// v3.2 core contract Enum ProjectUpdatedFields
-export const ENUM_FIELD_PROJECT_COMPLETED = 0;
-export const ENUM_FIELD_PROJECT_ACTIVE = 1;
-export const ENUM_FIELD_PROJECT_ARTIST_ADDRESS = 2;
-export const ENUM_FIELD_PROJECT_PAUSED = 3;
-export const ENUM_FIELD_PROJECT_CREATED = 4;
-export const ENUM_FIELD_PROJECT_NAME = 5;
-export const ENUM_FIELD_PROJECT_ARTIST_NAME = 6;
-export const ENUM_FIELD_PROJECT_SECONDARY_MARKET_ROYALTY_PERCENTAGE = 7;
-export const ENUM_FIELD_PROJECT_DESCRIPTION = 8;
-export const ENUM_FIELD_PROJECT_WEBSITE = 9;
-export const ENUM_FIELD_PROJECT_LICENSE = 10;
-export const ENUM_FIELD_PROJECT_MAX_INVOCATIONS = 11;
-export const ENUM_FIELD_PROJECT_SCRIPT = 12;
-export const ENUM_FIELD_PROJECT_SCRIPT_TYPE = 13;
-export const ENUM_FIELD_PROJECT_ASPECT_RATIO = 14;
-export const ENUM_FIELD_PROJECT_BASE_URI = 15;
-export const ENUM_FIELD_PROJECT_PROVIDER_SECONDARY_FINANCIALS = 16;
+// v3.2 core contract Enum ProjectUpdatedFields, encoded as bytes32 Bytes
+export const ENUM_FIELD_PROJECT_COMPLETED = toBytes32Numeric(0);
+export const ENUM_FIELD_PROJECT_ACTIVE = toBytes32Numeric(1);
+export const ENUM_FIELD_PROJECT_ARTIST_ADDRESS = toBytes32Numeric(2);
+export const ENUM_FIELD_PROJECT_PAUSED = toBytes32Numeric(3);
+export const ENUM_FIELD_PROJECT_CREATED = toBytes32Numeric(4);
+export const ENUM_FIELD_PROJECT_NAME = toBytes32Numeric(5);
+export const ENUM_FIELD_PROJECT_ARTIST_NAME = toBytes32Numeric(6);
+export const ENUM_FIELD_PROJECT_SECONDARY_MARKET_ROYALTY_PERCENTAGE = toBytes32Numeric(
+  7 as i32
+);
+export const ENUM_FIELD_PROJECT_DESCRIPTION = toBytes32Numeric(8);
+export const ENUM_FIELD_PROJECT_WEBSITE = toBytes32Numeric(9);
+export const ENUM_FIELD_PROJECT_LICENSE = toBytes32Numeric(10);
+export const ENUM_FIELD_PROJECT_MAX_INVOCATIONS = toBytes32Numeric(11);
+export const ENUM_FIELD_PROJECT_SCRIPT = toBytes32Numeric(12);
+export const ENUM_FIELD_PROJECT_SCRIPT_TYPE = toBytes32Numeric(13);
+export const ENUM_FIELD_PROJECT_ASPECT_RATIO = toBytes32Numeric(14);
+export const ENUM_FIELD_PROJECT_BASE_URI = toBytes32Numeric(15);
+export const ENUM_FIELD_PROJECT_PROVIDER_SECONDARY_FINANCIALS = toBytes32Numeric(
+  16
+);
 
-// pre-v3.2 core contract ProjectUpdatedFields (bytes32 strings)
+// pre-v3.2 core contract ProjectUpdatedFields, as their unpadded string values here
 export const FIELD_PROJECT_ACTIVE = "active";
 export const FIELD_PROJECT_ARTIST_ADDRESS = "artistAddress";
 export const FIELD_PROJECT_ARTIST_NAME = "artistName";
@@ -305,89 +309,91 @@ export const FIELD_PROJECT_PROVIDER_SECONDARY_FINANCIALS =
 function getProjectUpdatedField(_update: Bytes): string | null {
   // @dev switch/case not supported in AssemblyScript for Bytes type
   if (
-    _update == Bytes.fromUTF8(FIELD_PROJECT_ACTIVE) ||
-    _update == Bytes.fromI32(ENUM_FIELD_PROJECT_ACTIVE)
+    _update.equals(toBytes32(FIELD_PROJECT_ACTIVE)) ||
+    _update.equals(ENUM_FIELD_PROJECT_ACTIVE)
   ) {
     return FIELD_PROJECT_ACTIVE;
   } else if (
-    _update == Bytes.fromUTF8(FIELD_PROJECT_ARTIST_ADDRESS) ||
-    _update == Bytes.fromI32(ENUM_FIELD_PROJECT_ARTIST_ADDRESS)
+    _update.equals(toBytes32(FIELD_PROJECT_ARTIST_ADDRESS)) ||
+    _update.equals(ENUM_FIELD_PROJECT_ARTIST_ADDRESS)
   ) {
     return FIELD_PROJECT_ARTIST_ADDRESS;
   } else if (
-    _update == Bytes.fromUTF8(FIELD_PROJECT_ARTIST_NAME) ||
-    _update == Bytes.fromI32(ENUM_FIELD_PROJECT_ARTIST_NAME)
+    _update.equals(toBytes32(FIELD_PROJECT_ARTIST_NAME)) ||
+    _update.equals(ENUM_FIELD_PROJECT_ARTIST_NAME)
   ) {
     return FIELD_PROJECT_ARTIST_NAME;
   } else if (
-    _update == Bytes.fromUTF8(FIELD_PROJECT_ASPECT_RATIO) ||
-    _update == Bytes.fromI32(ENUM_FIELD_PROJECT_ASPECT_RATIO)
+    _update.equals(toBytes32(FIELD_PROJECT_ASPECT_RATIO)) ||
+    _update.equals(ENUM_FIELD_PROJECT_ASPECT_RATIO)
   ) {
     return FIELD_PROJECT_ASPECT_RATIO;
   } else if (
-    _update == Bytes.fromUTF8(FIELD_PROJECT_BASE_URI) ||
-    _update == Bytes.fromI32(ENUM_FIELD_PROJECT_BASE_URI)
+    _update.equals(toBytes32(FIELD_PROJECT_BASE_URI)) ||
+    _update.equals(ENUM_FIELD_PROJECT_BASE_URI)
   ) {
     return FIELD_PROJECT_BASE_URI;
   } else if (
-    _update == Bytes.fromUTF8(FIELD_PROJECT_COMPLETED) ||
-    _update == Bytes.fromI32(ENUM_FIELD_PROJECT_COMPLETED)
+    _update.equals(toBytes32(FIELD_PROJECT_COMPLETED)) ||
+    _update.equals(ENUM_FIELD_PROJECT_COMPLETED)
   ) {
     return FIELD_PROJECT_COMPLETED;
   } else if (
-    _update == Bytes.fromUTF8(FIELD_PROJECT_CREATED) ||
-    _update == Bytes.fromI32(ENUM_FIELD_PROJECT_CREATED)
+    _update.equals(toBytes32(FIELD_PROJECT_CREATED)) ||
+    _update.equals(ENUM_FIELD_PROJECT_CREATED)
   ) {
     return FIELD_PROJECT_CREATED;
   } else if (
-    _update == Bytes.fromUTF8(FIELD_PROJECT_DESCRIPTION) ||
-    _update == Bytes.fromI32(ENUM_FIELD_PROJECT_DESCRIPTION)
+    _update.equals(toBytes32(FIELD_PROJECT_DESCRIPTION)) ||
+    _update.equals(ENUM_FIELD_PROJECT_DESCRIPTION)
   ) {
     return FIELD_PROJECT_DESCRIPTION;
   } else if (
-    _update == Bytes.fromUTF8(FIELD_PROJECT_LICENSE) ||
-    _update == Bytes.fromI32(ENUM_FIELD_PROJECT_LICENSE)
+    _update.equals(toBytes32(FIELD_PROJECT_LICENSE)) ||
+    _update.equals(ENUM_FIELD_PROJECT_LICENSE)
   ) {
     return FIELD_PROJECT_LICENSE;
   } else if (
-    _update == Bytes.fromUTF8(FIELD_PROJECT_MAX_INVOCATIONS) ||
-    _update == Bytes.fromI32(ENUM_FIELD_PROJECT_MAX_INVOCATIONS)
+    _update.equals(toBytes32(FIELD_PROJECT_MAX_INVOCATIONS)) ||
+    _update.equals(ENUM_FIELD_PROJECT_MAX_INVOCATIONS)
   ) {
     return FIELD_PROJECT_MAX_INVOCATIONS;
   } else if (
-    _update == Bytes.fromUTF8(FIELD_PROJECT_NAME) ||
-    _update == Bytes.fromI32(ENUM_FIELD_PROJECT_NAME)
+    _update.equals(toBytes32(FIELD_PROJECT_NAME)) ||
+    _update.equals(ENUM_FIELD_PROJECT_NAME)
   ) {
     return FIELD_PROJECT_NAME;
   } else if (
-    _update == Bytes.fromUTF8(FIELD_PROJECT_PAUSED) ||
-    _update == Bytes.fromI32(ENUM_FIELD_PROJECT_PAUSED)
+    _update.equals(toBytes32(FIELD_PROJECT_PAUSED)) ||
+    _update.equals(ENUM_FIELD_PROJECT_PAUSED)
   ) {
     return FIELD_PROJECT_PAUSED;
   } else if (
-    _update == Bytes.fromUTF8(FIELD_PROJECT_SCRIPT) ||
-    _update == Bytes.fromI32(ENUM_FIELD_PROJECT_SCRIPT)
+    _update.equals(toBytes32(FIELD_PROJECT_SCRIPT)) ||
+    _update.equals(ENUM_FIELD_PROJECT_SCRIPT)
   ) {
     return FIELD_PROJECT_SCRIPT;
   } else if (
-    _update == Bytes.fromUTF8(FIELD_PROJECT_SCRIPT_TYPE) ||
-    _update == Bytes.fromI32(ENUM_FIELD_PROJECT_SCRIPT_TYPE)
+    _update.equals(toBytes32(FIELD_PROJECT_SCRIPT_TYPE)) ||
+    _update.equals(ENUM_FIELD_PROJECT_SCRIPT_TYPE)
   ) {
     return FIELD_PROJECT_SCRIPT_TYPE;
   } else if (
-    _update ==
-      Bytes.fromUTF8(FIELD_PROJECT_SECONDARY_MARKET_ROYALTY_PERCENTAGE) ||
-    _update ==
-      Bytes.fromI32(ENUM_FIELD_PROJECT_SECONDARY_MARKET_ROYALTY_PERCENTAGE)
+    _update.equals(
+      toBytes32(FIELD_PROJECT_SECONDARY_MARKET_ROYALTY_PERCENTAGE)
+    ) ||
+    _update.equals(ENUM_FIELD_PROJECT_SECONDARY_MARKET_ROYALTY_PERCENTAGE)
   ) {
     return FIELD_PROJECT_SECONDARY_MARKET_ROYALTY_PERCENTAGE;
   } else if (
-    _update == Bytes.fromUTF8(FIELD_PROJECT_WEBSITE) ||
-    _update == Bytes.fromI32(ENUM_FIELD_PROJECT_WEBSITE)
+    _update.equals(toBytes32(FIELD_PROJECT_WEBSITE)) ||
+    _update.equals(ENUM_FIELD_PROJECT_WEBSITE)
   ) {
     return FIELD_PROJECT_WEBSITE;
   } else if (
-    _update == Bytes.fromI32(ENUM_FIELD_PROJECT_PROVIDER_SECONDARY_FINANCIALS) // field did not exist prior to v3.2, so only check enum value
+    _update.equals(
+      ENUM_FIELD_PROJECT_PROVIDER_SECONDARY_FINANCIALS // field did not exist prior to v3.2, so only check enum value
+    )
   ) {
     return FIELD_PROJECT_PROVIDER_SECONDARY_FINANCIALS;
   } else {
@@ -400,10 +406,14 @@ export function handleProjectUpdated(event: ProjectUpdated): void {
   const update = getProjectUpdatedField(event.params._update);
   // unexpected case: unrecognized update field. Log warning and return early.
   if (!update) {
-    log.warning("Unexpected update field for project {} on contract {}", [
-      event.params._projectId.toString(),
-      event.address.toHexString()
-    ]);
+    log.warning(
+      "Unexpected update field for project {} on contract {}, update: {}",
+      [
+        event.params._projectId.toString(),
+        event.address.toHexString(),
+        event.params._update.toHexString()
+      ]
+    );
     return;
   }
   const timestamp = event.block.timestamp;
@@ -719,7 +729,9 @@ function createProject(
     );
     return null;
   }
+  log.info("found core contract version: {}", [coreVersion as string]);
   const isPreV3_2 = getIsPreV3_2(coreVersion as string);
+  log.info("isPreV3_2: {}", [isPreV3_2.toString()]);
   if (isPreV3_2) {
     if (contractEntity.type == "GenArt721CoreV3") {
       // use the artbocks getter functions (not an Engine contract)
@@ -1770,7 +1782,41 @@ function getIsLegacyMinterFilter(minterFilterAddress: Address): boolean {
  * @returns boolean, true if the version is pre-v3.2, false otherwise.
  */
 function getIsPreV3_2(version: string): boolean {
-  return version.includes("v3.0") || version.includes("v3.1");
+  return version.startsWith("v3.0.") || version.startsWith("v3.1.");
+}
+
+/**
+ * @notice helper function to convert a string value to a Bytes32 value.
+ * @dev string values are UTF-8 encoded, little-endian, so pads to right with 0s
+ * @param value string value to convert
+ * @returns Bytes result, 32 bytes long (consistent with typing in Subgraph utils)
+ */
+export function toBytes32(value: string): Bytes {
+  // string values are UTF-8 encoded, little-endian, so padEnd
+  return Bytes.fromHexString(
+    "0x" +
+      Bytes.fromUTF8(value)
+        .toHexString()
+        .slice(2)
+        .padEnd(64, "0")
+  );
+}
+
+/**
+ * @notice helper function to convert a numeric i32 value to a Bytes32 value.
+ * @dev numeric values are big-endian, so pads to left with 0s
+ * @param value numeric value to convert (i32)
+ * @returns Bytes result, 32 bytes long (consistent with typing in Subgraph utils)
+ */
+function toBytes32Numeric(value: i32): Bytes {
+  // enum values are numeric, big-endian, so padStart
+  return Bytes.fromHexString(
+    "0x" +
+      Bytes.fromI32(value)
+        .toHexString()
+        .slice(2)
+        .padStart(64, "0")
+  );
 }
 
 /** END HELPERS ***/

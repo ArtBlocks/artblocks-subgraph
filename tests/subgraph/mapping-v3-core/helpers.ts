@@ -23,6 +23,7 @@ import {
   booleanToString
 } from "../shared-helpers";
 import {
+  toBytes32,
   FIELD_PROJECT_ACTIVE,
   FIELD_PROJECT_ARTIST_NAME,
   FIELD_PROJECT_ASPECT_RATIO,
@@ -504,7 +505,7 @@ export function testProjectDetailsUpdated(
     ),
     new ethereum.EventParam(
       "_update",
-      ethereum.Value.fromBytes(Bytes.fromUTF8(updateField))
+      ethereum.Value.fromBytes(toBytes32(updateField))
     )
   ];
 
@@ -576,7 +577,7 @@ export function testProjectStateDataUpdated(
     ),
     new ethereum.EventParam(
       "_update",
-      ethereum.Value.fromBytes(Bytes.fromUTF8(FIELD_PROJECT_ACTIVE))
+      ethereum.Value.fromBytes(toBytes32(FIELD_PROJECT_ACTIVE))
     )
   ];
 
@@ -651,7 +652,7 @@ export function testProjectScriptDetailsUpdated(
     ),
     new ethereum.EventParam(
       "_update",
-      ethereum.Value.fromBytes(Bytes.fromUTF8(updateField))
+      ethereum.Value.fromBytes(toBytes32(updateField))
     )
   ];
 
