@@ -53,7 +53,8 @@ import { Project } from "../../../generated/schema";
 import {
   Mint,
   ProjectUpdated,
-  PlatformUpdated
+  PlatformUpdated,
+  ProjectRoyaltySplitterUpdated
 } from "../../../generated/IGenArt721CoreV3_Base/IGenArt721CoreContractV3_Base";
 import { Transfer } from "../../../generated/IERC721GenArt721CoreV3Contract/IERC721";
 import { OwnershipTransferred } from "../../../generated/OwnableGenArt721CoreV3Contract/Ownable";
@@ -82,7 +83,8 @@ import {
   handleTransfer,
   handlePlatformUpdated,
   handleOwnershipTransferred,
-  handleProjectUpdated
+  handleProjectUpdated,
+  handleProjectRoyaltySplitterUpdated
 } from "../../../src/mapping-v3-core";
 import {
   generateContractSpecificId,
@@ -2280,6 +2282,58 @@ describe(`${coreType}-${coreVersion}: handleProjectUpdated`, () => {
         generateContractSpecificId(TEST_CONTRACT_ADDRESS, projectId),
         "enginePlatformProviderSecondarySalesBPS",
         localDefaultEnginePlatformProviderSecondarySalesBPS.toString()
+      );
+    });
+  });
+
+  describe("ProjectRoyaltySplitterUpdated", () => {
+    test("should update royalty splitter", () => {
+      const projectId = BigInt.fromI32(0);
+      const fullProjectId = generateContractSpecificId(
+        TEST_CONTRACT_ADDRESS,
+        projectId
+      );
+      addNewProjectToStore(
+        TEST_CONTRACT_ADDRESS,
+        projectId,
+        "Test Project",
+        randomAddressGenerator.generateRandomAddress(),
+        BigInt.zero(),
+        CURRENT_BLOCK_TIMESTAMP
+      );
+      // create ProjectRoyaltySplitterUpdated event
+      const event: ProjectRoyaltySplitterUpdated = changetype<
+        ProjectRoyaltySplitterUpdated
+      >(newMockEvent());
+      event.address = TEST_CONTRACT_ADDRESS;
+      const newTimestamp = CURRENT_BLOCK_TIMESTAMP.plus(BigInt.fromI32(1));
+      event.block.timestamp = newTimestamp;
+      const newRoyaltySplitter = randomAddressGenerator.generateRandomAddress();
+      event.parameters = [
+        new ethereum.EventParam(
+          "projectId",
+          ethereum.Value.fromUnsignedBigInt(projectId)
+        ),
+        new ethereum.EventParam(
+          "royaltySplitter",
+          ethereum.Value.fromAddress(newRoyaltySplitter)
+        )
+      ];
+      // call handleProjectRoyaltySplitterUpdated
+      handleProjectRoyaltySplitterUpdated(event);
+
+      // assert Project entity updated
+      assert.fieldEquals(
+        PROJECT_ENTITY_TYPE,
+        fullProjectId,
+        "updatedAt",
+        newTimestamp.toString()
+      );
+      assert.fieldEquals(
+        PROJECT_ENTITY_TYPE,
+        fullProjectId,
+        "erc2981SplitterAddress",
+        newRoyaltySplitter.toHexString()
       );
     });
   });

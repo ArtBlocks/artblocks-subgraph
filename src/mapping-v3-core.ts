@@ -14,7 +14,8 @@ import {
   MinterUpdated,
   ProposedArtistAddressesAndSplits as ProposedArtistAddressesAndSplitsEvent,
   AcceptedArtistAddressesAndSplits,
-  IGenArt721CoreContractV3_Base
+  IGenArt721CoreContractV3_Base,
+  ProjectRoyaltySplitterUpdated
 } from "../generated/IGenArt721CoreV3_Base/IGenArt721CoreContractV3_Base";
 
 import { IGenArt721CoreContractV3_ProjectFinance } from "../generated/IGenArt721CoreV3_Base/IGenArt721CoreContractV3_ProjectFinance";
@@ -1096,6 +1097,30 @@ export function handleAcceptedArtistAddressesAndSplits(
 export function handleOwnershipTransferred(event: OwnershipTransferred): void {
   // refresh the contract to get the latest admin address
   refreshContractAtAddress(event.address, event.block.timestamp);
+}
+
+// Handle ProjectRoyaltySplitterUpdated event. This event is emitted when the
+// royalty splitter address is updated for a project. Other events trigger the
+// update logic for fields other than the royalty splitter address, so this
+// event is only used to update the royalty splitter address.
+export function handleProjectRoyaltySplitterUpdated(
+  event: ProjectRoyaltySplitterUpdated
+): void {
+  const project = Project.load(
+    generateContractSpecificId(event.address, event.params.projectId)
+  );
+
+  if (!project) {
+    log.warning(
+      "Project not found for ProjectRoyaltySplitterUpdated event on project {}-{}",
+      [event.address.toHexString(), event.params.projectId.toString()]
+    );
+    return;
+  }
+
+  project.erc2981SplitterAddress = event.params.royaltySplitter;
+  project.updatedAt = event.block.timestamp;
+  project.save();
 }
 
 export function handleExternalAssetDependencyUpdated(
