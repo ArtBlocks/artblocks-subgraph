@@ -256,6 +256,7 @@ export function handleTransfer(event: Transfer): void {
 }
 
 // v3.2 core contract Enum ProjectUpdatedFields, encoded as bytes32 Bytes
+// ref: https://github.com/ArtBlocks/artblocks-contracts/blob/795a7a52491cd1e6b71ef356c02356740a12c235/packages/contracts/contracts/interfaces/v0.8.x/IGenArt721CoreContractV3_Base.sol#L55
 export const ENUM_FIELD_PROJECT_COMPLETED = toBytes32Numeric(0);
 export const ENUM_FIELD_PROJECT_ACTIVE = toBytes32Numeric(1);
 export const ENUM_FIELD_PROJECT_ARTIST_ADDRESS = toBytes32Numeric(2);
@@ -591,8 +592,8 @@ function handleProjectSecondaryMarketRoyaltyPercentageUpdated(
 }
 
 /**
- * @notice Handle ProjectExternalAssetDependenciesLocked event. The event was
- * introduced in v3.2 and is emitted when the project's provider secondary payment
+ * @notice Handle ProjectUpdated event with ENUM_FIELD_PROJECT_PROVIDER_SECONDARY_FINANCIALS.
+ * The enum was introduced in v3.2 and is emitted when a project's provider secondary payment
  * information are updated.
  * @param contract V3 core contract
  * @param project project associated with the event
@@ -611,28 +612,29 @@ function handleProjectProviderSecondaryFinancialsUpdated(
   const projectFinance = contractAsV3_ProjectFinance.try_projectIdToFinancials(
     project.projectId
   );
-  if (!projectFinance.reverted) {
-    // update provider secondary financials on the project entity
-    project.renderProviderSecondarySalesAddress =
-      projectFinance.value.renderProviderSecondarySalesAddress;
-    project.renderProviderSecondarySalesBPS = BigInt.fromI32(
-      projectFinance.value.renderProviderSecondarySalesBPS
-    );
-    project.enginePlatformProviderSecondarySalesAddress =
-      projectFinance.value.platformProviderSecondarySalesAddress;
-    project.enginePlatformProviderSecondarySalesBPS = BigInt.fromI32(
-      projectFinance.value.platformProviderSecondarySalesBPS
-    );
-    // update and save project entity
-    project.updatedAt = timestamp;
-    project.save();
-  } else {
-    // @dev this should never happen, so log a warning if it does
+
+  // @dev revert should never happen, so log a warning if it does
+  if (projectFinance.reverted) {
     log.warning(
       "Unexpected error: Failed to get project financials for project: {}-{}",
       [contract._address.toHexString(), project.projectId.toString()]
     );
+    return;
   }
+  // update provider secondary financials on the project entity
+  project.renderProviderSecondarySalesAddress =
+    projectFinance.value.renderProviderSecondarySalesAddress;
+  project.renderProviderSecondarySalesBPS = BigInt.fromI32(
+    projectFinance.value.renderProviderSecondarySalesBPS
+  );
+  project.enginePlatformProviderSecondarySalesAddress =
+    projectFinance.value.platformProviderSecondarySalesAddress;
+  project.enginePlatformProviderSecondarySalesBPS = BigInt.fromI32(
+    projectFinance.value.platformProviderSecondarySalesBPS
+  );
+  // update and save project entity
+  project.updatedAt = timestamp;
+  project.save();
 }
 
 function createProject(
