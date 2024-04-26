@@ -60,21 +60,23 @@ import { OwnershipTransferred } from "../../../generated/OwnableGenArt721CoreV3C
 import { SuperAdminTransferred } from "../../../generated/AdminACLV0/IAdminACLV0";
 import {
   FIELD_PROJECT_ACTIVE,
-  FIELD_PROJECT_ARTIST_ADDRESS,
+  ENUM_FIELD_PROJECT_ACTIVE,
+  ENUM_FIELD_PROJECT_ARTIST_ADDRESS,
   FIELD_PROJECT_ARTIST_NAME,
   FIELD_PROJECT_ASPECT_RATIO,
-  FIELD_PROJECT_BASE_URI,
-  FIELD_PROJECT_COMPLETED,
-  FIELD_PROJECT_CREATED,
+  ENUM_FIELD_PROJECT_BASE_URI,
+  ENUM_FIELD_PROJECT_COMPLETED,
+  ENUM_FIELD_PROJECT_CREATED,
   FIELD_PROJECT_DESCRIPTION,
   FIELD_PROJECT_LICENSE,
   FIELD_PROJECT_MAX_INVOCATIONS,
   FIELD_PROJECT_NAME,
   FIELD_PROJECT_PAUSED,
-  FIELD_PROJECT_SCRIPT,
+  ENUM_FIELD_PROJECT_SCRIPT,
   FIELD_PROJECT_SCRIPT_TYPE,
-  FIELD_PROJECT_SECONDARY_MARKET_ROYALTY_PERCENTAGE,
+  ENUM_FIELD_PROJECT_SECONDARY_MARKET_ROYALTY_PERCENTAGE,
   FIELD_PROJECT_WEBSITE,
+  ENUM_FIELD_PROJECT_PROVIDER_SECONDARY_FINANCIALS,
   handleIAdminACLV0SuperAdminTransferred,
   handleMint,
   handleTransfer,
@@ -1144,7 +1146,7 @@ describe(`${coreType}-${coreVersion}: handleProjectUpdated`, () => {
         ),
         new ethereum.EventParam(
           "_update",
-          ethereum.Value.fromBytes(Bytes.fromUTF8(FIELD_PROJECT_CREATED))
+          ethereum.Value.fromBytes(Bytes.fromI32(ENUM_FIELD_PROJECT_CREATED))
         )
       ];
 
@@ -1169,7 +1171,7 @@ describe(`${coreType}-${coreVersion}: handleProjectUpdated`, () => {
         ),
         new ethereum.EventParam(
           "_update",
-          ethereum.Value.fromBytes(Bytes.fromUTF8(FIELD_PROJECT_CREATED))
+          ethereum.Value.fromBytes(Bytes.fromI32(ENUM_FIELD_PROJECT_CREATED))
         )
       ];
 
@@ -1250,7 +1252,7 @@ describe(`${coreType}-${coreVersion}: handleProjectUpdated`, () => {
         ),
         new ethereum.EventParam(
           "_update",
-          ethereum.Value.fromBytes(Bytes.fromUTF8(FIELD_PROJECT_CREATED))
+          ethereum.Value.fromBytes(Bytes.fromI32(ENUM_FIELD_PROJECT_CREATED))
         )
       ];
 
@@ -1353,29 +1355,6 @@ describe(`${coreType}-${coreVersion}: handleProjectUpdated`, () => {
       )
         .withArgs([ethereum.Value.fromUnsignedBigInt(projectId)])
         .returns([ethereum.Value.fromTuple(tuple)]);
-      // .returns([
-      //   ethereum.Value.fromTuple([
-      //     ethereum.Value.fromAddress(Address.zero()), // additional payee primary sales (unused in this test)
-      //     ethereum.Value.fromI32(0), // secondary market royalty percentage (unused in this test)
-      //     ethereum.Value.fromAddress(Address.zero()), // additional payee secondary sales (unused in this test)
-      //     ethereum.Value.fromI32(0), // additional payee secondary sales percentage (unused in this test)
-      //     ethereum.Value.fromAddress(Address.zero()), // artist address (unused in this test)
-      //     ethereum.Value.fromI32(0), // additionalPayeePrimarySalesPercentage (unused in this test)
-      //     ethereum.Value.fromAddress(
-      //       localDefaultEnginePlatformProviderSecondarySalesAddress
-      //     ),
-      //     ethereum.Value.fromUnsignedBigInt(
-      //       localDefaultEnginePlatformProviderSecondarySalesBPS
-      //     ),
-      //     ethereum.Value.fromAddress(
-      //       localDefaultRenderProviderSecondarySalesAddress
-      //     ),
-      //     ethereum.Value.fromUnsignedBigInt(
-      //       localDefaultRenderProviderSecondarySalesBPS
-      //     ),
-      //     ethereum.Value.fromAddress(Address.zero()) // royalty splitter (unused in this test)
-      //   ] as ethereum.Tuple)
-      // ]);
 
       handleProjectUpdated(event);
 
@@ -1571,7 +1550,7 @@ describe(`${coreType}-${coreVersion}: handleProjectUpdated`, () => {
         ),
         new ethereum.EventParam(
           "_update",
-          ethereum.Value.fromBytes(Bytes.fromUTF8(FIELD_PROJECT_ACTIVE))
+          ethereum.Value.fromBytes(Bytes.fromI32(ENUM_FIELD_PROJECT_ACTIVE))
         )
       ];
 
@@ -1620,7 +1599,9 @@ describe(`${coreType}-${coreVersion}: handleProjectUpdated`, () => {
         ),
         new ethereum.EventParam(
           "_update",
-          ethereum.Value.fromBytes(Bytes.fromUTF8(FIELD_PROJECT_ARTIST_ADDRESS))
+          ethereum.Value.fromBytes(
+            Bytes.fromI32(ENUM_FIELD_PROJECT_ARTIST_ADDRESS)
+          )
         )
       ];
 
@@ -1706,7 +1687,7 @@ describe(`${coreType}-${coreVersion}: handleProjectUpdated`, () => {
         ),
         new ethereum.EventParam(
           "_update",
-          ethereum.Value.fromBytes(Bytes.fromUTF8(FIELD_PROJECT_BASE_URI))
+          ethereum.Value.fromBytes(Bytes.fromI32(ENUM_FIELD_PROJECT_BASE_URI))
         )
       ];
 
@@ -1754,7 +1735,7 @@ describe(`${coreType}-${coreVersion}: handleProjectUpdated`, () => {
         ),
         new ethereum.EventParam(
           "_update",
-          ethereum.Value.fromBytes(Bytes.fromUTF8(FIELD_PROJECT_COMPLETED))
+          ethereum.Value.fromBytes(Bytes.fromI32(ENUM_FIELD_PROJECT_COMPLETED))
         )
       ];
 
@@ -1814,7 +1795,7 @@ describe(`${coreType}-${coreVersion}: handleProjectUpdated`, () => {
         ),
         new ethereum.EventParam(
           "_update",
-          ethereum.Value.fromBytes(Bytes.fromUTF8(FIELD_PROJECT_SCRIPT))
+          ethereum.Value.fromBytes(Bytes.fromI32(ENUM_FIELD_PROJECT_SCRIPT))
         )
       ];
 
@@ -1887,7 +1868,7 @@ describe(`${coreType}-${coreVersion}: handleProjectUpdated`, () => {
         ),
         new ethereum.EventParam(
           "_update",
-          ethereum.Value.fromBytes(Bytes.fromUTF8(FIELD_PROJECT_SCRIPT))
+          ethereum.Value.fromBytes(Bytes.fromI32(ENUM_FIELD_PROJECT_SCRIPT))
         )
       ];
 
@@ -1960,7 +1941,7 @@ describe(`${coreType}-${coreVersion}: handleProjectUpdated`, () => {
         ),
         new ethereum.EventParam(
           "_update",
-          ethereum.Value.fromBytes(Bytes.fromUTF8(FIELD_PROJECT_SCRIPT))
+          ethereum.Value.fromBytes(Bytes.fromI32(ENUM_FIELD_PROJECT_SCRIPT))
         )
       ];
 
@@ -2030,7 +2011,7 @@ describe(`${coreType}-${coreVersion}: handleProjectUpdated`, () => {
         ),
         new ethereum.EventParam(
           "_update",
-          ethereum.Value.fromBytes(Bytes.fromUTF8(FIELD_PROJECT_SCRIPT))
+          ethereum.Value.fromBytes(Bytes.fromI32(ENUM_FIELD_PROJECT_SCRIPT))
         )
       ];
 
@@ -2106,7 +2087,9 @@ describe(`${coreType}-${coreVersion}: handleProjectUpdated`, () => {
         new ethereum.EventParam(
           "_update",
           ethereum.Value.fromBytes(
-            Bytes.fromUTF8(FIELD_PROJECT_SECONDARY_MARKET_ROYALTY_PERCENTAGE)
+            Bytes.fromI32(
+              ENUM_FIELD_PROJECT_SECONDARY_MARKET_ROYALTY_PERCENTAGE
+            )
           )
         )
       ];
@@ -2139,6 +2122,168 @@ describe(`${coreType}-${coreVersion}: handleProjectUpdated`, () => {
         fullProjectId,
         "updatedAt",
         CURRENT_BLOCK_TIMESTAMP.toString()
+      );
+    });
+
+    test("should update project provider secondary financials", () => {
+      const projectId = BigInt.fromI32(0);
+      const artistAddress = randomAddressGenerator.generateRandomAddress();
+      const projectName = "Test Project";
+      const invocations = BigInt.fromI32(0);
+      const maxInvocations = BigInt.fromI32(ONE_MILLION);
+      const paused = true;
+      const scriptCount = BigInt.fromI32(0);
+
+      const event: ProjectUpdated = changetype<ProjectUpdated>(newMockEvent());
+      event.address = TEST_CONTRACT_ADDRESS;
+      event.block.timestamp = CURRENT_BLOCK_TIMESTAMP;
+      event.parameters = [
+        new ethereum.EventParam(
+          "_projectId",
+          ethereum.Value.fromUnsignedBigInt(projectId)
+        ),
+        new ethereum.EventParam(
+          "_update",
+          ethereum.Value.fromBytes(
+            Bytes.fromI32(ENUM_FIELD_PROJECT_PROVIDER_SECONDARY_FINANCIALS)
+          )
+        )
+      ];
+
+      // mock all refresh contract calls to ensure the required contract-level royalty functions are mocked
+      mockRefreshContractCalls(projectId, coreType, mockCoreContractOverrides);
+
+      // mock projectDetails
+      createMockedFunction(
+        TEST_CONTRACT_ADDRESS,
+        "projectDetails",
+        "projectDetails(uint256):(string,string,string,string,string)"
+      )
+        .withArgs([ethereum.Value.fromUnsignedBigInt(projectId)])
+        .returns([
+          ethereum.Value.fromString(projectName),
+          ethereum.Value.fromString(""),
+          ethereum.Value.fromString(""),
+          ethereum.Value.fromString(""),
+          ethereum.Value.fromString("")
+        ]);
+      // mock projectScriptDetails
+      createMockedFunction(
+        TEST_CONTRACT_ADDRESS,
+        "projectScriptDetails",
+        "projectScriptDetails(uint256):(string,string,uint256)"
+      )
+        .withArgs([ethereum.Value.fromUnsignedBigInt(projectId)])
+        .returns([
+          ethereum.Value.fromString(""),
+          ethereum.Value.fromString(""),
+          ethereum.Value.fromUnsignedBigInt(scriptCount)
+        ]);
+      // mock projectStateData
+      createMockedFunction(
+        TEST_CONTRACT_ADDRESS,
+        "projectStateData",
+        "projectStateData(uint256):(uint256,uint256,bool,bool,uint256,bool)"
+      )
+        .withArgs([ethereum.Value.fromUnsignedBigInt(projectId)])
+        .returns([
+          ethereum.Value.fromUnsignedBigInt(invocations),
+          ethereum.Value.fromUnsignedBigInt(maxInvocations),
+          ethereum.Value.fromBoolean(false),
+          ethereum.Value.fromBoolean(paused),
+          ethereum.Value.fromUnsignedBigInt(BigInt.fromI32(0)),
+          ethereum.Value.fromBoolean(false)
+        ]);
+      // // mock projectIdToArtistAddress
+      createMockedFunction(
+        TEST_CONTRACT_ADDRESS,
+        "projectIdToArtistAddress",
+        "projectIdToArtistAddress(uint256):(address)"
+      )
+        .withArgs([ethereum.Value.fromUnsignedBigInt(projectId)])
+        .returns([ethereum.Value.fromAddress(artistAddress)]);
+      // mock projectIdToSecondaryMarketRoyaltyPercentage, return 5
+      createMockedFunction(
+        TEST_CONTRACT_ADDRESS,
+        "projectIdToSecondaryMarketRoyaltyPercentage",
+        "projectIdToSecondaryMarketRoyaltyPercentage(uint256):(uint256)"
+      )
+        .withArgs([ethereum.Value.fromUnsignedBigInt(projectId)])
+        .returns([ethereum.Value.fromI32(5)]);
+
+      // mock projectIdToFinancials, used on v3.2 Engine core in handler
+      const localDefaultRenderProviderSecondarySalesAddress = randomAddressGenerator.generateRandomAddress();
+      const localDefaultRenderProviderSecondarySalesBPS = BigInt.fromI32(4);
+      const localDefaultEnginePlatformProviderSecondarySalesAddress = randomAddressGenerator.generateRandomAddress();
+      const localDefaultEnginePlatformProviderSecondarySalesBPS = BigInt.fromI32(
+        6
+      );
+      // return is a struct, which solidity returns as a tuple
+      let tupleArray: Array<ethereum.Value> = [
+        ethereum.Value.fromAddress(Address.zero()), // additional payee primary sales (unused in this test)
+        ethereum.Value.fromUnsignedBigInt(BigInt.fromI32(0)), // secondary market royalty percentage (unused in this test)
+        ethereum.Value.fromAddress(Address.zero()), // additional payee secondary sales (unused in this test)
+        ethereum.Value.fromUnsignedBigInt(BigInt.fromI32(0)), // additional payee secondary sales percentage (unused in this test)
+        ethereum.Value.fromAddress(Address.zero()), // artist address (unused in this test)
+        ethereum.Value.fromUnsignedBigInt(BigInt.fromI32(0)), // additionalPayeePrimarySalesPercentage (unused in this test)
+        ethereum.Value.fromAddress(
+          localDefaultEnginePlatformProviderSecondarySalesAddress
+        ),
+        ethereum.Value.fromUnsignedBigInt(
+          localDefaultEnginePlatformProviderSecondarySalesBPS
+        ),
+        ethereum.Value.fromAddress(
+          localDefaultRenderProviderSecondarySalesAddress
+        ),
+        ethereum.Value.fromUnsignedBigInt(
+          localDefaultRenderProviderSecondarySalesBPS
+        ),
+        ethereum.Value.fromAddress(Address.zero()) // royalty splitter (unused in this test)
+      ];
+      let tuple: ethereum.Tuple = changetype<ethereum.Tuple>(tupleArray);
+
+      createMockedFunction(
+        TEST_CONTRACT_ADDRESS,
+        "projectIdToFinancials",
+        "projectIdToFinancials(uint256):((address,uint8,address,uint8,address,uint8,address,uint16,address,uint16,address))"
+      )
+        .withArgs([ethereum.Value.fromUnsignedBigInt(projectId)])
+        .returns([ethereum.Value.fromTuple(tuple)]);
+
+      handleProjectUpdated(event);
+
+      // Project fields
+      assert.fieldEquals(
+        PROJECT_ENTITY_TYPE,
+        generateContractSpecificId(TEST_CONTRACT_ADDRESS, projectId),
+        "updatedAt",
+        CURRENT_BLOCK_TIMESTAMP.toString()
+      );
+      // project render provider royalties should equal contract-level values for v3.2 Engine core
+      assert.fieldEquals(
+        PROJECT_ENTITY_TYPE,
+        generateContractSpecificId(TEST_CONTRACT_ADDRESS, projectId),
+        "renderProviderSecondarySalesAddress",
+        localDefaultRenderProviderSecondarySalesAddress.toHexString()
+      );
+      assert.fieldEquals(
+        PROJECT_ENTITY_TYPE,
+        generateContractSpecificId(TEST_CONTRACT_ADDRESS, projectId),
+        "renderProviderSecondarySalesBPS",
+        localDefaultRenderProviderSecondarySalesBPS.toString()
+      );
+      // project platform provider royalties should equal contract-level values for pre-v3.2 Engine core
+      assert.fieldEquals(
+        PROJECT_ENTITY_TYPE,
+        generateContractSpecificId(TEST_CONTRACT_ADDRESS, projectId),
+        "enginePlatformProviderSecondarySalesAddress",
+        localDefaultEnginePlatformProviderSecondarySalesAddress.toHexString()
+      );
+      assert.fieldEquals(
+        PROJECT_ENTITY_TYPE,
+        generateContractSpecificId(TEST_CONTRACT_ADDRESS, projectId),
+        "enginePlatformProviderSecondarySalesBPS",
+        localDefaultEnginePlatformProviderSecondarySalesBPS.toString()
       );
     });
   });
