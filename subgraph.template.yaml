@@ -158,6 +158,8 @@ dataSources:
           handler: handleProposedArtistAddressesAndSplits
         - event: AcceptedArtistAddressesAndSplits(indexed uint256)
           handler: handleAcceptedArtistAddressesAndSplits
+        - event: ProjectRoyaltySplitterUpdated(indexed uint256,indexed address)
+          handler: handleProjectRoyaltySplitterUpdated
       file: ./src/mapping-v3-core.ts
   {{/iGenArt721CoreContractV3_BaseContracts}}
   {{#ownableGenArt721CoreV3Contracts}}

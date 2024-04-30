@@ -129,6 +129,9 @@ type Project @entity {
   "Proposed Artist addresses and payment split percentages"
   proposedArtistAddressesAndSplits: ProposedArtistAddressesAndSplit
 
+  "ERC-2981 royalty splitter address, used on v3.2 and-on"
+  erc2981SplitterAddress: Bytes
+
   "Accounts that own tokens of the project"
   owners: [AccountProject!] @derivedFrom(field: "project")
 
