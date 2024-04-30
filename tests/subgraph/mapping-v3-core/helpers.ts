@@ -23,6 +23,7 @@ import {
   booleanToString
 } from "../shared-helpers";
 import {
+  toBytes32,
   FIELD_PROJECT_ACTIVE,
   FIELD_PROJECT_ARTIST_NAME,
   FIELD_PROJECT_ASPECT_RATIO,
@@ -39,6 +40,8 @@ import { ProjectUpdated } from "../../../generated/IGenArt721CoreV3_Base/IGenArt
 
 // mocks return values for Soldity contract calls in refreshContract() helper function
 // currently handles V3 flagship and engine contracts
+// @dev accepts `coreVersion` as an optional override to test different core versions,
+// defaults to "v3.0.0"
 export function mockRefreshContractCalls(
   nextProjectId: BigInt,
   coreType: string,
@@ -68,6 +71,26 @@ export function mockRefreshContractCalls(
     "coreType",
     "coreType():(string)"
   ).returns([ethereum.Value.fromString(coreType)]);
+
+  createMockedFunction(
+    TEST_CONTRACT_ADDRESS,
+    "coreVersion",
+    "coreVersion():(string)"
+  ).returns([
+    ethereum.Value.fromString(
+      overrides && overrides.has("coreVersion")
+        ? changetype<Map<string, string>>(overrides).get("coreVersion")
+        : "v3.0.0"
+    )
+  ]);
+
+  createMockedFunction(
+    TEST_CONTRACT_ADDRESS,
+    "projectIdToSecondaryMarketRoyaltyPercentage",
+    "projectIdToSecondaryMarketRoyaltyPercentage(uint256):(uint256)"
+  )
+    .withArgs([ethereum.Value.fromUnsignedBigInt(BigInt.fromI32(0))])
+    .returns([ethereum.Value.fromUnsignedBigInt(BigInt.fromI32(5))]);
 
   if (coreType == "GenArt721CoreV3") {
     // flagship contract functions
@@ -222,6 +245,12 @@ export function mockRefreshContractCalls(
   } else {
     throw new Error("invalid coreType passed to mockRefreshContractCalls");
   }
+
+  createMockedFunction(
+    TEST_CONTRACT_ADDRESS,
+    "startingProjectId",
+    "startingProjectId():(uint256)"
+  ).returns([ethereum.Value.fromUnsignedBigInt(BigInt.fromI32(0))]);
 
   createMockedFunction(
     TEST_CONTRACT_ADDRESS,
@@ -476,7 +505,7 @@ export function testProjectDetailsUpdated(
     ),
     new ethereum.EventParam(
       "_update",
-      ethereum.Value.fromBytes(Bytes.fromUTF8(updateField))
+      ethereum.Value.fromBytes(toBytes32(updateField))
     )
   ];
 
@@ -548,7 +577,7 @@ export function testProjectStateDataUpdated(
     ),
     new ethereum.EventParam(
       "_update",
-      ethereum.Value.fromBytes(Bytes.fromUTF8(FIELD_PROJECT_ACTIVE))
+      ethereum.Value.fromBytes(toBytes32(FIELD_PROJECT_ACTIVE))
     )
   ];
 
@@ -623,7 +652,7 @@ export function testProjectScriptDetailsUpdated(
     ),
     new ethereum.EventParam(
       "_update",
-      ethereum.Value.fromBytes(Bytes.fromUTF8(updateField))
+      ethereum.Value.fromBytes(toBytes32(updateField))
     )
   ];
 

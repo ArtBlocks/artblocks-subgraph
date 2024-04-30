@@ -31,6 +31,7 @@ import {
   assertNewProjectFields,
   assertTestContractFields,
   addTestContractToStore,
+  addTestContractToStoreOfTypeAndVersion,
   addNewProjectToStore,
   addNewTokenToStore,
   TRANSFER_ENTITY_TYPE,
@@ -58,6 +59,7 @@ import { Transfer } from "../../../generated/IERC721GenArt721CoreV3Contract/IERC
 import { OwnershipTransferred } from "../../../generated/OwnableGenArt721CoreV3Contract/Ownable";
 import { SuperAdminTransferred } from "../../../generated/AdminACLV0/IAdminACLV0";
 import {
+  toBytes32,
   FIELD_PROJECT_ACTIVE,
   FIELD_PROJECT_ARTIST_ADDRESS,
   FIELD_PROJECT_ARTIST_NAME,
@@ -90,6 +92,7 @@ import {
 const randomAddressGenerator = new RandomAddressGenerator();
 
 const coreType = "GenArt721CoreV3_Engine";
+const coreVersion = "v3.1.0";
 
 test(`${coreType}: Can handle Mint`, () => {
   clearStore();
@@ -557,6 +560,7 @@ test(`${coreType}: Handles PlatformUpdated::providerSalesAddresses - changed val
   ).returns([
     ethereum.Value.fromAddress(newRenderProviderSecondarySalesAddress)
   ]);
+  // @dev pre-v3.2 do not have defaultRenderProviderSecondarySalesAddress()
 
   const newPlatformProviderPrimarySalesAddress = randomAddressGenerator.generateRandomAddress();
   createMockedFunction(
@@ -575,6 +579,7 @@ test(`${coreType}: Handles PlatformUpdated::providerSalesAddresses - changed val
   ).returns([
     ethereum.Value.fromAddress(newPlatformProviderSecondarySalesAddress)
   ]);
+  // @dev pre-v3.2 do not have defaultPlatformProviderSecondarySalesAddress()
 
   // create event
   const event: PlatformUpdated = changetype<PlatformUpdated>(newMockEvent());
@@ -597,10 +602,18 @@ test(`${coreType}: Handles PlatformUpdated::providerSalesAddresses - changed val
     "renderProviderAddress",
     newRenderProviderPrimarySalesAddress.toHexString()
   );
+  // DEPRECATED START ---
   assert.fieldEquals(
     CONTRACT_ENTITY_TYPE,
     TEST_CONTRACT_ADDRESS.toHexString(),
     "renderProviderSecondarySalesAddress",
+    newRenderProviderSecondarySalesAddress.toHexString()
+  );
+  // DEPRECATED END ---
+  assert.fieldEquals(
+    CONTRACT_ENTITY_TYPE,
+    TEST_CONTRACT_ADDRESS.toHexString(),
+    "defaultRenderProviderSecondarySalesAddress",
     newRenderProviderSecondarySalesAddress.toHexString()
   );
   assert.fieldEquals(
@@ -609,9 +622,166 @@ test(`${coreType}: Handles PlatformUpdated::providerSalesAddresses - changed val
     "enginePlatformProviderAddress",
     newPlatformProviderPrimarySalesAddress.toHexString()
   );
+  // DEPRECATED START ---
   assert.fieldEquals(
     CONTRACT_ENTITY_TYPE,
     TEST_CONTRACT_ADDRESS.toHexString(),
+    "enginePlatformProviderSecondarySalesAddress",
+    newPlatformProviderSecondarySalesAddress.toHexString()
+  );
+  // DEPRECATED END ---
+  assert.fieldEquals(
+    CONTRACT_ENTITY_TYPE,
+    TEST_CONTRACT_ADDRESS.toHexString(),
+    "defaultEnginePlatformProviderSecondarySalesAddress",
+    newPlatformProviderSecondarySalesAddress.toHexString()
+  );
+});
+
+test(`${coreType}: Handles PlatformUpdated::providerSalesAddresses - changed value - multi-project iteration`, () => {
+  // this test is to ensure that the secondary sales address is updated for all projects
+  // when the platform's secondary sales address is updated.
+  clearStore();
+  // add new contract to store
+  const projectId = BigInt.fromI32(0);
+  addTestContractToStoreOfTypeAndVersion(projectId, coreType, coreVersion);
+  mockRefreshContractCalls(
+    BigInt.fromI32(2), // next project id = 2, so projects 0 and 1 exist and should be iterated over
+    coreType,
+    null
+  );
+  // add projects 0 and 1 to store
+  addNewProjectToStore(
+    TEST_CONTRACT_ADDRESS,
+    BigInt.fromI32(0),
+    "Project 0",
+    randomAddressGenerator.generateRandomAddress(),
+    BigInt.fromI32(1),
+    CURRENT_BLOCK_TIMESTAMP
+  );
+  addNewProjectToStore(
+    TEST_CONTRACT_ADDRESS,
+    BigInt.fromI32(1),
+    "Project 1",
+    randomAddressGenerator.generateRandomAddress(),
+    BigInt.fromI32(1),
+    CURRENT_BLOCK_TIMESTAMP
+  );
+
+  // update mock function return values
+  const newRenderProviderPrimarySalesAddress = randomAddressGenerator.generateRandomAddress();
+  createMockedFunction(
+    TEST_CONTRACT_ADDRESS,
+    "renderProviderPrimarySalesAddress",
+    "renderProviderPrimarySalesAddress():(address)"
+  ).returns([ethereum.Value.fromAddress(newRenderProviderPrimarySalesAddress)]);
+
+  const newRenderProviderSecondarySalesAddress = randomAddressGenerator.generateRandomAddress();
+  createMockedFunction(
+    TEST_CONTRACT_ADDRESS,
+    "renderProviderSecondarySalesAddress",
+    "renderProviderSecondarySalesAddress():(address)"
+  ).returns([
+    ethereum.Value.fromAddress(newRenderProviderSecondarySalesAddress)
+  ]);
+  // @dev pre-v3.2 do not have defaultRenderProviderSecondarySalesAddress()
+
+  const newPlatformProviderPrimarySalesAddress = randomAddressGenerator.generateRandomAddress();
+  createMockedFunction(
+    TEST_CONTRACT_ADDRESS,
+    "platformProviderPrimarySalesAddress",
+    "platformProviderPrimarySalesAddress():(address)"
+  ).returns([
+    ethereum.Value.fromAddress(newPlatformProviderPrimarySalesAddress)
+  ]);
+
+  const newPlatformProviderSecondarySalesAddress = randomAddressGenerator.generateRandomAddress();
+  createMockedFunction(
+    TEST_CONTRACT_ADDRESS,
+    "platformProviderSecondarySalesAddress",
+    "platformProviderSecondarySalesAddress():(address)"
+  ).returns([
+    ethereum.Value.fromAddress(newPlatformProviderSecondarySalesAddress)
+  ]);
+  // @dev pre-v3.2 do not have defaultPlatformProviderSecondarySalesAddress()
+
+  // create event
+  const event: PlatformUpdated = changetype<PlatformUpdated>(newMockEvent());
+  event.address = TEST_CONTRACT_ADDRESS;
+  event.transaction.hash = TEST_TX_HASH;
+  event.logIndex = BigInt.fromI32(0);
+  event.parameters = [
+    new ethereum.EventParam(
+      "_field",
+      ethereum.Value.fromBytes(Bytes.fromUTF8("providerSalesAddresses"))
+    )
+  ];
+  // handle event
+  handlePlatformUpdated(event);
+
+  // all four payment addresses in store should be updated
+  assert.fieldEquals(
+    CONTRACT_ENTITY_TYPE,
+    TEST_CONTRACT_ADDRESS.toHexString(),
+    "renderProviderAddress",
+    newRenderProviderPrimarySalesAddress.toHexString()
+  );
+  // DEPRECATED START ---
+  assert.fieldEquals(
+    CONTRACT_ENTITY_TYPE,
+    TEST_CONTRACT_ADDRESS.toHexString(),
+    "renderProviderSecondarySalesAddress",
+    newRenderProviderSecondarySalesAddress.toHexString()
+  );
+  // DEPRECATED END ---
+  assert.fieldEquals(
+    CONTRACT_ENTITY_TYPE,
+    TEST_CONTRACT_ADDRESS.toHexString(),
+    "defaultRenderProviderSecondarySalesAddress",
+    newRenderProviderSecondarySalesAddress.toHexString()
+  );
+  assert.fieldEquals(
+    CONTRACT_ENTITY_TYPE,
+    TEST_CONTRACT_ADDRESS.toHexString(),
+    "enginePlatformProviderAddress",
+    newPlatformProviderPrimarySalesAddress.toHexString()
+  );
+  // DEPRECATED START ---
+  assert.fieldEquals(
+    CONTRACT_ENTITY_TYPE,
+    TEST_CONTRACT_ADDRESS.toHexString(),
+    "enginePlatformProviderSecondarySalesAddress",
+    newPlatformProviderSecondarySalesAddress.toHexString()
+  );
+  // DEPRECATED END ---
+  assert.fieldEquals(
+    CONTRACT_ENTITY_TYPE,
+    TEST_CONTRACT_ADDRESS.toHexString(),
+    "defaultEnginePlatformProviderSecondarySalesAddress",
+    newPlatformProviderSecondarySalesAddress.toHexString()
+  );
+  // projects should also be updated
+  assert.fieldEquals(
+    PROJECT_ENTITY_TYPE,
+    generateContractSpecificId(TEST_CONTRACT_ADDRESS, BigInt.fromI32(0)),
+    "renderProviderSecondarySalesAddress",
+    newRenderProviderSecondarySalesAddress.toHexString()
+  );
+  assert.fieldEquals(
+    PROJECT_ENTITY_TYPE,
+    generateContractSpecificId(TEST_CONTRACT_ADDRESS, BigInt.fromI32(1)),
+    "renderProviderSecondarySalesAddress",
+    newRenderProviderSecondarySalesAddress.toHexString()
+  );
+  assert.fieldEquals(
+    PROJECT_ENTITY_TYPE,
+    generateContractSpecificId(TEST_CONTRACT_ADDRESS, BigInt.fromI32(0)),
+    "enginePlatformProviderSecondarySalesAddress",
+    newPlatformProviderSecondarySalesAddress.toHexString()
+  );
+  assert.fieldEquals(
+    PROJECT_ENTITY_TYPE,
+    generateContractSpecificId(TEST_CONTRACT_ADDRESS, BigInt.fromI32(1)),
     "enginePlatformProviderSecondarySalesAddress",
     newPlatformProviderSecondarySalesAddress.toHexString()
   );
@@ -625,12 +795,20 @@ test(`${coreType}: Handles PlatformUpdated::providerPrimaryPercentages - default
   addTestContractToStore(projectId);
   mockRefreshContractCalls(BigInt.fromI32(0), coreType, null);
 
-  // default value should be false
+  // default value should be test contract value
+  // DEPRECATED START ---
   assert.fieldEquals(
     CONTRACT_ENTITY_TYPE,
     TEST_CONTRACT_ADDRESS.toHexString(),
     "renderProviderSecondarySalesAddress",
     TEST_CONTRACT.renderProviderSecondarySalesAddress.toHexString()
+  );
+  // DEPRECATED END ---
+  assert.fieldEquals(
+    CONTRACT_ENTITY_TYPE,
+    TEST_CONTRACT_ADDRESS.toHexString(),
+    "defaultRenderProviderSecondarySalesAddress",
+    TEST_CONTRACT.defaultRenderProviderSecondarySalesAddress.toHexString()
   );
 });
 
@@ -922,12 +1100,20 @@ test(`${coreType}: Handles PlatformUpdated::providerSecondaryBPS - default value
   addTestContractToStore(projectId);
   mockRefreshContractCalls(BigInt.fromI32(0), coreType, null);
 
-  // default value should be false
+  // default value should be test contract default value
+  // DEFAULT START ---
   assert.fieldEquals(
     CONTRACT_ENTITY_TYPE,
     TEST_CONTRACT_ADDRESS.toHexString(),
     "renderProviderSecondarySalesBPS",
     TEST_CONTRACT.renderProviderSecondarySalesBPS.toString()
+  );
+  // DEFAULT END ---
+  assert.fieldEquals(
+    CONTRACT_ENTITY_TYPE,
+    TEST_CONTRACT_ADDRESS.toHexString(),
+    "defaultRenderProviderSecondarySalesBPS",
+    TEST_CONTRACT.defaultRenderProviderSecondarySalesBPS.toString()
   );
 });
 
@@ -947,6 +1133,7 @@ test(`${coreType}: Handles PlatformUpdated::providerSecondaryBPS - changed value
   ).returns([
     ethereum.Value.fromUnsignedBigInt(newRenderProviderSecondarySalesBPS)
   ]);
+  // @dev pre-v3.2 do not have defaultRenderProviderSecondarySalesBPS()
 
   const newPlatformProviderSecondarySalesBPS = BigInt.fromI32(200);
   createMockedFunction(
@@ -956,6 +1143,7 @@ test(`${coreType}: Handles PlatformUpdated::providerSecondaryBPS - changed value
   ).returns([
     ethereum.Value.fromUnsignedBigInt(newPlatformProviderSecondarySalesBPS)
   ]);
+  // @dev pre-v3.2 do not have defaultPlatformProviderSecondarySalesBPS()
 
   // create event
   const event: PlatformUpdated = changetype<PlatformUpdated>(newMockEvent());
@@ -972,6 +1160,7 @@ test(`${coreType}: Handles PlatformUpdated::providerSecondaryBPS - changed value
   handlePlatformUpdated(event);
 
   // values in store should be updated
+  // DEPRECATED START ---
   assert.fieldEquals(
     CONTRACT_ENTITY_TYPE,
     TEST_CONTRACT_ADDRESS.toHexString(),
@@ -982,6 +1171,19 @@ test(`${coreType}: Handles PlatformUpdated::providerSecondaryBPS - changed value
     CONTRACT_ENTITY_TYPE,
     TEST_CONTRACT_ADDRESS.toHexString(),
     "enginePlatformProviderSecondarySalesBPS",
+    newPlatformProviderSecondarySalesBPS.toString()
+  );
+  // DEPRECATED END ---
+  assert.fieldEquals(
+    CONTRACT_ENTITY_TYPE,
+    TEST_CONTRACT_ADDRESS.toHexString(),
+    "defaultRenderProviderSecondarySalesBPS",
+    newRenderProviderSecondarySalesBPS.toString()
+  );
+  assert.fieldEquals(
+    CONTRACT_ENTITY_TYPE,
+    TEST_CONTRACT_ADDRESS.toHexString(),
+    "defaultEnginePlatformProviderSecondarySalesBPS",
     newPlatformProviderSecondarySalesBPS.toString()
   );
 });
@@ -1047,6 +1249,11 @@ describe(`${coreType}: handleProjectUpdated`, () => {
     beforeEach(() => {
       clearStore();
       addTestContractToStore(BigInt.fromI32(0));
+      addTestContractToStoreOfTypeAndVersion(
+        BigInt.fromI32(0),
+        coreType,
+        coreVersion
+      );
     });
 
     test("should do nothing if the contract does not already exist", () => {
@@ -1063,7 +1270,7 @@ describe(`${coreType}: handleProjectUpdated`, () => {
         ),
         new ethereum.EventParam(
           "_update",
-          ethereum.Value.fromBytes(Bytes.fromUTF8(FIELD_PROJECT_CREATED))
+          ethereum.Value.fromBytes(toBytes32(FIELD_PROJECT_CREATED))
         )
       ];
 
@@ -1088,7 +1295,7 @@ describe(`${coreType}: handleProjectUpdated`, () => {
         ),
         new ethereum.EventParam(
           "_update",
-          ethereum.Value.fromBytes(Bytes.fromUTF8(FIELD_PROJECT_CREATED))
+          ethereum.Value.fromBytes(toBytes32(FIELD_PROJECT_CREATED))
         )
       ];
 
@@ -1169,9 +1376,12 @@ describe(`${coreType}: handleProjectUpdated`, () => {
         ),
         new ethereum.EventParam(
           "_update",
-          ethereum.Value.fromBytes(Bytes.fromUTF8(FIELD_PROJECT_CREATED))
+          ethereum.Value.fromBytes(toBytes32(FIELD_PROJECT_CREATED))
         )
       ];
+
+      // mock all refresh contract calls to ensure the required contract-level royalty functions are mocked
+      mockRefreshContractCalls(projectId, coreType, null);
 
       // mock projectDetails
       createMockedFunction(
@@ -1222,6 +1432,14 @@ describe(`${coreType}: handleProjectUpdated`, () => {
       )
         .withArgs([ethereum.Value.fromUnsignedBigInt(projectId)])
         .returns([ethereum.Value.fromAddress(artistAddress)]);
+      // mock projectIdToSecondaryMarketRoyaltyPercentage, return 0
+      createMockedFunction(
+        TEST_CONTRACT_ADDRESS,
+        "projectIdToSecondaryMarketRoyaltyPercentage",
+        "projectIdToSecondaryMarketRoyaltyPercentage(uint256):(uint256)"
+      )
+        .withArgs([ethereum.Value.fromUnsignedBigInt(projectId)])
+        .returns([ethereum.Value.fromI32(0)]);
 
       handleProjectUpdated(event);
 
@@ -1342,6 +1560,39 @@ describe(`${coreType}: handleProjectUpdated`, () => {
         "useIpfs",
         "false"
       );
+      // default royalty upon project creation is 0 for pre-v3.2 Engine core
+      assert.fieldEquals(
+        PROJECT_ENTITY_TYPE,
+        generateContractSpecificId(TEST_CONTRACT_ADDRESS, projectId),
+        "royaltyPercentage",
+        "0"
+      );
+      // project render provider royalties should equal contract-level values for pre-v3.2 Engine core
+      assert.fieldEquals(
+        PROJECT_ENTITY_TYPE,
+        generateContractSpecificId(TEST_CONTRACT_ADDRESS, projectId),
+        "renderProviderSecondarySalesAddress",
+        TEST_CONTRACT.defaultRenderProviderSecondarySalesAddress.toHexString()
+      );
+      assert.fieldEquals(
+        PROJECT_ENTITY_TYPE,
+        generateContractSpecificId(TEST_CONTRACT_ADDRESS, projectId),
+        "renderProviderSecondarySalesBPS",
+        TEST_CONTRACT.defaultRenderProviderSecondarySalesBPS.toString()
+      );
+      // project platform provider royalties should equal contract-level values for pre-v3.2 Engine core
+      assert.fieldEquals(
+        PROJECT_ENTITY_TYPE,
+        generateContractSpecificId(TEST_CONTRACT_ADDRESS, projectId),
+        "enginePlatformProviderSecondarySalesAddress",
+        TEST_CONTRACT.defaultEnginePlatformProviderSecondarySalesAddress.toHexString()
+      );
+      assert.fieldEquals(
+        PROJECT_ENTITY_TYPE,
+        generateContractSpecificId(TEST_CONTRACT_ADDRESS, projectId),
+        "enginePlatformProviderSecondarySalesBPS",
+        TEST_CONTRACT.defaultEnginePlatformProviderSecondarySalesBPS.toString()
+      );
     });
   });
 
@@ -1384,7 +1635,7 @@ describe(`${coreType}: handleProjectUpdated`, () => {
         ),
         new ethereum.EventParam(
           "_update",
-          ethereum.Value.fromBytes(Bytes.fromUTF8(FIELD_PROJECT_ACTIVE))
+          ethereum.Value.fromBytes(toBytes32(FIELD_PROJECT_ACTIVE))
         )
       ];
 
@@ -1433,7 +1684,7 @@ describe(`${coreType}: handleProjectUpdated`, () => {
         ),
         new ethereum.EventParam(
           "_update",
-          ethereum.Value.fromBytes(Bytes.fromUTF8(FIELD_PROJECT_ARTIST_ADDRESS))
+          ethereum.Value.fromBytes(toBytes32(FIELD_PROJECT_ARTIST_ADDRESS))
         )
       ];
 
@@ -1519,7 +1770,7 @@ describe(`${coreType}: handleProjectUpdated`, () => {
         ),
         new ethereum.EventParam(
           "_update",
-          ethereum.Value.fromBytes(Bytes.fromUTF8(FIELD_PROJECT_BASE_URI))
+          ethereum.Value.fromBytes(toBytes32(FIELD_PROJECT_BASE_URI))
         )
       ];
 
@@ -1567,7 +1818,7 @@ describe(`${coreType}: handleProjectUpdated`, () => {
         ),
         new ethereum.EventParam(
           "_update",
-          ethereum.Value.fromBytes(Bytes.fromUTF8(FIELD_PROJECT_COMPLETED))
+          ethereum.Value.fromBytes(toBytes32(FIELD_PROJECT_COMPLETED))
         )
       ];
 
@@ -1627,7 +1878,7 @@ describe(`${coreType}: handleProjectUpdated`, () => {
         ),
         new ethereum.EventParam(
           "_update",
-          ethereum.Value.fromBytes(Bytes.fromUTF8(FIELD_PROJECT_SCRIPT))
+          ethereum.Value.fromBytes(toBytes32(FIELD_PROJECT_SCRIPT))
         )
       ];
 
@@ -1700,7 +1951,7 @@ describe(`${coreType}: handleProjectUpdated`, () => {
         ),
         new ethereum.EventParam(
           "_update",
-          ethereum.Value.fromBytes(Bytes.fromUTF8(FIELD_PROJECT_SCRIPT))
+          ethereum.Value.fromBytes(toBytes32(FIELD_PROJECT_SCRIPT))
         )
       ];
 
@@ -1773,7 +2024,7 @@ describe(`${coreType}: handleProjectUpdated`, () => {
         ),
         new ethereum.EventParam(
           "_update",
-          ethereum.Value.fromBytes(Bytes.fromUTF8(FIELD_PROJECT_SCRIPT))
+          ethereum.Value.fromBytes(toBytes32(FIELD_PROJECT_SCRIPT))
         )
       ];
 
@@ -1843,7 +2094,7 @@ describe(`${coreType}: handleProjectUpdated`, () => {
         ),
         new ethereum.EventParam(
           "_update",
-          ethereum.Value.fromBytes(Bytes.fromUTF8(FIELD_PROJECT_SCRIPT))
+          ethereum.Value.fromBytes(toBytes32(FIELD_PROJECT_SCRIPT))
         )
       ];
 
@@ -1919,7 +2170,7 @@ describe(`${coreType}: handleProjectUpdated`, () => {
         new ethereum.EventParam(
           "_update",
           ethereum.Value.fromBytes(
-            Bytes.fromUTF8(FIELD_PROJECT_SECONDARY_MARKET_ROYALTY_PERCENTAGE)
+            toBytes32(FIELD_PROJECT_SECONDARY_MARKET_ROYALTY_PERCENTAGE)
           )
         )
       ];
