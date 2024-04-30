@@ -4,7 +4,8 @@ import {
   log,
   Address,
   Bytes,
-  ByteArray
+  ByteArray,
+  dataSource
 } from "@graphprotocol/graph-ts";
 
 import {
@@ -1459,7 +1460,8 @@ function refreshContract<T>(contract: T, timestamp: BigInt): Contract | null {
     }
   }
   contractEntity.type = contract.coreType();
-  const coreVersion = contract.coreVersion();
+  // use helper function to get core version, accounting for some known issues with versioning on testnet
+  const coreVersion = getCoreVersionFixed(contract);
   contractEntity.version = coreVersion;
   const isEngineOrEngineFlex =
     contract instanceof GenArt721CoreV3_Engine ||
@@ -1808,6 +1810,41 @@ function getIsLegacyMinterFilter(minterFilterAddress: Address): boolean {
  */
 function getIsPreV3_2(version: string): boolean {
   return version.startsWith("v3.0.") || version.startsWith("v3.1.");
+}
+
+/**
+ * @notice helper function that returns the core version of a V3 core contract,
+ * accounting for known issues with versioning of a couple contracts on testnet.
+ * @param contract CoreV3 contract instance
+ * @returns string, core version of the contract
+ */
+function getCoreVersionFixed<T>(contract: T): string {
+  if (
+    !(
+      contract instanceof GenArt721CoreV3 ||
+      contract instanceof GenArt721CoreV3_Engine ||
+      contract instanceof GenArt721CoreV3_Engine_Flex
+    )
+  ) {
+    throw new Error("Contract is not a V3 core contract.");
+  }
+  // override the core version for known issues on testnet
+  const network = dataSource.network();
+
+  if (network == "sepolia") {
+    // two sepolia contracts return v3.2.2, but should actually be v3.0.2
+    if (
+      contract._address.toHexString() ==
+        "0xec5dae4b11213290b2dbe5295093f75920bd2982" ||
+      contract._address.toHexString() ==
+        "0xd9f14781f6cba1f4ffb0743bcfd5fc860d1da847"
+    ) {
+      return "v3.0.2";
+    }
+  }
+  // no overrides required - return the core version as returned by the contract
+  let coreVersion = contract.coreVersion();
+  return coreVersion;
 }
 
 /**
