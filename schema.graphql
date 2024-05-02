@@ -234,7 +234,7 @@ type Contract @entity {
   type: CoreType!
 
   "Core contract version (populated on V3 and-on)"
-  version: String
+  coreVersion: String
 
   "Address that receives primary sales platform fees"
   renderProviderAddress: Bytes!
