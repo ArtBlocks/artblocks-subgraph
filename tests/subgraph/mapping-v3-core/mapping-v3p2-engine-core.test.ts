@@ -1122,6 +1122,13 @@ describe(`${coreType}-${coreVersion}: handleIAdminACLV0SuperAdminTransferred`, (
   });
 });
 
+test("event enums are defined correctly", () => {
+  assert.stringEquals(
+    ENUM_FIELD_PROJECT_CREATED.toHexString(),
+    "0x0000000000000000000000000000000000000000000000000000000000000004"
+  );
+});
+
 describe(`${coreType}-${coreVersion}: handleProjectUpdated`, () => {
   describe("create", () => {
     beforeEach(() => {

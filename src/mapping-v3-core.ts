@@ -1874,7 +1874,7 @@ function toBytes32Numeric(value: i32): Bytes {
   // enum values are numeric, big-endian, so padStart
   return Bytes.fromHexString(
     "0x" +
-      Bytes.fromI32(value)
+      BigInt.fromI32(value)
         .toHexString()
         .slice(2)
         .padStart(64, "0")
