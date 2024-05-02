@@ -407,7 +407,7 @@ export function addTestContractToStoreOfTypeAndVersion(
   let contract = new Contract(TEST_CONTRACT_ADDRESS.toHexString());
   contract.admin = TEST_CONTRACT.admin;
   contract.type = coreType;
-  contract.version = coreVersion;
+  contract.coreVersion = coreVersion;
   contract.createdAt = CURRENT_BLOCK_TIMESTAMP.minus(BigInt.fromI32(10));
   contract.nextProjectId = nextProjectId;
   contract.randomizerContract = TEST_CONTRACT.randomizerContract;

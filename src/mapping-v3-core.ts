@@ -724,7 +724,7 @@ function createProject(
     projectId
   );
   // provider secondary financials are modeled differently on v3.0 and v3.1 vs. v3.2+, handle both cases
-  const coreVersion = contractEntity.version;
+  const coreVersion = contractEntity.coreVersion;
   // version should never be null on a V3 contract
   if (!coreVersion) {
     log.error(
@@ -1462,7 +1462,7 @@ function refreshContract<T>(contract: T, timestamp: BigInt): Contract | null {
   contractEntity.type = contract.coreType();
   // use helper function to get core version, accounting for some known issues with versioning on testnet
   const coreVersion = getCoreVersionFixed(contract);
-  contractEntity.version = coreVersion;
+  contractEntity.coreVersion = coreVersion;
   const isEngineOrEngineFlex =
     contract instanceof GenArt721CoreV3_Engine ||
     contract instanceof GenArt721CoreV3_Engine_Flex;
