@@ -20,6 +20,18 @@ type Project @entity {
   "Percentage of artist's share of secondary sales that goes to additional payee"
   additionalPayeeSecondarySalesPercentage: BigInt
 
+  "Address that receives secondary sales platform royalties (null for pre-V3 contracts, check Royalty Registry)"
+  enginePlatformProviderSecondarySalesAddress: Bytes
+
+  "Basis points of secondary sales allocated to the platform (null for pre-V3 contracts, check Royalty Registry)"
+  enginePlatformProviderSecondarySalesBPS: BigInt
+
+  "Address that receives secondary sales render provider royalties (null for pre-V3 contracts, check Royalty Registry)"
+  renderProviderSecondarySalesAddress: Bytes
+
+  "Basis points of secondary sales allocated to the render provider (null for pre-V3 contracts, check Royalty Registry)"
+  renderProviderSecondarySalesBPS: BigInt
+
   "Artist that created the project"
   artist: Account!
 
@@ -116,6 +128,9 @@ type Project @entity {
 
   "Proposed Artist addresses and payment split percentages"
   proposedArtistAddressesAndSplits: ProposedArtistAddressesAndSplit
+
+  "ERC-2981 royalty splitter address, used on v3.2 and-on"
+  erc2981SplitterAddress: Bytes
 
   "Accounts that own tokens of the project"
   owners: [AccountProject!] @derivedFrom(field: "project")
@@ -218,16 +233,19 @@ type Contract @entity {
   "Core contract type"
   type: CoreType!
 
+  "Core contract version (populated on V3 and-on)"
+  coreVersion: String
+
   "Address that receives primary sales platform fees"
   renderProviderAddress: Bytes!
 
   "Percentage of primary sales allocated to the platform"
   renderProviderPercentage: BigInt!
 
-  "Address that receives secondary sales platform royalties (null for pre-V3 contracts, check Royalty Registry)"
+  "Deprecated field, will be removed and is not populated for v3.2+ - see Project.renderProviderSecondarySalesAddress"
   renderProviderSecondarySalesAddress: Bytes
 
-  "Basis points of secondary sales allocated to the platform (null for pre-V3 contracts, check Royalty Registry)"
+  "Deprecated field, will be removed and is not populated for v3.2+ - see Project.renderProviderSecondarySalesBPS"
   renderProviderSecondarySalesBPS: BigInt
 
   "Address that receives primary sales platform fees, only for V3_Engine contracts"
@@ -236,11 +254,23 @@ type Contract @entity {
   "Percentage of primary sales allocated to the platform, only for V3_Engine contracts"
   enginePlatformProviderPercentage: BigInt
 
-  "Address that receives secondary sales platform royalties, only for V3_Engine contracts"
+  "Deprecated field, will be removed and is not populated for v3.2+ - see Project.enginePlatformProviderSecondarySalesAddress"
   enginePlatformProviderSecondarySalesAddress: Bytes
 
-  "Basis points of secondary sales allocated to the platform, only for V3_Engine contracts"
+  "Deprecated field, will be removed and is not populated for v3.2+ - see Project.enginePlatformProviderSecondarySalesBPS"
   enginePlatformProviderSecondarySalesBPS: BigInt
+
+  "Default address that receives secondary sales render provider royalties when adding new projects (null for pre-V3 contracts)"
+  defaultRenderProviderSecondarySalesAddress: Bytes
+
+  "Default basis points of secondary sales allocated to the render provider when adding new projects (null for pre-V3 contracts)"
+  defaultRenderProviderSecondarySalesBPS: BigInt
+
+  "Default address that receives secondary sales platform provider royalties when adding new projects (null for pre-V3 contracts)"
+  defaultEnginePlatformProviderSecondarySalesAddress: Bytes
+
+  "Default basis points of secondary sales allocated to the platform provider when adding new projects (null for pre-V3 contracts)"
+  defaultEnginePlatformProviderSecondarySalesBPS: BigInt
 
   "List of contracts that are allowed to mint, equal to the single minterFilter address for V3 contracts"
   mintWhitelisted: [Bytes!]!
@@ -818,6 +848,8 @@ enum ProjectExternalAssetDependencyType {
   ARWEAVE
   "Asset hosted on chain"
   ONCHAIN
+  "Asset defined on the Art Blocks Dependency Registry"
+  ART_BLOCKS_DEPENDENCY_REGISTRY
 }
 
 type ProjectExternalAssetDependency @entity {
@@ -830,7 +862,7 @@ type ProjectExternalAssetDependency @entity {
   "The dependency type"
   dependencyType: ProjectExternalAssetDependencyType!
 
-  "The dependency cid. This will be an empty string assets of type ONCHAIN."
+  "The dependency cid. This will be the CID of the dependency if IPFS or ARWEAVE, empty string of ONCHAIN, or a string representation of the Art Blocks Dependency Registry's `dependencyNameAndVersion` if ART_BLOCKS_DEPENDENCY_REGISTRY."
   cid: String!
 
   "The dependency index"
