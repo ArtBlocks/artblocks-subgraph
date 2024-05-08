@@ -327,8 +327,13 @@
   "ICoreRegistryContracts": [
     {
       "address": "0x985C11541ff1fe763822Dc8f71B581C688B979EE",
-      "name": "Sepolia staging engine registry contract",
+      "name": "Old Sepolia dev engine registry contract",
       "startBlock": 4405396
+    },
+    {
+      "address": "0xfeA4f2f4E45c255ceE626a1A994BB214039c2B9A",
+      "name": "Current Sepolia dev core registry contract",
+      "startBlock": 5863293
     }
   ],
   "pbabContracts": [
