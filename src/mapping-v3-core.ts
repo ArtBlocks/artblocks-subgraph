@@ -4,7 +4,8 @@ import {
   log,
   Address,
   Bytes,
-  ByteArray
+  ByteArray,
+  dataSource
 } from "@graphprotocol/graph-ts";
 
 import {
@@ -727,7 +728,7 @@ function createProject(
     projectId
   );
   // provider secondary financials are modeled differently on v3.0 and v3.1 vs. v3.2+, handle both cases
-  const coreVersion = contractEntity.version;
+  const coreVersion = contractEntity.coreVersion;
   // version should never be null on a V3 contract
   if (!coreVersion) {
     log.error(
@@ -1486,8 +1487,9 @@ function refreshContract<T>(contract: T, timestamp: BigInt): Contract | null {
     }
   }
   contractEntity.type = contract.coreType();
-  const coreVersion = contract.coreVersion();
-  contractEntity.version = coreVersion;
+  // use helper function to get core version, accounting for some known issues with versioning on testnet
+  const coreVersion = getCoreVersionFixed(contract);
+  contractEntity.coreVersion = coreVersion;
   const isEngineOrEngineFlex =
     contract instanceof GenArt721CoreV3_Engine ||
     contract instanceof GenArt721CoreV3_Engine_Flex;
@@ -1850,6 +1852,41 @@ export function getIsPreV3_2(version: string): boolean {
 }
 
 /**
+ * @notice helper function that returns the core version of a V3 core contract,
+ * accounting for known issues with versioning of a couple contracts on testnet.
+ * @param contract CoreV3 contract instance
+ * @returns string, core version of the contract
+ */
+function getCoreVersionFixed<T>(contract: T): string {
+  if (
+    !(
+      contract instanceof GenArt721CoreV3 ||
+      contract instanceof GenArt721CoreV3_Engine ||
+      contract instanceof GenArt721CoreV3_Engine_Flex
+    )
+  ) {
+    throw new Error("Contract is not a V3 core contract.");
+  }
+  // override the core version for known issues on testnet
+  const network = dataSource.network();
+
+  if (network == "sepolia") {
+    // two sepolia contracts return v3.2.2, but should actually be v3.0.2
+    if (
+      contract._address.toHexString() ==
+        "0xec5dae4b11213290b2dbe5295093f75920bd2982" ||
+      contract._address.toHexString() ==
+        "0xd9f14781f6cba1f4ffb0743bcfd5fc860d1da847"
+    ) {
+      return "v3.0.2";
+    }
+  }
+  // no overrides required - return the core version as returned by the contract
+  let coreVersion = contract.coreVersion();
+  return coreVersion;
+}
+
+/**
  * @notice helper function to convert a string value to a Bytes32 value.
  * @dev string values are UTF-8 encoded, little-endian, so pads to right with 0s
  * @param value string value to convert
@@ -1876,7 +1913,7 @@ function toBytes32Numeric(value: i32): Bytes {
   // enum values are numeric, big-endian, so padStart
   return Bytes.fromHexString(
     "0x" +
-      Bytes.fromI32(value)
+      BigInt.fromI32(value)
         .toHexString()
         .slice(2)
         .padStart(64, "0")

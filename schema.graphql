@@ -237,7 +237,7 @@ type Contract @entity {
   type: CoreType!
 
   "Core contract version (populated on V3 and-on)"
-  version: String
+  coreVersion: String
 
   "Address that receives primary sales platform fees"
   renderProviderAddress: Bytes!
@@ -888,6 +888,8 @@ enum ProjectExternalAssetDependencyType {
   ARWEAVE
   "Asset hosted on chain"
   ONCHAIN
+  "Asset defined on the Art Blocks Dependency Registry"
+  ART_BLOCKS_DEPENDENCY_REGISTRY
 }
 
 type ProjectExternalAssetDependency @entity {
@@ -900,7 +902,7 @@ type ProjectExternalAssetDependency @entity {
   "The dependency type"
   dependencyType: ProjectExternalAssetDependencyType!
 
-  "The dependency cid. This will be an empty string assets of type ONCHAIN."
+  "The dependency cid. This will be the CID of the dependency if IPFS or ARWEAVE, empty string of ONCHAIN, or a string representation of the Art Blocks Dependency Registry's `dependencyNameAndVersion` if ART_BLOCKS_DEPENDENCY_REGISTRY."
   cid: String!
 
   "The dependency index"
