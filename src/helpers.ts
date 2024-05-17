@@ -20,7 +20,9 @@ import {
   CoreRegistry,
   Contract,
   Token,
-  PrimaryPurchase
+  PrimaryPurchase,
+  RoyaltySplitterContract,
+  RoyaltySplitRecipient
 } from "../generated/schema";
 
 import { IMinterFilterV1 } from "../generated/SharedMinterFilter/IMinterFilterV1";
@@ -36,6 +38,7 @@ import { createTypedMapFromJSONString } from "./json";
 import { KNOWN_MINTER_FILTER_TYPES } from "./constants";
 import { Mint as GenArt721Core2PBABMint } from "../generated/GenArt721Core2PBAB/GenArt721Core2PBAB";
 import { Mint as GenArt721CoreV1Mint } from "../generated/GenArt721Core/GenArt721Core";
+import { IGenArt721CoreContractV3_ProjectFinance } from "../generated/IGenArt721CoreV3_Base/IGenArt721CoreContractV3_ProjectFinance";
 
 export class MinterProjectAndConfig {
   minter: Minter;
@@ -172,6 +175,170 @@ export function getReceiptId(
   accountAddress: Address
 ): string {
   return minterId + "-" + projectId + "-" + accountAddress.toHexString();
+}
+
+/**
+ * Load or create a RoyaltySplitterContract entity, referencing a project actively using the contract
+ * in case it needs to be created.
+ * Handles case where the zero address is passed in as the royalty splitter id, and
+ * will result in a RoyaltySplitterContract entity with a zero address id and no associated
+ * recipients, which is a fair representation of the state of the contract.
+ * @dev Due to ordering of events, this function does NOT source payment state from
+ * project entity in store, because the project entity may not be up-to-date.
+ * Instead, it sources payment state via call to the contract directly.
+ * @dev Royalty splitter configuration is assumed to be immutable.
+ * @dev Assumes project is on a v3.2+ contract, which are the only contracts that support a royalty split provider field.
+ * @param royaltySplitterId Royalty splitter contract address
+ * @param project Project entity actively using the royalty splitter
+ * @param timestamp
+ * @returns RoyaltySplitterContract entity (either loaded or created)
+ */
+export function loadOrCreateRoyaltySplitterContract(
+  royaltySplitterId: string,
+  project: Project,
+  timestamp: BigInt
+): RoyaltySplitterContract {
+  let royaltySplitterContract = RoyaltySplitterContract.load(royaltySplitterId);
+  if (royaltySplitterContract) {
+    // already exists, so return
+    return royaltySplitterContract;
+  }
+
+  // create and populate new RoyaltySplitterContract entity
+
+  // load the project's contract
+  const contract = Contract.load(project.contract);
+  if (!contract) {
+    // should never happen, because project.contract is a required field
+    log.error(
+      "[WARN] Could not load contract with id {} when creating RoyaltySplitterContract entity with id {}",
+      [project.contract, royaltySplitterId]
+    );
+    throw new Error("Project entity does not have a contract field.");
+  }
+
+  if (!contract.royaltySplitProvider) {
+    // should never happen, because project.contract is a required field
+    log.error(
+      "[WARN] Could not load royalty split provider address on contract with id {} when creating RoyaltySplitterContract entity with id {}",
+      [project.contract, royaltySplitterId]
+    );
+    throw new Error(
+      "v3.2+ Contract entity does not have a royalty split provider field, which is an invalid state."
+    );
+  }
+
+  // get project's payment state via call to contract, because project entity may not be up-to-date
+  // due to event ordering
+  const boundContract = IGenArt721CoreContractV3_ProjectFinance.bind(
+    Address.fromString(contract.id)
+  );
+  const projectFinanceResult = boundContract.try_projectIdToFinancials(
+    project.projectId
+  );
+  if (projectFinanceResult.reverted) {
+    // should never happen, all projects with royalty splitters should have financials
+    log.error(
+      "[WARN] Could not load project financials for project with id {} when creating RoyaltySplitterContract entity with id {}",
+      [project.id, royaltySplitterId]
+    );
+    throw new Error(
+      "Could not load project financials for project with id " + project.id
+    );
+  }
+  const projectFinance = projectFinanceResult.value;
+
+  royaltySplitterContract = new RoyaltySplitterContract(royaltySplitterId);
+  // @dev v3.2+ contracts always have a populated royaltySplitProvider field
+  // @dev already checked for null royaltySplitProvider above, but compiler requires casting
+  royaltySplitterContract.splitProviderCreator = contract.royaltySplitProvider as Bytes;
+  royaltySplitterContract.coreContract = contract.id;
+
+  // create and populate the royalty recipients and allocations
+  // @dev source allocations from core contract to avoid dependency on splitter implementation)
+  // @dev define allocations in BPS, since that is sufficient granularity for core contract split definitions
+  const artistAllocation = BigInt.fromI32(
+    projectFinance.secondaryMarketRoyaltyPercentage
+  ).times(
+    BigInt.fromI32(100).minus(
+      BigInt.fromI32(projectFinance.additionalPayeeSecondarySalesPercentage)
+    )
+  );
+  const additionalAllocation = BigInt.fromI32(
+    projectFinance.secondaryMarketRoyaltyPercentage
+  ).times(
+    BigInt.fromI32(projectFinance.additionalPayeeSecondarySalesPercentage)
+  );
+  const renderAllocation = BigInt.fromI32(
+    projectFinance.renderProviderSecondarySalesBPS
+  );
+  const platformAllocation = BigInt.fromI32(
+    projectFinance.platformProviderSecondarySalesBPS
+  );
+  // total allocation is sum of all allocations
+  royaltySplitterContract.totalAllocation = artistAllocation
+    .plus(additionalAllocation)
+    .plus(renderAllocation)
+    .plus(platformAllocation);
+  // seve royaltySplitterContract to store
+  royaltySplitterContract.createdAt = timestamp;
+  royaltySplitterContract.save();
+
+  // create royalty split recipients
+  if (artistAllocation.gt(BigInt.fromI32(0))) {
+    createRoyaltySplitRecipient(
+      royaltySplitterId,
+      projectFinance.artistAddress,
+      artistAllocation
+    );
+  }
+  if (additionalAllocation.gt(BigInt.fromI32(0))) {
+    createRoyaltySplitRecipient(
+      royaltySplitterId,
+      projectFinance.additionalPayeeSecondarySales,
+      additionalAllocation
+    );
+  }
+  if (renderAllocation.gt(BigInt.fromI32(0))) {
+    createRoyaltySplitRecipient(
+      royaltySplitterId,
+      projectFinance.renderProviderSecondarySalesAddress,
+      renderAllocation
+    );
+  }
+  if (platformAllocation.gt(BigInt.fromI32(0))) {
+    createRoyaltySplitRecipient(
+      royaltySplitterId,
+      projectFinance.platformProviderSecondarySalesAddress,
+      platformAllocation
+    );
+  }
+
+  return royaltySplitterContract;
+}
+
+/**
+ * Creates and saves a RoyaltySplitRecipient entity with the given parameters.
+ * Assumes the recipient is a valid address, and the royaltySplitterId exists
+ * in the store.
+ * Allocation may be arbitrary, but should be correct relative to the totalAllocation
+ * of the associated RoyaltySplitterContract.
+ * @param royaltySplitterId the associated RoyaltySplitterContract entity id
+ * @param recipientAddress the address of the recipient
+ * @param allocation the allocation of the recipient. Allocation may be arbitrary,
+ * but should be correct relative to the totalAllocation of the associated RoyaltySplitterContract.
+ */
+function createRoyaltySplitRecipient(
+  royaltySplitterId: string,
+  recipientAddress: Address,
+  allocation: BigInt
+): void {
+  let recipientId = royaltySplitterId + "-" + recipientAddress.toHexString();
+  let recipient = new RoyaltySplitRecipient(recipientId);
+  recipient.royaltySplitterContract = royaltySplitterId;
+  recipient.recipientAddress = recipientAddress;
+  recipient.allocation = allocation;
+  recipient.save();
 }
 
 // @dev projectId must be the contract-specific id
