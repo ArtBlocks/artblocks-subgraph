@@ -217,17 +217,6 @@ export function loadOrCreateRoyaltySplitterContract(
     throw new Error("Project entity does not have a contract field.");
   }
 
-  if (!contract.royaltySplitProvider) {
-    // should never happen, because project.contract is a required field
-    log.error(
-      "[WARN] Could not load royalty split provider address on contract with id {} when creating RoyaltySplitterContract entity with id {}",
-      [project.contract, royaltySplitterId]
-    );
-    throw new Error(
-      "v3.2+ Contract entity does not have a royalty split provider field, which is an invalid state."
-    );
-  }
-
   // get project's payment state via call to contract, because project entity may not be up-to-date
   // due to event ordering
   const boundContract = IGenArt721CoreContractV3_ProjectFinance.bind(

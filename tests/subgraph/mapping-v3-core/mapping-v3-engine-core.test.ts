@@ -939,6 +939,23 @@ test(`${coreType}: Handles PlatformUpdated::dependencyRegistryAddress - default 
   );
 });
 
+test(`${coreType}: does not populate royaltySplitProvider on contract refresh for v3.2`, () => {
+  // default value is false
+  clearStore();
+  // add new contract to store
+  const projectId = BigInt.fromI32(0);
+  addTestContractToStore(projectId);
+  mockRefreshContractCalls(BigInt.fromI32(0), coreType, null);
+
+  // value should be null on pre-v3.2
+  assert.fieldEquals(
+    CONTRACT_ENTITY_TYPE,
+    TEST_CONTRACT_ADDRESS.toHexString(),
+    "royaltySplitProvider",
+    "null"
+  );
+});
+
 test(`${coreType}: Handles PlatformUpdated::dependencyRegistryAddress - changed value`, () => {
   clearStore();
   // add new contract to store
@@ -1592,6 +1609,19 @@ describe(`${coreType}: handleProjectUpdated`, () => {
         generateContractSpecificId(TEST_CONTRACT_ADDRESS, projectId),
         "enginePlatformProviderSecondarySalesBPS",
         TEST_CONTRACT.defaultEnginePlatformProviderSecondarySalesBPS.toString()
+      );
+      // pre-v3.2 should have null splitters
+      assert.fieldEquals(
+        PROJECT_ENTITY_TYPE,
+        generateContractSpecificId(TEST_CONTRACT_ADDRESS, projectId),
+        "erc2981SplitterAddress",
+        "null"
+      );
+      assert.fieldEquals(
+        PROJECT_ENTITY_TYPE,
+        generateContractSpecificId(TEST_CONTRACT_ADDRESS, projectId),
+        "erc2981SplitterContract",
+        "null"
       );
     });
   });

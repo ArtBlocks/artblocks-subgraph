@@ -20,7 +20,9 @@ import {
   TEST_MINTER_FILTER_ADDRESS,
   TEST_SUPER_ADMIN_ADDRESS,
   PROJECT_ENTITY_TYPE,
-  booleanToString
+  booleanToString,
+  TEST_ARTIST_ADDRESS,
+  TEST_ADDITIONAL_PAYEE_ADDRESS
 } from "../shared-helpers";
 import {
   toBytes32,
@@ -34,7 +36,8 @@ import {
   FIELD_PROJECT_PAUSED,
   FIELD_PROJECT_SCRIPT_TYPE,
   FIELD_PROJECT_WEBSITE,
-  handleProjectUpdated
+  handleProjectUpdated,
+  getIsPreV3_2
 } from "../../../src/mapping-v3-core";
 import { ProjectUpdated } from "../../../generated/IGenArt721CoreV3_Base/IGenArt721CoreContractV3_Base";
 
@@ -83,6 +86,71 @@ export function mockRefreshContractCalls(
         : "v3.0.0"
     )
   ]);
+
+  if (overrides && overrides.has("splitProvider")) {
+    createMockedFunction(
+      TEST_CONTRACT_ADDRESS,
+      "splitProvider",
+      "splitProvider():(address)"
+    ).returns([
+      ethereum.Value.fromAddress(
+        Address.fromString(overrides.get("splitProvider") as string)
+      )
+    ]);
+  } else {
+    // make splitProvider revert if not overridden (doesn't exist on pre-v3.2)
+    createMockedFunction(
+      TEST_CONTRACT_ADDRESS,
+      "splitProvider",
+      "splitProvider():(address)"
+    ).reverts();
+  }
+
+  // in general, if the contract is not a v3.0 or v3.2, should have default provider functions
+  if (overrides && overrides.has("coreVersion")) {
+    const coreVersion = changetype<Map<string, string>>(overrides).get(
+      "coreVersion"
+    );
+    if (!getIsPreV3_2(coreVersion)) {
+      // mock v3.2 functions
+      createMockedFunction(
+        TEST_CONTRACT_ADDRESS,
+        "defaultRenderProviderSecondarySalesAddress",
+        "defaultRenderProviderSecondarySalesAddress():(address)"
+      ).returns([
+        ethereum.Value.fromAddress(
+          TEST_CONTRACT.defaultRenderProviderSecondarySalesAddress
+        )
+      ]);
+      createMockedFunction(
+        TEST_CONTRACT_ADDRESS,
+        "defaultRenderProviderSecondarySalesBPS",
+        "defaultRenderProviderSecondarySalesBPS():(uint256)"
+      ).returns([
+        ethereum.Value.fromUnsignedBigInt(
+          TEST_CONTRACT.defaultRenderProviderSecondarySalesBPS
+        )
+      ]);
+      createMockedFunction(
+        TEST_CONTRACT_ADDRESS,
+        "defaultPlatformProviderSecondarySalesAddress",
+        "defaultPlatformProviderSecondarySalesAddress():(address)"
+      ).returns([
+        ethereum.Value.fromAddress(
+          TEST_CONTRACT.defaultEnginePlatformProviderSecondarySalesAddress
+        )
+      ]);
+      createMockedFunction(
+        TEST_CONTRACT_ADDRESS,
+        "defaultPlatformProviderSecondarySalesBPS",
+        "defaultPlatformProviderSecondarySalesBPS():(uint256)"
+      ).returns([
+        ethereum.Value.fromUnsignedBigInt(
+          TEST_CONTRACT.defaultEnginePlatformProviderSecondarySalesBPS
+        )
+      ]);
+    }
+  }
 
   createMockedFunction(
     TEST_CONTRACT_ADDRESS,
@@ -281,6 +349,47 @@ export function mockRefreshContractCalls(
     "artblocksDependencyRegistryAddress",
     "artblocksDependencyRegistryAddress():(address)"
   ).returns([ethereum.Value.fromAddress(TEST_CONTRACT.dependencyRegistry)]);
+}
+
+export function mockProjectFinance(
+  projectId: BigInt,
+  royaltyPercentage: BigInt,
+  additionalPayeePercentagePrimarySales: BigInt,
+  additionalPayeePercentageSecondarySales: BigInt
+): void {
+  // mock project finance function
+  // mock projectIdToFinancials, used on v3.2 Engine core in handler
+  // return is a struct, which solidity returns as a tuple
+  let tupleArray: Array<ethereum.Value> = [
+    ethereum.Value.fromAddress(TEST_ADDITIONAL_PAYEE_ADDRESS), // additional payee primary sales
+    ethereum.Value.fromUnsignedBigInt(royaltyPercentage), // secondary market royalty percentage
+    ethereum.Value.fromAddress(TEST_ADDITIONAL_PAYEE_ADDRESS), // additional payee secondary sales
+    ethereum.Value.fromUnsignedBigInt(additionalPayeePercentageSecondarySales), // additional payee secondary sales percentage
+    ethereum.Value.fromAddress(TEST_ARTIST_ADDRESS), // artist address
+    ethereum.Value.fromUnsignedBigInt(additionalPayeePercentagePrimarySales), // additionalPayeePrimarySalesPercentage
+    ethereum.Value.fromAddress(
+      TEST_CONTRACT.defaultEnginePlatformProviderSecondarySalesAddress
+    ),
+    ethereum.Value.fromUnsignedBigInt(
+      TEST_CONTRACT.defaultEnginePlatformProviderSecondarySalesBPS
+    ),
+    ethereum.Value.fromAddress(
+      TEST_CONTRACT.defaultRenderProviderSecondarySalesAddress
+    ),
+    ethereum.Value.fromUnsignedBigInt(
+      TEST_CONTRACT.defaultRenderProviderSecondarySalesBPS
+    ),
+    ethereum.Value.fromAddress(Address.zero()) // royalty splitter (unused in this test)
+  ];
+  let tuple: ethereum.Tuple = changetype<ethereum.Tuple>(tupleArray);
+
+  createMockedFunction(
+    TEST_CONTRACT_ADDRESS,
+    "projectIdToFinancials",
+    "projectIdToFinancials(uint256):((address,uint8,address,uint8,address,uint8,address,uint16,address,uint16,address))"
+  )
+    .withArgs([ethereum.Value.fromUnsignedBigInt(projectId)])
+    .returns([ethereum.Value.fromTuple(tuple)]);
 }
 
 // mocks return values for Soldity contract calls in handleMinterUpdated() function

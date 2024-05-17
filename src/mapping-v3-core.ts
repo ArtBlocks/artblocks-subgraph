@@ -717,6 +717,9 @@ function createProject(
   project.scriptCount = scriptCount;
   project.useHashString = useHashString;
   project.useIpfs = false;
+  // @dev subsequent events will update royalty splitter address fields
+  project.erc2981SplitterAddress = null;
+  project.erc2981SplitterContract = null;
 
   // populate the project's financial information
   // available on all cores, populated to non-zero value for new projects on v3.2+ cores
@@ -1842,7 +1845,7 @@ function getIsLegacyMinterFilter(minterFilterAddress: Address): boolean {
  * @param version version string of V3 core contract
  * @returns boolean, true if the version is pre-v3.2, false otherwise.
  */
-function getIsPreV3_2(version: string): boolean {
+export function getIsPreV3_2(version: string): boolean {
   return version.startsWith("v3.0.") || version.startsWith("v3.1.");
 }
 

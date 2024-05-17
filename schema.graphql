@@ -132,7 +132,7 @@ type Project @entity {
   "ERC-2981 royalty splitter address, used on v3.2 and-on"
   erc2981SplitterAddress: Bytes
 
-  "Royalty splitter contract, used on v3.2 and-on"
+  "The active royalty splitter contract, used on v3.2 and-on"
   erc2981SplitterContract: RoyaltySplitterContract
 
   "Accounts that own tokens of the project"
