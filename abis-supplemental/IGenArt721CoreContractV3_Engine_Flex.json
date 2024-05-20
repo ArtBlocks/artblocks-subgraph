@@ -459,6 +459,86 @@
     {
       "inputs": [
         {
+          "components": [
+            {
+              "internalType": "string",
+              "name": "tokenName",
+              "type": "string"
+            },
+            {
+              "internalType": "string",
+              "name": "tokenSymbol",
+              "type": "string"
+            },
+            {
+              "internalType": "address",
+              "name": "renderProviderAddress",
+              "type": "address"
+            },
+            {
+              "internalType": "address",
+              "name": "platformProviderAddress",
+              "type": "address"
+            },
+            {
+              "internalType": "address",
+              "name": "newSuperAdminAddress",
+              "type": "address"
+            },
+            {
+              "internalType": "address",
+              "name": "randomizerContract",
+              "type": "address"
+            },
+            {
+              "internalType": "address",
+              "name": "splitProviderAddress",
+              "type": "address"
+            },
+            {
+              "internalType": "address",
+              "name": "minterFilterAddress",
+              "type": "address"
+            },
+            {
+              "internalType": "uint248",
+              "name": "startingProjectId",
+              "type": "uint248"
+            },
+            {
+              "internalType": "bool",
+              "name": "autoApproveArtistSplitProposals",
+              "type": "bool"
+            },
+            {
+              "internalType": "bool",
+              "name": "nullPlatformProvider",
+              "type": "bool"
+            },
+            {
+              "internalType": "bool",
+              "name": "allowArtistProjectActivation",
+              "type": "bool"
+            }
+          ],
+          "internalType": "struct EngineConfiguration",
+          "name": "engineConfiguration",
+          "type": "tuple"
+        },
+        {
+          "internalType": "address",
+          "name": "adminACLContract_",
+          "type": "address"
+        }
+      ],
+      "name": "initialize",
+      "outputs": [],
+      "stateMutability": "nonpayable",
+      "type": "function"
+    },
+    {
+      "inputs": [
+        {
           "internalType": "address",
           "name": "minter",
           "type": "address"
@@ -913,6 +993,19 @@
       "name": "setTokenHash_8PT",
       "outputs": [],
       "stateMutability": "nonpayable",
+      "type": "function"
+    },
+    {
+      "inputs": [],
+      "name": "splitProvider",
+      "outputs": [
+        {
+          "internalType": "contract ISplitProviderV0",
+          "name": "",
+          "type": "address"
+        }
+      ],
+      "stateMutability": "view",
       "type": "function"
     },
     {

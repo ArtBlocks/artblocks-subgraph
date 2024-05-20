@@ -91,6 +91,8 @@ export const PROJECT_EXTERNAL_ASSET_DEPENDENCY_ENTITY_TYPE =
   "ProjectExternalAssetDependency";
 export const PROJECT_SCRIPT_ENTITY_TYPE = "ProjectScript";
 export const TOKEN_ENTITY_TYPE = "Token";
+export const ROYALTY_SPLITTER_ENTITY_TYPE = "RoyaltySplitterContract";
+export const ROYALTY_SPLIT_RECIPIENT_TYPE = "RoyaltySplitRecipient";
 export const TRANSFER_ENTITY_TYPE = "Transfer";
 export const PROJECT_MINTER_CONFIGURATION_ENTITY_TYPE =
   "ProjectMinterConfiguration";
@@ -106,6 +108,8 @@ export const IPFS_CID2 = "QmQCqjqxVXZQ6vXNmZvF7FjyZkCXKXMykCyyPQQrZ6m7W2";
 export const CURRENT_BLOCK_TIMESTAMP = BigInt.fromI32(1647051214);
 export const TEST_CONTRACT_ADDRESS = randomAddressGenerator.generateRandomAddress();
 export const TEST_SUPER_ADMIN_ADDRESS = randomAddressGenerator.generateRandomAddress();
+export const TEST_ARTIST_ADDRESS = randomAddressGenerator.generateRandomAddress();
+export const TEST_ADDITIONAL_PAYEE_ADDRESS = randomAddressGenerator.generateRandomAddress();
 export const TEST_TOKEN_HASH = Bytes.fromByteArray(
   crypto.keccak256(Bytes.fromUTF8("token hash"))
 );
@@ -373,6 +377,7 @@ export function addTestContractToStore(nextProjectId: BigInt): Contract {
   contract.admin = TEST_CONTRACT.admin;
   contract.type = TEST_CONTRACT.type;
   contract.createdAt = CURRENT_BLOCK_TIMESTAMP.minus(BigInt.fromI32(10));
+  contract.royaltySplitProvider = null;
   contract.nextProjectId = nextProjectId;
   contract.randomizerContract = TEST_CONTRACT.randomizerContract;
   contract.renderProviderAddress = TEST_CONTRACT.renderProviderAddress;
