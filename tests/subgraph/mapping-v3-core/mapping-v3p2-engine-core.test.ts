@@ -1170,6 +1170,7 @@ describe(`${coreType}-${coreVersion}: handleProjectUpdated`, () => {
 
     test("should do nothing if request for project info reverts", () => {
       const projectId = BigInt.fromI32(0);
+      const newBaseUri = "New Base URI";
 
       const event: ProjectUpdated = changetype<ProjectUpdated>(newMockEvent());
       event.address = TEST_CONTRACT_ADDRESS;
@@ -1234,6 +1235,15 @@ describe(`${coreType}-${coreVersion}: handleProjectUpdated`, () => {
         .withArgs([ethereum.Value.fromUnsignedBigInt(projectId)])
         .reverts();
 
+      // // mock projectURIInfo
+      createMockedFunction(
+        TEST_CONTRACT_ADDRESS,
+        "projectURIInfo",
+        "projectURIInfo(uint256):(string)"
+      )
+        .withArgs([ethereum.Value.fromUnsignedBigInt(projectId)])
+        .returns([ethereum.Value.fromString(newBaseUri)]);
+
       handleProjectUpdated(event);
 
       assert.notInStore(
@@ -1250,6 +1260,7 @@ describe(`${coreType}-${coreVersion}: handleProjectUpdated`, () => {
       const maxInvocations = BigInt.fromI32(ONE_MILLION);
       const paused = true;
       const scriptCount = BigInt.fromI32(0);
+      const newBaseUri = "New Base URI";
 
       const event: ProjectUpdated = changetype<ProjectUpdated>(newMockEvent());
       event.address = TEST_CONTRACT_ADDRESS;
@@ -1364,6 +1375,15 @@ describe(`${coreType}-${coreVersion}: handleProjectUpdated`, () => {
       )
         .withArgs([ethereum.Value.fromUnsignedBigInt(projectId)])
         .returns([ethereum.Value.fromTuple(tuple)]);
+
+      // // mock projectURIInfo
+      createMockedFunction(
+        TEST_CONTRACT_ADDRESS,
+        "projectURIInfo",
+        "projectURIInfo(uint256):(string)"
+      )
+        .withArgs([ethereum.Value.fromUnsignedBigInt(projectId)])
+        .returns([ethereum.Value.fromString(newBaseUri)]);
 
       handleProjectUpdated(event);
 
