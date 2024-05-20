@@ -1,0 +1,87 @@
+{
+  "_format": "hh-sol-artifact-1",
+  "contractName": "IGenArt721CoreContractV3_ProjectFinance",
+  "sourceName": "contracts/interfaces/v0.8.x/IGenArt721CoreContractV3_ProjectFinance.sol",
+  "abi": [
+    {
+      "inputs": [
+        {
+          "internalType": "uint256",
+          "name": "_projectId",
+          "type": "uint256"
+        }
+      ],
+      "name": "projectIdToFinancials",
+      "outputs": [
+        {
+          "components": [
+            {
+              "internalType": "address payable",
+              "name": "additionalPayeePrimarySales",
+              "type": "address"
+            },
+            {
+              "internalType": "uint8",
+              "name": "secondaryMarketRoyaltyPercentage",
+              "type": "uint8"
+            },
+            {
+              "internalType": "address payable",
+              "name": "additionalPayeeSecondarySales",
+              "type": "address"
+            },
+            {
+              "internalType": "uint8",
+              "name": "additionalPayeeSecondarySalesPercentage",
+              "type": "uint8"
+            },
+            {
+              "internalType": "address payable",
+              "name": "artistAddress",
+              "type": "address"
+            },
+            {
+              "internalType": "uint8",
+              "name": "additionalPayeePrimarySalesPercentage",
+              "type": "uint8"
+            },
+            {
+              "internalType": "address",
+              "name": "platformProviderSecondarySalesAddress",
+              "type": "address"
+            },
+            {
+              "internalType": "uint16",
+              "name": "platformProviderSecondarySalesBPS",
+              "type": "uint16"
+            },
+            {
+              "internalType": "address",
+              "name": "renderProviderSecondarySalesAddress",
+              "type": "address"
+            },
+            {
+              "internalType": "uint16",
+              "name": "renderProviderSecondarySalesBPS",
+              "type": "uint16"
+            },
+            {
+              "internalType": "address",
+              "name": "royaltySplitter",
+              "type": "address"
+            }
+          ],
+          "internalType": "struct IGenArt721CoreContractV3_ProjectFinance.ProjectFinance",
+          "name": "",
+          "type": "tuple"
+        }
+      ],
+      "stateMutability": "view",
+      "type": "function"
+    }
+  ],
+  "bytecode": "0x",
+  "deployedBytecode": "0x",
+  "linkReferences": {},
+  "deployedLinkReferences": {}
+}

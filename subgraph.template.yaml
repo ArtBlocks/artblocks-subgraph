@@ -35,6 +35,10 @@ dataSources:
           file: ./abis/IGenArt721CoreContractV3_Engine.json
         - name: IGenArt721CoreContractV3_Engine_Flex
           file: ./abis/IGenArt721CoreContractV3_Engine_Flex.json
+        - name: IGenArt721CoreContractV3_ProjectFinance
+          file: ./abis/IGenArt721CoreContractV3_ProjectFinance.json
+        - name: IGenArt721CoreContractV3_Engine_PreV3p2
+          file: ./abis/IGenArt721CoreContractV3_Engine_PreV3p2.json
         - name: GenArt721CoreV3_Engine_Flex
           file: ./abis/GenArt721CoreV3_Engine_Flex.json
         - name: GenArt721CoreV3
@@ -107,6 +111,10 @@ dataSources:
           file: ./abis/IGenArt721CoreContractV3_Engine.json
         - name: IGenArt721CoreContractV3_Engine_Flex
           file: ./abis/IGenArt721CoreContractV3_Engine_Flex.json
+        - name: IGenArt721CoreContractV3_ProjectFinance
+          file: ./abis/IGenArt721CoreContractV3_ProjectFinance.json
+        - name: IGenArt721CoreContractV3_Engine_PreV3p2
+          file: ./abis/IGenArt721CoreContractV3_Engine_PreV3p2.json
         - name: GenArt721CoreV3_Engine_Flex
           file: ./abis/GenArt721CoreV3_Engine_Flex.json
         - name: GenArt721CoreV3
@@ -150,6 +158,8 @@ dataSources:
           handler: handleProposedArtistAddressesAndSplits
         - event: AcceptedArtistAddressesAndSplits(indexed uint256)
           handler: handleAcceptedArtistAddressesAndSplits
+        - event: ProjectRoyaltySplitterUpdated(indexed uint256,indexed address)
+          handler: handleProjectRoyaltySplitterUpdated
       file: ./src/mapping-v3-core.ts
   {{/iGenArt721CoreContractV3_BaseContracts}}
   {{#ownableGenArt721CoreV3Contracts}}
@@ -185,6 +195,10 @@ dataSources:
           file: ./abis/IGenArt721CoreContractV3_Engine.json
         - name: IGenArt721CoreContractV3_Engine_Flex
           file: ./abis/IGenArt721CoreContractV3_Engine_Flex.json
+        - name: IGenArt721CoreContractV3_ProjectFinance
+          file: ./abis/IGenArt721CoreContractV3_ProjectFinance.json
+        - name: IGenArt721CoreContractV3_Engine_PreV3p2
+          file: ./abis/IGenArt721CoreContractV3_Engine_PreV3p2.json
         - name: GenArt721CoreV3_Engine_Flex
           file: ./abis/GenArt721CoreV3_Engine_Flex.json
         - name: GenArt721CoreV3
@@ -251,6 +265,10 @@ dataSources:
           file: ./abis/IGenArt721CoreContractV3_Engine.json
         - name: IGenArt721CoreContractV3_Engine_Flex
           file: ./abis/IGenArt721CoreContractV3_Engine_Flex.json
+        - name: IGenArt721CoreContractV3_ProjectFinance
+          file: ./abis/IGenArt721CoreContractV3_ProjectFinance.json
+        - name: IGenArt721CoreContractV3_Engine_PreV3p2
+          file: ./abis/IGenArt721CoreContractV3_Engine_PreV3p2.json
         - name: GenArt721CoreV3_Engine_Flex
           file: ./abis/GenArt721CoreV3_Engine_Flex.json
         - name: GenArt721CoreV3
@@ -818,6 +836,10 @@ dataSources:
           file: ./abis/IGenArt721CoreContractV3_Engine.json
         - name: IGenArt721CoreContractV3_Engine_Flex
           file: ./abis/IGenArt721CoreContractV3_Engine_Flex.json
+        - name: IGenArt721CoreContractV3_ProjectFinance
+          file: ./abis/IGenArt721CoreContractV3_ProjectFinance.json
+        - name: IGenArt721CoreContractV3_Engine_PreV3p2
+          file: ./abis/IGenArt721CoreContractV3_Engine_PreV3p2.json
         - name: GenArt721CoreV3_Engine_Flex
           file: ./abis/GenArt721CoreV3_Engine_Flex.json
         - name: GenArt721CoreV3
@@ -2310,6 +2332,10 @@ templates:
           file: ./abis/IGenArt721CoreContractV3_Engine.json
         - name: IGenArt721CoreContractV3_Engine_Flex
           file: ./abis/IGenArt721CoreContractV3_Engine_Flex.json
+        - name: IGenArt721CoreContractV3_ProjectFinance
+          file: ./abis/IGenArt721CoreContractV3_ProjectFinance.json
+        - name: IGenArt721CoreContractV3_Engine_PreV3p2
+          file: ./abis/IGenArt721CoreContractV3_Engine_PreV3p2.json
         - name: GenArt721CoreV3_Engine_Flex
           file: ./abis/GenArt721CoreV3_Engine_Flex.json
         - name: GenArt721CoreV3
@@ -2351,6 +2377,8 @@ templates:
           handler: handleProposedArtistAddressesAndSplits
         - event: AcceptedArtistAddressesAndSplits(indexed uint256)
           handler: handleAcceptedArtistAddressesAndSplits
+        - event: ProjectRoyaltySplitterUpdated(indexed uint256,indexed address)
+          handler: handleProjectRoyaltySplitterUpdated
       file: ./src/mapping-v3-core.ts
 
   - name: OwnableGenArt721CoreV3Contract_Template
@@ -2383,6 +2411,10 @@ templates:
           file: ./abis/IGenArt721CoreContractV3_Engine.json
         - name: IGenArt721CoreContractV3_Engine_Flex
           file: ./abis/IGenArt721CoreContractV3_Engine_Flex.json
+        - name: IGenArt721CoreContractV3_ProjectFinance
+          file: ./abis/IGenArt721CoreContractV3_ProjectFinance.json
+        - name: IGenArt721CoreContractV3_Engine_PreV3p2
+          file: ./abis/IGenArt721CoreContractV3_Engine_PreV3p2.json
         - name: GenArt721CoreV3_Engine_Flex
           file: ./abis/GenArt721CoreV3_Engine_Flex.json
         - name: GenArt721CoreV3
@@ -2446,6 +2478,10 @@ templates:
           file: ./abis/IGenArt721CoreContractV3_Engine.json
         - name: IGenArt721CoreContractV3_Engine_Flex
           file: ./abis/IGenArt721CoreContractV3_Engine_Flex.json
+        - name: IGenArt721CoreContractV3_ProjectFinance
+          file: ./abis/IGenArt721CoreContractV3_ProjectFinance.json
+        - name: IGenArt721CoreContractV3_Engine_PreV3p2
+          file: ./abis/IGenArt721CoreContractV3_Engine_PreV3p2.json
         - name: GenArt721CoreV3_Engine_Flex
           file: ./abis/GenArt721CoreV3_Engine_Flex.json
         - name: GenArt721CoreV3
@@ -2509,6 +2545,10 @@ templates:
           file: ./abis/IGenArt721CoreContractV3_Engine.json
         - name: IGenArt721CoreContractV3_Engine_Flex
           file: ./abis/IGenArt721CoreContractV3_Engine_Flex.json
+        - name: IGenArt721CoreContractV3_ProjectFinance
+          file: ./abis/IGenArt721CoreContractV3_ProjectFinance.json
+        - name: IGenArt721CoreContractV3_Engine_PreV3p2
+          file: ./abis/IGenArt721CoreContractV3_Engine_PreV3p2.json
         - name: GenArt721CoreV3_Engine_Flex
           file: ./abis/GenArt721CoreV3_Engine_Flex.json
         - name: GenArt721CoreV3
@@ -2571,6 +2611,10 @@ templates:
           file: ./abis/IGenArt721CoreContractV3_Engine.json
         - name: IGenArt721CoreContractV3_Engine_Flex
           file: ./abis/IGenArt721CoreContractV3_Engine_Flex.json
+        - name: IGenArt721CoreContractV3_ProjectFinance
+          file: ./abis/IGenArt721CoreContractV3_ProjectFinance.json
+        - name: IGenArt721CoreContractV3_Engine_PreV3p2
+          file: ./abis/IGenArt721CoreContractV3_Engine_PreV3p2.json
         - name: GenArt721CoreV3_Engine_Flex
           file: ./abis/GenArt721CoreV3_Engine_Flex.json
         - name: GenArt721CoreV3
