@@ -20,6 +20,8 @@ import {
   CONTRACT_ENTITY_TYPE,
   PROJECT_SCRIPT_ENTITY_TYPE,
   TOKEN_ENTITY_TYPE,
+  ROYALTY_SPLITTER_ENTITY_TYPE,
+  ROYALTY_SPLIT_RECIPIENT_TYPE,
   CURRENT_BLOCK_TIMESTAMP,
   RandomAddressGenerator,
   mockProjectScriptByIndex,
@@ -39,7 +41,8 @@ import {
   booleanToString,
   TEST_CONTRACT,
   TEST_SUPER_ADMIN_ADDRESS,
-  WHITELISTING_ENTITY_TYPE
+  WHITELISTING_ENTITY_TYPE,
+  TEST_ARTIST_ADDRESS
 } from "../shared-helpers";
 import {
   mockProjectScriptDetailsCall,
@@ -47,9 +50,10 @@ import {
   testProjectDetailsUpdated,
   testProjectScriptDetailsUpdated,
   testProjectStateDataUpdated,
-  mockRefreshContractCalls
+  mockRefreshContractCalls,
+  mockProjectFinance
 } from "./helpers";
-import { Project } from "../../../generated/schema";
+import { Contract, Project } from "../../../generated/schema";
 import {
   Mint,
   ProjectUpdated,
@@ -96,9 +100,14 @@ const randomAddressGenerator = new RandomAddressGenerator();
 
 const coreType = "GenArt721CoreV3_Engine";
 const coreVersion = "v3.2.0"; // test v3.2 contract handling
+const SPLIT_PROVIDER_ADDRESS = randomAddressGenerator.generateRandomAddress();
 // override mock core version
 const mockCoreContractOverrides = new Map<string, string>();
 mockCoreContractOverrides.set("coreVersion", coreVersion);
+mockCoreContractOverrides.set(
+  "splitProvider",
+  SPLIT_PROVIDER_ADDRESS.toHexString()
+);
 
 test(`${coreType}-${coreVersion}: Can handle Mint`, () => {
   clearStore();
@@ -228,7 +237,7 @@ test(`${coreType}-${coreVersion}: Handles OwnershipTransferred to new address an
     // emitted by the V3 constructor, and we expect item may not be in store.
     // DO add mock contract calls, because we expect the contract to be called
     // during initial contract setup.
-    mockRefreshContractCalls(projectId, coreType, null);
+    mockRefreshContractCalls(projectId, coreType, mockCoreContractOverrides);
     // overwrite mock function to return the new admin
     createMockedFunction(
       TEST_CONTRACT_ADDRESS,
@@ -337,7 +346,7 @@ test(`${coreType}-${coreVersion}: Handles OwnershipTransferred to new address an
     // expect contract entity to be in store.
     addTestContractToStore(projectId);
     // also add mock contract calls, because that will always be available.
-    mockRefreshContractCalls(projectId, coreType, null);
+    mockRefreshContractCalls(projectId, coreType, mockCoreContractOverrides);
     // overwrite mock function to return the new admin
     createMockedFunction(
       TEST_CONTRACT_ADDRESS,
@@ -417,7 +426,11 @@ test(`${coreType}-${coreVersion}: Handles PlatformUpdated::nextProjectId`, () =>
     // add new contract to store
     const projectId = BigInt.fromI32(i);
     addTestContractToStore(projectId);
-    mockRefreshContractCalls(BigInt.fromI32(i), coreType, null);
+    mockRefreshContractCalls(
+      BigInt.fromI32(i),
+      coreType,
+      mockCoreContractOverrides
+    );
 
     const event: PlatformUpdated = changetype<PlatformUpdated>(newMockEvent());
     event.address = TEST_CONTRACT_ADDRESS;
@@ -447,7 +460,11 @@ test(`${coreType}-${coreVersion}: Handles PlatformUpdated::newProjectsForbidden 
   // add new contract to store
   const projectId = BigInt.fromI32(0);
   addTestContractToStore(projectId);
-  mockRefreshContractCalls(BigInt.fromI32(0), coreType, null);
+  mockRefreshContractCalls(
+    BigInt.fromI32(0),
+    coreType,
+    mockCoreContractOverrides
+  );
 
   // default value should be false
   assert.fieldEquals(
@@ -463,7 +480,11 @@ test(`${coreType}-${coreVersion}: Handles PlatformUpdated::newProjectsForbidden 
   // add new contract to store
   const projectId = BigInt.fromI32(0);
   addTestContractToStore(projectId);
-  mockRefreshContractCalls(BigInt.fromI32(0), coreType, null);
+  mockRefreshContractCalls(
+    BigInt.fromI32(0),
+    coreType,
+    mockCoreContractOverrides
+  );
 
   // update mock function return value to true
   createMockedFunction(
@@ -502,7 +523,11 @@ test(`${coreType}-${coreVersion}: Handles PlatformUpdated::nextProjectId`, () =>
     // add new contract to store
     const projectId = BigInt.fromI32(i);
     addTestContractToStore(projectId);
-    mockRefreshContractCalls(BigInt.fromI32(i), coreType, null);
+    mockRefreshContractCalls(
+      BigInt.fromI32(i),
+      coreType,
+      mockCoreContractOverrides
+    );
 
     const event: PlatformUpdated = changetype<PlatformUpdated>(newMockEvent());
     event.address = TEST_CONTRACT_ADDRESS;
@@ -532,7 +557,11 @@ test(`${coreType}-${coreVersion}: Handles PlatformUpdated::artblocksPrimarySales
   // add new contract to store
   const projectId = BigInt.fromI32(0);
   addTestContractToStore(projectId);
-  mockRefreshContractCalls(BigInt.fromI32(0), coreType, null);
+  mockRefreshContractCalls(
+    BigInt.fromI32(0),
+    coreType,
+    mockCoreContractOverrides
+  );
 
   // default value should be false
   assert.fieldEquals(
@@ -674,7 +703,11 @@ test(`${coreType}-${coreVersion}: Handles PlatformUpdated::providerPrimaryPercen
   // add new contract to store
   const projectId = BigInt.fromI32(0);
   addTestContractToStore(projectId);
-  mockRefreshContractCalls(BigInt.fromI32(0), coreType, null);
+  mockRefreshContractCalls(
+    BigInt.fromI32(0),
+    coreType,
+    mockCoreContractOverrides
+  );
 
   // default value should be test contract value
   // DEPRECATED START ---
@@ -699,7 +732,11 @@ test(`${coreType}-${coreVersion}: Handles PlatformUpdated::randomizerAddress - d
   // add new contract to store
   const projectId = BigInt.fromI32(0);
   addTestContractToStore(projectId);
-  mockRefreshContractCalls(BigInt.fromI32(0), coreType, null);
+  mockRefreshContractCalls(
+    BigInt.fromI32(0),
+    coreType,
+    mockCoreContractOverrides
+  );
 
   // default value should be false
   assert.fieldEquals(
@@ -715,7 +752,11 @@ test(`${coreType}-${coreVersion}: Handles PlatformUpdated::randomizerAddress - c
   // add new contract to store
   const projectId = BigInt.fromI32(0);
   addTestContractToStore(projectId);
-  mockRefreshContractCalls(BigInt.fromI32(0), coreType, null);
+  mockRefreshContractCalls(
+    BigInt.fromI32(0),
+    coreType,
+    mockCoreContractOverrides
+  );
 
   // update mock function return value
   const newAddress = randomAddressGenerator.generateRandomAddress();
@@ -754,7 +795,11 @@ test(`${coreType}-${coreVersion}: Handles PlatformUpdated::curationRegistryAddre
   // add new contract to store
   const projectId = BigInt.fromI32(0);
   addTestContractToStore(projectId);
-  mockRefreshContractCalls(BigInt.fromI32(0), coreType, null);
+  mockRefreshContractCalls(
+    BigInt.fromI32(0),
+    coreType,
+    mockCoreContractOverrides
+  );
 
   // default value should be nothing
   assert.fieldEquals(
@@ -770,7 +815,11 @@ test(`${coreType}-${coreVersion}: Null curationRegistryAddress on Engine contrac
   // add new contract to store
   const projectId = BigInt.fromI32(0);
   addTestContractToStore(projectId);
-  mockRefreshContractCalls(BigInt.fromI32(0), coreType, null);
+  mockRefreshContractCalls(
+    BigInt.fromI32(0),
+    coreType,
+    mockCoreContractOverrides
+  );
 
   // update mock function for curation registry to revert
   const newAddress = randomAddressGenerator.generateRandomAddress();
@@ -809,7 +858,11 @@ test(`${coreType}-${coreVersion}: Handles PlatformUpdated::dependencyRegistryAdd
   // add new contract to store
   const projectId = BigInt.fromI32(0);
   addTestContractToStore(projectId);
-  mockRefreshContractCalls(BigInt.fromI32(0), coreType, null);
+  mockRefreshContractCalls(
+    BigInt.fromI32(0),
+    coreType,
+    mockCoreContractOverrides
+  );
 
   // default value should be false
   assert.fieldEquals(
@@ -825,7 +878,11 @@ test(`${coreType}-${coreVersion}: Handles PlatformUpdated::dependencyRegistryAdd
   // add new contract to store
   const projectId = BigInt.fromI32(0);
   addTestContractToStore(projectId);
-  mockRefreshContractCalls(BigInt.fromI32(0), coreType, null);
+  mockRefreshContractCalls(
+    BigInt.fromI32(0),
+    coreType,
+    mockCoreContractOverrides
+  );
 
   // update mock function return value
   const newAddress = randomAddressGenerator.generateRandomAddress();
@@ -860,12 +917,52 @@ test(`${coreType}-${coreVersion}: Handles PlatformUpdated::dependencyRegistryAdd
   );
 });
 
+test(`${coreType}: populates royaltySplitProvider on contract refresh for v3.2`, () => {
+  clearStore();
+  // add new contract to store
+  const projectId = BigInt.fromI32(0);
+  addTestContractToStore(projectId);
+  mockRefreshContractCalls(
+    BigInt.fromI32(0),
+    coreType,
+    mockCoreContractOverrides
+  );
+
+  // create event
+  const event: PlatformUpdated = changetype<PlatformUpdated>(newMockEvent());
+  event.address = TEST_CONTRACT_ADDRESS;
+  event.transaction.hash = TEST_TX_HASH;
+  event.logIndex = BigInt.fromI32(0);
+  event.parameters = [
+    new ethereum.EventParam(
+      "_field",
+      ethereum.Value.fromBytes(
+        Bytes.fromUTF8("ENUM_FIELD_SPLIT_PROVIDER_BUT_ARBITRARY_FOR_HANDLER")
+      )
+    )
+  ];
+  // handle event
+  handlePlatformUpdated(event);
+
+  // value should be non-null v3.2+
+  assert.fieldEquals(
+    CONTRACT_ENTITY_TYPE,
+    TEST_CONTRACT_ADDRESS.toHexString(),
+    "royaltySplitProvider",
+    SPLIT_PROVIDER_ADDRESS.toHexString()
+  );
+});
+
 test(`${coreType}-${coreVersion}: Populated autoApproveAtistSplitProposals on Engine contract`, () => {
   clearStore();
   // add new contract to store
   const projectId = BigInt.fromI32(0);
   addTestContractToStore(projectId);
-  mockRefreshContractCalls(BigInt.fromI32(0), coreType, null);
+  mockRefreshContractCalls(
+    BigInt.fromI32(0),
+    coreType,
+    mockCoreContractOverrides
+  );
 
   // update mock function for autoApproveArtistSplitProposals to return tested value
   const valuesToTest = [true, false];
@@ -907,7 +1004,11 @@ test(`${coreType}-${coreVersion}: Handles PlatformUpdated::providerPrimaryPercen
   // add new contract to store
   const projectId = BigInt.fromI32(0);
   addTestContractToStore(projectId);
-  mockRefreshContractCalls(BigInt.fromI32(0), coreType, null);
+  mockRefreshContractCalls(
+    BigInt.fromI32(0),
+    coreType,
+    mockCoreContractOverrides
+  );
 
   // default value should be false
   assert.fieldEquals(
@@ -923,7 +1024,11 @@ test(`${coreType}-${coreVersion}: Handles PlatformUpdated::providerPrimaryPercen
   // add new contract to store
   const projectId = BigInt.fromI32(0);
   addTestContractToStore(projectId);
-  mockRefreshContractCalls(BigInt.fromI32(0), coreType, null);
+  mockRefreshContractCalls(
+    BigInt.fromI32(0),
+    coreType,
+    mockCoreContractOverrides
+  );
 
   // update mock function return values
   const newRenderProviderPrimarySalesPercentage = BigInt.fromI32(13);
@@ -979,7 +1084,11 @@ test(`${coreType}-${coreVersion}: Handles PlatformUpdated::providerSecondaryBPS 
   // add new contract to store
   const projectId = BigInt.fromI32(0);
   addTestContractToStore(projectId);
-  mockRefreshContractCalls(BigInt.fromI32(0), coreType, null);
+  mockRefreshContractCalls(
+    BigInt.fromI32(0),
+    coreType,
+    mockCoreContractOverrides
+  );
 
   // default value should be test contract default value
   // @dev v3.2 does not have function `renderProviderSecondarySalesBPS()`
@@ -1072,7 +1181,11 @@ describe(`${coreType}-${coreVersion}: handleIAdminACLV0SuperAdminTransferred`, (
     // add new contract to store
     const projectId = BigInt.fromI32(0);
     addTestContractToStore(projectId);
-    mockRefreshContractCalls(BigInt.fromI32(0), coreType, null);
+    mockRefreshContractCalls(
+      BigInt.fromI32(0),
+      coreType,
+      mockCoreContractOverrides
+    );
     // mock AdminACLV0 superAdmin
     const newOwnerSuperAdmin = randomAddressGenerator.generateRandomAddress();
     createMockedFunction(
@@ -1254,7 +1367,7 @@ describe(`${coreType}-${coreVersion}: handleProjectUpdated`, () => {
 
     test("should create a project entity", () => {
       const projectId = BigInt.fromI32(0);
-      const artistAddress = randomAddressGenerator.generateRandomAddress();
+      const artistAddress = TEST_ARTIST_ADDRESS;
       const projectName = "Test Project";
       const invocations = BigInt.fromI32(0);
       const maxInvocations = BigInt.fromI32(ONE_MILLION);
@@ -1337,44 +1450,12 @@ describe(`${coreType}-${coreVersion}: handleProjectUpdated`, () => {
         .withArgs([ethereum.Value.fromUnsignedBigInt(projectId)])
         .returns([ethereum.Value.fromI32(5)]);
 
-      // mock projectIdToFinancials, used on v3.2 Engine core in handler
-      const localDefaultRenderProviderSecondarySalesAddress = randomAddressGenerator.generateRandomAddress();
-      const localDefaultRenderProviderSecondarySalesBPS = BigInt.fromI32(4);
-      const localDefaultEnginePlatformProviderSecondarySalesAddress = randomAddressGenerator.generateRandomAddress();
-      const localDefaultEnginePlatformProviderSecondarySalesBPS = BigInt.fromI32(
-        6
+      mockProjectFinance(
+        projectId,
+        BigInt.fromI32(0),
+        BigInt.fromI32(0),
+        BigInt.fromI32(0)
       );
-      // return is a struct, which solidity returns as a tuple
-      let tupleArray: Array<ethereum.Value> = [
-        ethereum.Value.fromAddress(Address.zero()), // additional payee primary sales (unused in this test)
-        ethereum.Value.fromUnsignedBigInt(BigInt.fromI32(0)), // secondary market royalty percentage (unused in this test)
-        ethereum.Value.fromAddress(Address.zero()), // additional payee secondary sales (unused in this test)
-        ethereum.Value.fromUnsignedBigInt(BigInt.fromI32(0)), // additional payee secondary sales percentage (unused in this test)
-        ethereum.Value.fromAddress(Address.zero()), // artist address (unused in this test)
-        ethereum.Value.fromUnsignedBigInt(BigInt.fromI32(0)), // additionalPayeePrimarySalesPercentage (unused in this test)
-        ethereum.Value.fromAddress(
-          localDefaultEnginePlatformProviderSecondarySalesAddress
-        ),
-        ethereum.Value.fromUnsignedBigInt(
-          localDefaultEnginePlatformProviderSecondarySalesBPS
-        ),
-        ethereum.Value.fromAddress(
-          localDefaultRenderProviderSecondarySalesAddress
-        ),
-        ethereum.Value.fromUnsignedBigInt(
-          localDefaultRenderProviderSecondarySalesBPS
-        ),
-        ethereum.Value.fromAddress(Address.zero()) // royalty splitter (unused in this test)
-      ];
-      let tuple: ethereum.Tuple = changetype<ethereum.Tuple>(tupleArray);
-
-      createMockedFunction(
-        TEST_CONTRACT_ADDRESS,
-        "projectIdToFinancials",
-        "projectIdToFinancials(uint256):((address,uint8,address,uint8,address,uint8,address,uint16,address,uint16,address))"
-      )
-        .withArgs([ethereum.Value.fromUnsignedBigInt(projectId)])
-        .returns([ethereum.Value.fromTuple(tuple)]);
 
       // // mock projectURIInfo
       createMockedFunction(
@@ -1516,26 +1597,26 @@ describe(`${coreType}-${coreVersion}: handleProjectUpdated`, () => {
         PROJECT_ENTITY_TYPE,
         generateContractSpecificId(TEST_CONTRACT_ADDRESS, projectId),
         "renderProviderSecondarySalesAddress",
-        localDefaultRenderProviderSecondarySalesAddress.toHexString()
+        TEST_CONTRACT.renderProviderSecondarySalesAddress.toHexString()
       );
       assert.fieldEquals(
         PROJECT_ENTITY_TYPE,
         generateContractSpecificId(TEST_CONTRACT_ADDRESS, projectId),
         "renderProviderSecondarySalesBPS",
-        localDefaultRenderProviderSecondarySalesBPS.toString()
+        TEST_CONTRACT.defaultRenderProviderSecondarySalesBPS.toString()
       );
       // project platform provider royalties should equal contract-level values for pre-v3.2 Engine core
       assert.fieldEquals(
         PROJECT_ENTITY_TYPE,
         generateContractSpecificId(TEST_CONTRACT_ADDRESS, projectId),
         "enginePlatformProviderSecondarySalesAddress",
-        localDefaultEnginePlatformProviderSecondarySalesAddress.toHexString()
+        TEST_CONTRACT.enginePlatformProviderSecondarySalesAddress.toHexString()
       );
       assert.fieldEquals(
         PROJECT_ENTITY_TYPE,
         generateContractSpecificId(TEST_CONTRACT_ADDRESS, projectId),
         "enginePlatformProviderSecondarySalesBPS",
-        localDefaultEnginePlatformProviderSecondarySalesBPS.toString()
+        TEST_CONTRACT.defaultEnginePlatformProviderSecondarySalesBPS.toString()
       );
     });
   });
@@ -2320,6 +2401,21 @@ describe(`${coreType}-${coreVersion}: handleProjectUpdated`, () => {
         TEST_CONTRACT_ADDRESS,
         projectId
       );
+      addTestContractToStore(projectId.plus(BigInt.fromI32(1)));
+      // for v3.2, always have a populated royaltySplitProvider field
+      const contractInStore = Contract.load(
+        TEST_CONTRACT_ADDRESS.toHexString()
+      );
+      if (!contractInStore) {
+        throw new Error("Contract not found in store");
+      }
+      contractInStore.royaltySplitProvider = randomAddressGenerator.generateRandomAddress();
+      contractInStore.save();
+      mockRefreshContractCalls(
+        BigInt.fromI32(0),
+        coreType,
+        mockCoreContractOverrides
+      );
       addNewProjectToStore(
         TEST_CONTRACT_ADDRESS,
         projectId,
@@ -2346,6 +2442,14 @@ describe(`${coreType}-${coreVersion}: handleProjectUpdated`, () => {
           ethereum.Value.fromAddress(newRoyaltySplitter)
         )
       ];
+      // mock project finance call
+      mockProjectFinance(
+        projectId,
+        BigInt.fromI32(5),
+        BigInt.fromI32(0),
+        BigInt.fromI32(0)
+      );
+
       // call handleProjectRoyaltySplitterUpdated
       handleProjectRoyaltySplitterUpdated(event);
 
@@ -2361,6 +2465,109 @@ describe(`${coreType}-${coreVersion}: handleProjectUpdated`, () => {
         fullProjectId,
         "erc2981SplitterAddress",
         newRoyaltySplitter.toHexString()
+      );
+      // assert royalty splitter in store
+      assert.fieldEquals(
+        ROYALTY_SPLITTER_ENTITY_TYPE,
+        newRoyaltySplitter.toHexString(),
+        "id",
+        newRoyaltySplitter.toHexString()
+      );
+      assert.fieldEquals(
+        ROYALTY_SPLITTER_ENTITY_TYPE,
+        newRoyaltySplitter.toHexString(),
+        "splitProviderCreator",
+        (contractInStore.royaltySplitProvider as Bytes).toHexString()
+      );
+      assert.fieldEquals(
+        ROYALTY_SPLITTER_ENTITY_TYPE,
+        newRoyaltySplitter.toHexString(),
+        "coreContract",
+        TEST_CONTRACT_ADDRESS.toHexString()
+      );
+      assert.fieldEquals(
+        ROYALTY_SPLITTER_ENTITY_TYPE,
+        newRoyaltySplitter.toHexString(),
+        "totalAllocation",
+        "1050" // total 10.5% = 5% artist + 3.0% platform + 2.5% render provider
+      );
+      assert.fieldEquals(
+        ROYALTY_SPLITTER_ENTITY_TYPE,
+        newRoyaltySplitter.toHexString(),
+        "createdAt",
+        newTimestamp.toString()
+      );
+      // assert new split recipients in store
+      assert.fieldEquals(
+        ROYALTY_SPLIT_RECIPIENT_TYPE,
+        newRoyaltySplitter.toHexString() +
+          "-" +
+          TEST_ARTIST_ADDRESS.toHexString(),
+        "id",
+        newRoyaltySplitter.toHexString() +
+          "-" +
+          TEST_ARTIST_ADDRESS.toHexString()
+      );
+      assert.fieldEquals(
+        ROYALTY_SPLIT_RECIPIENT_TYPE,
+        newRoyaltySplitter.toHexString() +
+          "-" +
+          TEST_ARTIST_ADDRESS.toHexString(),
+        "royaltySplitterContract",
+        newRoyaltySplitter.toHexString()
+      );
+      assert.fieldEquals(
+        ROYALTY_SPLIT_RECIPIENT_TYPE,
+        newRoyaltySplitter.toHexString() +
+          "-" +
+          TEST_ARTIST_ADDRESS.toHexString(),
+        "recipientAddress",
+        TEST_ARTIST_ADDRESS.toHexString()
+      );
+      assert.fieldEquals(
+        ROYALTY_SPLIT_RECIPIENT_TYPE,
+        newRoyaltySplitter.toHexString() +
+          "-" +
+          TEST_ARTIST_ADDRESS.toHexString(),
+        "allocation",
+        "500"
+      );
+      // only check existence and allocation of platform and render provider recipients
+      assert.fieldEquals(
+        ROYALTY_SPLIT_RECIPIENT_TYPE,
+        newRoyaltySplitter.toHexString() +
+          "-" +
+          TEST_CONTRACT.defaultRenderProviderSecondarySalesAddress.toHexString(),
+        "id",
+        newRoyaltySplitter.toHexString() +
+          "-" +
+          TEST_CONTRACT.defaultRenderProviderSecondarySalesAddress.toHexString()
+      );
+      assert.fieldEquals(
+        ROYALTY_SPLIT_RECIPIENT_TYPE,
+        newRoyaltySplitter.toHexString() +
+          "-" +
+          TEST_CONTRACT.defaultRenderProviderSecondarySalesAddress.toHexString(),
+        "allocation",
+        "250"
+      );
+      assert.fieldEquals(
+        ROYALTY_SPLIT_RECIPIENT_TYPE,
+        newRoyaltySplitter.toHexString() +
+          "-" +
+          TEST_CONTRACT.defaultEnginePlatformProviderSecondarySalesAddress.toHexString(),
+        "id",
+        newRoyaltySplitter.toHexString() +
+          "-" +
+          TEST_CONTRACT.defaultEnginePlatformProviderSecondarySalesAddress.toHexString()
+      );
+      assert.fieldEquals(
+        ROYALTY_SPLIT_RECIPIENT_TYPE,
+        newRoyaltySplitter.toHexString() +
+          "-" +
+          TEST_CONTRACT.defaultEnginePlatformProviderSecondarySalesAddress.toHexString(),
+        "allocation",
+        "300"
       );
     });
   });

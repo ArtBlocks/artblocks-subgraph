@@ -132,6 +132,9 @@ type Project @entity {
   "ERC-2981 royalty splitter address, used on v3.2 and-on"
   erc2981SplitterAddress: Bytes
 
+  "The active royalty splitter contract, used on v3.2 and-on"
+  erc2981SplitterContract: RoyaltySplitterContract
+
   "Accounts that own tokens of the project"
   owners: [AccountProject!] @derivedFrom(field: "project")
 
@@ -283,6 +286,9 @@ type Contract @entity {
 
   "Dependency registry contract address"
   dependencyRegistry: DependencyRegistry
+
+  "Curent royalty split provider contract address, used on v3.2 and-on"
+  royaltySplitProvider: Bytes
 
   nextProjectId: BigInt!
 
@@ -635,6 +641,40 @@ type SplitAtomicSplit @entity {
 
   "Basis points of the split"
   basisPoints: BigInt!
+}
+
+type RoyaltySplitterContract @entity {
+  "unique identifier equal to royalty splitter's contract address"
+  id: ID!
+
+  "split provider contract address that was used to create this contract"
+  splitProviderCreator: Bytes!
+
+  "Core contract that this royalty splitter is associated with"
+  coreContract: Contract!
+
+  "Total allocation of all recipients on the contract"
+  totalAllocation: BigInt!
+
+  "List of split atomic contract splits"
+  royaltySplitRecipients: [RoyaltySplitRecipient!]!
+    @derivedFrom(field: "royaltySplitterContract")
+
+  createdAt: BigInt!
+}
+
+type RoyaltySplitRecipient @entity {
+  "unique identifier equal to {royalty splitter contract address}-{recipient address}"
+  id: ID!
+
+  "Royalty splitter contract that contains this split recipient"
+  royaltySplitterContract: RoyaltySplitterContract!
+
+  "Address of the recipient of this split"
+  recipientAddress: Bytes!
+
+  "Allocation of the recipient on the split. Recipient receives allocation / totalAllocation of all funds sent to the splitter"
+  allocation: BigInt!
 }
 
 enum SaleType {

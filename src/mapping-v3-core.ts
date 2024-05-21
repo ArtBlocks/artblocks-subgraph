@@ -50,7 +50,8 @@ import { loadOrCreateMinterFilter as legacyLoadOrCreatMinterFilter } from "./leg
 
 import {
   loadOrCreateAndSetProjectMinterConfiguration,
-  loadOrCreateMinter
+  loadOrCreateMinter,
+  loadOrCreateRoyaltySplitterContract
 } from "./helpers";
 
 import {
@@ -720,6 +721,9 @@ function createProject(
   project.scriptCount = scriptCount;
   project.useHashString = useHashString;
   project.useIpfs = false;
+  // @dev subsequent events will update royalty splitter address fields
+  project.erc2981SplitterAddress = null;
+  project.erc2981SplitterContract = null;
 
   // populate the project's financial information
   // available on all cores, populated to non-zero value for new projects on v3.2+ cores
@@ -1106,7 +1110,16 @@ export function handleOwnershipTransferred(event: OwnershipTransferred): void {
 // Handle ProjectRoyaltySplitterUpdated event. This event is emitted when the
 // royalty splitter address is updated for a project. Other events trigger the
 // update logic for fields other than the royalty splitter address, so this
-// event is only used to update the royalty splitter address.
+// event is only used to update the royalty splitter address, and populate the
+// royalty splitter contract entity.
+// Assigns the project's royalty splitter fields to null if the new address is
+// the zero address.
+// @dev This event may be emitted BEFORE the ProjectUpdated event that updates
+// the project entity with new state data. Therefore, any payment data must be
+// sourced from the contract directly, rather than the project entity in the store.
+// @dev specifically in the case of a new project, the ProjectUpdated event will
+// be reliably emitted before the ProjectRoyaltySplitterUpdated event, ensuring
+// the project entity will exist before this handler is called.
 export function handleProjectRoyaltySplitterUpdated(
   event: ProjectRoyaltySplitterUpdated
 ): void {
@@ -1122,7 +1135,21 @@ export function handleProjectRoyaltySplitterUpdated(
     return;
   }
 
-  project.erc2981SplitterAddress = event.params.royaltySplitter;
+  // assign + create the royalty splitter contract entity if it doesn't exist
+  const royaltySplitterContractId = event.params.royaltySplitter.toHexString();
+  // assign the new royalty splitter address or null if the address is zero
+  if (royaltySplitterContractId == Address.zero().toHexString()) {
+    project.erc2981SplitterAddress = null;
+    project.erc2981SplitterContract = null;
+  } else {
+    loadOrCreateRoyaltySplitterContract(
+      royaltySplitterContractId,
+      project,
+      event.block.timestamp
+    );
+    project.erc2981SplitterAddress = event.params.royaltySplitter;
+    project.erc2981SplitterContract = royaltySplitterContractId;
+  }
   project.updatedAt = event.block.timestamp;
   project.save();
 }
@@ -1608,6 +1635,18 @@ function refreshContract<T>(contract: T, timestamp: BigInt): Contract | null {
       contractEntity.defaultEnginePlatformProviderSecondarySalesAddress = defaultEnginePlatformProviderSecondarySalesAddress;
       contractEntity.defaultEnginePlatformProviderSecondarySalesBPS = defaultEnginePlatformProviderSecondarySalesBPS;
       // project-level secondary sales are defined on the projects after release of v3.2 core contracts, so we don't need to update them here
+
+      // v3.2+ contracts have a royalty split provider
+      // @dev use try for extra safety and error handling/logging
+      const splitProviderResult = V3_2Contract.try_splitProvider();
+      if (splitProviderResult.reverted) {
+        log.error(
+          "[ERROR] Unexpected on v3.2+ core contract. Could not load split provider for contract at address {}.",
+          [contract._address.toHexString()]
+        );
+        throw new Error("Could not load split provider for v3.2+ contract.");
+      }
+      contractEntity.royaltySplitProvider = splitProviderResult.value;
     }
     // null curation registry on engine contracts
     contractEntity.curationRegistry = null;
@@ -1811,7 +1850,7 @@ function getIsLegacyMinterFilter(minterFilterAddress: Address): boolean {
  * @param version version string of V3 core contract
  * @returns boolean, true if the version is pre-v3.2, false otherwise.
  */
-function getIsPreV3_2(version: string): boolean {
+export function getIsPreV3_2(version: string): boolean {
   return version.startsWith("v3.0.") || version.startsWith("v3.1.");
 }
 
