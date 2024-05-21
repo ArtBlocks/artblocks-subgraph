@@ -662,12 +662,14 @@ function createProject(
   const projectScriptDetails = contract.try_projectScriptDetails(projectId);
   const projectStateData = contract.try_projectStateData(projectId);
   const projectArtistAddress = contract.try_projectIdToArtistAddress(projectId);
+  const projectBaseURI = contract.try_projectURIInfo(projectId);
 
   if (
     projectDetails.reverted ||
     projectScriptDetails.reverted ||
     projectStateData.reverted ||
-    projectArtistAddress.reverted
+    projectArtistAddress.reverted ||
+    projectBaseURI.reverted
   ) {
     log.warning("Failed to get project details for new project: {}-{}", [
       contractAddress,
@@ -677,7 +679,6 @@ function createProject(
   }
 
   let name = projectDetails.value.getProjectName();
-  let artistName = projectDetails.value.getArtist();
 
   let artistAddress = projectArtistAddress.value;
   let artist = new Account(artistAddress.toHexString());
@@ -697,9 +698,11 @@ function createProject(
     generateContractSpecificId(contract._address, projectId)
   );
 
+
   project.active = false;
   project.artist = artist.id;
   project.artistAddress = artistAddress;
+  project.baseUri = projectBaseURI.value;
   project.complete = false;
   project.contract = contractAddress;
   project.createdAt = timestamp;
