@@ -52,7 +52,8 @@ export const ERC1155 = "ERC1155";
 export const FLEX_CONTRACT_EXTERNAL_ASSET_DEP_TYPES = [
   "IPFS",
   "ARWEAVE",
-  "ONCHAIN"
+  "ONCHAIN",
+  "ART_BLOCKS_DEPENDENCY_REGISTRY"
 ];
 
 // This is directly tied to the MinterFilterType enum defined in the subgraph schema

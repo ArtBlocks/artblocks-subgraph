@@ -91,6 +91,8 @@ export const PROJECT_EXTERNAL_ASSET_DEPENDENCY_ENTITY_TYPE =
   "ProjectExternalAssetDependency";
 export const PROJECT_SCRIPT_ENTITY_TYPE = "ProjectScript";
 export const TOKEN_ENTITY_TYPE = "Token";
+export const ROYALTY_SPLITTER_ENTITY_TYPE = "RoyaltySplitterContract";
+export const ROYALTY_SPLIT_RECIPIENT_TYPE = "RoyaltySplitRecipient";
 export const TRANSFER_ENTITY_TYPE = "Transfer";
 export const PROJECT_MINTER_CONFIGURATION_ENTITY_TYPE =
   "ProjectMinterConfiguration";
@@ -106,6 +108,8 @@ export const IPFS_CID2 = "QmQCqjqxVXZQ6vXNmZvF7FjyZkCXKXMykCyyPQQrZ6m7W2";
 export const CURRENT_BLOCK_TIMESTAMP = BigInt.fromI32(1647051214);
 export const TEST_CONTRACT_ADDRESS = randomAddressGenerator.generateRandomAddress();
 export const TEST_SUPER_ADMIN_ADDRESS = randomAddressGenerator.generateRandomAddress();
+export const TEST_ARTIST_ADDRESS = randomAddressGenerator.generateRandomAddress();
+export const TEST_ADDITIONAL_PAYEE_ADDRESS = randomAddressGenerator.generateRandomAddress();
 export const TEST_TOKEN_HASH = Bytes.fromByteArray(
   crypto.keccak256(Bytes.fromUTF8("token hash"))
 );
@@ -151,34 +155,50 @@ export const DEFAULT_AUTO_APPROVE_ARTIST_SPLIT_PROPOSALS = false;
 export class ContractValues {
   admin: Address;
   type: string;
+  version: string;
   mintWhitelisted: Bytes[];
   randomizerContract: Address;
   minterContract: Address;
   renderProviderAddress: Address;
   renderProviderPercentage: BigInt;
+  // DEPRECATED START ---
   renderProviderSecondarySalesAddress: Address;
   renderProviderSecondarySalesBPS: BigInt;
+  // DEPRECATED END ---
+  defaultRenderProviderSecondarySalesAddress: Address;
+  defaultRenderProviderSecondarySalesBPS: BigInt;
   dependencyRegistry: Address;
   curationRegistry: Address;
   newProjectsForbidden: boolean;
   // engine-specific fields
   enginePlatformProviderAddress: Address;
   enginePlatformProviderPercentage: BigInt;
+  // DEPRECATED START ---
   enginePlatformProviderSecondarySalesAddress: Address;
   enginePlatformProviderSecondarySalesBPS: BigInt;
+  // DEPRECATED END ---
+  defaultEnginePlatformProviderSecondarySalesAddress: Address;
+  defaultEnginePlatformProviderSecondarySalesBPS: BigInt;
   autoApproveArtistSplitProposals: boolean;
 }
 export const TEST_CONTRACT: ContractValues = {
   admin: Address.fromString("0x96dc73c8b5969608c77375f085949744b5177660"),
   type: "GenArt721CoreV1",
+  version: "v1.0.0",
   renderProviderPercentage: BigInt.fromI32(10),
   renderProviderAddress: Address.fromString(
     "0xf7a55108a6e830a809e88e74cbf5f5de9d930153"
   ),
+  // DEPRECATED START ---
   renderProviderSecondarySalesAddress: Address.fromString(
     "0xf4c61bd7b43e89f072fe1ef4e063fcf07f94565c"
   ),
   renderProviderSecondarySalesBPS: BigInt.fromI32(250),
+  // DEPRECATED END ---
+  defaultRenderProviderSecondarySalesAddress: Address.fromString(
+    "0xf4c61bd7b43e89f072fe1ef4e063fcf07f94565c"
+  ),
+  defaultRenderProviderSecondarySalesBPS: BigInt.fromI32(250),
   mintWhitelisted: [],
   minterContract: Address.zero(),
   randomizerContract: RANDOMIZER_ADDRESS,
@@ -188,8 +208,12 @@ export const TEST_CONTRACT: ContractValues = {
   // engine-specific fields
   enginePlatformProviderAddress: ENGINE_PLATFORM_PROVIDER_ADDRESS,
   enginePlatformProviderPercentage: ENGINE_PLATFORM_PROVIDER_PERCENTAGE,
+  // DEPRECATED START ---
   enginePlatformProviderSecondarySalesAddress: ENGINE_PLATFORM_PROVIDER_SECONDARY_SALES_ADDRESS,
   enginePlatformProviderSecondarySalesBPS: ENGINE_PLATFORM_PROVIDER_SECONDARY_SALES_BPS,
+  // DEPRECATED END ---
+  defaultEnginePlatformProviderSecondarySalesAddress: ENGINE_PLATFORM_PROVIDER_SECONDARY_SALES_ADDRESS,
+  defaultEnginePlatformProviderSecondarySalesBPS: ENGINE_PLATFORM_PROVIDER_SECONDARY_SALES_BPS,
   autoApproveArtistSplitProposals: DEFAULT_AUTO_APPROVE_ARTIST_SPLIT_PROPOSALS
 };
 export const TEST_CONTRACT_CREATED_AT = BigInt.fromI32(1607763598);
@@ -353,14 +377,57 @@ export function addTestContractToStore(nextProjectId: BigInt): Contract {
   contract.admin = TEST_CONTRACT.admin;
   contract.type = TEST_CONTRACT.type;
   contract.createdAt = CURRENT_BLOCK_TIMESTAMP.minus(BigInt.fromI32(10));
+  contract.royaltySplitProvider = null;
   contract.nextProjectId = nextProjectId;
   contract.randomizerContract = TEST_CONTRACT.randomizerContract;
   contract.renderProviderAddress = TEST_CONTRACT.renderProviderAddress;
   contract.renderProviderPercentage = TEST_CONTRACT.renderProviderPercentage;
+  // DEPRECATED START ---
   contract.renderProviderSecondarySalesAddress =
     TEST_CONTRACT.renderProviderSecondarySalesAddress;
   contract.renderProviderSecondarySalesBPS =
     TEST_CONTRACT.renderProviderSecondarySalesBPS;
+  // DEPRECATED END ---
+  contract.defaultRenderProviderSecondarySalesAddress =
+    TEST_CONTRACT.defaultRenderProviderSecondarySalesAddress;
+  contract.defaultRenderProviderSecondarySalesBPS =
+    TEST_CONTRACT.defaultRenderProviderSecondarySalesBPS;
+  contract.curationRegistry = TEST_CONTRACT.curationRegistry;
+  contract.dependencyRegistry = TEST_CONTRACT.dependencyRegistry;
+  contract.updatedAt = contract.createdAt;
+  contract.mintWhitelisted = TEST_CONTRACT.mintWhitelisted;
+  contract.newProjectsForbidden = false;
+  contract.registeredOn = null;
+  contract.save();
+
+  return contract;
+}
+
+// adds test contract to store with specified core type and version
+export function addTestContractToStoreOfTypeAndVersion(
+  nextProjectId: BigInt,
+  coreType: string,
+  coreVersion: string
+): Contract {
+  let contract = new Contract(TEST_CONTRACT_ADDRESS.toHexString());
+  contract.admin = TEST_CONTRACT.admin;
+  contract.type = coreType;
+  contract.coreVersion = coreVersion;
+  contract.createdAt = CURRENT_BLOCK_TIMESTAMP.minus(BigInt.fromI32(10));
+  contract.nextProjectId = nextProjectId;
+  contract.randomizerContract = TEST_CONTRACT.randomizerContract;
+  contract.renderProviderAddress = TEST_CONTRACT.renderProviderAddress;
+  contract.renderProviderPercentage = TEST_CONTRACT.renderProviderPercentage;
+  // DEPRECATED START ---
+  contract.renderProviderSecondarySalesAddress =
+    TEST_CONTRACT.renderProviderSecondarySalesAddress;
+  contract.renderProviderSecondarySalesBPS =
+    TEST_CONTRACT.renderProviderSecondarySalesBPS;
+  // DEPRECATED END ---
+  contract.defaultRenderProviderSecondarySalesAddress =
+    TEST_CONTRACT.defaultRenderProviderSecondarySalesAddress;
+  contract.defaultRenderProviderSecondarySalesBPS =
+    TEST_CONTRACT.defaultRenderProviderSecondarySalesBPS;
   contract.curationRegistry = TEST_CONTRACT.curationRegistry;
   contract.dependencyRegistry = TEST_CONTRACT.dependencyRegistry;
   contract.updatedAt = contract.createdAt;
@@ -384,10 +451,16 @@ export function addArbitraryContractToStore(
   contract.randomizerContract = TEST_CONTRACT.randomizerContract;
   contract.renderProviderAddress = TEST_CONTRACT.renderProviderAddress;
   contract.renderProviderPercentage = TEST_CONTRACT.renderProviderPercentage;
+  // DEPRECATED START ---
   contract.renderProviderSecondarySalesAddress =
     TEST_CONTRACT.renderProviderSecondarySalesAddress;
   contract.renderProviderSecondarySalesBPS =
     TEST_CONTRACT.renderProviderSecondarySalesBPS;
+  // DEPRECATED END ---
+  contract.defaultRenderProviderSecondarySalesAddress =
+    TEST_CONTRACT.defaultRenderProviderSecondarySalesAddress;
+  contract.defaultRenderProviderSecondarySalesBPS =
+    TEST_CONTRACT.defaultRenderProviderSecondarySalesBPS;
   contract.curationRegistry = TEST_CONTRACT.curationRegistry;
   contract.dependencyRegistry = TEST_CONTRACT.dependencyRegistry;
   contract.updatedAt = contract.createdAt;
