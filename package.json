@@ -26,6 +26,7 @@
     "prepare:sepolia-dev": "yarn codegen:generic && mustache config/sepolia-dev.json subgraph.template.yaml > subgraph.yaml",
     "prepare:arbitrum-sepolia-staging": "yarn codegen:generic && mustache config/arbitrum-sepolia-staging.json subgraph.template.yaml > subgraph.yaml",
     "prepare:arbitrum-one": "yarn codegen:generic && mustache config/arbitrum-one.json subgraph.template.yaml > subgraph.yaml",
+    "prepare:base": "yarn codegen:generic && mustache config/base.json subgraph.template.yaml > subgraph.yaml",
     "prepare:palm": "yarn codegen:generic && mustache config/palm.json subgraph.template.yaml > subgraph.yaml",
     "prepare:palm-testnet": "yarn codegen:generic && mustache config/palm-testnet.json subgraph.template.yaml > subgraph.yaml",
     "prepare:local": "yarn codegen:generic && mustache config/local.json subgraph.template.yaml > subgraph.yaml",

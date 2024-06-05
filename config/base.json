@@ -1,0 +1,36 @@
+{
+  "network": "base",
+  "iGenArt721CoreContractV3_BaseContracts": [
+    {
+      "address": "0x0000000000000000000000000000000000000000",
+      "startBlock": 96747000
+    }
+  ],
+  "ownableGenArt721CoreV3Contracts": [],
+  "iERC721GenArt721CoreV3Contracts": [],
+  "sharedMinterFilterContracts": [],
+  "genericMinterEventsLibContracts": [],
+  "splitFundsLibContracts": [],
+  "setPriceLibContracts": [],
+  "maxInvocationsLibContracts": [],
+  "merkleLibContracts": [],
+  "holderLibContracts": [],
+  "DALibContracts": [],
+  "DAExpLibContracts": [],
+  "DALinLibContracts": [],
+  "settlementExpLibContracts": [],
+  "minterFilterV0Contracts": [],
+  "minterFilterV1Contracts": [],
+  "minterSetPriceContracts": [],
+  "minterSetPriceERC20Contracts": [],
+  "minterDAExpContracts": [],
+  "minterDALinContracts": [],
+  "minterMerkleContracts": [],
+  "minterHolderContracts": [],
+  "minterDAExpSettlementContracts": [],
+  "adminACLV0Contracts": [],
+  "ICoreRegistryContracts": [],
+  "iDependencyRegistryV0Contracts": [],
+  "ownableUpgradeableDependencyRegistryContracts": [],
+  "iSplitAtomicFactoryV0Contracts": []
+}
