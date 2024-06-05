@@ -23,6 +23,8 @@ IGenArt721CoreContractV3
 IGenArt721CoreContractV3_Base
 IGenArt721CoreContractV3_Engine
 IGenArt721CoreContractV3_Engine_Flex
+IGenArt721CoreContractV3_Engine_PreV3p2
+IGenArt721CoreContractV3_ProjectFinance
 IMinterFilterV0
 IMinterFilterV1
 MinterFilterV0
@@ -49,3 +51,7 @@ SetPriceLib
 SettlementExpLib
 SplitFundsLib
 TokenHolderLib
+ISharedMinterRAMV0
+ISplitAtomicFactoryV0
+ISplitAtomicV0
+RAMLib
