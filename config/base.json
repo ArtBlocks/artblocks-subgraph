@@ -245,7 +245,13 @@
   "minterHolderContracts": [],
   "minterDAExpSettlementContracts": [],
   "adminACLV0Contracts": [],
-  "ICoreRegistryContracts": [],
+  "ICoreRegistryContracts": [
+    {
+      "address": "0xe2bC24f74ed326CA4deB75753942731A566ebC83",
+      "name": "Base mainnet core registry for partner deployments: CoreRegistryV1",
+      "startBlock": 15975400
+    }
+  ],
   "iDependencyRegistryV0Contracts": [],
   "ownableUpgradeableDependencyRegistryContracts": [],
   "iSplitAtomicFactoryV0Contracts": []
