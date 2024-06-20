@@ -3,11 +3,15 @@
   "iGenArt721CoreContractV3_BaseContracts": [
     {
       "address": "0x0000000000000000000000000000000000000000",
-      "startBlock": 96747000
+      "startBlock": 15490909
     }
   ],
   "ownableGenArt721CoreV3Contracts": [],
   "iERC721GenArt721CoreV3Contracts": [],
+  "genArt721CoreContracts": [],
+  "genArt721Contracts": [],
+  "pbabContracts": [],
+  "engineFlexContracts": [],
   "sharedMinterFilterContracts": [],
   "genericMinterEventsLibContracts": [],
   "splitFundsLibContracts": [],

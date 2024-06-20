@@ -12,6 +12,7 @@
     "deploy:mainnet-hosted": "yarn prepare:mainnet && graph deploy --product hosted-service --node https://api.thegraph.com/deploy/ --ipfs https://api.thegraph.com/ipfs/ artblocks/art-blocks",
     "deploy:mainnet-with-secondary-hosted": "yarn prepare:mainnet-with-secondary && graph deploy --product hosted-service --ac --node https://api.thegraph.com/deploy/ --ipfs https://api.thegraph.com/ipfs/ artblocks/art-blocks-with-secondary",
     "deploy:studio": "yarn prepare:mainnet && graph deploy --studio art-blocks",
+    "deploy:studio-base": "yarn prepare:base && graph deploy --studio art-blocks-base",
     "deploy:studio-with-secondary": "yarn prepare:mainnet-with-secondary && graph deploy --studio art-blocks-with-secondary",
     "deploy:sepolia-dev": "yarn prepare:sepolia-dev && graph deploy --product hosted-service artblocks/art-blocks-dev-sepolia",
     "deploy:sepolia-staging": "yarn prepare:sepolia-staging && graph deploy --product hosted-service artblocks/art-blocks-staging-sepolia",
