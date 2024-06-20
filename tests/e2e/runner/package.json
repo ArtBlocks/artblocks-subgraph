@@ -6,7 +6,7 @@
     "generate-supplemental-abis": "path-exists ./supplemental_abis/*.json && typechain --target ethers-v5 --out-dir ./contracts './supplemental_abis/*.json' || echo 'No supplemental ABIs found.'"
   },
   "devDependencies": {
-    "@artblocks/contracts": "1.1.0",
+    "@artblocks/contracts": "1.2.0",
     "@graphql-codegen/cli": "^3.0.0",
     "@graphql-codegen/typescript": "^3.0.0",
     "@graphql-codegen/typescript-document-nodes": "^3.0.0",
