@@ -2379,6 +2379,8 @@ templates:
           handler: handleAcceptedArtistAddressesAndSplits
         - event: ProjectRoyaltySplitterUpdated(indexed uint256,indexed address)
           handler: handleProjectRoyaltySplitterUpdated
+        - event: ArtBlocksCurationRegistryContractUpdated(indexed address)
+          handler: handleArtBlocksCurationRegistryContractUpdated
       file: ./src/mapping-v3-core.ts
 
   - name: OwnableGenArt721CoreV3Contract_Template

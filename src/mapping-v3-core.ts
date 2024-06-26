@@ -16,7 +16,8 @@ import {
   ProposedArtistAddressesAndSplits as ProposedArtistAddressesAndSplitsEvent,
   AcceptedArtistAddressesAndSplits,
   IGenArt721CoreContractV3_Base,
-  ProjectRoyaltySplitterUpdated
+  ProjectRoyaltySplitterUpdated,
+  ArtBlocksCurationRegistryContractUpdated
 } from "../generated/IGenArt721CoreV3_Base/IGenArt721CoreContractV3_Base";
 
 import { IGenArt721CoreContractV3_ProjectFinance } from "../generated/IGenArt721CoreV3_Base/IGenArt721CoreContractV3_ProjectFinance";
@@ -698,7 +699,6 @@ function createProject(
     generateContractSpecificId(contract._address, projectId)
   );
 
-
   project.active = false;
   project.artist = artist.id;
   project.artistAddress = artistAddress;
@@ -1152,6 +1152,36 @@ export function handleProjectRoyaltySplitterUpdated(
   }
   project.updatedAt = event.block.timestamp;
   project.save();
+}
+
+// Handle ArtBlocksCurationRegistryContractUpdated event. This event is emitted when the
+// AB Curation Registry address is updated for a contract.
+// Assigns the contract's curation registry fields to null if the new address is
+// the zero address.
+export function handleArtBlocksCurationRegistryContractUpdated(
+  event: ArtBlocksCurationRegistryContractUpdated
+): void {
+  const contractEntity = Contract.load(event.address.toHexString());
+  if (!contractEntity) {
+    log.warning(
+      "Contract not found for ArtBlocksCurationRegistryContractUpdated event on contract {}",
+      [event.address.toHexString()]
+    );
+    return;
+  }
+
+  // assign the new curation registry address or null if the address is zero
+  if (
+    event.params.artblocksCurationRegistryAddress.toHexString() ==
+    Address.zero().toHexString()
+  ) {
+    contractEntity.curationRegistry = null;
+  } else {
+    contractEntity.curationRegistry =
+      event.params.artblocksCurationRegistryAddress;
+  }
+  contractEntity.updatedAt = event.block.timestamp;
+  contractEntity.save();
 }
 
 export function handleExternalAssetDependencyUpdated(
