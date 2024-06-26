@@ -53,7 +53,8 @@ import { Project } from "../../../generated/schema";
 import {
   Mint,
   ProjectUpdated,
-  PlatformUpdated
+  PlatformUpdated,
+  ArtBlocksCurationRegistryContractUpdated
 } from "../../../generated/IGenArt721CoreV3_Base/IGenArt721CoreContractV3_Base";
 import { Transfer } from "../../../generated/IERC721GenArt721CoreV3Contract/IERC721";
 import { OwnershipTransferred } from "../../../generated/OwnableGenArt721CoreV3Contract/Ownable";
@@ -81,7 +82,8 @@ import {
   handleTransfer,
   handlePlatformUpdated,
   handleOwnershipTransferred,
-  handleProjectUpdated
+  handleProjectUpdated,
+  handleArtBlocksCurationRegistryContractUpdated
 } from "../../../src/mapping-v3-core";
 import {
   generateContractSpecificId,
@@ -920,6 +922,70 @@ test(`${coreType}: Null curationRegistryAddress on Engine contract`, () => {
     TEST_CONTRACT_ADDRESS.toHexString(),
     "curationRegistry",
     "null"
+  );
+});
+
+test(`${coreType}: Null curationRegistryAddress on Engine contract after zero param in ArtBlocksCurationRegistryContractUpdated`, () => {
+  clearStore();
+  // add new contract to store
+  const projectId = BigInt.fromI32(0);
+  addTestContractToStore(projectId);
+
+  // create dummy event to induce contract assignment
+  const zeroAddress = Address.zero();
+  const event: ArtBlocksCurationRegistryContractUpdated = changetype<
+    ArtBlocksCurationRegistryContractUpdated
+  >(newMockEvent());
+  event.address = TEST_CONTRACT_ADDRESS;
+  event.transaction.hash = TEST_TX_HASH;
+  event.logIndex = BigInt.fromI32(0);
+  event.parameters = [
+    new ethereum.EventParam(
+      "artblocksCurationRegistryAddress",
+      ethereum.Value.fromAddress(zeroAddress)
+    )
+  ];
+  // handle event
+  handleArtBlocksCurationRegistryContractUpdated(event);
+
+  // value in store should reflect a null curation registry address
+  assert.fieldEquals(
+    CONTRACT_ENTITY_TYPE,
+    TEST_CONTRACT_ADDRESS.toHexString(),
+    "curationRegistry",
+    "null"
+  );
+});
+
+test(`${coreType}: Updated curationRegistryAddress on Engine contract after non-zero param in ArtBlocksCurationRegistryContractUpdated`, () => {
+  clearStore();
+  // add new contract to store
+  const projectId = BigInt.fromI32(0);
+  addTestContractToStore(projectId);
+
+  // create dummy event to induce contract assignment
+  const newAddress = randomAddressGenerator.generateRandomAddress();
+  const event: ArtBlocksCurationRegistryContractUpdated = changetype<
+    ArtBlocksCurationRegistryContractUpdated
+  >(newMockEvent());
+  event.address = TEST_CONTRACT_ADDRESS;
+  event.transaction.hash = TEST_TX_HASH;
+  event.logIndex = BigInt.fromI32(0);
+  event.parameters = [
+    new ethereum.EventParam(
+      "artblocksCurationRegistryAddress",
+      ethereum.Value.fromAddress(newAddress)
+    )
+  ];
+  // handle event
+  handleArtBlocksCurationRegistryContractUpdated(event);
+
+  // value in store should reflect a null curation registry address
+  assert.fieldEquals(
+    CONTRACT_ENTITY_TYPE,
+    TEST_CONTRACT_ADDRESS.toHexString(),
+    "curationRegistry",
+    newAddress.toHexString()
   );
 });
 
