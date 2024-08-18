@@ -379,6 +379,7 @@ describe("RAMLib event handling", () => {
       expect(toppedUpBidRes.isRemoved).toBe(false);
       expect(toppedUpBidRes.value).toBe(slot12price.toString());
       expect(toppedUpBidRes.updatedAt).toBe(auctionBid2Timestamp.toString());
+      expect(toppedUpBidRes.timestamp).toBe(auctionBid2Timestamp.toString());
     });
   });
 
