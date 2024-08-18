@@ -119,6 +119,8 @@ import {
 
 import { createTypedMapFromEntries, toJSONValue } from "./json";
 
+import { ERC20 } from "../generated/MinterSetPriceERC20/ERC20";
+
 // IFilteredMinterV0 events
 export function handlePricePerTokenInWeiUpdated(
   event: PricePerTokenInWeiUpdated
@@ -162,6 +164,15 @@ export function handleProjectCurrencyInfoUpdated(
 
   projectMinterConfig.currencyAddress = event.params._currencyAddress;
   projectMinterConfig.currencySymbol = event.params._currencySymbol;
+
+  const erc20Contract = ERC20.bind(event.params._currencyAddress);
+  const decimalsResult = erc20Contract.try_decimals();
+  if (!decimalsResult.reverted) {
+    projectMinterConfig.currencyDecimals = decimalsResult.value;
+  } else {
+    projectMinterConfig.currencyDecimals = 18;
+  }
+
   projectMinterConfig.save();
 
   project.updatedAt = event.block.timestamp;
@@ -1246,6 +1257,7 @@ function loadMinterProjectAndConfigLegacyMinters(
     projectMinterConfig.priceIsConfigured = false;
     projectMinterConfig.currencySymbol = "ETH";
     projectMinterConfig.currencyAddress = Address.zero();
+    projectMinterConfig.currencyDecimals = 18;
     projectMinterConfig.purchaseToDisabled = false;
     projectMinterConfig.extraMinterDetails = "{}";
     projectMinterConfig.save();

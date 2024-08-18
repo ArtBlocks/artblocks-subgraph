@@ -555,6 +555,7 @@ describe("MinterFilterV2 event handling", () => {
       expect(projectMinterConfig.priceIsConfigured).toBe(false);
       expect(projectMinterConfig.currencySymbol).toBe("ETH");
       expect(projectMinterConfig.currencyAddress).toBe(constants.AddressZero);
+      expect(projectMinterConfig.currencyDecimals).toBe(18);
       expect(projectMinterConfig.purchaseToDisabled).toBe(false);
       expect(projectMinterConfig.extraMinterDetails).toBe("{}");
       expect(projectMinterConfig.basePrice).toBeNull();

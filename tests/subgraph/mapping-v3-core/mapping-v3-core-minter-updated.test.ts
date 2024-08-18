@@ -301,6 +301,7 @@ test(`${coreType}/MinterUpdated: should populate project minter configurations f
   previousMinterConfig0.priceIsConfigured = project0PriceIsConfigured;
   previousMinterConfig0.currencyAddress = project0CurrencyAddress;
   previousMinterConfig0.currencySymbol = project0CurrencySymbol;
+  previousMinterConfig0.currencyDecimals = 18;
   previousMinterConfig0.purchaseToDisabled = project0PurchaseToDisabled;
   previousMinterConfig0.extraMinterDetails = "{}";
 
@@ -338,6 +339,7 @@ test(`${coreType}/MinterUpdated: should populate project minter configurations f
   previousMinterConfig1.priceIsConfigured = project1PriceIsConfigured;
   previousMinterConfig1.currencyAddress = project1CurrencyAddress;
   previousMinterConfig1.currencySymbol = project1CurrencySymbol;
+  previousMinterConfig1.currencyDecimals = 18;
   previousMinterConfig1.purchaseToDisabled = project1PurchaseToDisabled;
   previousMinterConfig1.extraMinterDetails = "{}";
 
@@ -378,6 +380,7 @@ test(`${coreType}/MinterUpdated: should populate project minter configurations f
   previousMinterConfig2.priceIsConfigured = project2PriceIsConfigured;
   previousMinterConfig2.currencyAddress = project2CurrencyAddress;
   previousMinterConfig2.currencySymbol = project2CurrencySymbol;
+  previousMinterConfig2.currencyDecimals = 18;
   previousMinterConfig2.purchaseToDisabled = project2PurchaseToDisabled;
   previousMinterConfig2.extraMinterDetails = getJSONStringFromEntries([
     { key: "startTime", value: toJSONValue(project2StartTime) },
@@ -407,6 +410,7 @@ test(`${coreType}/MinterUpdated: should populate project minter configurations f
   const project3PriceIsConfigured = true;
   const project3CurrencySymbol = "ETH";
   const project3CurrencyAddress = Address.zero();
+  const project3CurrencyDecimals = 18;
   const project3PurchaseToDisabled = false;
   const project3StartTime = CURRENT_BLOCK_TIMESTAMP.plus(BigInt.fromI32(100));
   const project3HalfLifeSeconds = BigInt.fromI32(500);
@@ -422,6 +426,7 @@ test(`${coreType}/MinterUpdated: should populate project minter configurations f
   previousMinterConfig3.basePrice = project3BasePrice;
   previousMinterConfig3.priceIsConfigured = project3PriceIsConfigured;
   previousMinterConfig3.currencyAddress = project3CurrencyAddress;
+  previousMinterConfig3.currencyDecimals = project3CurrencyDecimals;
   previousMinterConfig3.currencySymbol = project3CurrencySymbol;
   previousMinterConfig3.purchaseToDisabled = project3PurchaseToDisabled;
   previousMinterConfig3.extraMinterDetails = getJSONStringFromEntries([

@@ -107,6 +107,7 @@ export function handleMint(event: Mint): void {
     primaryPurchaseDetails.minterAddress = event.address;
     primaryPurchaseDetails.currencyAddress = Address.zero();
     primaryPurchaseDetails.currencySymbol = "ETH";
+    primaryPurchaseDetails.currencyDecimals = 18;
     primaryPurchaseDetails.save();
     token.primaryPurchaseDetails = primaryPurchaseDetails.id;
 
@@ -251,6 +252,7 @@ export function handleAddProject(call: AddProjectCall): void {
   project.createdAt = call.block.timestamp;
   project.currencyAddress = Address.zero();
   project.currencySymbol = "ETH";
+  project.currencyDecimals = 18;
   project.dynamic = dynamic;
   project.externalAssetDependencyCount = BigInt.fromI32(0);
   project.externalAssetDependenciesLocked = false;

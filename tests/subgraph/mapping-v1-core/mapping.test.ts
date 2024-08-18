@@ -1600,6 +1600,7 @@ test("GenArt721Core: Can update a projects currency info", () => {
   );
   const currencySymbol = "DAI";
   const currencyAddress = randomAddressGenerator.generateRandomAddress();
+  const currencyDecimals = 6;
 
   const call = changetype<UpdateProjectCurrencyInfoCall>(newMockCall());
   call.to = TEST_CONTRACT_ADDRESS;

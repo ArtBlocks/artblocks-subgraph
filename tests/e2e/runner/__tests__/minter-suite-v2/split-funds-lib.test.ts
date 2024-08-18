@@ -13,6 +13,7 @@ import { ERC20Mock__factory } from "../../contracts/factories/ERC20Mock__factory
 import { ethers } from "ethers";
 // hide nuisance logs about event overloading
 import { Logger } from "@ethersproject/logger";
+import { ERC20MockAltDecimals__factory } from "../../contracts";
 Logger.setLogLevel(Logger.levels.ERROR);
 
 // waiting for subgraph to sync can take longer than the default 5s timeout
@@ -102,9 +103,9 @@ describe("SplitFundsLib event handling", () => {
     test("Currency is updated and configured", async () => {
       const currencySymbol = "ERC20";
       // deploy new ERC20 currency, sending initial supply to artist
-      const newCurrency = await new ERC20Mock__factory(artist).deploy(
-        ethers.utils.parseEther("100")
-      );
+      const newCurrency = await new ERC20MockAltDecimals__factory(
+        artist
+      ).deploy(ethers.utils.parseEther("100"));
       // set minter for project zero to the fixed price ERC20 minter
       await sharedMinterFilterContract
         .connect(artist)
@@ -129,10 +130,14 @@ describe("SplitFundsLib event handling", () => {
         client,
         targetId
       );
+
+      const decimals = await newCurrency.decimals();
+
       expect(minterConfigRes.currencySymbol).toBe(currencySymbol);
       expect(minterConfigRes.currencyAddress).toBe(
         newCurrency.address.toLowerCase()
       );
+      expect(minterConfigRes.currencyDecimals).toBe(decimals);
     });
   });
 });

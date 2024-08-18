@@ -32,7 +32,8 @@ import {
   mockTokenIdToHash,
   TEST_TOKEN_HASH,
   addNewLegacyProjectMinterConfigToStore,
-  PRIMARY_PURCHASE_ENTITY_TYPE
+  PRIMARY_PURCHASE_ENTITY_TYPE,
+  mockCurrencyDecimals
 } from "../shared-helpers";
 
 import {
@@ -1164,6 +1165,9 @@ test("GenArt721Core2PBAB: Can update a projects currency info", () => {
   );
   const currencySymbol = "DAI";
   const currencyAddress = randomAddressGenerator.generateRandomAddress();
+  const currencyDecimals = 6;
+
+  mockCurrencyDecimals(currencyAddress, currencyDecimals);
 
   const call = changetype<UpdateProjectCurrencyInfoCall>(newMockCall());
   call.to = TEST_CONTRACT_ADDRESS;
