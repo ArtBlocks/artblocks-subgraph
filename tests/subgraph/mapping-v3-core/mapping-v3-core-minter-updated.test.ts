@@ -289,6 +289,7 @@ test(`${coreType}/MinterUpdated: should populate project minter configurations f
   const project0BasePrice = BigInt.fromI32(0);
   const project0CurrencySymbol = "ETH";
   const project0CurrencyAddress = Address.zero();
+  const project0CurrencyDecimals = 18;
   const project0PurchaseToDisabled = true;
   const project0MinterType = "MinterSetPriceV2";
 
@@ -301,7 +302,7 @@ test(`${coreType}/MinterUpdated: should populate project minter configurations f
   previousMinterConfig0.priceIsConfigured = project0PriceIsConfigured;
   previousMinterConfig0.currencyAddress = project0CurrencyAddress;
   previousMinterConfig0.currencySymbol = project0CurrencySymbol;
-  previousMinterConfig0.currencyDecimals = 18;
+  previousMinterConfig0.currencyDecimals = project0CurrencyDecimals;
   previousMinterConfig0.purchaseToDisabled = project0PurchaseToDisabled;
   previousMinterConfig0.extraMinterDetails = "{}";
 
@@ -324,6 +325,7 @@ test(`${coreType}/MinterUpdated: should populate project minter configurations f
   const project1BasePrice = BigInt.fromI64(i64(1e18));
   const project1CurrencySymbol = "DAI";
   const project1CurrencyAddress = randomAddressGenerator.generateRandomAddress();
+  const project1CurrencyDecimals = 18;
   const project1PurchaseToDisabled = false;
   const project1MinterType = "MinterSetPriceERC20V2";
 
@@ -339,7 +341,7 @@ test(`${coreType}/MinterUpdated: should populate project minter configurations f
   previousMinterConfig1.priceIsConfigured = project1PriceIsConfigured;
   previousMinterConfig1.currencyAddress = project1CurrencyAddress;
   previousMinterConfig1.currencySymbol = project1CurrencySymbol;
-  previousMinterConfig1.currencyDecimals = 18;
+  previousMinterConfig1.currencyDecimals = project1CurrencyDecimals;
   previousMinterConfig1.purchaseToDisabled = project1PurchaseToDisabled;
   previousMinterConfig1.extraMinterDetails = "{}";
 
@@ -364,6 +366,7 @@ test(`${coreType}/MinterUpdated: should populate project minter configurations f
   const project2PriceIsConfigured = true;
   const project2CurrencySymbol = "ETH";
   const project2CurrencyAddress = Address.zero();
+  const project2CurrencyDecimals = 18;
   const project2PurchaseToDisabled = false;
   const project2StartTime = CURRENT_BLOCK_TIMESTAMP.plus(BigInt.fromI32(100));
   const project2EndTime = CURRENT_BLOCK_TIMESTAMP.plus(BigInt.fromI32(3700));
@@ -380,7 +383,7 @@ test(`${coreType}/MinterUpdated: should populate project minter configurations f
   previousMinterConfig2.priceIsConfigured = project2PriceIsConfigured;
   previousMinterConfig2.currencyAddress = project2CurrencyAddress;
   previousMinterConfig2.currencySymbol = project2CurrencySymbol;
-  previousMinterConfig2.currencyDecimals = 18;
+  previousMinterConfig2.currencyDecimals = project2CurrencyDecimals;
   previousMinterConfig2.purchaseToDisabled = project2PurchaseToDisabled;
   previousMinterConfig2.extraMinterDetails = getJSONStringFromEntries([
     { key: "startTime", value: toJSONValue(project2StartTime) },
