@@ -394,6 +394,7 @@ export function handleBidToppedUp(event: BidToppedUp): void {
   // Update slot index and value
   bid.slotIndex = event.params.newSlotIndex;
   bid.value = bidValue;
+  bid.timestamp = event.block.timestamp;
   bid.updatedAt = event.block.timestamp;
   bid.save();
 }
