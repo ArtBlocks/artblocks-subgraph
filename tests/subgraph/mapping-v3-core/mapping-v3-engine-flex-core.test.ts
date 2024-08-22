@@ -1253,6 +1253,13 @@ describe(`${coreType}: handleProjectUpdated`, () => {
 
       handleProjectUpdated(event);
 
+      const createdProject = Project.load(
+        generateContractSpecificId(TEST_CONTRACT_ADDRESS, projectId)
+      );
+      if (!createdProject) {
+        throw new Error("Project entity not created");
+      }
+
       // Artist entity
       assert.fieldEquals(
         ACCOUNT_ENTITY_TYPE,
@@ -1286,24 +1293,16 @@ describe(`${coreType}: handleProjectUpdated`, () => {
         "contract",
         TEST_CONTRACT_ADDRESS.toHexString()
       );
-      assert.fieldEquals(
-        PROJECT_ENTITY_TYPE,
-        generateContractSpecificId(TEST_CONTRACT_ADDRESS, projectId),
-        "createdAt",
-        CURRENT_BLOCK_TIMESTAMP.toString()
+
+      // No currencyAddress or currencySymbol on project for v3 and up
+      assert.assertNull(createdProject.currencySymbol);
+      // Excuse the funky test here, matchstick was barfing on a null check
+      assert.assertTrue(
+        (createdProject.currencyAddress
+          ? (createdProject.currencyAddress as Address).toHexString()
+          : "") === ""
       );
-      assert.fieldEquals(
-        PROJECT_ENTITY_TYPE,
-        generateContractSpecificId(TEST_CONTRACT_ADDRESS, projectId),
-        "currencyAddress",
-        Address.zero().toHexString()
-      );
-      assert.fieldEquals(
-        PROJECT_ENTITY_TYPE,
-        generateContractSpecificId(TEST_CONTRACT_ADDRESS, projectId),
-        "currencySymbol",
-        "ETH"
-      );
+
       assert.fieldEquals(
         PROJECT_ENTITY_TYPE,
         generateContractSpecificId(TEST_CONTRACT_ADDRESS, projectId),

@@ -688,9 +688,6 @@ function createProject(
   let pricePerTokenInWei = BigInt.fromI32(0);
   let invocations = projectStateData.value.getInvocations();
   let maxInvocations = projectStateData.value.getMaxInvocations();
-  let currencySymbol = "ETH";
-  let currencyAddress = Address.zero();
-  let currencyDecimals = 18;
 
   let scriptCount = projectScriptDetails.value.getScriptCount();
   let useHashString = true;
@@ -707,9 +704,6 @@ function createProject(
   project.complete = false;
   project.contract = contractAddress;
   project.createdAt = timestamp;
-  project.currencyAddress = currencyAddress;
-  project.currencySymbol = currencySymbol;
-  project.currencyDecimals = currencyDecimals;
   project.dynamic = true;
   project.externalAssetDependencyCount = BigInt.fromI32(0);
   project.externalAssetDependenciesLocked = false;
