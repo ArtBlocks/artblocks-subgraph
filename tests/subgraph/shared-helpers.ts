@@ -232,6 +232,7 @@ export class DefaultProjectValues {
   completedAt: BigInt;
   currencyAddress: Address;
   currencySymbol: string;
+  currencyDecimals: i32;
   description: string;
   dynamic: boolean;
   invocations: BigInt;
@@ -270,6 +271,7 @@ export const DEFAULT_PROJECT_VALUES: DefaultProjectValues = {
   completedAt: BigInt.fromI32(0),
   currencyAddress: Address.zero(),
   currencySymbol: "ETH",
+  currencyDecimals: 18,
   description: "",
   dynamic: true,
   invocations: BigInt.zero(),
@@ -516,6 +518,7 @@ export const addNewLegacyProjectMinterConfigToStore = (
   projectMinterConfig.priceIsConfigured = false;
   projectMinterConfig.currencyAddress = Address.zero();
   projectMinterConfig.currencySymbol = "ETH";
+  projectMinterConfig.currencyDecimals = 18;
   projectMinterConfig.purchaseToDisabled = false;
   projectMinterConfig.extraMinterDetails = "{}";
 
@@ -784,4 +787,15 @@ export function getJsonStringFromInputs(
   }
   // use helper function to convert from typed map to json string
   return typedMapToJSONString(jsonMapping);
+}
+
+export function mockCurrencyDecimals(
+  contractAddress: Address,
+  decimals: i32
+): void {
+  createMockedFunction(
+    contractAddress,
+    "decimals",
+    "decimals():(uint8)"
+  ).returns([ethereum.Value.fromI32(decimals)]);
 }

@@ -19,6 +19,7 @@ fragment ProjectDetails on Project {
     priceIsConfigured
     currencySymbol
     currencyAddress
+    currencyDecimals
     purchaseToDisabled
     basePrice
     extraMinterDetails

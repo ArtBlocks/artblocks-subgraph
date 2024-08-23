@@ -31,7 +31,8 @@ import {
   addNewTokenToStore,
   TRANSFER_ENTITY_TYPE,
   addNewLegacyProjectMinterConfigToStore,
-  PRIMARY_PURCHASE_ENTITY_TYPE
+  PRIMARY_PURCHASE_ENTITY_TYPE,
+  mockCurrencyDecimals
 } from "../shared-helpers";
 
 import {
@@ -1600,6 +1601,9 @@ test("GenArt721Core: Can update a projects currency info", () => {
   );
   const currencySymbol = "DAI";
   const currencyAddress = randomAddressGenerator.generateRandomAddress();
+  const currencyDecimals = 6;
+
+  mockCurrencyDecimals(currencyAddress, currencyDecimals);
 
   const call = changetype<UpdateProjectCurrencyInfoCall>(newMockCall());
   call.to = TEST_CONTRACT_ADDRESS;
@@ -1631,6 +1635,12 @@ test("GenArt721Core: Can update a projects currency info", () => {
     "currencyAddress",
     DEFAULT_PROJECT_VALUES.currencyAddress.toHexString()
   );
+  assert.fieldEquals(
+    PROJECT_ENTITY_TYPE,
+    fullProjectId,
+    "currencyDecimals",
+    DEFAULT_PROJECT_VALUES.currencyDecimals.toString()
+  );
 
   handleUpdateProjectCurrencyInfo(call);
 
@@ -1645,6 +1655,12 @@ test("GenArt721Core: Can update a projects currency info", () => {
     fullProjectId,
     "currencyAddress",
     currencyAddress.toHexString()
+  );
+  assert.fieldEquals(
+    PROJECT_ENTITY_TYPE,
+    fullProjectId,
+    "currencyDecimals",
+    currencyDecimals.toString()
   );
   assert.fieldEquals(
     PROJECT_ENTITY_TYPE,

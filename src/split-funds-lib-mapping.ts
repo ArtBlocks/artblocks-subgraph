@@ -6,6 +6,7 @@ import { ProjectCurrencyInfoUpdated } from "../generated/SplitFundsLib/SplitFund
 import { updateProjectIfMinterConfigIsActive } from "./helpers";
 
 import { loadOrCreateMinterProjectAndConfigIfProject } from "./generic-minter-events-lib-mapping";
+import { ERC20 } from "../generated/MinterSetPriceERC20/ERC20";
 
 ///////////////////////////////////////////////////////////////////////////////
 // EVENT HANDLERS start here
@@ -33,6 +34,15 @@ export function handleProjectCurrencyInfoUpdated(
   const projectMinterConfig = minterProjectAndConfig.projectMinterConfiguration;
   projectMinterConfig.currencyAddress = event.params.currencyAddress;
   projectMinterConfig.currencySymbol = event.params.currencySymbol;
+  projectMinterConfig.currencyDecimals = 18;
+  if (event.params.currencyAddress != Address.zero()) {
+    let currencyContract = ERC20.bind(event.params.currencyAddress);
+    let decimals = currencyContract.try_decimals();
+    if (!decimals.reverted) {
+      projectMinterConfig.currencyDecimals = decimals.value;
+    }
+  }
+
   projectMinterConfig.save();
 
   // induce sync if the project minter configuration is the active one

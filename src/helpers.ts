@@ -539,6 +539,7 @@ export function loadOrCreateProjectMinterConfiguration(
     projectMinterConfig.priceIsConfigured = false;
     projectMinterConfig.currencySymbol = "ETH";
     projectMinterConfig.currencyAddress = Address.zero();
+    projectMinterConfig.currencyDecimals = 18;
     projectMinterConfig.purchaseToDisabled = false;
     projectMinterConfig.extraMinterDetails = "{}";
     projectMinterConfig.save();
@@ -924,6 +925,7 @@ export function createPrimaryPurchaseDetailsFromTokenMint<T>(
       );
       purchaseDetails.currencyAddress = minterConfig.currencyAddress;
       purchaseDetails.currencySymbol = minterConfig.currencySymbol;
+      purchaseDetails.currencyDecimals = minterConfig.currencyDecimals;
 
       purchaseDetails.save();
       return purchaseDetails.id;
@@ -953,6 +955,7 @@ export function createPrimaryPurchaseDetailsFromTokenMint<T>(
       purchaseDetails.currencyAddress =
         project.currencyAddress || Address.zero();
       purchaseDetails.currencySymbol = project.currencySymbol || "ETH";
+      purchaseDetails.currencyDecimals = project.currencyDecimals || 18;
 
       purchaseDetails.save();
       return purchaseDetails.id;

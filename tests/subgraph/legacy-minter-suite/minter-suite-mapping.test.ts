@@ -23,7 +23,8 @@ import {
   TEST_CONTRACT_ADDRESS,
   assertJsonFieldEquals,
   getJSONStringFromEntries,
-  addTestMinterFilterToStore
+  addTestMinterFilterToStore,
+  mockCurrencyDecimals
 } from "../shared-helpers";
 import {
   generateContractSpecificId,
@@ -217,6 +218,7 @@ describe("handlePricePerTokenInWeiUpdated", () => {
     projectMinterConfig.purchaseToDisabled = false;
     projectMinterConfig.currencyAddress = Address.zero();
     projectMinterConfig.currencySymbol = "ETH";
+    projectMinterConfig.currencyDecimals = 18;
     projectMinterConfig.save();
 
     const newPricePerTokenInWei = ONE_ETH_IN_WEI.div(BigInt.fromI32(5));
@@ -324,11 +326,13 @@ describe("handleProjectCurrencyInfoUpdated", () => {
     projectMinterConfig.priceIsConfigured = false;
     projectMinterConfig.currencyAddress = Address.zero();
     projectMinterConfig.currencySymbol = "ETH";
+    projectMinterConfig.currencyDecimals = 18;
     projectMinterConfig.purchaseToDisabled = false;
     projectMinterConfig.save();
 
     const newCurrencyAddress = randomAddressGenerator.generateRandomAddress();
     const newCurrencySymbol = "DAI";
+    const newCurrencyDecimals = 6;
     const projectCurrencyInfoUpdatedEvent: ProjectCurrencyInfoUpdated = changetype<
       ProjectCurrencyInfoUpdated
     >(newMockEvent());
@@ -353,6 +357,8 @@ describe("handleProjectCurrencyInfoUpdated", () => {
       newCurrencyAddress != projectMinterConfig.currencyAddress
     );
 
+    mockCurrencyDecimals(newCurrencyAddress, newCurrencyDecimals);
+
     handleProjectCurrencyInfoUpdated(projectCurrencyInfoUpdatedEvent);
 
     assert.fieldEquals(
@@ -366,6 +372,12 @@ describe("handleProjectCurrencyInfoUpdated", () => {
       getProjectMinterConfigId(minterAddress.toHexString(), project.id),
       "currencySymbol",
       newCurrencySymbol
+    );
+    assert.fieldEquals(
+      PROJECT_MINTER_CONFIGURATION_ENTITY_TYPE,
+      getProjectMinterConfigId(minterAddress.toHexString(), project.id),
+      "currencyDecimals",
+      newCurrencyDecimals.toString()
     );
 
     assert.fieldEquals(
@@ -447,6 +459,7 @@ describe("handlePurchaseToDisabledUpdated", () => {
     projectMinterConfig.priceIsConfigured = false;
     projectMinterConfig.currencyAddress = Address.zero();
     projectMinterConfig.currencySymbol = "ETH";
+    projectMinterConfig.currencyDecimals = 18;
     projectMinterConfig.purchaseToDisabled = false;
     projectMinterConfig.save();
 
@@ -610,6 +623,7 @@ describe("MinterDALin-related tests", () => {
         projectMinterConfig.priceIsConfigured = false;
         projectMinterConfig.currencyAddress = Address.zero();
         projectMinterConfig.currencySymbol = "ETH";
+        projectMinterConfig.currencyDecimals = 18;
         projectMinterConfig.purchaseToDisabled = false;
         projectMinterConfig.save();
 
@@ -766,6 +780,7 @@ describe("MinterDALin-related tests", () => {
           projectMinterConfig.priceIsConfigured = true;
           projectMinterConfig.currencyAddress = Address.zero();
           projectMinterConfig.currencySymbol = "ETH";
+          projectMinterConfig.currencyDecimals = 18;
           projectMinterConfig.purchaseToDisabled = false;
           projectMinterConfig.save();
 
@@ -957,6 +972,7 @@ describe("MinterDAExp-related tests", () => {
         projectMinterConfig.priceIsConfigured = false;
         projectMinterConfig.currencyAddress = Address.zero();
         projectMinterConfig.currencySymbol = "ETH";
+        projectMinterConfig.currencyDecimals = 18;
         projectMinterConfig.purchaseToDisabled = false;
         projectMinterConfig.save();
 
@@ -1075,6 +1091,7 @@ describe("MinterDAExp-related tests", () => {
         projectMinterConfig.priceIsConfigured = false;
         projectMinterConfig.currencyAddress = Address.zero();
         projectMinterConfig.currencySymbol = "ETH";
+        projectMinterConfig.currencyDecimals = 18;
         projectMinterConfig.purchaseToDisabled = false;
         projectMinterConfig.save();
 
@@ -1262,6 +1279,7 @@ describe("MinterDAExp-related tests", () => {
         projectMinterConfig.priceIsConfigured = true;
         projectMinterConfig.currencyAddress = Address.zero();
         projectMinterConfig.currencySymbol = "ETH";
+        projectMinterConfig.currencyDecimals = 18;
         projectMinterConfig.purchaseToDisabled = false;
         projectMinterConfig.save();
 
@@ -1373,6 +1391,7 @@ describe("MinterDAExp-related tests", () => {
         projectMinterConfig.priceIsConfigured = true;
         projectMinterConfig.currencyAddress = Address.zero();
         projectMinterConfig.currencySymbol = "ETH";
+        projectMinterConfig.currencyDecimals = 18;
         projectMinterConfig.purchaseToDisabled = false;
         projectMinterConfig.save();
 
@@ -1486,6 +1505,7 @@ describe("DAExpSettlementMinters", () => {
       projectMinterConfig.priceIsConfigured = true;
       projectMinterConfig.currencyAddress = Address.zero();
       projectMinterConfig.currencySymbol = "ETH";
+      projectMinterConfig.currencyDecimals = 18;
       projectMinterConfig.purchaseToDisabled = false;
       projectMinterConfig.save();
 
@@ -1638,6 +1658,7 @@ describe("DAExpSettlementMinters", () => {
       projectMinterConfig.priceIsConfigured = true;
       projectMinterConfig.currencyAddress = Address.zero();
       projectMinterConfig.currencySymbol = "ETH";
+      projectMinterConfig.currencyDecimals = 18;
       projectMinterConfig.purchaseToDisabled = false;
       projectMinterConfig.save();
 
@@ -1836,6 +1857,7 @@ describe("DAExpSettlementMinters", () => {
       projectMinterConfig.priceIsConfigured = true;
       projectMinterConfig.currencyAddress = Address.zero();
       projectMinterConfig.currencySymbol = "ETH";
+      projectMinterConfig.currencyDecimals = 18;
       projectMinterConfig.purchaseToDisabled = false;
       projectMinterConfig.save();
 
@@ -1921,6 +1943,7 @@ describe("DAExpSettlementMinters", () => {
       projectMinterConfig.priceIsConfigured = true;
       projectMinterConfig.currencyAddress = Address.zero();
       projectMinterConfig.currencySymbol = "ETH";
+      projectMinterConfig.currencyDecimals = 18;
       projectMinterConfig.purchaseToDisabled = false;
       projectMinterConfig.save();
 
@@ -2043,6 +2066,7 @@ describe("DAExpSettlementMinters", () => {
       projectMinterConfig.priceIsConfigured = true;
       projectMinterConfig.currencyAddress = Address.zero();
       projectMinterConfig.currencySymbol = "ETH";
+      projectMinterConfig.currencyDecimals = 18;
       projectMinterConfig.purchaseToDisabled = false;
       projectMinterConfig.save();
 
@@ -4153,6 +4177,7 @@ describe("handleProjectMaxInvocationsLimitUpdated", () => {
     projectMinterConfig.priceIsConfigured = false;
     projectMinterConfig.currencyAddress = Address.zero();
     projectMinterConfig.currencySymbol = "ETH";
+    projectMinterConfig.currencyDecimals = 18;
     projectMinterConfig.purchaseToDisabled = false;
     projectMinterConfig.save();
 

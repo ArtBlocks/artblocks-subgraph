@@ -56,6 +56,9 @@ type Project @entity {
   "Currency symbol for ERC-20"
   currencySymbol: String
 
+  "Number of decimals used to get a currency's display representation (i.e. 18 for ETH)"
+  currencyDecimals: Int
+
   "Artist description of the project"
   description: String
 
@@ -409,6 +412,9 @@ type PrimaryPurchase @entity {
 
   "Symbol of currency used to purchase token"
   currencySymbol: String
+
+  "Number of decimals used to get a currency's display representation (i.e. 18 for ETH)"
+  currencyDecimals: Int
 }
 
 type MinterFilter @entity {
@@ -500,6 +506,9 @@ type ProjectMinterConfiguration @entity {
 
   "currency address as defined on minter - address(0) reserved for ether"
   currencyAddress: Bytes!
+
+  "number of decimals used to get a currency's display representation (i.e. 18 for ETH)"
+  currencyDecimals: Int!
 
   "Defines if purchasing token to another is allowed"
   purchaseToDisabled: Boolean!

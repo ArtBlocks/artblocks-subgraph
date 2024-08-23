@@ -9,6 +9,7 @@ fragment ProjectMinterConfigurationDetails on ProjectMinterConfiguration {
   priceIsConfigured
   currencySymbol
   currencyAddress
+  currencyDecimals
   purchaseToDisabled
   basePrice
   extraMinterDetails

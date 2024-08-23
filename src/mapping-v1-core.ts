@@ -76,6 +76,7 @@ import {
   createPrimaryPurchaseDetailsFromTokenMint
 } from "./helpers";
 import { GEN_ART_721_CORE_V1 } from "./constants";
+import { ERC20 } from "../generated/MinterSetPriceERC20/ERC20";
 
 /*** EVENT HANDLERS ***/
 export function handleMint(event: Mint): void {
@@ -242,6 +243,14 @@ export function handleAddProject(call: AddProjectCall): void {
   let maxInvocations = projectTokenInfo.value3;
   let currencyAddress = projectTokenInfo.value5;
   let currencySymbol = projectTokenInfo.value7;
+  let currencyDecimals = 18;
+  if (currencyAddress != Address.zero()) {
+    let currencyContract = ERC20.bind(currencyAddress);
+    let decimals = currencyContract.try_decimals();
+    if (!decimals.reverted) {
+      currencyDecimals = decimals.value;
+    }
+  }
 
   let scriptCount = projectScriptInfo.value1;
   let useHashString = projectScriptInfo.value2;
@@ -259,6 +268,7 @@ export function handleAddProject(call: AddProjectCall): void {
   project.createdAt = timestamp;
   project.currencySymbol = currencySymbol;
   project.currencyAddress = currencyAddress;
+  project.currencyDecimals = currencyDecimals;
   project.dynamic = dynamic;
   project.externalAssetDependencyCount = BigInt.fromI32(0);
   project.externalAssetDependenciesLocked = false;
@@ -589,6 +599,15 @@ export function handleUpdateProjectCurrencyInfo(
   if (project) {
     project.currencySymbol = call.inputs._currencySymbol;
     project.currencyAddress = call.inputs._currencyAddress;
+
+    if (call.inputs._currencyAddress != Address.zero()) {
+      let currencyContract = ERC20.bind(call.inputs._currencyAddress);
+      let decimals = currencyContract.try_decimals();
+      if (!decimals.reverted) {
+        project.currencyDecimals = decimals.value;
+      }
+    }
+
     project.updatedAt = call.block.timestamp;
     project.save();
   }

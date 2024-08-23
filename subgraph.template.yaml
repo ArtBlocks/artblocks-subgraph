@@ -47,6 +47,8 @@ dataSources:
           file: ./abis/GenArt721CoreV3_Engine.json
         - name: IERC721
           file: ./abis/IERC721.json
+        - name: ERC20
+          file: ./abis/ERC20.json
         - name: Ownable
           file: ./abis/Ownable.json
         - name: IAdminACLV0
@@ -123,6 +125,8 @@ dataSources:
           file: ./abis/GenArt721CoreV3_Engine.json
         - name: IERC721
           file: ./abis/IERC721.json
+        - name: ERC20
+          file: ./abis/ERC20.json
         - name: Ownable
           file: ./abis/Ownable.json
         - name: IAdminACLV0
@@ -207,6 +211,8 @@ dataSources:
           file: ./abis/GenArt721CoreV3_Engine.json
         - name: IERC721
           file: ./abis/IERC721.json
+        - name: ERC20
+          file: ./abis/ERC20.json
         - name: Ownable
           file: ./abis/Ownable.json
         - name: IAdminACLV0
@@ -277,6 +283,8 @@ dataSources:
           file: ./abis/GenArt721CoreV3_Engine.json
         - name: IERC721
           file: ./abis/IERC721.json
+        - name: ERC20
+          file: ./abis/ERC20.json
         - name: Ownable
           file: ./abis/Ownable.json
         - name: IAdminACLV0
@@ -329,6 +337,8 @@ dataSources:
       abis:
         - name: GenArt721Core
           file: ./abis/GenArt721Core.json
+        - name: ERC20
+          file: ./abis/ERC20.json
       eventHandlers:
         - event: Mint(indexed address,indexed uint256,indexed uint256)
           handler: handleMint
@@ -434,6 +444,8 @@ dataSources:
           file: ./abis/GenArt721Core2.json
         - name: GenArt721Core
           file: ./abis/GenArt721Core.json
+        - name: ERC20
+          file: ./abis/ERC20.json
       eventHandlers:
         - event: Mint(indexed address,indexed uint256,indexed uint256)
           handler: handleMint
@@ -539,6 +551,8 @@ dataSources:
       abis:
         - name: GenArt721Core2PBAB
           file: ./abis/GenArt721Core2PBAB.json
+        - name: ERC20
+          file: ./abis/ERC20.json
       eventHandlers:
         - event: Mint(indexed address,indexed uint256,indexed uint256)
           handler: handleMint
@@ -635,6 +649,8 @@ dataSources:
           file: ./abis/GenArt721Core2EngineFlex.json
         - name: GenArt721Core2PBAB
           file: ./abis/GenArt721Core2PBAB.json
+        - name: ERC20
+          file: ./abis/ERC20.json
       eventHandlers:
         - event: Mint(indexed address,indexed uint256,indexed uint256)
           handler: handleMint
@@ -736,6 +752,8 @@ dataSources:
       abis:
         - name: GenArt721
           file: ./abis/GenArt721.json
+        - name: ERC20
+          file: ./abis/ERC20.json
       eventHandlers:
         - event: Mint(indexed address,indexed uint256,indexed uint256,uint256,uint256)
           handler: handleMint
@@ -1126,6 +1144,8 @@ dataSources:
           file: ./abis/IFilteredMinterMerkleV2.json
         - name: IFilteredMinterSEAV0
           file: ./abis/IFilteredMinterSEAV0.json
+        - name: ERC20
+          file: ./abis/ERC20.json
       eventHandlers:
         - event: ProjectCurrencyInfoUpdated(indexed uint256,indexed address,indexed address,string)
           handler: handleProjectCurrencyInfoUpdated
@@ -1175,6 +1195,8 @@ dataSources:
           file: ./abis/IFilteredMinterMerkleV2.json
         - name: IFilteredMinterSEAV0
           file: ./abis/IFilteredMinterSEAV0.json
+        - name: ERC20
+          file: ./abis/ERC20.json
       eventHandlers:
         - event: PricePerTokenUpdated(indexed uint256,indexed address,indexed uint256)
           handler: handlePricePerTokenUpdated
@@ -1226,6 +1248,8 @@ dataSources:
           file: ./abis/IFilteredMinterMerkleV2.json
         - name: IFilteredMinterSEAV0
           file: ./abis/IFilteredMinterSEAV0.json
+        - name: ERC20
+          file: ./abis/ERC20.json
       eventHandlers:
         - event: ProjectMaxInvocationsLimitUpdated(indexed uint256,indexed address,uint256)
           handler: handleProjectMaxInvocationsLimitUpdated
@@ -1277,6 +1301,8 @@ dataSources:
           file: ./abis/IFilteredMinterMerkleV2.json
         - name: IFilteredMinterSEAV0
           file: ./abis/IFilteredMinterSEAV0.json
+        - name: ERC20
+          file: ./abis/ERC20.json
       eventHandlers:
         - event: DefaultMaxInvocationsPerAddress(uint256)
           handler: handleDefaultMaxInvocationsPerAddress
@@ -1330,6 +1356,8 @@ dataSources:
           file: ./abis/IFilteredMinterMerkleV2.json
         - name: IFilteredMinterSEAV0
           file: ./abis/IFilteredMinterSEAV0.json
+        - name: ERC20
+          file: ./abis/ERC20.json
       eventHandlers:
         - event: DelegationRegistryUpdated(address)
           handler: handleDelegationRegistryUpdated
@@ -1385,6 +1413,8 @@ dataSources:
           file: ./abis/IFilteredMinterMerkleV2.json
         - name: IFilteredMinterSEAV0
           file: ./abis/IFilteredMinterSEAV0.json
+        - name: ERC20
+          file: ./abis/ERC20.json
       eventHandlers:
         - event: MinAuctionDurationSecondsUpdated(uint256)
           handler: handleMinAuctionDurationSecondsUpdated
@@ -1454,6 +1484,8 @@ dataSources:
           file: ./abis/IFilteredMinterHolderV2.json
         - name: IFilteredMinterMerkleV2
           file: ./abis/IFilteredMinterMerkleV2.json
+        - name: ERC20
+          file: ./abis/ERC20.json
       eventHandlers:
         - event: AuctionBufferTimeParamsUpdated(uint256,uint256)
           handler: handleAuctionBufferTimeParamsUpdated
@@ -1529,6 +1561,8 @@ dataSources:
           file: ./abis/IFilteredMinterMerkleV2.json
         - name: IFilteredMinterSEAV0
           file: ./abis/IFilteredMinterSEAV0.json
+        - name: ERC20
+          file: ./abis/ERC20.json
       eventHandlers:
         - event: ResetAuctionDetails(indexed uint256,indexed address)
           handler: handleResetAuctionDetails
@@ -1582,6 +1616,8 @@ dataSources:
           file: ./abis/IFilteredMinterMerkleV2.json
         - name: IFilteredMinterSEAV0
           file: ./abis/IFilteredMinterSEAV0.json
+        - name: ERC20
+          file: ./abis/ERC20.json
       eventHandlers:
         - event: SetAuctionDetailsExp(indexed uint256,indexed address,uint40,uint40,uint256,uint256)
           handler: handleSetAuctionDetailsExp
@@ -1637,6 +1673,8 @@ dataSources:
           file: ./abis/IFilteredMinterMerkleV2.json
         - name: IFilteredMinterSEAV0
           file: ./abis/IFilteredMinterSEAV0.json
+        - name: ERC20
+          file: ./abis/ERC20.json
       eventHandlers:
         - event: SetAuctionDetailsLin(indexed uint256,indexed address,uint40,uint40,uint256,uint256)
           handler: handleSetAuctionDetailsLin
@@ -1694,6 +1732,8 @@ dataSources:
           file: ./abis/IFilteredMinterMerkleV2.json
         - name: IFilteredMinterSEAV0
           file: ./abis/IFilteredMinterSEAV0.json
+        - name: ERC20
+          file: ./abis/ERC20.json
       eventHandlers:
         - event: ReceiptUpdated(indexed address,indexed uint256,indexed address,uint24,uint256)
           handler: handleReceiptUpdated
@@ -1739,6 +1779,8 @@ dataSources:
           file: ./abis/IFilteredMinterMerkleV2.json
         - name: IFilteredMinterSEAV0
           file: ./abis/IFilteredMinterSEAV0.json
+        - name: ERC20
+          file: ./abis/ERC20.json
       eventHandlers:
         - event: PricePerTokenInWeiUpdated(indexed uint256,indexed uint256)
           handler: handlePricePerTokenInWeiUpdated
@@ -1785,6 +1827,8 @@ dataSources:
           file: ./abis/IFilteredMinterMerkleV2.json
         - name: IFilteredMinterSEAV0
           file: ./abis/IFilteredMinterSEAV0.json
+        - name: ERC20
+          file: ./abis/ERC20.json
       eventHandlers:
         - event: PricePerTokenInWeiUpdated(indexed uint256,indexed uint256)
           handler: handlePricePerTokenInWeiUpdated
@@ -1831,6 +1875,8 @@ dataSources:
           file: ./abis/IFilteredMinterMerkleV2.json
         - name: IFilteredMinterSEAV0
           file: ./abis/IFilteredMinterSEAV0.json
+        - name: ERC20
+          file: ./abis/ERC20.json
       eventHandlers:
         - event: AuctionHalfLifeRangeSecondsUpdated(uint256,uint256)
           handler: handleAuctionHalfLifeRangeSecondsUpdated
@@ -1883,6 +1929,8 @@ dataSources:
           file: ./abis/IFilteredMinterMerkleV2.json
         - name: IFilteredMinterSEAV0
           file: ./abis/IFilteredMinterSEAV0.json
+        - name: ERC20
+          file: ./abis/ERC20.json
       eventHandlers:
         - event: MinimumAuctionLengthSecondsUpdated(uint256)
           handler: handleMinimumAuctionLengthSecondsUpdated
@@ -1936,6 +1984,8 @@ dataSources:
           file: ./abis/IFilteredMinterMerkleV2.json
         - name: IFilteredMinterSEAV0
           file: ./abis/IFilteredMinterSEAV0.json
+        - name: ERC20
+          file: ./abis/ERC20.json
       eventHandlers:
         - event: PricePerTokenInWeiUpdated(indexed uint256,indexed uint256)
           handler: handlePricePerTokenInWeiUpdated
@@ -1992,6 +2042,8 @@ dataSources:
           file: ./abis/IFilteredMinterMerkleV2.json
         - name: IFilteredMinterSEAV0
           file: ./abis/IFilteredMinterSEAV0.json
+        - name: ERC20
+          file: ./abis/ERC20.json
       eventHandlers:
         - event: PricePerTokenInWeiUpdated(indexed uint256,indexed uint256)
           handler: handlePricePerTokenInWeiUpdated
@@ -2044,6 +2096,8 @@ dataSources:
           file: ./abis/IFilteredMinterMerkleV2.json
         - name: IFilteredMinterSEAV0
           file: ./abis/IFilteredMinterSEAV0.json
+        - name: ERC20
+          file: ./abis/ERC20.json
       eventHandlers:
         - event: PricePerTokenInWeiUpdated(indexed uint256,indexed uint256)
           handler: handlePricePerTokenInWeiUpdated
@@ -2098,6 +2152,8 @@ dataSources:
           file: ./abis/IFilteredMinterMerkleV2.json
         - name: IFilteredMinterSEAV0
           file: ./abis/IFilteredMinterSEAV0.json
+        - name: ERC20
+          file: ./abis/ERC20.json
       eventHandlers:
         - event: PricePerTokenInWeiUpdated(indexed uint256,indexed uint256)
           handler: handlePricePerTokenInWeiUpdated
@@ -2364,6 +2420,8 @@ templates:
           file: ./abis/IFilteredMinterDAExpV1.json
         - name: IFilteredMinterSEAV0
           file: ./abis/IFilteredMinterSEAV0.json
+        - name: ERC20
+          file: ./abis/ERC20.json
       eventHandlers:
         - event: Mint(indexed address,indexed uint256)
           handler: handleMint
@@ -2425,6 +2483,8 @@ templates:
           file: ./abis/GenArt721CoreV3_Engine.json
         - name: IERC721
           file: ./abis/IERC721.json
+        - name: ERC20
+          file: ./abis/ERC20.json
         - name: Ownable
           file: ./abis/Ownable.json
         - name: IAdminACLV0
@@ -2492,6 +2552,8 @@ templates:
           file: ./abis/GenArt721CoreV3_Engine.json
         - name: IERC721
           file: ./abis/IERC721.json
+        - name: ERC20
+          file: ./abis/ERC20.json
         - name: Ownable
           file: ./abis/Ownable.json
         - name: IAdminACLV0
@@ -2559,6 +2621,8 @@ templates:
           file: ./abis/GenArt721CoreV3_Engine.json
         - name: IERC721
           file: ./abis/IERC721.json
+        - name: ERC20
+          file: ./abis/ERC20.json
         - name: Ownable
           file: ./abis/Ownable.json
         - name: IAdminACLV0
