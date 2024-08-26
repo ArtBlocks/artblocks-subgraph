@@ -661,14 +661,6 @@ test(`${coreType}-${coreVersion}: Handles PlatformUpdated::providerSalesAddresse
     "renderProviderAddress",
     newRenderProviderPrimarySalesAddress.toHexString()
   );
-  // DEPRECATED START ---
-  assert.fieldEquals(
-    CONTRACT_ENTITY_TYPE,
-    TEST_CONTRACT_ADDRESS.toHexString(),
-    "renderProviderSecondarySalesAddress",
-    newRenderProviderSecondarySalesAddress.toHexString()
-  );
-  // DEPRECATED END ---
   assert.fieldEquals(
     CONTRACT_ENTITY_TYPE,
     TEST_CONTRACT_ADDRESS.toHexString(),
@@ -681,14 +673,6 @@ test(`${coreType}-${coreVersion}: Handles PlatformUpdated::providerSalesAddresse
     "enginePlatformProviderAddress",
     newPlatformProviderPrimarySalesAddress.toHexString()
   );
-  // DEPRECATED START ---
-  assert.fieldEquals(
-    CONTRACT_ENTITY_TYPE,
-    TEST_CONTRACT_ADDRESS.toHexString(),
-    "enginePlatformProviderSecondarySalesAddress",
-    newPlatformProviderSecondarySalesAddress.toHexString()
-  );
-  // DEPRECATED END ---
   assert.fieldEquals(
     CONTRACT_ENTITY_TYPE,
     TEST_CONTRACT_ADDRESS.toHexString(),
@@ -710,14 +694,6 @@ test(`${coreType}-${coreVersion}: Handles PlatformUpdated::providerPrimaryPercen
   );
 
   // default value should be test contract value
-  // DEPRECATED START ---
-  assert.fieldEquals(
-    CONTRACT_ENTITY_TYPE,
-    TEST_CONTRACT_ADDRESS.toHexString(),
-    "renderProviderSecondarySalesAddress",
-    TEST_CONTRACT.renderProviderSecondarySalesAddress.toHexString()
-  );
-  // DEPRECATED END ---
   assert.fieldEquals(
     CONTRACT_ENTITY_TYPE,
     TEST_CONTRACT_ADDRESS.toHexString(),
@@ -1147,20 +1123,6 @@ test(`${coreType}-${coreVersion}: Handles PlatformUpdated::providerSecondaryBPS 
   handlePlatformUpdated(event);
 
   // values in store should be updated
-  // DEPRECATED START ---
-  assert.fieldEquals(
-    CONTRACT_ENTITY_TYPE,
-    TEST_CONTRACT_ADDRESS.toHexString(),
-    "renderProviderSecondarySalesBPS",
-    newRenderProviderSecondarySalesBPS.toString()
-  );
-  assert.fieldEquals(
-    CONTRACT_ENTITY_TYPE,
-    TEST_CONTRACT_ADDRESS.toHexString(),
-    "enginePlatformProviderSecondarySalesBPS",
-    newPlatformProviderSecondarySalesBPS.toString()
-  );
-  // DEPRECATED END ---
   assert.fieldEquals(
     CONTRACT_ENTITY_TYPE,
     TEST_CONTRACT_ADDRESS.toHexString(),
@@ -1603,7 +1565,7 @@ describe(`${coreType}-${coreVersion}: handleProjectUpdated`, () => {
         PROJECT_ENTITY_TYPE,
         generateContractSpecificId(TEST_CONTRACT_ADDRESS, projectId),
         "renderProviderSecondarySalesAddress",
-        TEST_CONTRACT.renderProviderSecondarySalesAddress.toHexString()
+        TEST_CONTRACT.defaultRenderProviderSecondarySalesAddress.toHexString()
       );
       assert.fieldEquals(
         PROJECT_ENTITY_TYPE,
@@ -1616,7 +1578,7 @@ describe(`${coreType}-${coreVersion}: handleProjectUpdated`, () => {
         PROJECT_ENTITY_TYPE,
         generateContractSpecificId(TEST_CONTRACT_ADDRESS, projectId),
         "enginePlatformProviderSecondarySalesAddress",
-        TEST_CONTRACT.enginePlatformProviderSecondarySalesAddress.toHexString()
+        TEST_CONTRACT.defaultEnginePlatformProviderSecondarySalesAddress.toHexString()
       );
       assert.fieldEquals(
         PROJECT_ENTITY_TYPE,

@@ -772,14 +772,6 @@ test(`${coreType}: Handles PlatformUpdated::artblocksSecondarySalesAddress - def
   mockRefreshContractCalls(BigInt.fromI32(0), coreType, null);
 
   // default value should be false
-  // DEPRECATED START ---
-  assert.fieldEquals(
-    CONTRACT_ENTITY_TYPE,
-    TEST_CONTRACT_ADDRESS.toHexString(),
-    "renderProviderSecondarySalesAddress",
-    TEST_CONTRACT.renderProviderSecondarySalesAddress.toHexString()
-  );
-  // DEPRECATED END ---
   assert.fieldEquals(
     CONTRACT_ENTITY_TYPE,
     TEST_CONTRACT_ADDRESS.toHexString(),
@@ -818,14 +810,6 @@ test(`${coreType}: Handles PlatformUpdated::artblocksSecondarySalesAddress - cha
   handlePlatformUpdated(event);
 
   // value in store should be updated
-  // DEPRECATED START ---
-  assert.fieldEquals(
-    CONTRACT_ENTITY_TYPE,
-    TEST_CONTRACT_ADDRESS.toHexString(),
-    "renderProviderSecondarySalesAddress",
-    newAddress.toHexString()
-  );
-  // DEPRECATED END ---
   assert.fieldEquals(
     CONTRACT_ENTITY_TYPE,
     TEST_CONTRACT_ADDRESS.toHexString(),
@@ -887,14 +871,6 @@ test(`${coreType}: Handles PlatformUpdated::artblocksSecondarySalesAddress - cha
   handlePlatformUpdated(event);
 
   // value in store should be updated
-  // DEPRECATED START ---
-  assert.fieldEquals(
-    CONTRACT_ENTITY_TYPE,
-    TEST_CONTRACT_ADDRESS.toHexString(),
-    "renderProviderSecondarySalesAddress",
-    newAddress.toHexString()
-  );
-  // DEPRECATED END ---
   assert.fieldEquals(
     CONTRACT_ENTITY_TYPE,
     TEST_CONTRACT_ADDRESS.toHexString(),
@@ -1184,14 +1160,6 @@ test(`${coreType}: Handles PlatformUpdated::artblocksSecondaryBPS - default valu
   mockRefreshContractCalls(BigInt.fromI32(0), coreType, null);
 
   // default value should be false
-  // DEPRECATED START ---
-  assert.fieldEquals(
-    CONTRACT_ENTITY_TYPE,
-    TEST_CONTRACT_ADDRESS.toHexString(),
-    "renderProviderSecondarySalesBPS",
-    TEST_CONTRACT.renderProviderSecondarySalesBPS.toString()
-  );
-  // DEPRECATED END ---
   assert.fieldEquals(
     CONTRACT_ENTITY_TYPE,
     TEST_CONTRACT_ADDRESS.toHexString(),
@@ -1230,14 +1198,6 @@ test(`${coreType}: Handles PlatformUpdated::artblocksSecondaryBPS - changed valu
   handlePlatformUpdated(event);
 
   // value in store should be updated
-  // DEPRECATED START ---
-  assert.fieldEquals(
-    CONTRACT_ENTITY_TYPE,
-    TEST_CONTRACT_ADDRESS.toHexString(),
-    "renderProviderSecondarySalesBPS",
-    newValue.toString()
-  );
-  // DEPRECATED END ---
   assert.fieldEquals(
     CONTRACT_ENTITY_TYPE,
     TEST_CONTRACT_ADDRESS.toHexString(),

@@ -633,7 +633,7 @@ test(`${coreType}: Handles PlatformUpdated::providerPrimaryPercentages - default
     CONTRACT_ENTITY_TYPE,
     TEST_CONTRACT_ADDRESS.toHexString(),
     "renderProviderSecondarySalesAddress",
-    TEST_CONTRACT.renderProviderSecondarySalesAddress.toHexString()
+    TEST_CONTRACT.defaultRenderProviderSecondarySalesAddress.toHexString()
   );
 });
 
@@ -930,7 +930,7 @@ test(`${coreType}: Handles PlatformUpdated::providerSecondaryBPS - default value
     CONTRACT_ENTITY_TYPE,
     TEST_CONTRACT_ADDRESS.toHexString(),
     "renderProviderSecondarySalesBPS",
-    TEST_CONTRACT.renderProviderSecondarySalesBPS.toString()
+    TEST_CONTRACT.defaultRenderProviderSecondarySalesBPS.toString()
   );
 });
 

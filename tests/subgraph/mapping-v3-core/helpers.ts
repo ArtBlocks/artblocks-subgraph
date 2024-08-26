@@ -204,7 +204,7 @@ export function mockRefreshContractCalls(
       "artblocksSecondarySalesAddress():(address)"
     ).returns([
       ethereum.Value.fromAddress(
-        TEST_CONTRACT.renderProviderSecondarySalesAddress
+        TEST_CONTRACT.defaultRenderProviderSecondarySalesAddress
       )
     ]);
 
@@ -214,7 +214,7 @@ export function mockRefreshContractCalls(
       "artblocksSecondarySalesBPS():(uint256)"
     ).returns([
       ethereum.Value.fromUnsignedBigInt(
-        TEST_CONTRACT.renderProviderSecondarySalesBPS
+        TEST_CONTRACT.defaultRenderProviderSecondarySalesBPS
       )
     ]);
 
@@ -250,7 +250,7 @@ export function mockRefreshContractCalls(
       "renderProviderSecondarySalesAddress():(address)"
     ).returns([
       ethereum.Value.fromAddress(
-        TEST_CONTRACT.renderProviderSecondarySalesAddress
+        TEST_CONTRACT.defaultRenderProviderSecondarySalesAddress
       )
     ]);
 
@@ -260,7 +260,7 @@ export function mockRefreshContractCalls(
       "renderProviderSecondarySalesBPS():(uint256)"
     ).returns([
       ethereum.Value.fromUnsignedBigInt(
-        TEST_CONTRACT.renderProviderSecondarySalesBPS
+        TEST_CONTRACT.defaultRenderProviderSecondarySalesBPS
       )
     ]);
 
@@ -289,7 +289,7 @@ export function mockRefreshContractCalls(
       "platformProviderSecondarySalesAddress():(address)"
     ).returns([
       ethereum.Value.fromAddress(
-        TEST_CONTRACT.enginePlatformProviderSecondarySalesAddress
+        TEST_CONTRACT.defaultEnginePlatformProviderSecondarySalesAddress
       )
     ]);
 
@@ -299,7 +299,7 @@ export function mockRefreshContractCalls(
       "platformProviderSecondarySalesBPS():(uint256)"
     ).returns([
       ethereum.Value.fromUnsignedBigInt(
-        TEST_CONTRACT.enginePlatformProviderSecondarySalesBPS
+        TEST_CONTRACT.defaultEnginePlatformProviderSecondarySalesBPS
       )
     ]);
 
