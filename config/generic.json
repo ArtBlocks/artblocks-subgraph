@@ -75,6 +75,11 @@
       "address": ""
     }
   ],
+  "minPriceLibContracts": [
+    {
+      "address": ""
+    }
+  ],
   "maxInvocationsLibContracts": [
     {
       "address": ""
