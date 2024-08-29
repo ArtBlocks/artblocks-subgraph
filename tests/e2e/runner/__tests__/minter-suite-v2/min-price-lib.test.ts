@@ -57,7 +57,7 @@ describe("MinPriceLib event handling", () => {
       const minterRes = await getMinterDetails(client, targetId);
       const extraMinterDetails = JSON.parse(minterRes.extraMinterDetails);
       expect(extraMinterDetails.defaultMinMintFee).toBe(
-        expectedValue.toNumber()
+        expectedValue.toString()
       );
     });
   });
