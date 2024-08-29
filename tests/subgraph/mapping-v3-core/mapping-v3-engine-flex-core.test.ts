@@ -615,7 +615,7 @@ test(`${coreType}: Handles PlatformUpdated::providerSalesAddresses - changed val
   assert.fieldEquals(
     CONTRACT_ENTITY_TYPE,
     TEST_CONTRACT_ADDRESS.toHexString(),
-    "enginePlatformProviderSecondarySalesAddress",
+    "defaultEnginePlatformProviderSecondarySalesAddress",
     newPlatformProviderSecondarySalesAddress.toHexString()
   );
 });
@@ -984,7 +984,7 @@ test(`${coreType}: Handles PlatformUpdated::providerSecondaryBPS - changed value
   assert.fieldEquals(
     CONTRACT_ENTITY_TYPE,
     TEST_CONTRACT_ADDRESS.toHexString(),
-    "enginePlatformProviderSecondarySalesBPS",
+    "defaultEnginePlatformProviderSecondarySalesBPS",
     newPlatformProviderSecondarySalesBPS.toString()
   );
 });
