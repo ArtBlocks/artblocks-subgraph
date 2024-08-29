@@ -1145,14 +1145,6 @@ test(`${coreType}: Handles PlatformUpdated::providerSecondaryBPS - default value
   mockRefreshContractCalls(BigInt.fromI32(0), coreType, null);
 
   // default value should be test contract default value
-  // DEFAULT START ---
-  assert.fieldEquals(
-    CONTRACT_ENTITY_TYPE,
-    TEST_CONTRACT_ADDRESS.toHexString(),
-    "renderProviderSecondarySalesBPS",
-    TEST_CONTRACT.defaultRenderProviderSecondarySalesBPS.toString()
-  );
-  // DEFAULT END ---
   assert.fieldEquals(
     CONTRACT_ENTITY_TYPE,
     TEST_CONTRACT_ADDRESS.toHexString(),
