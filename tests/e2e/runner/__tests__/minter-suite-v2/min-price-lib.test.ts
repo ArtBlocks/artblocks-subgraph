@@ -44,21 +44,19 @@ describe("MinPriceLib event handling", () => {
     });
   });
 
-  describe("DefaultMinMintFeeUpdated", () => {
+  describe("MinMintFeeUpdated", () => {
     // this is a minter-level, value set in the constructor and other function(s),
     // so we can inspect it by checking the Minter entity in the subgraph
     // that was created during deployment
     test("value was populated during deployment", async () => {
       // query public constant for the expected value (>0)
-      const expectedValue = await minterMinPriceV0Contract.defaultMinMintFee();
+      const expectedValue = await minterMinPriceV0Contract.minMintFee();
       expect(expectedValue.gt(0)).toBe(true);
       // validate minter's extraMinterDetails in subgraph
       const targetId = minterMinPriceV0Address.toLowerCase();
       const minterRes = await getMinterDetails(client, targetId);
       const extraMinterDetails = JSON.parse(minterRes.extraMinterDetails);
-      expect(extraMinterDetails.defaultMinMintFee).toBe(
-        expectedValue.toString()
-      );
+      expect(extraMinterDetails.minMintFee).toBe(expectedValue.toString());
     });
   });
 });

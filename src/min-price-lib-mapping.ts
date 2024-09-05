@@ -1,4 +1,4 @@
-import { DefaultMinMintFeeUpdated } from "../generated/MinPriceLib/MinPriceLib";
+import { MinMintFeeUpdated } from "../generated/MinPriceLib/MinPriceLib";
 import { loadOrCreateMinter } from "./helpers";
 import { setMinterExtraMinterDetailsValue } from "./extra-minter-details-helpers";
 
@@ -7,21 +7,19 @@ import { setMinterExtraMinterDetailsValue } from "./extra-minter-details-helpers
 ///////////////////////////////////////////////////////////////////////////////
 
 /**
- * Handles the update of contract-level default mint fee.
+ * Handles the update of contract-level min mint fee.
  * Loads or creates the minter, updates the minter's extra minter details with
  * the updated value, and induces a sync of the minter entity.
- * @param event The event carrying new default mint fee value.
+ * @param event The event carrying new min mint fee value.
  */
-export function handleDefaultMinMintFeeUpdated(
-  event: DefaultMinMintFeeUpdated
-): void {
+export function handleMinMintFeeUpdated(event: MinMintFeeUpdated): void {
   // load minter
   const minter = loadOrCreateMinter(event.address, event.block.timestamp);
 
   // update minter entity
   setMinterExtraMinterDetailsValue(
-    "defaultMinMintFee",
-    event.params.defaultMinMintFee.toString(),
+    "minMintFee",
+    event.params.minMintFee.toString(),
     minter
   );
 

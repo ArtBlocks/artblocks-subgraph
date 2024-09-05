@@ -1251,8 +1251,8 @@ dataSources:
         - name: ERC20
           file: ./abis/ERC20.json
       eventHandlers:
-        - event: DefaultMinMintFeeUpdated(uint256)
-          handler: handleDefaultMinMintFeeUpdated
+        - event: MinMintFeeUpdated(uint256)
+          handler: handleMinMintFeeUpdated
       file: ./src/min-price-lib-mapping.ts
   {{/minPriceLibContracts}}
   {{#maxInvocationsLibContracts}}

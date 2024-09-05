@@ -422,11 +422,11 @@ async function main() {
   ];
 
   // Min Price Minters
-  const DEFAULT_MINT_FEE = ethers.utils.parseEther("0.1");
+  const MIN_MINT_FEE = ethers.utils.parseEther("0.1");
   const MinterMinPriceV0Factory = new MinterMinPriceV0__factory(deployer);
   const minterMinPriceV0 = await MinterMinPriceV0Factory.deploy(
     minterFilter.address,
-    DEFAULT_MINT_FEE
+    MIN_MINT_FEE
   );
   await minterMinPriceV0.deployed();
   console.log(`minterMinPriceV0 deployed at ${minterMinPriceV0.address}`);
