@@ -1531,18 +1531,14 @@ function refreshContract<T>(contract: T, timestamp: BigInt): Contract | null {
     const renderProviderSecondarySalesBPS = contract.artblocksSecondarySalesBPS();
     // detect if secondary sales payment info have changed
     const platformSecondaryHaveChanged =
-      !contractEntity.renderProviderSecondarySalesAddress ||
+      !contractEntity.defaultRenderProviderSecondarySalesAddress ||
       Address.fromBytes(
-        contractEntity.renderProviderSecondarySalesAddress as Bytes // @dev casting shouldn't be necessary, but is required to compile
+        contractEntity.defaultRenderProviderSecondarySalesAddress as Bytes // @dev casting shouldn't be necessary, but is required to compile
       ).toHexString() != renderProviderSecondarySalesAddress.toHexString() ||
-      !contractEntity.renderProviderSecondarySalesBPS ||
-      (contractEntity.renderProviderSecondarySalesBPS as BigInt) != // @dev casting shouldn't be necessary, but is required to compile
+      !contractEntity.defaultRenderProviderSecondarySalesBPS ||
+      (contractEntity.defaultRenderProviderSecondarySalesBPS as BigInt) != // @dev casting shouldn't be necessary, but is required to compile
         renderProviderSecondarySalesBPS;
     if (platformSecondaryHaveChanged) {
-      // @dev DEPRECATED-START ---
-      contractEntity.renderProviderSecondarySalesAddress = renderProviderSecondarySalesAddress;
-      contractEntity.renderProviderSecondarySalesBPS = renderProviderSecondarySalesBPS;
-      // @dev DEPRECATED-END ---
       contractEntity.defaultRenderProviderSecondarySalesAddress = renderProviderSecondarySalesAddress;
       contractEntity.defaultRenderProviderSecondarySalesBPS = renderProviderSecondarySalesBPS;
       // secondary sales are defined on the projects after release of v3.2 core contracts
@@ -1588,28 +1584,22 @@ function refreshContract<T>(contract: T, timestamp: BigInt): Contract | null {
       const enginePlatformProviderSecondarySalesBPS = preV3_2Contract.platformProviderSecondarySalesBPS();
       // detect if secondary sales payment info have changed (to prevent unnecessary updates)
       let platformSecondaryHaveChanged =
-        !contractEntity.renderProviderSecondarySalesAddress ||
+        !contractEntity.defaultRenderProviderSecondarySalesAddress ||
         Address.fromBytes(
-          contractEntity.renderProviderSecondarySalesAddress as Bytes // @dev casting shouldn't be necessary, but is required to compile
+          contractEntity.defaultRenderProviderSecondarySalesAddress as Bytes // @dev casting shouldn't be necessary, but is required to compile
         ).toHexString() != renderProviderSecondarySalesAddress.toHexString() ||
-        !contractEntity.renderProviderSecondarySalesBPS ||
-        (contractEntity.renderProviderSecondarySalesBPS as BigInt) != // @dev casting shouldn't be necessary, but is required to compile
+        !contractEntity.defaultRenderProviderSecondarySalesBPS ||
+        (contractEntity.defaultRenderProviderSecondarySalesBPS as BigInt) != // @dev casting shouldn't be necessary, but is required to compile
           renderProviderSecondarySalesBPS ||
-        !contractEntity.enginePlatformProviderSecondarySalesAddress ||
+        !contractEntity.defaultEnginePlatformProviderSecondarySalesAddress ||
         Address.fromBytes(
-          contractEntity.enginePlatformProviderSecondarySalesAddress as Bytes // @dev casting shouldn't be necessary, but is required to compile
+          contractEntity.defaultEnginePlatformProviderSecondarySalesAddress as Bytes // @dev casting shouldn't be necessary, but is required to compile
         ).toHexString() !=
           enginePlatformProviderSecondarySalesAddress.toHexString() ||
-        !contractEntity.enginePlatformProviderSecondarySalesBPS ||
-        (contractEntity.enginePlatformProviderSecondarySalesBPS as BigInt) != // @dev casting shouldn't be necessary, but is required to compile
+        !contractEntity.defaultEnginePlatformProviderSecondarySalesBPS ||
+        (contractEntity.defaultEnginePlatformProviderSecondarySalesBPS as BigInt) != // @dev casting shouldn't be necessary, but is required to compile
           enginePlatformProviderSecondarySalesBPS;
       if (platformSecondaryHaveChanged) {
-        // @dev DEPRECATED-START ---
-        contractEntity.renderProviderSecondarySalesAddress = renderProviderSecondarySalesAddress;
-        contractEntity.renderProviderSecondarySalesBPS = renderProviderSecondarySalesBPS;
-        contractEntity.enginePlatformProviderSecondarySalesAddress = enginePlatformProviderSecondarySalesAddress;
-        contractEntity.enginePlatformProviderSecondarySalesBPS = enginePlatformProviderSecondarySalesBPS;
-        // @dev DEPRECATED-END ---
         // set defaults to the contract-level fields for pre-v3.2 contracts
         contractEntity.defaultRenderProviderSecondarySalesAddress = renderProviderSecondarySalesAddress;
         contractEntity.defaultRenderProviderSecondarySalesBPS = renderProviderSecondarySalesBPS;
@@ -1648,13 +1638,6 @@ function refreshContract<T>(contract: T, timestamp: BigInt): Contract | null {
       // @dev no need to optimally detect if secondary sales payment info have changed, as we are setting defaults
       // and not iterating over all projects on the contract
 
-      // backwards-compatible deprecated fields
-      // @dev DEPRECATED-START ---
-      contractEntity.renderProviderSecondarySalesAddress = defaultRenderProviderSecondarySalesAddress;
-      contractEntity.renderProviderSecondarySalesBPS = defaultRenderProviderSecondarySalesBPS;
-      contractEntity.enginePlatformProviderSecondarySalesAddress = defaultEnginePlatformProviderSecondarySalesAddress;
-      contractEntity.enginePlatformProviderSecondarySalesBPS = defaultEnginePlatformProviderSecondarySalesBPS;
-      // @dev DEPRECATED-END ---
       // set defaults to the default values for v3.2+ contracts
       contractEntity.defaultRenderProviderSecondarySalesAddress = defaultRenderProviderSecondarySalesAddress;
       contractEntity.defaultRenderProviderSecondarySalesBPS = defaultRenderProviderSecondarySalesBPS;

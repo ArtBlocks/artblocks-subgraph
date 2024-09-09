@@ -1204,6 +1204,57 @@ dataSources:
           handler: handlePricePerTokenReset
       file: ./src/set-price-lib-mapping.ts
   {{/setPriceLibContracts}}
+  {{#minPriceLibContracts}}
+  - kind: ethereum/contract
+    name: 'MinPriceLib{{#address}}-{{address}}{{/address}}'
+    network: {{network}}
+    source:
+      address: "{{#address}}{{address}}{{/address}}{{^address}}0x0000000000000000000000000000000000000000{{/address}}"
+      abi: MinPriceLib
+      {{#startBlock}}startBlock: {{startBlock}}{{/startBlock}}
+    mapping:
+      kind: ethereum/events
+      apiVersion: 0.0.5
+      language: wasm/assemblyscript
+      entities:
+        - Project
+        - ProjectScript
+        - Token
+        - Contract
+        - Account
+        - AccountProject
+        - Whitelisting
+        - MinterFilter
+        - Minter
+        - ProjectMinterConfiguration
+      abis:
+        - name: MinPriceLib
+          file: ./abis/MinPriceLib.json
+        - name: ISharedMinterV0
+          file: ./abis/ISharedMinterV0.json
+        - name: IFilteredMinterV2
+          file: ./abis/IFilteredMinterV2.json
+        - name: IFilteredMinterDALinV1
+          file: ./abis/IFilteredMinterDALinV1.json
+        - name: IFilteredMinterDAExpV1
+          file: ./abis/IFilteredMinterDAExpV1.json
+        - name: IFilteredMinterDAExpSettlementV1
+          file: ./abis/IFilteredMinterDAExpSettlementV1.json
+        - name: IFilteredMinterV2
+          file: ./abis/IFilteredMinterV2.json
+        - name: IFilteredMinterHolderV2
+          file: ./abis/IFilteredMinterHolderV2.json
+        - name: IFilteredMinterMerkleV2
+          file: ./abis/IFilteredMinterMerkleV2.json
+        - name: IFilteredMinterSEAV0
+          file: ./abis/IFilteredMinterSEAV0.json
+        - name: ERC20
+          file: ./abis/ERC20.json
+      eventHandlers:
+        - event: MinMintFeeUpdated(uint256)
+          handler: handleMinMintFeeUpdated
+      file: ./src/min-price-lib-mapping.ts
+  {{/minPriceLibContracts}}
   {{#maxInvocationsLibContracts}}
   - kind: ethereum/contract
     name: 'MaxInvocationsLib{{#address}}-{{address}}{{/address}}'
