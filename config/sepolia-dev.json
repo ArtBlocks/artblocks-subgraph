@@ -352,7 +352,7 @@
       "blockNumber": 5621983
     }
   ],
-  "MinPriceLibContracts": [
+  "minPriceLibContracts": [
     {
       "address": "0x8b15aC3F02D9dd200C48c126d3e22d3e0325a6a5",
       "name": "Sepolia dev shared minter: MinterMinPriceV0",
