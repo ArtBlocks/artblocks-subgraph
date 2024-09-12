@@ -30,6 +30,7 @@ export type SubgraphConfig = Partial<{
   maxInvocationsLibContracts: { address: string }[];
   merkleLibContracts: { address: string }[];
   holderLibContracts: { address: string }[];
+  minPriceLibContracts: { address: string }[];
   SEALibContracts: { address: string }[];
   RAMLibContracts: { address: string }[];
   DALibContracts: { address: string }[];
