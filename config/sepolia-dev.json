@@ -30,6 +30,16 @@
   ],
   "genericMinterEventsLibContracts": [
     {
+      "address": "0x8b15aC3F02D9dd200C48c126d3e22d3e0325a6a5",
+      "name": "Sepolia dev shared minter: MinterMinPriceV0",
+      "startBlock": 6645666
+    },
+    {
+      "address": "0x6063504bc2408dA5D51167A73e0d4f49ad593288",
+      "name": "Sepolia dev shared minter: MinterMinPriceMerkleV0",
+      "startBlock": 6645668
+    },
+    {
       "address": "0x9Fa2FDE53148e0dcbA6335E51Bd539BedCe633E4",
       "name": "Sepolia dev shared minter: MinterSEAV1",
       "blockNumber": 5140819
@@ -109,6 +119,16 @@
   ],
   "setPriceLibContracts": [
     {
+      "address": "0x8b15aC3F02D9dd200C48c126d3e22d3e0325a6a5",
+      "name": "Sepolia dev shared minter: MinterMinPriceV0",
+      "startBlock": 6645666
+    },
+    {
+      "address": "0x6063504bc2408dA5D51167A73e0d4f49ad593288",
+      "name": "Sepolia dev shared minter: MinterMinPriceMerkleV0",
+      "startBlock": 6645668
+    },
+    {
       "address": "0x42c250c81cd2D38143a89A21cab6434092c2F52b",
       "name": "Sepolia dev shared minter: MinterSetPriceV5",
       "blockNumber": 4655325
@@ -140,6 +160,16 @@
     }
   ],
   "maxInvocationsLibContracts": [
+    {
+      "address": "0x8b15aC3F02D9dd200C48c126d3e22d3e0325a6a5",
+      "name": "Sepolia dev shared minter: MinterMinPriceV0",
+      "startBlock": 6645666
+    },
+    {
+      "address": "0x6063504bc2408dA5D51167A73e0d4f49ad593288",
+      "name": "Sepolia dev shared minter: MinterMinPriceMerkleV0",
+      "startBlock": 6645668
+    },
     {
       "address": "0x42c250c81cd2D38143a89A21cab6434092c2F52b",
       "name": "Sepolia dev shared minter: MinterSetPriceV5",
@@ -207,6 +237,11 @@
     }
   ],
   "merkleLibContracts": [
+    {
+      "address": "0x6063504bc2408dA5D51167A73e0d4f49ad593288",
+      "name": "Sepolia dev shared minter: MinterMinPriceMerkleV0",
+      "startBlock": 6645668
+    },
     {
       "address": "0x522FA6Bd096787b9aD5E96cD8c6CC1ECAe582044",
       "name": "Sepolia dev shared minter: MinterSetPriceMerkleV5",
@@ -315,6 +350,18 @@
       "address": "0xaCdAeb402C6733CeaeF332383AEaB1763e712722",
       "name": "Sepolia dev shared minter: MinterRAMV0",
       "blockNumber": 5621983
+    }
+  ],
+  "minPriceLibContracts": [
+    {
+      "address": "0x8b15aC3F02D9dd200C48c126d3e22d3e0325a6a5",
+      "name": "Sepolia dev shared minter: MinterMinPriceV0",
+      "startBlock": 6645666
+    },
+    {
+      "address": "0x6063504bc2408dA5D51167A73e0d4f49ad593288",
+      "name": "Sepolia dev shared minter: MinterMinPriceMerkleV0",
+      "startBlock": 6645668
     }
   ],
   "adminACLV0Contracts": [
