@@ -248,23 +248,11 @@ type Contract @entity {
   "Percentage of primary sales allocated to the platform"
   renderProviderPercentage: BigInt!
 
-  "Deprecated field, will be removed and is not populated for v3.2+ - see Project.renderProviderSecondarySalesAddress"
-  renderProviderSecondarySalesAddress: Bytes
-
-  "Deprecated field, will be removed and is not populated for v3.2+ - see Project.renderProviderSecondarySalesBPS"
-  renderProviderSecondarySalesBPS: BigInt
-
   "Address that receives primary sales platform fees, only for V3_Engine contracts"
   enginePlatformProviderAddress: Bytes
 
   "Percentage of primary sales allocated to the platform, only for V3_Engine contracts"
   enginePlatformProviderPercentage: BigInt
-
-  "Deprecated field, will be removed and is not populated for v3.2+ - see Project.enginePlatformProviderSecondarySalesAddress"
-  enginePlatformProviderSecondarySalesAddress: Bytes
-
-  "Deprecated field, will be removed and is not populated for v3.2+ - see Project.enginePlatformProviderSecondarySalesBPS"
-  enginePlatformProviderSecondarySalesBPS: BigInt
 
   "Default address that receives secondary sales render provider royalties when adding new projects (null for pre-V3 contracts)"
   defaultRenderProviderSecondarySalesAddress: Bytes

@@ -603,7 +603,7 @@ test(`${coreType}: Handles PlatformUpdated::providerSalesAddresses - changed val
   assert.fieldEquals(
     CONTRACT_ENTITY_TYPE,
     TEST_CONTRACT_ADDRESS.toHexString(),
-    "renderProviderSecondarySalesAddress",
+    "defaultRenderProviderSecondarySalesAddress",
     newRenderProviderSecondarySalesAddress.toHexString()
   );
   assert.fieldEquals(
@@ -615,7 +615,7 @@ test(`${coreType}: Handles PlatformUpdated::providerSalesAddresses - changed val
   assert.fieldEquals(
     CONTRACT_ENTITY_TYPE,
     TEST_CONTRACT_ADDRESS.toHexString(),
-    "enginePlatformProviderSecondarySalesAddress",
+    "defaultEnginePlatformProviderSecondarySalesAddress",
     newPlatformProviderSecondarySalesAddress.toHexString()
   );
 });
@@ -632,8 +632,8 @@ test(`${coreType}: Handles PlatformUpdated::providerPrimaryPercentages - default
   assert.fieldEquals(
     CONTRACT_ENTITY_TYPE,
     TEST_CONTRACT_ADDRESS.toHexString(),
-    "renderProviderSecondarySalesAddress",
-    TEST_CONTRACT.renderProviderSecondarySalesAddress.toHexString()
+    "defaultRenderProviderSecondarySalesAddress",
+    TEST_CONTRACT.defaultRenderProviderSecondarySalesAddress.toHexString()
   );
 });
 
@@ -929,8 +929,8 @@ test(`${coreType}: Handles PlatformUpdated::providerSecondaryBPS - default value
   assert.fieldEquals(
     CONTRACT_ENTITY_TYPE,
     TEST_CONTRACT_ADDRESS.toHexString(),
-    "renderProviderSecondarySalesBPS",
-    TEST_CONTRACT.renderProviderSecondarySalesBPS.toString()
+    "defaultRenderProviderSecondarySalesBPS",
+    TEST_CONTRACT.defaultRenderProviderSecondarySalesBPS.toString()
   );
 });
 
@@ -978,13 +978,13 @@ test(`${coreType}: Handles PlatformUpdated::providerSecondaryBPS - changed value
   assert.fieldEquals(
     CONTRACT_ENTITY_TYPE,
     TEST_CONTRACT_ADDRESS.toHexString(),
-    "renderProviderSecondarySalesBPS",
+    "defaultRenderProviderSecondarySalesBPS",
     newRenderProviderSecondarySalesBPS.toString()
   );
   assert.fieldEquals(
     CONTRACT_ENTITY_TYPE,
     TEST_CONTRACT_ADDRESS.toHexString(),
-    "enginePlatformProviderSecondarySalesBPS",
+    "defaultEnginePlatformProviderSecondarySalesBPS",
     newPlatformProviderSecondarySalesBPS.toString()
   );
 });
