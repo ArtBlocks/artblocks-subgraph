@@ -15,7 +15,7 @@
     "deploy:studio-base": "yarn prepare:base && graph deploy --studio art-blocks-base",
     "deploy:studio-with-secondary": "yarn prepare:mainnet-with-secondary && graph deploy --studio art-blocks-with-secondary",
     "deploy:sepolia-dev": "yarn prepare:sepolia-dev && graph deploy --studio art-blocks-dev-sepolia",
-    "deploy:sepolia-staging": "yarn prepare:sepolia-staging && graph deploy --product hosted-service artblocks/art-blocks-staging-sepolia",
+    "deploy:sepolia-staging": "yarn prepare:sepolia-staging && graph deploy --studio art-blocks-staging-sepolia",
     "deploy:arbitrum-sepolia-staging": "yarn prepare:arbitrum-sepolia-staging && graph deploy --product hosted-service artblocks/art-blocks-staging-arb-sepolia",
     "deploy:arbitrum-one": "yarn prepare:arbitrum-one && graph deploy --product hosted-service --node https://api.thegraph.com/deploy/ --ipfs https://api.thegraph.com/ipfs/ artblocks/art-blocks-arbitrum",
     "create:local": "graph create --node http://localhost:8020/ artblocks/art-blocks",

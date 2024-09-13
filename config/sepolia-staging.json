@@ -30,6 +30,16 @@
   ],
   "genericMinterEventsLibContracts": [
     {
+      "address": "0xa1e3af1A317b23A3dD8f27fe3930e837B6fce40d",
+      "name": "Sepolia staging shared minter: MinterMinPriceV0",
+      "startBlock": 6685744
+    },
+    {
+      "address": "0x6B230C15Fe09a293459E135275A08563c37C5452",
+      "name": "Sepolia staging shared minter: MinterMinPriceMerkleV0",
+      "startBlock": 6685747
+    },
+    {
       "address": "0x9E19D9Ec5a73E616C153E65291306F6ef1917Bdf",
       "name": "Sepolia staging shared minter: MinterSEAV1",
       "blockNumber": 5140842
@@ -104,6 +114,16 @@
   ],
   "setPriceLibContracts": [
     {
+      "address": "0xa1e3af1A317b23A3dD8f27fe3930e837B6fce40d",
+      "name": "Sepolia staging shared minter: MinterMinPriceV0",
+      "startBlock": 6685744
+    },
+    {
+      "address": "0x6B230C15Fe09a293459E135275A08563c37C5452",
+      "name": "Sepolia staging shared minter: MinterMinPriceMerkleV0",
+      "startBlock": 6685747
+    },
+    {
       "address": "0xA84E2eFFfCFd1cbE01785Bd10aaEE520A68CD3DD",
       "name": "Sepolia staging shared minter: MinterSetPriceV5",
       "blockNumber": 4655740
@@ -135,6 +155,16 @@
     }
   ],
   "maxInvocationsLibContracts": [
+    {
+      "address": "0xa1e3af1A317b23A3dD8f27fe3930e837B6fce40d",
+      "name": "Sepolia staging shared minter: MinterMinPriceV0",
+      "startBlock": 6685744
+    },
+    {
+      "address": "0x6B230C15Fe09a293459E135275A08563c37C5452",
+      "name": "Sepolia staging shared minter: MinterMinPriceMerkleV0",
+      "startBlock": 6685747
+    },
     {
       "address": "0xA84E2eFFfCFd1cbE01785Bd10aaEE520A68CD3DD",
       "name": "Sepolia staging shared minter: MinterSetPriceV5",
@@ -197,6 +227,11 @@
     }
   ],
   "merkleLibContracts": [
+    {
+      "address": "0x6B230C15Fe09a293459E135275A08563c37C5452",
+      "name": "Sepolia staging shared minter: MinterMinPriceMerkleV0",
+      "startBlock": 6685747
+    },
     {
       "address": "0xdD1724761e8f291545EA18eE16cCB3f1dDD07466",
       "name": "Sepolia staging shared minter: MinterSetPriceMerkleV5",
@@ -301,6 +336,18 @@
     }
   ],
   "RAMLibContracts": [],
+  "minPriceLibContracts": [
+    {
+      "address": "0xa1e3af1A317b23A3dD8f27fe3930e837B6fce40d",
+      "name": "Sepolia staging shared minter: MinterMinPriceV0",
+      "startBlock": 6685744
+    },
+    {
+      "address": "0x6B230C15Fe09a293459E135275A08563c37C5452",
+      "name": "Sepolia staging shared minter: MinterMinPriceMerkleV0",
+      "startBlock": 6685747
+    }
+  ],
   "adminACLV0Contracts": [
     {
       "address": "0x3b30d421a6dA95694EaaE09971424F15Eb375269",
