@@ -1216,13 +1216,25 @@ export function handleExternalAssetDependencyUpdated(
     FLEX_CONTRACT_EXTERNAL_ASSET_DEP_TYPES[event.params._dependencyType];
 
   if (assetEntity.dependencyType === "ONCHAIN") {
-    const projextExternalAssetDependency = engineFlexContract.projectExternalAssetDependencyByIndex(
+    // @dev this needs a try_ in case an invalid bytecode address was set by artist when configuring the project
+    const projextExternalAssetDependencyResult = engineFlexContract.try_projectExternalAssetDependencyByIndex(
       event.params._projectId,
       event.params._index
     );
-    assetEntity.bytecodeAddress =
-      projextExternalAssetDependency.bytecodeAddress;
-    assetEntity.data = projextExternalAssetDependency.data;
+    if (projextExternalAssetDependencyResult.reverted) {
+      log.warning(
+        "Failed to get external asset dependency for project {} at index {}",
+        [project.id, event.params._index.toString()]
+      );
+      assetEntity.bytecodeAddress = null;
+      assetEntity.data = null;
+    } else {
+      const projextExternalAssetDependency =
+        projextExternalAssetDependencyResult.value;
+      assetEntity.bytecodeAddress =
+        projextExternalAssetDependency.bytecodeAddress;
+      assetEntity.data = projextExternalAssetDependency.data;
+    }
   }
 
   assetEntity.save();
@@ -1287,21 +1299,37 @@ export function handleExternalAssetDependencyRemoved(
       generateProjectExternalAssetDependencyId(project.id, index.toString())
     );
 
-    const contractExternalAsset = engineFlexContract.projectExternalAssetDependencyByIndex(
+    assetEntity.project = project.id;
+    assetEntity.index = index;
+
+    // @dev this needs a try_ in case an invalid bytecode address was set by artist when configuring the project
+    const contractExternalAssetResult = engineFlexContract.try_projectExternalAssetDependencyByIndex(
       project.projectId,
       index
     );
-
-    assetEntity.cid = contractExternalAsset.cid;
-    assetEntity.project = project.id;
-    assetEntity.index = index;
-    assetEntity.dependencyType =
-      FLEX_CONTRACT_EXTERNAL_ASSET_DEP_TYPES[
-        contractExternalAsset.dependencyType
-      ];
-    if (assetEntity.dependencyType === "ONCHAIN") {
-      assetEntity.bytecodeAddress = contractExternalAsset.bytecodeAddress;
-      assetEntity.data = contractExternalAsset.data;
+    if (contractExternalAssetResult.reverted) {
+      log.warning(
+        "Failed to get external asset dependency for project {} at index {}. Values will be set to null or default.",
+        [project.id, index.toString()]
+      );
+      assetEntity.bytecodeAddress = null;
+      assetEntity.data = null;
+      assetEntity.cid = "";
+      // @dev this is a dummy value to conform to enum type. warning is logged
+      assetEntity.dependencyType = "IPFS";
+      assetEntity.bytecodeAddress = null;
+      assetEntity.data = null;
+    } else {
+      const contractExternalAsset = contractExternalAssetResult.value;
+      assetEntity.cid = contractExternalAsset.cid;
+      assetEntity.dependencyType =
+        FLEX_CONTRACT_EXTERNAL_ASSET_DEP_TYPES[
+          contractExternalAsset.dependencyType
+        ];
+      if (assetEntity.dependencyType === "ONCHAIN") {
+        assetEntity.bytecodeAddress = contractExternalAsset.bytecodeAddress;
+        assetEntity.data = contractExternalAsset.data;
+      }
     }
     assetEntity.save();
   }
