@@ -178,6 +178,11 @@
       "startBlock": 20815636
     },
     {
+      "address": "0xDeA98CB77d90e03dbF312626402ADb452Ed7a4e3",
+      "name": "mainnet shared minter: MinterRAMV0",
+      "blockNumber": 20866252
+    },
+    {
       "address": "0x0635E2f2926b306356b5B3F5CB6489107796b085",
       "name": "mainnet shared minter: MinterSetPriceV5",
       "startBlock": 18486235
@@ -297,6 +302,11 @@
       "address": "0x723EBF276f95E992480D009bC132c9820A39B58F",
       "name": "mainnet shared minter: MinterMinPriceMerkleV0",
       "startBlock": 20815636
+    },
+    {
+      "address": "0xDeA98CB77d90e03dbF312626402ADb452Ed7a4e3",
+      "name": "mainnet shared minter: MinterRAMV0",
+      "blockNumber": 20866252
     },
     {
       "address": "0x0635E2f2926b306356b5B3F5CB6489107796b085",
@@ -454,6 +464,13 @@
       "address": "0x6caFC1B007F16f171B34eE45Fc61B378ad58F592",
       "name": "mainnet shared minter: MinterDAExpSettlementV3",
       "startBlock": 18486235
+    }
+  ],
+  "RAMLibContracts": [
+    {
+      "address": "0xDeA98CB77d90e03dbF312626402ADb452Ed7a4e3",
+      "name": "mainnet shared minter: MinterRAMV0",
+      "blockNumber": 20866252
     }
   ],
   "minPriceLibContracts": [
