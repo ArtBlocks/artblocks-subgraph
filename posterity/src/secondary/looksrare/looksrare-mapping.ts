@@ -37,8 +37,8 @@ export function handleTakerBid(event: TakerBid): void {
 
 /**
  *
- * @param event TakerAsk or TakerBid event from looksrare, beeing emitted when a seller accept
- * an offer from a buyer (TakerAsk) or when a buyer accept to buy from a seller (TakerBid)
+ * @param event TakerAsk or TakerBid event from looksrare, being emitted when a seller accepts
+ * an offer from a buyer (TakerAsk) or when a buyer accepts to buy from a seller (TakerBid)
  * @description This function handle TakerAsk/TakerBid events from LooksRare, build the associated Sale and
  * SaleLookUpTable entities and store them
  */
