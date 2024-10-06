@@ -178,7 +178,7 @@ function _handleSingleAssetSale(call: AtomicMatch_Call): void {
  *
  * @param call The AtomicMatch call that triggered the handleAtomicMatch_ call handler.
  * @description This function is used to handle the case of a "bundle" sale made from OpenSea.
- *              A "bundle" sale is a sale that contains several assets embeded in the same, atomic, transaction.
+ *              A "bundle" sale is a sale that contains several assets embedded in the same, atomic, transaction.
  */
 function _handleBundleSale(call: AtomicMatch_Call): void {
   let callInputs = call.inputs;
