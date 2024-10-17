@@ -347,6 +347,7 @@ describe("RAMLib event handling", () => {
       expect(bidRes.winningBid).toBe(false);
       expect(bidRes.isRemoved).toBe(false);
       expect(bidRes.timestamp).toBe(auctionBidTimestamp.toString());
+      expect(bidRes.logIndex).toBeDefined();
       expect(bidRes.updatedAt).toBe(auctionBidTimestamp.toString());
       expect(bidRes.project.id).toBe(`${genArt721CoreAddress.toLowerCase()}-0`);
       expect(bidRes.minter.id).toBe(minterRAMV0Address.toLowerCase());
@@ -380,6 +381,7 @@ describe("RAMLib event handling", () => {
       expect(toppedUpBidRes.value).toBe(slot12price.toString());
       expect(toppedUpBidRes.updatedAt).toBe(auctionBid2Timestamp.toString());
       expect(toppedUpBidRes.timestamp).toBe(auctionBid2Timestamp.toString());
+      expect(toppedUpBidRes.logIndex).toBeDefined();
     });
   });
 

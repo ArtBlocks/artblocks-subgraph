@@ -19,6 +19,7 @@ fragment BidDetails on Bid {
   value
   winningBid
   timestamp
+  logIndex
   updatedAt
 }
 

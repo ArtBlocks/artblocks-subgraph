@@ -553,6 +553,9 @@ type Bid @entity {
   "The timestamp of the bid"
   timestamp: BigInt!
 
+  "The log index of the event triggering bid update"
+  logIndex: BigInt!
+
   updatedAt: BigInt!
 }
 
