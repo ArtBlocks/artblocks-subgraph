@@ -299,6 +299,7 @@ export function handleBidCreated(event: BidCreated): void {
   bid.isRemoved = false;
   bid.slotIndex = event.params.slotIndex;
   bid.timestamp = event.block.timestamp;
+  bid.logIndex = event.logIndex;
   bid.updatedAt = event.block.timestamp;
   bid.save();
 }
@@ -395,6 +396,7 @@ export function handleBidToppedUp(event: BidToppedUp): void {
   bid.slotIndex = event.params.newSlotIndex;
   bid.value = bidValue;
   bid.timestamp = event.block.timestamp;
+  bid.logIndex = event.logIndex;
   bid.updatedAt = event.block.timestamp;
   bid.save();
 }
