@@ -56,7 +56,7 @@ function _calculateFinalPrice(
 }
 
 /**
- * Necessary function because of graph bugs whe calling `calculateMatchPrice_` of WyvernExchange, see: https://github.com/graphprotocol/graph-ts/issues/211
+ * Necessary function because of graph bugs when calling `calculateMatchPrice_` of WyvernExchange, see: https://github.com/graphprotocol/graph-ts/issues/211
  * @param buySide See `calculateFinalPrice` of WyvernExchange
  * @param buySaleKind See `calculateFinalPrice` of WyvernExchange
  * @param buyBasePrice See `calculateFinalPrice` of WyvernExchange
@@ -123,7 +123,7 @@ export function guardedArrayReplace(
   replacement: Bytes,
   mask: Bytes
 ): void {
-  // Sometime the replacementPattern is empty, meaning that both arrays (buyCallData and sellCallData) are identicall and
+  // Sometime the replacementPattern is empty, meaning that both arrays (buyCallData and sellCallData) are identical and
   // no merging is necessary. In such a case randomly return the first array (buyCallData)
   if (mask.length == 0) {
     return;
