@@ -490,6 +490,7 @@ function createBidFromValidEvent<T>(event: T): void {
   bid.winningBid = true;
   bid.isRemoved = false;
   bid.timestamp = event.block.timestamp;
+  bid.logIndex = event.logIndex;
   bid.updatedAt = event.block.timestamp;
   bid.save();
 }
