@@ -346,6 +346,7 @@ describe("RAMLib event handling", () => {
       expect(bidRes.value).toBe(slot10price.toString());
       expect(bidRes.winningBid).toBe(false);
       expect(bidRes.isRemoved).toBe(false);
+      expect(bidRes.txHash).toBe(receipt.transactionHash);
       expect(bidRes.timestamp).toBe(auctionBidTimestamp.toString());
       expect(bidRes.logIndex).toBeDefined();
       expect(bidRes.updatedAt).toBe(auctionBidTimestamp.toString());
@@ -380,6 +381,7 @@ describe("RAMLib event handling", () => {
       expect(toppedUpBidRes.isRemoved).toBe(false);
       expect(toppedUpBidRes.value).toBe(slot12price.toString());
       expect(toppedUpBidRes.updatedAt).toBe(auctionBid2Timestamp.toString());
+      expect(toppedUpBidRes.txHash).toBe(receipt2.transactionHash);
       expect(toppedUpBidRes.timestamp).toBe(auctionBid2Timestamp.toString());
       expect(toppedUpBidRes.logIndex).toBeDefined();
     });

@@ -550,6 +550,9 @@ type Bid @entity {
   "Indicates settlement status (RAM only)"
   settled: Boolean
 
+  "Transaction hash that created the bid"
+  txHash: Bytes!
+
   "The timestamp of the bid"
   timestamp: BigInt!
 
