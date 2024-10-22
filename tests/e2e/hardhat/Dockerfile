@@ -1,4 +1,4 @@
-FROM node:16.3.0-alpine
+FROM node:18-alpine
 RUN ["apk", "add", "--no-cache", "curl"]
 WORKDIR /usr/hardhat
 COPY . .
