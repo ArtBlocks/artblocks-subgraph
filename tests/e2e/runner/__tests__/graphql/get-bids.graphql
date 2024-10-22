@@ -18,6 +18,7 @@ fragment BidDetails on Bid {
   slotIndex
   value
   winningBid
+  txHash
   timestamp
   logIndex
   updatedAt
