@@ -1,4 +1,4 @@
-FROM node:16.10.0-alpine
+FROM node:18-alpine
 WORKDIR /usr/runner
 COPY . .
 RUN ["yarn"]
