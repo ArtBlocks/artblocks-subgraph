@@ -446,7 +446,12 @@ export function handleProjectUpdated(event: ProjectUpdated): void {
     update == FIELD_PROJECT_MAX_INVOCATIONS ||
     update == FIELD_PROJECT_PAUSED
   ) {
-    handleProjectStateDataUpdated(contract, project, timestamp);
+    handleProjectStateDataUpdated(
+      contract,
+      project,
+      timestamp,
+      update as string
+    );
   } else if (update == FIELD_PROJECT_ARTIST_ADDRESS) {
     handleProjectArtistAddressUpdated(contract, project, timestamp);
   } else if (
@@ -500,11 +505,17 @@ export function handleProjectUpdated(event: ProjectUpdated): void {
 function handleProjectStateDataUpdated(
   contract: IGenArt721CoreContractV3_Base,
   project: Project,
-  timestamp: BigInt
+  timestamp: BigInt,
+  updateField: string
 ): void {
   const projectStateData = contract.try_projectStateData(project.projectId);
   if (!projectStateData.reverted) {
-    project.active = projectStateData.value.getActive();
+    const active = projectStateData.value.getActive();
+    project.active = active;
+    if (updateField === FIELD_PROJECT_ACTIVE) {
+      project.activatedAt = active ? timestamp : null;
+    }
+
     project.maxInvocations = projectStateData.value.getMaxInvocations();
     project.paused = projectStateData.value.getPaused();
     project.updatedAt = timestamp;
