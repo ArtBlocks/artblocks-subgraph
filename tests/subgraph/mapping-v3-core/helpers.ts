@@ -705,6 +705,15 @@ export function testProjectStateDataUpdated(
     newValueAsString
   );
 
+  if (updateField === FIELD_PROJECT_ACTIVE) {
+    assert.fieldEquals(
+      PROJECT_ENTITY_TYPE,
+      fullProjectId,
+      "activatedAt",
+      CURRENT_BLOCK_TIMESTAMP.toString()
+    );
+  }
+
   assert.fieldEquals(
     PROJECT_ENTITY_TYPE,
     fullProjectId,
