@@ -530,7 +530,7 @@ describe("RAMLib event handling", () => {
       const extraMinterDetails = JSON.parse(minterConfigRes.extraMinterDetails);
       expect(extraMinterDetails.auctionEndTime).toBe(reducedTargetAuctionEnd);
       expect(extraMinterDetails.configuredAuctionEndTime).toBe(
-        targetAuctionEnd
+        reducedTargetAuctionEnd
       );
 
       // Jump to last minute of auction

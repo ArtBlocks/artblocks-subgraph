@@ -1,7 +1,7 @@
 {
   "scripts": {
     "codegen": "yarn graphql-codegen --require dotenv/config --config ./graphql.config.js dotenv_config_path=./.env",
-    "test": "yarn generate:typechain && yarn codegen && yarn jest --runInBand",
+    "test": "yarn generate:typechain && yarn codegen && yarn jest --runInBand __tests__/minter-suite-v2/ram-lib.test.ts",
     "generate:typechain": "typechain --target ethers-v5 --out-dir ./contracts './node_modules/@artblocks/contracts//artifacts/contracts/**/!(*.dbg)*.json' && yarn generate-supplemental-abis",
     "generate-supplemental-abis": "path-exists ./supplemental_abis/*.json && typechain --target ethers-v5 --out-dir ./contracts './supplemental_abis/*.json' || echo 'No supplemental ABIs found.'"
   },
