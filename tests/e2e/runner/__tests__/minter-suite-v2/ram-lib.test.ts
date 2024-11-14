@@ -216,6 +216,7 @@ describe("RAMLib event handling", () => {
       expect(extraMinterDetails.startTime).toBe(targetAuctionStart);
       expect(extraMinterDetails.auctionEndTime).toBe(targetAuctionEnd);
       expect(extraMinterDetails.adminArtistOnlyMintPeriodIfSellout).toBe(true);
+      expect(extraMinterDetails.allowExtraTime).toBe(true);
     });
   });
 

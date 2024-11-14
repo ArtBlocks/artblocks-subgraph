@@ -177,6 +177,10 @@ export function handleAuctionConfigUpdated(event: AuctionConfigUpdated): void {
       value: toJSONValue(event.params.numTokensInAuction)
     },
     {
+      key: "allowExtraTime",
+      value: toJSONValue(event.params.allowExtraTime)
+    },
+    {
       key: "adminArtistOnlyMintPeriodIfSellout",
       value: toJSONValue(event.params.adminArtistOnlyMintPeriodIfSellout)
     }
