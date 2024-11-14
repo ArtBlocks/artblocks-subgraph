@@ -217,6 +217,9 @@ describe("RAMLib event handling", () => {
       expect(extraMinterDetails.auctionEndTime).toBe(targetAuctionEnd);
       expect(extraMinterDetails.adminArtistOnlyMintPeriodIfSellout).toBe(true);
       expect(extraMinterDetails.allowExtraTime).toBe(true);
+      expect(extraMinterDetails.configuredAuctionEndTime).toBe(
+        targetAuctionEnd
+      );
     });
   });
 
@@ -526,26 +529,61 @@ describe("RAMLib event handling", () => {
       // validate extraMinterDetails
       const extraMinterDetails = JSON.parse(minterConfigRes.extraMinterDetails);
       expect(extraMinterDetails.auctionEndTime).toBe(reducedTargetAuctionEnd);
+      expect(extraMinterDetails.configuredAuctionEndTime).toBe(
+        targetAuctionEnd
+      );
+
+      // Jump to last minute of auction
+      await increaseTimeNextBlock(560); // 620 - 60 seconds
+
+      // Place another bid in last minute which should extend auction end time
+      const slot15price = await minterRAMV0Contract.slotIndexToBidValue(
+        currentProjectNumber,
+        genArt721CoreAddress,
+        15
+      );
+      const tx5 = await minterRAMV0Contract
+        .connect(deployer)
+        .createBid(currentProjectNumber, genArt721CoreAddress, 15, {
+          value: slot15price,
+        });
+      await tx5.wait();
+      await waitUntilSubgraphIsSynced(client);
+
+      // Validate auction end time was extended but configured end time stayed same
+      const updatedMinterConfigRes = await getProjectMinterConfigurationDetails(
+        client,
+        targetId
+      );
+      const updatedExtraMinterDetails = JSON.parse(
+        updatedMinterConfigRes.extraMinterDetails
+      );
+      expect(updatedExtraMinterDetails.auctionEndTime).toBeGreaterThan(
+        reducedTargetAuctionEnd
+      );
+      expect(updatedExtraMinterDetails.configuredAuctionEndTime).toBe(
+        reducedTargetAuctionEnd
+      );
 
       // Wait until auction ends
-      await increaseTimeNextBlock(620);
+      await increaseTimeNextBlock(60);
       // Auto mint tokens to winners
-      const tx5 = await minterRAMV0Contract
+      const tx6 = await minterRAMV0Contract
         .connect(artist)
         .adminArtistAutoMintTokensToWinners(
           currentProjectNumber, // _projectId
           genArt721CoreAddress, // _coreContract
           2 // _numTokensToMint
         );
-      const receipt5 = await tx5.wait();
-      const auctionBid5Timestamp = (
-        await artist.provider.getBlock(receipt5.blockNumber)
+      const receipt6 = await tx6.wait();
+      const auctionBid6Timestamp = (
+        await artist.provider.getBlock(receipt6.blockNumber)
       )?.timestamp;
       await waitUntilSubgraphIsSynced(client);
       // validate Bids settled and minted
       const winningBidTokenId = Number(currentProjectNumber) * 1000000;
       const winningBid1 = `${minterRAMV0Address.toLowerCase()}-${genArt721CoreAddress.toLowerCase()}-${currentProjectNumber}-1`;
-      const winningBid2 = `${minterRAMV0Address.toLowerCase()}-${genArt721CoreAddress.toLowerCase()}-${currentProjectNumber}-3`;
+      const winningBid2 = `${minterRAMV0Address.toLowerCase()}-${genArt721CoreAddress.toLowerCase()}-${currentProjectNumber}-4`;
       const winningBid1Res = await getBidDetails(client, winningBid1);
       const winningBid2Res = await getBidDetails(client, winningBid2);
       expect(winningBid1Res.settled).toBe(true);
@@ -554,14 +592,14 @@ describe("RAMLib event handling", () => {
       expect(winningBid1Res?.token?.id).toBe(
         `${genArt721CoreAddress.toLowerCase()}-${winningBidTokenId + 1}`
       );
-      expect(winningBid1Res.updatedAt).toBe(auctionBid5Timestamp.toString());
+      expect(winningBid1Res.updatedAt).toBe(auctionBid6Timestamp.toString());
       expect(winningBid2Res.settled).toBe(true);
       expect(winningBid2Res.winningBid).toBe(true);
       expect(winningBid2Res.isRemoved).toBe(false);
       expect(winningBid2Res?.token?.id).toBe(
         `${genArt721CoreAddress.toLowerCase()}-${winningBidTokenId}`
       );
-      expect(winningBid1Res.updatedAt).toBe(auctionBid5Timestamp.toString());
+      expect(winningBid1Res.updatedAt).toBe(auctionBid6Timestamp.toString());
     });
   });
 
