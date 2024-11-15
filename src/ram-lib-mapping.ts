@@ -136,16 +136,6 @@ export function handleAuctionTimestampEndUpdated(
     projectMinterConfig
   );
 
-  // If the transaction value is 0, this is not an extension, so we should
-  // update the configured auction end time to the new auction end time.
-  if (event.transaction.value.equals(BigInt.fromI32(0))) {
-    setProjectMinterConfigExtraMinterDetailsValue(
-      "configuredAuctionEndTime",
-      event.params.timestampEnd,
-      projectMinterConfig
-    );
-  }
-
   projectMinterConfig.save();
 
   // induce sync if the project minter configuration is the active one

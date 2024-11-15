@@ -431,6 +431,8 @@ describe("RAMLib event handling", () => {
       const targetAuctionStart = latestBlock.timestamp + 60;
       const reducedTargetAuctionEnd = targetAuctionStart + 620;
       const targetAuctionEnd = targetAuctionStart + 700;
+      const targetId = `${minterRAMV0Address.toLowerCase()}-${genArt721CoreAddress.toLowerCase()}-${currentProjectNumber}`;
+
       // Set auction details
       await minterRAMV0Contract.connect(artist).setAuctionDetails(
         currentProjectNumber, // _projectId
@@ -452,14 +454,30 @@ describe("RAMLib event handling", () => {
           genArt721CoreAddress, // _coreContract
           2
         );
+
+      let minterConfigRes = await getProjectMinterConfigurationDetails(
+        client,
+        targetId
+      );
+
+      // Validate
+      expect(minterConfigRes.extraMinterDetails.auctionEndTime).toBe(
+        targetAuctionEnd
+      );
+      expect(minterConfigRes.extraMinterDetails.configuredAuctionEndTime).toBe(
+        targetAuctionEnd
+      );
+
       // Get slot index for bid value
       const slot5price = await minterRAMV0Contract.slotIndexToBidValue(
         currentProjectNumber, //_projectId
         genArt721CoreAddress, // _coreContract
         5 // _slotIndex
       );
+
       // Wait until auction starts (60s + 6s margin)
       await increaseTimeNextBlock(66);
+
       // Create bid for auction
       // @dev bids can only be created when auction is live
       const createBidTx1 = await minterRAMV0Contract
@@ -488,6 +506,7 @@ describe("RAMLib event handling", () => {
           }
         );
       await createBidTx2.wait();
+
       await waitUntilSubgraphIsSynced(client);
 
       // Place a third, higher bid
@@ -536,17 +555,26 @@ describe("RAMLib event handling", () => {
 
       await waitUntilSubgraphIsSynced(client);
 
-      const targetId = `${minterRAMV0Address.toLowerCase()}-${genArt721CoreAddress.toLowerCase()}-${currentProjectNumber}`;
-      const minterConfigRes = await getProjectMinterConfigurationDetails(
+      // validate extraMinterDetails
+      minterConfigRes = await getProjectMinterConfigurationDetails(
         client,
         targetId
       );
 
-      // validate extraMinterDetails
       const extraMinterDetails = JSON.parse(minterConfigRes.extraMinterDetails);
       expect(extraMinterDetails.auctionEndTime).toBe(reducedTargetAuctionEnd);
+      // The configuredAuctionEndTime is only updated when receiving an AuctionConfigUpdated event,
+      // not when receiving AuctionTimestampEndUpdated. While AuctionTimestampEndUpdated is emitted
+      // in three cases:
+      // 1. When a bid in the last 5 minutes extends the auction (most common)
+      // 2. When reduceAuctionLength is called
+      // 3. When adminAddEmergencyAuctionHours is called
+      // Ideally, we would update configuredAuctionEndTime for cases 2 and 3. However, since
+      // these are edge cases and we cannot reliably differentiate them from the more common
+      // case 1, we err on the side of not updating configuredAuctionEndTime in the
+      // AuctionTimestampEndUpdated handler.
       expect(extraMinterDetails.configuredAuctionEndTime).toBe(
-        reducedTargetAuctionEnd
+        targetAuctionEnd
       );
 
       // Jump to last minute of auction
@@ -567,12 +595,12 @@ describe("RAMLib event handling", () => {
       await waitUntilSubgraphIsSynced(client);
 
       // Validate auction end time was extended but configured end time stayed same
-      const updatedMinterConfigRes = await getProjectMinterConfigurationDetails(
+      minterConfigRes = await getProjectMinterConfigurationDetails(
         client,
         targetId
       );
       const updatedExtraMinterDetails = JSON.parse(
-        updatedMinterConfigRes.extraMinterDetails
+        minterConfigRes.extraMinterDetails
       );
       expect(updatedExtraMinterDetails.auctionEndTime).toBeGreaterThan(
         reducedTargetAuctionEnd
