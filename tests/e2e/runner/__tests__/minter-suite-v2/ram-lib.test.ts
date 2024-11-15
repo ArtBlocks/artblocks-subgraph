@@ -603,7 +603,7 @@ describe("RAMLib event handling", () => {
         reducedTargetAuctionEnd
       );
       expect(extraMinterDetails.configuredAuctionEndTime).toBe(
-        reducedTargetAuctionEnd
+        targetAuctionEnd
       );
 
       // Wait until auction ends (assume it's been extended by 5 minutes)
