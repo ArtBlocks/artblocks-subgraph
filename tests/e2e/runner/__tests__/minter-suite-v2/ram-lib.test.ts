@@ -462,26 +462,30 @@ describe("RAMLib event handling", () => {
       await increaseTimeNextBlock(66);
       // Create bid for auction
       // @dev bids can only be created when auction is live
-      const tx = await minterRAMV0Contract.connect(deployer).createBid(
-        currentProjectNumber, // _projectId
-        genArt721CoreAddress, // _coreContract
-        5, // _slotIndex
-        {
-          value: slot5price,
-        }
-      );
-      await tx.wait();
+      const createBidTx1 = await minterRAMV0Contract
+        .connect(deployer)
+        .createBid(
+          currentProjectNumber, // _projectId
+          genArt721CoreAddress, // _coreContract
+          5, // _slotIndex
+          {
+            value: slot5price,
+          }
+        );
+      await createBidTx1.wait();
       await waitUntilSubgraphIsSynced(client);
       // Place another bid
-      const tx2 = await minterRAMV0Contract.connect(deployer).createBid(
-        currentProjectNumber, // _projectId
-        genArt721CoreAddress, // _coreContract
-        5, // _slotIndex
-        {
-          value: slot5price,
-        }
-      );
-      await tx2.wait();
+      const createBidTx2 = await minterRAMV0Contract
+        .connect(deployer)
+        .createBid(
+          currentProjectNumber, // _projectId
+          genArt721CoreAddress, // _coreContract
+          5, // _slotIndex
+          {
+            value: slot5price,
+          }
+        );
+      await createBidTx2.wait();
       await waitUntilSubgraphIsSynced(client);
       // Place a third, higher bid
       // Get slot index for bid value
@@ -490,15 +494,17 @@ describe("RAMLib event handling", () => {
         genArt721CoreAddress, // _coreContract
         10 // _slotIndex
       );
-      const tx3 = await minterRAMV0Contract.connect(deployer).createBid(
-        currentProjectNumber, // _projectId
-        genArt721CoreAddress, // _coreContract
-        10, // _slotIndex
-        {
-          value: slot10price,
-        }
-      );
-      const receipt3 = await tx3.wait();
+      const createBidTx3 = await minterRAMV0Contract
+        .connect(deployer)
+        .createBid(
+          currentProjectNumber, // _projectId
+          genArt721CoreAddress, // _coreContract
+          10, // _slotIndex
+          {
+            value: slot10price,
+          }
+        );
+      const receipt3 = await createBidTx3.wait();
       const auctionBid3Timestamp = (
         await artist.provider.getBlock(receipt3.blockNumber)
       )?.timestamp;
@@ -514,12 +520,14 @@ describe("RAMLib event handling", () => {
       expect(bidRes.updatedAt).toBe(auctionBid3Timestamp.toString());
 
       // Artist reduces auction length time
-      const tx4 = await minterRAMV0Contract.connect(artist).reduceAuctionLength(
-        currentProjectNumber, // _projectId
-        genArt721CoreAddress, // _coreContract
-        reducedTargetAuctionEnd // _auctionTimestampEnd
-      );
-      await tx4.wait();
+      const reduceAuctionLengthTx = await minterRAMV0Contract
+        .connect(artist)
+        .reduceAuctionLength(
+          currentProjectNumber, // _projectId
+          genArt721CoreAddress, // _coreContract
+          reducedTargetAuctionEnd // _auctionTimestampEnd
+        );
+      await reduceAuctionLengthTx.wait();
       await waitUntilSubgraphIsSynced(client);
       const targetId = `${minterRAMV0Address.toLowerCase()}-${genArt721CoreAddress.toLowerCase()}-${currentProjectNumber}`;
       const minterConfigRes = await getProjectMinterConfigurationDetails(
@@ -542,12 +550,12 @@ describe("RAMLib event handling", () => {
         genArt721CoreAddress,
         15
       );
-      const tx5 = await minterRAMV0Contract
+      const createBidTx4 = await minterRAMV0Contract
         .connect(deployer)
         .createBid(currentProjectNumber, genArt721CoreAddress, 15, {
           value: slot15price,
         });
-      await tx5.wait();
+      await createBidTx4.wait();
       await waitUntilSubgraphIsSynced(client);
 
       // Validate auction end time was extended but configured end time stayed same
@@ -565,17 +573,17 @@ describe("RAMLib event handling", () => {
         reducedTargetAuctionEnd
       );
 
-      // Wait until auction ends
-      await increaseTimeNextBlock(60);
+      // Wait until auction ends (assume it's been extended by 5 minutes)
+      await increaseTimeNextBlock(620);
       // Auto mint tokens to winners
-      const tx6 = await minterRAMV0Contract
+      const adminArtistAutoMintTx = await minterRAMV0Contract
         .connect(artist)
         .adminArtistAutoMintTokensToWinners(
           currentProjectNumber, // _projectId
           genArt721CoreAddress, // _coreContract
           2 // _numTokensToMint
         );
-      const receipt6 = await tx6.wait();
+      const receipt6 = await adminArtistAutoMintTx.wait();
       const auctionBid6Timestamp = (
         await artist.provider.getBlock(receipt6.blockNumber)
       )?.timestamp;
