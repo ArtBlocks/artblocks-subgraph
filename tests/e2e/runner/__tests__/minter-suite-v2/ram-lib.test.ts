@@ -473,7 +473,9 @@ describe("RAMLib event handling", () => {
           }
         );
       await createBidTx1.wait();
+
       await waitUntilSubgraphIsSynced(client);
+
       // Place another bid
       const createBidTx2 = await minterRAMV0Contract
         .connect(deployer)
@@ -487,6 +489,7 @@ describe("RAMLib event handling", () => {
         );
       await createBidTx2.wait();
       await waitUntilSubgraphIsSynced(client);
+
       // Place a third, higher bid
       // Get slot index for bid value
       const slot10price = await minterRAMV0Contract.slotIndexToBidValue(
@@ -508,7 +511,9 @@ describe("RAMLib event handling", () => {
       const auctionBid3Timestamp = (
         await artist.provider.getBlock(receipt3.blockNumber)
       )?.timestamp;
+
       await waitUntilSubgraphIsSynced(client);
+
       // Validate the second Bid was removed
       const bidId = `${minterRAMV0Address.toLowerCase()}-${genArt721CoreAddress.toLowerCase()}-${currentProjectNumber}-2`;
       const bidRes = await getBidDetails(client, bidId);
@@ -528,12 +533,15 @@ describe("RAMLib event handling", () => {
           reducedTargetAuctionEnd // _auctionTimestampEnd
         );
       await reduceAuctionLengthTx.wait();
+
       await waitUntilSubgraphIsSynced(client);
+
       const targetId = `${minterRAMV0Address.toLowerCase()}-${genArt721CoreAddress.toLowerCase()}-${currentProjectNumber}`;
       const minterConfigRes = await getProjectMinterConfigurationDetails(
         client,
         targetId
       );
+
       // validate extraMinterDetails
       const extraMinterDetails = JSON.parse(minterConfigRes.extraMinterDetails);
       expect(extraMinterDetails.auctionEndTime).toBe(reducedTargetAuctionEnd);
@@ -575,6 +583,7 @@ describe("RAMLib event handling", () => {
 
       // Wait until auction ends (assume it's been extended by 5 minutes)
       await increaseTimeNextBlock(620);
+
       // Auto mint tokens to winners
       const adminArtistAutoMintTx = await minterRAMV0Contract
         .connect(artist)
@@ -587,10 +596,12 @@ describe("RAMLib event handling", () => {
       const auctionBid6Timestamp = (
         await artist.provider.getBlock(receipt6.blockNumber)
       )?.timestamp;
+
       await waitUntilSubgraphIsSynced(client);
+
       // validate Bids settled and minted
       const winningBidTokenId = Number(currentProjectNumber) * 1000000;
-      const winningBid1 = `${minterRAMV0Address.toLowerCase()}-${genArt721CoreAddress.toLowerCase()}-${currentProjectNumber}-1`;
+      const winningBid1 = `${minterRAMV0Address.toLowerCase()}-${genArt721CoreAddress.toLowerCase()}-${currentProjectNumber}-3`;
       const winningBid2 = `${minterRAMV0Address.toLowerCase()}-${genArt721CoreAddress.toLowerCase()}-${currentProjectNumber}-4`;
       const winningBid1Res = await getBidDetails(client, winningBid1);
       const winningBid2Res = await getBidDetails(client, winningBid2);
