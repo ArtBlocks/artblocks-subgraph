@@ -459,12 +459,11 @@ describe("RAMLib event handling", () => {
         client,
         targetId
       );
+      let extraMinterDetails = JSON.parse(minterConfigRes.extraMinterDetails);
 
       // Validate
-      expect(minterConfigRes.extraMinterDetails.auctionEndTime).toBe(
-        targetAuctionEnd
-      );
-      expect(minterConfigRes.extraMinterDetails.configuredAuctionEndTime).toBe(
+      expect(extraMinterDetails.auctionEndTime).toBe(targetAuctionEnd);
+      expect(extraMinterDetails.configuredAuctionEndTime).toBe(
         targetAuctionEnd
       );
 
@@ -561,7 +560,7 @@ describe("RAMLib event handling", () => {
         targetId
       );
 
-      const extraMinterDetails = JSON.parse(minterConfigRes.extraMinterDetails);
+      extraMinterDetails = JSON.parse(minterConfigRes.extraMinterDetails);
       expect(extraMinterDetails.auctionEndTime).toBe(reducedTargetAuctionEnd);
       // The configuredAuctionEndTime is only updated when receiving an AuctionConfigUpdated event,
       // not when receiving AuctionTimestampEndUpdated. While AuctionTimestampEndUpdated is emitted
@@ -599,13 +598,11 @@ describe("RAMLib event handling", () => {
         client,
         targetId
       );
-      const updatedExtraMinterDetails = JSON.parse(
-        minterConfigRes.extraMinterDetails
-      );
-      expect(updatedExtraMinterDetails.auctionEndTime).toBeGreaterThan(
+      extraMinterDetails = JSON.parse(minterConfigRes.extraMinterDetails);
+      expect(extraMinterDetails.auctionEndTime).toBeGreaterThan(
         reducedTargetAuctionEnd
       );
-      expect(updatedExtraMinterDetails.configuredAuctionEndTime).toBe(
+      expect(extraMinterDetails.configuredAuctionEndTime).toBe(
         reducedTargetAuctionEnd
       );
 
