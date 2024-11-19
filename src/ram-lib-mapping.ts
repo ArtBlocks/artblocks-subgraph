@@ -129,7 +129,18 @@ export function handleAuctionTimestampEndUpdated(
   }
 
   const projectMinterConfig = minterProjectAndConfig.projectMinterConfiguration;
-  // update project minter configuration extraMinterDetails json field
+
+  // Note: we do not update the configuredAuctionEndTime field in this handler.
+  // The configuredAuctionEndTime field is only updated when receiving an
+  // AuctionConfigUpdated event, not when receiving AuctionTimestampEndUpdated.
+  // While AuctionTimestampEndUpdated is emitted in three cases:
+  // 1. When a bid in the last 5 minutes extends the auction (most common)
+  // 2. When reduceAuctionLength is called
+  // 3. When adminAddEmergencyAuctionHours is called
+  // Ideally, we would update configuredAuctionEndTime for cases 2 and 3.
+  // However, since these are edge cases and we cannot reliably differentiate
+  // them from the more common case 1, we take the conservative approach of
+  // not updating configuredAuctionEndTime in this handler.
   setProjectMinterConfigExtraMinterDetailsValue(
     "auctionEndTime",
     event.params.timestampEnd,
@@ -172,9 +183,21 @@ export function handleAuctionConfigUpdated(event: AuctionConfigUpdated): void {
       value: toJSONValue(event.params.timestampStart)
     },
     { key: "auctionEndTime", value: toJSONValue(event.params.timestampEnd) },
+    // If extensions are enabled, the auction end time may be updated when
+    // a bid is created. We want to track the configured end time separately
+    // so that we can calculate the latest possible auction end time (1 hour
+    // past the configured end time).
+    {
+      key: "configuredAuctionEndTime",
+      value: toJSONValue(event.params.timestampEnd)
+    },
     {
       key: "numTokensInAuction",
       value: toJSONValue(event.params.numTokensInAuction)
+    },
+    {
+      key: "allowExtraTime",
+      value: toJSONValue(event.params.allowExtraTime)
     },
     {
       key: "adminArtistOnlyMintPeriodIfSellout",
