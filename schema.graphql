@@ -202,6 +202,9 @@ type CoreRegistry @entity {
 
   "All core contracts that are registered on this CoreRegistry, when this is most recent Core Registry to add the contract"
   registeredContracts: [Contract!] @derivedFrom(field: "registeredOn")
+
+  "Latest dependency registry to use this Core Registry"
+  dependencyRegistry: DependencyRegistry
 }
 
 enum CoreType {
@@ -277,6 +280,12 @@ type Contract @entity {
 
   "Latest Override Allowlisted on Dependency Registry; only populated if allowlisted on a DependencyRegistry instead of the CoreRegistry"
   latestDepenencyRegistryOverrideAllowlistedOn: DependencyRegistry
+
+  "On chain pointer to dependency registry contract - not used for any on-chain logic or allowlisting. Null if not populated or set to non-indexed Dependency Registry address."
+  dependencyRegistry: DependencyRegistry
+
+  "On chain pointer to on-chain generator contract address - not used for any on-chain logic or allowlisting. Null if not populated on chain."
+  onChainGenerator: Bytes
 
   "Curent royalty split provider contract address, used on v3.2 and-on"
   royaltySplitProvider: Bytes
