@@ -1,4 +1,4 @@
-import { BigInt, store, log, Address } from "@graphprotocol/graph-ts";
+import { BigInt, store, log, Address, ethereum } from "@graphprotocol/graph-ts";
 import {
   DependencyAdded,
   DependencyAdditionalCDNRemoved,
@@ -14,8 +14,9 @@ import {
   LicenseTypeAdded,
   ProjectDependencyOverrideAdded,
   ProjectDependencyOverrideRemoved,
-  SupportedCoreContractAdded,
-  SupportedCoreContractRemoved,
+  CoreRegistryAddressUpdated,
+  SupportedCoreContractOverrideAdded,
+  SupportedCoreContractOverrideRemoved,
   IDependencyRegistryV0
 } from "../generated/IDependencyRegistryV0/IDependencyRegistryV0";
 import { IDependencyRegistryV0_Legacy } from "../generated/IDependencyRegistryV0/IDependencyRegistryV0_Legacy";
@@ -28,7 +29,8 @@ import {
   DependencyAdditionalRepository,
   DependencyRegistry,
   DependencyScript,
-  Project
+  Project,
+  CoreRegistry
 } from "../generated/schema";
 import {
   generateContractSpecificId,
@@ -42,7 +44,7 @@ import {
 
  * 1. The 'dependencyNameAndVersion' is used as the unique identifier for the Dependency entity.
  * 2. Before updating a Dependency entity, we do not verify if the dependency's associated dependency registry matches the event address.
- * 3. In the 'handleSupportedCoreContractAdded' and 'handleSupportedCoreContractRemoved' handlers, we do not check a contract's dependency registry address before updating its dependency registry field.
+ * 3. In the 'handleSupportedCoreContractOverrideAdded' and 'handleSupportedCoreContractOverrideRemoved' handlers, we do not check a contract's dependency registry address before updating its dependency registry field.
  * 4. In the 'handleProjectDependencyOverrideAdded' and 'handleProjectDependencyOverrideRemoved' functions, we do not verify a project's contract's dependency registry address before updating its 'scriptTypeAndVersionOverride' field.
 
  * Given that we control the indexing process with this subgraph, this assumption is considered safe.
@@ -405,8 +407,42 @@ export function handleDependencyScriptUpdated(
   dependency.save();
 }
 
-export function handleSupportedCoreContractAdded(
-  event: SupportedCoreContractAdded
+export function handleCoreRegistryAddressUpdated(
+  event: CoreRegistryAddressUpdated
+): void {
+  let dependencyRegistry = DependencyRegistry.load(event.address);
+
+  // guard against missing dependency registry
+  if (!dependencyRegistry) {
+    // not expected to happen, but log error if it does
+    log.error("[ERROR] Failed to load dependency registry at address {}", [
+      event.address.toHexString()
+    ]);
+    return;
+  }
+
+  // update core registry address on dependency registry
+  dependencyRegistry.coreRegistry = event.params.coreRegistryAddress.toHexString();
+  dependencyRegistry.updatedAt = event.block.timestamp;
+  dependencyRegistry.save();
+
+  // update latest dependency registry address on core registry
+  let coreRegistry = CoreRegistry.load(
+    event.params.coreRegistryAddress.toHexString()
+  );
+  if (!coreRegistry) {
+    // not expected to happen, but log warning if it does
+    log.warning("[WARN] Failed to load core registry at address {}", [
+      event.params.coreRegistryAddress.toHexString()
+    ]);
+    return;
+  }
+  coreRegistry.dependencyRegistry = event.address;
+  coreRegistry.save();
+}
+
+export function handleSupportedCoreContractOverrideAdded(
+  event: SupportedCoreContractOverrideAdded
 ): void {
   const coreContract = Contract.load(
     event.params.coreContractAddress.toHexString()
@@ -416,13 +452,13 @@ export function handleSupportedCoreContractAdded(
     return;
   }
 
-  coreContract.dependencyRegistry = event.address;
+  coreContract.latestDepenencyRegistryOverrideAllowlistedOn = event.address;
   coreContract.updatedAt = event.block.timestamp;
   coreContract.save();
 }
 
 export function handleSupportedCoreContractRemoved(
-  event: SupportedCoreContractRemoved
+  event: SupportedCoreContractOverrideRemoved
 ): void {
   const coreContract = Contract.load(
     event.params.coreContractAddress.toHexString()
@@ -432,9 +468,17 @@ export function handleSupportedCoreContractRemoved(
     return;
   }
 
-  coreContract.dependencyRegistry = null;
-  coreContract.updatedAt = event.block.timestamp;
-  coreContract.save();
+  // null out the dependency registry override if it matches the event address
+  if (
+    coreContract.latestDepenencyRegistryOverrideAllowlistedOn &&
+    coreContract.latestDepenencyRegistryOverrideAllowlistedOn!.equals(
+      event.address
+    )
+  ) {
+    coreContract.latestDepenencyRegistryOverrideAllowlistedOn = null;
+    coreContract.updatedAt = event.block.timestamp;
+    coreContract.save();
+  }
 }
 
 export function handleProjectDependencyOverrideAdded(

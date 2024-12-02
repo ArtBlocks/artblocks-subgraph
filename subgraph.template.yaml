@@ -2344,10 +2344,12 @@ dataSources:
           handler: handleProjectDependencyOverrideAdded
         - event: ProjectDependencyOverrideRemoved(indexed address,indexed uint256)
           handler: handleProjectDependencyOverrideRemoved
-        - event: SupportedCoreContractAdded(indexed address)
-          handler: handleSupportedCoreContractAdded
-        - event: SupportedCoreContractRemoved(indexed address)
-          handler: handleSupportedCoreContractRemoved
+        - event: CoreRegistryAddressUpdated(indexed address)
+          handler: handleCoreRegistryAddressUpdated
+        - event: SupportedCoreContractOverrideAdded(indexed address)
+          handler: handleSupportedCoreContractOverrideAdded
+        - event: SupportedCoreContractOverrideRemoved(indexed address)
+          handler: handleSupportedCoreContractOverrideRemoved
       file: ./src/dependency-registry.ts
   {{/iDependencyRegistryV0Contracts}}
   {{#ownableUpgradeableDependencyRegistryContracts}}

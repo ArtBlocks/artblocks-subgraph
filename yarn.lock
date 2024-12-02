@@ -7,10 +7,10 @@
   resolved "https://registry.yarnpkg.com/@0no-co/graphql.web/-/graphql.web-1.0.7.tgz#c7a762c887b3482a79ffa68f63de5e96059a62e4"
   integrity sha512-E3Qku4mTzdrlwVWGPxklDnME5ANrEGetvYw4i2GCRlppWXXE4QD66j7pwb8HelZwS6LnqEChhrSOGCXpbiu6MQ==
 
-"@artblocks/contracts@1.2.0":
-  version "1.2.0"
-  resolved "https://registry.yarnpkg.com/@artblocks/contracts/-/contracts-1.2.0.tgz#aa28a894da72a2238268f5d56e385ef8691dab5f"
-  integrity sha512-kHB8oNng6B+Ns/AleVoEHAqB15/vGxZVA5eDQPV+cl8TKwmVH4Pynky5ctB9CTbbWMm+GC0ZL8FILXRAYG3Bkw==
+"@artblocks/contracts@1.2.1":
+  version "1.2.1"
+  resolved "https://registry.yarnpkg.com/@artblocks/contracts/-/contracts-1.2.1.tgz#17c9e921fc6ea8fa260b1ec029c2537d8586bf58"
+  integrity sha512-HnpfRTmKHTsihHzIqLhZer/0ojyWG+6jzMWj0IsT4KRStkAD1t6uxlAFa8PSLUmFVPqaUMSd4egagvbAw8wtSg==
   dependencies:
     "@nomicfoundation/hardhat-verify" "^2.0.5"
     "@openzeppelin-0.5/contracts" "npm:@openzeppelin/contracts@2.5.1"
@@ -19,7 +19,8 @@
     "@openzeppelin-4.8/contracts-upgradeable" "npm:@openzeppelin/contracts-upgradeable@4.8.0"
     "@openzeppelin-5.0/contracts" "npm:@openzeppelin/contracts@5.0.1"
     "@urql/exchange-retry" "^1.2.1"
-    graphql "^16.8.1"
+    graphql "^16.8.2"
+    scripty.sol "2.1.1"
     solady "^0.0.181"
     urql "^4.0.7"
 
@@ -1927,10 +1928,10 @@ graphql@^16.6.0:
   resolved "https://registry.yarnpkg.com/graphql/-/graphql-16.6.0.tgz#c2dcffa4649db149f6282af726c8c83f1c7c5fdb"
   integrity sha512-KPIBPDlW7NxrbT/eh4qPXz5FiFdL5UbaA0XUNz2Rp3Z3hqBSkbj0GVjwFDztsWVauZUWsbKHgMg++sk8UX0bkw==
 
-graphql@^16.8.1:
-  version "16.8.1"
-  resolved "https://registry.yarnpkg.com/graphql/-/graphql-16.8.1.tgz#1930a965bef1170603702acdb68aedd3f3cf6f07"
-  integrity sha512-59LZHPdGZVh695Ud9lRzPBVTtlX9ZCV150Er2W43ro37wVof0ctenSaskPPjN7lVTIN8mSZt8PHUNKZuNQUuxw==
+graphql@^16.8.2:
+  version "16.9.0"
+  resolved "https://registry.yarnpkg.com/graphql/-/graphql-16.9.0.tgz#1c310e63f16a49ce1fbb230bd0a000e99f6f115f"
+  integrity sha512-GGTKBX4SD7Wdb8mqeDLni2oaRGYQWjWHGKPQ24ZMnUtKfcsVoiv4uX8+LJr1K6U5VW2Lu1BwJnj7uiori0YtRw==
 
 har-schema@^2.0.0:
   version "2.0.0"
@@ -3224,6 +3225,11 @@ safe-buffer@~5.1.0, safe-buffer@~5.1.1:
   version "2.1.2"
   resolved "https://registry.yarnpkg.com/safer-buffer/-/safer-buffer-2.1.2.tgz#44fa161b0187b9549dd84bb91802f9bd8385cd6a"
   integrity sha512-YZo3K82SD7Riyi0E1EQPojLz7kpepnSQI9IyPbHHg1XXXevb5dJI7tpyN2ADxGcQbHG7vcyRHk0cbwqcQriUtg==
+
+scripty.sol@2.1.1:
+  version "2.1.1"
+  resolved "https://registry.yarnpkg.com/scripty.sol/-/scripty.sol-2.1.1.tgz#965ca2b910b2631c48347e58dc82ee144b6f270f"
+  integrity sha512-JZFo+fAxn1vY37kHhb6PwYviZiW2ofA/FIlHfnhJs+iRWV/7qj17uEhoxBBae9+P/k+KS4LrWrfSPhRBG2GBPw==
 
 scrypt-js@^3.0.0:
   version "3.0.1"
