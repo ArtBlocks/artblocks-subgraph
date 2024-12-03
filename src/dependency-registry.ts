@@ -410,9 +410,8 @@ export function handleDependencyScriptUpdated(
 export function handleCoreRegistryAddressUpdated(
   event: CoreRegistryAddressUpdated
 ): void {
+  // guard against missing dependency registry (error)
   let dependencyRegistry = DependencyRegistry.load(event.address);
-
-  // guard against missing dependency registry
   if (!dependencyRegistry) {
     // not expected to happen, but log error if it does
     log.error("[ERROR] Failed to load dependency registry at address {}", [
@@ -421,12 +420,7 @@ export function handleCoreRegistryAddressUpdated(
     return;
   }
 
-  // update core registry address on dependency registry
-  dependencyRegistry.coreRegistry = event.params.coreRegistryAddress.toHexString();
-  dependencyRegistry.updatedAt = event.block.timestamp;
-  dependencyRegistry.save();
-
-  // update latest dependency registry address on core registry
+  // guard against missing core registry (warn)
   let coreRegistry = CoreRegistry.load(
     event.params.coreRegistryAddress.toHexString()
   );
@@ -435,8 +429,16 @@ export function handleCoreRegistryAddressUpdated(
     log.warning("[WARN] Failed to load core registry at address {}", [
       event.params.coreRegistryAddress.toHexString()
     ]);
+    // returning early, as we cannot update the dependency registry to point to CoreRegistry that does not exist
     return;
   }
+
+  // update core registry address on dependency registry
+  dependencyRegistry.coreRegistry = event.params.coreRegistryAddress.toHexString();
+  dependencyRegistry.updatedAt = event.block.timestamp;
+  dependencyRegistry.save();
+
+  // update dependency registry address on core registry
   coreRegistry.dependencyRegistry = event.address;
   coreRegistry.save();
 }
