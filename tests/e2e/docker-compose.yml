@@ -24,8 +24,10 @@ services:
         RUN ["apt", "update"]
         RUN ["apt-get", "install", "-y", "curl"]
     depends_on:
-      - ipfs
-      - postgres
+      ipfs:
+        condition: service_healthy
+      postgres:
+        condition: service_healthy
     extra_hosts:
       - host.docker.internal:host-gateway
     environment:
