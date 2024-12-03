@@ -849,7 +849,7 @@ type DependencyRegistry @entity {
   "Unique identifier made up of dependency registry contract address"
   id: Bytes!
   "Core registry that defines the base set of contracts supported by this registry"
-  coreRegistry: CoreRegistry!
+  coreRegistry: CoreRegistry
   "List of core contracts that are explicitly allowlisted on this registry, extending those on the CoreRegistry"
   supportedCoreContractsOverride: [Contract!]!
     @derivedFrom(field: "latestDepenencyRegistryOverrideAllowlistedOn")
