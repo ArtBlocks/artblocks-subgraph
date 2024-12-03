@@ -47,10 +47,11 @@ services:
   ipfs:
     image: ipfs/go-ipfs:v0.10.0
     healthcheck:
-      test: ["CMD-SHELL", "curl -sf http://127.0.0.1:5001/api/v0/version || sleep 5 && curl -sf http://127.0.0.1:5001/api/v0/version || exit 1"]
-      interval: 10s
-      timeout: 5s
-      retries: 10
+      test: ["CMD-SHELL", "wget --post-data='' http://127.0.0.1:5001/api/v0/version -O - || exit 1"]
+      interval: 30s
+      timeout: 10s
+      retries: 5
+      start_period: 30s
     volumes:
       - ipfs:/data/ipfs
   postgres:
