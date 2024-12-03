@@ -67,7 +67,8 @@ import {
   ProposedArtistAddressesAndSplit,
   ProjectExternalAssetDependency,
   ProjectMinterConfiguration,
-  PrimaryPurchase
+  PrimaryPurchase,
+  DependencyRegistry
 } from "../generated/schema";
 
 import {
@@ -1555,6 +1556,30 @@ function refreshContract<T>(contract: T, timestamp: BigInt): Contract | null {
     }
   }
   contractEntity.type = contract.coreType();
+
+  // try getting AB dependency registry from the contract
+  const dependencyRegistry = contract.try_artblocksDependencyRegistryAddress();
+  if (!dependencyRegistry.reverted) {
+    const dependencyRegistryAddress = dependencyRegistry.value;
+    if (
+      dependencyRegistryAddress.toHexString() == NULL_ADDRESS ||
+      !DependencyRegistry.load(dependencyRegistryAddress)
+    ) {
+      contractEntity.dependencyRegistry = null;
+    } else {
+      contractEntity.dependencyRegistry = dependencyRegistry.value;
+    }
+  }
+  // try getting AB on-chain generator from the contract
+  const onChainGenerator = contract.try_artblocksOnChainGeneratorAddress();
+  if (!onChainGenerator.reverted) {
+    if (onChainGenerator.value.toHexString() == NULL_ADDRESS) {
+      contractEntity.onChainGenerator = null;
+    } else {
+      contractEntity.onChainGenerator = onChainGenerator.value;
+    }
+  }
+
   // use helper function to get core version, accounting for some known issues with versioning on testnet
   const coreVersion = getCoreVersionFixed(contract);
   contractEntity.coreVersion = coreVersion;
