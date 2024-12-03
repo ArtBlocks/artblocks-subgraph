@@ -44,6 +44,7 @@ services:
       interval: 10s
       timeout: 5s
       retries: 5
+      start_period: 60s
   ipfs:
     image: ipfs/go-ipfs:v0.10.0
     healthcheck:
