@@ -459,7 +459,7 @@ export function handleSupportedCoreContractOverrideAdded(
   coreContract.save();
 }
 
-export function handleSupportedCoreContractRemoved(
+export function handleSupportedCoreContractOverrideRemoved(
   event: SupportedCoreContractOverrideRemoved
 ): void {
   const coreContract = Contract.load(
