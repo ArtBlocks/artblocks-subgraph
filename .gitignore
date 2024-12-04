@@ -4,6 +4,7 @@ build
 subgraph.yaml
 .bin
 tests/.latest.json
+.env
 
 # Ignore generated files
 generated/
