@@ -13,6 +13,7 @@ import {
 } from "@graphprotocol/graph-ts";
 import {
   Contract,
+  DependencyRegistry,
   Minter,
   MinterFilter,
   Project,
@@ -117,6 +118,8 @@ export const TEST_TX_HASH = Bytes.fromByteArray(
   crypto.keccak256(Bytes.fromUTF8("tx hash"))
 );
 export const TEST_MINTER_FILTER_ADDRESS = randomAddressGenerator.generateRandomAddress();
+export const TEST_DEPENDENCY_REGISTRY_ADDRESS = randomAddressGenerator.generateRandomAddress();
+export const TEST_CORE_REGISTRY_ADDRESS = randomAddressGenerator.generateRandomAddress();
 export const ONE_ETH_IN_WEI = BigInt.fromString("1000000000000000000");
 
 export const DEFAULT_ORDER_HASH =
@@ -163,7 +166,9 @@ export class ContractValues {
   renderProviderPercentage: BigInt;
   defaultRenderProviderSecondarySalesAddress: Address;
   defaultRenderProviderSecondarySalesBPS: BigInt;
+  latestDependencyRegistryOverrideAllowlistedOn: Address;
   dependencyRegistry: Address;
+  onChainGenerator: Address;
   curationRegistry: Address;
   newProjectsForbidden: boolean;
   // engine-specific fields
@@ -188,7 +193,9 @@ export const TEST_CONTRACT: ContractValues = {
   mintWhitelisted: [],
   minterContract: Address.zero(),
   randomizerContract: RANDOMIZER_ADDRESS,
+  latestDependencyRegistryOverrideAllowlistedOn: Address.zero(),
   dependencyRegistry: Address.zero(),
+  onChainGenerator: Address.zero(),
   curationRegistry: Address.zero(),
   newProjectsForbidden: false,
   // engine-specific fields
@@ -371,7 +378,10 @@ export function addTestContractToStore(nextProjectId: BigInt): Contract {
   contract.defaultRenderProviderSecondarySalesBPS =
     TEST_CONTRACT.defaultRenderProviderSecondarySalesBPS;
   contract.curationRegistry = TEST_CONTRACT.curationRegistry;
+  contract.latestDependencyRegistryOverrideAllowlistedOn =
+    TEST_CONTRACT.latestDependencyRegistryOverrideAllowlistedOn;
   contract.dependencyRegistry = TEST_CONTRACT.dependencyRegistry;
+  contract.onChainGenerator = TEST_CONTRACT.onChainGenerator;
   contract.updatedAt = contract.createdAt;
   contract.mintWhitelisted = TEST_CONTRACT.mintWhitelisted;
   contract.newProjectsForbidden = false;
@@ -401,7 +411,10 @@ export function addTestContractToStoreOfTypeAndVersion(
   contract.defaultRenderProviderSecondarySalesBPS =
     TEST_CONTRACT.defaultRenderProviderSecondarySalesBPS;
   contract.curationRegistry = TEST_CONTRACT.curationRegistry;
+  contract.latestDependencyRegistryOverrideAllowlistedOn =
+    TEST_CONTRACT.latestDependencyRegistryOverrideAllowlistedOn;
   contract.dependencyRegistry = TEST_CONTRACT.dependencyRegistry;
+  contract.onChainGenerator = TEST_CONTRACT.onChainGenerator;
   contract.updatedAt = contract.createdAt;
   contract.mintWhitelisted = TEST_CONTRACT.mintWhitelisted;
   contract.newProjectsForbidden = false;
@@ -428,13 +441,27 @@ export function addArbitraryContractToStore(
   contract.defaultRenderProviderSecondarySalesBPS =
     TEST_CONTRACT.defaultRenderProviderSecondarySalesBPS;
   contract.curationRegistry = TEST_CONTRACT.curationRegistry;
+  contract.latestDependencyRegistryOverrideAllowlistedOn =
+    TEST_CONTRACT.latestDependencyRegistryOverrideAllowlistedOn;
   contract.dependencyRegistry = TEST_CONTRACT.dependencyRegistry;
+  contract.onChainGenerator = TEST_CONTRACT.onChainGenerator;
   contract.updatedAt = contract.createdAt;
   contract.mintWhitelisted = TEST_CONTRACT.mintWhitelisted;
   contract.newProjectsForbidden = false;
   contract.save();
 
   return contract;
+}
+
+export function addDependencyRegistryToStore(): DependencyRegistry {
+  let depReg = new DependencyRegistry(TEST_DEPENDENCY_REGISTRY_ADDRESS);
+  // dummy value for core registry
+  depReg.coreRegistry = TEST_CORE_REGISTRY_ADDRESS.toHexString();
+  depReg.updatedAt = CURRENT_BLOCK_TIMESTAMP.minus(BigInt.fromI32(10));
+  depReg.owner = TEST_SUPER_ADMIN_ADDRESS;
+  depReg.save();
+
+  return depReg;
 }
 
 export function addTestMinterFilterToStore(): MinterFilter {

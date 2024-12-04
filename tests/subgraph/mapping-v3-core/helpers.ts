@@ -349,6 +349,12 @@ export function mockRefreshContractCalls(
     "artblocksDependencyRegistryAddress",
     "artblocksDependencyRegistryAddress():(address)"
   ).returns([ethereum.Value.fromAddress(TEST_CONTRACT.dependencyRegistry)]);
+
+  createMockedFunction(
+    TEST_CONTRACT_ADDRESS,
+    "artblocksOnChainGeneratorAddress",
+    "artblocksOnChainGeneratorAddress():(address)"
+  ).returns([ethereum.Value.fromAddress(TEST_CONTRACT.onChainGenerator)]);
 }
 
 export function mockProjectFinance(

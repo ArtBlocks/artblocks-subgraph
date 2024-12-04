@@ -34,6 +34,7 @@ import {
   assertTestContractFields,
   addTestContractToStore,
   addTestContractToStoreOfTypeAndVersion,
+  addDependencyRegistryToStore,
   addNewProjectToStore,
   addNewTokenToStore,
   TRANSFER_ENTITY_TYPE,
@@ -849,7 +850,50 @@ test(`${coreType}-${coreVersion}: Handles PlatformUpdated::dependencyRegistryAdd
   );
 });
 
-test(`${coreType}-${coreVersion}: Handles PlatformUpdated::dependencyRegistryAddress - changed value`, () => {
+test(`${coreType}-${coreVersion}: Handles PlatformUpdated::dependencyRegistryAddress - changed value to valid dependency registry`, () => {
+  clearStore();
+  // add new contract to store
+  const projectId = BigInt.fromI32(0);
+  addTestContractToStore(projectId);
+  const depReg = addDependencyRegistryToStore();
+  mockRefreshContractCalls(
+    BigInt.fromI32(0),
+    coreType,
+    mockCoreContractOverrides
+  );
+
+  // update mock function return value that is NOT a dependency registry address
+  const newAddress = randomAddressGenerator.generateRandomAddress();
+  createMockedFunction(
+    TEST_CONTRACT_ADDRESS,
+    "artblocksDependencyRegistryAddress",
+    "artblocksDependencyRegistryAddress():(address)"
+  ).returns([ethereum.Value.fromAddress(Address.fromBytes(depReg.id))]);
+
+  // create event
+  const event: PlatformUpdated = changetype<PlatformUpdated>(newMockEvent());
+  event.address = TEST_CONTRACT_ADDRESS;
+  event.transaction.hash = TEST_TX_HASH;
+  event.logIndex = BigInt.fromI32(0);
+  event.parameters = [
+    new ethereum.EventParam(
+      "_field",
+      ethereum.Value.fromBytes(Bytes.fromUTF8("dependencyRegistryAddress"))
+    )
+  ];
+  // handle event
+  handlePlatformUpdated(event);
+
+  // value in store should be null when not the dependency registry address
+  assert.fieldEquals(
+    CONTRACT_ENTITY_TYPE,
+    TEST_CONTRACT_ADDRESS.toHexString(),
+    "dependencyRegistry",
+    depReg.id.toHexString()
+  );
+});
+
+test(`${coreType}-${coreVersion}: Handles PlatformUpdated::dependencyRegistryAddress - changed value to invalid dependency registry`, () => {
   clearStore();
   // add new contract to store
   const projectId = BigInt.fromI32(0);
@@ -860,7 +904,7 @@ test(`${coreType}-${coreVersion}: Handles PlatformUpdated::dependencyRegistryAdd
     mockCoreContractOverrides
   );
 
-  // update mock function return value
+  // update mock function return value that is NOT a dependency registry address
   const newAddress = randomAddressGenerator.generateRandomAddress();
   createMockedFunction(
     TEST_CONTRACT_ADDRESS,
@@ -882,14 +926,12 @@ test(`${coreType}-${coreVersion}: Handles PlatformUpdated::dependencyRegistryAdd
   // handle event
   handlePlatformUpdated(event);
 
-  // value in store should be the same
-  // We allow the dependency registry to control this value
-  // so we ignore the value on the core contract
+  // value in store should be null when not the dependency registry address
   assert.fieldEquals(
     CONTRACT_ENTITY_TYPE,
     TEST_CONTRACT_ADDRESS.toHexString(),
     "dependencyRegistry",
-    Address.zero().toHexString()
+    "null"
   );
 });
 

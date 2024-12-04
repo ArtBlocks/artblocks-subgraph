@@ -39,8 +39,8 @@ import {
   LicenseTypeAdded,
   ProjectDependencyOverrideAdded,
   ProjectDependencyOverrideRemoved,
-  SupportedCoreContractAdded,
-  SupportedCoreContractRemoved
+  SupportedCoreContractOverrideAdded,
+  SupportedCoreContractOverrideRemoved
 } from "../../../generated/IDependencyRegistryV0/IDependencyRegistryV0";
 
 import { OwnershipTransferred } from "../../../generated/OwnableUpgradeable/OwnableUpgradeable";
@@ -61,8 +61,8 @@ import {
   handleOwnershipTransferred,
   handleProjectDependencyOverrideAdded,
   handleProjectDependencyOverrideRemoved,
-  handleSupportedCoreContractAdded,
-  handleSupportedCoreContractRemoved
+  handleSupportedCoreContractOverrideAdded,
+  handleSupportedCoreContractOverrideRemoved
 } from "../../../src/dependency-registry";
 
 import {
@@ -114,6 +114,7 @@ describe("DependencyRegistry", () => {
     const dependencyRegistry = new DependencyRegistry(
       dependencyRegistryAddress
     );
+    dependencyRegistry.coreRegistry = null;
     dependencyRegistry.owner = randomAddressGenerator.generateRandomAddress();
     dependencyRegistry.updatedAt = CURRENT_BLOCK_TIMESTAMP;
     dependencyRegistry.save();
@@ -154,6 +155,7 @@ describe("DependencyRegistry", () => {
     const dependencyRegistry = new DependencyRegistry(
       dependencyRegistryAddress
     );
+    dependencyRegistry.coreRegistry = null;
     dependencyRegistry.owner = randomAddressGenerator.generateRandomAddress();
     dependencyRegistry.updatedAt = CURRENT_BLOCK_TIMESTAMP;
     dependencyRegistry.save();
@@ -1634,33 +1636,33 @@ describe("DependencyRegistry", () => {
       );
     });
   });
-  describe("handleSupportedCoreContractAdded", () => {
+  describe("handleSupportedCoreContractOverrideAdded", () => {
     test("should do nothing if core contract does not exist", () => {
-      const event: SupportedCoreContractAdded = changetype<
-        SupportedCoreContractAdded
+      const event: SupportedCoreContractOverrideAdded = changetype<
+        SupportedCoreContractOverrideAdded
       >(newMockEvent());
       event.parameters = [
         new ethereum.EventParam(
-          "coreContract",
+          "coreContractAddress",
           ethereum.Value.fromAddress(
             randomAddressGenerator.generateRandomAddress()
           )
         )
       ];
-      handleSupportedCoreContractAdded(event);
+      handleSupportedCoreContractOverrideAdded(event);
 
       assert.entityCount("Contract", 0);
     });
-    test("should update core contract if core contract exists", () => {
+    test("should update core contract if core contract exists when adding", () => {
       const dependencyRegistryAddress = randomAddressGenerator.generateRandomAddress();
       const coreContract = addTestContractToStore(BigInt.fromI32(1));
 
-      const event: SupportedCoreContractAdded = changetype<
-        SupportedCoreContractAdded
+      const event: SupportedCoreContractOverrideAdded = changetype<
+        SupportedCoreContractOverrideAdded
       >(newMockEvent());
       event.parameters = [
         new ethereum.EventParam(
-          "coreContract",
+          "coreContractAddress",
           ethereum.Value.fromAddress(Address.fromString(coreContract.id))
         )
       ];
@@ -1670,12 +1672,12 @@ describe("DependencyRegistry", () => {
       event.address = dependencyRegistryAddress;
       event.block.timestamp = updatedAtBlockTimestamp;
 
-      handleSupportedCoreContractAdded(event);
+      handleSupportedCoreContractOverrideAdded(event);
 
       assert.fieldEquals(
         "Contract",
         coreContract.id,
-        "dependencyRegistry",
+        "latestDependencyRegistryOverrideAllowlistedOn",
         dependencyRegistryAddress.toHexString()
       );
       assert.fieldEquals(
@@ -1686,35 +1688,67 @@ describe("DependencyRegistry", () => {
       );
     });
   });
-  describe("handleSupportedCoreContractRemoved", () => {
+  describe("handleSupportedCoreContractOverrideRemoved", () => {
     test("should do nothing if core contract does not exist", () => {
-      const event: SupportedCoreContractRemoved = changetype<
-        SupportedCoreContractRemoved
+      const event: SupportedCoreContractOverrideRemoved = changetype<
+        SupportedCoreContractOverrideRemoved
       >(newMockEvent());
       event.parameters = [
         new ethereum.EventParam(
-          "coreContract",
+          "coreContractAddress",
           ethereum.Value.fromAddress(
             randomAddressGenerator.generateRandomAddress()
           )
         )
       ];
-      handleSupportedCoreContractRemoved(event);
+      handleSupportedCoreContractOverrideRemoved(event);
 
       assert.entityCount("Contract", 0);
     });
-    test("should update core contract if core contract exists", () => {
+    test("should not update core contract if latest dependency allowlisted on is NOT the contract emitting the event", () => {
       const dependencyRegistryAddress = randomAddressGenerator.generateRandomAddress();
+      const differentDependencyRegistryAddress = randomAddressGenerator.generateRandomAddress();
       const coreContract = addTestContractToStore(BigInt.fromI32(1));
-      coreContract.dependencyRegistry = dependencyRegistryAddress;
+      coreContract.latestDependencyRegistryOverrideAllowlistedOn = differentDependencyRegistryAddress;
       coreContract.save();
+      const originalUpdatedAt = coreContract.updatedAt;
 
-      const event: SupportedCoreContractRemoved = changetype<
-        SupportedCoreContractRemoved
+      const event: SupportedCoreContractOverrideRemoved = changetype<
+        SupportedCoreContractOverrideRemoved
       >(newMockEvent());
       event.parameters = [
         new ethereum.EventParam(
-          "coreContract",
+          "coreContractAddress",
+          ethereum.Value.fromAddress(Address.fromString(coreContract.id))
+        )
+      ];
+      const updatedAtBlockTimestamp = CURRENT_BLOCK_TIMESTAMP.plus(
+        BigInt.fromI32(1)
+      );
+      event.address = dependencyRegistryAddress; // NOT the same as the contract's latestDependencyRegistryOverrideAllowlistedOn
+      event.block.timestamp = updatedAtBlockTimestamp;
+
+      handleSupportedCoreContractOverrideRemoved(event);
+      assert.fieldEquals(
+        "Contract",
+        coreContract.id,
+        "updatedAt",
+        originalUpdatedAt.toString() // should not update
+      );
+    });
+
+    test("should update core contract if core contract exists when removing", () => {
+      const dependencyRegistryAddress = randomAddressGenerator.generateRandomAddress();
+      const coreContract = addTestContractToStore(BigInt.fromI32(1));
+      coreContract.latestDependencyRegistryOverrideAllowlistedOn = dependencyRegistryAddress;
+      coreContract.save();
+
+      const event: SupportedCoreContractOverrideRemoved = changetype<
+        SupportedCoreContractOverrideRemoved
+      >(newMockEvent());
+      event.parameters = [
+        new ethereum.EventParam(
+          "coreContractAddress",
           ethereum.Value.fromAddress(Address.fromString(coreContract.id))
         )
       ];
@@ -1724,12 +1758,12 @@ describe("DependencyRegistry", () => {
       event.address = dependencyRegistryAddress;
       event.block.timestamp = updatedAtBlockTimestamp;
 
-      handleSupportedCoreContractRemoved(event);
+      handleSupportedCoreContractOverrideRemoved(event);
 
       assert.fieldEquals(
         "Contract",
         coreContract.id,
-        "dependencyRegistry",
+        "latestDependencyRegistryOverrideAllowlistedOn",
         "null"
       );
       assert.fieldEquals(
