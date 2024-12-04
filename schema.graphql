@@ -279,7 +279,7 @@ type Contract @entity {
   curationRegistry: Bytes
 
   "Latest Override Allowlisted on Dependency Registry; only populated if allowlisted on a DependencyRegistry instead of the CoreRegistry"
-  latestDepenencyRegistryOverrideAllowlistedOn: DependencyRegistry
+  latestDependencyRegistryOverrideAllowlistedOn: DependencyRegistry
 
   "On chain pointer to dependency registry contract - not used for any on-chain logic or allowlisting. Null if not populated or set to non-indexed Dependency Registry address."
   dependencyRegistry: DependencyRegistry
@@ -852,7 +852,7 @@ type DependencyRegistry @entity {
   coreRegistry: CoreRegistry
   "List of core contracts that are explicitly allowlisted on this registry, extending those on the CoreRegistry"
   supportedCoreContractsOverride: [Contract!]!
-    @derivedFrom(field: "latestDepenencyRegistryOverrideAllowlistedOn")
+    @derivedFrom(field: "latestDependencyRegistryOverrideAllowlistedOn")
   "List of dependencies that are registered on this registry contract"
   dependencies: [Dependency!] @derivedFrom(field: "dependencyRegistry")
   "Current owner of this contract"

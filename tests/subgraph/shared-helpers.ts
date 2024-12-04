@@ -166,7 +166,7 @@ export class ContractValues {
   renderProviderPercentage: BigInt;
   defaultRenderProviderSecondarySalesAddress: Address;
   defaultRenderProviderSecondarySalesBPS: BigInt;
-  latestDepenencyRegistryOverrideAllowlistedOn: Address;
+  latestDependencyRegistryOverrideAllowlistedOn: Address;
   dependencyRegistry: Address;
   onChainGenerator: Address;
   curationRegistry: Address;
@@ -193,7 +193,7 @@ export const TEST_CONTRACT: ContractValues = {
   mintWhitelisted: [],
   minterContract: Address.zero(),
   randomizerContract: RANDOMIZER_ADDRESS,
-  latestDepenencyRegistryOverrideAllowlistedOn: Address.zero(),
+  latestDependencyRegistryOverrideAllowlistedOn: Address.zero(),
   dependencyRegistry: Address.zero(),
   onChainGenerator: Address.zero(),
   curationRegistry: Address.zero(),
@@ -378,8 +378,8 @@ export function addTestContractToStore(nextProjectId: BigInt): Contract {
   contract.defaultRenderProviderSecondarySalesBPS =
     TEST_CONTRACT.defaultRenderProviderSecondarySalesBPS;
   contract.curationRegistry = TEST_CONTRACT.curationRegistry;
-  contract.latestDepenencyRegistryOverrideAllowlistedOn =
-    TEST_CONTRACT.latestDepenencyRegistryOverrideAllowlistedOn;
+  contract.latestDependencyRegistryOverrideAllowlistedOn =
+    TEST_CONTRACT.latestDependencyRegistryOverrideAllowlistedOn;
   contract.dependencyRegistry = TEST_CONTRACT.dependencyRegistry;
   contract.onChainGenerator = TEST_CONTRACT.onChainGenerator;
   contract.updatedAt = contract.createdAt;
@@ -411,8 +411,8 @@ export function addTestContractToStoreOfTypeAndVersion(
   contract.defaultRenderProviderSecondarySalesBPS =
     TEST_CONTRACT.defaultRenderProviderSecondarySalesBPS;
   contract.curationRegistry = TEST_CONTRACT.curationRegistry;
-  contract.latestDepenencyRegistryOverrideAllowlistedOn =
-    TEST_CONTRACT.latestDepenencyRegistryOverrideAllowlistedOn;
+  contract.latestDependencyRegistryOverrideAllowlistedOn =
+    TEST_CONTRACT.latestDependencyRegistryOverrideAllowlistedOn;
   contract.dependencyRegistry = TEST_CONTRACT.dependencyRegistry;
   contract.onChainGenerator = TEST_CONTRACT.onChainGenerator;
   contract.updatedAt = contract.createdAt;
@@ -441,8 +441,8 @@ export function addArbitraryContractToStore(
   contract.defaultRenderProviderSecondarySalesBPS =
     TEST_CONTRACT.defaultRenderProviderSecondarySalesBPS;
   contract.curationRegistry = TEST_CONTRACT.curationRegistry;
-  contract.latestDepenencyRegistryOverrideAllowlistedOn =
-    TEST_CONTRACT.latestDepenencyRegistryOverrideAllowlistedOn;
+  contract.latestDependencyRegistryOverrideAllowlistedOn =
+    TEST_CONTRACT.latestDependencyRegistryOverrideAllowlistedOn;
   contract.dependencyRegistry = TEST_CONTRACT.dependencyRegistry;
   contract.onChainGenerator = TEST_CONTRACT.onChainGenerator;
   contract.updatedAt = contract.createdAt;

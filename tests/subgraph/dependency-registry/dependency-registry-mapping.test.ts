@@ -1677,7 +1677,7 @@ describe("DependencyRegistry", () => {
       assert.fieldEquals(
         "Contract",
         coreContract.id,
-        "latestDepenencyRegistryOverrideAllowlistedOn",
+        "latestDependencyRegistryOverrideAllowlistedOn",
         dependencyRegistryAddress.toHexString()
       );
       assert.fieldEquals(
@@ -1709,7 +1709,7 @@ describe("DependencyRegistry", () => {
       const dependencyRegistryAddress = randomAddressGenerator.generateRandomAddress();
       const differentDependencyRegistryAddress = randomAddressGenerator.generateRandomAddress();
       const coreContract = addTestContractToStore(BigInt.fromI32(1));
-      coreContract.latestDepenencyRegistryOverrideAllowlistedOn = differentDependencyRegistryAddress;
+      coreContract.latestDependencyRegistryOverrideAllowlistedOn = differentDependencyRegistryAddress;
       coreContract.save();
       const originalUpdatedAt = coreContract.updatedAt;
 
@@ -1725,7 +1725,7 @@ describe("DependencyRegistry", () => {
       const updatedAtBlockTimestamp = CURRENT_BLOCK_TIMESTAMP.plus(
         BigInt.fromI32(1)
       );
-      event.address = dependencyRegistryAddress; // NOT the same as the contract's latestDepenencyRegistryOverrideAllowlistedOn
+      event.address = dependencyRegistryAddress; // NOT the same as the contract's latestDependencyRegistryOverrideAllowlistedOn
       event.block.timestamp = updatedAtBlockTimestamp;
 
       handleSupportedCoreContractOverrideRemoved(event);
@@ -1740,7 +1740,7 @@ describe("DependencyRegistry", () => {
     test("should update core contract if core contract exists when removing", () => {
       const dependencyRegistryAddress = randomAddressGenerator.generateRandomAddress();
       const coreContract = addTestContractToStore(BigInt.fromI32(1));
-      coreContract.latestDepenencyRegistryOverrideAllowlistedOn = dependencyRegistryAddress;
+      coreContract.latestDependencyRegistryOverrideAllowlistedOn = dependencyRegistryAddress;
       coreContract.save();
 
       const event: SupportedCoreContractOverrideRemoved = changetype<
@@ -1763,7 +1763,7 @@ describe("DependencyRegistry", () => {
       assert.fieldEquals(
         "Contract",
         coreContract.id,
-        "latestDepenencyRegistryOverrideAllowlistedOn",
+        "latestDependencyRegistryOverrideAllowlistedOn",
         "null"
       );
       assert.fieldEquals(

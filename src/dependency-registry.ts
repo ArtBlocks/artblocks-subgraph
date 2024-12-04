@@ -454,7 +454,7 @@ export function handleSupportedCoreContractOverrideAdded(
     return;
   }
 
-  coreContract.latestDepenencyRegistryOverrideAllowlistedOn = event.address;
+  coreContract.latestDependencyRegistryOverrideAllowlistedOn = event.address;
   coreContract.updatedAt = event.block.timestamp;
   coreContract.save();
 }
@@ -472,12 +472,12 @@ export function handleSupportedCoreContractOverrideRemoved(
 
   // null out the dependency registry override if it matches the event address
   if (
-    coreContract.latestDepenencyRegistryOverrideAllowlistedOn &&
-    coreContract.latestDepenencyRegistryOverrideAllowlistedOn!.equals(
+    coreContract.latestDependencyRegistryOverrideAllowlistedOn &&
+    coreContract.latestDependencyRegistryOverrideAllowlistedOn!.equals(
       event.address
     )
   ) {
-    coreContract.latestDepenencyRegistryOverrideAllowlistedOn = null;
+    coreContract.latestDependencyRegistryOverrideAllowlistedOn = null;
     coreContract.updatedAt = event.block.timestamp;
     coreContract.save();
   }
