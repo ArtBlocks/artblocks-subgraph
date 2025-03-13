@@ -189,5 +189,10 @@
     {
       "address": ""
     }
+  ],
+  "pmpV0Contracts": [
+    {
+      "address": ""
+    }
   ]
 }

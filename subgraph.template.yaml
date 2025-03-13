@@ -2289,6 +2289,39 @@ dataSources:
           handler: handleIAdminACLV0SuperAdminTransferred
       file: ./src/mapping-v3-core.ts
   {{/adminACLV0Contracts}}
+  {{#pmpV0Contracts}}
+  - kind: ethereum/contract
+    name: 'PMPV0{{#address}}-{{address}}{{/address}}'
+    network: {{network}}
+    source:
+      address: "{{#address}}{{address}}{{/address}}{{^address}}0x0000000000000000000000000000000000000000{{/address}}"
+      abi: PMPV0
+      {{#startBlock}}startBlock: {{startBlock}}{{/startBlock}}
+    mapping:
+      kind: ethereum/events
+      apiVersion: 0.0.5
+      language: wasm/assemblyscript
+      entities:
+        - Project
+        - Token
+        - Contract
+        - PMPProjectConfig
+        - PMPConfig
+        - PMP
+      abis:
+        - name: PMPV0
+          file: ./abis/PMPV0.json
+        - name: IGenArt721CoreContractV3_Base
+          file: ./abis/IGenArt721CoreContractV3_Base.json
+        - name: IERC721
+          file: ./abis/IERC721.json
+      eventHandlers:
+        - event: ProjectConfigured(address,uint256,(string,(uint8,uint8,uint48,address,string[],bytes32,bytes32))[],uint8)
+          handler: handleProjectConfigured
+        - event: TokenParamsConfigured(address,uint256,(string,uint8,bytes32,bool,string)[])
+          handler: handleTokenParamsConfigured
+      file: ./src/mapping-pmp-v0.ts
+  {{/pmpV0Contracts}}
   {{#iDependencyRegistryV0Contracts}}
   - kind: ethereum/contract
     name: 'IDependencyRegistryV0{{#address}}-{{address}}{{/address}}'
