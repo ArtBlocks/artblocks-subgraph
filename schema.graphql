@@ -1044,6 +1044,9 @@ type PMP @entity {
   "Unique identifier made up of {PMP_Plugin_Address}-{tokenId}-{Key}-{tokenPMPNonce}"
   id: ID!
 
+  "The key for this PMP"
+  key: String!
+
   "The token associated with this PMP"
   token: Token!
 

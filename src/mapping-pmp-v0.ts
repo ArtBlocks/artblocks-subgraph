@@ -72,6 +72,7 @@ export function handleTokenParamsConfigured(
       );
 
       let pmp = new PMP(pmpId);
+      pmp.key = pmpInput.key;
       pmp.token = token.id;
 
       let currentConfiguredParamType = getPMPParamTypeString(
