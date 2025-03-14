@@ -83,3 +83,26 @@ export const COMPROMISED_ENGINE_REGISTRY_ADDRESS_ARBITRUM =
 export const COMPROMISED_ENGINE_REGISTRY_CUTOFF_BLOCK_ARBITRUM = BigInt.fromI32(
   150114684
 );
+
+// PMP enum values for auth options and param types
+export const PMP_AUTH_OPTIONS: string[] = [
+  "Artist",
+  "TokenOwner",
+  "Address",
+  "ArtistAndTokenOwner",
+  "ArtistAndAddress",
+  "TokenOwnerAndAddress",
+  "ArtistAndTokenOwnerAndAddress"
+];
+
+export const PMP_PARAM_TYPES: string[] = [
+  "Unconfigured",
+  "Select",
+  "Bool",
+  "Uint256Range",
+  "Int256Range",
+  "DecimalRange",
+  "HexColor",
+  "Timestamp",
+  "String"
+];

@@ -2289,13 +2289,13 @@ dataSources:
           handler: handleIAdminACLV0SuperAdminTransferred
       file: ./src/mapping-v3-core.ts
   {{/adminACLV0Contracts}}
-  {{#pmpV0Contracts}}
+  {{#iPMPV0Contracts}}
   - kind: ethereum/contract
-    name: 'PMPV0{{#address}}-{{address}}{{/address}}'
+    name: 'IPMPV0{{#address}}-{{address}}{{/address}}'
     network: {{network}}
     source:
       address: "{{#address}}{{address}}{{/address}}{{^address}}0x0000000000000000000000000000000000000000{{/address}}"
-      abi: PMPV0
+      abi: IPMPV0
       {{#startBlock}}startBlock: {{startBlock}}{{/startBlock}}
     mapping:
       kind: ethereum/events
@@ -2309,8 +2309,8 @@ dataSources:
         - PMPConfig
         - PMP
       abis:
-        - name: PMPV0
-          file: ./abis/PMPV0.json
+        - name: IPMPV0
+          file: ./abis/IPMPV0.json
         - name: IGenArt721CoreContractV3_Base
           file: ./abis/IGenArt721CoreContractV3_Base.json
         - name: IERC721
@@ -2321,7 +2321,7 @@ dataSources:
         - event: TokenParamsConfigured(address,uint256,(string,uint8,bytes32,bool,string)[])
           handler: handleTokenParamsConfigured
       file: ./src/mapping-pmp-v0.ts
-  {{/pmpV0Contracts}}
+  {{/iPMPV0Contracts}}
   {{#iDependencyRegistryV0Contracts}}
   - kind: ethereum/contract
     name: 'IDependencyRegistryV0{{#address}}-{{address}}{{/address}}'
