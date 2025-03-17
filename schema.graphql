@@ -1010,7 +1010,7 @@ type PMPConfig @entity {
   id: ID!
 
   "PMP Project config associated with this PMP config"
-  PMPProjectConfig: PMPProjectConfig!
+  pmpProjectConfig: PMPProjectConfig!
 
   "Auth option for this PMP config"
   authOption: PMPAuthOptions!
