@@ -1005,7 +1005,7 @@ type PMPProjectConfig @entity {
   updatedAt: BigInt!
 
   "List of PMP configs for this project"
-  PMPConfigs: [PMPConfig!]! @derivedFrom(field: "pmpProjectConfig")
+  pmpConfigs: [PMPConfig!]! @derivedFrom(field: "pmpProjectConfig")
 }
 
 type PMPConfig @entity {

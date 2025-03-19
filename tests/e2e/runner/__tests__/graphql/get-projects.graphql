@@ -1,6 +1,9 @@
 fragment ProjectDetails on Project {
   id
   projectId
+  pmpProjectConfig {
+    id
+  }
   minterConfiguration {
     id
     project {

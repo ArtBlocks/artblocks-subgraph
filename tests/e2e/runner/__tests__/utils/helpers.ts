@@ -39,6 +39,18 @@ import {
   GetTargetSplitAtomicContractsQueryVariables,
   GetTargetSplitAtomicContractsDocument,
   SplitAtomicContractDetailsFragment,
+  GetProjectPmpConfigsQuery,
+  GetProjectPmpConfigsQueryVariables,
+  GetProjectPmpConfigsDocument,
+  PmpProjectConfigDetailsFragment,
+  GetTokenPmPsQuery,
+  GetTokenPmPsQueryVariables,
+  GetTokenPmPsDocument,
+  PmpDetailsFragment,
+  GetTokenLatestPmpStatesQuery,
+  GetTokenLatestPmpStatesQueryVariables,
+  GetTokenLatestPmpStatesDocument,
+  PmpLatestStateDetailsFragment,
 } from "../../generated/graphql";
 import {
   createClient,
@@ -347,4 +359,75 @@ export const getSplitAtomicContractDetails = async (
   if (!splitAtomicContractRes)
     throw new Error("No Split Atomic Contract entity found");
   return splitAtomicContractRes;
+};
+
+/**
+ * Gets a PMPProjectConfigDetails fragment from the subgraph, at specified id.
+ * Reverts if no entity is found.
+ * @param client the subgraph client
+ * @param entityId the id of the PMPProjectConfig entity
+ */
+export const getProjectPMPConfigDetails = async (
+  client: Client,
+  entityId: string
+): Promise<PmpProjectConfigDetailsFragment | undefined> => {
+  const configRes = await client
+    .query<GetProjectPmpConfigsQuery, GetProjectPmpConfigsQueryVariables>(
+      GetProjectPmpConfigsDocument,
+      {
+        targetId: entityId,
+      }
+    )
+    .toPromise();
+
+  const res = configRes.data?.pmpprojectConfigs?.[0];
+  return res;
+};
+
+/**
+ * Gets a PMPDetails fragment from the subgraph, at specified id.
+ * Reverts if no entity is found.
+ * @param client the subgraph client
+ * @param entityId the id of the PMP entity
+ */
+export const getTokenPMPDetails = async (
+  client: Client,
+  entityId: string
+): Promise<PmpDetailsFragment> => {
+  const pmpRes = (
+    await client
+      .query<GetTokenPmPsQuery, GetTokenPmPsQueryVariables>(
+        GetTokenPmPsDocument,
+        {
+          targetId: entityId,
+        }
+      )
+      .toPromise()
+  ).data?.pmps?.[0];
+  if (!pmpRes) throw new Error("No PMP entity found");
+  return pmpRes;
+};
+
+/**
+ * Gets a PMPLatestStateDetails fragment from the subgraph, at specified id.
+ * Reverts if no entity is found.
+ * @param client the subgraph client
+ * @param entityId the id of the PMPLatestState entity
+ */
+export const getTokenLatestPMPStateDetails = async (
+  client: Client,
+  entityId: string
+): Promise<PmpLatestStateDetailsFragment> => {
+  const stateRes = (
+    await client
+      .query<
+        GetTokenLatestPmpStatesQuery,
+        GetTokenLatestPmpStatesQueryVariables
+      >(GetTokenLatestPmpStatesDocument, {
+        targetId: entityId,
+      })
+      .toPromise()
+  ).data?.pmplatestStates?.[0];
+  if (!stateRes) throw new Error("No PMPLatestState entity found");
+  return stateRes;
 };
