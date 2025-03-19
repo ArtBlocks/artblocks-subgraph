@@ -377,6 +377,9 @@ type Token @entity {
   "Project of the token"
   project: Project!
 
+  "All PMPs associated with this token"
+  pmps: [PMP!] @derivedFrom(field: "token")
+
   uri: String
   createdAt: BigInt!
   updatedAt: BigInt!
@@ -1002,7 +1005,7 @@ type PMPProjectConfig @entity {
   updatedAt: BigInt!
 
   "List of PMP configs for this project"
-  PMPConfigs: [PMPConfig!]! @derivedFrom(field: "PMPProjectConfig")
+  PMPConfigs: [PMPConfig!]! @derivedFrom(field: "pmpProjectConfig")
 }
 
 type PMPConfig @entity {
@@ -1048,7 +1051,7 @@ type PMP @entity(immutable: true) {
   key: String!
 
   "The token associated with this PMP"
-  token: Token!
+  token: Token
 
   "Off-chain nonce incremented every time this pmp is updated"
   tokenPMPNonce: BigInt!

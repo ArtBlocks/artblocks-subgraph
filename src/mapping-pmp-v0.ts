@@ -11,23 +11,37 @@ import {
   PMPLatestState
 } from "../generated/schema";
 import { Address, BigInt, log, store } from "@graphprotocol/graph-ts";
-import { generateContractSpecificId } from "./helpers";
+import {
+  generateContractSpecificId,
+  generateProjectIdNumberFromTokenIdNumber
+} from "./helpers";
 import { PMP_AUTH_OPTIONS, PMP_PARAM_TYPES } from "./constants";
 
 export function handleTokenParamsConfigured(
   event: TokenParamsConfigured
 ): void {
+  const projectIdNumber = generateProjectIdNumberFromTokenIdNumber(
+    event.params.tokenId
+  );
+
+  const projectId = generateContractSpecificId(
+    event.params.coreContract,
+    projectIdNumber
+  );
+
+  let project = Project.load(projectId);
+
+  if (!project) {
+    // @dev While PMP is open to any NFT, we only index params on indexed projects
+    return;
+  }
+
   const tokenId = generateContractSpecificId(
     event.params.coreContract,
     event.params.tokenId
   );
 
   let token = Token.load(tokenId);
-
-  if (!token) {
-    // @dev While PMP is open to any NFT, we only index params on indexed projects
-    return;
-  }
   // for each PMP input in the event, create a new PMP entity. Older PMP entities should persist, don't overwrite them.
   for (let i = 0; i < event.params.pmpInputs.length; i++) {
     const pmpInput = event.params.pmpInputs[i];
@@ -56,7 +70,10 @@ export function handleTokenParamsConfigured(
 
     let pmp = new PMP(pmpId);
     pmp.key = pmpInput.key;
-    pmp.token = token.id;
+    if (token) {
+      // @dev it is valid for PMP to be created before token exists
+      pmp.token = token.id;
+    }
 
     let currentConfiguredParamType = getPMPParamTypeString(
       BigInt.fromI32(pmpInput.configuredParamType)
@@ -95,6 +112,7 @@ export function handleProjectConfigured(event: ProjectConfigured): void {
   }
   const projectConfigId = generateProjectConfigId(
     event.address,
+    event.params.coreContract,
     event.params.projectId
   );
 
@@ -123,11 +141,7 @@ export function handleProjectConfigured(event: ProjectConfigured): void {
     } else if (previousPMPConfigCount.gt(BigInt.fromI32(0))) {
       // delete all old pmp configs
       for (let i = 0; i < previousPMPConfigCount.toI32(); i++) {
-        const prevPMPConfigId = generatePMPConfigId(
-          event.address,
-          event.params.projectId,
-          storedKeys[i]
-        );
+        const prevPMPConfigId = storedKeys[i];
         store.remove("PMPConfig", prevPMPConfigId);
       }
     }
@@ -137,19 +151,21 @@ export function handleProjectConfigured(event: ProjectConfigured): void {
   let configKeys: string[] = [];
   for (let i = 0; i < event.params.pmpInputConfigs.length; i++) {
     const config = event.params.pmpInputConfigs[i];
-    configKeys.push(config.key);
     const pmpConfigId = generatePMPConfigId(
       event.address,
+      event.params.coreContract,
       event.params.projectId,
       config.key
     );
+
+    configKeys.push(pmpConfigId);
 
     let pmpConfig = PMPConfig.load(pmpConfigId);
     if (!pmpConfig) {
       pmpConfig = new PMPConfig(pmpConfigId);
     }
 
-    pmpConfig.PMPProjectConfig = projectConfig.id;
+    pmpConfig.pmpProjectConfig = projectConfig.id;
     pmpConfig.authOption = getPMPAuthOptionString(
       BigInt.fromI32(config.pmpConfig.authOption)
     );
@@ -198,17 +214,19 @@ function generatePMPId(
 
 function generateProjectConfigId(
   contractAddress: Address,
+  coreContractAddress: Address,
   projectId: BigInt
 ): string {
-  return `${contractAddress.toHexString()}-${projectId.toString()}`;
+  return `${contractAddress.toHexString()}-${coreContractAddress.toHexString()}-${projectId.toString()}`;
 }
 
 function generatePMPConfigId(
   contractAddress: Address,
+  coreContractAddress: Address,
   projectId: BigInt,
   key: string
 ): string {
-  return `${contractAddress.toHexString()}-${projectId.toString()}-${key}`;
+  return `${contractAddress.toHexString()}-${coreContractAddress.toHexString()}-${projectId.toString()}-${key}`;
 }
 
 function getPMPAuthOptionString(value: BigInt): string {
