@@ -8,6 +8,9 @@ fragment PMPProjectConfigDetails on PMPProjectConfig {
   updatedAt
   pmpConfigs {
     id
+    pmpProjectConfig {
+      id
+    }
     authOption
     paramType
     key
