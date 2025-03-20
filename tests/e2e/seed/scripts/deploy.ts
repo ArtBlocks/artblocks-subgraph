@@ -450,7 +450,7 @@ async function main() {
 
   // deploy PMP
   const pmpV0Factory = new PMPV0__factory(deployer);
-  const pmpV0 = await pmpV0Factory.deploy();
+  const pmpV0 = await pmpV0Factory.deploy(delegationRegistryAddress);
   await pmpV0.deployed();
   console.log(`PMPV0 deployed at ${pmpV0.address}`);
   // update subgraph config to index PMPV0

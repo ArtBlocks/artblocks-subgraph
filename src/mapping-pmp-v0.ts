@@ -50,6 +50,7 @@ export function handleTokenParamsConfigured(
     // load or create the latest state entity for this PMP
     const latestStateId = generateLatestStateId(
       event.address,
+      event.params.coreContract,
       event.params.tokenId,
       pmpInput.key
     );
@@ -63,6 +64,7 @@ export function handleTokenParamsConfigured(
 
     const pmpId = generatePMPId(
       event.address,
+      event.params.coreContract,
       event.params.tokenId,
       pmpInput.key,
       latestNonce
@@ -197,19 +199,21 @@ export function handleProjectConfigured(event: ProjectConfigured): void {
 
 function generateLatestStateId(
   contractAddress: Address,
+  coreContractAddress: Address,
   tokenId: BigInt,
   key: string
 ): string {
-  return `${contractAddress.toHexString()}-${tokenId.toString()}-${key}`;
+  return `${contractAddress.toHexString()}-${coreContractAddress.toHexString()}-${tokenId.toString()}-${key}`;
 }
 
 function generatePMPId(
   contractAddress: Address,
+  coreContractAddress: Address,
   tokenId: BigInt,
   key: string,
   tokenPMPNonce: BigInt
 ): string {
-  return `${contractAddress.toHexString()}-${tokenId.toString()}-${key}-${tokenPMPNonce}`;
+  return `${contractAddress.toHexString()}-${coreContractAddress.toHexString()}-${tokenId.toString()}-${key}-${tokenPMPNonce}`;
 }
 
 function generateProjectConfigId(
