@@ -1076,5 +1076,5 @@ type PMPLatestState @entity {
   id: ID!
   
   "Latest off-chain nonce for this PMP, used for indexing PMP history"
-  latestNonce: BigInt!
+  latestTokenPMPNonce: BigInt!
 }

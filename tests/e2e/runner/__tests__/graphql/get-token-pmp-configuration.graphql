@@ -14,7 +14,7 @@ fragment PMPDetails on PMP {
 
 fragment PMPLatestStateDetails on PMPLatestState {
   id
-  latestNonce
+  latestTokenPMPNonce
 }
 
 query GetTokenLatestPMPStates($targetId: ID!) {

@@ -45,7 +45,7 @@ export function handleTokenParamsConfigured(
   // for each PMP input in the event, create a new PMP entity. Older PMP entities should persist, don't overwrite them.
   for (let i = 0; i < event.params.pmpInputs.length; i++) {
     const pmpInput = event.params.pmpInputs[i];
-    let latestNonce = BigInt.fromI32(0);
+    let latestTokenPMPNonce = BigInt.fromI32(0);
 
     // load or create the latest state entity for this PMP
     const latestStateId = generateLatestStateId(
@@ -59,7 +59,9 @@ export function handleTokenParamsConfigured(
     if (!latestState) {
       latestState = new PMPLatestState(latestStateId);
     } else {
-      latestNonce = latestState.latestNonce.plus(BigInt.fromI32(1));
+      latestTokenPMPNonce = latestState.latestTokenPMPNonce.plus(
+        BigInt.fromI32(1)
+      );
     }
 
     const pmpId = generatePMPId(
@@ -67,7 +69,7 @@ export function handleTokenParamsConfigured(
       event.params.coreContract,
       event.params.tokenId,
       pmpInput.key,
-      latestNonce
+      latestTokenPMPNonce
     );
 
     let pmp = new PMP(pmpId);
@@ -81,7 +83,7 @@ export function handleTokenParamsConfigured(
       BigInt.fromI32(pmpInput.configuredParamType)
     );
 
-    pmp.tokenPMPNonce = latestNonce;
+    pmp.tokenPMPNonce = latestTokenPMPNonce;
     pmp.configuredParamType = currentConfiguredParamType;
     pmp.configuredValue = pmpInput.configuredValue.toHexString();
 
@@ -96,7 +98,7 @@ export function handleTokenParamsConfigured(
     pmp.save();
 
     // update the latest state entity
-    latestState.latestNonce = latestNonce;
+    latestState.latestTokenPMPNonce = latestTokenPMPNonce;
     latestState.save();
   }
 }

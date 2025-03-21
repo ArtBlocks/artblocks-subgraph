@@ -357,7 +357,7 @@ describe("PMP event handling", () => {
       );
 
       // validate latest PMP state fields
-      expect(tokenPmpLatestStateRes?.latestNonce).toBe("0");
+      expect(tokenPmpLatestStateRes?.latestTokenPMPNonce).toBe("0");
 
       // validate PMP fields
       expect(tokenPmpRes?.key).toBe(paramKey);
@@ -402,7 +402,7 @@ describe("PMP event handling", () => {
       );
 
       // validate latest PMP state fields
-      expect(tokenPmpLatestStateResNew?.latestNonce).toBe("1");
+      expect(tokenPmpLatestStateResNew?.latestTokenPMPNonce).toBe("1");
 
       // validate new PMP fields
       expect(tokenPmpRes2?.key).toBe(paramKey);
