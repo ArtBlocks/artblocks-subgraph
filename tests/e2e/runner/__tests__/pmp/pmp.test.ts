@@ -80,7 +80,6 @@ describe("PMP event handling", () => {
         client,
         targetId
       );
-      const fullPmpConfigKey = `${pmpV0Address.toLowerCase()}-${genArt721CoreAddress.toLowerCase()}-${projectId}-${paramKey}`;
       // validate project field
       expect(projectRes?.pmpProjectConfig?.id).toBe(targetId);
 
@@ -91,7 +90,7 @@ describe("PMP event handling", () => {
       expect(projectPmpConfigRes?.project?.id).toBe(fullProjectId);
       expect(projectPmpConfigRes?.pmpConfigCount).toBe("1");
       expect(projectPmpConfigRes?.pmpConfigKeys?.length).toBe(1);
-      expect(projectPmpConfigRes?.pmpConfigKeys?.[0]).toBe(fullPmpConfigKey);
+      expect(projectPmpConfigRes?.pmpConfigKeys?.[0]).toBe(paramKey);
       expect(projectPmpConfigRes?.updatedAt).toBe(
         projectConfiguredTimestamp.toString()
       );
@@ -209,10 +208,8 @@ describe("PMP event handling", () => {
     );
     expect(secondConfig?.createdAt).toBe(projectConfiguredTimestamp.toString());
 
-    const firstPMPConfigKey = `${pmpV0Address.toLowerCase()}-${genArt721CoreAddress.toLowerCase()}-${projectId}-${firstParamKey}`;
-    const secondPMPConfigKey = `${pmpV0Address.toLowerCase()}-${genArt721CoreAddress.toLowerCase()}-${projectId}-${firstParamKey}`;
-    expect(projectPmpConfigRes?.pmpConfigKeys).toContain(firstPMPConfigKey);
-    expect(projectPmpConfigRes?.pmpConfigKeys).toContain(secondPMPConfigKey);
+    expect(projectPmpConfigRes?.pmpConfigKeys).toContain(firstParamKey);
+    expect(projectPmpConfigRes?.pmpConfigKeys).toContain(secondParamKey);
     // validate project field
     expect(projectRes?.pmpProjectConfig?.id).toBe(targetId);
 
@@ -275,12 +272,8 @@ describe("PMP event handling", () => {
     );
 
     // verify the old config key is no longer in the keys array
-    const oldPmpConfigKey = `${pmpV0Address.toLowerCase()}-${genArt721CoreAddress.toLowerCase()}-${projectId}-${firstParamKey}`;
-    const newPmpConfigKey = `${pmpV0Address.toLowerCase()}-${genArt721CoreAddress.toLowerCase()}-${projectId}-${newParamKey}`;
-    expect(projectPmpConfigNextRes?.pmpConfigKeys).toContain(newPmpConfigKey);
-    expect(projectPmpConfigNextRes?.pmpConfigKeys).not.toContain(
-      oldPmpConfigKey
-    );
+    expect(projectPmpConfigNextRes?.pmpConfigKeys).toContain(newParamKey);
+    expect(projectPmpConfigNextRes?.pmpConfigKeys).not.toContain(firstParamKey);
 
     // validate project field
     expect(projectNextRes?.pmpProjectConfig?.id).toBe(targetId);

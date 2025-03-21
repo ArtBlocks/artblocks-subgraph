@@ -87,9 +87,13 @@ export function handleTokenParamsConfigured(
     pmp.configuredValue = pmpInput.configuredValue.toHexString();
 
     if (pmpInput.configuringArtistString) {
-      pmp.artistConfiguredValueString = pmpInput.configuredValueString;
+      pmp.artistConfiguredValueString = pmpInput.configuredValueString
+        ? pmpInput.configuredValueString
+        : null;
     } else {
-      pmp.nonArtistConfiguredValueString = pmpInput.configuredValueString;
+      pmp.nonArtistConfiguredValueString = pmpInput.configuredValueString
+        ? pmpInput.configuredValueString
+        : null;
     }
 
     // update the token pmp
@@ -144,7 +148,13 @@ export function handleProjectConfigured(event: ProjectConfigured): void {
     } else if (previousPMPConfigCount.gt(BigInt.fromI32(0))) {
       // delete all old pmp configs
       for (let i = 0; i < previousPMPConfigCount.toI32(); i++) {
-        const prevPMPConfigId = storedKeys[i];
+        const prevPMPConfigKey = storedKeys[i];
+        const prevPMPConfigId = generatePMPConfigId(
+          event.address,
+          event.params.coreContract,
+          event.params.projectId,
+          prevPMPConfigKey
+        );
         store.remove("PMPConfig", prevPMPConfigId);
       }
     }
@@ -161,7 +171,7 @@ export function handleProjectConfigured(event: ProjectConfigured): void {
       config.key
     );
 
-    configKeys.push(pmpConfigId);
+    configKeys.push(config.key);
 
     let pmpConfig = PMPConfig.load(pmpConfigId);
     if (!pmpConfig) {
