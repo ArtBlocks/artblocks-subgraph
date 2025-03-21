@@ -76,7 +76,7 @@ export function handleTokenParamsConfigured(
     // @dev it is valid for PMP to be created before token exists
     // additional tokenId field supports querying for this case
     pmp.token = tokenId;
-    pmp.tokenId = tokenId;
+    pmp.tokenIdString = tokenId;
 
     let currentConfiguredParamType = getPMPParamTypeString(
       BigInt.fromI32(pmpInput.configuredParamType)
