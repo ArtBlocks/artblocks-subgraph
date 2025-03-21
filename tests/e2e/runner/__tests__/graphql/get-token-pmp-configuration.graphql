@@ -4,6 +4,7 @@ fragment PMPDetails on PMP {
   token {
     id
   }
+  tokenId
   tokenPMPNonce
   configuredParamType
   configuredValue

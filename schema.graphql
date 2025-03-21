@@ -1053,6 +1053,9 @@ type PMP @entity(immutable: true) {
   "The token associated with this PMP"
   token: Token
 
+  "The token ID string, potentially available before token entity exists"
+  tokenId: String!
+
   "Off-chain nonce incremented every time this pmp is updated"
   tokenPMPNonce: BigInt!
 

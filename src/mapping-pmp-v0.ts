@@ -7,7 +7,6 @@ import {
   PMPConfig,
   PMP,
   Project,
-  Token,
   PMPLatestState
 } from "../generated/schema";
 import { Address, BigInt, log, store } from "@graphprotocol/graph-ts";
@@ -41,7 +40,6 @@ export function handleTokenParamsConfigured(
     event.params.tokenId
   );
 
-  let token = Token.load(tokenId);
   // for each PMP input in the event, create a new PMP entity. Older PMP entities should persist, don't overwrite them.
   for (let i = 0; i < event.params.pmpInputs.length; i++) {
     const pmpInput = event.params.pmpInputs[i];
@@ -74,10 +72,11 @@ export function handleTokenParamsConfigured(
 
     let pmp = new PMP(pmpId);
     pmp.key = pmpInput.key;
-    if (token) {
-      // @dev it is valid for PMP to be created before token exists
-      pmp.token = token.id;
-    }
+
+    // @dev it is valid for PMP to be created before token exists
+    // additional tokenId field supports querying for this case
+    pmp.token = tokenId;
+    pmp.tokenId = tokenId;
 
     let currentConfiguredParamType = getPMPParamTypeString(
       BigInt.fromI32(pmpInput.configuredParamType)

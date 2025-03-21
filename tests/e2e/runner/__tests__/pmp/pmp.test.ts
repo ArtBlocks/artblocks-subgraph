@@ -362,6 +362,7 @@ describe("PMP event handling", () => {
       // validate PMP fields
       expect(tokenPmpRes?.key).toBe(paramKey);
       expect(tokenPmpRes?.token?.id).toBe(fullTokenId);
+      expect(tokenPmpRes?.tokenId).toBe(fullTokenId);
       expect(tokenPmpRes?.tokenPMPNonce).toBe("0");
       expect(tokenPmpRes?.configuredParamType).toBe("Uint256Range");
       expect(tokenPmpRes?.configuredValue).toBe(
@@ -407,6 +408,7 @@ describe("PMP event handling", () => {
       // validate new PMP fields
       expect(tokenPmpRes2?.key).toBe(paramKey);
       expect(tokenPmpRes2?.token?.id).toBe(fullTokenId);
+      expect(tokenPmpRes2?.tokenId).toBe(fullTokenId);
       expect(tokenPmpRes2?.tokenPMPNonce).toBe("1");
       expect(tokenPmpRes2?.configuredParamType).toBe("Uint256Range");
       expect(tokenPmpRes2?.configuredValue).toBe(
@@ -420,6 +422,7 @@ describe("PMP event handling", () => {
       // validate previous PMP fields
       expect(tokenPrevPmpRes?.key).toBe(paramKey);
       expect(tokenPrevPmpRes?.token?.id).toBe(fullTokenId);
+      expect(tokenPrevPmpRes?.tokenId).toBe(fullTokenId);
       expect(tokenPrevPmpRes?.tokenPMPNonce).toBe("0");
       expect(tokenPrevPmpRes?.configuredParamType).toBe("Uint256Range");
       expect(tokenPrevPmpRes?.configuredValue).toBe(
