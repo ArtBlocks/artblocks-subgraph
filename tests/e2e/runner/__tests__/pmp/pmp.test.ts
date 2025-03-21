@@ -58,6 +58,7 @@ if (!config.iPMPV0Contracts) {
 }
 const pmpV0Address = config.iPMPV0Contracts[0].address;
 const pmpV0Contract = new PMPV0__factory(deployer).attach(pmpV0Address);
+let initialSizeConfigureTimestamp = 0;
 
 describe("PMP event handling", () => {
   beforeAll(async () => {
@@ -233,8 +234,9 @@ describe("PMP event handling", () => {
     // validate project field
     expect(projectRes?.pmpProjectConfig?.id).toBe(targetId);
 
-    // re-configure with different parameter
+    // re-configure with different parameters
     const newParamKey = "size";
+    const newParamKeyTwo = "exampleString";
     tx = await pmpV0Contract
       .connect(artist)
       .configureProject(genArt721CoreAddress, projectId, [
@@ -250,6 +252,20 @@ describe("PMP event handling", () => {
               "0x0000000000000000000000000000000000000000000000000000000000000001", // 1
             maxRange:
               "0x000000000000000000000000000000000000000000000000000000000000000a", // 10
+          },
+        },
+        {
+          key: newParamKeyTwo,
+          pmpConfig: {
+            authOption: 3, // ArtistAndTokenOwner auth
+            paramType: 8, // String type
+            pmpLockedAfterTimestamp: 0,
+            authAddress: ethers.constants.AddressZero,
+            selectOptions: [],
+            minRange:
+              "0x0000000000000000000000000000000000000000000000000000000000000000",
+            maxRange:
+              "0x0000000000000000000000000000000000000000000000000000000000000000",
           },
         },
       ]);
@@ -268,23 +284,42 @@ describe("PMP event handling", () => {
 
     // verify only one config exists and it's the new one
     const projectPmpConfigsNext = projectPmpConfigNextRes?.pmpConfigs;
-    expect(projectPmpConfigsNext?.length).toBe(1);
-    expect(projectPmpConfigNextRes?.pmpConfigCount).toBe("1");
+    expect(projectPmpConfigsNext?.length).toBe(2);
+    expect(projectPmpConfigNextRes?.pmpConfigCount).toBe("2");
 
     // verify the new config details
     const nextConfig = projectPmpConfigsNext?.[0];
     expect(nextConfig?.pmpProjectConfig?.id).toBe(targetId);
-    expect(nextConfig?.key).toBe(newParamKey);
+    expect(nextConfig?.key).toBe(newParamKeyTwo);
     expect(nextConfig?.authOption).toBe("ArtistAndTokenOwner");
-    expect(nextConfig?.paramType).toBe("Uint256Range");
+    expect(nextConfig?.paramType).toBe("String");
     expect(nextConfig?.selectOptions).toEqual([]);
     expect(nextConfig?.minRange).toBe(
-      "0x0000000000000000000000000000000000000000000000000000000000000001"
+      "0x0000000000000000000000000000000000000000000000000000000000000000"
     );
     expect(nextConfig?.maxRange).toBe(
-      "0x000000000000000000000000000000000000000000000000000000000000000a"
+      "0x0000000000000000000000000000000000000000000000000000000000000000"
     );
     expect(nextConfig?.createdAt).toBe(
+      projectConfiguredNextTimestamp.toString()
+    );
+    expect(projectPmpConfigNextRes?.updatedAt).toBe(
+      projectConfiguredNextTimestamp.toString()
+    );
+
+    const nextConfig2 = projectPmpConfigsNext?.[1];
+    expect(nextConfig2?.pmpProjectConfig?.id).toBe(targetId);
+    expect(nextConfig2?.key).toBe(newParamKey);
+    expect(nextConfig2?.authOption).toBe("ArtistAndTokenOwner");
+    expect(nextConfig2?.paramType).toBe("Uint256Range");
+    expect(nextConfig2?.selectOptions).toEqual([]);
+    expect(nextConfig2?.minRange).toBe(
+      "0x0000000000000000000000000000000000000000000000000000000000000001"
+    );
+    expect(nextConfig2?.maxRange).toBe(
+      "0x000000000000000000000000000000000000000000000000000000000000000a"
+    );
+    expect(nextConfig2?.createdAt).toBe(
       projectConfiguredNextTimestamp.toString()
     );
     expect(projectPmpConfigNextRes?.updatedAt).toBe(
@@ -322,7 +357,7 @@ describe("PMP event handling", () => {
       const tokenConfiguredTimestamp = (
         await artist.provider.getBlock(receipt.blockNumber)
       )?.timestamp;
-
+      initialSizeConfigureTimestamp = tokenConfiguredTimestamp;
       // validate pmp config in subgraph
       await waitUntilSubgraphIsSynced(client);
       const fullTokenId = genArt721CoreAddress
@@ -351,6 +386,7 @@ describe("PMP event handling", () => {
         "0x0000000000000000000000000000000000000000000000000000000000000003"
       );
       expect(tokenPmpRes?.artistConfiguredValueString).toBeNull();
+      expect(tokenPmpRes?.nonArtistConfiguredValueString).toBeNull();
       expect(tokenPmpRes?.createdAt).toBe(tokenConfiguredTimestamp.toString());
     });
     test("creates a new PMP config for a token when configured", async () => {
@@ -392,17 +428,17 @@ describe("PMP event handling", () => {
 
       await waitUntilSubgraphIsSynced(client);
 
-      const paramKey = "size";
+      const stringParamKey = "exampleString";
       const tx = await pmpV0Contract
         .connect(artist)
         .configureTokenParams(genArt721CoreAddress, nextTokenId, [
           {
-            key: paramKey,
-            configuredParamType: 3,
+            key: stringParamKey,
+            configuredParamType: 8,
             configuredValue:
-              "0x0000000000000000000000000000000000000000000000000000000000000003",
-            configuringArtistString: false,
-            configuredValueString: "",
+              "0x0000000000000000000000000000000000000000000000000000000000000000",
+            configuringArtistString: true,
+            configuredValueString: "example",
           },
         ]);
 
@@ -417,37 +453,38 @@ describe("PMP event handling", () => {
         .toLowerCase()
         .concat(`-${nextTokenId}`);
 
-      const tokenLatestPmpStateId = `${pmpV0Address.toLowerCase()}-${fullTokenId}-${paramKey}`;
+      const tokenLatestPmpStateId = `${pmpV0Address.toLowerCase()}-${fullTokenId}-${stringParamKey}`;
       const tokenPmpLatestStateRes = await getTokenLatestPMPStateDetails(
         client,
         tokenLatestPmpStateId
       );
 
       const latestPMPStateNonce = tokenPmpLatestStateRes?.latestTokenPMPNonce;
-      const targetPMPId = `${pmpV0Address.toLowerCase()}-${fullTokenId}-${paramKey}-${latestPMPStateNonce}`;
+      const targetPMPId = `${pmpV0Address.toLowerCase()}-${fullTokenId}-${stringParamKey}-${latestPMPStateNonce}`;
       const tokenPmpRes = await getTokenPMPDetails(client, targetPMPId);
 
-      // validate latest PMP state fields (was previously configured for a non-existent token)
-      expect(tokenPmpLatestStateRes?.latestTokenPMPNonce).toBe("1");
+      expect(tokenPmpLatestStateRes?.latestTokenPMPNonce).toBe("0");
 
       // validate PMP fields
-      expect(tokenPmpRes?.key).toBe(paramKey);
+      expect(tokenPmpRes?.key).toBe(stringParamKey);
       expect(tokenPmpRes?.token?.id).toBe(fullTokenId);
       expect(tokenPmpRes?.tokenIdString).toBe(fullTokenId);
-      expect(tokenPmpRes?.tokenPMPNonce).toBe("1");
-      expect(tokenPmpRes?.configuredParamType).toBe("Uint256Range");
+      expect(tokenPmpRes?.tokenPMPNonce).toBe("0");
+      expect(tokenPmpRes?.configuredParamType).toBe("String");
       expect(tokenPmpRes?.configuredValue).toBe(
-        "0x0000000000000000000000000000000000000000000000000000000000000003"
+        "0x0000000000000000000000000000000000000000000000000000000000000000"
       );
-      expect(tokenPmpRes?.artistConfiguredValueString).toBeNull();
+      expect(tokenPmpRes?.artistConfiguredValueString).toBe("example");
+      expect(tokenPmpRes?.nonArtistConfiguredValueString).toBeNull();
       expect(tokenPmpRes?.createdAt).toBe(tokenConfiguredTimestamp.toString());
 
       // update size param and validate that the new PMP exists and the previous PMP persists
+      const sizeParamKey = "size";
       const tx2 = await pmpV0Contract
         .connect(artist)
         .configureTokenParams(genArt721CoreAddress, nextTokenId, [
           {
-            key: paramKey,
+            key: sizeParamKey,
             configuredParamType: 3,
             configuredValue:
               "0x0000000000000000000000000000000000000000000000000000000000000006",
@@ -464,44 +501,51 @@ describe("PMP event handling", () => {
       // validate pmp config in subgraph
       await waitUntilSubgraphIsSynced(client);
 
+      const sizeParamLatestPMPStateId = `${pmpV0Address.toLowerCase()}-${fullTokenId}-${sizeParamKey}`;
       const tokenPmpLatestStateResNew = await getTokenLatestPMPStateDetails(
         client,
-        tokenLatestPmpStateId
+        sizeParamLatestPMPStateId
       );
       const latestPMPStateNonceNew =
         tokenPmpLatestStateResNew?.latestTokenPMPNonce;
-      const targetPMPId2 = `${pmpV0Address.toLowerCase()}-${fullTokenId}-${paramKey}-${latestPMPStateNonceNew}`;
+      const targetPMPId2 = `${pmpV0Address.toLowerCase()}-${fullTokenId}-${sizeParamKey}-${latestPMPStateNonceNew}`;
+      const targetSizePMPId1 = `${pmpV0Address.toLowerCase()}-${fullTokenId}-${sizeParamKey}-0`;
       const tokenPmpRes2 = await getTokenPMPDetails(client, targetPMPId2);
-      const tokenPrevPmpRes = await getTokenPMPDetails(client, targetPMPId);
+      const tokenPrevPmpRes = await getTokenPMPDetails(
+        client,
+        targetSizePMPId1
+      );
       // validate latest PMP state fields
-      expect(tokenPmpLatestStateResNew?.latestTokenPMPNonce).toBe("2");
+      expect(tokenPmpLatestStateResNew?.latestTokenPMPNonce).toBe("1");
 
       // validate new PMP fields
-      expect(tokenPmpRes2?.key).toBe(paramKey);
+      expect(tokenPmpRes2?.key).toBe(sizeParamKey);
       expect(tokenPmpRes2?.token?.id).toBe(fullTokenId);
       expect(tokenPmpRes2?.tokenIdString).toBe(fullTokenId);
-      expect(tokenPmpRes2?.tokenPMPNonce).toBe("2");
+      expect(tokenPmpRes2?.tokenPMPNonce).toBe("1");
       expect(tokenPmpRes2?.configuredParamType).toBe("Uint256Range");
       expect(tokenPmpRes2?.configuredValue).toBe(
         "0x0000000000000000000000000000000000000000000000000000000000000006"
       );
       expect(tokenPmpRes2?.artistConfiguredValueString).toBeNull();
+      expect(tokenPmpRes2?.nonArtistConfiguredValueString).toBeNull();
       expect(tokenPmpRes2?.createdAt).toBe(
         tokenConfiguredNextTimestamp.toString()
       );
 
       // validate previous PMP fields
-      expect(tokenPrevPmpRes?.key).toBe(paramKey);
+      expect(tokenPrevPmpRes?.key).toBe(sizeParamKey);
       expect(tokenPrevPmpRes?.token?.id).toBe(fullTokenId);
       expect(tokenPrevPmpRes?.tokenIdString).toBe(fullTokenId);
-      expect(tokenPrevPmpRes?.tokenPMPNonce).toBe("1");
+      expect(tokenPrevPmpRes?.tokenPMPNonce).toBe("0");
       expect(tokenPrevPmpRes?.configuredParamType).toBe("Uint256Range");
       expect(tokenPrevPmpRes?.configuredValue).toBe(
         "0x0000000000000000000000000000000000000000000000000000000000000003"
       );
       expect(tokenPrevPmpRes?.artistConfiguredValueString).toBeNull();
+      expect(tokenPrevPmpRes?.nonArtistConfiguredValueString).toBeNull();
       expect(tokenPrevPmpRes?.createdAt).toBe(
-        tokenConfiguredTimestamp.toString()
+        initialSizeConfigureTimestamp.toString()
       );
     });
   });
