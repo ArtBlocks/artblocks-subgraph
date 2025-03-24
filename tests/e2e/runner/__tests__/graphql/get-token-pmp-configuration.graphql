@@ -1,0 +1,31 @@
+fragment PMPDetails on PMP {
+  id
+  key
+  token {
+    id
+  }
+  tokenIdString
+  tokenPMPNonce
+  configuredParamType
+  configuredValue
+  artistConfiguredValueString
+  nonArtistConfiguredValueString
+  createdAt
+}
+
+fragment PMPLatestStateDetails on PMPLatestState {
+  id
+  latestTokenPMPNonce
+}
+
+query GetTokenLatestPMPStates($targetId: ID!) {
+  pmplatestStates(where: { id: $targetId }) {
+    ...PMPLatestStateDetails
+  }
+}
+
+query GetTokenPMPs($targetId: ID!) {
+  pmps(where: { id: $targetId }) {
+    ...PMPDetails
+  }
+}

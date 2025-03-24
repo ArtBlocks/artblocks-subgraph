@@ -35,6 +35,9 @@ import { MinterMinPriceV0__factory } from "../contracts/factories/MinterMinPrice
 import { SplitAtomicV0__factory } from "../contracts/factories/SplitAtomicV0__factory";
 import { SplitAtomicFactoryV0__factory } from "../contracts/factories/SplitAtomicFactoryV0__factory";
 
+// PMP
+import { PMPV0__factory } from "../contracts/factories/PMPV0__factory";
+
 import fs from "fs";
 import { JsonRpcProvider } from "@ethersproject/providers";
 // hide nuisance logs about event overloading
@@ -444,6 +447,20 @@ async function main() {
       address: minterMinPriceV0.address,
     },
   ];
+
+  // deploy PMP
+  const pmpV0Factory = new PMPV0__factory(deployer);
+  const pmpV0 = await pmpV0Factory.deploy(delegationRegistryAddress);
+  await pmpV0.deployed();
+  console.log(`PMPV0 deployed at ${pmpV0.address}`);
+  // update subgraph config to index PMPV0
+  subgraphConfig.iPMPV0Contracts = [
+    {
+      address: pmpV0.address,
+    },
+  ];
+  // update subgraph config metadata to include PMPV0 address
+  subgraphConfig.metadata.pmpV0Address = pmpV0.address;
 
   // deploy splitAtomic system of contracts
   // deploy implementation

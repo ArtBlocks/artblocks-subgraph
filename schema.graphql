@@ -85,6 +85,9 @@ type Project @entity {
   "Purchases paused"
   paused: Boolean!
 
+  "PMP configuration for this project, if any"
+  pmpProjectConfig: PMPProjectConfig
+
   pricePerTokenInWei: BigInt!
 
   "Artist/additional payee royalty percentage"
@@ -373,6 +376,9 @@ type Token @entity {
 
   "Project of the token"
   project: Project!
+
+  "All PMPs associated with this token"
+  pmps: [PMP!] @derivedFrom(field: "token")
 
   uri: String
   createdAt: BigInt!
@@ -928,4 +934,150 @@ type ProjectExternalAssetDependency @entity {
 
   "The asset data if it is onchain"
   data: String
+}
+
+enum PMPAuthOptions {
+  "Artist has authority to configure PMP"
+  Artist,
+
+  "Token owner has authority to configure PMP"
+  TokenOwner,
+
+  "Contract address has authority to configure PMP"
+  Address,
+
+  "Artist and token owner have authority to configure PMP"
+  ArtistAndTokenOwner,
+
+  "Artist and contract address have authority to configure PMP"
+  ArtistAndAddress,
+
+  "Token owner and contract address have authority to configure PMP"
+  TokenOwnerAndAddress,
+
+  "Artist, token owner, and contract address have authority to configure PMP"
+  ArtistAndTokenOwnerAndAddress
+}
+
+enum PMPParamTypes {
+  "Unconfigured by default, used to check if PMP is configured"
+  Unconfigured,
+
+  "List of options"
+  Select,
+
+  "Boolean value"
+  Bool,
+
+  "Uint256 range"
+  Uint256Range,
+
+  "Int256 range"
+  Int256Range,
+
+  "Decimal range"
+  DecimalRange,
+
+  "Hex color"
+  HexColor,
+
+  "Timestamp"
+  Timestamp,
+
+  "String"
+  String
+}
+
+type PMPProjectConfig @entity {
+  "Unique identifier made up of {PMP_Plugin_Address}-{ProjectId}"
+  id: ID!
+
+  "Project associated with this PMP project config"
+  project: Project!
+
+  "Count of PMP configs for this project"
+  pmpConfigCount: BigInt!
+
+  "Array of keys for the current PMP configs"
+  pmpConfigKeys: [String!]!
+
+  "Timestamp of last update"
+  updatedAt: BigInt!
+
+  "List of PMP configs for this project"
+  pmpConfigs: [PMPConfig!]! @derivedFrom(field: "pmpProjectConfig")
+}
+
+type PMPConfig @entity {
+  "Unique identifier made up of {PMP_Plugin_Address}-{ProjectId}-{Key}"
+  id: ID!
+
+  "PMP Project config associated with this PMP config"
+  pmpProjectConfig: PMPProjectConfig!
+
+  "Auth option for this PMP config"
+  authOption: PMPAuthOptions!
+
+  "Param type for this PMP config"
+  paramType: PMPParamTypes!
+
+  "Parameter key for this PMP config"
+  key: String!
+
+  "Timestamp after which updates are no longer possible to the PMP"
+  pmpLockedAfterTimestamp: BigInt!
+
+  "only populated if auth is type Address, null otherwise"
+  authAddress: Bytes
+
+  "options to choose from, if Select type"
+  selectOptions: [String!]!
+
+  "bytes32 representation of type's minimum allowed value, if applicible"
+  minRange: String
+
+  "bytes32 representation of type's maximum allowed value, if applicible"
+  maxRange: String
+
+  "Timestamp of creation"
+  createdAt: BigInt!
+}
+
+type PMP @entity(immutable: true) {
+  "Unique identifier made up of {PMP_Plugin_Address}-{tokenId}-{Key}-{tokenPMPNonce}"
+  id: ID!
+
+  "The key for this PMP"
+  key: String!
+
+  "The token associated with this PMP"
+  token: Token
+
+  "The token ID string, potentially available before token entity exists"
+  tokenIdString: String!
+
+  "Off-chain nonce incremented every time this pmp is updated"
+  tokenPMPNonce: BigInt!
+
+  configuredParamType: PMPParamTypes!
+
+  "Configured PMP value, bytes32 representation"
+  configuredValue: String
+
+  "Artist-configured string value, if configured"
+  artistConfiguredValueString: String
+
+  "Non-Artist configured string value, if configured"
+  nonArtistConfiguredValueString: String
+
+  "Timestamp of creation"
+  createdAt: BigInt!
+}
+
+type PMPLatestState @entity {
+  "Unique identifier made up of {PMP_Plugin_Address}-{tokenId}-{Key}"
+  id: ID!
+  
+  "Latest off-chain nonce for this PMP, used for indexing PMP history"
+  latestTokenPMPNonce: BigInt!
 }

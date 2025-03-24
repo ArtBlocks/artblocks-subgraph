@@ -1,0 +1,30 @@
+fragment PMPProjectConfigDetails on PMPProjectConfig {
+  id
+  project {
+    id
+  }
+  pmpConfigCount
+  pmpConfigKeys
+  updatedAt
+  pmpConfigs {
+    id
+    pmpProjectConfig {
+      id
+    }
+    authOption
+    paramType
+    key
+    pmpLockedAfterTimestamp
+    authAddress
+    selectOptions
+    minRange
+    maxRange
+    createdAt
+  }
+}
+
+query GetProjectPMPConfigs($targetId: ID!) {
+  pmpprojectConfigs(where: { id: $targetId }) {
+    ...PMPProjectConfigDetails
+  }
+}
