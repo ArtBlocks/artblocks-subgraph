@@ -1,6 +1,8 @@
-specVersion: 0.0.2
+specVersion: 1.3.0
 schema:
   file: ./schema.graphql
+indexerHints:
+  prune: 500
 dataSources:
   {{#iGenArt721CoreContractV3_Engine_FlexContracts}}
   - kind: ethereum/contract
