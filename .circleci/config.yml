@@ -1,7 +1,7 @@
 version: 2.1
 
 orbs:
-  node: circleci/node@5.1.0
+  node: circleci/node@7.1.0
 
 jobs:
   test:
@@ -11,7 +11,7 @@ jobs:
       - checkout
       - node/install:
           install-yarn: true
-          node-version: "18.15"
+          node-version: "20.18.1"
       - node/install-packages:
           pkg-manager: yarn
       - run: node --version
@@ -27,7 +27,7 @@ jobs:
       - setup_remote_docker
       - node/install:
           install-yarn: true
-          node-version: "18.15"
+          node-version: "20.18.1"
       - node/install-packages:
           pkg-manager: yarn
       - run: node --version
