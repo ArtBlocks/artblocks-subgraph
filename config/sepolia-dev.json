@@ -417,5 +417,12 @@
       "name": "Sepolia dev split atomic factory contract",
       "startBlock": 5011408
     }
+  ],
+  "iPMPV0Contracts": [
+    {
+      "address": "0x59e6F582C4671d5aBDB0F1787Fa9bEE347BB5667",
+      "name": "Sepolia dev pmp contract",
+      "startBlock": 7986976
+    }
   ]
 }
