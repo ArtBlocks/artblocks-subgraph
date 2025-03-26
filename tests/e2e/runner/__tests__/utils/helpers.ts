@@ -43,9 +43,9 @@ import {
   GetProjectPmpConfigsQueryVariables,
   GetProjectPmpConfigsDocument,
   PmpProjectConfigDetailsFragment,
-  GetTokenPmPsQuery,
-  GetTokenPmPsQueryVariables,
-  GetTokenPmPsDocument,
+  GetTokenPmpsQuery,
+  GetTokenPmpsQueryVariables,
+  GetTokenPmpsDocument,
   PmpDetailsFragment,
   GetTokenLatestPmpStatesQuery,
   GetTokenLatestPmpStatesQueryVariables,
@@ -380,7 +380,7 @@ export const getProjectPMPConfigDetails = async (
     )
     .toPromise();
 
-  const res = configRes.data?.pmpprojectConfigs?.[0];
+  const res = configRes.data?.pmpProjectConfigs?.[0];
   return res;
 };
 
@@ -427,7 +427,7 @@ export const getTokenLatestPmpStateDetails = async (
         targetId: entityId,
       })
       .toPromise()
-  ).data?.pmplatestStates?.[0];
+  ).data?.pmpLatestStates?.[0];
   if (!stateRes) throw new Error("No PmpLatestState entity found");
   return stateRes;
 };
