@@ -367,7 +367,7 @@ export const getSplitAtomicContractDetails = async (
  * @param client the subgraph client
  * @param entityId the id of the PMPProjectConfig entity
  */
-export const getProjectPMPConfigDetails = async (
+export const getProjectPmpConfigDetails = async (
   client: Client,
   entityId: string
 ): Promise<PmpProjectConfigDetailsFragment | undefined> => {
