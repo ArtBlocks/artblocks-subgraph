@@ -1,4 +1,4 @@
-fragment PMPDetails on PMP {
+fragment PmpDetails on Pmp {
   id
   key
   token {
@@ -13,19 +13,19 @@ fragment PMPDetails on PMP {
   createdAt
 }
 
-fragment PMPLatestStateDetails on PMPLatestState {
+fragment PmpLatestStateDetails on PmpLatestState {
   id
   latestTokenPMPNonce
 }
 
-query GetTokenLatestPMPStates($targetId: ID!) {
-  pmplatestStates(where: { id: $targetId }) {
-    ...PMPLatestStateDetails
+query GetTokenLatestPmpStates($targetId: ID!) {
+  pmpLatestStates(where: { id: $targetId }) {
+    ...PmpLatestStateDetails
   }
 }
 
-query GetTokenPMPs($targetId: ID!) {
+query GetTokenPmps($targetId: ID!) {
   pmps(where: { id: $targetId }) {
-    ...PMPDetails
+    ...PmpDetails
   }
 }

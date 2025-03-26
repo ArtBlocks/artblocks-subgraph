@@ -5,9 +5,9 @@ import {
   getAccounts,
   waitUntilSubgraphIsSynced,
   getProjectDetails,
-  getProjectPMPConfigDetails,
-  getTokenLatestPMPStateDetails,
-  getTokenPMPDetails,
+  getProjectPmpConfigDetails,
+  getTokenLatestPmpStateDetails,
+  getTokenPmpDetails,
 } from "../utils/helpers";
 
 import { PMPV0__factory } from "../../contracts/factories/PMPV0__factory";
@@ -97,7 +97,7 @@ describe("PMP event handling", () => {
       const targetId = `${pmpV0Address.toLowerCase()}-${genArt721CoreAddress.toLowerCase()}-${projectId}`;
       const fullProjectId = genArt721CoreAddress.toLowerCase().concat("-0");
       const projectRes = await getProjectDetails(client, fullProjectId);
-      const projectPmpConfigRes = await getProjectPMPConfigDetails(
+      const projectPmpConfigRes = await getProjectPmpConfigDetails(
         client,
         targetId
       );
@@ -184,7 +184,7 @@ describe("PMP event handling", () => {
 
     // validate first configuration
     const targetId = `${pmpV0Address.toLowerCase()}-${genArt721CoreAddress.toLowerCase()}-${projectId}`;
-    const projectPmpConfigRes = await getProjectPMPConfigDetails(
+    const projectPmpConfigRes = await getProjectPmpConfigDetails(
       client,
       targetId
     );
@@ -276,7 +276,7 @@ describe("PMP event handling", () => {
 
     await waitUntilSubgraphIsSynced(client);
 
-    const projectPmpConfigNextRes = await getProjectPMPConfigDetails(
+    const projectPmpConfigNextRes = await getProjectPmpConfigDetails(
       client,
       targetId
     );
@@ -365,10 +365,10 @@ describe("PMP event handling", () => {
         .concat(`-${nextTokenId}`);
 
       const targetPMPId = `${pmpV0Address.toLowerCase()}-${fullTokenId}-${paramKey}-0`;
-      const tokenPmpRes = await getTokenPMPDetails(client, targetPMPId);
+      const tokenPmpRes = await getTokenPmpDetails(client, targetPMPId);
 
       const tokenLatestPmpStateId = `${pmpV0Address.toLowerCase()}-${fullTokenId}-${paramKey}`;
-      const tokenPmpLatestStateRes = await getTokenLatestPMPStateDetails(
+      const tokenPmpLatestStateRes = await getTokenLatestPmpStateDetails(
         client,
         tokenLatestPmpStateId
       );
@@ -454,14 +454,14 @@ describe("PMP event handling", () => {
         .concat(`-${nextTokenId}`);
 
       const tokenLatestPmpStateId = `${pmpV0Address.toLowerCase()}-${fullTokenId}-${stringParamKey}`;
-      const tokenPmpLatestStateRes = await getTokenLatestPMPStateDetails(
+      const tokenPmpLatestStateRes = await getTokenLatestPmpStateDetails(
         client,
         tokenLatestPmpStateId
       );
 
       const latestPMPStateNonce = tokenPmpLatestStateRes?.latestTokenPMPNonce;
       const targetPMPId = `${pmpV0Address.toLowerCase()}-${fullTokenId}-${stringParamKey}-${latestPMPStateNonce}`;
-      const tokenPmpRes = await getTokenPMPDetails(client, targetPMPId);
+      const tokenPmpRes = await getTokenPmpDetails(client, targetPMPId);
 
       expect(tokenPmpLatestStateRes?.latestTokenPMPNonce).toBe("0");
 
@@ -502,7 +502,7 @@ describe("PMP event handling", () => {
       await waitUntilSubgraphIsSynced(client);
 
       const sizeParamLatestPMPStateId = `${pmpV0Address.toLowerCase()}-${fullTokenId}-${sizeParamKey}`;
-      const tokenPmpLatestStateResNew = await getTokenLatestPMPStateDetails(
+      const tokenPmpLatestStateResNew = await getTokenLatestPmpStateDetails(
         client,
         sizeParamLatestPMPStateId
       );
@@ -510,8 +510,8 @@ describe("PMP event handling", () => {
         tokenPmpLatestStateResNew?.latestTokenPMPNonce;
       const targetPMPId2 = `${pmpV0Address.toLowerCase()}-${fullTokenId}-${sizeParamKey}-${latestPMPStateNonceNew}`;
       const targetSizePMPId1 = `${pmpV0Address.toLowerCase()}-${fullTokenId}-${sizeParamKey}-0`;
-      const tokenPmpRes2 = await getTokenPMPDetails(client, targetPMPId2);
-      const tokenPrevPmpRes = await getTokenPMPDetails(
+      const tokenPmpRes2 = await getTokenPmpDetails(client, targetPMPId2);
+      const tokenPrevPmpRes = await getTokenPmpDetails(
         client,
         targetSizePMPId1
       );

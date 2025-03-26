@@ -3,11 +3,11 @@ import {
   ProjectConfigured
 } from "../generated/IPMPV0/IPMPV0";
 import {
-  PMPProjectConfig,
-  PMPConfig,
-  PMP,
+  PmpProjectConfig,
+  PmpConfig,
+  Pmp,
   Project,
-  PMPLatestState
+  PmpLatestState
 } from "../generated/schema";
 import { Address, BigInt, log, store } from "@graphprotocol/graph-ts";
 import {
@@ -52,10 +52,10 @@ export function handleTokenParamsConfigured(
       event.params.tokenId,
       pmpInput.key
     );
-    let latestState = PMPLatestState.load(latestStateId);
+    let latestState = PmpLatestState.load(latestStateId);
 
     if (!latestState) {
-      latestState = new PMPLatestState(latestStateId);
+      latestState = new PmpLatestState(latestStateId);
     } else {
       latestTokenPMPNonce = latestState.latestTokenPMPNonce.plus(
         BigInt.fromI32(1)
@@ -70,7 +70,7 @@ export function handleTokenParamsConfigured(
       latestTokenPMPNonce
     );
 
-    let pmp = new PMP(pmpId);
+    let pmp = new Pmp(pmpId);
     pmp.key = pmpInput.key;
 
     // @dev it is valid for PMP to be created before token exists
@@ -123,9 +123,9 @@ export function handleProjectConfigured(event: ProjectConfigured): void {
     event.params.projectId
   );
 
-  let projectConfig = PMPProjectConfig.load(projectConfigId);
+  let projectConfig = PmpProjectConfig.load(projectConfigId);
   if (!projectConfig) {
-    projectConfig = new PMPProjectConfig(projectConfigId);
+    projectConfig = new PmpProjectConfig(projectConfigId);
     projectConfig.project = project.id;
 
     // add project pmp config to the project
@@ -155,7 +155,7 @@ export function handleProjectConfigured(event: ProjectConfigured): void {
           event.params.projectId,
           prevPMPConfigKey
         );
-        store.remove("PMPConfig", prevPMPConfigId);
+        store.remove("PmpConfig", prevPMPConfigId);
       }
     }
   }
@@ -173,9 +173,9 @@ export function handleProjectConfigured(event: ProjectConfigured): void {
 
     configKeys.push(config.key);
 
-    let pmpConfig = PMPConfig.load(pmpConfigId);
+    let pmpConfig = PmpConfig.load(pmpConfigId);
     if (!pmpConfig) {
-      pmpConfig = new PMPConfig(pmpConfigId);
+      pmpConfig = new PmpConfig(pmpConfigId);
     }
 
     pmpConfig.pmpProjectConfig = projectConfig.id;

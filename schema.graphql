@@ -86,7 +86,7 @@ type Project @entity {
   paused: Boolean!
 
   "PMP configuration for this project, if any"
-  pmpProjectConfig: PMPProjectConfig
+  pmpProjectConfig: PmpProjectConfig
 
   pricePerTokenInWei: BigInt!
 
@@ -378,7 +378,7 @@ type Token @entity {
   project: Project!
 
   "All PMPs associated with this token"
-  pmps: [PMP!] @derivedFrom(field: "token")
+  pmps: [Pmp!] @derivedFrom(field: "token")
 
   uri: String
   createdAt: BigInt!
@@ -936,7 +936,7 @@ type ProjectExternalAssetDependency @entity {
   data: String
 }
 
-enum PMPAuthOptions {
+enum PmpAuthOptions {
   "Artist has authority to configure PMP"
   Artist,
 
@@ -959,7 +959,7 @@ enum PMPAuthOptions {
   ArtistAndTokenOwnerAndAddress
 }
 
-enum PMPParamTypes {
+enum PmpParamTypes {
   "Unconfigured by default, used to check if PMP is configured"
   Unconfigured,
 
@@ -988,7 +988,7 @@ enum PMPParamTypes {
   String
 }
 
-type PMPProjectConfig @entity {
+type PmpProjectConfig @entity {
   "Unique identifier made up of {PMP_Plugin_Address}-{ProjectId}"
   id: ID!
 
@@ -1005,21 +1005,21 @@ type PMPProjectConfig @entity {
   updatedAt: BigInt!
 
   "List of PMP configs for this project"
-  pmpConfigs: [PMPConfig!]! @derivedFrom(field: "pmpProjectConfig")
+  pmpConfigs: [PmpConfig!]! @derivedFrom(field: "pmpProjectConfig")
 }
 
-type PMPConfig @entity {
+type PmpConfig @entity {
   "Unique identifier made up of {PMP_Plugin_Address}-{ProjectId}-{Key}"
   id: ID!
 
   "PMP Project config associated with this PMP config"
-  pmpProjectConfig: PMPProjectConfig!
+  pmpProjectConfig: PmpProjectConfig!
 
   "Auth option for this PMP config"
-  authOption: PMPAuthOptions!
+  authOption: PmpAuthOptions!
 
   "Param type for this PMP config"
-  paramType: PMPParamTypes!
+  paramType: PmpParamTypes!
 
   "Parameter key for this PMP config"
   key: String!
@@ -1043,7 +1043,7 @@ type PMPConfig @entity {
   createdAt: BigInt!
 }
 
-type PMP @entity(immutable: true) {
+type Pmp @entity(immutable: true) {
   "Unique identifier made up of {PMP_Plugin_Address}-{tokenId}-{Key}-{tokenPMPNonce}"
   id: ID!
 
@@ -1059,7 +1059,7 @@ type PMP @entity(immutable: true) {
   "Off-chain nonce incremented every time this pmp is updated"
   tokenPMPNonce: BigInt!
 
-  configuredParamType: PMPParamTypes!
+  configuredParamType: PmpParamTypes!
 
   "Configured PMP value, bytes32 representation"
   configuredValue: String
@@ -1074,7 +1074,7 @@ type PMP @entity(immutable: true) {
   createdAt: BigInt!
 }
 
-type PMPLatestState @entity {
+type PmpLatestState @entity {
   "Unique identifier made up of {PMP_Plugin_Address}-{tokenId}-{Key}"
   id: ID!
   
