@@ -14,8 +14,6 @@
     "deploy:studio-sepolia-dev": "yarn prepare:sepolia-dev && graph deploy --studio art-blocks-dev-sepolia",
     "deploy:studio-sepolia-staging": "yarn prepare:sepolia-staging && graph deploy --studio art-blocks-staging-sepolia",
     "deploy:studio-arbitrum-one": "yarn prepare:arbitrum-one && graph deploy --studio art-blocks-arbitrum",
-    "deploy:alchemy-sepolia-dev": "yarn prepare:sepolia-dev && export $(cat .env | xargs) && graph deploy art-blocks-sepolia-dev --node https://subgraphs.alchemy.com/api/subgraphs/deploy --ipfs https://ipfs.satsuma.xyz --deploy-key $ALCHEMY_DEPLOY_KEY",
-    "deploy:alchemy-sepolia-staging": "yarn prepare:sepolia-staging && export $(cat .env | xargs) && graph deploy art-blocks-sepolia-staging --node https://subgraphs.alchemy.com/api/subgraphs/deploy --ipfs https://ipfs.satsuma.xyz --deploy-key $ALCHEMY_DEPLOY_KEY",
     "deploy:chainstack-sepolia-dev": "yarn prepare:sepolia-dev && export $(cat .env | xargs) && graph deploy sgr-918-426-596 --node https://api.graph-ams.p2pify.com/$CHAINSTACK_DEV_KEY/deploy --ipfs https://api.graph-ams.p2pify.com/$CHAINSTACK_DEV_KEY/ipfs",
     "deploy:chainstack-sepolia-staging": "yarn prepare:sepolia-staging && export $(cat .env | xargs) && graph deploy sgr-745-487-357 --node https://api.graph-ams.p2pify.com/$CHAINSTACK_STAGING_KEY/deploy --ipfs https://api.graph-ams.p2pify.com/$CHAINSTACK_STAGING_KEY/ipfs",
     "create:local": "graph create --node http://localhost:8020/ artblocks/art-blocks",
@@ -42,5 +40,6 @@
   "devDependencies": {
     "assemblyscript": "^0.19.22",
     "mustache": "^4.1.0"
-  }
+  },
+  "packageManager": "yarn@1.22.22"
 }
