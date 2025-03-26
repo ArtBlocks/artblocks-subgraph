@@ -390,14 +390,14 @@ export const getProjectPMPConfigDetails = async (
  * @param client the subgraph client
  * @param entityId the id of the PMP entity
  */
-export const getTokenPMPDetails = async (
+export const getTokenPmpDetails = async (
   client: Client,
   entityId: string
 ): Promise<PmpDetailsFragment> => {
   const pmpRes = (
     await client
-      .query<GetTokenPmPsQuery, GetTokenPmPsQueryVariables>(
-        GetTokenPmPsDocument,
+      .query<GetTokenPmpsQuery, GetTokenPmpsQueryVariables>(
+        GetTokenPmpsDocument,
         {
           targetId: entityId,
         }
@@ -414,7 +414,7 @@ export const getTokenPMPDetails = async (
  * @param client the subgraph client
  * @param entityId the id of the PMPLatestState entity
  */
-export const getTokenLatestPMPStateDetails = async (
+export const getTokenLatestPmpStateDetails = async (
   client: Client,
   entityId: string
 ): Promise<PmpLatestStateDetailsFragment> => {
@@ -428,6 +428,6 @@ export const getTokenLatestPMPStateDetails = async (
       })
       .toPromise()
   ).data?.pmplatestStates?.[0];
-  if (!stateRes) throw new Error("No PMPLatestState entity found");
+  if (!stateRes) throw new Error("No PmpLatestState entity found");
   return stateRes;
 };

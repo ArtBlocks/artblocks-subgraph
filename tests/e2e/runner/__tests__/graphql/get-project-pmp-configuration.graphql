@@ -1,4 +1,4 @@
-fragment PMPProjectConfigDetails on PMPProjectConfig {
+fragment PmpProjectConfigDetails on PmpProjectConfig {
   id
   project {
     id
@@ -23,8 +23,8 @@ fragment PMPProjectConfigDetails on PMPProjectConfig {
   }
 }
 
-query GetProjectPMPConfigs($targetId: ID!) {
-  pmpprojectConfigs(where: { id: $targetId }) {
-    ...PMPProjectConfigDetails
+query GetProjectPmpConfigs($targetId: ID!) {
+  pmpProjectConfigs(where: { id: $targetId }) {
+    ...PmpProjectConfigDetails
   }
 }
