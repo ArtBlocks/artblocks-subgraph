@@ -19,7 +19,7 @@ fragment PmpLatestStateDetails on PmpLatestState {
 }
 
 query GetTokenLatestPmpStates($targetId: ID!) {
-  pmplatestStates(where: { id: $targetId }) {
+  pmpLatestStates(where: { id: $targetId }) {
     ...PmpLatestStateDetails
   }
 }
