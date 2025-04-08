@@ -183,6 +183,11 @@
       "blockNumber": 20866252
     },
     {
+      "address": "0xE56087D37973F49fE3C154272cFD3041d7539c52",
+      "name": "mainnet shared minter: MinterSEAV1",
+      "blockNumber": 22220303
+    },
+    {
       "address": "0x0635E2f2926b306356b5B3F5CB6489107796b085",
       "name": "mainnet shared minter: MinterSetPriceV5",
       "startBlock": 18486235
@@ -307,6 +312,11 @@
       "address": "0xDeA98CB77d90e03dbF312626402ADb452Ed7a4e3",
       "name": "mainnet shared minter: MinterRAMV0",
       "blockNumber": 20866252
+    },
+    {
+      "address": "0xE56087D37973F49fE3C154272cFD3041d7539c52",
+      "name": "mainnet shared minter: MinterSEAV1",
+      "blockNumber": 22220303
     },
     {
       "address": "0x0635E2f2926b306356b5B3F5CB6489107796b085",
@@ -464,6 +474,13 @@
       "address": "0x6caFC1B007F16f171B34eE45Fc61B378ad58F592",
       "name": "mainnet shared minter: MinterDAExpSettlementV3",
       "startBlock": 18486235
+    }
+  ],
+  "SEALibContracts": [
+    {
+      "address": "0xE56087D37973F49fE3C154272cFD3041d7539c52",
+      "name": "mainnet shared minter: MinterSEAV1",
+      "blockNumber": 22220303
     }
   ],
   "RAMLibContracts": [
@@ -811,6 +828,13 @@
       "address": "0xb26aaD97B0e1d250dB131CD4133c11629EBB4ef7",
       "name": "Mainnet split atomic factory contract",
       "startBlock": 18924905
+    }
+  ],
+  "iPMPV0Contracts": [
+    {
+      "address": "0x000000001AC1998e4A97d207915889f2B9Ced8e2",
+      "name": "mainnet pmp contract",
+      "startBlock": 22219827
     }
   ]
 }
