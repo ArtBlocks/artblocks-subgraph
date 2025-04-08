@@ -127,7 +127,6 @@ export function handleProjectConfigured(event: ProjectConfigured): void {
   if (!projectConfig) {
     projectConfig = new PmpProjectConfig(projectConfigId);
     projectConfig.project = project.id;
-
     // add project pmp config to the project
     project.pmpProjectConfig = projectConfig.id;
     project.save();
@@ -202,7 +201,7 @@ export function handleProjectConfigured(event: ProjectConfigured): void {
     event.params.pmpInputConfigs.length
   );
   projectConfig.pmpConfigKeys = configKeys;
-
+  projectConfig.pmpAddress = event.address;
   // update the project config updatedAt timestamp to induce a sync, and save
   projectConfig.updatedAt = event.block.timestamp;
   projectConfig.save();

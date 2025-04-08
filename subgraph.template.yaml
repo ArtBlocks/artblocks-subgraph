@@ -2305,9 +2305,9 @@ dataSources:
         - Project
         - Token
         - Contract
-        - PMPProjectConfig
-        - PMPConfig
-        - PMP
+        - PmpProjectConfig
+        - PmpConfig
+        - Pmp
       abis:
         - name: IPMPV0
           file: ./abis/IPMPV0.json

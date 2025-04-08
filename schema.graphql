@@ -992,6 +992,9 @@ type PmpProjectConfig @entity {
   "Unique identifier made up of {PMP_Plugin_Address}-{ProjectId}"
   id: ID!
 
+  "PMP contract address"
+  pmpAddress: Bytes!
+
   "Project associated with this PMP project config"
   project: Project!
 
