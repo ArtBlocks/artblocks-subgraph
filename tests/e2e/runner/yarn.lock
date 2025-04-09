@@ -45,10 +45,10 @@
   dependencies:
     node-fetch "^2.6.1"
 
-"@artblocks/contracts@1.2.1":
-  version "1.2.1"
-  resolved "https://registry.yarnpkg.com/@artblocks/contracts/-/contracts-1.2.1.tgz#17c9e921fc6ea8fa260b1ec029c2537d8586bf58"
-  integrity sha512-HnpfRTmKHTsihHzIqLhZer/0ojyWG+6jzMWj0IsT4KRStkAD1t6uxlAFa8PSLUmFVPqaUMSd4egagvbAw8wtSg==
+"@artblocks/contracts@1.3.0":
+  version "1.3.0"
+  resolved "https://registry.yarnpkg.com/@artblocks/contracts/-/contracts-1.3.0.tgz#8ed3975530829406c574268bfd0e9771cce449f3"
+  integrity sha512-tdqJme/OWF9VUyPlXxFGt/MZO8TO82IOsZA6tFwvWhlSIL11jTb0zNiypy4R7LHtbgyBpGDEZJ0iOeCDiYjMPw==
   dependencies:
     "@nomicfoundation/hardhat-verify" "^2.0.5"
     "@openzeppelin-0.5/contracts" "npm:@openzeppelin/contracts@2.5.1"
@@ -56,11 +56,11 @@
     "@openzeppelin-4.7/contracts" "npm:@openzeppelin/contracts@4.7.1"
     "@openzeppelin-4.8/contracts-upgradeable" "npm:@openzeppelin/contracts-upgradeable@4.8.0"
     "@openzeppelin-5.0/contracts" "npm:@openzeppelin/contracts@5.0.1"
-    "@urql/exchange-retry" "^1.2.1"
+    "@urql/exchange-retry" "^1.3.0"
     graphql "^16.8.2"
     scripty.sol "2.1.1"
     solady "^0.0.181"
-    urql "^4.0.7"
+    urql "^4.2.1"
 
 "@babel/code-frame@^7.0.0", "@babel/code-frame@^7.12.13", "@babel/code-frame@^7.18.6":
   version "7.18.6"
@@ -2040,10 +2040,10 @@
   dependencies:
     wonka "^6.1.2"
 
-"@urql/core@^5.0.0":
-  version "5.0.6"
-  resolved "https://registry.yarnpkg.com/@urql/core/-/core-5.0.6.tgz#0d6624e30084f9137f78dc6c5bb8a599cba7f9dc"
-  integrity sha512-38rgSDqVNihFDauw1Pm9V7XLWIKuK8V9CKgrUF7/xEKinze8ENKP1ZeBhkG+dxWzJan7CHK+SLl46kAdvZwIlA==
+"@urql/core@^5.1.1":
+  version "5.1.1"
+  resolved "https://registry.yarnpkg.com/@urql/core/-/core-5.1.1.tgz#d83c405451806a5936dabbd3f10a22967199e2f5"
+  integrity sha512-aGh024z5v2oINGD/In6rAtVKTm4VmQ2TxKQBAtk2ZSME5dunZFcjltw4p5ENQg+5CBhZ3FHMzl0Oa+rwqiWqlg==
   dependencies:
     "@0no-co/graphql.web" "^1.0.5"
     wonka "^6.3.2"
@@ -2056,12 +2056,12 @@
     "@urql/core" ">=3.0.0"
     wonka "^6.0.0"
 
-"@urql/exchange-retry@^1.2.1":
-  version "1.3.0"
-  resolved "https://registry.yarnpkg.com/@urql/exchange-retry/-/exchange-retry-1.3.0.tgz#c46abdf74aee612645ff47562e6c6868ad1731dd"
-  integrity sha512-FLt+d81gP4oiHah4hWFDApimc+/xABWMU1AMYsZ1PVB0L0YPtrMCjbOp9WMM7hBzy4gbTDrG24sio0dCfSh/HQ==
+"@urql/exchange-retry@^1.3.0":
+  version "1.3.1"
+  resolved "https://registry.yarnpkg.com/@urql/exchange-retry/-/exchange-retry-1.3.1.tgz#b2538afd5f568081f6260fada3cb1a50a7af009f"
+  integrity sha512-EEmtFu8JTuwsInqMakhLq+U3qN8ZMd5V3pX44q0EqD2imqTDsa8ikZqJ1schVrN8HljOdN+C08cwZ1/r5uIgLw==
   dependencies:
-    "@urql/core" "^5.0.0"
+    "@urql/core" "^5.1.1"
     wonka "^6.3.2"
 
 "@whatwg-node/events@^0.0.2":
@@ -5427,12 +5427,12 @@ urql@^3.0.3:
     "@urql/core" "^3.0.3"
     wonka "^6.0.0"
 
-urql@^4.0.7:
-  version "4.1.0"
-  resolved "https://registry.yarnpkg.com/urql/-/urql-4.1.0.tgz#a75efe572d7b2e69103649a8457d3a63fce31ee8"
-  integrity sha512-NfbfTvxy1sM89EQAJWm89qJZihUWk7BSMfrWgfljFXLOf+e7RK7DtV/Tbg2+82HnCG2x3LcEOJenxiFSYEC+bw==
+urql@^4.2.1:
+  version "4.2.2"
+  resolved "https://registry.yarnpkg.com/urql/-/urql-4.2.2.tgz#e0852fe3bea377edaa616e6175dd39be2d4bf1da"
+  integrity sha512-3GgqNa6iF7bC4hY/ImJKN4REQILcSU9VKcKL8gfELZM8mM5BnLH1BsCc8kBdnVGD1LIFOs4W3O2idNHhON1r0w==
   dependencies:
-    "@urql/core" "^5.0.0"
+    "@urql/core" "^5.1.1"
     wonka "^6.3.2"
 
 util-deprecate@^1.0.1:

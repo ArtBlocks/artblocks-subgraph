@@ -55,3 +55,6 @@ ISharedMinterRAMV0
 ISplitAtomicFactoryV0
 ISplitAtomicV0
 RAMLib
+MinPriceLib
+IGenArt721CoreContractV3_Base
+IPMPV0

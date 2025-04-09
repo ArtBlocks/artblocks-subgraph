@@ -5,7 +5,7 @@
     "generate-supplemental-abis": "path-exists ./supplemental_abis/*.json && typechain --target ethers-v5 --out-dir ./contracts './supplemental_abis/*.json' || echo 'No supplemental ABIs found.'"
   },
   "devDependencies": {
-    "@artblocks/contracts": "1.2.1",
+    "@artblocks/contracts": "1.3.0",
     "@typechain/ethers-v5": "^9.0.0",
     "@types/node": "^18.13.0",
     "ethers": "^5.0.0",
