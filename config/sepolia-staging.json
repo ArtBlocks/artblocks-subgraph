@@ -98,6 +98,11 @@
       "address": "0xa1577a3EB47CB49afB6b8F53cBcF0E9d613ABEB4",
       "name": "Sepolia staging shared minter: MinterDALinHolderV5",
       "blockNumber": 4655740
+    },
+    {
+      "address": "0xb69ca145211857bAc4EfF1443d138B6328c461FB",
+      "name": "Sepolia staging shared minter: MinterRAMV0",
+      "blockNumber": 8180981
     }
   ],
   "splitFundsLibContracts": [
@@ -224,6 +229,11 @@
       "address": "0x9E19D9Ec5a73E616C153E65291306F6ef1917Bdf",
       "name": "Sepolia staging shared minter: MinterSEAV1",
       "blockNumber": 5140842
+    },
+    {
+      "address": "0xb69ca145211857bAc4EfF1443d138B6328c461FB",
+      "name": "Sepolia staging shared minter: MinterRAMV0",
+      "blockNumber": 8180981
     }
   ],
   "merkleLibContracts": [
@@ -335,7 +345,13 @@
       "blockNumber": 5140842
     }
   ],
-  "RAMLibContracts": [],
+  "RAMLibContracts": [
+    {
+      "address": "0xb69ca145211857bAc4EfF1443d138B6328c461FB",
+      "name": "Sepolia staging shared minter: MinterRAMV0",
+      "blockNumber": 8180981
+    }
+  ],
   "minPriceLibContracts": [
     {
       "address": "0xa1e3af1A317b23A3dD8f27fe3930e837B6fce40d",
