@@ -395,6 +395,7 @@ describe("PMP event handling", () => {
       );
       expect(tokenPmpRes?.artistConfiguredValueString).toBeNull();
       expect(tokenPmpRes?.nonArtistConfiguredValueString).toBeNull();
+      expect(tokenPmpRes?.configuringAddress).toBe(artist.address);
       expect(tokenPmpRes?.createdAt).toBe(tokenConfiguredTimestamp.toString());
     });
     test("creates a new PMP config for a token when configured", async () => {

@@ -96,6 +96,9 @@ export function handleTokenParamsConfigured(
         : null;
     }
 
+    // add the configuring address to the pmp
+    pmp.configuringAddress = event.params.authAddresses[i];
+
     // update the token pmp
     pmp.createdAt = event.block.timestamp;
     pmp.save();
