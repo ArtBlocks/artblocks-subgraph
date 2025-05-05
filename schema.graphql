@@ -938,22 +938,22 @@ type ProjectExternalAssetDependency @entity {
 
 enum PmpAuthOptions {
   "Artist has authority to configure PMP"
-  Artist,
+  Artist
 
   "Token owner has authority to configure PMP"
-  TokenOwner,
+  TokenOwner
 
   "Contract address has authority to configure PMP"
-  Address,
+  Address
 
   "Artist and token owner have authority to configure PMP"
-  ArtistAndTokenOwner,
+  ArtistAndTokenOwner
 
   "Artist and contract address have authority to configure PMP"
-  ArtistAndAddress,
+  ArtistAndAddress
 
   "Token owner and contract address have authority to configure PMP"
-  TokenOwnerAndAddress,
+  TokenOwnerAndAddress
 
   "Artist, token owner, and contract address have authority to configure PMP"
   ArtistAndTokenOwnerAndAddress
@@ -961,28 +961,28 @@ enum PmpAuthOptions {
 
 enum PmpParamTypes {
   "Unconfigured by default, used to check if PMP is configured"
-  Unconfigured,
+  Unconfigured
 
   "List of options"
-  Select,
+  Select
 
   "Boolean value"
-  Bool,
+  Bool
 
   "Uint256 range"
-  Uint256Range,
+  Uint256Range
 
   "Int256 range"
-  Int256Range,
+  Int256Range
 
   "Decimal range"
-  DecimalRange,
+  DecimalRange
 
   "Hex color"
-  HexColor,
+  HexColor
 
   "Timestamp"
-  Timestamp,
+  Timestamp
 
   "String"
   String
@@ -1073,6 +1073,9 @@ type Pmp @entity(immutable: true) {
   "Non-Artist configured string value, if configured"
   nonArtistConfiguredValueString: String
 
+  "Address that configured the PMP"
+  configuringAddress: Bytes!
+
   "Timestamp of creation"
   createdAt: BigInt!
 }
@@ -1080,7 +1083,7 @@ type Pmp @entity(immutable: true) {
 type PmpLatestState @entity {
   "Unique identifier made up of {PMP_Plugin_Address}-{tokenId}-{Key}"
   id: ID!
-  
+
   "Latest off-chain nonce for this PMP, used for indexing PMP history"
   latestTokenPMPNonce: BigInt!
 }

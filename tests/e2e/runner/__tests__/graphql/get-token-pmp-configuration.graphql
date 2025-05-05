@@ -10,6 +10,7 @@ fragment PmpDetails on Pmp {
   configuredValue
   artistConfiguredValueString
   nonArtistConfiguredValueString
+  configuringAddress
   createdAt
 }
 
