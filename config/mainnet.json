@@ -832,7 +832,7 @@
   ],
   "iPMPV0Contracts": [
     {
-      "address": "0x00000000b1A9D462777c9Ef2a700476069AfF57A",
+      "address": "0x00000000A78E278b2d2e2935FaeBe19ee9F1FF14",
       "name": "mainnet pmp contract",
       "startBlock": 22283574
     }
