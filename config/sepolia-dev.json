@@ -420,7 +420,7 @@
   ],
   "iPMPV0Contracts": [
     {
-      "address": "0x59e6F582C4671d5aBDB0F1787Fa9bEE347BB5667",
+      "address": "0x62ADA51D5B4b3fc90d9B20904521e7Ef6690b189",
       "name": "Sepolia dev pmp contract",
       "startBlock": 7986976
     }
