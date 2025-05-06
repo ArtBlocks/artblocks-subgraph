@@ -799,7 +799,7 @@ function refreshProjectScript(
 ): void {
   let scriptDetails = contract.try_projectScriptDetails(project.projectId);
   if (scriptDetails.reverted) {
-    log.warning("Could not retrive script info for project {}", [project.id]);
+    log.warning("Could not retrieve script info for project {}", [project.id]);
     return;
   }
 
@@ -1346,7 +1346,7 @@ export function handleExternalAssetDependencyRemoved(
     assetEntity.save();
   }
 
-  // lastEntityIndex is previous external asset dependecy count - 1
+  // lastEntityIndex is previous external asset dependency count - 1
   project.externalAssetDependencyCount = lastEntityIndex;
   project.updatedAt = event.block.timestamp;
   project.save();
