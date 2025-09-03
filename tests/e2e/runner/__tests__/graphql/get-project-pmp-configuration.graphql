@@ -6,6 +6,8 @@ fragment PmpProjectConfigDetails on PmpProjectConfig {
   pmpConfigCount
   pmpConfigKeys
   pmpAddress
+  tokenPMPPostConfigHook
+  tokenPMPReadAugmentationHook
   updatedAt
   pmpConfigs {
     id

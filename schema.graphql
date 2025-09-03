@@ -995,6 +995,12 @@ type PmpProjectConfig @entity {
   "PMP contract address"
   pmpAddress: Bytes!
 
+  "Optional hook called after a token PMP is configured"
+  tokenPMPPostConfigHook: Bytes
+
+  "Optional hook used to augment token PMP reads"
+  tokenPMPReadAugmentationHook: Bytes
+
   "Project associated with this PMP project config"
   project: Project!
 
