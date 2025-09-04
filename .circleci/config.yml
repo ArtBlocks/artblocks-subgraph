@@ -6,7 +6,7 @@ orbs:
 jobs:
   test:
     docker:
-      - image: "cimg/base:current"
+      - image: "cimg/node:20.17"
     steps:
       - checkout
       - node/install:
