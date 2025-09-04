@@ -2318,6 +2318,8 @@ dataSources:
       eventHandlers:
         - event: ProjectConfigured(address,uint256,(string,(uint8,uint8,uint48,address,string[],bytes32,bytes32))[],uint8)
           handler: handleProjectConfigured
+        - event: ProjectHooksConfigured(address,uint256,address,address)
+          handler: handleProjectHooksConfigured
         - event: TokenParamsConfigured(address,uint256,(string,uint8,bytes32,bool,string)[],address[])
           handler: handleTokenParamsConfigured
       file: ./src/mapping-pmp-v0.ts

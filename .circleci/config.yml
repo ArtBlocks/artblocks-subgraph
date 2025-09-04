@@ -6,12 +6,11 @@ orbs:
 jobs:
   test:
     docker:
-      - image: "cimg/base:current"
+      - image: "cimg/node:20.17"
     steps:
       - checkout
       - node/install:
           install-yarn: true
-          node-version: "18.15"
       - node/install-packages:
           pkg-manager: yarn
       - run: node --version

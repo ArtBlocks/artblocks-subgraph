@@ -140,6 +140,42 @@ describe("PMP event handling", () => {
       );
     });
   });
+
+  describe("ProjectHooksConfigured", () => {
+    test("updates hook addresses on PmpProjectConfig", async () => {
+      const projectId = 0;
+
+      // set hooks
+      const tx = await pmpV0Contract.connect(artist).configureProjectHooks(
+        genArt721CoreAddress,
+        projectId,
+        ethers.constants.AddressZero, // tokenPMPPostConfigHook, zero address
+        ethers.constants.AddressZero // tokenPMPReadAugmentationHook, zero address
+      );
+      const receipt = await tx.wait();
+      const hooksConfiguredTimestamp = (
+        await artist.provider.getBlock(receipt.blockNumber)
+      )?.timestamp;
+
+      // validate hooks in subgraph
+      await waitUntilSubgraphIsSynced(client);
+      const targetId = `${pmpV0Address.toLowerCase()}-${genArt721CoreAddress.toLowerCase()}-${projectId}`;
+      const projectPmpConfigRes = await getProjectPmpConfigDetails(
+        client,
+        targetId
+      );
+      expect(projectPmpConfigRes?.tokenPMPPostConfigHook?.toLowerCase()).toBe(
+        ethers.constants.AddressZero.toLowerCase()
+      );
+      expect(
+        projectPmpConfigRes?.tokenPMPReadAugmentationHook?.toLowerCase()
+      ).toBe(ethers.constants.AddressZero.toLowerCase());
+      // timestamp should update
+      expect(projectPmpConfigRes?.updatedAt).toBe(
+        hooksConfiguredTimestamp?.toString()
+      );
+    });
+  });
   test("overwrites existing PMP config when project is reconfigured", async () => {
     const projectId = 0;
     // first configuration

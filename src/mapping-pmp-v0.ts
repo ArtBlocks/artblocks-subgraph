@@ -1,6 +1,7 @@
 import {
   TokenParamsConfigured,
-  ProjectConfigured
+  ProjectConfigured,
+  ProjectHooksConfigured
 } from "../generated/IPMPV0/IPMPV0";
 import {
   PmpProjectConfig,
@@ -206,6 +207,46 @@ export function handleProjectConfigured(event: ProjectConfigured): void {
   projectConfig.pmpConfigKeys = configKeys;
   projectConfig.pmpAddress = event.address;
   // update the project config updatedAt timestamp to induce a sync, and save
+  projectConfig.updatedAt = event.block.timestamp;
+  projectConfig.save();
+}
+
+export function handleProjectHooksConfigured(
+  event: ProjectHooksConfigured
+): void {
+  let projectId = generateContractSpecificId(
+    event.params.coreContract,
+    event.params.projectId
+  );
+  let project = Project.load(projectId);
+
+  if (!project) {
+    // @dev While PMP is open to any NFT, we only index params on indexed projects
+    return;
+  }
+
+  const projectConfigId = generateProjectConfigId(
+    event.address,
+    event.params.coreContract,
+    event.params.projectId
+  );
+
+  let projectConfig = PmpProjectConfig.load(projectConfigId);
+  if (!projectConfig) {
+    projectConfig = new PmpProjectConfig(projectConfigId);
+    projectConfig.project = project.id;
+    projectConfig.pmpAddress = event.address;
+    projectConfig.pmpConfigCount = BigInt.fromI32(0);
+    projectConfig.pmpConfigKeys = [];
+    projectConfig.updatedAt = event.block.timestamp;
+    // link config to project if not already linked
+    project.pmpProjectConfig = projectConfig.id;
+    project.save();
+  }
+
+  projectConfig.tokenPMPPostConfigHook = event.params.tokenPMPPostConfigHook;
+  projectConfig.tokenPMPReadAugmentationHook =
+    event.params.tokenPMPReadAugmentationHook;
   projectConfig.updatedAt = event.block.timestamp;
   projectConfig.save();
 }
