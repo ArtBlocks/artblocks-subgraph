@@ -423,6 +423,11 @@
       "address": "0x62ADA51D5B4b3fc90d9B20904521e7Ef6690b189",
       "name": "Sepolia dev pmp contract",
       "startBlock": 7986976
+    },
+    {
+      "address": "0x4A8ed1FC47dc71c3EDA3F13F1F2B0a317740f32a",
+      "name": "SRHooks proxy contract, sepolia dev - emits pmp configured events directly",
+      "startBlock": 9624905
     }
   ]
 }
