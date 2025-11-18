@@ -835,6 +835,11 @@
       "address": "0x00000000A78E278b2d2e2935FaeBe19ee9F1FF14",
       "name": "mainnet pmp contract",
       "startBlock": 22283574
+    },
+    {
+      "address": "0x4FFc102CdC983c50BBA66b4284c390b80229F4E3",
+      "name": "SRHooks proxy contract, mainnet - emits pmp configured events directly",
+      "startBlock": 23822207
     }
   ]
 }
