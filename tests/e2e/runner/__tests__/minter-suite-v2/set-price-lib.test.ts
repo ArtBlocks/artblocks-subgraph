@@ -10,6 +10,7 @@ import {
 import { MinterFilterV2__factory } from "../../contracts/factories/MinterFilterV2__factory";
 import { MinterSetPriceV5__factory } from "../../contracts/factories/MinterSetPriceV5__factory";
 import { MinterSetPriceERC20V5__factory } from "../../contracts/factories/MinterSetPriceERC20V5__factory";
+import { MinterSlidingScaleV0__factory } from "../../contracts/factories/MinterSlidingScaleV0__factory";
 import { ERC20Mock__factory } from "../../contracts/factories/ERC20Mock__factory";
 import { ethers } from "ethers";
 // hide nuisance logs about event overloading
@@ -34,7 +35,7 @@ if (!sharedMinterFilter) {
   throw new Error("No shared minter filter found in config metadata");
 }
 const sharedMinterFilterContract = new MinterFilterV2__factory(deployer).attach(
-  sharedMinterFilter.address
+  sharedMinterFilter.address,
 );
 // get contract from the subgraph config
 if (!config.iGenArt721CoreContractV3_BaseContracts) {
@@ -47,7 +48,7 @@ const bytecodeStorageReaderAddress =
   config.metadata?.bytecodeStorageReaderAddress;
 if (!bytecodeStorageReaderAddress)
   throw new Error(
-    "No bytecode storage reader address found in config metadata"
+    "No bytecode storage reader address found in config metadata",
   );
 
 // get MinterSetPriceV5
@@ -58,7 +59,7 @@ if (!config.genericMinterEventsLibContracts) {
 const minterSetPriceV5Address =
   config.genericMinterEventsLibContracts[0].address;
 const minterSetPriceV5Contract = new MinterSetPriceV5__factory(deployer).attach(
-  minterSetPriceV5Address
+  minterSetPriceV5Address,
 );
 
 // get MinterSetPriceERC20V5
@@ -66,8 +67,16 @@ const minterSetPriceV5Contract = new MinterSetPriceV5__factory(deployer).attach(
 const minterSetPriceERC20V5Address =
   config.genericMinterEventsLibContracts[1].address;
 const minterSetPriceERC20V5Contract = new MinterSetPriceERC20V5__factory(
-  deployer
+  deployer,
 ).attach(minterSetPriceERC20V5Address);
+
+// get MinterSlidingScaleV0
+// @dev this is minter at index 2 in the subgraph config
+const minterSlidingScaleV0Address =
+  config.genericMinterEventsLibContracts[2].address;
+const minterSlidingScaleV0Contract = new MinterSlidingScaleV0__factory(
+  deployer,
+).attach(minterSlidingScaleV0Address);
 
 describe("SetPriceLib event handling", () => {
   beforeAll(async () => {
@@ -114,7 +123,7 @@ describe("SetPriceLib event handling", () => {
       const targetId = `${minterSetPriceV5Address.toLowerCase()}-${genArt721CoreAddress.toLowerCase()}-0`;
       const minterConfigRes = await getProjectMinterConfigurationDetails(
         client,
-        targetId
+        targetId,
       );
       expect(minterConfigRes.basePrice).toBe(newPrice.toString());
       // @dev this could have been true before the update, but we can't know for sure, and
@@ -148,7 +157,7 @@ describe("SetPriceLib event handling", () => {
       const currencySymbol = "ERC20";
       // deploy new ERC20 currency, sending initial supply to artist
       const newCurrency = await new ERC20Mock__factory(artist).deploy(
-        ethers.utils.parseEther("100")
+        ethers.utils.parseEther("100"),
       );
       // set minter for project zero to the fixed price ERC20 minter
       await sharedMinterFilterContract
@@ -156,7 +165,7 @@ describe("SetPriceLib event handling", () => {
         .setMinterForProject(
           0,
           genArt721CoreAddress,
-          minterSetPriceERC20V5Address
+          minterSetPriceERC20V5Address,
         );
       // update currency info
       await minterSetPriceERC20V5Contract
@@ -165,7 +174,7 @@ describe("SetPriceLib event handling", () => {
           0,
           genArt721CoreAddress,
           currencySymbol,
-          newCurrency.address
+          newCurrency.address,
         );
       // configure price
       const newPrice = ethers.utils.parseEther(Math.random().toString());
@@ -177,17 +186,17 @@ describe("SetPriceLib event handling", () => {
       const targetId = `${minterSetPriceERC20V5Address.toLowerCase()}-${genArt721CoreAddress.toLowerCase()}-0`;
       const minterConfigRes = await getProjectMinterConfigurationDetails(
         client,
-        targetId
+        targetId,
       );
       expect(minterConfigRes.currencySymbol).toBe(currencySymbol);
       expect(minterConfigRes.currencyAddress).toBe(
-        newCurrency.address.toLowerCase()
+        newCurrency.address.toLowerCase(),
       );
       expect(minterConfigRes.basePrice).toBe(newPrice.toString());
       expect(minterConfigRes.priceIsConfigured).toBe(true);
       // invoke price reset by updating to a different currency
       const newCurrency2 = await new ERC20Mock__factory(artist).deploy(
-        ethers.utils.parseEther("100")
+        ethers.utils.parseEther("100"),
       );
       const currencySymbol2 = "ERC20";
       await minterSetPriceERC20V5Contract
@@ -196,20 +205,59 @@ describe("SetPriceLib event handling", () => {
           0,
           genArt721CoreAddress,
           currencySymbol2,
-          newCurrency2.address
+          newCurrency2.address,
         );
       await waitUntilSubgraphIsSynced(client);
       // validate currency info and price is NOT configured in subgraph
       const minterConfigRes2 = await getProjectMinterConfigurationDetails(
         client,
-        targetId
+        targetId,
       );
       expect(minterConfigRes2.currencySymbol).toBe(currencySymbol2);
       expect(minterConfigRes2.currencyAddress).toBe(
-        newCurrency2.address.toLowerCase()
+        newCurrency2.address.toLowerCase(),
       );
       expect(minterConfigRes2.priceIsConfigured).toBe(false);
       expect(minterConfigRes2.basePrice).toBe("0");
+    });
+  });
+
+  describe("MinterSlidingScaleV0 - PricePerTokenUpdated", () => {
+    afterEach(async () => {
+      // clear the minter for project zero
+      // @dev call success depends on test state, so use a try/catch block
+      try {
+        await sharedMinterFilterContract
+          .connect(artist)
+          .removeMinterForProject(0, genArt721CoreAddress);
+      } catch (error) {
+        // swallow error - see comment in PricePerTokenUpdated afterEach
+      }
+    });
+
+    test("Price is updated and configured", async () => {
+      // set minter for project zero to the sliding scale minter
+      await sharedMinterFilterContract
+        .connect(artist)
+        .setMinterForProject(
+          0,
+          genArt721CoreAddress,
+          minterSlidingScaleV0Address,
+        );
+      // update price
+      const newPrice = ethers.utils.parseEther(Math.random().toString());
+      await minterSlidingScaleV0Contract
+        .connect(artist)
+        .updatePricePerTokenInWei(0, genArt721CoreAddress, newPrice);
+      await waitUntilSubgraphIsSynced(client);
+      // validate price in subgraph
+      const targetId = `${minterSlidingScaleV0Address.toLowerCase()}-${genArt721CoreAddress.toLowerCase()}-0`;
+      const minterConfigRes = await getProjectMinterConfigurationDetails(
+        client,
+        targetId,
+      );
+      expect(minterConfigRes.basePrice).toBe(newPrice.toString());
+      expect(minterConfigRes.priceIsConfigured).toBe(true);
     });
   });
 });
