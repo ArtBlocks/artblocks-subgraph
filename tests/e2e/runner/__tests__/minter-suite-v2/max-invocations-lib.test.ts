@@ -14,6 +14,7 @@ import {
 } from "../../contracts/factories/GenArt721CoreV3__factory";
 import { MinterFilterV2__factory } from "../../contracts/factories/MinterFilterV2__factory";
 import { MinterSetPriceV5__factory } from "../../contracts/factories/MinterSetPriceV5__factory";
+import { MinterSlidingScaleV0__factory } from "../../contracts/factories/MinterSlidingScaleV0__factory";
 // hide nuisance logs about event overloading
 import { Logger } from "@ethersproject/logger";
 Logger.setLogLevel(Logger.levels.ERROR);
@@ -36,7 +37,7 @@ if (!sharedMinterFilter) {
   throw new Error("No shared minter filter found in config metadata");
 }
 const sharedMinterFilterContract = new MinterFilterV2__factory(deployer).attach(
-  sharedMinterFilter.address
+  sharedMinterFilter.address,
 );
 // get contract from the subgraph config
 if (!config.iGenArt721CoreContractV3_BaseContracts) {
@@ -49,7 +50,7 @@ const bytecodeStorageReaderAddress =
   config.metadata?.bytecodeStorageReaderAddress;
 if (!bytecodeStorageReaderAddress)
   throw new Error(
-    "No bytecode storage reader address found in config metadata"
+    "No bytecode storage reader address found in config metadata",
   );
 const linkLibraryAddresses: GenArt721CoreV3LibraryAddresses = {
   "contracts/libs/v0.8.x/BytecodeStorageV1.sol:BytecodeStorageReader":
@@ -57,7 +58,7 @@ const linkLibraryAddresses: GenArt721CoreV3LibraryAddresses = {
 };
 const genArt721CoreContract = new GenArt721CoreV3__factory(
   linkLibraryAddresses,
-  deployer
+  deployer,
 ).attach(genArt721CoreAddress);
 
 // get MinterSetPriceV5
@@ -68,8 +69,16 @@ if (!config.genericMinterEventsLibContracts) {
 const minterSetPriceV5Address =
   config.genericMinterEventsLibContracts[0].address;
 const minterSetPriceV5Contract = new MinterSetPriceV5__factory(deployer).attach(
-  minterSetPriceV5Address
+  minterSetPriceV5Address,
 );
+
+// get MinterSlidingScaleV0
+// @dev this is minter at index 2 in the subgraph config
+const minterSlidingScaleV0Address =
+  config.genericMinterEventsLibContracts[2].address;
+const minterSlidingScaleV0Contract = new MinterSlidingScaleV0__factory(
+  deployer,
+).attach(minterSlidingScaleV0Address);
 
 describe("MaxInvocationsLib event handling", () => {
   beforeAll(async () => {
@@ -118,11 +127,11 @@ describe("MaxInvocationsLib event handling", () => {
       const targetId = `${minterSetPriceV5Address.toLowerCase()}-${genArt721CoreAddress.toLowerCase()}-0`;
       const minterConfigRes = await getProjectMinterConfigurationDetails(
         client,
-        targetId
+        targetId,
       );
       // subgraph max invocations should match core max invocations
       expect(minterConfigRes.maxInvocations).toBe(
-        projectStateData.maxInvocations.toString()
+        projectStateData.maxInvocations.toString(),
       );
       // set max invocations to 99
       await minterSetPriceV5Contract
@@ -132,9 +141,61 @@ describe("MaxInvocationsLib event handling", () => {
       // validate max invocations in subgraph was updated
       const minterConfigRes2 = await getProjectMinterConfigurationDetails(
         client,
-        targetId
+        targetId,
       );
       // subgraph max invocations should match core max invocations
+      expect(minterConfigRes2.maxInvocations).toBe("99");
+      // state is reset in afterEach
+    });
+  });
+
+  describe("MinterSlidingScaleV0 - ProjectMaxInvocationsUpdated", () => {
+    afterEach(async () => {
+      // reset minter max invocations to core max invocations
+      await minterSlidingScaleV0Contract
+        .connect(artist)
+        .syncProjectMaxInvocationsToCore(0, genArt721CoreAddress);
+
+      // clear the minter for project zero
+      try {
+        await sharedMinterFilterContract
+          .connect(artist)
+          .removeMinterForProject(0, genArt721CoreAddress);
+      } catch (error) {
+        // swallow error - see comment in ProjectMaxInvocationsUpdated afterEach
+      }
+    });
+
+    test("Max invocations is updated and configured", async () => {
+      // set minter for project zero to the sliding scale minter
+      await sharedMinterFilterContract
+        .connect(artist)
+        .setMinterForProject(
+          0,
+          genArt721CoreAddress,
+          minterSlidingScaleV0Address,
+        );
+      // verify initial max invocation state in subgraph
+      const projectStateData = await genArt721CoreContract.projectStateData(0);
+      const targetId = `${minterSlidingScaleV0Address.toLowerCase()}-${genArt721CoreAddress.toLowerCase()}-0`;
+      const minterConfigRes = await getProjectMinterConfigurationDetails(
+        client,
+        targetId,
+      );
+      // subgraph max invocations should match core max invocations
+      expect(minterConfigRes.maxInvocations).toBe(
+        projectStateData.maxInvocations.toString(),
+      );
+      // set max invocations to 99
+      await minterSlidingScaleV0Contract
+        .connect(artist)
+        .manuallyLimitProjectMaxInvocations(0, genArt721CoreAddress, 99);
+      await waitUntilSubgraphIsSynced(client);
+      // validate max invocations in subgraph was updated
+      const minterConfigRes2 = await getProjectMinterConfigurationDetails(
+        client,
+        targetId,
+      );
       expect(minterConfigRes2.maxInvocations).toBe("99");
       // state is reset in afterEach
     });

@@ -23,6 +23,7 @@ import { MinterFilterV2__factory } from "../contracts/factories/MinterFilterV2__
 import { DummySharedMinter__factory } from "../contracts/factories/DummySharedMinter__factory";
 import { MinterSetPriceV5__factory } from "../contracts/factories/MinterSetPriceV5__factory";
 import { MinterSetPriceERC20V5__factory } from "../contracts/factories/MinterSetPriceERC20V5__factory";
+import { MinterSlidingScaleV0__factory } from "../contracts/factories/MinterSlidingScaleV0__factory";
 import { MinterSetPriceMerkleV5__factory } from "../contracts/factories/MinterSetPriceMerkleV5__factory";
 import { MinterSetPriceHolderV5__factory } from "../contracts/factories/MinterSetPriceHolderV5__factory";
 import { MinterSEAV1__factory } from "../contracts/factories/MinterSEAV1__factory";
@@ -76,14 +77,14 @@ async function main() {
   // SETUP ACCOUNTS BEGINS HERE
   /////////////////////////////////////////////////////////////////////////////
   const accounts = JSON.parse(
-    fs.readFileSync("./shared/accounts.json", "utf8")
+    fs.readFileSync("./shared/accounts.json", "utf8"),
   );
   const deployer = ethers.Wallet.fromMnemonic(accounts.mnemonic).connect(
-    new JsonRpcProvider("http://hardhat:8545")
+    new JsonRpcProvider("http://hardhat:8545"),
   );
   const artist = ethers.Wallet.fromMnemonic(
     accounts.mnemonic,
-    "m/44'/60'/1'/0/0" // bip-44 derivation path Ethereum account 1
+    "m/44'/60'/1'/0/0", // bip-44 derivation path Ethereum account 1
   );
   // fund artist wallet
   await deployer.sendTransaction({
@@ -133,13 +134,13 @@ async function main() {
 
   // Deploy shared BytecodeStorage reader
   const bytecodeStorageReaderFactory = new BytecodeStorageReader__factory(
-    deployer
+    deployer,
   );
   const bytecodeStorageReader = await bytecodeStorageReaderFactory.deploy();
   await bytecodeStorageReader.deployed();
   const bytecodeStorageReaderAddress: string = bytecodeStorageReader.address;
   console.log(
-    `BytecodeStorageReader deployed at ${bytecodeStorageReaderAddress}`
+    `BytecodeStorageReader deployed at ${bytecodeStorageReaderAddress}`,
   );
   subgraphConfig.metadata.bytecodeStorageReaderAddress =
     bytecodeStorageReaderAddress;
@@ -151,14 +152,14 @@ async function main() {
 
   const genArt721CoreFactory = new GenArt721CoreV3__factory(
     linkLibraryAddresses,
-    deployer
+    deployer,
   );
   const genArt721Core = await genArt721CoreFactory.deploy(
     tokenName,
     tokenTicker,
     randomizerAddress,
     adminACLAddress,
-    startingProjectId
+    startingProjectId,
   );
   await genArt721Core.deployed();
 
@@ -200,7 +201,7 @@ async function main() {
   const minterFilterFactory = new MinterFilterV2__factory(deployer);
   const minterFilter = await minterFilterFactory.deploy(
     minterFilterAdminACLAddress,
-    coreRegistryAddress
+    coreRegistryAddress,
   );
   await minterFilter.deployed();
   console.log(`Shared Minter Filter deployed at ${minterFilter.address}`);
@@ -215,7 +216,7 @@ async function main() {
   // dummy shared minter
   const dummySharedMinterFactory = new DummySharedMinter__factory(deployer);
   const dummySharedMinter = await dummySharedMinterFactory.deploy(
-    minterFilter.address
+    minterFilter.address,
   );
   await dummySharedMinter.deployed();
   console.log(`Dummy shared minter deployed at ${dummySharedMinter.address}`);
@@ -223,7 +224,7 @@ async function main() {
   // Fixed Price Minters
   const minterSetPriceV5Factory = new MinterSetPriceV5__factory(deployer);
   const minterSetPriceV5 = await minterSetPriceV5Factory.deploy(
-    minterFilter.address
+    minterFilter.address,
   );
   await minterSetPriceV5.deployed();
   console.log(`MinterSetPriceV5 deployed at ${minterSetPriceV5.address}`);
@@ -245,14 +246,14 @@ async function main() {
 
   // @dev also deploy ERC20 set price minter
   const minterSetPriceERC20V5Factory = new MinterSetPriceERC20V5__factory(
-    deployer
+    deployer,
   );
   const minterSetPriceERC20V5 = await minterSetPriceERC20V5Factory.deploy(
-    minterFilter.address
+    minterFilter.address,
   );
   await minterSetPriceERC20V5.deployed();
   console.log(
-    `MinterSetPriceERC20V5 deployed at ${minterSetPriceERC20V5.address}`
+    `MinterSetPriceERC20V5 deployed at ${minterSetPriceERC20V5.address}`,
   );
   subgraphConfig.genericMinterEventsLibContracts.push({
     address: minterSetPriceERC20V5.address,
@@ -269,15 +270,36 @@ async function main() {
     address: minterSetPriceERC20V5.address,
   });
 
+  // Sliding Scale Minter
+  const minterSlidingScaleV0Factory = new MinterSlidingScaleV0__factory(
+    deployer,
+  );
+  const minterSlidingScaleV0 = await minterSlidingScaleV0Factory.deploy(
+    minterFilter.address,
+  );
+  await minterSlidingScaleV0.deployed();
+  console.log(
+    `MinterSlidingScaleV0 deployed at ${minterSlidingScaleV0.address}`,
+  );
+  subgraphConfig.genericMinterEventsLibContracts.push({
+    address: minterSlidingScaleV0.address,
+  });
+  subgraphConfig.setPriceLibContracts.push({
+    address: minterSlidingScaleV0.address,
+  });
+  subgraphConfig.maxInvocationsLibContracts.push({
+    address: minterSlidingScaleV0.address,
+  });
+
   // Merkle Minters
   const minterMerkleV5Factory = new MinterSetPriceMerkleV5__factory(deployer);
   const minterSetPriceMerkleV5 = await minterMerkleV5Factory.deploy(
     minterFilter.address,
-    delegationRegistryAddress
+    delegationRegistryAddress,
   );
   await minterSetPriceMerkleV5.deployed();
   console.log(
-    `MinterSetPriceMerkleV5 deployed at ${minterSetPriceMerkleV5.address}`
+    `MinterSetPriceMerkleV5 deployed at ${minterSetPriceMerkleV5.address}`,
   );
   subgraphConfig.genericMinterEventsLibContracts.push({
     address: minterSetPriceMerkleV5.address,
@@ -298,11 +320,11 @@ async function main() {
   const minterHolderV5Factory = new MinterSetPriceHolderV5__factory(deployer);
   const minterSetPriceHolderV5 = await minterHolderV5Factory.deploy(
     minterFilter.address,
-    delegationRegistryAddress
+    delegationRegistryAddress,
   );
   await minterSetPriceHolderV5.deployed();
   console.log(
-    `minterSetPriceHolderV5 deployed at ${minterSetPriceHolderV5.address}`
+    `minterSetPriceHolderV5 deployed at ${minterSetPriceHolderV5.address}`,
   );
   subgraphConfig.genericMinterEventsLibContracts.push({
     address: minterSetPriceHolderV5.address,
@@ -397,14 +419,14 @@ async function main() {
 
   // DA Exp Settlement Minters
   const MinterDAExpSettlementV3Factory = new MinterDAExpSettlementV3__factory(
-    deployer
+    deployer,
   );
   const minterDAExpSettlementV3 = await MinterDAExpSettlementV3Factory.deploy(
-    minterFilter.address
+    minterFilter.address,
   );
   await minterDAExpSettlementV3.deployed();
   console.log(
-    `minterDAExpSettlementV3 deployed at ${minterDAExpSettlementV3.address}`
+    `minterDAExpSettlementV3 deployed at ${minterDAExpSettlementV3.address}`,
   );
   subgraphConfig.genericMinterEventsLibContracts.push({
     address: minterDAExpSettlementV3.address,
@@ -429,7 +451,7 @@ async function main() {
   const MinterMinPriceV0Factory = new MinterMinPriceV0__factory(deployer);
   const minterMinPriceV0 = await MinterMinPriceV0Factory.deploy(
     minterFilter.address,
-    MIN_MINT_FEE
+    MIN_MINT_FEE,
   );
   await minterMinPriceV0.deployed();
   console.log(`minterMinPriceV0 deployed at ${minterMinPriceV0.address}`);
@@ -468,20 +490,20 @@ async function main() {
   const splitAtomicV0 = await splitAtomicV0Factory.deploy();
   await splitAtomicV0.deployed();
   console.log(
-    `splitAtomicV0 implementation deployed at ${splitAtomicV0.address}`
+    `splitAtomicV0 implementation deployed at ${splitAtomicV0.address}`,
   );
   // deploy proxy factory
   const splitAtomicFactoryV0Factory = new SplitAtomicFactoryV0__factory(
-    deployer
+    deployer,
   );
   const splitAtomicFactoryV0 = await splitAtomicFactoryV0Factory.deploy(
     splitAtomicV0.address,
     deployer.address, // easy address to test with
-    2222 // 22.22%
+    2222, // 22.22%
   );
   await splitAtomicFactoryV0.deployed();
   console.log(
-    `splitAtomicFactoryV0 deployed at ${splitAtomicFactoryV0.address}`
+    `splitAtomicFactoryV0 deployed at ${splitAtomicFactoryV0.address}`,
   );
   // update subgraph config to index splitAtomicFactoryV0
   subgraphConfig.iSplitAtomicFactoryV0Contracts = [
@@ -507,10 +529,10 @@ async function main() {
     .registerContract(
       genArt721Core.address,
       ethers.utils.formatBytes32String("GenArt721CoreV3"),
-      ethers.utils.formatBytes32String("1.0.0")
+      ethers.utils.formatBytes32String("1.0.0"),
     );
   console.log(
-    `Registered the Core contract with the Core Registry at ${coreRegistryAddress}.`
+    `Registered the Core contract with the Core Registry at ${coreRegistryAddress}.`,
   );
 
   // Allowlist the Minter on the Core contract.
@@ -518,7 +540,7 @@ async function main() {
     .connect(deployer)
     .updateMinterContract(minterFilter.address);
   console.log(
-    `Updated the Minter Filter on the Core contract to ${minterFilter.address}.`
+    `Updated the Minter Filter on the Core contract to ${minterFilter.address}.`,
   );
 
   // Update the Art Blocks primary and secondary payment Addresses (if different than default deployer address).
@@ -530,11 +552,11 @@ async function main() {
       .connect(deployer)
       .updateArtblocksPrimarySalesAddress(artblocksPrimarySalesAddress);
     console.log(
-      `Updated the artblocks primary sales payment address to: ${artblocksPrimarySalesAddress}.`
+      `Updated the artblocks primary sales payment address to: ${artblocksPrimarySalesAddress}.`,
     );
   } else {
     console.log(
-      `artblocks primary sales payment address remains as deployer addresses: ${deployer.address}.`
+      `artblocks primary sales payment address remains as deployer addresses: ${deployer.address}.`,
     );
   }
   if (
@@ -545,11 +567,11 @@ async function main() {
       .connect(deployer)
       .updateArtblocksSecondarySalesAddress(artblocksSecondarySalesAddress);
     console.log(
-      `Updated the artblocks secondary sales payment address to: ${artblocksSecondarySalesAddress}.`
+      `Updated the artblocks secondary sales payment address to: ${artblocksSecondarySalesAddress}.`,
     );
   } else {
     console.log(
-      `artblocks secondary sales payment address remains as deployer addresses: ${deployer.address}.`
+      `artblocks secondary sales payment address remains as deployer addresses: ${deployer.address}.`,
     );
   }
 
@@ -558,67 +580,73 @@ async function main() {
     .connect(deployer)
     .approveMinterGlobally(dummySharedMinter.address);
   console.log(
-    `Allowlisted dummy shared minter ${dummySharedMinter.address} on minter filter.`
+    `Allowlisted dummy shared minter ${dummySharedMinter.address} on minter filter.`,
   );
   await minterFilter
     .connect(deployer)
     .approveMinterGlobally(minterSetPriceV5.address);
   console.log(
-    `Allowlisted minterSetPriceV5 ${minterSetPriceV5.address} on minter filter.`
+    `Allowlisted minterSetPriceV5 ${minterSetPriceV5.address} on minter filter.`,
   );
   await minterFilter
     .connect(deployer)
     .approveMinterGlobally(minterSetPriceERC20V5.address);
   console.log(
-    `Allowlisted minterSetPriceERC20V5 ${minterSetPriceERC20V5.address} on minter filter.`
+    `Allowlisted minterSetPriceERC20V5 ${minterSetPriceERC20V5.address} on minter filter.`,
+  );
+  await minterFilter
+    .connect(deployer)
+    .approveMinterGlobally(minterSlidingScaleV0.address);
+  console.log(
+    `Allowlisted minterSlidingScaleV0 ${minterSlidingScaleV0.address} on minter filter.`,
   );
   await minterFilter
     .connect(deployer)
     .approveMinterGlobally(minterSetPriceMerkleV5.address);
   console.log(
-    `Allowlisted minterSetPriceMerkleV5 ${minterSetPriceMerkleV5.address} on minter filter.`
+    `Allowlisted minterSetPriceMerkleV5 ${minterSetPriceMerkleV5.address} on minter filter.`,
   );
   await minterFilter
     .connect(deployer)
     .approveMinterGlobally(minterSetPriceHolderV5.address);
   console.log(
-    `Allowlisted minterSetPriceHolderV5 ${minterSetPriceHolderV5.address} on minter filter.`
+    `Allowlisted minterSetPriceHolderV5 ${minterSetPriceHolderV5.address} on minter filter.`,
   );
   await minterFilter
     .connect(deployer)
     .approveMinterGlobally(minterSEAV1.address);
   console.log(
-    `Allowlisted minterSEAV1 ${minterSEAV1.address} on minter filter.`
+    `Allowlisted minterSEAV1 ${minterSEAV1.address} on minter filter.`,
   );
   await minterFilter
     .connect(deployer)
     .approveMinterGlobally(minterRAMV0.address);
   console.log(
-    `Allowlisted minterRAMV0 ${minterRAMV0.address} on minter filter.`
+    `Allowlisted minterRAMV0 ${minterRAMV0.address} on minter filter.`,
   );
   await minterFilter
     .connect(deployer)
     .approveMinterGlobally(minterDAExpV5.address);
   console.log(
-    `Allowlisted minterDAExpV5 ${minterDAExpV5.address} on minter filter.`
+    `Allowlisted minterDAExpV5 ${minterDAExpV5.address} on minter filter.`,
   );
   await minterFilter
     .connect(deployer)
     .approveMinterGlobally(minterDALinV5.address);
   console.log(
-    `Allowlisted minterDALinV5 ${minterDALinV5.address} on minter filter.`
+    `Allowlisted minterDALinV5 ${minterDALinV5.address} on minter filter.`,
   );
   await minterFilter
     .connect(deployer)
     .approveMinterGlobally(minterDAExpSettlementV3.address);
   console.log(
-    `Allowlisted minterDAExpSettlementV3 ${minterDAExpSettlementV3.address} on minter filter.`
+    `Allowlisted minterDAExpSettlementV3 ${minterDAExpSettlementV3.address} on minter filter.`,
   );
   await minterFilter
     .connect(deployer)
     .approveMinterGlobally(minterMinPriceV0.address);
   console.log(
-    `Allowlisted minterMinPriceV0 ${minterMinPriceV0.address} on minter filter.`
+    `Allowlisted minterMinPriceV0 ${minterMinPriceV0.address} on minter filter.`,
   );
 
   // add initial project to the core contract
@@ -649,7 +677,7 @@ async function main() {
   console.log("subgraphConfig:", JSON.stringify(subgraphConfig, null, 2));
   fs.writeFileSync(
     "/usr/seed/shared/test-config.json",
-    JSON.stringify(subgraphConfig)
+    JSON.stringify(subgraphConfig),
   );
 
   //////////////////////////////////////////////////////////////////////////////

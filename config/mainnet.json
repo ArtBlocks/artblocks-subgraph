@@ -241,6 +241,11 @@
       "address": "0x733c849D0174f009A993268eF258f7E829f62523",
       "name": "mainnet shared minter: MinterDALinHolderV5",
       "startBlock": 18486235
+    },
+    {
+      "address": "0x8c4ceA530b2Ff89d312F15A8DB38f04cDB5371d8",
+      "name": "mainnet shared minter: MinterSlidingScaleV0",
+      "startBlock": 24379273
     }
   ],
   "splitFundsLibContracts": [
@@ -295,6 +300,11 @@
       "address": "0x72f4ed8AEadD991162D97506F320018C5d85C142",
       "name": "mainnet shared minter: MinterSetPricePolyptychERC20V5",
       "startBlock": 18486235
+    },
+    {
+      "address": "0x8c4ceA530b2Ff89d312F15A8DB38f04cDB5371d8",
+      "name": "mainnet shared minter: MinterSlidingScaleV0",
+      "startBlock": 24379273
     }
   ],
   "maxInvocationsLibContracts": [
@@ -372,6 +382,11 @@
       "address": "0x733c849D0174f009A993268eF258f7E829f62523",
       "name": "mainnet shared minter: MinterDALinHolderV5",
       "startBlock": 18486235
+    },
+    {
+      "address": "0x8c4ceA530b2Ff89d312F15A8DB38f04cDB5371d8",
+      "name": "mainnet shared minter: MinterSlidingScaleV0",
+      "startBlock": 24379273
     }
   ],
   "merkleLibContracts": [
