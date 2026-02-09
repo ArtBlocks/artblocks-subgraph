@@ -103,6 +103,11 @@
       "address": "0x725b18673125Bb1384c65a558D24A13fbb88D812",
       "name": "Sepolia dev shared minter: MinterDALinHolderV5",
       "blockNumber": 4655325
+    },
+    {
+      "address": "0xdef46Ae165A3B29B2Bf85fcEa0271Ac0e74a232B",
+      "name": "Sepolia dev shared minter: MinterSlidingScaleV0",
+      "startBlock": 10185437
     }
   ],
   "splitFundsLibContracts": [
@@ -157,6 +162,11 @@
       "address": "0xf5c43CBeF349787CF54422742471c770C61074a0",
       "name": "Sepolia dev shared minter: MinterSetPricePolyptychERC20V5",
       "blockNumber": 4655325
+    },
+    {
+      "address": "0xdef46Ae165A3B29B2Bf85fcEa0271Ac0e74a232B",
+      "name": "Sepolia dev shared minter: MinterSlidingScaleV0",
+      "startBlock": 10185437
     }
   ],
   "maxInvocationsLibContracts": [
@@ -234,6 +244,11 @@
       "address": "0xaCdAeb402C6733CeaeF332383AEaB1763e712722",
       "name": "Sepolia dev shared minter: MinterRAMV0",
       "blockNumber": 5621983
+    },
+    {
+      "address": "0xdef46Ae165A3B29B2Bf85fcEa0271Ac0e74a232B",
+      "name": "Sepolia dev shared minter: MinterSlidingScaleV0",
+      "startBlock": 10185437
     }
   ],
   "merkleLibContracts": [
