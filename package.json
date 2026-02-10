@@ -9,11 +9,9 @@
     "test:e2e:ci": "cd tests/e2e && GRAPH_NODE_BASE_IMAGE=graphprotocol/graph-node:latest docker compose -f docker-compose.yml -f docker-compose.ci.yml up --exit-code-from runner",
     "run:local": "cd tests/e2e && GRAPH_NODE_BASE_IMAGE=graph-node:latest docker compose -f docker-compose.yml -f docker-compose.local.yml up",
     "coverage": "graph test -- -c",
-    "deploy:studio": "yarn prepare:mainnet && graph deploy --studio art-blocks",
-    "deploy:studio-base": "yarn prepare:base && graph deploy --studio art-blocks-base",
-    "deploy:studio-sepolia-dev": "yarn prepare:sepolia-dev && graph deploy --studio art-blocks-dev-sepolia",
-    "deploy:studio-sepolia-staging": "yarn prepare:sepolia-staging && graph deploy --studio art-blocks-staging-sepolia",
-    "deploy:studio-arbitrum-one": "yarn prepare:arbitrum-one && graph deploy --studio art-blocks-arbitrum",
+    "deploy:studio": "yarn prepare:mainnet && source .env && yarn graph deploy --studio art-blocks --deploy-key=$GRAPH_DEPLOY_KEY",
+    "deploy:studio-base": "yarn prepare:base && source .env && yarn graph deploy --studio art-blocks-base --deploy-key=$GRAPH_DEPLOY_KEY",
+    "deploy:studio-arbitrum-one": "yarn prepare:arbitrum-one && source .env && yarn graph deploy --studio art-blocks-arbitrum --deploy-key=$GRAPH_DEPLOY_KEY",
     "deploy:goldsky-sepolia-dev": "sh -c 'read -p \"Enter subgraph version: \" version; if [ -z \"$version\" ]; then echo \"Version is required\" >&2; exit 1; fi; yarn prepare:sepolia-dev && graph build && set -a && source .env && set +a && goldsky login --token \"$GOLDSKY_API_KEY\" && goldsky subgraph deploy artblocks-sepolia-dev/\"$version\"'",
     "deploy:goldsky-sepolia-staging": "sh -c 'read -p \"Enter subgraph version: \" version; if [ -z \"$version\" ]; then echo \"Version is required\" >&2; exit 1; fi; yarn prepare:sepolia-staging && graph build && set -a && source .env && set +a && goldsky login --token \"$GOLDSKY_API_KEY\" && goldsky subgraph deploy artblocks-sepolia-staging/\"$version\"'",
     "tag-latest:goldsky-sepolia-dev": "sh -c 'read -p \"Enter dev subgraph version you want to tag as latest: \" version; if [ -z \"$version\" ]; then echo \"Version is required\" >&2; exit 1; fi; source .env && set +a && goldsky login --token \"$GOLDSKY_API_KEY\" && goldsky subgraph tag create artblocks-sepolia-dev/\"$version\" --tag latest'",
@@ -30,7 +28,8 @@
     "prepare:local": "yarn codegen:generic && mustache config/local.json subgraph.template.yaml > subgraph.yaml",
     "prepare:generic": "yarn codegen:generic",
     "codegen:generic": "yarn generate:abis && mkdir -p ./generated && rm -r ./generated && mustache config/generic.json subgraph.template.yaml > subgraph.yaml && graph codegen",
-    "generate:abis": "cd ./abis && ./_generate-abis.sh && cd ../"
+    "generate:abis": "cd ./abis && ./_generate-abis.sh && cd ../",
+    "postinstall": "patch-package"
   },
   "dependencies": {
     "@artblocks/contracts": "1.3.2",
@@ -41,6 +40,8 @@
   },
   "devDependencies": {
     "assemblyscript": "^0.19.22",
-    "mustache": "^4.1.0"
+    "mustache": "^4.1.0",
+    "patch-package": "^8.0.1",
+    "postinstall-postinstall": "^2.1.0"
   }
 }

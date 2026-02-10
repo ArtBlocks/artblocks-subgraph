@@ -1,0 +1,71 @@
+diff --git a/node_modules/@graphprotocol/graph-cli/dist/compiler/index.js b/node_modules/@graphprotocol/graph-cli/dist/compiler/index.js
+index a53b2a0..71b032f 100644
+--- a/node_modules/@graphprotocol/graph-cli/dist/compiler/index.js
++++ b/node_modules/@graphprotocol/graph-cli/dist/compiler/index.js
+@@ -480,6 +480,10 @@ class Compiler {
+         const uploadCacheKey = this.cacheKeyForFile(absoluteFile);
+         const alreadyUploaded = uploadedFiles.has(uploadCacheKey);
+         if (!alreadyUploaded) {
++            // Throttle uploads: wait 250ms between each new upload to avoid rate limits
++            if (uploadedFiles.size > 0) {
++                await new Promise(resolve => setTimeout(resolve, 250));
++            }
+             // @ts-expect-error Buffer.from with Buffer data can indeed accept utf-8
+             const content = Buffer.from(await fs_extra_1.default.readFile(absoluteFile), 'utf-8');
+             const hash = await this._uploadToIPFS({
+@@ -497,20 +501,41 @@ class Compiler {
+         const file = { path: 'subgraph.yaml', content: Buffer.from(str, 'utf-8') };
+         return await this._uploadToIPFS(file);
+     }
+-    async _uploadToIPFS(file) {
+-        try {
+-            const files = this.ipfs.addAll([file]);
+-            // We get back async iterable
+-            const filesIterator = files[Symbol.asyncIterator]();
+-            // We only care about the first item, since that is the file, rest could be directories
+-            const { value } = await filesIterator.next();
+-            // we grab the file and pin it
+-            const uploadedFile = value;
+-            await this.ipfs.pin.add(uploadedFile.cid);
+-            return uploadedFile.cid.toString();
+-        }
+-        catch (e) {
+-            throw Error(`Failed to upload file to IPFS: ${e.message}`);
++    _isRateLimitError(message) {
++        return message && (message.includes('1015') || message.includes('rate limit') || message.includes('Rate limit') || message.includes('banned you temporarily') || message.includes('Access denied'));
++    }
++    async _uploadToIPFS(file, retries = 8) {
++        for (let attempt = 1; attempt <= retries; attempt++) {
++            try {
++                const files = this.ipfs.addAll([file]);
++                // We get back async iterable
++                const filesIterator = files[Symbol.asyncIterator]();
++                // We only care about the first item, since that is the file, rest could be directories
++                const { value } = await filesIterator.next();
++                // we grab the file and pin it
++                const uploadedFile = value;
++                await this.ipfs.pin.add(uploadedFile.cid);
++                return uploadedFile.cid.toString();
++            }
++            catch (e) {
++                if (attempt < retries) {
++                    let delay;
++                    if (this._isRateLimitError(e.message)) {
++                        // Cloudflare rate limit: wait 60-90s for the ban to expire
++                        delay = 60000 + Math.random() * 30000;
++                        console.warn(`IPFS upload attempt ${attempt}/${retries} rate-limited. Waiting ${Math.round(delay / 1000)}s for rate limit to reset...`);
++                    }
++                    else {
++                        // Other errors: standard exponential backoff (1s, 2s, 4s, 8s...)
++                        delay = Math.min(1000 * Math.pow(2, attempt - 1), 30000) + Math.random() * 1000;
++                        console.warn(`IPFS upload attempt ${attempt}/${retries} failed: ${e.message}. Retrying in ${Math.round(delay / 1000)}s...`);
++                    }
++                    await new Promise(resolve => setTimeout(resolve, delay));
++                }
++                else {
++                    throw Error(`Failed to upload file to IPFS after ${retries} attempts: ${e.message}`);
++                }
++            }
+         }
+     }
+ }
