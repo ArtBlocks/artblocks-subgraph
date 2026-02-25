@@ -138,6 +138,11 @@ export function handleMint(event: Mint): void {
  * performance and reliability.
  * Both handlers must remain active: legacy contracts emit the 2-param
  * Mint event, while v3.2.9+ contracts emit this 3-param version.
+ * @dev If `_tokenHash` is bytes32(0), it means the token's hash was not
+ * atomically assigned during the mint transaction. If that flow is to be
+ * supported in the future, this handler's logic will need to be updated
+ * to handle that case (e.g. by deferring hash assignment or listening
+ * for a subsequent hash-assignment event).
  */
 export function handleMintWithTokenHash(event: MintWithTokenHash): void {
   _handleMintEvent(
