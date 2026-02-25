@@ -55,6 +55,7 @@ import {
 import { Project } from "../../../generated/schema";
 import {
   Mint,
+  Mint1 as MintWithTokenHash,
   ProjectUpdated,
   PlatformUpdated
 } from "../../../generated/IGenArt721CoreV3_Base/IGenArt721CoreContractV3_Base";
@@ -81,6 +82,7 @@ import {
   FIELD_PROJECT_WEBSITE,
   handleIAdminACLV0SuperAdminTransferred,
   handleMint,
+  handleMintWithTokenHash,
   handleTransfer,
   handlePlatformUpdated,
   handleOwnershipTransferred,
@@ -249,6 +251,190 @@ test(`${coreType}: Can handle Mint without purchase details`, () => {
     fullTokenId,
     "owner",
     toAddress.toHexString()
+  );
+
+  assert.notInStore(PRIMARY_PURCHASE_ENTITY_TYPE, fullTokenId);
+});
+
+// Tests for the v3.2.9+ Mint(address,uint256,bytes32) event, which includes
+// the token hash directly in the event. The handler should NOT make any RPC
+// calls to `tokenIdToHash`; notably, we do NOT mock `tokenIdToHash` here,
+// so the test will fail if the handler attempts that call.
+test(`${coreType}: Can handle MintWithTokenHash with purchase details`, () => {
+  clearStore();
+  const projectId = BigInt.fromI32(1);
+  const tokenId = BigInt.fromI32(1000001);
+  addTestContractToStore(projectId);
+  // Intentionally NOT mocking tokenIdToHash — the handler must not call it.
+  mockCoreType(TEST_CONTRACT_ADDRESS, `${coreType}`);
+
+  const fullProjectId = generateContractSpecificId(
+    TEST_CONTRACT_ADDRESS,
+    projectId
+  );
+  const artistAddress = randomAddressGenerator.generateRandomAddress();
+  const projectName = "Test Project";
+  const pricePerTokenInWei = BigInt.fromI64(i64(1e18));
+
+  const project = addNewProjectToStore(
+    TEST_CONTRACT_ADDRESS,
+    projectId,
+    projectName,
+    artistAddress,
+    pricePerTokenInWei,
+    CURRENT_BLOCK_TIMESTAMP
+  );
+
+  const minterAddress = randomAddressGenerator.generateRandomAddress();
+  const currencyAddress = randomAddressGenerator.generateRandomAddress();
+  const currencySymbol = "TEST";
+  const projectMinterConfig = addNewLegacyProjectMinterConfigToStore(
+    fullProjectId,
+    minterAddress
+  );
+  projectMinterConfig.currencyAddress = currencyAddress;
+  projectMinterConfig.currencySymbol = currencySymbol;
+  projectMinterConfig.save();
+
+  project.minterConfiguration = projectMinterConfig.id;
+  project.save();
+
+  const fullTokenId = generateContractSpecificId(
+    TEST_CONTRACT_ADDRESS,
+    tokenId
+  );
+
+  const toAddress = randomAddressGenerator.generateRandomAddress();
+
+  const event: MintWithTokenHash = changetype<MintWithTokenHash>(
+    newMockEvent()
+  );
+  event.address = TEST_CONTRACT_ADDRESS;
+  event.transaction.hash = TEST_TX_HASH;
+  event.logIndex = BigInt.fromI32(0);
+  event.parameters = [
+    new ethereum.EventParam("_to", ethereum.Value.fromAddress(toAddress)),
+    new ethereum.EventParam(
+      "_tokenId",
+      ethereum.Value.fromUnsignedBigInt(tokenId)
+    ),
+    new ethereum.EventParam(
+      "_tokenHash",
+      ethereum.Value.fromFixedBytes(TEST_TOKEN_HASH)
+    )
+  ];
+
+  handleMintWithTokenHash(event);
+
+  assert.fieldEquals(
+    TOKEN_ENTITY_TYPE,
+    fullTokenId,
+    "owner",
+    toAddress.toHexString()
+  );
+
+  // Verify token hash was sourced from the event, not an RPC call
+  assert.fieldEquals(
+    TOKEN_ENTITY_TYPE,
+    fullTokenId,
+    "hash",
+    TEST_TOKEN_HASH.toHexString()
+  );
+
+  assert.fieldEquals(
+    PRIMARY_PURCHASE_ENTITY_TYPE,
+    fullTokenId,
+    "token",
+    fullTokenId
+  );
+
+  assert.fieldEquals(
+    PRIMARY_PURCHASE_ENTITY_TYPE,
+    fullTokenId,
+    "minterAddress",
+    minterAddress.toHexString()
+  );
+
+  assert.fieldEquals(
+    PRIMARY_PURCHASE_ENTITY_TYPE,
+    fullTokenId,
+    "currencyAddress",
+    currencyAddress.toHexString()
+  );
+
+  assert.fieldEquals(
+    PRIMARY_PURCHASE_ENTITY_TYPE,
+    fullTokenId,
+    "currencySymbol",
+    currencySymbol
+  );
+});
+
+test(`${coreType}: Can handle MintWithTokenHash without purchase details`, () => {
+  clearStore();
+  const projectId = BigInt.fromI32(1);
+  const tokenId = BigInt.fromI32(1000001);
+  addTestContractToStore(projectId);
+  // Intentionally NOT mocking tokenIdToHash — the handler must not call it.
+  mockCoreType(TEST_CONTRACT_ADDRESS, `${coreType}`);
+
+  const fullProjectId = generateContractSpecificId(
+    TEST_CONTRACT_ADDRESS,
+    projectId
+  );
+  const artistAddress = randomAddressGenerator.generateRandomAddress();
+  const projectName = "Test Project";
+  const pricePerTokenInWei = BigInt.fromI64(i64(1e18));
+
+  addNewProjectToStore(
+    TEST_CONTRACT_ADDRESS,
+    projectId,
+    projectName,
+    artistAddress,
+    pricePerTokenInWei,
+    CURRENT_BLOCK_TIMESTAMP
+  );
+
+  const fullTokenId = generateContractSpecificId(
+    TEST_CONTRACT_ADDRESS,
+    tokenId
+  );
+
+  const toAddress = randomAddressGenerator.generateRandomAddress();
+
+  const event: MintWithTokenHash = changetype<MintWithTokenHash>(
+    newMockEvent()
+  );
+  event.address = TEST_CONTRACT_ADDRESS;
+  event.transaction.hash = TEST_TX_HASH;
+  event.logIndex = BigInt.fromI32(0);
+  event.parameters = [
+    new ethereum.EventParam("_to", ethereum.Value.fromAddress(toAddress)),
+    new ethereum.EventParam(
+      "_tokenId",
+      ethereum.Value.fromUnsignedBigInt(tokenId)
+    ),
+    new ethereum.EventParam(
+      "_tokenHash",
+      ethereum.Value.fromFixedBytes(TEST_TOKEN_HASH)
+    )
+  ];
+
+  handleMintWithTokenHash(event);
+
+  assert.fieldEquals(
+    TOKEN_ENTITY_TYPE,
+    fullTokenId,
+    "owner",
+    toAddress.toHexString()
+  );
+
+  // Verify token hash was sourced from the event, not an RPC call
+  assert.fieldEquals(
+    TOKEN_ENTITY_TYPE,
+    fullTokenId,
+    "hash",
+    TEST_TOKEN_HASH.toHexString()
   );
 
   assert.notInStore(PRIMARY_PURCHASE_ENTITY_TYPE, fullTokenId);
