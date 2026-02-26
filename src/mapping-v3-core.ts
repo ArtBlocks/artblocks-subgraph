@@ -10,6 +10,7 @@ import {
 
 import {
   Mint,
+  Mint1 as MintWithTokenHash,
   ProjectUpdated,
   PlatformUpdated,
   MinterUpdated,
@@ -113,14 +114,66 @@ export function handleIAdminACLV0SuperAdminTransferred(
 }
 
 export function handleMint(event: Mint): void {
+  // Legacy Mint event (pre-v3.2.9) does not include token hash, so we
+  // must fetch it via an RPC call to `tokenIdToHash`.
   const contract = getIGenArt721CoreContractV3_BaseContract(event.address);
+  const tokenHash = contract.tokenIdToHash(event.params._tokenId);
+  _handleMintEvent(
+    event.address,
+    event.params._tokenId,
+    event.params._to,
+    tokenHash,
+    event.block.timestamp,
+    event.transaction.hash
+  );
+}
+
+/**
+ * @dev Added in v3.2.9 of the V3 core contract.
+ * This handler processes the new Mint event that includes the token hash
+ * directly in the event parameters: Mint(address,uint256,bytes32).
+ * Unlike the legacy Mint(address,uint256) handler above, this handler does
+ * NOT need to make an RPC call to `tokenIdToHash` because the token hash
+ * is emitted as part of the event itself. This improves indexing
+ * performance and reliability.
+ * Both handlers must remain active: legacy contracts emit the 2-param
+ * Mint event, while v3.2.9+ contracts emit this 3-param version.
+ * @dev If `_tokenHash` is bytes32(0), it means the token's hash was not
+ * atomically assigned during the mint transaction. If that flow is to be
+ * supported in the future, this handler's logic will need to be updated
+ * to handle that case (e.g. by deferring hash assignment or listening
+ * for a subsequent hash-assignment event).
+ */
+export function handleMintWithTokenHash(event: MintWithTokenHash): void {
+  _handleMintEvent(
+    event.address,
+    event.params._tokenId,
+    event.params._to,
+    event.params._tokenHash,
+    event.block.timestamp,
+    event.transaction.hash
+  );
+}
+
+/**
+ * @dev Shared mint logic used by both the legacy Mint(address,uint256) handler
+ * and the v3.2.9+ Mint(address,uint256,bytes32) handler. The only difference
+ * between the two is how the token hash is resolved (RPC call vs. event
+ * parameter), which is handled by the caller before invoking this function.
+ */
+function _handleMintEvent(
+  contractAddress: Address,
+  tokenId: BigInt,
+  to: Address,
+  tokenHash: Bytes,
+  blockTimestamp: BigInt,
+  transactionHash: Bytes
+): void {
   let token = new Token(
-    generateContractSpecificId(event.address, event.params._tokenId)
+    generateContractSpecificId(contractAddress, tokenId)
   );
-  let projectIdNumber = generateProjectIdNumberFromTokenIdNumber(
-    event.params._tokenId
-  );
-  let projectId = generateContractSpecificId(event.address, projectIdNumber);
+  let projectIdNumber = generateProjectIdNumberFromTokenIdNumber(tokenId);
+  let projectId = generateContractSpecificId(contractAddress, projectIdNumber);
 
   let project = Project.load(projectId);
   if (project) {
@@ -129,18 +182,15 @@ export function handleMint(event: Mint): void {
     // because many invocations often occur in a single block.
     let invocation = project.invocations;
 
-    token.tokenId = event.params._tokenId;
-    token.contract = event.address.toHexString();
+    token.tokenId = tokenId;
+    token.contract = contractAddress.toHexString();
     token.project = projectId;
-    token.owner = event.params._to.toHexString();
-    // Okay to assume the hash is assigned in same tx as mint for now,
-    // but this will need to be updated if we ever support async token hash
-    // assignment.
-    token.hash = contract.tokenIdToHash(event.params._tokenId);
+    token.owner = to.toHexString();
+    token.hash = tokenHash;
     token.invocation = invocation;
-    token.createdAt = event.block.timestamp;
-    token.updatedAt = event.block.timestamp;
-    token.transactionHash = event.transaction.hash;
+    token.createdAt = blockTimestamp;
+    token.updatedAt = blockTimestamp;
+    token.transactionHash = transactionHash;
     token.nextSaleId = BigInt.fromI32(0);
 
     if (project.minterConfiguration) {
@@ -151,7 +201,7 @@ export function handleMint(event: Mint): void {
       if (minterConfiguration) {
         const purchaseDetails = new PrimaryPurchase(token.id);
         purchaseDetails.token = token.id;
-        purchaseDetails.transactionHash = event.transaction.hash;
+        purchaseDetails.transactionHash = transactionHash;
         purchaseDetails.minterAddress = changetype<Bytes>(
           ByteArray.fromHexString(minterConfiguration.minter)
         );
@@ -171,8 +221,8 @@ export function handleMint(event: Mint): void {
     project.invocations = invocation.plus(BigInt.fromI32(1));
     if (project.invocations == project.maxInvocations) {
       project.complete = true;
-      project.completedAt = event.block.timestamp;
-      project.updatedAt = event.block.timestamp;
+      project.completedAt = blockTimestamp;
+      project.updatedAt = blockTimestamp;
     }
     project.save();
 

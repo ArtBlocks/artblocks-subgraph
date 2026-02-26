@@ -152,6 +152,8 @@ dataSources:
       eventHandlers:
         - event: Mint(indexed address,indexed uint256)
           handler: handleMint
+        - event: Mint(indexed address,indexed uint256,bytes32)
+          handler: handleMintWithTokenHash
         - event: ProjectUpdated(indexed uint256,indexed bytes32)
           handler: handleProjectUpdated
         - event: PlatformUpdated(indexed bytes32)
@@ -2513,6 +2515,8 @@ templates:
       eventHandlers:
         - event: Mint(indexed address,indexed uint256)
           handler: handleMint
+        - event: Mint(indexed address,indexed uint256,bytes32)
+          handler: handleMintWithTokenHash
         - event: ProjectUpdated(indexed uint256,indexed bytes32)
           handler: handleProjectUpdated
         - event: PlatformUpdated(indexed bytes32)
