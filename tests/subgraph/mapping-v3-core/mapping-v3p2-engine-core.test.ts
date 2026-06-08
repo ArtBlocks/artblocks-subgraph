@@ -2580,6 +2580,118 @@ describe(`${coreType}-${coreVersion}: handleProjectUpdated`, () => {
         "300"
       );
     });
+
+    test("should combine allocations when an address fills multiple royalty roles", () => {
+      // Regression test: an on-chain 0xSplits config can list the same address
+      // more than once (e.g. the render provider and platform provider resolve
+      // to the same address). Each role contributes its own allocation, and the
+      // split pays the address the SUM. The recipient entity id is keyed on
+      // (splitter, recipient), so the duplicate must accumulate rather than
+      // overwrite — otherwise sum(recipient allocations) < totalAllocation.
+      const projectId = BigInt.fromI32(0);
+      const fullProjectId = generateContractSpecificId(
+        TEST_CONTRACT_ADDRESS,
+        projectId
+      );
+      addTestContractToStore(projectId.plus(BigInt.fromI32(1)));
+      const contractInStore = Contract.load(
+        TEST_CONTRACT_ADDRESS.toHexString()
+      );
+      if (!contractInStore) {
+        throw new Error("Contract not found in store");
+      }
+      contractInStore.royaltySplitProvider = randomAddressGenerator.generateRandomAddress();
+      contractInStore.save();
+      mockRefreshContractCalls(
+        BigInt.fromI32(0),
+        coreType,
+        mockCoreContractOverrides
+      );
+      addNewProjectToStore(
+        TEST_CONTRACT_ADDRESS,
+        projectId,
+        "Test Project",
+        randomAddressGenerator.generateRandomAddress(),
+        BigInt.zero(),
+        CURRENT_BLOCK_TIMESTAMP
+      );
+
+      const newTimestamp = CURRENT_BLOCK_TIMESTAMP.plus(BigInt.fromI32(1));
+      const newRoyaltySplitter = randomAddressGenerator.generateRandomAddress();
+      const event: ProjectRoyaltySplitterUpdated = changetype<
+        ProjectRoyaltySplitterUpdated
+      >(newMockEvent());
+      event.address = TEST_CONTRACT_ADDRESS;
+      event.block.timestamp = newTimestamp;
+      event.parameters = [
+        new ethereum.EventParam(
+          "projectId",
+          ethereum.Value.fromUnsignedBigInt(projectId)
+        ),
+        new ethereum.EventParam(
+          "royaltySplitter",
+          ethereum.Value.fromAddress(newRoyaltySplitter)
+        )
+      ];
+
+      // The render provider and platform provider share the same address. Each
+      // carries its own secondary-sales BPS (250 + 300), so the shared address
+      // should end up with a combined allocation of 550.
+      const sharedProvider = randomAddressGenerator.generateRandomAddress();
+      const someAdditionalPayee = randomAddressGenerator.generateRandomAddress();
+      const tupleArray: Array<ethereum.Value> = [
+        ethereum.Value.fromAddress(someAdditionalPayee), // additional payee primary sales
+        ethereum.Value.fromUnsignedBigInt(BigInt.fromI32(5)), // secondary market royalty percentage
+        ethereum.Value.fromAddress(someAdditionalPayee), // additional payee secondary sales
+        ethereum.Value.fromUnsignedBigInt(BigInt.fromI32(0)), // additional payee secondary sales percentage
+        ethereum.Value.fromAddress(TEST_ARTIST_ADDRESS), // artist address
+        ethereum.Value.fromUnsignedBigInt(BigInt.fromI32(0)), // additional payee primary sales percentage
+        ethereum.Value.fromAddress(sharedProvider), // platform provider secondary sales address
+        ethereum.Value.fromUnsignedBigInt(BigInt.fromI32(300)), // platform provider secondary sales BPS
+        ethereum.Value.fromAddress(sharedProvider), // render provider secondary sales address
+        ethereum.Value.fromUnsignedBigInt(BigInt.fromI32(250)), // render provider secondary sales BPS
+        ethereum.Value.fromAddress(Address.zero()) // royalty splitter (unused here)
+      ];
+      const tuple: ethereum.Tuple = changetype<ethereum.Tuple>(tupleArray);
+      createMockedFunction(
+        TEST_CONTRACT_ADDRESS,
+        "projectIdToFinancials",
+        "projectIdToFinancials(uint256):((address,uint8,address,uint8,address,uint8,address,uint16,address,uint16,address))"
+      )
+        .withArgs([ethereum.Value.fromUnsignedBigInt(projectId)])
+        .returns([ethereum.Value.fromTuple(tuple)]);
+
+      handleProjectRoyaltySplitterUpdated(event);
+
+      assert.fieldEquals(
+        PROJECT_ENTITY_TYPE,
+        fullProjectId,
+        "erc2981SplitterAddress",
+        newRoyaltySplitter.toHexString()
+      );
+      // total = 5% artist (500) + 3.0% platform (300) + 2.5% render (250) = 1050
+      assert.fieldEquals(
+        ROYALTY_SPLITTER_ENTITY_TYPE,
+        newRoyaltySplitter.toHexString(),
+        "totalAllocation",
+        "1050"
+      );
+      // artist recipient unaffected
+      assert.fieldEquals(
+        ROYALTY_SPLIT_RECIPIENT_TYPE,
+        newRoyaltySplitter.toHexString() + "-" + TEST_ARTIST_ADDRESS.toHexString(),
+        "allocation",
+        "500"
+      );
+      // shared address should hold the SUM of both roles (250 + 300), not just
+      // the last write — and sum(recipients) (500 + 550) must equal 1050.
+      assert.fieldEquals(
+        ROYALTY_SPLIT_RECIPIENT_TYPE,
+        newRoyaltySplitter.toHexString() + "-" + sharedProvider.toHexString(),
+        "allocation",
+        "550"
+      );
+    });
   });
 });
 
