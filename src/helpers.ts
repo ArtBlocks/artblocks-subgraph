@@ -323,10 +323,21 @@ function createRoyaltySplitRecipient(
   allocation: BigInt
 ): void {
   let recipientId = royaltySplitterId + "-" + recipientAddress.toHexString();
-  let recipient = new RoyaltySplitRecipient(recipientId);
-  recipient.royaltySplitterContract = royaltySplitterId;
-  recipient.recipientAddress = recipientAddress;
-  recipient.allocation = allocation;
+  // @dev A single address may appear in more than one royalty role (e.g. the
+  // render provider and platform provider resolve to the same address, or the
+  // artist is also the additional payee). The on-chain 0xSplits config lists
+  // such an address once with the SUM of its allocations, so we accumulate here
+  // rather than overwrite. Overwriting (the previous behavior) dropped the
+  // earlier allocation, leaving sum(recipient allocations) < totalAllocation.
+  let recipient = RoyaltySplitRecipient.load(recipientId);
+  if (recipient == null) {
+    recipient = new RoyaltySplitRecipient(recipientId);
+    recipient.royaltySplitterContract = royaltySplitterId;
+    recipient.recipientAddress = recipientAddress;
+    recipient.allocation = allocation;
+  } else {
+    recipient.allocation = recipient.allocation.plus(allocation);
+  }
   recipient.save();
 }
 
