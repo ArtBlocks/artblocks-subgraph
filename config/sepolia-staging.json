@@ -108,6 +108,11 @@
       "address": "0x950C529Fb199CDC54952e4d630D07a08FB7a24e5",
       "name": "Sepolia staging shared minter: MinterSlidingScaleV0",
       "startBlock": 10185476
+    },
+    {
+      "address": "0x72c7835d7E7CE84A786C0eB6c1d5B16f47CF9BE3",
+      "name": "Sepolia staging shared minter: MinterSetPriceTieredAllowV1",
+      "startBlock": 11279378
     }
   ],
   "splitFundsLibContracts": [
@@ -120,6 +125,11 @@
       "address": "0xCfc3818816eA26f7406f9FA33a1e4EDd57A01078",
       "name": "Sepolia staging shared minter: MinterSetPricePolyptychERC20V5",
       "blockNumber": 4655740
+    },
+    {
+      "address": "0x72c7835d7E7CE84A786C0eB6c1d5B16f47CF9BE3",
+      "name": "Sepolia staging shared minter: MinterSetPriceTieredAllowV1",
+      "startBlock": 11279378
     }
   ],
   "setPriceLibContracts": [
@@ -167,6 +177,11 @@
       "address": "0x950C529Fb199CDC54952e4d630D07a08FB7a24e5",
       "name": "Sepolia staging shared minter: MinterSlidingScaleV0",
       "startBlock": 10185476
+    },
+    {
+      "address": "0x72c7835d7E7CE84A786C0eB6c1d5B16f47CF9BE3",
+      "name": "Sepolia staging shared minter: MinterSetPriceTieredAllowV1",
+      "startBlock": 11279378
     }
   ],
   "maxInvocationsLibContracts": [
@@ -249,6 +264,11 @@
       "address": "0x950C529Fb199CDC54952e4d630D07a08FB7a24e5",
       "name": "Sepolia staging shared minter: MinterSlidingScaleV0",
       "startBlock": 10185476
+    },
+    {
+      "address": "0x72c7835d7E7CE84A786C0eB6c1d5B16f47CF9BE3",
+      "name": "Sepolia staging shared minter: MinterSetPriceTieredAllowV1",
+      "startBlock": 11279378
     }
   ],
   "merkleLibContracts": [
@@ -288,6 +308,11 @@
       "address": "0xa1577a3EB47CB49afB6b8F53cBcF0E9d613ABEB4",
       "name": "Sepolia staging shared minter: MinterDALinHolderV5",
       "blockNumber": 4655740
+    },
+    {
+      "address": "0x72c7835d7E7CE84A786C0eB6c1d5B16f47CF9BE3",
+      "name": "Sepolia staging shared minter: MinterSetPriceTieredAllowV1",
+      "startBlock": 11279378
     }
   ],
   "DALibContracts": [
