@@ -371,6 +371,11 @@
       "address": "0x00000000A78E278b2d2e2935FaeBe19ee9F1FF14",
       "name": "Base pmp contract",
       "startBlock": 29020798
+    },
+    {
+      "address": "0x00000000829C0278FBa4327efd97ab45493364cC",
+      "name": "Base pmp v1 contract",
+      "startBlock": 49506244
     }
   ]
 }
