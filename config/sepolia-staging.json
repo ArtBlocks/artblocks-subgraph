@@ -463,6 +463,11 @@
       "address": "0x00000000A78E278b2d2e2935FaeBe19ee9F1FF14",
       "name": "Sepolia staging pmp contract",
       "startBlock": 8132224
+    },
+    {
+      "address": "0x00000000829C0278FBa4327efd97ab45493364cC",
+      "name": "Sepolia staging pmp v1 contract",
+      "startBlock": 11413874
     }
   ]
 }
