@@ -346,6 +346,11 @@
       "address": "0x00000000A78E278b2d2e2935FaeBe19ee9F1FF14",
       "name": "Shape pmp contract",
       "startBlock": 29640404
+    },
+    {
+      "address": "0x00000000829C0278FBa4327efd97ab45493364cC",
+      "name": "Shape pmp v1 contract",
+      "startBlock": 32028670
     }
   ]
 }
