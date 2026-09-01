@@ -7,21 +7,24 @@
   resolved "https://registry.yarnpkg.com/@0no-co/graphql.web/-/graphql.web-1.0.7.tgz#c7a762c887b3482a79ffa68f63de5e96059a62e4"
   integrity sha512-E3Qku4mTzdrlwVWGPxklDnME5ANrEGetvYw4i2GCRlppWXXE4QD66j7pwb8HelZwS6LnqEChhrSOGCXpbiu6MQ==
 
-"@artblocks/contracts@1.3.2":
-  version "1.3.2"
-  resolved "https://registry.yarnpkg.com/@artblocks/contracts/-/contracts-1.3.2.tgz#5c48e5a40842aa34e613a84044e604af37ec0b59"
-  integrity sha512-AdNyUlCK6TEZi2qjkCUmrvxJbNJH4vRSW0LhXpd7CPt0UAw+ptZUWRwVFXjcfsD8beGfKMGxet42fdKhTGqC9w==
+"@artblocks/contracts@1.4.0":
+  version "1.4.0"
+  resolved "https://registry.yarnpkg.com/@artblocks/contracts/-/contracts-1.4.0.tgz#59649a4aedb74315f928e52f3e87023c1c95893b"
+  integrity sha512-W/Q84oUwC8C9fqRPJX8fnkqjX0P7fT2t8SHM5VITIYkcbh1U0gbi4c7xKNHhlFlmRVY9GmZMG82OUxcdVj9Qgg==
   dependencies:
-    "@nomicfoundation/hardhat-verify" "^2.0.5"
+    "@ethersproject/signing-key" "^5.8.0"
+    "@nomicfoundation/hardhat-verify" "^2.0.14"
     "@openzeppelin-0.5/contracts" "npm:@openzeppelin/contracts@2.5.1"
     "@openzeppelin-4.5/contracts" "npm:@openzeppelin/contracts@4.5.0"
     "@openzeppelin-4.7/contracts" "npm:@openzeppelin/contracts@4.7.1"
     "@openzeppelin-4.8/contracts-upgradeable" "npm:@openzeppelin/contracts-upgradeable@4.8.0"
     "@openzeppelin-5.0/contracts" "npm:@openzeppelin/contracts@5.0.1"
+    "@openzeppelin-5.0/contracts-upgradeable" "npm:@openzeppelin/contracts-upgradeable@5.0.1"
+    "@openzeppelin/contracts" "5.0.1"
     "@urql/exchange-retry" "^1.3.0"
     graphql "^16.8.2"
     scripty.sol "2.1.1"
-    solady "^0.0.181"
+    solady "^0.1.26"
     urql "^4.2.1"
 
 "@assemblyscript/loader@^0.19.22":
@@ -532,17 +535,17 @@
     "@nodelib/fs.scandir" "2.1.5"
     fastq "^1.6.0"
 
-"@nomicfoundation/hardhat-verify@^2.0.5":
-  version "2.0.8"
-  resolved "https://registry.yarnpkg.com/@nomicfoundation/hardhat-verify/-/hardhat-verify-2.0.8.tgz#6a77dc03de990a1a3aa8e6dc073c393263dbf258"
-  integrity sha512-x/OYya7A2Kcz+3W/J78dyDHxr0ezU23DKTrRKfy5wDPCnePqnr79vm8EXqX3gYps6IjPBYyGPZ9K6E5BnrWx5Q==
+"@nomicfoundation/hardhat-verify@^2.0.14":
+  version "2.1.3"
+  resolved "https://registry.yarnpkg.com/@nomicfoundation/hardhat-verify/-/hardhat-verify-2.1.3.tgz#f61a192a792b39f9978cef1450047deaff3ea052"
+  integrity sha512-danbGjPp2WBhLkJdQy9/ARM3WQIK+7vwzE0urNem1qZJjh9f54Kf5f1xuQv8DvqewUAkuPxVt/7q4Grz5WjqSg==
   dependencies:
     "@ethersproject/abi" "^5.1.2"
     "@ethersproject/address" "^5.0.2"
     cbor "^8.1.0"
-    chalk "^2.4.2"
     debug "^4.1.1"
     lodash.clonedeep "^4.5.0"
+    picocolors "^1.1.0"
     semver "^6.3.0"
     table "^6.8.0"
     undici "^5.14.0"
@@ -602,7 +605,17 @@
   resolved "https://registry.yarnpkg.com/@openzeppelin/contracts-upgradeable/-/contracts-upgradeable-4.8.0.tgz#26688982f46969018e3ed3199e72a07c8d114275"
   integrity sha512-5GeFgqMiDlqGT8EdORadp1ntGF0qzWZLmEY7Wbp/yVhN7/B3NNzCxujuI77ktlyG81N3CUZP8cZe3ZAQ/cW10w==
 
+"@openzeppelin-5.0/contracts-upgradeable@npm:@openzeppelin/contracts-upgradeable@5.0.1":
+  version "5.0.1"
+  resolved "https://registry.yarnpkg.com/@openzeppelin/contracts-upgradeable/-/contracts-upgradeable-5.0.1.tgz#ebc163cbed2de6b8b69bff628261d18deb912a81"
+  integrity sha512-MvaLoPnVcoZr/qqZP+4cl9piuR4gg0iIGgxVSZ/AL1iId3M6IdEHzz9Naw5Lirl4KKBI6ciTVnX07yL4dOMIJg==
+
 "@openzeppelin-5.0/contracts@npm:@openzeppelin/contracts@5.0.1":
+  version "5.0.1"
+  resolved "https://registry.yarnpkg.com/@openzeppelin/contracts/-/contracts-5.0.1.tgz#93da90fc209a0a4ff09c1deb037fbb35e4020890"
+  integrity sha512-yQJaT5HDp9hYOOp4jTYxMsR02gdFZFXhewX5HW9Jo4fsqSVqqyIO/xTHdWDaKX5a3pv1txmf076Lziz+sO7L1w==
+
+"@openzeppelin/contracts@5.0.1":
   version "5.0.1"
   resolved "https://registry.yarnpkg.com/@openzeppelin/contracts/-/contracts-5.0.1.tgz#93da90fc209a0a4ff09c1deb037fbb35e4020890"
   integrity sha512-yQJaT5HDp9hYOOp4jTYxMsR02gdFZFXhewX5HW9Jo4fsqSVqqyIO/xTHdWDaKX5a3pv1txmf076Lziz+sO7L1w==
@@ -3403,7 +3416,7 @@ performance-now@^2.1.0:
   resolved "https://registry.yarnpkg.com/performance-now/-/performance-now-2.1.0.tgz#6309f4e0e5fa913ec1c69307ae364b4b377c9e7b"
   integrity sha512-7EAHlyLHI56VEIdK57uwHdHKIaAGbnXPiw0yWbarQZOKaKpvUIgW0jWRVLiatnM+XXlSwsanIBH/hzGMJulMow==
 
-picocolors@^1.1.1:
+picocolors@^1.1.0, picocolors@^1.1.1:
   version "1.1.1"
   resolved "https://registry.yarnpkg.com/picocolors/-/picocolors-1.1.1.tgz#3d321af3eab939b083c8f929a1d12cda81c26b6b"
   integrity sha512-xceH2snhtb5M9liqDsmEw56le376mTZkEX/jEb/RxNFyegNul7eNslCXP9FDj/Lcu0X8KEyMceP2ntpaHrDEVA==
@@ -3853,10 +3866,10 @@ slice-ansi@^4.0.0:
     astral-regex "^2.0.0"
     is-fullwidth-code-point "^3.0.0"
 
-solady@^0.0.181:
-  version "0.0.181"
-  resolved "https://registry.yarnpkg.com/solady/-/solady-0.0.181.tgz#500b5c26010e1dec89b1fc71cb1ad33c7a761a82"
-  integrity sha512-uxMny+zHi9xrsKaoZoLliBkKBz00i7bWLHt2YMYjgsh7zKcQHWcONzY0zQB7qaGDzvxf4m/jFv8XiWpcP+0Pig==
+solady@^0.1.26:
+  version "0.1.26"
+  resolved "https://registry.yarnpkg.com/solady/-/solady-0.1.26.tgz#80b4d621cfdbd82b772c5c701877d2f0ca12736f"
+  integrity sha512-dhGr/ptJFdea/1KE6xgqgwEdbMhUiSfRc6A+jLeltPe16zyt9qtED3PElIBVRnzEmUO5aZTjKVAr6SlqXBBcIw==
 
 source-map-support@^0.5.20:
   version "0.5.21"
