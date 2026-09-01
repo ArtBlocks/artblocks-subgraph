@@ -8,7 +8,8 @@ import {
   OwnableGenArt721CoreV3Contract_Template,
   IERC721GenArt721CoreV3Contract_Template,
   AdminACLV0_Template,
-  IGenArt721CoreContractV3_Engine_Flex_Template
+  IGenArt721CoreContractV3_Engine_Flex_Template,
+  IGenArt721CoreV3_Engine_Template
 } from "../generated/templates";
 
 import {
@@ -69,6 +70,10 @@ export function handleContractRegistered(event: ContractRegistered): void {
     IERC721GenArt721CoreV3Contract_Template.create(coreAddress);
     // @dev okay to create this template even if the contract is not engine flex as event handlers do not overlap
     IGenArt721CoreContractV3_Engine_Flex_Template.create(coreAddress);
+    // @dev transfer hook events, keyed off the Engine interface. Created for
+    // every core for the same reason as above: handlers do not overlap with any
+    // other template, and pre-v3.3 cores simply never emit these events.
+    IGenArt721CoreV3_Engine_Template.create(coreAddress);
     // also track the new contract's Admin ACL contract to enable indexing if admin changes
     // @dev for V3 core contracts, the admin acl contract is the core contract's owner
     const ownableV3Core = Ownable.bind(coreAddress);
