@@ -4,6 +4,7 @@
   "scripts": {
     "build": "yarn codegen:generic && graph build",
     "test": "yarn codegen:generic && graph test -r",
+    "test:docker": "yarn codegen:generic && ./tests/run-matchstick-docker.sh",
     "test:e2e": "cd tests/e2e && GRAPH_NODE_BASE_IMAGE=graphprotocol/graph-node:latest docker compose -f docker-compose.yml -f docker-compose.test.yml up --exit-code-from runner",
     "test:e2e:m1": "cd tests/e2e && GRAPH_NODE_BASE_IMAGE=graph-node:latest docker compose -f docker-compose.yml -f docker-compose.test.yml up --exit-code-from runner",
     "test:e2e:ci": "cd tests/e2e && GRAPH_NODE_BASE_IMAGE=graphprotocol/graph-node:latest docker compose -f docker-compose.yml -f docker-compose.ci.yml up --exit-code-from runner",
