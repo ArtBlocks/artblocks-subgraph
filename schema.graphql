@@ -108,6 +108,12 @@ type Project @entity {
   "Once the project's external asset dependencies are locked they may never be modified again"
   externalAssetDependenciesLocked: Boolean!
 
+  "Transfer hook contract invoked after every ownership change on this project's tokens, or null if none is configured. Only v3.3+ Engine and Engine Flex cores support transfer hooks; on every earlier core this is always null."
+  transferHook: Bytes
+
+  "Null until the artist permanently locks this project's transfer hook by calling lockProjectTransferHook, and true from then on. Null does NOT mean unlocked: the on-chain configuration is also permanently locked, with no event to observe, once a completed project's four-week metadata lock elapses while `transferHook` is null. Derive that case as `transferHook == null && complete && completedAt + 4 weeks <= now`, the same way `locked` is derived. A project that has ever had a hook set stays configurable until the artist locks it explicitly. Projects on cores older than v3.3 have no transfer hook feature at all — gate on `contract.coreVersion` rather than reading this field."
+  transferHookLocked: Boolean
+
   "Extra information about the script and rendering options"
   scriptJSON: String
 

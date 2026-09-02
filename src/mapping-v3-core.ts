@@ -34,6 +34,13 @@ import {
   ExternalAssetDependencyUpdated
 } from "../generated/IGenArt721CoreV3_Engine_Flex/IGenArt721CoreContractV3_Engine_Flex";
 
+// @dev transfer hook events are declared on the Engine interface; the Flex
+// interface extends it, so this one import covers both core types
+import {
+  ProjectTransferHookUpdated,
+  ProjectTransferHookLocked
+} from "../generated/templates/IGenArt721CoreV3_Engine_Template/IGenArt721CoreContractV3_Engine";
+
 import { GenArt721CoreV3 } from "../generated/IGenArt721CoreV3_Base/GenArt721CoreV3";
 import { GenArt721CoreV3_Engine } from "../generated/IGenArt721CoreV3_Base/GenArt721CoreV3_Engine";
 import { GenArt721CoreV3_Engine_Flex } from "../generated/IGenArt721CoreV3_Engine_Flex/GenArt721CoreV3_Engine_Flex";
@@ -333,6 +340,10 @@ export const ENUM_FIELD_PROJECT_BASE_URI = toBytes32Numeric(15);
 export const ENUM_FIELD_PROJECT_PROVIDER_SECONDARY_FINANCIALS = toBytes32Numeric(
   16
 );
+// @dev added in v3.3, alongside per-project transfer hooks. No pre-v3.2 string
+// form exists for these, so only the enum value is ever checked.
+export const ENUM_FIELD_PROJECT_TRANSFER_HOOK = toBytes32Numeric(17);
+export const ENUM_FIELD_PROJECT_TRANSFER_HOOK_LOCKED = toBytes32Numeric(18);
 
 // pre-v3.2 core contract ProjectUpdatedFields, as their unpadded string values here
 export const FIELD_PROJECT_ACTIVE = "active";
@@ -355,6 +366,8 @@ export const FIELD_PROJECT_WEBSITE = "website";
 // field did not exist prior to v3.2, and only uses string here for consistency with other fields
 export const FIELD_PROJECT_PROVIDER_SECONDARY_FINANCIALS =
   "secondaryFinancials";
+export const FIELD_PROJECT_TRANSFER_HOOK = "transferHook";
+export const FIELD_PROJECT_TRANSFER_HOOK_LOCKED = "transferHookLocked";
 
 /**
  * @notice helper function to get the field name for a ProjectUpdated event
@@ -452,6 +465,10 @@ function getProjectUpdatedField(_update: Bytes): string | null {
     )
   ) {
     return FIELD_PROJECT_PROVIDER_SECONDARY_FINANCIALS;
+  } else if (_update.equals(ENUM_FIELD_PROJECT_TRANSFER_HOOK)) {
+    return FIELD_PROJECT_TRANSFER_HOOK;
+  } else if (_update.equals(ENUM_FIELD_PROJECT_TRANSFER_HOOK_LOCKED)) {
+    return FIELD_PROJECT_TRANSFER_HOOK_LOCKED;
   } else {
     return null;
   }
@@ -532,6 +549,15 @@ export function handleProjectUpdated(event: ProjectUpdated): void {
       project,
       timestamp
     );
+  } else if (
+    update == FIELD_PROJECT_TRANSFER_HOOK ||
+    update == FIELD_PROJECT_TRANSFER_HOOK_LOCKED
+  ) {
+    // Intentionally no-op. The core emits this alongside the dedicated
+    // ProjectTransferHookUpdated / ProjectTransferHookLocked events, which
+    // carry the hook address directly and are handled on the Engine interface
+    // template. Recognizing the field here only keeps it from being reported as
+    // an unknown update.
   } else if (update == FIELD_PROJECT_PROVIDER_SECONDARY_FINANCIALS) {
     handleProjectProviderSecondaryFinancialsUpdated(
       contract,
@@ -1973,9 +1999,75 @@ function getIsLegacyMinterFilter(minterFilterAddress: Address): boolean {
  * @param version version string of V3 core contract
  * @returns boolean, true if the version is pre-v3.2, false otherwise.
  */
+/**
+ * Handle a project's transfer hook being set or cleared.
+ *
+ * @dev Added in core v3.3. Keyed off `IGenArt721CoreContractV3_Engine`, which is
+ * the interface that declares it — `IGenArt721CoreContractV3_Engine_Flex`
+ * extends that interface, so both Engine and Engine Flex cores emit it and a
+ * single template covers both. Handlers are registered on the Engine template
+ * only; adding them to the Flex template as well would double-handle every
+ * event, because both templates are created for every registered core.
+ *
+ * The event carries the hook address, so no contract call is needed.
+ * `address(0)` means the hook was cleared.
+ */
+export function handleProjectTransferHookUpdated(
+  event: ProjectTransferHookUpdated
+): void {
+  const project = Project.load(
+    generateContractSpecificId(event.address, event.params._projectId)
+  );
+  if (!project) {
+    log.warning("Project not found for transfer hook update: {}-{}", [
+      event.address.toHexString(),
+      event.params._projectId.toString()
+    ]);
+    return;
+  }
+  // @dev store null rather than the zero address so "no hook" is a single
+  // representation for consumers, matching how the core reports it
+  if (event.params._hook == Address.zero()) {
+    project.transferHook = null;
+  } else {
+    project.transferHook = event.params._hook;
+  }
+  project.updatedAt = event.block.timestamp;
+  project.save();
+}
+
+/**
+ * Handle a project's transfer hook being permanently locked by its artist.
+ *
+ * @dev One-way, and set only by this handler. The field stays null until an
+ * artist locks explicitly, which is why null must not be read as "unlocked":
+ * the configuration is also permanently locked, with no event to observe, once
+ * the four-week metadata lock elapses on a completed project whose hook is
+ * null. Consumers derive that case — see the `transferHookLocked` field
+ * documentation in the schema.
+ */
+export function handleProjectTransferHookLocked(
+  event: ProjectTransferHookLocked
+): void {
+  const project = Project.load(
+    generateContractSpecificId(event.address, event.params._projectId)
+  );
+  if (!project) {
+    log.warning("Project not found for transfer hook lock: {}-{}", [
+      event.address.toHexString(),
+      event.params._projectId.toString()
+    ]);
+    return;
+  }
+  project.transferHookLocked = true;
+  project.updatedAt = event.block.timestamp;
+  project.save();
+}
+
 export function getIsPreV3_2(version: string): boolean {
   return version.startsWith("v3.0.") || version.startsWith("v3.1.");
 }
+
 
 /**
  * @notice helper function that returns the core version of a V3 core contract,
