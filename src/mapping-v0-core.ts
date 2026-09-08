@@ -67,7 +67,9 @@ import {
   generateAccountProjectId,
   generateWhitelistingId,
   generateContractSpecificId,
-  generateTransferId
+  generateTransferId,
+  generateInvocationFromTokenIdNumber,
+  syncProjectInvocationsFromMintedTokenId
 } from "./helpers";
 import { generateProjectScriptId } from "./helpers";
 import { GEN_ART_721_CORE_V0 } from "./constants";
@@ -82,11 +84,18 @@ export function handleMint(event: Mint): void {
 
   let project = Project.load(projectId);
   if (project) {
-    let invocation = project.invocations;
-
-    let token = new Token(
-      generateContractSpecificId(event.address, event.params._tokenId)
+    const tokenEntityId = generateContractSpecificId(
+      event.address,
+      event.params._tokenId
     );
+    if (Token.load(tokenEntityId)) {
+      log.warning("Duplicate mint handler call for token {}; skipping", [
+        tokenEntityId
+      ]);
+      return;
+    }
+
+    let token = new Token(tokenEntityId);
 
     token.project = projectId;
     token.tokenId = event.params._tokenId;
@@ -94,7 +103,9 @@ export function handleMint(event: Mint): void {
     token.owner = event.params._to.toHexString();
     // None used more than 1
     token.hash = contract.showTokenHashes(event.params._tokenId)[0];
-    token.invocation = invocation;
+    token.invocation = generateInvocationFromTokenIdNumber(
+      event.params._tokenId
+    );
     token.createdAt = event.block.timestamp;
     token.updatedAt = event.block.timestamp;
     token.transactionHash = event.transaction.hash;
@@ -113,12 +124,11 @@ export function handleMint(event: Mint): void {
 
     token.save();
 
-    project.invocations = invocation.plus(BigInt.fromI32(1));
-    if (project.invocations == project.maxInvocations) {
-      project.complete = true;
-      project.completedAt = event.block.timestamp;
-      project.updatedAt = event.block.timestamp;
-    }
+    syncProjectInvocationsFromMintedTokenId(
+      project,
+      event.params._tokenId,
+      event.block.timestamp
+    );
     project.save();
 
     let account = new Account(token.owner);

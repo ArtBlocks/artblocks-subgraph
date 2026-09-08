@@ -71,7 +71,9 @@ import {
   addWhitelisting,
   removeWhitelisting,
   generateTransferId,
-  createPrimaryPurchaseDetailsFromTokenMint
+  createPrimaryPurchaseDetailsFromTokenMint,
+  generateInvocationFromTokenIdNumber,
+  syncProjectInvocationsFromMintedTokenId
 } from "./helpers";
 import {
   FLEX_CONTRACT_EXTERNAL_ASSET_DEP_TYPES,
@@ -83,9 +85,18 @@ import { ERC20 } from "../generated/MinterSetPriceERC20/ERC20";
 export function handleMint(event: Mint): void {
   let contract = GenArt721Core2PBAB.bind(event.address);
 
-  let token = new Token(
-    generateContractSpecificId(event.address, event.params._tokenId)
+  const tokenEntityId = generateContractSpecificId(
+    event.address,
+    event.params._tokenId
   );
+  if (Token.load(tokenEntityId)) {
+    log.warning("Duplicate mint handler call for token {}; skipping", [
+      tokenEntityId
+    ]);
+    return;
+  }
+
+  let token = new Token(tokenEntityId);
   let projectId = generateContractSpecificId(
     event.address,
     event.params._projectId
@@ -93,14 +104,14 @@ export function handleMint(event: Mint): void {
   let project = Project.load(projectId);
 
   if (project) {
-    let invocation = project.invocations;
-
     token.tokenId = event.params._tokenId;
     token.contract = event.address.toHexString();
     token.project = projectId;
     token.owner = event.params._to.toHexString();
     token.hash = contract.tokenIdToHash(event.params._tokenId);
-    token.invocation = invocation;
+    token.invocation = generateInvocationFromTokenIdNumber(
+      event.params._tokenId
+    );
     token.createdAt = event.block.timestamp;
     token.updatedAt = event.block.timestamp;
     token.transactionHash = event.transaction.hash;
@@ -113,12 +124,11 @@ export function handleMint(event: Mint): void {
 
     token.save();
 
-    project.invocations = invocation.plus(BigInt.fromI32(1));
-    if (project.invocations == project.maxInvocations) {
-      project.complete = true;
-      project.completedAt = event.block.timestamp;
-      project.updatedAt = event.block.timestamp;
-    }
+    syncProjectInvocationsFromMintedTokenId(
+      project,
+      event.params._tokenId,
+      event.block.timestamp
+    );
     project.save();
 
     let account = new Account(token.owner);
