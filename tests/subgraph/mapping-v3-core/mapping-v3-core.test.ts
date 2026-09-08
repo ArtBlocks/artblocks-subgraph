@@ -89,6 +89,7 @@ import {
   handleProjectUpdated
 } from "../../../src/mapping-v3-core";
 import {
+  generateAccountProjectId,
   generateContractSpecificId,
   generateProjectScriptId,
   generateTransferId,
@@ -438,6 +439,135 @@ test(`${coreType}: Can handle MintWithTokenHash without purchase details`, () =>
   );
 
   assert.notInStore(PRIMARY_PURCHASE_ENTITY_TYPE, fullTokenId);
+});
+
+test(`${coreType}: Duplicate Mint handler does not bump invocations or AccountProject count`, () => {
+  clearStore();
+  const projectId = BigInt.fromI32(1);
+  const tokenId = BigInt.fromI32(1000001);
+  addTestContractToStore(projectId);
+  mockTokenIdToHash(TEST_CONTRACT_ADDRESS, tokenId, TEST_TOKEN_HASH);
+  mockCoreType(TEST_CONTRACT_ADDRESS, `${coreType}`);
+
+  const fullProjectId = generateContractSpecificId(
+    TEST_CONTRACT_ADDRESS,
+    projectId
+  );
+  const artistAddress = randomAddressGenerator.generateRandomAddress();
+  const projectName = "Test Project";
+  const pricePerTokenInWei = BigInt.fromI64(i64(1e18));
+
+  addNewProjectToStore(
+    TEST_CONTRACT_ADDRESS,
+    projectId,
+    projectName,
+    artistAddress,
+    pricePerTokenInWei,
+    CURRENT_BLOCK_TIMESTAMP
+  );
+
+  const fullTokenId = generateContractSpecificId(
+    TEST_CONTRACT_ADDRESS,
+    tokenId
+  );
+  const toAddress = randomAddressGenerator.generateRandomAddress();
+  const accountProjectId = generateAccountProjectId(
+    toAddress.toHexString(),
+    fullProjectId
+  );
+
+  const event: Mint = changetype<Mint>(newMockEvent());
+  event.address = TEST_CONTRACT_ADDRESS;
+  event.transaction.hash = TEST_TX_HASH;
+  event.logIndex = BigInt.fromI32(0);
+  event.parameters = [
+    new ethereum.EventParam("_to", ethereum.Value.fromAddress(toAddress)),
+    new ethereum.EventParam(
+      "_tokenId",
+      ethereum.Value.fromUnsignedBigInt(tokenId)
+    )
+  ];
+
+  handleMint(event);
+  handleMint(event);
+
+  // tokenId 1_000_001 → invocation 1, so project.invocations becomes 2
+  assert.fieldEquals(
+    PROJECT_ENTITY_TYPE,
+    fullProjectId,
+    "invocations",
+    "2"
+  );
+  assert.fieldEquals("AccountProject", accountProjectId, "count", "1");
+  assert.entityCount(TOKEN_ENTITY_TYPE, 1);
+  assert.fieldEquals(
+    TOKEN_ENTITY_TYPE,
+    fullTokenId,
+    "invocation",
+    "1"
+  );
+});
+
+test(`${coreType}: Mint derives token.invocation from token id even if project.invocations is drifted high`, () => {
+  clearStore();
+  const projectId = BigInt.fromI32(1);
+  const tokenId = BigInt.fromI32(1000001);
+  addTestContractToStore(projectId);
+  mockTokenIdToHash(TEST_CONTRACT_ADDRESS, tokenId, TEST_TOKEN_HASH);
+  mockCoreType(TEST_CONTRACT_ADDRESS, `${coreType}`);
+
+  const fullProjectId = generateContractSpecificId(
+    TEST_CONTRACT_ADDRESS,
+    projectId
+  );
+  const artistAddress = randomAddressGenerator.generateRandomAddress();
+  const projectName = "Test Project";
+  const pricePerTokenInWei = BigInt.fromI64(i64(1e18));
+
+  const project = addNewProjectToStore(
+    TEST_CONTRACT_ADDRESS,
+    projectId,
+    projectName,
+    artistAddress,
+    pricePerTokenInWei,
+    CURRENT_BLOCK_TIMESTAMP
+  );
+  project.invocations = BigInt.fromI32(100);
+  project.save();
+
+  const fullTokenId = generateContractSpecificId(
+    TEST_CONTRACT_ADDRESS,
+    tokenId
+  );
+  const toAddress = randomAddressGenerator.generateRandomAddress();
+
+  const event: Mint = changetype<Mint>(newMockEvent());
+  event.address = TEST_CONTRACT_ADDRESS;
+  event.transaction.hash = TEST_TX_HASH;
+  event.logIndex = BigInt.fromI32(0);
+  event.parameters = [
+    new ethereum.EventParam("_to", ethereum.Value.fromAddress(toAddress)),
+    new ethereum.EventParam(
+      "_tokenId",
+      ethereum.Value.fromUnsignedBigInt(tokenId)
+    )
+  ];
+
+  handleMint(event);
+
+  assert.fieldEquals(
+    TOKEN_ENTITY_TYPE,
+    fullTokenId,
+    "invocation",
+    "1"
+  );
+  // Do not lower an already-high counter; only raise it to match the token id.
+  assert.fieldEquals(
+    PROJECT_ENTITY_TYPE,
+    fullProjectId,
+    "invocations",
+    "100"
+  );
 });
 
 test(`${coreType}: Can handle transfer`, () => {

@@ -74,10 +74,44 @@ export function generateMinterFilterContractAllowlistId(
   return minterFilterContractAddress + "-" + coreContractAddress;
 }
 
+// Art Blocks token ids encode project index and invocation as:
+// tokenId = projectIndex * 1_000_000 + invocation
+export const PROJECT_INVOCATION_RANGE = BigInt.fromI32(1000000);
+
 export function generateProjectIdNumberFromTokenIdNumber(
   tokenId: BigInt
 ): BigInt {
-  return tokenId.div(BigInt.fromI32(1000000));
+  return tokenId.div(PROJECT_INVOCATION_RANGE);
+}
+
+export function generateInvocationFromTokenIdNumber(tokenId: BigInt): BigInt {
+  return tokenId.mod(PROJECT_INVOCATION_RANGE);
+}
+
+/**
+ * Raise project.invocations to at least (tokenId % 1_000_000) + 1.
+ *
+ * The on-chain token id is the source of truth for mint order. Using it
+ * (instead of unconditionally incrementing a store counter) keeps
+ * project.invocations correct even if a Mint handler is delivered more
+ * than once for the same token.
+ */
+export function syncProjectInvocationsFromMintedTokenId(
+  project: Project,
+  tokenId: BigInt,
+  timestamp: BigInt
+): void {
+  const nextInvocations = generateInvocationFromTokenIdNumber(tokenId).plus(
+    BigInt.fromI32(1)
+  );
+  if (project.invocations.lt(nextInvocations)) {
+    project.invocations = nextInvocations;
+    if (project.invocations == project.maxInvocations) {
+      project.complete = true;
+      project.completedAt = timestamp;
+      project.updatedAt = timestamp;
+    }
+  }
 }
 
 export function generateSEAMinterBidId(

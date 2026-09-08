@@ -82,13 +82,15 @@ import {
 import {
   generateAccountProjectId,
   generateProjectIdNumberFromTokenIdNumber,
+  generateInvocationFromTokenIdNumber,
   generateProjectExternalAssetDependencyId,
   generateContractSpecificId,
   generateProjectScriptId,
   addWhitelisting,
   removeWhitelisting,
   generateTransferId,
-  loadOrCreateSharedMinterFilter
+  loadOrCreateSharedMinterFilter,
+  syncProjectInvocationsFromMintedTokenId
 } from "./helpers";
 
 import {
@@ -176,18 +178,27 @@ function _handleMintEvent(
   blockTimestamp: BigInt,
   transactionHash: Bytes
 ): void {
-  let token = new Token(
-    generateContractSpecificId(contractAddress, tokenId)
-  );
+  const tokenEntityId = generateContractSpecificId(contractAddress, tokenId);
+  // Duplicate Mint deliveries (reorg retries, overlapping templates, indexer
+  // glitches) must not increment project.invocations or AccountProject counts.
+  if (Token.load(tokenEntityId)) {
+    log.warning("Duplicate mint handler call for token {}; skipping", [
+      tokenEntityId
+    ]);
+    return;
+  }
+
+  let token = new Token(tokenEntityId);
   let projectIdNumber = generateProjectIdNumberFromTokenIdNumber(tokenId);
   let projectId = generateContractSpecificId(contractAddress, projectIdNumber);
 
   let project = Project.load(projectId);
   if (project) {
-    // @dev use invocations from entity in store. This will reflect the state
-    // at the time of the event, not the end of the block, which is required
-    // because many invocations often occur in a single block.
-    let invocation = project.invocations;
+    // Invocation is encoded in the token id (projectIndex * 1_000_000 +
+    // invocation). Prefer that over incrementing a store counter, which
+    // drifts if this handler runs more than once. Token ids are assigned
+    // at mint time, so this is event-time state, not end-of-block RPC state.
+    const invocation = generateInvocationFromTokenIdNumber(tokenId);
 
     token.tokenId = tokenId;
     token.contract = contractAddress.toHexString();
@@ -225,12 +236,7 @@ function _handleMintEvent(
 
     token.save();
 
-    project.invocations = invocation.plus(BigInt.fromI32(1));
-    if (project.invocations == project.maxInvocations) {
-      project.complete = true;
-      project.completedAt = blockTimestamp;
-      project.updatedAt = blockTimestamp;
-    }
+    syncProjectInvocationsFromMintedTokenId(project, tokenId, blockTimestamp);
     project.save();
 
     let account = new Account(token.owner);
