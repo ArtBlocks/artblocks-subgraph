@@ -31,6 +31,11 @@
       "startBlock": 29640404
     },
     {
+      "address": "0xAc521EA7A83a3Bc3f9f1e09F8300a6301743fB1f",
+      "name": "shape shared minter: MinterSEAV1",
+      "startBlock": 33706989
+    },
+    {
       "address": "0xeE4494Cb6178979f3B0481AE4653fE8A8A204c53",
       "name": "shape shared minter: MinterSetPriceV5",
       "startBlock": 29640404
@@ -84,6 +89,11 @@
       "address": "0x0D39AB55664007ff2d089A25480f169C6D0597Bb",
       "name": "shape shared minter: MinterDALinHolderV5",
       "startBlock": 29640404
+    },
+    {
+      "address": "0x1a820A0D3edC157ba76757b16750149d717cbC96",
+      "name": "shape shared minter: MinterRAMV0",
+      "startBlock": 33706920
     }
   ],
   "splitFundsLibContracts": [
@@ -205,6 +215,16 @@
       "address": "0x0D39AB55664007ff2d089A25480f169C6D0597Bb",
       "name": "shape shared minter: MinterDALinHolderV5",
       "startBlock": 29640404
+    },
+    {
+      "address": "0xAc521EA7A83a3Bc3f9f1e09F8300a6301743fB1f",
+      "name": "shape shared minter: MinterSEAV1",
+      "startBlock": 33706989
+    },
+    {
+      "address": "0x1a820A0D3edC157ba76757b16750149d717cbC96",
+      "name": "shape shared minter: MinterRAMV0",
+      "startBlock": 33706920
     }
   ],
   "merkleLibContracts": [
@@ -307,6 +327,20 @@
       "address": "0xF8ad843D1022d4752e938435e3EaC65d81dF2fbb",
       "name": "shape shared minter: MinterDAExpSettlementV3",
       "startBlock": 29640404
+    }
+  ],
+  "SEALibContracts": [
+    {
+      "address": "0xAc521EA7A83a3Bc3f9f1e09F8300a6301743fB1f",
+      "name": "shape shared minter: MinterSEAV1",
+      "startBlock": 33706989
+    }
+  ],
+  "RAMLibContracts": [
+    {
+      "address": "0x1a820A0D3edC157ba76757b16750149d717cbC96",
+      "name": "shape shared minter: MinterRAMV0",
+      "startBlock": 33706920
     }
   ],
   "minPriceLibContracts": [
