@@ -110,6 +110,11 @@
       "address": "0x720d430e9bbcAABCEB62d88693577edA8d36524F",
       "name": "Arbitrum shared minter: MinterSetPriceTieredAllowV1",
       "startBlock": 484220989
+    },
+    {
+      "address": "0x393487d584abab147957C911398A01c1cdfB0743",
+      "name": "Arbitrum shared minter: MinterSetPricePMPV0",
+      "startBlock": 512327232
     }
   ],
   "maxInvocationsLibContracts": [
@@ -182,6 +187,11 @@
       "address": "0x720d430e9bbcAABCEB62d88693577edA8d36524F",
       "name": "Arbitrum shared minter: MinterSetPriceTieredAllowV1",
       "startBlock": 484220989
+    },
+    {
+      "address": "0x393487d584abab147957C911398A01c1cdfB0743",
+      "name": "Arbitrum shared minter: MinterSetPricePMPV0",
+      "startBlock": 512327232
     }
   ],
   "setPriceLibContracts": [
@@ -229,6 +239,11 @@
       "address": "0x720d430e9bbcAABCEB62d88693577edA8d36524F",
       "name": "Arbitrum shared minter: MinterSetPriceTieredAllowV1",
       "startBlock": 484220989
+    },
+    {
+      "address": "0x393487d584abab147957C911398A01c1cdfB0743",
+      "name": "Arbitrum shared minter: MinterSetPricePMPV0",
+      "startBlock": 512327232
     }
   ],
   "splitFundsLibContracts": [
@@ -353,6 +368,13 @@
       "address": "0x4C9d23D14fF4D4d336dD7eF75B20Ef45D25B3e92",
       "name": "Arbitrum shared minter: MinterDAExpSettlementV3",
       "blockNumber": 149213815
+    }
+  ],
+  "requiredPMPLibContracts": [
+    {
+      "address": "0x393487d584abab147957C911398A01c1cdfB0743",
+      "name": "Arbitrum shared minter: MinterSetPricePMPV0",
+      "startBlock": 512327232
     }
   ],
   "minPriceLibContracts": [

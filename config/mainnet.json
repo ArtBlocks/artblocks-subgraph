@@ -251,6 +251,11 @@
       "address": "0xeECF28BE5721ce842d2711a92F4dB808F7998f7a",
       "name": "mainnet shared minter: MinterSetPriceTieredAllowV1",
       "startBlock": 25540267
+    },
+    {
+      "address": "0xCB084b813116B3799EB4AD261fe6ba69f8277c26",
+      "name": "mainnet shared minter: MinterSetPricePMPV0",
+      "startBlock": 26129615
     }
   ],
   "splitFundsLibContracts": [
@@ -320,6 +325,11 @@
       "address": "0xeECF28BE5721ce842d2711a92F4dB808F7998f7a",
       "name": "mainnet shared minter: MinterSetPriceTieredAllowV1",
       "startBlock": 25540267
+    },
+    {
+      "address": "0xCB084b813116B3799EB4AD261fe6ba69f8277c26",
+      "name": "mainnet shared minter: MinterSetPricePMPV0",
+      "startBlock": 26129615
     }
   ],
   "maxInvocationsLibContracts": [
@@ -407,6 +417,11 @@
       "address": "0xeECF28BE5721ce842d2711a92F4dB808F7998f7a",
       "name": "mainnet shared minter: MinterSetPriceTieredAllowV1",
       "startBlock": 25540267
+    },
+    {
+      "address": "0xCB084b813116B3799EB4AD261fe6ba69f8277c26",
+      "name": "mainnet shared minter: MinterSetPricePMPV0",
+      "startBlock": 26129615
     }
   ],
   "merkleLibContracts": [
@@ -514,6 +529,13 @@
       "address": "0x6caFC1B007F16f171B34eE45Fc61B378ad58F592",
       "name": "mainnet shared minter: MinterDAExpSettlementV3",
       "startBlock": 18486235
+    }
+  ],
+  "requiredPMPLibContracts": [
+    {
+      "address": "0xCB084b813116B3799EB4AD261fe6ba69f8277c26",
+      "name": "mainnet shared minter: MinterSetPricePMPV0",
+      "startBlock": 26129615
     }
   ],
   "SEALibContracts": [
