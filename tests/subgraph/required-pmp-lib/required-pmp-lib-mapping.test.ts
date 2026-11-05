@@ -3,7 +3,6 @@ import {
   clearStore,
   describe,
   test,
-  beforeEach,
   newMockEvent
 } from "matchstick-as/assembly/index";
 import { BigInt, ethereum, Address } from "@graphprotocol/graph-ts";
@@ -18,18 +17,48 @@ import {
   addNewProjectToStore
 } from "../shared-helpers";
 
-import { Minter, Project } from "../../../generated/schema";
+import { Project } from "../../../generated/schema";
 import { ProjectRequiredPMPKeysUpdated } from "../../../generated/RequiredPMPLib/RequiredPMPLib";
 import { handleProjectRequiredPMPKeysUpdated } from "../../../src/required-pmp-lib-mapping";
-import {
-  generateContractSpecificId,
-  getProjectMinterConfigId
-} from "../../../src/helpers";
+import { getProjectMinterConfigId } from "../../../src/helpers";
 
 const PROJECT_NUMBER = BigInt.fromI32(0);
 
+class TestSetup {
+  minterAddress: Address;
+  project: Project;
+  configId: string;
+
+  constructor(minterAddress: Address, project: Project, configId: string) {
+    this.minterAddress = minterAddress;
+    this.project = project;
+    this.configId = configId;
+  }
+}
+
+// @dev AssemblyScript does not support closures, so each test calls this
+// rather than sharing state through beforeEach
+function setup(): TestSetup {
+  clearStore();
+  const minter = addNewMinterToStore("MinterSetPricePMPV0");
+  const project = addNewProjectToStore(
+    TEST_CONTRACT_ADDRESS,
+    PROJECT_NUMBER,
+    "Test Project",
+    TEST_ARTIST_ADDRESS,
+    ONE_ETH_IN_WEI,
+    CURRENT_BLOCK_TIMESTAMP
+  );
+  return new TestSetup(
+    Address.fromString(minter.id),
+    project,
+    getProjectMinterConfigId(minter.id, project.id)
+  );
+}
+
 function createProjectRequiredPMPKeysUpdatedEvent(
   minterAddress: Address,
+  projectNumber: BigInt,
   requiredPMPKeys: string[],
   timestamp: BigInt
 ): ProjectRequiredPMPKeysUpdated {
@@ -39,7 +68,7 @@ function createProjectRequiredPMPKeysUpdatedEvent(
   event.parameters = [
     new ethereum.EventParam(
       "projectId",
-      ethereum.Value.fromUnsignedBigInt(PROJECT_NUMBER)
+      ethereum.Value.fromUnsignedBigInt(projectNumber)
     ),
     new ethereum.EventParam(
       "coreContract",
@@ -54,28 +83,13 @@ function createProjectRequiredPMPKeysUpdatedEvent(
 }
 
 describe("RequiredPMPLib/ProjectRequiredPMPKeysUpdated", () => {
-  let minter: Minter;
-  let project: Project;
-  let configId: string;
-
-  beforeEach(() => {
-    clearStore();
-    minter = addNewMinterToStore("MinterSetPricePMPV0");
-    project = addNewProjectToStore(
-      TEST_CONTRACT_ADDRESS,
-      PROJECT_NUMBER,
-      "Test Project",
-      TEST_ARTIST_ADDRESS,
-      ONE_ETH_IN_WEI,
-      CURRENT_BLOCK_TIMESTAMP
-    );
-    configId = getProjectMinterConfigId(minter.id, project.id);
-  });
-
   test("stores required PMP keys in extraMinterDetails", () => {
+    const s = setup();
+
     handleProjectRequiredPMPKeysUpdated(
       createProjectRequiredPMPKeysUpdatedEvent(
-        Address.fromString(minter.id),
+        s.minterAddress,
+        PROJECT_NUMBER,
         ["color", "name"],
         CURRENT_BLOCK_TIMESTAMP
       )
@@ -83,23 +97,27 @@ describe("RequiredPMPLib/ProjectRequiredPMPKeysUpdated", () => {
 
     assert.fieldEquals(
       PROJECT_MINTER_CONFIGURATION_ENTITY_TYPE,
-      configId,
+      s.configId,
       "extraMinterDetails",
       '{"requiredPMPKeys":["color","name"]}'
     );
   });
 
   test("clears required PMP keys when updated with an empty array", () => {
+    const s = setup();
+
     handleProjectRequiredPMPKeysUpdated(
       createProjectRequiredPMPKeysUpdatedEvent(
-        Address.fromString(minter.id),
+        s.minterAddress,
+        PROJECT_NUMBER,
         ["color"],
         CURRENT_BLOCK_TIMESTAMP
       )
     );
     handleProjectRequiredPMPKeysUpdated(
       createProjectRequiredPMPKeysUpdatedEvent(
-        Address.fromString(minter.id),
+        s.minterAddress,
+        PROJECT_NUMBER,
         [],
         CURRENT_BLOCK_TIMESTAMP
       )
@@ -107,16 +125,19 @@ describe("RequiredPMPLib/ProjectRequiredPMPKeysUpdated", () => {
 
     assert.fieldEquals(
       PROJECT_MINTER_CONFIGURATION_ENTITY_TYPE,
-      configId,
+      s.configId,
       "extraMinterDetails",
       '{"requiredPMPKeys":[]}'
     );
   });
 
   test("skips keys that are not JSON-safe", () => {
+    const s = setup();
+
     handleProjectRequiredPMPKeysUpdated(
       createProjectRequiredPMPKeysUpdatedEvent(
-        Address.fromString(minter.id),
+        s.minterAddress,
+        PROJECT_NUMBER,
         ["color", 'bad"key', "bad\\key", "name"],
         CURRENT_BLOCK_TIMESTAMP
       )
@@ -124,20 +145,22 @@ describe("RequiredPMPLib/ProjectRequiredPMPKeysUpdated", () => {
 
     assert.fieldEquals(
       PROJECT_MINTER_CONFIGURATION_ENTITY_TYPE,
-      configId,
+      s.configId,
       "extraMinterDetails",
       '{"requiredPMPKeys":["color","name"]}'
     );
   });
 
   test("updates project updatedAt when the minter config is active", () => {
-    project.minterConfiguration = configId;
-    project.save();
+    const s = setup();
+    s.project.minterConfiguration = s.configId;
+    s.project.save();
     const updatedTimestamp = CURRENT_BLOCK_TIMESTAMP.plus(BigInt.fromI32(10));
 
     handleProjectRequiredPMPKeysUpdated(
       createProjectRequiredPMPKeysUpdatedEvent(
-        Address.fromString(minter.id),
+        s.minterAddress,
+        PROJECT_NUMBER,
         ["color"],
         updatedTimestamp
       )
@@ -145,24 +168,23 @@ describe("RequiredPMPLib/ProjectRequiredPMPKeysUpdated", () => {
 
     assert.fieldEquals(
       PROJECT_ENTITY_TYPE,
-      generateContractSpecificId(TEST_CONTRACT_ADDRESS, PROJECT_NUMBER),
+      s.project.id,
       "updatedAt",
       updatedTimestamp.toString()
     );
   });
 
   test("does not create a config when the project does not exist", () => {
-    const event = createProjectRequiredPMPKeysUpdatedEvent(
-      Address.fromString(minter.id),
-      ["color"],
-      CURRENT_BLOCK_TIMESTAMP
-    );
-    event.parameters[0] = new ethereum.EventParam(
-      "projectId",
-      ethereum.Value.fromUnsignedBigInt(BigInt.fromI32(999))
-    );
+    const s = setup();
 
-    handleProjectRequiredPMPKeysUpdated(event);
+    handleProjectRequiredPMPKeysUpdated(
+      createProjectRequiredPMPKeysUpdatedEvent(
+        s.minterAddress,
+        BigInt.fromI32(999),
+        ["color"],
+        CURRENT_BLOCK_TIMESTAMP
+      )
+    );
 
     assert.entityCount(PROJECT_MINTER_CONFIGURATION_ENTITY_TYPE, 0);
   });
