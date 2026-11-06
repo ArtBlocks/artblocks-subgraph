@@ -18,7 +18,7 @@ import {
 } from "../shared-helpers";
 
 import { Project } from "../../../generated/schema";
-import { ProjectRequiredPMPKeysUpdated } from "../../../generated/RequiredPMPLib/RequiredPMPLib";
+import { ProjectRequiredPMPKeysUpdated } from "../../../generated/RequiredPMPLib/ISharedMinterRequiredPMPV0";
 import { handleProjectRequiredPMPKeysUpdated } from "../../../src/required-pmp-lib-mapping";
 import { getProjectMinterConfigId } from "../../../src/helpers";
 

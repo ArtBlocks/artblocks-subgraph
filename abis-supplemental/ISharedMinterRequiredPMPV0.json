@@ -1,7 +1,7 @@
 {
   "_format": "hh-sol-artifact-1",
-  "contractName": "RequiredPMPLib",
-  "sourceName": "contracts/libs/v0.8.x/minter-libs/RequiredPMPLib.sol",
+  "contractName": "ISharedMinterRequiredPMPV0",
+  "sourceName": "contracts/interfaces/v0.8.x/ISharedMinterRequiredPMPV0.sol",
   "abi": [
     {
       "anonymous": false,

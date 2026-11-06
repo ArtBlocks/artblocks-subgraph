@@ -1,6 +1,6 @@
 import { JSONValue, log } from "@graphprotocol/graph-ts";
 
-import { ProjectRequiredPMPKeysUpdated } from "../generated/RequiredPMPLib/RequiredPMPLib";
+import { ProjectRequiredPMPKeysUpdated } from "../generated/RequiredPMPLib/ISharedMinterRequiredPMPV0";
 
 import { loadOrCreateMinterProjectAndConfigIfProject } from "./generic-minter-events-lib-mapping";
 

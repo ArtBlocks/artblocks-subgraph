@@ -1798,7 +1798,7 @@ dataSources:
     network: {{network}}
     source:
       address: "{{#address}}{{address}}{{/address}}{{^address}}0x0000000000000000000000000000000000000000{{/address}}"
-      abi: RequiredPMPLib
+      abi: ISharedMinterRequiredPMPV0
       {{#startBlock}}startBlock: {{startBlock}}{{/startBlock}}
     mapping:
       kind: ethereum/events
@@ -1816,8 +1816,8 @@ dataSources:
         - Minter
         - ProjectMinterConfiguration
       abis:
-        - name: RequiredPMPLib
-          file: ./abis/RequiredPMPLib.json
+        - name: ISharedMinterRequiredPMPV0
+          file: ./abis/ISharedMinterRequiredPMPV0.json
         - name: ISharedMinterV0
           file: ./abis/ISharedMinterV0.json
         - name: IFilteredMinterV2
