@@ -58,3 +58,4 @@ RAMLib
 MinPriceLib
 IGenArt721CoreContractV3_Base
 IPMPV0
+ISharedMinterRequiredPMPV0
