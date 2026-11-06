@@ -94,6 +94,11 @@
       "address": "0x1a820A0D3edC157ba76757b16750149d717cbC96",
       "name": "shape shared minter: MinterRAMV0",
       "startBlock": 33706920
+    },
+    {
+      "address": "0xcA88Fd9582d0E7697a740579AbC65a0F2717aA96",
+      "name": "shape shared minter: MinterSetPricePMPV0",
+      "startBlock": 34783570
     }
   ],
   "splitFundsLibContracts": [
@@ -148,6 +153,11 @@
       "address": "0x8651eFeBA58F94A3785113B6Bc60a50Aa305df4c",
       "name": "shape shared minter: MinterSetPricePolyptychERC20V5",
       "startBlock": 29640404
+    },
+    {
+      "address": "0xcA88Fd9582d0E7697a740579AbC65a0F2717aA96",
+      "name": "shape shared minter: MinterSetPricePMPV0",
+      "startBlock": 34783570
     }
   ],
   "maxInvocationsLibContracts": [
@@ -225,6 +235,11 @@
       "address": "0x1a820A0D3edC157ba76757b16750149d717cbC96",
       "name": "shape shared minter: MinterRAMV0",
       "startBlock": 33706920
+    },
+    {
+      "address": "0xcA88Fd9582d0E7697a740579AbC65a0F2717aA96",
+      "name": "shape shared minter: MinterSetPricePMPV0",
+      "startBlock": 34783570
     }
   ],
   "merkleLibContracts": [
@@ -327,6 +342,13 @@
       "address": "0xF8ad843D1022d4752e938435e3EaC65d81dF2fbb",
       "name": "shape shared minter: MinterDAExpSettlementV3",
       "startBlock": 29640404
+    }
+  ],
+  "requiredPMPLibContracts": [
+    {
+      "address": "0xcA88Fd9582d0E7697a740579AbC65a0F2717aA96",
+      "name": "shape shared minter: MinterSetPricePMPV0",
+      "startBlock": 34783570
     }
   ],
   "SEALibContracts": [

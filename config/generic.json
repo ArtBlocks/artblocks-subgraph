@@ -125,6 +125,11 @@
       "address": ""
     }
   ],
+  "requiredPMPLibContracts": [
+    {
+      "address": ""
+    }
+  ],
   "minterSetPriceContracts": [
     {
       "address": ""

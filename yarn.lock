@@ -7,10 +7,10 @@
   resolved "https://registry.yarnpkg.com/@0no-co/graphql.web/-/graphql.web-1.0.7.tgz#c7a762c887b3482a79ffa68f63de5e96059a62e4"
   integrity sha512-E3Qku4mTzdrlwVWGPxklDnME5ANrEGetvYw4i2GCRlppWXXE4QD66j7pwb8HelZwS6LnqEChhrSOGCXpbiu6MQ==
 
-"@artblocks/contracts@1.4.0":
-  version "1.4.0"
-  resolved "https://registry.yarnpkg.com/@artblocks/contracts/-/contracts-1.4.0.tgz#59649a4aedb74315f928e52f3e87023c1c95893b"
-  integrity sha512-W/Q84oUwC8C9fqRPJX8fnkqjX0P7fT2t8SHM5VITIYkcbh1U0gbi4c7xKNHhlFlmRVY9GmZMG82OUxcdVj9Qgg==
+"@artblocks/contracts@1.6.0":
+  version "1.6.0"
+  resolved "https://registry.yarnpkg.com/@artblocks/contracts/-/contracts-1.6.0.tgz#c6f3207d009c019d47ea0472d6823c6b42c979b0"
+  integrity sha512-r7/c38wbrF/F83dzTThCySNcPoRUv3WX8XJlUZ+0nPqUetIfFOJkq74LmqzpVEP8JVXkc+iGGNLU6QtRotqRDA==
   dependencies:
     "@ethersproject/signing-key" "^5.8.0"
     "@nomicfoundation/hardhat-verify" "^2.0.14"
@@ -25,6 +25,7 @@
     graphql "^16.8.2"
     scripty.sol "2.1.1"
     solady "^0.1.26"
+    undici "^5.29.0"
     urql "^4.2.1"
 
 "@assemblyscript/loader@^0.19.22":
@@ -4221,6 +4222,13 @@ undici@^5.14.0:
   version "5.28.4"
   resolved "https://registry.yarnpkg.com/undici/-/undici-5.28.4.tgz#6b280408edb6a1a604a9b20340f45b422e373068"
   integrity sha512-72RFADWFqKmUb2hmmvNODKL3p9hcB6Gt2DOQMis1SEBaV6a4MH8soBvzg+95CYhCKPFedut2JY9bMfrDl9D23g==
+  dependencies:
+    "@fastify/busboy" "^2.0.0"
+
+undici@^5.29.0:
+  version "5.29.0"
+  resolved "https://registry.yarnpkg.com/undici/-/undici-5.29.0.tgz#419595449ae3f2cdcba3580a2e8903399bd1f5a3"
+  integrity sha512-raqeBD6NQK4SkWhQzeYKd1KmIG6dllBOTt55Rmkt4HtI9mwdWtJljnrXjAFUBLTSN67HWrOIZ3EPF4kjUw80Bg==
   dependencies:
     "@fastify/busboy" "^2.0.0"
 
