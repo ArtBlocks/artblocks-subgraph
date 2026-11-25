@@ -1,4 +1,4 @@
-import { BigInt, store, log, Address, ethereum } from "@graphprotocol/graph-ts";
+import { BigInt, Bytes, store, log, Address, ethereum } from "@graphprotocol/graph-ts";
 import {
   DependencyAdded,
   DependencyAdditionalCDNRemoved,
@@ -10,6 +10,7 @@ import {
   DependencyWebsiteUpdated,
   DependencyRemoved,
   DependencyScriptUpdated,
+  DependencyAbxfsFileCidUpdated,
   LicenseTextUpdated,
   LicenseTypeAdded,
   ProjectDependencyOverrideAdded,
@@ -38,6 +39,9 @@ import {
   generateDependencyAdditionalRepositoryId,
   generateDependencyScriptId
 } from "./helpers";
+
+const ZERO_BYTES32 =
+  "0x0000000000000000000000000000000000000000000000000000000000000000";
 
 /*
  * This code operates under the assumption that only a single dependency registry is being indexed. This assumption has several significant effects:
@@ -291,26 +295,95 @@ export function handleDependencyAdditionalRepositoryRemoved(
 export function handleDependencyScriptUpdated(
   event: DependencyScriptUpdated
 ): void {
-  const dependencyNameAndVersion = event.params.dependencyNameAndVersion.toString();
-  const dependency = Dependency.load(dependencyNameAndVersion);
+  const dependency = Dependency.load(
+    event.params.dependencyNameAndVersion.toString()
+  );
   if (!dependency) {
     return;
   }
 
-  const dependencyRegistryContract = IDependencyRegistryV0.bind(event.address);
-  let prevScriptCount = dependency.scriptCount.toI32();
-  const scriptCount = dependencyRegistryContract
-    .getDependencyScriptCount(event.params.dependencyNameAndVersion)
-    .toI32();
+  refreshDependencyScripts(
+    dependency,
+    event.address,
+    event.params.dependencyNameAndVersion,
+    event.block.timestamp,
+    false
+  );
+}
+
+/**
+ * The dependency registry keeps a dependency's script as an ABX FS file and emits
+ * DependencyAbxfsFileCidUpdated when the file is set or cleared. The registry's
+ * getDependencyScriptCount / getDependencyScript then serve that file as base64
+ * slices of its gzip, so the scripts are refreshed from them here, replacing any
+ * scripts indexed before. A zero CID clears the file, and with it the scripts.
+ */
+export function handleDependencyAbxfsFileCidUpdated(
+  event: DependencyAbxfsFileCidUpdated
+): void {
+  const dependency = Dependency.load(
+    event.params.dependencyNameAndVersion.toString()
+  );
+  if (!dependency) {
+    return;
+  }
+
+  const cid = event.params.abxfsFileCid;
+  if (cid.toHexString() == ZERO_BYTES32) {
+    dependency.abxfsFileCid = null;
+  } else {
+    dependency.abxfsFileCid = cid;
+  }
+
+  refreshDependencyScripts(
+    dependency,
+    event.address,
+    event.params.dependencyNameAndVersion,
+    event.block.timestamp,
+    true
+  );
+}
+
+/**
+ * Re-reads a dependency's scripts from the registry and replaces its DependencyScript
+ * entities, script and scriptCount. Saves the dependency.
+ *
+ * @param fromAbxfsFile true when the registry serves the scripts from the dependency's
+ * ABX FS file: those slices have no bytecode storage contract, so their address is
+ * zero and no bytecode address is requested.
+ */
+function refreshDependencyScripts(
+  dependency: Dependency,
+  registryAddress: Address,
+  dependencyNameAndVersionBytes: Bytes,
+  timestamp: BigInt,
+  fromAbxfsFile: boolean
+): void {
+  const dependencyNameAndVersion = dependency.id;
+  const dependencyRegistryContract = IDependencyRegistryV0.bind(
+    registryAddress
+  );
+  const prevScriptCount = dependency.scriptCount.toI32();
+  const scriptCountResult = dependencyRegistryContract.try_getDependencyScriptCount(
+    dependencyNameAndVersionBytes
+  );
+  if (scriptCountResult.reverted) {
+    // log error because this is unexpected; keep the scripts already indexed
+    log.error(
+      "[ERROR] Failed to load script count for dependency type {}, on registry at address {}",
+      [dependencyNameAndVersion, registryAddress.toHexString()]
+    );
+    dependency.updatedAt = timestamp;
+    dependency.save();
+    return;
+  }
+  const scriptCount = scriptCountResult.value.toI32();
 
   // Remove ProjectScripts that no longer exist on chain
   if (prevScriptCount > scriptCount) {
     for (let i = scriptCount; i < prevScriptCount; i++) {
       const dependencyScript = DependencyScript.load(
-        generateDependencyScriptId(
-          event.params.dependencyNameAndVersion.toString(),
-          BigInt.fromI32(i)
-        )
+        generateDependencyScriptId(dependencyNameAndVersion, BigInt.fromI32(i))
       );
       if (dependencyScript) {
         store.remove("DependencyScript", dependencyScript.id);
@@ -323,7 +396,7 @@ export function handleDependencyScriptUpdated(
     // default to empty string, raise warnings if fail to get script
     let script: string = "";
     let result = dependencyRegistryContract.try_getDependencyScript(
-      event.params.dependencyNameAndVersion,
+      dependencyNameAndVersionBytes,
       BigInt.fromI32(i)
     );
     if (!result.reverted) {
@@ -331,9 +404,9 @@ export function handleDependencyScriptUpdated(
     } else {
       // view function used to have different name, try legacy name
       let legacyResult = IDependencyRegistryV0_Legacy.bind(
-        event.address
+        registryAddress
       ).try_getDependencyScriptAtIndex(
-        event.params.dependencyNameAndVersion,
+        dependencyNameAndVersionBytes,
         BigInt.fromI32(i)
       );
       if (!legacyResult.reverted) {
@@ -342,41 +415,37 @@ export function handleDependencyScriptUpdated(
         // log error because this is unexpected
         log.error(
           "[ERROR] Failed to load script for dependency type {}, on registry at address {}",
-          [
-            event.params.dependencyNameAndVersion.toString(),
-            event.address.toHexString()
-          ]
+          [dependencyNameAndVersion, registryAddress.toHexString()]
         );
       }
     }
 
     // default to zero address, raise warnings if fail to get address
     let scriptAddress: Address = Address.zero();
-    let addressResult = dependencyRegistryContract.try_getDependencyScriptBytecodeAddress(
-      event.params.dependencyNameAndVersion,
-      BigInt.fromI32(i)
-    );
-    if (!addressResult.reverted) {
-      scriptAddress = addressResult.value;
-    } else {
-      // view function used to have different name, try legacy name
-      let legacyAddressResult = IDependencyRegistryV0_Legacy.bind(
-        event.address
-      ).try_getDependencyScriptBytecodeAddressAtIndex(
-        event.params.dependencyNameAndVersion,
+    if (!fromAbxfsFile) {
+      let addressResult = dependencyRegistryContract.try_getDependencyScriptBytecodeAddress(
+        dependencyNameAndVersionBytes,
         BigInt.fromI32(i)
       );
-      if (!legacyAddressResult.reverted) {
-        scriptAddress = legacyAddressResult.value;
+      if (!addressResult.reverted) {
+        scriptAddress = addressResult.value;
       } else {
-        // log error because this is unexpected
-        log.error(
-          "[ERROR] Failed to load script bytecode address for dependency type {}, on registry at address {}",
-          [
-            event.params.dependencyNameAndVersion.toString(),
-            event.address.toHexString()
-          ]
+        // view function used to have different name, try legacy name
+        let legacyAddressResult = IDependencyRegistryV0_Legacy.bind(
+          registryAddress
+        ).try_getDependencyScriptBytecodeAddressAtIndex(
+          dependencyNameAndVersionBytes,
+          BigInt.fromI32(i)
         );
+        if (!legacyAddressResult.reverted) {
+          scriptAddress = legacyAddressResult.value;
+        } else {
+          // log error because this is unexpected
+          log.error(
+            "[ERROR] Failed to load script bytecode address for dependency type {}, on registry at address {}",
+            [dependencyNameAndVersion, registryAddress.toHexString()]
+          );
+        }
       }
     }
 
@@ -402,7 +471,7 @@ export function handleDependencyScriptUpdated(
 
   dependency.script = script;
   dependency.scriptCount = BigInt.fromI32(scriptCount);
-  dependency.updatedAt = event.block.timestamp;
+  dependency.updatedAt = timestamp;
 
   dependency.save();
 }

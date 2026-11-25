@@ -1,0 +1,733 @@
+{
+  "_format": "hh-sol-artifact-1",
+  "contractName": "IDependencyRegistryV0",
+  "sourceName": "contracts/interfaces/v0.8.x/IDependencyRegistryV0.sol",
+  "abi": [
+    {
+      "anonymous": false,
+      "inputs": [
+        {
+          "indexed": true,
+          "internalType": "address",
+          "name": "coreRegistryAddress",
+          "type": "address"
+        }
+      ],
+      "name": "CoreRegistryAddressUpdated",
+      "type": "event"
+    },
+    {
+      "anonymous": false,
+      "inputs": [
+        {
+          "indexed": true,
+          "internalType": "bytes32",
+          "name": "dependencyNameAndVersion",
+          "type": "bytes32"
+        },
+        {
+          "indexed": true,
+          "internalType": "bytes32",
+          "name": "licenseType",
+          "type": "bytes32"
+        },
+        {
+          "indexed": false,
+          "internalType": "string",
+          "name": "preferredCDN",
+          "type": "string"
+        },
+        {
+          "indexed": false,
+          "internalType": "string",
+          "name": "preferredRepository",
+          "type": "string"
+        },
+        {
+          "indexed": false,
+          "internalType": "string",
+          "name": "website",
+          "type": "string"
+        }
+      ],
+      "name": "DependencyAdded",
+      "type": "event"
+    },
+    {
+      "anonymous": false,
+      "inputs": [
+        {
+          "indexed": true,
+          "internalType": "bytes32",
+          "name": "dependencyNameAndVersion",
+          "type": "bytes32"
+        },
+        {
+          "indexed": true,
+          "internalType": "uint256",
+          "name": "additionalCDNIndex",
+          "type": "uint256"
+        }
+      ],
+      "name": "DependencyAdditionalCDNRemoved",
+      "type": "event"
+    },
+    {
+      "anonymous": false,
+      "inputs": [
+        {
+          "indexed": true,
+          "internalType": "bytes32",
+          "name": "dependencyNameAndVersion",
+          "type": "bytes32"
+        },
+        {
+          "indexed": false,
+          "internalType": "string",
+          "name": "additionalCDN",
+          "type": "string"
+        },
+        {
+          "indexed": false,
+          "internalType": "uint256",
+          "name": "additionalCDNIndex",
+          "type": "uint256"
+        }
+      ],
+      "name": "DependencyAdditionalCDNUpdated",
+      "type": "event"
+    },
+    {
+      "anonymous": false,
+      "inputs": [
+        {
+          "indexed": true,
+          "internalType": "bytes32",
+          "name": "dependencyNameAndVersion",
+          "type": "bytes32"
+        },
+        {
+          "indexed": true,
+          "internalType": "uint256",
+          "name": "additionalRepositoryIndex",
+          "type": "uint256"
+        }
+      ],
+      "name": "DependencyAdditionalRepositoryRemoved",
+      "type": "event"
+    },
+    {
+      "anonymous": false,
+      "inputs": [
+        {
+          "indexed": true,
+          "internalType": "bytes32",
+          "name": "dependencyNameAndVersion",
+          "type": "bytes32"
+        },
+        {
+          "indexed": false,
+          "internalType": "string",
+          "name": "additionalRepository",
+          "type": "string"
+        },
+        {
+          "indexed": false,
+          "internalType": "uint256",
+          "name": "additionalRepositoryIndex",
+          "type": "uint256"
+        }
+      ],
+      "name": "DependencyAdditionalRepositoryUpdated",
+      "type": "event"
+    },
+    {
+      "anonymous": false,
+      "inputs": [
+        {
+          "indexed": true,
+          "internalType": "bytes32",
+          "name": "dependencyNameAndVersion",
+          "type": "bytes32"
+        },
+        {
+          "indexed": false,
+          "internalType": "enum IDependencyRegistryV0.CanvasTagType",
+          "name": "canvasTagType",
+          "type": "uint8"
+        }
+      ],
+      "name": "DependencyCanvasTagTypeUpdated",
+      "type": "event"
+    },
+    {
+      "anonymous": false,
+      "inputs": [
+        {
+          "indexed": true,
+          "internalType": "bytes32",
+          "name": "dependencyNameAndVersion",
+          "type": "bytes32"
+        },
+        {
+          "indexed": false,
+          "internalType": "bool",
+          "name": "loadAsModule",
+          "type": "bool"
+        }
+      ],
+      "name": "DependencyLoadAsModuleUpdated",
+      "type": "event"
+    },
+    {
+      "anonymous": false,
+      "inputs": [
+        {
+          "indexed": true,
+          "internalType": "bytes32",
+          "name": "dependencyNameAndVersion",
+          "type": "bytes32"
+        },
+        {
+          "indexed": false,
+          "internalType": "string",
+          "name": "preferredCDN",
+          "type": "string"
+        }
+      ],
+      "name": "DependencyPreferredCDNUpdated",
+      "type": "event"
+    },
+    {
+      "anonymous": false,
+      "inputs": [
+        {
+          "indexed": true,
+          "internalType": "bytes32",
+          "name": "dependencyNameAndVersion",
+          "type": "bytes32"
+        },
+        {
+          "indexed": false,
+          "internalType": "string",
+          "name": "preferredRepository",
+          "type": "string"
+        }
+      ],
+      "name": "DependencyPreferredRepositoryUpdated",
+      "type": "event"
+    },
+    {
+      "anonymous": false,
+      "inputs": [
+        {
+          "indexed": true,
+          "internalType": "bytes32",
+          "name": "dependencyNameAndVersion",
+          "type": "bytes32"
+        },
+        {
+          "indexed": false,
+          "internalType": "enum IDependencyRegistryV0.ProjectScriptTagType",
+          "name": "projectScriptTagType",
+          "type": "uint8"
+        },
+        {
+          "indexed": false,
+          "internalType": "string",
+          "name": "projectScriptSpecialType",
+          "type": "string"
+        }
+      ],
+      "name": "DependencyProjectScriptTagTypeUpdated",
+      "type": "event"
+    },
+    {
+      "anonymous": false,
+      "inputs": [
+        {
+          "indexed": true,
+          "internalType": "bytes32",
+          "name": "dependencyNameAndVersion",
+          "type": "bytes32"
+        }
+      ],
+      "name": "DependencyRemoved",
+      "type": "event"
+    },
+    {
+      "anonymous": false,
+      "inputs": [
+        {
+          "indexed": true,
+          "internalType": "bytes32",
+          "name": "dependencyNameAndVersion",
+          "type": "bytes32"
+        }
+      ],
+      "name": "DependencyScriptUpdated",
+      "type": "event"
+    },
+    {
+      "anonymous": false,
+      "inputs": [
+        {
+          "indexed": true,
+          "internalType": "bytes32",
+          "name": "dependencyNameAndVersion",
+          "type": "bytes32"
+        },
+        {
+          "indexed": false,
+          "internalType": "string",
+          "name": "website",
+          "type": "string"
+        }
+      ],
+      "name": "DependencyWebsiteUpdated",
+      "type": "event"
+    },
+    {
+      "anonymous": false,
+      "inputs": [
+        {
+          "indexed": true,
+          "internalType": "bytes32",
+          "name": "licenseType",
+          "type": "bytes32"
+        }
+      ],
+      "name": "LicenseTextUpdated",
+      "type": "event"
+    },
+    {
+      "anonymous": false,
+      "inputs": [
+        {
+          "indexed": true,
+          "internalType": "bytes32",
+          "name": "licenseType",
+          "type": "bytes32"
+        }
+      ],
+      "name": "LicenseTypeAdded",
+      "type": "event"
+    },
+    {
+      "anonymous": false,
+      "inputs": [
+        {
+          "indexed": true,
+          "internalType": "address",
+          "name": "coreContractAddress",
+          "type": "address"
+        },
+        {
+          "indexed": true,
+          "internalType": "uint256",
+          "name": "projectId",
+          "type": "uint256"
+        },
+        {
+          "indexed": false,
+          "internalType": "bytes32",
+          "name": "dependencyNameAndVersion",
+          "type": "bytes32"
+        }
+      ],
+      "name": "ProjectDependencyOverrideAdded",
+      "type": "event"
+    },
+    {
+      "anonymous": false,
+      "inputs": [
+        {
+          "indexed": true,
+          "internalType": "address",
+          "name": "coreContractAddress",
+          "type": "address"
+        },
+        {
+          "indexed": true,
+          "internalType": "uint256",
+          "name": "projectId",
+          "type": "uint256"
+        }
+      ],
+      "name": "ProjectDependencyOverrideRemoved",
+      "type": "event"
+    },
+    {
+      "anonymous": false,
+      "inputs": [
+        {
+          "indexed": true,
+          "internalType": "address",
+          "name": "coreContractAddress",
+          "type": "address"
+        }
+      ],
+      "name": "SupportedCoreContractAdded",
+      "type": "event"
+    },
+    {
+      "anonymous": false,
+      "inputs": [
+        {
+          "indexed": true,
+          "internalType": "address",
+          "name": "coreContractAddress",
+          "type": "address"
+        }
+      ],
+      "name": "SupportedCoreContractOverrideAdded",
+      "type": "event"
+    },
+    {
+      "anonymous": false,
+      "inputs": [
+        {
+          "indexed": true,
+          "internalType": "address",
+          "name": "coreContractAddress",
+          "type": "address"
+        }
+      ],
+      "name": "SupportedCoreContractOverrideRemoved",
+      "type": "event"
+    },
+    {
+      "anonymous": false,
+      "inputs": [
+        {
+          "indexed": true,
+          "internalType": "address",
+          "name": "coreContractAddress",
+          "type": "address"
+        }
+      ],
+      "name": "SupportedCoreContractRemoved",
+      "type": "event"
+    },
+    {
+      "anonymous": false,
+      "inputs": [
+        {
+          "indexed": true,
+          "internalType": "address",
+          "name": "newReader",
+          "type": "address"
+        }
+      ],
+      "name": "UniversalBytecodeStorageReaderUpdated",
+      "type": "event"
+    },
+    {
+      "inputs": [
+        {
+          "internalType": "address",
+          "name": "sender",
+          "type": "address"
+        },
+        {
+          "internalType": "address",
+          "name": "contract_",
+          "type": "address"
+        },
+        {
+          "internalType": "bytes4",
+          "name": "selector",
+          "type": "bytes4"
+        }
+      ],
+      "name": "adminACLAllowed",
+      "outputs": [
+        {
+          "internalType": "bool",
+          "name": "",
+          "type": "bool"
+        }
+      ],
+      "stateMutability": "nonpayable",
+      "type": "function"
+    },
+    {
+      "inputs": [
+        {
+          "internalType": "bytes32",
+          "name": "dependencyNameAndVersion",
+          "type": "bytes32"
+        }
+      ],
+      "name": "getDependencyDetails",
+      "outputs": [
+        {
+          "internalType": "string",
+          "name": "nameAndVersion",
+          "type": "string"
+        },
+        {
+          "internalType": "string",
+          "name": "licenseType",
+          "type": "string"
+        },
+        {
+          "internalType": "string",
+          "name": "preferredCDN",
+          "type": "string"
+        },
+        {
+          "internalType": "uint24",
+          "name": "additionalCDNCount",
+          "type": "uint24"
+        },
+        {
+          "internalType": "string",
+          "name": "preferredRepository",
+          "type": "string"
+        },
+        {
+          "internalType": "uint24",
+          "name": "additionalRepositoryCount",
+          "type": "uint24"
+        },
+        {
+          "internalType": "string",
+          "name": "dependencyWebsite",
+          "type": "string"
+        },
+        {
+          "internalType": "bool",
+          "name": "availableOnChain",
+          "type": "bool"
+        },
+        {
+          "internalType": "uint24",
+          "name": "scriptCount",
+          "type": "uint24"
+        }
+      ],
+      "stateMutability": "view",
+      "type": "function"
+    },
+    {
+      "inputs": [
+        {
+          "internalType": "bytes32",
+          "name": "dependencyNameAndVersion",
+          "type": "bytes32"
+        }
+      ],
+      "name": "getDependencyDetailsV2",
+      "outputs": [
+        {
+          "components": [
+            {
+              "internalType": "string",
+              "name": "nameAndVersion",
+              "type": "string"
+            },
+            {
+              "internalType": "string",
+              "name": "licenseType",
+              "type": "string"
+            },
+            {
+              "internalType": "string",
+              "name": "preferredCDN",
+              "type": "string"
+            },
+            {
+              "internalType": "uint24",
+              "name": "additionalCDNCount",
+              "type": "uint24"
+            },
+            {
+              "internalType": "string",
+              "name": "preferredRepository",
+              "type": "string"
+            },
+            {
+              "internalType": "uint24",
+              "name": "additionalRepositoryCount",
+              "type": "uint24"
+            },
+            {
+              "internalType": "string",
+              "name": "dependencyWebsite",
+              "type": "string"
+            },
+            {
+              "internalType": "bool",
+              "name": "availableOnChain",
+              "type": "bool"
+            },
+            {
+              "internalType": "uint24",
+              "name": "scriptCount",
+              "type": "uint24"
+            },
+            {
+              "internalType": "bool",
+              "name": "loadAsModule",
+              "type": "bool"
+            },
+            {
+              "internalType": "enum IDependencyRegistryV0.CanvasTagType",
+              "name": "canvasTagType",
+              "type": "uint8"
+            },
+            {
+              "internalType": "enum IDependencyRegistryV0.ProjectScriptTagType",
+              "name": "projectScriptTagType",
+              "type": "uint8"
+            },
+            {
+              "internalType": "string",
+              "name": "projectScriptSpecialType",
+              "type": "string"
+            }
+          ],
+          "internalType": "struct IDependencyRegistryV0.DependencyDetails",
+          "name": "dependencyDetails",
+          "type": "tuple"
+        }
+      ],
+      "stateMutability": "view",
+      "type": "function"
+    },
+    {
+      "inputs": [
+        {
+          "internalType": "address",
+          "name": "contractAddress",
+          "type": "address"
+        },
+        {
+          "internalType": "uint256",
+          "name": "projectId",
+          "type": "uint256"
+        }
+      ],
+      "name": "getDependencyNameAndVersionForProject",
+      "outputs": [
+        {
+          "internalType": "string",
+          "name": "",
+          "type": "string"
+        }
+      ],
+      "stateMutability": "view",
+      "type": "function"
+    },
+    {
+      "inputs": [
+        {
+          "internalType": "bytes32",
+          "name": "dependencyNameAndVersion",
+          "type": "bytes32"
+        },
+        {
+          "internalType": "uint256",
+          "name": "index",
+          "type": "uint256"
+        }
+      ],
+      "name": "getDependencyScript",
+      "outputs": [
+        {
+          "internalType": "string",
+          "name": "",
+          "type": "string"
+        }
+      ],
+      "stateMutability": "view",
+      "type": "function"
+    },
+    {
+      "inputs": [
+        {
+          "internalType": "bytes32",
+          "name": "dependencyNameAndVersion",
+          "type": "bytes32"
+        },
+        {
+          "internalType": "uint256",
+          "name": "index",
+          "type": "uint256"
+        }
+      ],
+      "name": "getDependencyScriptBytecodeAddress",
+      "outputs": [
+        {
+          "internalType": "address",
+          "name": "",
+          "type": "address"
+        }
+      ],
+      "stateMutability": "view",
+      "type": "function"
+    },
+    {
+      "inputs": [
+        {
+          "internalType": "bytes32",
+          "name": "dependencyNameAndVersion",
+          "type": "bytes32"
+        }
+      ],
+      "name": "getDependencyScriptCount",
+      "outputs": [
+        {
+          "internalType": "uint256",
+          "name": "",
+          "type": "uint256"
+        }
+      ],
+      "stateMutability": "view",
+      "type": "function"
+    },
+    {
+      "inputs": [
+        {
+          "internalType": "address",
+          "name": "coreContractAddress",
+          "type": "address"
+        }
+      ],
+      "name": "isSupportedCoreContract",
+      "outputs": [
+        {
+          "internalType": "bool",
+          "name": "",
+          "type": "bool"
+        }
+      ],
+      "stateMutability": "view",
+      "type": "function"
+    },
+    {
+      "anonymous": false,
+      "inputs": [
+        {
+          "indexed": true,
+          "internalType": "bytes32",
+          "name": "dependencyNameAndVersion",
+          "type": "bytes32"
+        },
+        {
+          "indexed": false,
+          "internalType": "bytes32",
+          "name": "abxfsFileCid",
+          "type": "bytes32"
+        }
+      ],
+      "name": "DependencyAbxfsFileCidUpdated",
+      "type": "event"
+    }
+  ],
+  "bytecode": "0x",
+  "deployedBytecode": "0x",
+  "linkReferences": {},
+  "deployedLinkReferences": {}
+}
