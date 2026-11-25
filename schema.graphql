@@ -849,6 +849,8 @@ type Dependency @entity {
   scriptCount: BigInt!
   "Concatenated string of all scripts for this dependency"
   script: String
+  "ABX FS file CID of this dependency's gzip-compressed script, set by the dependency registry's DependencyAbxfsFileCidUpdated event; null when unset. While set, scripts and script hold the file's base64-encoded gzip as the registry serves it."
+  abxfsFileCid: Bytes
   "Reference website for this dependency (e.g. https://p5js.org)"
   website: String!
   "Depenency registry contract that this dependency is registered on"
@@ -904,7 +906,7 @@ type DependencyScript @entity {
   index: BigInt!
   "Contents of script"
   script: String!
-  "Address of the bytecode storage contract for this script"
+  "Address of the bytecode storage contract for this script. Zero for a script served from the dependency's ABX FS file (see Dependency.abxfsFileCid), which has no bytecode storage contract of its own"
   address: Bytes!
 }
 
