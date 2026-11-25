@@ -461,16 +461,16 @@
   ],
   "iDependencyRegistryV0Contracts": [
     {
-      "address": "0xEFA7Ef074A6E90a99fba8bAd4dCf337ef298387f",
-      "name": "Sepolia staging dependency registry contract",
-      "startBlock": 4874684
+      "address": "0x5Fcc415BCFb164C5F826B5305274749BeB684e9b",
+      "name": "Sepolia dependency registry contract (read by the dev and staging generators)",
+      "startBlock": 4869157
     }
   ],
   "ownableUpgradeableDependencyRegistryContracts": [
     {
-      "address": "0xEFA7Ef074A6E90a99fba8bAd4dCf337ef298387f",
-      "name": "Sepolia staging dependency registry contract",
-      "startBlock": 4874684
+      "address": "0x5Fcc415BCFb164C5F826B5305274749BeB684e9b",
+      "name": "Sepolia dependency registry contract (read by the dev and staging generators)",
+      "startBlock": 4869157
     }
   ],
   "iSplitAtomicFactoryV0Contracts": [
